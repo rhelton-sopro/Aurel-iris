@@ -1,0 +1,38 @@
+{
+  "source_path": "D:/GDrive/iridologista/SPEC.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Aurel Iris — Especificação Técnica do MVP",
+  "summary": "Technical specification for Aurel Iris, a SaaS iridology platform with computer vision pipeline, LLM analysis, RAG knowledge base, schema, folder structure, and phased roadmap.",
+  "scope": [
+    "Next.js 15 frontend and API",
+    "Supabase Postgres with pgvector",
+    "Supabase Auth and Storage",
+    "Stripe payments (BRL/PIX)",
+    "Modal.com vision pipeline (Python/OpenCV)",
+    "Claude Sonnet 4.6 LLM analysis",
+    "Voyage AI embeddings (voyage-3)",
+    "Resend transactional email",
+    "PWA mobile capture (getUserMedia + MediaPipe)",
+    "Database schema (profiles, clients, readings, reading_images, knowledge_chunks, subscriptions)",
+    "RLS policies",
+    "Iridology vision feature extraction (constitution, sectors, rings, signs)",
+    "RAG ingestion and retrieval pipeline",
+    "Iridological report prompt structure",
+    "LGPD compliance for biometric/health data",
+    "MVP roadmap (Phase 0-8)"
+  ],
+  "cross_refs": [
+    "components/capture/IrisDetector.tsx",
+    "vision-service/modal_app.py",
+    "scripts/ingest-knowledge.ts",
+    "lib/rag/search.ts",
+    "prompts/system.md",
+    "prompts/feature-injection.md",
+    "lib/anthropic/analyze.ts"
+  ],
+  "locked": false,
+  "precedence": null,
+  "notes": ""
+}

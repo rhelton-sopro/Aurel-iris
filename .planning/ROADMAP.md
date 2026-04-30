@@ -1,0 +1,167 @@
+# Roadmap: Aurel Iris
+
+## Visão geral
+
+Aurel Iris é entregue em 9 fases que espelham o roadmap canônico do `SPEC.md` §7 ("Roadmap em Fases", Fase 0 → Fase 8). A jornada parte da infraestrutura (contas, schema, Next.js inicializado), constrói o esqueleto do consultório virtual (auth + clientes), abre as duas vias de entrada de imagem (PWA mobile com captura validada on-device + dropzone desktop), entrega o coração do produto (pipeline de visão Modal produzindo o JSON de features), monta a base de conhecimento iridológica indexada (RAG via Voyage + pgvector), produz a leitura propriamente dita (Claude Sonnet 4.6 ancorado em features e RAG) e finalmente fecha as bordas comerciais e legais (Stripe BR + LGPD) antes do polish e do gate de dogfooding pelo próprio fundador.
+
+A métrica de sucesso primária do MVP **não é** o lançamento beta com 10–20 terapeutas — é o uso semanal real do fundador (ele mesmo iridologista em exercício) em clientes verdadeiros sem cair de volta em notas manuais. Beta externo é Estágio 2, condicional ao Estágio 1.
+
+## Fases
+
+**Numeração:**
+- Fases inteiras (1, 2, …): trabalho planejado de milestone v1.
+- Fases decimais (2.1, 2.2): inserções urgentes (futuras), marcadas como INSERTED.
+
+A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção da ferramenta de planejamento. O mapeamento Fase v1 ↔ Fase SPEC está explícito em cada bloco.
+
+- [ ] **Fase 1: Setup** — Infraestrutura (contas, env vars, Next.js init, migration do schema).
+- [ ] **Fase 2: Auth + Dashboard básico** — Magic-link auth e CRUD de clientes do terapeuta.
+- [ ] **Fase 3: Captura mobile (PWA)** — App instalável com captura validada on-device de 3 ângulos × 2 olhos.
+- [ ] **Fase 4: Upload desktop** — Dropzone desktop produzindo a mesma estrutura de leitura.
+- [ ] **Fase 5: Pipeline de visão (Modal)** — Serviço Modal `analyze_iris` produzindo o JSON canônico de features.
+- [ ] **Fase 6: RAG — Ingestão da base de conhecimento** — Corpus iridológico chunked, embedded e indexado em pgvector.
+- [ ] **Fase 7: Análise LLM** — Relatório iridológico em pt-BR gerado por Claude Sonnet 4.6 ancorado em features + RAG.
+- [ ] **Fase 8: Pagamento + LGPD** — Stripe BR (BRL+PIX) com trial 14d e termo de consentimento + direitos LGPD.
+- [ ] **Fase 9: Polish + dogfooding + beta** — Onboarding, e-mail transacional, uso semanal real pelo fundador, depois beta com 10–20 terapeutas.
+
+## Detalhes das fases
+
+### Fase 1: Setup
+**Mapeamento SPEC:** Fase 0 — Setup (1–2 dias).
+**Goal**: Ambiente operacional pronto — contas conectadas, projeto Next.js 15 deployable, banco Supabase com schema completo (incluindo pgvector e RLS) aplicado.
+**Depends on**: Nada (primeira fase).
+**Requirements**: SETUP-01, SETUP-02, SETUP-03, SETUP-04
+**Success Criteria** (o que deve ser verdade):
+  1. `npm run dev` levanta o app Next.js localmente; deploy de teste na Vercel responde 200 em `/`.
+  2. Conexão ao Supabase a partir do app autenticado funciona, e `select * from clients limit 0` retorna a estrutura esperada (tabela existe com colunas e tipos do SPEC §3).
+  3. Índice HNSW em `knowledge_chunks(embedding) vector_cosine_ops` está criado e `vector(1024)` aceita inserts dummy.
+  4. Variáveis de ambiente para Supabase, Anthropic, Voyage, Modal, Stripe e Resend estão presentes em `.env.local` e em "Vercel → Environment Variables" (mesmo que vazias para serviços ainda não usados).
+  5. Tentativa de leitura cross-terapeuta (com dois `auth.uid()` distintos) é bloqueada por RLS.
+**Plans**: TBD
+
+### Fase 2: Auth + Dashboard básico
+**Mapeamento SPEC:** Fase 1 — Auth + Dashboard básico (2–3 dias).
+**Goal**: Terapeuta consegue criar conta, entrar com magic link, navegar pelo dashboard e gerenciar a própria carteira de clientes.
+**Depends on**: Fase 1.
+**Requirements**: AUTH-01, AUTH-02, AUTH-03, CLIENT-01, CLIENT-02, CLIENT-03
+**Success Criteria** (o que deve ser verdade):
+  1. Terapeuta novo recebe magic link no e-mail informado e completa login pela primeira vez.
+  2. Após login, sessão persiste em refresh do browser; tentativa de acessar `/dashboard` sem sessão redireciona para `/login`.
+  3. Terapeuta cadastra um cliente com nome, data de nascimento, gênero e notas; cliente aparece em `/clientes` apenas para esse terapeuta (RLS verificada com segunda conta).
+  4. Terapeuta consegue editar e ver a página de detalhe do cliente, e excluir um cliente apaga o registro respeitando cascade.
+  5. Registro em `profiles` do novo terapeuta tem `subscription_status='trial'` e `trial_ends_at` 14 dias à frente.
+**Plans**: TBD
+**UI hint**: yes
+
+### Fase 3: Captura mobile (PWA)
+**Mapeamento SPEC:** Fase 2 — Captura mobile / PWA (4–6 dias).
+**Goal**: Terapeuta consegue, no celular, instalar o PWA, abrir o fluxo de nova leitura e capturar 6 imagens (3 ângulos × 2 olhos) com qualidade gated por validação on-device, salvando tudo no bucket privado.
+**Depends on**: Fase 2.
+**Requirements**: CAPTURE-01, CAPTURE-02, CAPTURE-03, CAPTURE-04, CAPTURE-05, CAPTURE-06
+**Success Criteria** (o que deve ser verdade):
+  1. PWA instala em iOS Safari e Chrome Android (manifest + service worker funcionais; ícone na home screen).
+  2. Tela de captura usa câmera traseira; overlay circular guia o posicionamento do olho.
+  3. Feedback ao vivo aparece e muda conforme `QualityCheck` (mensagens tipo "aproxime mais", "muito reflexo", "ótima — capturando"); botão de captura só fica habilitado quando `overallScore >= 0.75`.
+  4. Fluxo guiado conduz a sequência exata `right/frontal → right/lateral → right/backlight → left/frontal → left/lateral → left/backlight` com instrução visual entre cada captura.
+  5. Ao final do fluxo, há 6 linhas em `reading_images` apontando para arquivos no Storage privado do terapeuta, com `eye`, `angle`, `storage_path`, `quality_score`, `width`, `height` preenchidos.
+**Plans**: TBD
+**UI hint**: yes
+
+### Fase 4: Upload desktop
+**Mapeamento SPEC:** Fase 3 — Upload desktop (1–2 dias).
+**Goal**: Terapeuta no desktop pode iniciar uma leitura subindo até 6 imagens já capturadas em câmera profissional, produzindo a mesma estrutura de armazenamento do fluxo mobile.
+**Depends on**: Fase 3 (depende da estrutura `reading_images` validada em produção via Fase 3, não da PWA em si).
+**Requirements**: UPLOAD-01, UPLOAD-02
+**Success Criteria** (o que deve ser verdade):
+  1. Em `/leituras/nova/upload`, dropzone aceita drag-and-drop de arquivos de imagem com preview por arquivo.
+  2. Validação rejeita arquivos não-imagem ou acima do limite definido, com mensagem clara em pt-BR.
+  3. Após submit, leitura criada tem `capture_method='desktop_upload'` e até 6 entradas em `reading_images` com `eye` e `angle` definidos pela UI de associação.
+  4. Mesmo bucket privado por terapeuta + URLs assinadas usados; nenhuma diferença observável a jusante (a Fase 5 consegue consumir leitura criada por upload desktop).
+**Plans**: TBD
+**UI hint**: yes
+
+### Fase 5: Pipeline de visão (Modal)
+**Mapeamento SPEC:** Fase 4 — Pipeline de visão / Modal (5–7 dias).
+**Goal**: Dada uma leitura com 6 imagens, o pipeline Modal produz o JSON canônico de features (SPEC §4.3) e o grava em `readings.vision_features`.
+**Depends on**: Fase 3 e Fase 4 (precisa de leituras com imagens populadas).
+**Requirements**: VISION-01, VISION-02, VISION-03, VISION-04
+**Success Criteria** (o que deve ser verdade):
+  1. Endpoint Modal `analyze_iris(reading_id, image_urls)` aceita o contrato de entrada (lista de `{eye, angle, url}`) e roda no GPU T4 dentro de 120s para uma leitura típica de 6 imagens.
+  2. As 6 etapas do pipeline (`detect → segment → compose → normalize → enhance → features`) executam na ordem e cada etapa tem teste mínimo (pelo menos um caso de regressão por etapa).
+  3. JSON retornado conforma o esquema do SPEC §4.3: `right_eye` e `left_eye` com `constitution`, `iris_color`, `fiber_density`, `collarette`, `pupil`, `sectors[]`, `rings`, `global_signs`, `image_quality`; mais `asymmetry_notes` e `processing_metadata` no topo.
+  4. Webhook callback do Modal valida HMAC, atualiza `readings.vision_features`, define `readings.status='ready'` (ou `failed` em erro) e preenche `processed_at`.
+  5. Trigger end-to-end: terapeuta finaliza captura/upload → `readings.status` transita `pending → processing → ready` sem intervenção manual; `vision_features` populado.
+**Plans**: TBD
+
+### Fase 6: RAG — Ingestão da base de conhecimento
+**Mapeamento SPEC:** Fase 5 — RAG ingestão (2–3 dias).
+**Goal**: Os PDFs seed (Jensen Vol. 1 + Battello Iridologia Clínica) estão chunked, embedded e indexados em `knowledge_chunks`, prontos para serem recuperados por `retrieveRelevantKnowledge`.
+**Depends on**: Fase 1 (precisa do `pgvector` e da tabela `knowledge_chunks` com índice HNSW).
+**Requirements**: RAG-01, RAG-02, RAG-03, RAG-04
+**Success Criteria** (o que deve ser verdade):
+  1. `scripts/ingest-knowledge.ts` rodado uma vez gera chunks com size ~500 tokens e overlap 80, respeitando prioridade `chapter → section → paragraph`; cada chunk tem 3–5 tags geradas pelo LLM.
+  2. `knowledge_chunks` tem registros para Jensen e Battello, com `source_book`, `source_chapter`, `source_page` e `metadata` (autor, escola, idioma) preenchidos.
+  3. Embeddings têm dimensão 1024 e foram inseridos via batches Voyage de até 128 textos sem erro de quota; custo total de indexação inicial ≤ ~US$ 25.
+  4. `retrieveRelevantKnowledge(features)` retorna até 30 chunks deduplicados (~15k tokens) em ≤ 3 segundos para uma `vision_features` típica, com queries derivadas de constituição, achados por setor (`findings.length > 0`) e sinais globais.
+  5. Spot-check: para uma feature simulada com `lacuna no setor 7 (fígado)`, os top-5 chunks retornados são reconhecidamente relevantes a fígado/lacuna em obras clássicas (validação pelo fundador).
+**Plans**: TBD
+
+### Fase 7: Análise LLM
+**Mapeamento SPEC:** Fase 6 — Análise LLM (3–5 dias).
+**Goal**: Dado um `readings.vision_features` populado, o sistema gera um relatório iridológico em pt-BR que respeita os 5 princípios do prompt-base e a estrutura de 13 seções, e o terapeuta pode editar antes de entregar.
+**Depends on**: Fase 5 (features) e Fase 6 (knowledge).
+**Requirements**: LLM-01, LLM-02, LLM-03, LLM-04
+**Success Criteria** (o que deve ser verdade):
+  1. Em `/leituras/[id]`, com a leitura `ready`, o terapeuta dispara "gerar análise" e o relatório aparece em streaming, totalmente em pt-BR, com as 13 seções numeradas (1. Constituição → 13. Mensagem Final).
+  2. Cada interpretação no relatório cita entre colchetes a feature do JSON que a ancora (`[ancorado em: features.X]`); auditoria automática rejeita relatórios em que > 5% das afirmações de seções 2–6 não tenham âncora.
+  3. Linguagem hipotética é respeitada: nenhuma ocorrência das frases proibidas ("o cliente tem", "diagnostica-se", "está doente de", "trauma confirmado aos X anos", e os termos "diagnóstico", "tratamento", "cura") em 10 relatórios de teste consecutivos sobre features distintas.
+  4. Disclaimer literal de encerramento (SPEC §6) aparece sempre, no fim de todo relatório.
+  5. Em `/leituras/[id]/editar`, terapeuta ajusta texto e salva — `ai_report_edited` é gravado e `status='edited'`; `ai_report_raw` permanece intacto para auditoria.
+**Plans**: TBD
+**UI hint**: yes
+
+### Fase 8: Pagamento + LGPD
+**Mapeamento SPEC:** Fase 7 — Pagamento + LGPD (3–4 dias).
+**Goal**: Terapeuta pode contratar um plano em BRL/PIX após o trial e cumpre os deveres LGPD (termo de consentimento por cliente, exclusão cascateada, logs de acesso, copy obrigatória, vocabulário auditado).
+**Depends on**: Fase 7 (faz sentido cobrar quando o produto entrega análise).
+**Requirements**: BILLING-01, BILLING-02, BILLING-03, LGPD-01, LGPD-02, LGPD-03, LGPD-04, LGPD-05, LGPD-06
+**Success Criteria** (o que deve ser verdade):
+  1. Em `/assinatura`, terapeuta escolhe um dos três tiers (Starter R$ 89, Profissional R$ 189, Escola R$ 490) e completa checkout Stripe BR via cartão **ou** PIX; webhook atualiza `profiles.subscription_status` e `subscriptions` em ≤ 1 min.
+  2. Após `trial_ends_at` vencer sem assinatura, middleware bloqueia disparo de novas análises (`POST /api/readings/[id]/process` retorna 402/403 com link para `/assinatura`); leituras já geradas continuam visíveis.
+  3. Tentativa de criar leitura para cliente sem `consent_signed_at` é bloqueada na UI; fluxo "gerar termo" produz PDF assinável (DocuSeal/Clicksign), e após assinatura `consent_document_url` e `consent_signed_at` são preenchidos.
+  4. Botão "deletar dados" na página do cliente, após confirmação explícita, apaga em cascata o cliente, suas leituras, suas imagens (Storage incluso) e o termo de consentimento; auditoria sql confirma 0 órfãos.
+  5. Cada GET de imagem em Storage por terapeuta gera linha de log de auditoria; spot-check confirma `reading_image.id`, `therapist_id` e timestamp registrados.
+  6. Auditoria de vocabulário (script + revisão manual) confirma ausência de "diagnóstico", "tratamento", "cura" nas superfícies do produto (UI, prompts, relatórios), com exceção de páginas de política que as citam para negá-las; copy obrigatória "ferramenta de apoio à anamnese terapêutica integrativa, não substitui avaliação médica" aparece em landing, cabeçalho do relatório e rodapé legal.
+**Plans**: TBD
+**UI hint**: yes
+
+### Fase 9: Polish + dogfooding + beta
+**Mapeamento SPEC:** Fase 8 — Polish + beta fechado (1 semana).
+**Goal**: Aurel Iris é polido o suficiente para o fundador usar em consultas reais semanalmente; e, após esse gate, é distribuído para 5 terapeutas internos seguidos de 10–20 selecionados.
+**Depends on**: Fase 8 (precisa de cobrança e LGPD em pé antes de qualquer rollout externo).
+**Requirements**: ONBOARD-01, ONBOARD-02, ONBOARD-03, ONBOARD-04, ONBOARD-05
+**Success Criteria** (o que deve ser verdade):
+  1. Terapeuta novo conclui onboarding em 3 passos (perfil → primeiro cliente → primeira leitura demo) e métricas de onboarding registram conclusão; tempo mediano até primeira leitura real ≤ 30 minutos.
+  2. E-mails transacionais via Resend chegam em sandbox e em produção: confirmação de signup, recibo de pagamento Stripe, "leitura pronta" com link assinado, e exportação solicitada.
+  3. Página pública de apresentação está no ar com posicionamento LGPD-compliant ("ferramenta de apoio à anamnese...") e nenhum vocabulário proibido.
+  4. **Gate de Estágio 1 (dogfooding):** o fundador, terapeuta iridologista em exercício, usou Aurel Iris **semanalmente em pelo menos 3 clientes reais por 3 semanas consecutivas** sem recorrer a notas manuais paralelas; o backlog de ajustes de prompt/UX foi alimentado por essa experiência e os bloqueadores foram resolvidos antes do gate.
+  5. **Gate de Estágio 2 (beta externo, só após Estágio 1 fechado):** 5 terapeutas internos completaram pelo menos 1 leitura real cada e deram feedback estruturado; rollout para 10–20 terapeutas selecionados está agendado com checklist de revisão jurídica de healthtech (~R$ 2–4k) executado.
+**Plans**: TBD
+**UI hint**: yes
+
+## Progresso
+
+**Ordem de execução:**
+Fases executam em ordem numérica: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9.
+
+| Fase | Plans concluídos | Status | Concluída em |
+|-------|------------------|--------|--------------|
+| 1. Setup | 0/TBD | Não iniciada | — |
+| 2. Auth + Dashboard básico | 0/TBD | Não iniciada | — |
+| 3. Captura mobile (PWA) | 0/TBD | Não iniciada | — |
+| 4. Upload desktop | 0/TBD | Não iniciada | — |
+| 5. Pipeline de visão (Modal) | 0/TBD | Não iniciada | — |
+| 6. RAG — Ingestão | 0/TBD | Não iniciada | — |
+| 7. Análise LLM | 0/TBD | Não iniciada | — |
+| 8. Pagamento + LGPD | 0/TBD | Não iniciada | — |
+| 9. Polish + dogfooding + beta | 0/TBD | Não iniciada | — |
