@@ -12,7 +12,7 @@ Ambiente operacional pronto para que as fases subsequentes (Auth, Captura, Visio
 - Projeto Next.js 15 (App Router, TypeScript, Tailwind, shadcn/ui) instalado, rodando local (`pnpm dev`) e deployado em preview na Vercel (região `gru1`).
 - Projeto Supabase provisionado em `sa-east-1` (São Paulo), com `pgvector` habilitado, schema completo do SPEC §3 aplicado via Supabase CLI (migrations versionadas em `supabase/migrations/`), índice HNSW em `knowledge_chunks(embedding) vector_cosine_ops`, e RLS habilitada nas tabelas sensíveis com policies-base do SPEC §3.
 - Variáveis de ambiente para Vercel, Supabase, Anthropic, Voyage, Modal, Stripe e Resend cadastradas em `.env.local` e em "Vercel → Environment Variables" (mesmo que vazias para serviços que entram só em fases posteriores).
-- Teste E2E mínimo demonstrando: (a) `pnpm dev` levanta o app; (b) cliente Supabase autenticado consegue `select 0 from clients`; (c) tentativa cross-terapeuta com dois `auth.uid()` distintos é bloqueada por RLS; (d) insert dummy de `vector(1024)` em `knowledge_chunks` aceito.
+- Teste E2E mínimo demonstrando: (a) `pnpm dev` levanta o app; (b) migration aplicada no Supabase remoto (verificada via `supabase migration list --linked`); (c) tentativa cross-terapeuta com dois `auth.uid()` distintos é bloqueada por RLS; (d) insert dummy de `vector(1024)` em `knowledge_chunks` aceito.
 
 **Fora do escopo desta fase:**
 - Qualquer página de UI além das default geradas pelo `create-next-app`.

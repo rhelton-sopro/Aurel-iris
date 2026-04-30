@@ -33,11 +33,16 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
 **Requirements**: SETUP-01, SETUP-02, SETUP-03, SETUP-04
 **Success Criteria** (o que deve ser verdade):
   1. `npm run dev` levanta o app Next.js localmente; deploy de teste na Vercel responde 200 em `/`.
-  2. Conexão ao Supabase a partir do app autenticado funciona, e `select * from clients limit 0` retorna a estrutura esperada (tabela existe com colunas e tipos do SPEC §3).
-  3. Índice HNSW em `knowledge_chunks(embedding) vector_cosine_ops` está criado e `vector(1024)` aceita inserts dummy.
-  4. Variáveis de ambiente para Supabase, Anthropic, Voyage, Modal, Stripe e Resend estão presentes em `.env.local` e em "Vercel → Environment Variables" (mesmo que vazias para serviços ainda não usados).
-  5. Tentativa de leitura cross-terapeuta (com dois `auth.uid()` distintos) é bloqueada por RLS.
-**Plans**: TBD
+  2. Índice HNSW em `knowledge_chunks(embedding) vector_cosine_ops` está criado e `vector(1024)` aceita inserts dummy.
+  3. Variáveis de ambiente para Supabase, Anthropic, Voyage, Modal, Stripe e Resend estão presentes em `.env.local` e em "Vercel → Environment Variables" (mesmo que vazias para serviços ainda não usados).
+  4. Tentativa de leitura cross-terapeuta (com dois `auth.uid()` distintos) é bloqueada por RLS.
+**Plans:** 6 plans
+- [ ] 01-01-PLAN.md — Repo + Next.js 15 scaffold (apps/web/) com Tailwind + shadcn/ui (Wave 1).
+- [ ] 01-02-PLAN.md — vision-service/ Python skeleton (Modal app + pipeline/ stubs) (Wave 1).
+- [ ] 01-03-PLAN.md — supabase init + migration 0001 com schema SPEC §3 + link projeto remoto sa-east-1 (Wave 2).
+- [ ] 01-04-PLAN.md — [BLOCKING] supabase db push --linked + apps/web/types/database.ts (Wave 3).
+- [ ] 01-05-PLAN.md — Teste SQL de RLS cross-terapeuta executado contra remoto (Wave 4).
+- [ ] 01-06-PLAN.md — .env.example (11 chaves D-11) + vercel.json gru1 + Vercel deploy preview (Wave 4).
 
 ### Fase 2: Auth + Dashboard básico
 **Mapeamento SPEC:** Fase 1 — Auth + Dashboard básico (2–3 dias).
@@ -50,6 +55,7 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
   3. Terapeuta cadastra um cliente com nome, data de nascimento, gênero e notas; cliente aparece em `/clientes` apenas para esse terapeuta (RLS verificada com segunda conta).
   4. Terapeuta consegue editar e ver a página de detalhe do cliente, e excluir um cliente apaga o registro respeitando cascade.
   5. Registro em `profiles` do novo terapeuta tem `subscription_status='trial'` e `trial_ends_at` 14 dias à frente.
+  6. Cliente Supabase autenticado (server + browser) consegue executar queries no banco; rota smoke `/api/health/db` retorna 200 com `count(*) from clients` da sessão do terapeuta logado.
 **Plans**: TBD
 **UI hint**: yes
 
