@@ -10,9 +10,9 @@ Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 ## Posição atual
 
 Fase: 1 de 9 (Setup)
-Plan: 0 de TBD na fase atual
-Status: Pronto para planejar (`/gsd-plan-phase 1`)
-Última atividade: 2026-04-30 — bootstrap do `.planning/` a partir da síntese do `SPEC.md`.
+Plan: 0 de 6 na fase atual
+Status: Pronto para executar (`/gsd-execute-phase 1`)
+Última atividade: 2026-04-30 — Fase 1 planejada (6 planos, 4 waves) e verificada após 1 ciclo de revisão.
 
 Progresso: [░░░░░░░░░░] 0%
 
@@ -67,5 +67,5 @@ Nenhum (bootstrap inicial, sem milestone anterior).
 ## Continuidade de sessão
 
 Última sessão: 2026-04-30
-Parou em: bootstrap do `.planning/` (PROJECT.md, REQUIREMENTS.md, ROADMAP.md, STATE.md) a partir da síntese do `SPEC.md` via doc-ingest.
-Arquivo de retomada: nenhum — próxima ação é `/gsd-plan-phase 1`.
+Parou em: Fase 1 planejada — 6 planos em 4 waves (1: scaffold web+vision; 2: supabase init+migration+link; 3: BLOCKING db push+types; 4: RLS test remoto + Vercel deploy). Revisão 1× resolveu 2 blockers + 4 warnings (deferimento do critério `select autenticado` para Fase 2; correções em verify chains, RLS test methodology, wave deps).
+Arquivo de retomada: `.planning/phases/01-setup/` — próxima ação é `/gsd-execute-phase 1`.
