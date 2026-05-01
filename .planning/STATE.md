@@ -1,3 +1,17 @@
+---
+gsd_state_version: 1.0
+milestone: v1.0
+milestone_name: milestone
+status: executing
+last_updated: "2026-05-01T11:34:19.832Z"
+progress:
+  total_phases: 2
+  completed_phases: 1
+  total_plans: 10
+  completed_plans: 6
+  percent: 60
+---
+
 # Estado do projeto
 
 ## Referência ao projeto
@@ -11,7 +25,7 @@ Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 
 Fase: 2 de 9 (Auth + Dashboard básico)
 Plan: 0 de 4 na fase atual
-Status: Fase 2 planejada. Pronto para `/gsd-execute-phase 2`.
+Status: Executing Phase 02
 Última atividade: 2026-05-01 — Fase 2 planejada: 4 plans em 4 waves (Supabase Auth infra → Auth pages → Dashboard layout → CRUD clientes + smoke test).
 
 Progresso: [█░░░░░░░░░] 11% (1/9 fases)
@@ -19,6 +33,7 @@ Progresso: [█░░░░░░░░░] 11% (1/9 fases)
 ## Métricas de performance
 
 **Velocidade:**
+
 - Total de plans concluídos: 6
 - Duração média: ~12 min/plan (incluindo descoberta+fix de bug de grants e 3 iterações de vercel.json)
 - Tempo total de execução: ~75 min de Wave 1 ao deploy production
@@ -30,6 +45,7 @@ Progresso: [█░░░░░░░░░] 11% (1/9 fases)
 | 1 — Setup | 6 | ~75 min | ~12 min |
 
 **Tendência recente:**
+
 - Últimos 5 plans: —
 - Tendência: — (sem amostra ainda)
 
