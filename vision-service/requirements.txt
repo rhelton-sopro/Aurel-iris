@@ -1,0 +1,12 @@
+# Core deps from SPEC §4.2 (Modal vision pipeline)
+opencv-python-headless>=4.10.0
+numpy>=1.26.0
+scikit-image>=0.24.0
+mediapipe>=0.10.14
+torch>=2.4.0
+torchvision>=0.19.0
+Pillow>=10.4.0
+supabase>=2.7.0
+
+# Modal SDK (deploy/test). Phase 5 will pin the version.
+modal>=0.64.0
