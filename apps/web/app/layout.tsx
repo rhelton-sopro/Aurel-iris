@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -14,15 +14,27 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Aurel Iris",
-  description:
-    "Ferramenta de apoio à anamnese terapêutica integrativa.",
+  description: "Ferramenta de apoio à anamnese terapêutica integrativa.",
+  applicationName: "Aurel Iris",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Aurel Iris",
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
+  themeColor: "#000000",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt-BR">
       <body
