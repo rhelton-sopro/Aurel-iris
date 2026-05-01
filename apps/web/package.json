@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "gen:types": "echo 'use plan 1.4 supabase gen types command' && exit 1"
+    "gen:types": "supabase gen types typescript --linked --schema public > types/database.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
