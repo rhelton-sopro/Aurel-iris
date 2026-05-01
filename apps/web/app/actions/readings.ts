@@ -3,21 +3,12 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { z } from 'zod'
+import {
+  createReadingSchema,
+  readingIdSchema,
+} from './readings.schemas'
 
-// Zod v4: usar .min(1, msg) não { required_error: msg }. Schemas exportados para reutilização nos testes.
-export const createReadingSchema = z.object({
-  client_id: z.string().uuid('client_id inválido'),
-})
-
-export const readingIdSchema = z.object({
-  reading_id: z.string().uuid('reading_id inválido'),
-})
-
-export type ReadingFormState = {
-  error?: Record<string, string[]> | string | null
-  readingId?: string
-}
+export type { ReadingFormState, DraftReading } from './readings.schemas'
 
 /**
  * Cria um reading com status='pending', capture_method='mobile_camera'.
@@ -143,13 +134,6 @@ export async function discardReadingAction(
   return {}
 }
 
-export type DraftReading = {
-  id: string
-  created_at: string
-  client_id: string
-  client_name: string
-  imagesCaptured: number
-}
 
 /**
  * Retorna o rascunho mais recente do terapeuta (CONTEXT D-12 — recovery banner).

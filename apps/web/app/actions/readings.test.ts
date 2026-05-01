@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { createReadingSchema, readingIdSchema } from './readings'
+import { createReadingSchema, readingIdSchema } from './readings.schemas'
 
 // UUIDs válidos RFC 9562 (v4): 3o bloco começa com 4, 4o bloco começa com 8/9/a/b
 // Zod v4 usa regex RFC estrita — UUIDs sintéticos como 1111..1111 são rejeitados.
