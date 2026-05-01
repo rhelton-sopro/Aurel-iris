@@ -12,5 +12,8 @@
     "start": "pnpm --filter web start",
     "lint": "pnpm --filter web lint",
     "type-check": "pnpm --filter web exec tsc --noEmit"
+  },
+  "devDependencies": {
+    "pg": "^8.20.0"
   }
 }
