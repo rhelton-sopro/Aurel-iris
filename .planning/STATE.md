@@ -10,9 +10,9 @@ Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 ## Posição atual
 
 Fase: 2 de 9 (Auth + Dashboard básico)
-Plan: 0 de TBD na fase atual
-Status: Fase 2 contexto capturado. Pronto para `/gsd-plan-phase 2`.
-Última atividade: 2026-05-01 — Fase 2 contexto discutido e capturado em 02-CONTEXT.md. Áreas: Fluxo Auth, SMTP Resend, Layout do dashboard.
+Plan: 0 de 4 na fase atual
+Status: Fase 2 planejada. Pronto para `/gsd-execute-phase 2`.
+Última atividade: 2026-05-01 — Fase 2 planejada: 4 plans em 4 waves (Supabase Auth infra → Auth pages → Dashboard layout → CRUD clientes + smoke test).
 
 Progresso: [█░░░░░░░░░] 11% (1/9 fases)
 
