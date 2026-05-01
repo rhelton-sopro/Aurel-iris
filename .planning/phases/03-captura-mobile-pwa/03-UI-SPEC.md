@@ -105,7 +105,7 @@ Tipografia mínima: 4 tamanhos × 2 pesos = 8 combinações. Line-height padrão
 
 **Pesos disponíveis:** **400 (regular)** e **600 (semibold)** — apenas dois. Sem `font-bold` (700) nesta fase para evitar peso visual dominando o conteúdo da câmera.
 
-**Live feedback (`LiveFeedbackMessage`):** usa `text-base` 16px / 400 / 1.4 com `font-medium` (500) opcional para destaque sutil. Cor sempre branca em fundo `bg-black/60` para legibilidade outdoor.
+**Live feedback (`LiveFeedbackMessage`):** usa `text-base` 16px / 400 / 1.4 (regular). Para destaque pontual, usar `font-semibold` (600) — sem peso intermediário. Cor sempre branca em fundo `bg-black/60` para legibilidade outdoor.
 
 ---
 
