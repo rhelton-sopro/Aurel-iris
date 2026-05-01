@@ -100,22 +100,20 @@ function FormLabel({
   )
 }
 
-function FormControl({ ...props }: React.HTMLAttributes<HTMLDivElement>) {
+function FormControl({ children, ...props }: React.HTMLAttributes<HTMLElement>) {
   const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
 
-  return (
-    <div
-      data-slot="form-control"
-      id={formItemId}
-      aria-describedby={
-        !error
-          ? `${formDescriptionId}`
-          : `${formDescriptionId} ${formMessageId}`
-      }
-      aria-invalid={!!error}
-      {...props}
-    />
-  )
+  // Pass accessibility attributes to the single child element
+  const child = React.Children.only(children) as React.ReactElement<Record<string, unknown>>
+  return React.cloneElement(child, {
+    id: formItemId,
+    'aria-describedby': !error
+      ? `${formDescriptionId}`
+      : `${formDescriptionId} ${formMessageId}`,
+    'aria-invalid': !!error || undefined,
+    ...(child.props as object),
+    ...props,
+  })
 }
 
 function FormDescription({
