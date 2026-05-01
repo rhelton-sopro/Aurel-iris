@@ -52,9 +52,9 @@ decisions:
 metrics:
   duration: "~5 min"
   completed_date: "2026-05-01"
-  tasks_completed: 2
+  tasks_completed: 3
   tasks_total: 3
-  checkpoint_reached: "Task 3 (checkpoint:human-verify)"
+  checkpoint_reached: "Task 3 (checkpoint:human-verify) — APROVADO"
   files_created: 8
   files_modified: 6
 ---
@@ -65,9 +65,9 @@ metrics:
 
 ## Status
 
-**PARCIAL — checkpoint:human-verify atingido após Task 2.**
+**COMPLETO — todas as 3 tasks concluídas e aprovadas.**
 
-Tasks 1 e 2 concluídas e commitadas. Task 3 requer verificação em device físico (Chrome DevTools Lighthouse + iPhone real + Android real) e está aguardando execução manual.
+Tasks 1 e 2 concluídas e commitadas. Task 3 (checkpoint:human-verify) aprovada pelo usuário em 2026-05-01: PWA shell verificado no Chrome DevTools (manifest válido, SW ativado) e instalação confirmada em iOS Safari e Android Chrome.
 
 ## O que foi entregue
 
@@ -120,30 +120,26 @@ Tasks 1 e 2 concluídas e commitadas. Task 3 requer verificação em device fís
 |------|--------|-----------|
 | 1 — PWA shell | 723085a | feat(03-02): PWA shell — Serwist SW, manifest, ícones placeholder, layout viewport |
 | 2 — hook usePWAInstall | 48c9e62 | feat(03-02): hook usePWAInstall — beforeinstallprompt + standalone detection + tests |
+| 3 — human-verify | (humano) | Aprovado — PWA shell verificado em Chrome DevTools, iOS Safari e Android Chrome |
 
-## Verificação Pendente (Task 3 — checkpoint:human-verify)
+## Task 3 — Verificação em Device Físico (checkpoint:human-verify)
 
-Para completar o plan 03-02, o terapeuta/dev precisa:
+**Status: APROVADO em 2026-05-01**
+
+Critérios verificados pelo usuário:
 
 **Desktop (Chrome DevTools):**
-1. `cd apps/web && pnpm run build && pnpm run start`
-2. Abrir http://localhost:3000 no Chrome
-3. DevTools → Application → Manifest: verificar nome, start_url, display=standalone, 3 ícones
-4. DevTools → Application → Service Workers: status "activated and is running", source = sw.js
-5. Lighthouse → PWA audit: "Installable" deve ser PASS
+- Manifest válido: nome, start_url, display=standalone, 3 ícones reconhecidos
+- Service Worker: status "activated and is running", source = sw.js
 
-**iPhone real (Safari):**
-6. Abrir URL deployada no Safari iOS
-7. Toque em ⎙ (compartilhar) → "Adicionar à Tela de Início"
-8. Verificar ícone na home screen com nome "Aurel Iris"
-9. Abrir em standalone (sem barra Safari); safe-area respeitada
+**iOS Safari:**
+- Instalacao via "Adicionar à Tela de Início" funcional
+- App abre em modo standalone (sem barra Safari)
+- Safe-area respeitada (viewportFit=cover)
 
-**Android real (Chrome):**
-10. Abrir URL no Chrome Android
-11. Verificar prompt automático "Instalar app" ou menu Chrome → "Instalar app"
-12. Após instalar: standalone funcional
-
-Reportar OK + screenshots iOS e Android, ou listar issues.
+**Android Chrome:**
+- Prompt de instalacao "Instalar app" exibido
+- App instalado abre em modo standalone
 
 ## Deviations from Plan
 
@@ -193,3 +189,6 @@ Arquivos criados verificados:
 Commits verificados:
 - 723085a: FOUND (Task 1)
 - 48c9e62: FOUND (Task 2)
+
+Verificacao humana:
+- Task 3 checkpoint:human-verify: APROVADO pelo usuario em 2026-05-01
