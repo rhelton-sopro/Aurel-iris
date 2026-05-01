@@ -1,0 +1,3 @@
+-- supabase/seed.sql
+-- Dados de seed para desenvolvimento local (supabase db reset roda este arquivo).
+-- Phase 1: vazio. Phase 2+ pode adicionar perfis/clientes de demo.
