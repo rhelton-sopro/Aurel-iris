@@ -56,7 +56,11 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
   4. Terapeuta consegue editar e ver a página de detalhe do cliente, e excluir um cliente apaga o registro respeitando cascade.
   5. Registro em `profiles` do novo terapeuta tem `subscription_status='trial'` e `trial_ends_at` 14 dias à frente.
   6. Cliente Supabase autenticado (server + browser) consegue executar queries no banco; rota smoke `/api/health/db` retorna 200 com `count(*) from clients` da sessão do terapeuta logado.
-**Plans**: TBD
+**Plans:** 4 plans
+- [ ] 02-01-PLAN.md — Supabase Auth infra: lib/supabase/ clients, middleware.ts, /api/auth/callback, migration 0003 + [BLOCKING] supabase db push --linked, Resend SMTP config, NEXT_PUBLIC_SITE_URL (Wave 1)
+- [ ] 02-02-PLAN.md — Auth pages: (auth)/layout.tsx, signup/page.tsx, login/page.tsx + shadcn: input label form card toast (Wave 2)
+- [ ] 02-03-PLAN.md — Dashboard layout: (dashboard)/layout.tsx, app-sidebar.tsx, dashboard-header.tsx, summary-cards.tsx, /dashboard/page.tsx, /leituras/page.tsx + shadcn: sidebar avatar badge dropdown-menu separator (Wave 3)
+- [ ] 02-04-PLAN.md — CRUD de clientes + smoke test: clients.ts actions, clientes/page.tsx, clients-table.tsx, clientes/novo, clientes/[id], clientes/[id]/editar, delete-client-dialog.tsx, /api/health/db + shadcn: table dialog select textarea skeleton (Wave 4)
 **UI hint**: yes
 
 ### Fase 3: Captura mobile (PWA)
@@ -163,7 +167,7 @@ Fases executam em ordem numérica: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 �
 | Fase | Plans concluídos | Status | Concluída em |
 |-------|------------------|--------|--------------|
 | 1. Setup | 0/TBD | Não iniciada | — |
-| 2. Auth + Dashboard básico | 0/TBD | Não iniciada | — |
+| 2. Auth + Dashboard básico | 0/4 | Planejada | — |
 | 3. Captura mobile (PWA) | 0/TBD | Não iniciada | — |
 | 4. Upload desktop | 0/TBD | Não iniciada | — |
 | 5. Pipeline de visão (Modal) | 0/TBD | Não iniciada | — |
