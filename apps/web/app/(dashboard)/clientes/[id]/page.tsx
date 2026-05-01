@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { format } from 'date-fns'
 import { createClient } from '@/lib/supabase/server'
-import { Button, buttonVariants } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 const GENDER_LABELS: Record<string, string> = {
@@ -67,9 +67,12 @@ export default async function ClienteDetailPage({
           <p className="text-sm text-muted-foreground">
             As leituras de íris deste cliente aparecerão aqui.
           </p>
-          <Button disabled title="Disponível em breve">
+          <Link
+            href={`/leituras/nova?cliente=${client.id}`}
+            className={cn(buttonVariants())}
+          >
             Nova Leitura
-          </Button>
+          </Link>
         </div>
       </div>
     </div>
