@@ -20,6 +20,8 @@ const eslintConfig = [
       "next-env.d.ts",
       "public/sw.js",
       "public/swe-worker-*.js",
+      // MediaPipe WASM bundles — generated/compiled, not user code
+      "public/mediapipe/**",
     ],
   },
 ];
