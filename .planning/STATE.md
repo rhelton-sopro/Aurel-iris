@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-01T11:34:19.832Z"
+last_updated: "2026-05-01T14:50:00.000Z"
 progress:
-  total_phases: 2
+  total_phases: 3
   completed_phases: 1
-  total_plans: 10
+  total_plans: 18
   completed_plans: 6
-  percent: 60
+  percent: 33
 ---
 
 # Estado do projeto
@@ -19,16 +19,16 @@ progress:
 Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 
 **Valor central:** Cada cliente atendido produz um JSON de features genuinamente diferente, e por isso cada relatório é genuinamente diferente. Pipeline de visão objetivo + LLM ancorado em RAG é o coração do produto.
-**Foco atual:** Fase 2 — Auth + Dashboard básico.
+**Foco atual:** Fase 3 — Captura mobile (PWA), planejada e pronta para executar.
 
 ## Posição atual
 
-Fase: 2 de 9 (Auth + Dashboard básico)
-Plan: 0 de 4 na fase atual
-Status: Executing Phase 02
-Última atividade: 2026-05-01 — Fase 2 planejada: 4 plans em 4 waves (Supabase Auth infra → Auth pages → Dashboard layout → CRUD clientes + smoke test).
+Fase: 3 de 9 (Captura mobile / PWA)
+Plan: 0 de 8 na fase atual
+Status: Ready to execute Phase 03
+Última atividade: 2026-05-01 — Fase 3 planejada: 8 plans em 8 waves (Wave 0 vitest+migration → PWA shell → entry points → camera shell → MediaPipe core → sequência guiada → captura+upload → recovery+finalize).
 
-Progresso: [█░░░░░░░░░] 11% (1/9 fases)
+Progresso: [██░░░░░░░░] 11% (1/9 fases)
 
 ## Métricas de performance
 
@@ -71,7 +71,6 @@ Nenhum ainda.
 - **Sem ADRs ratificados:** as 21 constraints do SPEC (Next.js / Supabase / Modal / Sonnet 4.6 / Voyage / Stripe / Resend) estão como `locked: false`. Não bloqueia execução, mas qualquer plan-phase deve estar consciente de que pode formalmente re-decidir via ADR — particularmente antes da Fase 5 (Modal) e Fase 7 (LLM), onde a escolha tem maior impacto técnico.
 - **Revisão jurídica healthtech (~R$ 2–4k) recomendada antes de qualquer rollout externo na Fase 9.** Não é pré-requisito para dogfooding interno do fundador (Estágio 1), mas é gate para Estágio 2.
 - **Corpus RAG seed (Fase 6) depende de obter PDFs de Jensen Vol. 1 e Battello em pt** — verificar disponibilidade legal/licenciamento antes de ingerir.
-- **Database password apareceu no chat (2026-05-01):** durante execução do plan 01-05 (RLS test), `AurelIris123` foi colada em conversa. Rotacionar via Supabase Dashboard antes de qualquer dogfooding real (Estágio 1 do PROJECT.md). Atualizar `.env.local` (gitignored) e Vercel env `SUPABASE_SERVICE_ROLE_KEY` se rotacionar.
 
 ## Itens diferidos
 
@@ -84,5 +83,5 @@ Nenhum (bootstrap inicial, sem milestone anterior).
 ## Continuidade de sessão
 
 Última sessão: 2026-05-01
-Parou em: Fase 1 (Setup) **concluída**. Repo movido de D:/GDrive/iridologista para D:/Projetos/Iridologista. Monorepo pnpm com apps/web/ (Next.js 15 + shadcn/ui) e vision-service/ (Python skeleton). Supabase Aurel Iris em sa-east-1 (ref owgbrllpznsngrkvodyw) com schema do SPEC §3 + migration 0002 (grants para authenticated role) aplicado. RLS verificada cross-terapeuta no remoto via teste SQL idempotente em supabase/tests/. Deploy production verde em https://aurel-iris-web.vercel.app/ (Vercel gru1). 4 SETUP requirements (01..04) cobertos. Critério `select autenticado from clients` deferido pra Fase 2.
-Arquivo de retomada: `.planning/phases/02-auth-dashboard-basico/02-CONTEXT.md` — próxima ação é `/gsd-plan-phase 2`.
+Parou em: **Fase 3 (Captura mobile / PWA) planejada e pronta para executar**. 8 plans em 8 waves cobrindo todas as 6 CAPTURE requirements: Wave 0 (vitest + migration 0004 com bucket `iris-captures` privado + RLS folder + unique constraint reading_images) → Wave 1 (PWA shell com Serwist) → Wave 2 (server actions + entry pages) → Wave 3 (camera shell + useCamera + CameraDeniedScreen) → Wave 4 (MediaPipe FaceLandmarker lazy-loaded + 7 sub-scores + 400ms gate) → Wave 5 (sequência guiada 6 capturas) → Wave 6 (compressão JPEG 0.85/2048px + Storage upload) → Wave 7 (RecoveryBanner + PWAInstallBanner + finalize). Plan-checker passou com 5 warnings cosméticos (0 blockers). Stack novo: `@mediapipe/tasks-vision` 0.10.35 + `@serwist/next` 9.5.10 + `sonner` 2.0.7. Plans 03-04..03-08 são `autonomous: false` (UAT manual em iPhone+Android obrigatória). Note: Fase 2 ainda tem plans listados como concluídos no STATE histórico mas tracking real do execute precisa ser revisitado — esta sessão focou em Fase 3 plan only.
+Arquivo de retomada: `.planning/phases/03-captura-mobile-pwa/03-01-PLAN.md` — próxima ação é `/clear` + `/gsd-execute-phase 3`.

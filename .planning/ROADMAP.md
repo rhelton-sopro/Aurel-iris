@@ -74,7 +74,38 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
   3. Feedback ao vivo aparece e muda conforme `QualityCheck` (mensagens tipo "aproxime mais", "muito reflexo", "ótima — capturando"); botão de captura só fica habilitado quando `overallScore >= 0.75`.
   4. Fluxo guiado conduz a sequência exata `right/frontal → right/lateral → right/backlight → left/frontal → left/lateral → left/backlight` com instrução visual entre cada captura.
   5. Ao final do fluxo, há 6 linhas em `reading_images` apontando para arquivos no Storage privado do terapeuta, com `eye`, `angle`, `storage_path`, `quality_score`, `width`, `height` preenchidos.
-**Plans**: TBD
+**Plans:** 8 plans em 8 waves (sequência serial — cada wave depende da anterior)
+
+**Wave 0 — Infra**
+- [ ] 03-01-PLAN.md — vitest setup + scripts + migration 0004 (bucket iris-captures + RLS folder + unique constraint reading_images) + types regen + audit:vocabulary + storage_cross_therapist_rls.sql
+
+**Wave 1 — PWA shell** *(blocked on Wave 0)*
+- [ ] 03-02-PLAN.md — manifest.ts + Serwist SW + next.config + ícones placeholder + viewport + usePWAInstall hook
+
+**Wave 2 — Entry points** *(blocked on Wave 0)*
+- [ ] 03-03-PLAN.md — Server actions readings (create/finalize/discard + getDraftReading) + /leituras/nova select cliente + /leituras/nova/upload placeholder + ativar botão Nova Leitura em /clientes/[id]
+
+**Wave 3 — Camera shell** *(blocked on Wave 2)*
+- [ ] 03-04-PLAN.md — (capture) route group + page server-component + capture-client skeleton + useCamera + CameraView + CameraDeniedScreen (D-15)
+
+**Wave 4 — MediaPipe core** *(blocked on Wave 3)*
+- [ ] 03-05-PLAN.md — libs (iris-geometry, laplacian, exposure, quality-scoring) + assets em public/mediapipe/ + IrisDetector lazy-load + useIrisDetector + useQualityScore (400ms) + QualityIndicator + LiveFeedbackMessage
+
+**Wave 5 — Sequência guiada** *(blocked on Wave 4)*
+- [ ] 03-06-PLAN.md — sequence.ts + AngleIcon + AngleOverlay + AngleInterstitial + CaptureProgress + state machine completa
+
+**Wave 6 — Captura + upload** *(blocked on Wave 5)*
+- [ ] 03-07-PLAN.md — Compressão JPEG + storage-path + upload com retry + CapturePreview (2s + tap-to-redo D-09) + sonner toast + integração captura real no capture-client
+
+**Wave 7 — Recovery + finalize** *(blocked on Wave 6)*
+- [ ] 03-08-PLAN.md — RecoveryBanner (D-12) + listagem /leituras com rascunhos + PWAInstallBanner (D-14) + finalize do reading no 6º slot
+
+**Cross-cutting constraints (must_haves presentes em ≥2 plans):**
+- Vocabulário proibido LGPD ("diagnóstico", "tratamento", "cura") ausente em todos os arquivos novos (auditável via grep `pnpm audit:vocabulary`).
+- Storage path canônico `{therapist_id}/{reading_id}/{eye}_{angle}.jpg` consistente entre RLS folder policy (03-01) e upload (03-07).
+- RLS pattern `auth.uid() = therapist_id` em todas as queries de `readings` e `reading_images` (03-03, 03-07, 03-08).
+- MediaPipe carregado apenas via `next/dynamic({ ssr: false })` na rota `(capture)` — não vaza para bundle do `(dashboard)` (03-05, verificável em build output).
+
 **UI hint**: yes
 
 ### Fase 4: Upload desktop
@@ -168,7 +199,7 @@ Fases executam em ordem numérica: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 �
 |-------|------------------|--------|--------------|
 | 1. Setup | 0/TBD | Não iniciada | — |
 | 2. Auth + Dashboard básico | 0/4 | Planejada | — |
-| 3. Captura mobile (PWA) | 0/TBD | Não iniciada | — |
+| 3. Captura mobile (PWA) | 0/8 | Planejada | — |
 | 4. Upload desktop | 0/TBD | Não iniciada | — |
 | 5. Pipeline de visão (Modal) | 0/TBD | Não iniciada | — |
 | 6. RAG — Ingestão | 0/TBD | Não iniciada | — |
