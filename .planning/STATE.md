@@ -11,8 +11,8 @@ Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 
 Fase: 2 de 9 (Auth + Dashboard básico)
 Plan: 0 de TBD na fase atual
-Status: Fase 1 concluída. Pronto para `/gsd-discuss-phase 2`.
-Última atividade: 2026-05-01 — Fase 1 (Setup) executada e completa. 6/6 plans, 4 waves, deploy production verde em https://aurel-iris-web.vercel.app/. SETUP-01..04 todos cobertos.
+Status: Fase 2 contexto capturado. Pronto para `/gsd-plan-phase 2`.
+Última atividade: 2026-05-01 — Fase 2 contexto discutido e capturado em 02-CONTEXT.md. Áreas: Fluxo Auth, SMTP Resend, Layout do dashboard.
 
 Progresso: [█░░░░░░░░░] 11% (1/9 fases)
 
@@ -69,4 +69,4 @@ Nenhum (bootstrap inicial, sem milestone anterior).
 
 Última sessão: 2026-05-01
 Parou em: Fase 1 (Setup) **concluída**. Repo movido de D:/GDrive/iridologista para D:/Projetos/Iridologista. Monorepo pnpm com apps/web/ (Next.js 15 + shadcn/ui) e vision-service/ (Python skeleton). Supabase Aurel Iris em sa-east-1 (ref owgbrllpznsngrkvodyw) com schema do SPEC §3 + migration 0002 (grants para authenticated role) aplicado. RLS verificada cross-terapeuta no remoto via teste SQL idempotente em supabase/tests/. Deploy production verde em https://aurel-iris-web.vercel.app/ (Vercel gru1). 4 SETUP requirements (01..04) cobertos. Critério `select autenticado from clients` deferido pra Fase 2.
-Arquivo de retomada: `.planning/phases/01-setup/` — próxima ação é `/gsd-discuss-phase 2`.
+Arquivo de retomada: `.planning/phases/02-auth-dashboard-basico/02-CONTEXT.md` — próxima ação é `/gsd-plan-phase 2`.
