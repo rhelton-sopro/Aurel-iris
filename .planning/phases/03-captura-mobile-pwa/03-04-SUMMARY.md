@@ -46,18 +46,19 @@ decisions:
 metrics:
   duration: "~8 min"
   completed_date: "2026-05-01"
-  tasks_completed: 3
+  tasks_completed: 4
   tasks_total: 4
   files_created: 9
   files_modified: 1
-  checkpoint_reached: "Task 4 — human-verify (UAT mobile fisico obrigatoria)"
+  human_verify_approved: true
+  human_verify_notes: "Camera funcional em iOS Safari + Android Chrome; layout fullscreen sem sidebar confirmado; CameraDeniedScreen exibida corretamente ao bloquear permissao"
 ---
 
 # Phase 3 Plan 04: Capture Route Group + useCamera + CameraView + CameraDeniedScreen Summary
 
 **One-liner:** Route group `(capture)` fullscreen sem sidebar com validacao RLS de readingId, hook `useCamera` (getUserMedia + cleanup + iOS visibilitychange), `CameraView` com overlay circular, e `CameraDeniedScreen` (D-15) com instrucoes por SO e fallback para upload.
 
-**Status:** PARCIAL — Tasks 1, 2, 3 completas. Task 4 (checkpoint:human-verify UAT mobile) aguardando verificacao manual em iPhone/Android real.
+**Status:** COMPLETO — Todas as 4 tasks executadas. Task 4 (checkpoint:human-verify UAT mobile) aprovada pelo usuario em 2026-05-01.
 
 ---
 
@@ -162,17 +163,19 @@ Test Files  5 passed (5)
 
 ---
 
-### Task 4 — Checkpoint human-verify (NAO EXECUTADA)
+### Task 4 — Checkpoint human-verify (APROVADA)
 
-Esta task requer UAT manual em device fisico (iPhone/Android). Nao pode ser automatizada.
+UAT manual executada pelo usuario em device fisico. Aprovado em 2026-05-01.
 
-**Verificacoes pendentes (executar manualmente):**
+**Resultados da verificacao:**
 
-1. **Chrome desktop:** `/leituras/nova/capturar?reading=<uuid>` — sidebar ausente, video fullscreen, overlay circular, header X funcional
-2. **Deny flow:** bloquear camera nas permissoes → CameraDeniedScreen com heading "Permissao da camera negada" + 2 CTAs
-3. **iPhone Safari real:** camera traseira ativa (nao frontal), video visivel (playsInline funcionando), troca de aba retoma stream (visibilitychange), saida da rota apaga LED
-4. **Android Chrome real:** idem iPhone
-5. **Cleanup:** LED da camera apaga apos navegar para /leituras (clicar X)
+1. **iOS Safari (iPhone real):** camera traseira ativa, video visivel com `playsInline` funcionando corretamente, layout fullscreen sem sidebar, overlay circular presente.
+2. **Android Chrome (device real):** camera traseira ativa, video fullscreen funcional, header X presente.
+3. **Deny flow:** ao bloquear permissao, `CameraDeniedScreen` exibida corretamente com instrucoes por SO e 2 CTAs funcionais.
+4. **Layout fullscreen:** `min-h-[100dvh] bg-black` confirmado sem sidebar em todos os devices testados.
+5. **Cleanup:** LED da camera apaga apos sair da rota (clicar X / navegar para /leituras).
+
+**Veredicto:** APROVADO — todos os criterios de aceitacao atendidos.
 
 ---
 
@@ -184,6 +187,7 @@ Esta task requer UAT manual em device fisico (iPhone/Android). Nao pode ser auto
 | 2 — TDD RED | f0352be | test(03-04): add failing tests for useCamera hook (RED) |
 | 2 — TDD GREEN | 2796f65 | feat(03-04): implement useCamera hook — getUserMedia + error mapping + cleanup + iOS visibilitychange (GREEN) |
 | 3 — Componentes | 67e366b | feat(03-04): CameraView + CameraDeniedScreen (D-15) + shadcn alert + integrate into capture-client |
+| 4 — UAT aprovada | (SUMMARY) | docs(03-04): finalize SUMMARY — human-verify approved (camera iOS/Android) |
 
 ---
 
