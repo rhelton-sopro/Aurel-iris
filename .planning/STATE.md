@@ -5,29 +5,29 @@
 Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 
 **Valor central:** Cada cliente atendido produz um JSON de features genuinamente diferente, e por isso cada relatório é genuinamente diferente. Pipeline de visão objetivo + LLM ancorado em RAG é o coração do produto.
-**Foco atual:** Fase 1 — Setup.
+**Foco atual:** Fase 2 — Auth + Dashboard básico.
 
 ## Posição atual
 
-Fase: 1 de 9 (Setup)
-Plan: 0 de 6 na fase atual
-Status: Pronto para executar (`/gsd-execute-phase 1`)
-Última atividade: 2026-04-30 — Fase 1 planejada (6 planos, 4 waves) e verificada após 1 ciclo de revisão.
+Fase: 2 de 9 (Auth + Dashboard básico)
+Plan: 0 de TBD na fase atual
+Status: Fase 1 concluída. Pronto para `/gsd-discuss-phase 2`.
+Última atividade: 2026-05-01 — Fase 1 (Setup) executada e completa. 6/6 plans, 4 waves, deploy production verde em https://aurel-iris-web.vercel.app/. SETUP-01..04 todos cobertos.
 
-Progresso: [░░░░░░░░░░] 0%
+Progresso: [█░░░░░░░░░] 11% (1/9 fases)
 
 ## Métricas de performance
 
 **Velocidade:**
-- Total de plans concluídos: 0
-- Duração média: —
-- Tempo total de execução: —
+- Total de plans concluídos: 6
+- Duração média: ~12 min/plan (incluindo descoberta+fix de bug de grants e 3 iterações de vercel.json)
+- Tempo total de execução: ~75 min de Wave 1 ao deploy production
 
 **Por fase:**
 
 | Fase | Plans | Total | Média/plan |
 |-------|-------|-------|------------|
-| — | — | — | — |
+| 1 — Setup | 6 | ~75 min | ~12 min |
 
 **Tendência recente:**
 - Últimos 5 plans: —
@@ -55,6 +55,7 @@ Nenhum ainda.
 - **Sem ADRs ratificados:** as 21 constraints do SPEC (Next.js / Supabase / Modal / Sonnet 4.6 / Voyage / Stripe / Resend) estão como `locked: false`. Não bloqueia execução, mas qualquer plan-phase deve estar consciente de que pode formalmente re-decidir via ADR — particularmente antes da Fase 5 (Modal) e Fase 7 (LLM), onde a escolha tem maior impacto técnico.
 - **Revisão jurídica healthtech (~R$ 2–4k) recomendada antes de qualquer rollout externo na Fase 9.** Não é pré-requisito para dogfooding interno do fundador (Estágio 1), mas é gate para Estágio 2.
 - **Corpus RAG seed (Fase 6) depende de obter PDFs de Jensen Vol. 1 e Battello em pt** — verificar disponibilidade legal/licenciamento antes de ingerir.
+- **Database password apareceu no chat (2026-05-01):** durante execução do plan 01-05 (RLS test), `AurelIris123` foi colada em conversa. Rotacionar via Supabase Dashboard antes de qualquer dogfooding real (Estágio 1 do PROJECT.md). Atualizar `.env.local` (gitignored) e Vercel env `SUPABASE_SERVICE_ROLE_KEY` se rotacionar.
 
 ## Itens diferidos
 
@@ -66,6 +67,6 @@ Nenhum (bootstrap inicial, sem milestone anterior).
 
 ## Continuidade de sessão
 
-Última sessão: 2026-04-30
-Parou em: Fase 1 planejada — 6 planos em 4 waves (1: scaffold web+vision; 2: supabase init+migration+link; 3: BLOCKING db push+types; 4: RLS test remoto + Vercel deploy). Revisão 1× resolveu 2 blockers + 4 warnings (deferimento do critério `select autenticado` para Fase 2; correções em verify chains, RLS test methodology, wave deps).
-Arquivo de retomada: `.planning/phases/01-setup/` — próxima ação é `/gsd-execute-phase 1`.
+Última sessão: 2026-05-01
+Parou em: Fase 1 (Setup) **concluída**. Repo movido de D:/GDrive/iridologista para D:/Projetos/Iridologista. Monorepo pnpm com apps/web/ (Next.js 15 + shadcn/ui) e vision-service/ (Python skeleton). Supabase Aurel Iris em sa-east-1 (ref owgbrllpznsngrkvodyw) com schema do SPEC §3 + migration 0002 (grants para authenticated role) aplicado. RLS verificada cross-terapeuta no remoto via teste SQL idempotente em supabase/tests/. Deploy production verde em https://aurel-iris-web.vercel.app/ (Vercel gru1). 4 SETUP requirements (01..04) cobertos. Critério `select autenticado from clients` deferido pra Fase 2.
+Arquivo de retomada: `.planning/phases/01-setup/` — próxima ação é `/gsd-discuss-phase 2`.

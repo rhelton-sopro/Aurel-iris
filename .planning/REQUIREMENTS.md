@@ -11,10 +11,10 @@ Requisitos para o release inicial. Cada um mapeia para exatamente uma fase do ro
 
 ### Setup (Fase 1 — Setup)
 
-- [ ] **SETUP-01**: Projeto Next.js 15 (App Router) inicializado com TypeScript, Tailwind e shadcn/ui, deployable na Vercel.
-- [ ] **SETUP-02**: Contas e variáveis de ambiente configuradas para Vercel, Supabase, Stripe Brasil, Modal, Anthropic, Voyage AI e Resend.
-- [ ] **SETUP-03**: Schema do banco aplicado via migration no Supabase Postgres com `pgvector`, incluindo tabelas `profiles`, `clients`, `readings`, `reading_images`, `knowledge_chunks`, `subscriptions`, índices mandatórios e índice HNSW em `knowledge_chunks(embedding) vector_cosine_ops`.
-- [ ] **SETUP-04**: RLS habilitada nas tabelas sensíveis (`profiles`, `clients`, `readings`, `reading_images`, `subscriptions`) com políticas-base "terapeutas só veem seus próprios dados" e `knowledge_chunks` legível por qualquer autenticado.
+- [x] **SETUP-01**: Projeto Next.js 15 (App Router) inicializado com TypeScript, Tailwind e shadcn/ui, deployable na Vercel.
+- [x] **SETUP-02**: Contas e variáveis de ambiente configuradas para Vercel, Supabase, Stripe Brasil, Modal, Anthropic, Voyage AI e Resend.
+- [x] **SETUP-03**: Schema do banco aplicado via migration no Supabase Postgres com `pgvector`, incluindo tabelas `profiles`, `clients`, `readings`, `reading_images`, `knowledge_chunks`, `subscriptions`, índices mandatórios e índice HNSW em `knowledge_chunks(embedding) vector_cosine_ops`.
+- [x] **SETUP-04**: RLS habilitada nas tabelas sensíveis (`profiles`, `clients`, `readings`, `reading_images`, `subscriptions`) com políticas-base "terapeutas só veem seus próprios dados" e `knowledge_chunks` legível por qualquer autenticado.
 
 ### Autenticação (Fase 2 — Auth + Dashboard básico)
 
@@ -124,10 +124,10 @@ Excluídos explicitamente. Documentado para evitar reintrodução.
 
 | Requisito | Fase | Status |
 |-----------|------|--------|
-| SETUP-01 | Fase 1 | Pendente |
-| SETUP-02 | Fase 1 | Pendente |
-| SETUP-03 | Fase 1 | Pendente |
-| SETUP-04 | Fase 1 | Pendente |
+| SETUP-01 | Fase 1 | Completo |
+| SETUP-02 | Fase 1 | Completo |
+| SETUP-03 | Fase 1 | Completo |
+| SETUP-04 | Fase 1 | Completo |
 | AUTH-01 | Fase 2 | Pendente |
 | AUTH-02 | Fase 2 | Pendente |
 | AUTH-03 | Fase 2 | Pendente |
