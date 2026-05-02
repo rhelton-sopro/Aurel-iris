@@ -7,14 +7,23 @@ import { X } from 'lucide-react'
 import { CameraView } from '@/components/capture/CameraView'
 import { QualityIndicator } from '@/components/capture/QualityIndicator'
 import { LiveFeedbackMessage } from '@/components/capture/LiveFeedbackMessage'
+import { CaptureProgress } from '@/components/capture/CaptureProgress'
+import { AngleOverlay } from '@/components/capture/AngleOverlay'
+import { AngleInterstitial } from '@/components/capture/AngleInterstitial'
 import {
   computeQualityCheck,
   overallScore,
   dominantFailure,
   feedbackMessage,
   type QualityCheck,
-  type Eye,
 } from '@/lib/capture/quality-scoring'
+import {
+  SEQUENCE,
+  type Slot,
+  type SlotPhase,
+  getResumeSlotIndex,
+  isOuterEyeTransition,
+} from '@/lib/capture/sequence'
 import type { UseIrisDetectorResult } from '@/hooks/use-iris-detector'
 import { useStableQualityGate } from '@/hooks/use-quality-score'
 
@@ -35,31 +44,55 @@ interface CaptureClientProps {
 const ANALYSIS_W = 256
 const ANALYSIS_H = 256
 
-export function CaptureClient({ readingId, therapistId: _therapistId, clientName, capturedSlots: _capturedSlots, resumeMode: _resumeMode }: CaptureClientProps) {
+export function CaptureClient({
+  readingId,
+  therapistId: _therapistId,
+  clientName,
+  capturedSlots: initialCaptured,
+  resumeMode: _resumeMode,
+}: CaptureClientProps) {
   const videoRef = React.useRef<HTMLVideoElement>(null)
   const analysisCanvasRef = React.useRef<HTMLCanvasElement | null>(null)
   const detectorRef = React.useRef<UseIrisDetectorResult | null>(null)
 
+  // Inicializa slotIndex baseado no que já foi capturado (D-12 + resume)
+  const initialIndex = React.useMemo(() => {
+    const idx = getResumeSlotIndex(initialCaptured)
+    return idx === -1 ? SEQUENCE.length - 1 : idx
+  }, [initialCaptured])
+
+  const [slotIndex, setSlotIndex] = React.useState(initialIndex)
+  const [phase, setPhase] = React.useState<SlotPhase>(() => {
+    // Se for resume cruzando para o olho esquerdo, começar com interstitial
+    if (initialIndex >= 3 && initialCaptured.every(c => c.eye !== 'left')) {
+      return 'interstitial'
+    }
+    return 'streaming'
+  })
+  const [capturedCount, setCapturedCount] = React.useState(initialCaptured.length)
   const [score, setScore] = React.useState(0)
   const [check, setCheck] = React.useState<QualityCheck | null>(null)
 
-  // Slot fixo nesta fase — sequence machine virá em 03-06
-  const currentEye: Eye = 'right'
+  const slot: Slot = SEQUENCE[Math.min(slotIndex, SEQUENCE.length - 1)]
 
-  // Loop de inferência por frame
+  // Loop de inferência por frame — só roda quando phase é streaming ou overlay
   React.useEffect(() => {
     const video = videoRef.current
     if (!video) return
+    if (phase !== 'streaming' && phase !== 'overlay') return
 
     let handle: number | null = null
-    const supportsRVFC = typeof (HTMLVideoElement.prototype as unknown as { requestVideoFrameCallback?: unknown }).requestVideoFrameCallback === 'function'
+    const proto = HTMLVideoElement.prototype as unknown as {
+      requestVideoFrameCallback?: (cb: (now: number) => void) => number
+      cancelVideoFrameCallback?: (id: number) => void
+    }
+    const supportsRVFC = typeof proto.requestVideoFrameCallback === 'function'
 
     const tick = (now: number) => {
       const det = detectorRef.current
-      if (det?.ready && video.readyState >= 2) {
+      if (det?.ready && video.readyState >= 2 && video.videoWidth > 0 && video.videoHeight > 0) {
         const result = det.detect(video, now)
         const landmarks = result?.faceLandmarks?.[0] ?? null
-        // Recortar janela 256×256 centrada — usa canvas auxiliar
         if (!analysisCanvasRef.current) {
           analysisCanvasRef.current = document.createElement('canvas')
           analysisCanvasRef.current.width = ANALYSIS_W
@@ -67,56 +100,96 @@ export function CaptureClient({ readingId, therapistId: _therapistId, clientName
         }
         const canvas = analysisCanvasRef.current
         const ctx = canvas.getContext('2d', { alpha: false })
-        if (ctx && video.videoWidth > 0 && video.videoHeight > 0) {
-          // Crop centralizado para downscale 256x256 — perde aspect mas é aceitável para análise
+        if (ctx) {
           const minDim = Math.min(video.videoWidth, video.videoHeight)
           const sx = (video.videoWidth - minDim) / 2
           const sy = (video.videoHeight - minDim) / 2
           ctx.drawImage(video, sx, sy, minDim, minDim, 0, 0, ANALYSIS_W, ANALYSIS_H)
           const imageData = ctx.getImageData(0, 0, ANALYSIS_W, ANALYSIS_H)
-          const c = computeQualityCheck(landmarks, currentEye, imageData, ANALYSIS_W, ANALYSIS_H)
-          // [calibration] remover após calibrar irisRadiusTarget
-          if (process.env.NODE_ENV !== 'production') {
-            const { getIrisRadius } = await import('@/lib/capture/iris-geometry')
-            console.log('[iris-radius]', getIrisRadius(landmarks, currentEye).toFixed(4), '| score', overallScore(c).toFixed(2), '| dist', c.irisDistanceOk.toFixed(2))
-          }
+          const c = computeQualityCheck(landmarks, slot.eye, imageData, ANALYSIS_W, ANALYSIS_H)
           setCheck(c)
           setScore(overallScore(c))
         }
       }
-      if (supportsRVFC) {
-        handle = (video as HTMLVideoElement & { requestVideoFrameCallback: (cb: (now: number) => void) => number }).requestVideoFrameCallback(tick)
+      const videoEx = video as HTMLVideoElement & {
+        requestVideoFrameCallback?: (cb: (now: number) => void) => number
+      }
+      if (supportsRVFC && videoEx.requestVideoFrameCallback) {
+        handle = videoEx.requestVideoFrameCallback(tick)
       } else {
         handle = requestAnimationFrame(tick)
       }
     }
-    if (supportsRVFC) {
-      handle = (video as HTMLVideoElement & { requestVideoFrameCallback: (cb: (now: number) => void) => number }).requestVideoFrameCallback(tick)
+    const videoEx = video as HTMLVideoElement & {
+      requestVideoFrameCallback?: (cb: (now: number) => void) => number
+      cancelVideoFrameCallback?: (id: number) => void
+    }
+    if (supportsRVFC && videoEx.requestVideoFrameCallback) {
+      handle = videoEx.requestVideoFrameCallback(tick)
     } else {
       handle = requestAnimationFrame(tick)
     }
     return () => {
       if (handle == null) return
-      if (supportsRVFC && 'cancelVideoFrameCallback' in video) {
-        ;(video as HTMLVideoElement & { cancelVideoFrameCallback: (id: number) => void }).cancelVideoFrameCallback(handle)
+      if (supportsRVFC && videoEx.cancelVideoFrameCallback) {
+        videoEx.cancelVideoFrameCallback(handle)
       } else {
         cancelAnimationFrame(handle)
       }
     }
-  }, [currentEye])
+  }, [phase, slot.eye])
 
-  // Auto-capture stub — em 03-07 vai chamar Canvas.toBlob + upload
-  useStableQualityGate(score, () => {
-    console.log(`[capture-client] auto-trigger ready for slot ${currentEye}/frontal — captura real virá no plan 03-07`)
+  // Avança para o próximo slot — chamado pelo trigger stub OU por debug
+  const advanceToNextSlot = React.useCallback(() => {
+    const next = slotIndex + 1
+    if (next >= SEQUENCE.length) {
+      setPhase('finalizing')
+      // 03-08 cuida da finalização real (chama finalizeReadingAction + redirect)
+      // Por ora apenas marca e exibe a tela de finalização stub
+      return
+    }
+    if (isOuterEyeTransition(slotIndex, next)) {
+      setPhase('interstitial')
+    } else {
+      setPhase('overlay')
+    }
+    setSlotIndex(next)
+    setCapturedCount(c => c + 1)
+  }, [slotIndex])
+
+  // Stub do auto-trigger — em 03-07 capturará Canvas.toBlob + upload + insert
+  const captureGate = useStableQualityGate(score, () => {
+    if (phase !== 'streaming') return
+    console.log(
+      `[capture-client] STUB: capturing slot ${slot.eye}/${slot.angle} (idx ${slotIndex}, score ${score.toFixed(2)})`
+    )
+    advanceToNextSlot()
   })
 
-  // Mensagem dominante
+  // Quando entra em 'overlay', auto-volta para 'streaming' após 2.5s + reset gate
+  React.useEffect(() => {
+    if (phase !== 'overlay') return
+    const id = window.setTimeout(() => {
+      setPhase('streaming')
+      captureGate.reset()
+    }, 2500)
+    return () => window.clearTimeout(id)
+  }, [phase, captureGate])
+
+  // Reset gate quando entra em interstitial ou finalizing (não dispara enquanto está parado)
+  React.useEffect(() => {
+    if (phase === 'interstitial' || phase === 'finalizing') {
+      captureGate.reset()
+    }
+  }, [phase, captureGate])
+
   const message = check ? feedbackMessage(dominantFailure(check)) : 'Aguarde — preparando câmera...'
 
   return (
     <div className="relative flex-1 flex flex-col">
+      {/* Header */}
       <header className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3 pt-[env(safe-area-inset-top)]">
-        <span className="text-sm text-white/80">{clientName}</span>
+        <span className="text-sm text-white/80 truncate max-w-[60%]">{clientName}</span>
         <Link
           href="/leituras"
           aria-label="Cancelar leitura"
@@ -128,26 +201,58 @@ export function CaptureClient({ readingId, therapistId: _therapistId, clientName
 
       <CameraView videoRef={videoRef} />
 
-      {/* Barra de qualidade no topo, abaixo da safe-area */}
-      <div className="absolute left-0 right-0 z-20 pt-[calc(env(safe-area-inset-top)+44px)]">
-        <QualityIndicator score={score} />
-      </div>
+      {/* QualityIndicator + CaptureProgress no topo (ocultos durante interstitial e finalizing) */}
+      {phase !== 'interstitial' && phase !== 'finalizing' && (
+        <div className="absolute left-0 right-0 z-20 pt-[calc(env(safe-area-inset-top)+44px)] flex flex-col items-center gap-3">
+          <QualityIndicator score={score} />
+          <CaptureProgress currentIndex={slotIndex} capturedCount={capturedCount} />
+        </div>
+      )}
 
-      {/* Live feedback no centro inferior */}
-      <div className="absolute left-0 right-0 bottom-[calc(env(safe-area-inset-bottom)+96px)] z-20 flex justify-center px-4">
-        <LiveFeedbackMessage message={message} />
-      </div>
+      {/* AngleOverlay quando phase==='overlay' */}
+      {phase === 'overlay' && (
+        <div className="absolute top-[calc(env(safe-area-inset-top)+120px)] left-1/2 -translate-x-1/2 z-25 max-w-[90%]">
+          <AngleOverlay slot={slot} resetKey={`${slot.eye}_${slot.angle}`} />
+        </div>
+      )}
 
-      {/* Lazy-loaded MediaPipe — não renderiza UI; expõe API via callback */}
+      {/* LiveFeedbackMessage no centro-inferior (apenas durante streaming) */}
+      {phase === 'streaming' && (
+        <div className="absolute left-0 right-0 bottom-[calc(env(safe-area-inset-bottom)+96px)] z-20 flex justify-center px-4">
+          <LiveFeedbackMessage message={message} />
+        </div>
+      )}
+
+      {/* AngleInterstitial fullscreen — transição de olho (T-03-06-03: gate suspenso) */}
+      {phase === 'interstitial' && (
+        <AngleInterstitial
+          nextSlot={slot}
+          onProceed={() => {
+            setPhase('streaming')
+            captureGate.reset()
+          }}
+        />
+      )}
+
+      {/* Finalizing stub — 03-08 substitui com finalizeReadingAction + redirect */}
+      {phase === 'finalizing' && (
+        <div className="absolute inset-0 z-50 bg-background flex flex-col items-center justify-center gap-4 text-foreground">
+          <h1 className="text-xl font-semibold">6 de 6 imagens registradas</h1>
+          <p className="text-sm text-muted-foreground">Finalizando leitura...</p>
+        </div>
+      )}
+
+      {/* Lazy MediaPipe — não renderiza UI; expõe API via callback */}
       <IrisDetector
         onReady={(api) => {
           detectorRef.current = api
         }}
       />
 
-      {/* Debug stub — remover quando 03-06 montar state machine */}
-      <div className="absolute bottom-2 right-2 z-10 px-2 py-1 rounded bg-black/40 text-[10px] text-white/60">
-        {readingId.slice(0, 8)} • {currentEye} • {(score * 100).toFixed(0)}%
+      {/* Debug — remove em 03-08 */}
+      <div className="absolute bottom-1 right-1 z-10 px-1.5 py-0.5 rounded bg-black/40 text-[10px] text-white/50">
+        {phase} • {slotIndex + 1}/6 • {(score * 100).toFixed(0)}%
+        {process.env.NODE_ENV !== 'production' && ` • ${readingId.slice(0, 8)}`}
       </div>
     </div>
   )
