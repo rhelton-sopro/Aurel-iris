@@ -4,23 +4,28 @@ import * as React from 'react'
 import { Button } from '@/components/ui/button'
 import { AngleIcon } from './AngleIcon'
 import type { Slot } from '@/lib/capture/sequence'
-import { getInterstitialCopy } from '@/lib/capture/sequence'
+import { getInterstitialCopy, getFirstInterstitialCopy } from '@/lib/capture/sequence'
 
 interface AngleInterstitialProps {
   /** Slot que vai começar após o CTA */
   nextSlot: Slot
-  /** Callback chamado quando o usuário toca em "Pronto, vou capturar" */
+  /** Callback chamado quando o usuário toca no CTA */
   onProceed: () => void
+  /**
+   * Quando true, usa a copy da TELA INICIAL ("Vamos começar pelo olho... Primeiro ângulo: ...")
+   * exibida antes da 1ª captura. Quando false (default), usa a copy de TRANSIÇÃO
+   * entre olhos (direito → esquerdo).
+   */
+  isFirst?: boolean
 }
 
 /**
- * Tela fullscreen exibida na transição entre olhos (right → left).
+ * Tela fullscreen exibida (a) antes da 1ª captura ou (b) na transição entre olhos.
  * CONTEXT D-10: câmera para, instrução visual com CTA.
  * UI-SPEC §AngleInterstitial: fade + slide-up 300ms, CTA h-12 full-width na bottom safe area.
- * Copy verbatim de UI-SPEC §Copywriting (via getInterstitialCopy — T-03-06-04).
  */
-export function AngleInterstitial({ nextSlot, onProceed }: AngleInterstitialProps) {
-  const copy = getInterstitialCopy(nextSlot.eye)
+export function AngleInterstitial({ nextSlot, onProceed, isFirst = false }: AngleInterstitialProps) {
+  const copy = isFirst ? getFirstInterstitialCopy(nextSlot) : getInterstitialCopy(nextSlot.eye)
 
   return (
     <div

@@ -2,66 +2,108 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
 import type { Eye } from './iris-geometry'
 import type { Angle } from './sequence'
-import { buildStoragePath } from './storage-path'
+import { buildCroppedStoragePath, buildOriginalStoragePath } from './storage-path'
 
 const BUCKET = 'iris-captures'
 
 export interface UploadArgs {
   supabase: SupabaseClient<Database>
-  blob: Blob
+  /** JPEG do recorte centrado na íris (consumido pela UI/preview). */
+  croppedBlob: Blob
+  /** Dimensões do JPEG recortado (já após compressão). */
+  croppedWidth: number
+  croppedHeight: number
+  /**
+   * JPEG original em alta resolução (consumido pelo pipeline Modal da Fase 5).
+   * Quando ausente, faz upload apenas do recortado — fallback para devices que
+   * falharem em ImageCapture / takePhotoBlob.
+   */
+  originalBlob?: Blob
   therapistId: string
   readingId: string
   eye: Eye
   angle: Angle
   qualityScore: number
-  width: number
-  height: number
   /**
    * AbortSignal para cancelar uploads concorrentes (tap-to-redo — T-03-07-02).
-   * Quando signal.aborted=true, uploadCaptureImage lança AbortError imediatamente.
+   * Quando signal.aborted=true, lança AbortError imediatamente.
    */
   signal?: AbortSignal
 }
 
 export interface UploadResult {
-  path: string
+  croppedPath: string
+  originalPath: string | null
 }
 
 /**
- * Sobe blob ao Storage com upsert (path determinístico) e insere/atualiza
- * reading_images via upsert por (reading_id, eye, angle).
+ * Sobe os dois blobs ao Storage (recortado + original quando disponível) em
+ * paralelo e insere/atualiza reading_images com path do RECORTADO.
  *
  * RLS:
  *  - storage.objects: folder[1] = auth.uid() (bucket iris-captures, migration 0004)
  *  - reading_images: reading.therapist_id = auth.uid()
  *
- * T-03-07-01: path inclui therapistId + readingId → RLS folder-based bloqueia cross-tenant.
+ * Convenção: reading_images.storage_path = path do recortado. O path do
+ * original é descoberto trocando "/recortadas/" por "/originais/".
+ *
+ * T-03-07-01: paths incluem therapistId + readingId → RLS folder-based bloqueia cross-tenant.
  * T-03-07-02: AbortController por slot cancela upload obsoleto em tap-to-redo.
  * T-03-07-03: storage_path não aparece em toasts/logs UI — apenas slot.eye/slot.angle.
  */
 export async function uploadCaptureImage(args: UploadArgs): Promise<UploadResult> {
-  const { supabase, blob, therapistId, readingId, eye, angle, qualityScore, width, height, signal } = args
+  const {
+    supabase,
+    croppedBlob,
+    croppedWidth,
+    croppedHeight,
+    originalBlob,
+    therapistId,
+    readingId,
+    eye,
+    angle,
+    qualityScore,
+    signal,
+  } = args
 
   if (signal?.aborted) {
     throw new DOMException('Upload abortado', 'AbortError')
   }
 
-  const path = buildStoragePath(therapistId, readingId, eye, angle)
+  const croppedPath = buildCroppedStoragePath(therapistId, readingId, eye, angle)
+  const originalPath = originalBlob
+    ? buildOriginalStoragePath(therapistId, readingId, eye, angle)
+    : null
 
-  // Upload com upsert (suporta tap-to-redo D-09 sem criar duplicatas)
-  const { error: storageError } = await supabase.storage
-    .from(BUCKET)
-    .upload(path, blob, {
+  const uploads: Promise<{ error: { message: string } | null }>[] = [
+    supabase.storage.from(BUCKET).upload(croppedPath, croppedBlob, {
       contentType: 'image/jpeg',
       upsert: true,
-    })
+    }),
+  ]
+  if (originalBlob && originalPath) {
+    uploads.push(
+      supabase.storage.from(BUCKET).upload(originalPath, originalBlob, {
+        contentType: 'image/jpeg',
+        upsert: true,
+      })
+    )
+  }
+
+  const results = await Promise.all(uploads)
 
   if (signal?.aborted) {
     throw new DOMException('Upload abortado', 'AbortError')
   }
 
-  if (storageError) {
-    throw new Error(`[upload] storage falhou: ${storageError.message}`)
+  const croppedErr = results[0]?.error
+  if (croppedErr) {
+    throw new Error(`[upload] storage recortado falhou: ${croppedErr.message}`)
+  }
+  // Original é best-effort — falha não bloqueia (UI usa o recortado).
+  const originalErr = results[1]?.error
+  if (originalErr) {
+    console.warn('[upload] storage original falhou:', originalErr.message)
   }
 
   // Insert/update reading_images (upsert pelo UNIQUE reading_id+eye+angle — migration 0004)
@@ -72,10 +114,10 @@ export async function uploadCaptureImage(args: UploadArgs): Promise<UploadResult
         reading_id: readingId,
         eye,
         angle,
-        storage_path: path,
+        storage_path: croppedPath,
         quality_score: qualityScore,
-        width,
-        height,
+        width: croppedWidth,
+        height: croppedHeight,
       },
       { onConflict: 'reading_id,eye,angle' }
     )
@@ -84,7 +126,10 @@ export async function uploadCaptureImage(args: UploadArgs): Promise<UploadResult
     throw new Error(`[upload] insert reading_images falhou: ${dbError.message}`)
   }
 
-  return { path }
+  return {
+    croppedPath,
+    originalPath: originalErr ? null : originalPath,
+  }
 }
 
 /**

@@ -31,7 +31,8 @@ import {
 import { getIrisRadiusPx, getIrisCenterPx } from '@/lib/capture/iris-geometry'
 import { getExposureDirection } from '@/lib/capture/exposure'
 import { compressFrameToJpeg } from '@/lib/capture/jpeg-compress'
-import { snapshotAndCropAroundIris } from '@/lib/capture/iris-crop'
+import { snapshotAndCropAroundIris, cropBlobAroundIris } from '@/lib/capture/iris-crop'
+import { takePhotoBlob } from '@/lib/capture/take-photo'
 import { analyzeCapturedJpeg, type PostCaptureAnalysis } from '@/lib/capture/post-capture-analysis'
 import { uploadWithRetry } from '@/lib/capture/upload'
 import { createClient } from '@/lib/supabase/client'
@@ -155,6 +156,9 @@ export function CaptureClient({
 
   const [slotIndex, setSlotIndex] = React.useState(initialIndex)
   const [phase, setPhase] = React.useState<SlotPhase>(() => {
+    // Tela inicial de instrução antes da 1ª captura.
+    if (initialIndex === 0 && initialCaptured.length === 0) return 'interstitial'
+    // Transição direito → esquerdo já capturada (resume após apenas right-eye).
     if (initialIndex >= 3 && initialCaptured.every(c => c.eye !== 'left')) return 'interstitial'
     return 'streaming'
   })
@@ -178,8 +182,11 @@ export function CaptureClient({
   const lastIrisDetectedAtRef = React.useRef(0)
 
   // Contexto do frame congelado entre o tap e o disparo da captura real (300ms).
+  // `previewCrop` = canvas low-res (snapshot do video) usado para o freeze visual
+  // e como fallback caso takePhotoBlob falhe.
   const freezeContextRef = React.useRef<{
-    canvas: HTMLCanvasElement
+    previewCrop: HTMLCanvasElement
+    irisCenter: { x: number; y: number } | null
     irisRadius: number
     streamingScore: number
   } | null>(null)
@@ -314,15 +321,20 @@ export function CaptureClient({
   // Captura
   // ---------------------------------------------------------------------------
   /**
-   * Comprime o crop produzido pelo snapshot, dispara upload e análise pós-captura.
-   * Recebe os artefatos do freeze (canvas cropado, raio da íris no source,
-   * score do streaming) — não depende mais do estado live nem do videoRef.
+   * Recebe o crop em alta-res (canvas), o blob original opcional, e dispara:
+   *  - compressão + análise + preview do recorte
+   *  - upload paralelo de RECORTADO (sempre) + ORIGINAL (quando disponível)
+   *
+   * Quando `originalBlob` é null (takePhotoBlob falhou), só o recorte é salvo —
+   * UI permanece funcional mas o pipeline da Fase 5 perde a versão original.
    */
-  const captureCurrentFrame = React.useCallback(async (
-    cropCanvas: HTMLCanvasElement,
-    irisRadiusInCrop: number,
-    streamingScore: number,
-  ) => {
+  const captureCurrentFrame = React.useCallback(async (input: {
+    cropCanvas: HTMLCanvasElement
+    irisRadiusInCrop: number
+    streamingScore: number
+    originalBlob: Blob | null
+  }) => {
+    const { cropCanvas, irisRadiusInCrop, streamingScore, originalBlob } = input
     if (cropCanvas.width === 0 || cropCanvas.height === 0) return
 
     let compressed
@@ -337,7 +349,7 @@ export function CaptureClient({
     const imageUrl = URL.createObjectURL(compressed.blob)
     const currentSlotIdx = slotIndex
 
-    // Raio da íris no JPEG: raio no canvas source × scale da compressão.
+    // Raio da íris no JPEG recortado: raio no canvas × scale da compressão.
     const compressionScale = cropCanvas.width > 0
       ? compressed.width / cropCanvas.width
       : 1
@@ -355,8 +367,6 @@ export function CaptureClient({
     setPhase('previewing')
 
     // Análise pós-captura (best-effort, em paralelo com upload).
-    // Quando streamingScore ≥ 0.70, analyzeCapturedJpeg suprime o overlay
-    // — só mostra alerta para frames de qualidade incerta.
     void analyzeCapturedJpeg(
       compressed.blob,
       irisRadiusInJpeg,
@@ -371,9 +381,7 @@ export function CaptureClient({
             : prev,
         )
       })
-      .catch(() => {
-        // Análise é best-effort; falha não atrapalha o fluxo
-      })
+      .catch(() => { /* best-effort */ })
 
     const previousAbort = slotAbortRefs.current.get(currentSlotIdx)
     if (previousAbort) previousAbort.abort()
@@ -384,14 +392,15 @@ export function CaptureClient({
 
     const uploadP = uploadWithRetry({
       supabase,
-      blob: compressed.blob,
+      croppedBlob: compressed.blob,
+      croppedWidth: compressed.width,
+      croppedHeight: compressed.height,
+      originalBlob: originalBlob ?? undefined,
       therapistId,
       readingId,
       eye: SEQUENCE[currentSlotIdx].eye,
       angle: SEQUENCE[currentSlotIdx].angle,
       qualityScore: streamingScore,
-      width: compressed.width,
-      height: compressed.height,
       signal: ac.signal,
     })
     uploadPromisesRef.current.set(currentSlotIdx, uploadP)
@@ -451,15 +460,74 @@ export function CaptureClient({
     return () => window.clearTimeout(id)
   }, [phase])
 
-  // Após 300ms na fase 'freezing', dispara compress + upload + análise.
+  // Durante a fase 'freezing': em paralelo com o timer de 300ms, dispara
+  // takePhotoBlob (alta-res) + cropBlobAroundIris. Quando ambos terminam,
+  // chama captureCurrentFrame com original + crop high-res. Se takePhoto
+  // falhar, cai para o crop low-res do snapshot do video (freezeContext.previewCrop).
   React.useEffect(() => {
     if (phase !== 'freezing') return
-    const id = window.setTimeout(() => {
-      const ctx = freezeContextRef.current
-      if (!ctx) return
-      void captureCurrentFrame(ctx.canvas, ctx.irisRadius, ctx.streamingScore)
-    }, FREEZE_MS)
-    return () => window.clearTimeout(id)
+    const ctx = freezeContextRef.current
+    const video = videoRef.current
+    if (!ctx || !video) return
+
+    let cancelled = false
+
+    const work = async () => {
+      const startedAt = performance.now()
+
+      let highResOriginal: Blob | null = null
+      let highResCropCanvas: HTMLCanvasElement | null = null
+      let highResIrisRadius = ctx.irisRadius
+
+      try {
+        const photo = await takePhotoBlob(video)
+        if (cancelled) return
+        if (ctx.irisCenter && ctx.irisRadius > 0) {
+          // Escala coords de íris (computadas em coords do video) para coords da foto.
+          const irisCenterInPhoto = {
+            x: ctx.irisCenter.x * photo.scaleX,
+            y: ctx.irisCenter.y * photo.scaleY,
+          }
+          // Para o raio, usa a média dos scales (assume aspect preservado;
+          // quando diverge, perdemos um pouco de precisão).
+          const radiusScale = (photo.scaleX + photo.scaleY) / 2
+          const irisRadiusInPhoto = ctx.irisRadius * radiusScale
+
+          const cropResult = await cropBlobAroundIris(
+            photo.blob,
+            photo.width,
+            photo.height,
+            irisCenterInPhoto,
+            irisRadiusInPhoto,
+          )
+          if (cropResult) {
+            highResOriginal = photo.blob
+            highResCropCanvas = cropResult.canvas
+            highResIrisRadius = cropResult.irisRadiusInCrop
+          }
+        }
+      } catch (e) {
+        console.warn('[capture-client] takePhoto/crop falhou — usando fallback low-res:', e)
+      }
+
+      // Garante FREEZE_MS mínimo de feedback visual antes de transicionar.
+      const elapsed = performance.now() - startedAt
+      if (elapsed < FREEZE_MS) {
+        await new Promise(r => setTimeout(r, FREEZE_MS - elapsed))
+      }
+
+      if (cancelled) return
+
+      void captureCurrentFrame({
+        cropCanvas: highResCropCanvas ?? ctx.previewCrop,
+        irisRadiusInCrop: highResIrisRadius,
+        streamingScore: ctx.streamingScore,
+        originalBlob: highResOriginal,
+      })
+    }
+    void work()
+
+    return () => { cancelled = true }
   }, [phase, captureCurrentFrame])
 
   // Quando entra em 'finalizing': aguarda uploads pendentes, chama
@@ -506,28 +574,30 @@ export function CaptureClient({
     const video = videoRef.current
     if (!video) return
 
-    // Snapshot + crop centrado na íris (lado = 2.5 × diâmetro).
-    const cropped = snapshotAndCropAroundIris(
+    // Snapshot + crop low-res do video element para EXIBIÇÃO IMEDIATA no freeze.
+    // O save real usa o crop do takePhotoBlob (alta-res), feito em paralelo
+    // dentro da useEffect de 'freezing'.
+    const previewCrop = snapshotAndCropAroundIris(
       video,
       lastIrisCenterPxRef.current,
       lastIrisRadiusPxRef.current,
     )
-    if (!cropped) {
+    if (!previewCrop) {
       toast.error('Falha ao capturar frame. Tente novamente.')
       return
     }
 
-    // Espelha o crop no canvas de exibição (visível durante 'freezing').
     const display = freezeDisplayCanvasRef.current
     if (display) {
-      display.width = cropped.width
-      display.height = cropped.height
+      display.width = previewCrop.width
+      display.height = previewCrop.height
       const dctx = display.getContext('2d', { alpha: false })
-      dctx?.drawImage(cropped, 0, 0)
+      dctx?.drawImage(previewCrop, 0, 0)
     }
 
     freezeContextRef.current = {
-      canvas: cropped,
+      previewCrop,
+      irisCenter: lastIrisCenterPxRef.current,
       irisRadius: lastIrisRadiusPxRef.current,
       streamingScore: score,
     }
@@ -635,6 +705,7 @@ export function CaptureClient({
       {phase === 'interstitial' && (
         <AngleInterstitial
           nextSlot={slot}
+          isFirst={capturedCount === 0 && slotIndex === 0}
           onProceed={() => {
             setPhase('streaming')
           }}

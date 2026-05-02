@@ -19,14 +19,14 @@ function makeMockSupabase(opts: { storageFails?: boolean; dbFails?: boolean } = 
 
 const baseArgs = (sb: SupabaseClient<Database>): UploadArgs => ({
   supabase: sb,
-  blob: new Blob([new Uint8Array(10)], { type: 'image/jpeg' }),
+  croppedBlob: new Blob([new Uint8Array(10)], { type: 'image/jpeg' }),
+  croppedWidth: 1024,
+  croppedHeight: 1024,
   therapistId: '11111111-1111-1111-1111-111111111111',
   readingId: '22222222-2222-2222-2222-222222222222',
   eye: 'right',
   angle: 'frontal',
   qualityScore: 0.85,
-  width: 1920,
-  height: 1080,
 })
 
 describe('uploadCaptureImage', () => {
@@ -35,7 +35,7 @@ describe('uploadCaptureImage', () => {
     await uploadCaptureImage(baseArgs(sb))
     expect((sb as unknown as { storage: { from: ReturnType<typeof vi.fn> } }).storage.from).toHaveBeenCalledWith('iris-captures')
     const callArgs = (sb as unknown as { _spies: { upload: ReturnType<typeof vi.fn> } })._spies.upload.mock.calls[0]
-    expect(callArgs[0]).toBe('11111111-1111-1111-1111-111111111111/22222222-2222-2222-2222-222222222222/right_frontal.jpg')
+    expect(callArgs[0]).toBe('11111111-1111-1111-1111-111111111111/22222222-2222-2222-2222-222222222222/recortadas/right_frontal.jpg')
     expect(callArgs[2]).toMatchObject({ contentType: 'image/jpeg', upsert: true })
   })
 
@@ -54,7 +54,7 @@ describe('uploadCaptureImage', () => {
 
   it('throws on storage error', async () => {
     const sb = makeMockSupabase({ storageFails: true })
-    await expect(uploadCaptureImage(baseArgs(sb))).rejects.toThrow(/storage falhou/)
+    await expect(uploadCaptureImage(baseArgs(sb))).rejects.toThrow(/storage recortado falhou/)
   })
 
   it('throws on db error', async () => {
@@ -97,7 +97,7 @@ describe('uploadWithRetry', () => {
     vi.useFakeTimers()
     const sb = makeMockSupabase({ storageFails: true })
     const promise = uploadWithRetry(baseArgs(sb), 2)
-    const exp = expect(promise).rejects.toThrow(/storage falhou/)
+    const exp = expect(promise).rejects.toThrow(/storage recortado falhou/)
     await vi.advanceTimersByTimeAsync(5000)
     await exp
     vi.useRealTimers()

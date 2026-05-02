@@ -59,6 +59,59 @@ export function snapshotAndCropAroundIris(
   return canvas
 }
 
+/**
+ * Crop centrado na íris em um Blob (foto em alta resolução). Decodifica o
+ * blob, recorta o quadrado centrado e devolve canvas + metadados.
+ *
+ * Usado pelo pipeline pós-takePhoto: o original em alta-res é decodificado,
+ * cortado, e o canvas resultante alimenta `compressFrameToJpeg` para gerar
+ * o JPEG final do recorte.
+ */
+export async function cropBlobAroundIris(
+  blob: Blob,
+  blobW: number,
+  blobH: number,
+  irisCenterPx: { x: number; y: number },
+  irisRadiusPx: number,
+): Promise<{ canvas: HTMLCanvasElement; irisRadiusInCrop: number } | null> {
+  if (irisRadiusPx <= 0 || blobW <= 0 || blobH <= 0) return null
+
+  let bitmap: ImageBitmap
+  try {
+    bitmap = await createImageBitmap(blob)
+  } catch {
+    return null
+  }
+
+  const side = CROP_SIDE_FACTOR * irisRadiusPx
+  let x = Math.round(irisCenterPx.x - side / 2)
+  let y = Math.round(irisCenterPx.y - side / 2)
+  let w = Math.round(side)
+  let h = Math.round(side)
+  if (x < 0) { w += x; x = 0 }
+  if (y < 0) { h += y; y = 0 }
+  if (x + w > blobW) w = blobW - x
+  if (y + h > blobH) h = blobH - y
+
+  if (w <= 0 || h <= 0) {
+    bitmap.close()
+    return null
+  }
+
+  const canvas = document.createElement('canvas')
+  canvas.width = w
+  canvas.height = h
+  const ctx = canvas.getContext('2d', { alpha: false })
+  if (!ctx) {
+    bitmap.close()
+    return null
+  }
+  ctx.drawImage(bitmap, x, y, w, h, 0, 0, w, h)
+  bitmap.close()
+
+  return { canvas, irisRadiusInCrop: irisRadiusPx }
+}
+
 export const IRIS_CROP_DEFAULTS = {
   CROP_SIDE_FACTOR,
 } as const

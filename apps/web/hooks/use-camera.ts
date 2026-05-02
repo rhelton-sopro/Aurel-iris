@@ -31,8 +31,11 @@ const CAMERA_CONSTRAINTS: MediaStreamConstraints = {
   video: {
     // 'ideal' (não 'exact') — em desktop sem câmera traseira, 'exact' joga OverconstrainedError direto
     facingMode: { ideal: 'environment' },
-    width: { ideal: 1920 },
-    height: { ideal: 1080 },
+    // 4K ideal: dobra/quadruplica a resolução vs. 1080p anterior, melhorando
+    // a qualidade da íris no JPEG salvo. Phones que não suportam 4K caem
+    // automaticamente para a melhor resolução disponível.
+    width: { ideal: 3840 },
+    height: { ideal: 2160 },
   },
   audio: false,
 }
