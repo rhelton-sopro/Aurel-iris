@@ -40,8 +40,10 @@ describe('CapturePreview', () => {
   it('shows alert reasons when analysis flags issues', () => {
     const analysis: PostCaptureAnalysis = {
       laplacianVariance: 50,
-      irisRatio: 0.10,
-      streamingScore: 0,
+      irisRadiusPx: 200,
+      imageWidth: 3840,
+      imageHeight: 2160,
+      sharpnessThreshold: 200,
       sharpnessAlert: true,
       irisAlert: true,
       hasAlert: true,
@@ -62,9 +64,11 @@ describe('CapturePreview', () => {
 
   it('does not show alert when analysis has no issues', () => {
     const analysis: PostCaptureAnalysis = {
-      laplacianVariance: 100,
-      irisRatio: 0.20,
-      streamingScore: 0.85,
+      laplacianVariance: 250,
+      irisRadiusPx: 500,
+      imageWidth: 3840,
+      imageHeight: 2160,
+      sharpnessThreshold: 200,
       sharpnessAlert: false,
       irisAlert: false,
       hasAlert: false,

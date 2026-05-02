@@ -49,10 +49,21 @@ export const EYE_LABEL: Record<Eye, string> = {
   right: 'direito',
 }
 
+/**
+ * Labels visíveis ao usuário. NÃO descrevem ângulos da câmera (ela fica
+ * sempre frontal ao olho); descrevem a ROTAÇÃO DO CORPO/CABEÇA do paciente.
+ *   - frontal:   rosto voltado para frente
+ *   - lateral:   corpo virado ~90° para a direita
+ *   - backlight: corpo virado ~90° para a esquerda
+ *
+ * Os identificadores internos ('frontal'/'lateral'/'backlight') ficam pra
+ * compatibilidade do schema (path no Storage, coluna `angle` em
+ * `reading_images`). Renomear é breaking change.
+ */
 export const ANGLE_LABEL: Record<Angle, string> = {
-  frontal: 'frontal',
-  lateral: 'lateral',
-  backlight: 'contraluz',
+  frontal: 'frente',
+  lateral: 'direita',
+  backlight: 'esquerda',
 }
 
 /**
@@ -87,47 +98,40 @@ export function getSlotProgressLabel(slotIndex: number): string {
 }
 
 /**
- * Retorna a copy verbatim da UI-SPEC §Copywriting AngleInterstitial.
+ * Copy de instrução por slot, exibida na AngleInterstitial antes de cada foto.
+ *
+ * Princípios (conversa com o terapeuta sobre captura iridológica):
+ *  - A câmera fica SEMPRE frontal ao olho. Quem gira é o paciente (cabeça/corpo).
+ *  - A fonte de luz nunca deve ficar atrás do paciente.
+ *  - 'lateral' = paciente vira ~90° para a direita; 'backlight' = ~90° para a
+ *    esquerda. Nomes internos preservados pra não quebrar storage_path.
  */
-export function getInterstitialCopy(toEye: Eye): { heading: string; subtitle: string; cta: string } {
-  if (toEye === 'left') {
-    return {
-      heading: 'Vamos para o olho esquerdo',
-      subtitle:
-        'Os próximos 3 registros serão do olho esquerdo. Posicione o celular e toque em capturar quando estiver pronto.',
-      cta: 'Pronto, vou capturar',
-    }
-  }
-  return {
-    heading: 'Vamos para o olho direito',
-    subtitle:
-      'Os próximos 3 registros serão do olho direito. Posicione o celular e toque em capturar quando estiver pronto.',
-    cta: 'Pronto, vou capturar',
-  }
-}
-
-/**
- * Copy da tela inicial de instrução, exibida UMA VEZ antes da 1ª captura.
- */
-export function getFirstInterstitialCopy(slot: Slot): { heading: string; subtitle: string; cta: string } {
-  return {
-    heading: `Vamos começar pelo olho ${EYE_LABEL[slot.eye]}`,
-    subtitle: `Primeiro ângulo: ${ANGLE_LABEL[slot.angle]}. Aproxime o celular até a íris ocupar o centro do enquadramento.`,
-    cta: 'Abrir câmera',
-  }
-}
-
-/**
- * Copy entre fotos do mesmo olho (slots 1, 2, 4, 5 da sequência canônica).
- * Indica o progresso e o ângulo da próxima foto.
- */
-export function getMidSlotInterstitialCopy(
+export function getSlotInstructionCopy(
   slot: Slot,
   slotIndex: number,
 ): { heading: string; subtitle: string; cta: string } {
+  const eyeUpper = slot.eye === 'left' ? 'ESQUERDO' : 'DIREITO'
+
+  let subtitle: string
+  let angleLabel: string
+  switch (slot.angle) {
+    case 'frontal':
+      angleLabel = 'Frente'
+      subtitle = `Rosto voltado para frente, olho ${eyeUpper} aberto. Luz de frente ou lateral — nunca atrás.`
+      break
+    case 'lateral':
+      angleLabel = 'Direita'
+      subtitle = 'Vire o corpo ~90° para a direita, mantendo o olho aberto e a câmera frontal ao olho.'
+      break
+    case 'backlight':
+      angleLabel = 'Esquerda'
+      subtitle = 'Vire o corpo ~90° para a esquerda, mantendo o olho aberto e a câmera frontal ao olho.'
+      break
+  }
+
   return {
-    heading: `Olho ${EYE_LABEL[slot.eye]} · ${ANGLE_LABEL[slot.angle]}`,
-    subtitle: `Foto ${slotIndex + 1} de ${SEQUENCE.length}. Aproxime o celular até a íris ocupar o centro do enquadramento.`,
+    heading: `Foto ${slotIndex + 1} de ${SEQUENCE.length} — Olho ${eyeUpper} · ${angleLabel}`,
+    subtitle,
     cta: 'Abrir câmera',
   }
 }

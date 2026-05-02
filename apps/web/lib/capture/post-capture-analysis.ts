@@ -14,8 +14,13 @@
  *     largura > 2000px (câmera nativa)  → threshold 200
  *     largura ≤ 2000px (fallback canvas) → threshold 80
  *
- * Performance: ~30–60ms (createImageBitmap + downscale 512×512 + laplacianVariance)
+ * Performance: ~30–60ms (Image.decode + downscale 512×512 + laplacianVariance)
  * em Android mid-tier.
+ *
+ * Nota técnica: usa HTMLImageElement (`naturalWidth`/`naturalHeight`) em vez
+ * de `createImageBitmap`. Em iOS Safari, createImageBitmap pode retornar o
+ * bitmap em resolução reduzida quando memória está apertada — naturalWidth
+ * sempre reflete as dimensões reais do arquivo.
  */
 
 import { laplacianVariance } from './laplacian-variance'
@@ -24,7 +29,7 @@ const ANALYSIS_DIM = 512
 const IRIS_RADIUS_ALERT_PX = 300
 const SHARPNESS_THRESHOLD_HIGH_RES = 200
 const SHARPNESS_THRESHOLD_LOW_RES = 80
-/** Largura da imagem em pixels acima da qual usamos o threshold "alta resolução". */
+/** Largura em px acima da qual usamos o threshold "alta resolução". */
 const HIGH_RES_WIDTH_BOUNDARY = 2000
 
 export interface PostCaptureAnalysis {
@@ -32,7 +37,7 @@ export interface PostCaptureAnalysis {
   laplacianVariance: number
   /** Raio da íris no JPEG original, em pixels absolutos. */
   irisRadiusPx: number
-  /** Largura/altura da imagem original (não downscale). */
+  /** Largura/altura reais do arquivo (naturalWidth/naturalHeight). */
   imageWidth: number
   imageHeight: number
   /** Threshold de nitidez aplicado (80 ou 200, depende da resolução). */
@@ -44,39 +49,43 @@ export interface PostCaptureAnalysis {
 
 /**
  * @param blob JPEG original da câmera nativa (não recomprimido).
- * @param irisRadiusPx Raio da íris em pixels do JPEG original (vem do
- *                     getIrisRadiusPx + bitmap dimensions).
+ * @param irisRadiusPx Raio da íris em pixels absolutos do JPEG original.
  */
 export async function analyzeCapturedJpeg(
   blob: Blob,
   irisRadiusPx: number,
 ): Promise<PostCaptureAnalysis> {
-  let bitmap: ImageBitmap | null = null
+  const url = URL.createObjectURL(blob)
+  const img = new Image()
+  img.src = url
+
   try {
-    bitmap = await createImageBitmap(blob)
+    await img.decode()
   } catch {
+    URL.revokeObjectURL(url)
     return makeResult(0, irisRadiusPx, 0, 0)
   }
 
-  const imageWidth = bitmap.width
-  const imageHeight = bitmap.height
+  // naturalWidth/naturalHeight = dimensões reais do arquivo, não as renderizadas.
+  const imageWidth = img.naturalWidth
+  const imageHeight = img.naturalHeight
 
   const canvas = document.createElement('canvas')
   canvas.width = ANALYSIS_DIM
   canvas.height = ANALYSIS_DIM
   const ctx = canvas.getContext('2d', { alpha: false })
   if (!ctx) {
-    bitmap.close()
+    URL.revokeObjectURL(url)
     return makeResult(0, irisRadiusPx, imageWidth, imageHeight)
   }
 
-  // Center crop quadrado + downscale para 512×512
-  const minSrc = Math.min(bitmap.width, bitmap.height)
-  const sx = (bitmap.width - minSrc) / 2
-  const sy = (bitmap.height - minSrc) / 2
-  ctx.drawImage(bitmap, sx, sy, minSrc, minSrc, 0, 0, ANALYSIS_DIM, ANALYSIS_DIM)
+  // Center crop quadrado + downscale para 512×512 (fonte do Laplacian).
+  const minSrc = Math.min(imageWidth, imageHeight)
+  const sx = (imageWidth - minSrc) / 2
+  const sy = (imageHeight - minSrc) / 2
+  ctx.drawImage(img, sx, sy, minSrc, minSrc, 0, 0, ANALYSIS_DIM, ANALYSIS_DIM)
   const imageData = ctx.getImageData(0, 0, ANALYSIS_DIM, ANALYSIS_DIM)
-  bitmap.close()
+  URL.revokeObjectURL(url)
 
   const variance = laplacianVariance(imageData)
   return makeResult(variance, irisRadiusPx, imageWidth, imageHeight)

@@ -4,42 +4,24 @@ import * as React from 'react'
 import { Button } from '@/components/ui/button'
 import { AngleIcon } from './AngleIcon'
 import type { Slot } from '@/lib/capture/sequence'
-import {
-  getInterstitialCopy,
-  getFirstInterstitialCopy,
-  getMidSlotInterstitialCopy,
-} from '@/lib/capture/sequence'
-
-export type InterstitialVariant = 'first' | 'eye-transition' | 'mid-slot'
+import { getSlotInstructionCopy } from '@/lib/capture/sequence'
 
 interface AngleInterstitialProps {
   /** Slot que vai começar após o CTA */
   nextSlot: Slot
-  /** Índice 0-based do slot — usado pela copy 'mid-slot' (formato "Foto X de N"). */
+  /** Índice 0-based do slot — usado pela copy ("Foto X de N — Olho..."). */
   slotIndex: number
   /** Callback chamado quando o usuário toca no CTA */
   onProceed: () => void
-  /**
-   * Qual copy usar:
-   *  - 'first':         Antes da 1ª foto ("Vamos começar pelo olho... Primeiro ângulo... / Abrir câmera")
-   *  - 'eye-transition': Transição entre olhos (slot 3, esq → dir).
-   *  - 'mid-slot':      Demais slots (1, 2, 4, 5) — instrução curta com progresso.
-   */
-  variant: InterstitialVariant
 }
 
 /**
  * Tela fullscreen exibida antes de cada foto do fluxo de captura nativa.
- * Mostra o ângulo + olho + CTA. UI-SPEC §AngleInterstitial: ícone 96×96,
- * heading + subtitle, CTA h-12 full-width na bottom safe area.
+ * Copy é específica do slot (frente/direita 90°/esquerda 90°), comunicando
+ * a rotação do paciente — a câmera fica sempre frontal ao olho.
  */
-export function AngleInterstitial({ nextSlot, slotIndex, onProceed, variant }: AngleInterstitialProps) {
-  const copy =
-    variant === 'first'
-      ? getFirstInterstitialCopy(nextSlot)
-      : variant === 'eye-transition'
-        ? getInterstitialCopy(nextSlot.eye)
-        : getMidSlotInterstitialCopy(nextSlot, slotIndex)
+export function AngleInterstitial({ nextSlot, slotIndex, onProceed }: AngleInterstitialProps) {
+  const copy = getSlotInstructionCopy(nextSlot, slotIndex)
 
   return (
     <div

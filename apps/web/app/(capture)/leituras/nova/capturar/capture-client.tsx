@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation'
 import { X } from 'lucide-react'
 import { toast } from 'sonner'
 import { finalizeReadingAction } from '@/app/actions/readings'
-import { AngleInterstitial, type InterstitialVariant } from '@/components/capture/AngleInterstitial'
+import { AngleInterstitial } from '@/components/capture/AngleInterstitial'
 import { CapturePreview } from '@/components/capture/CapturePreview'
 import { CaptureProgress } from '@/components/capture/CaptureProgress'
 import { analyzeCapturedJpeg, type PostCaptureAnalysis } from '@/lib/capture/post-capture-analysis'
@@ -53,16 +53,18 @@ interface OneShotResult {
 }
 
 function detectIris(
-  bitmap: ImageBitmap,
+  img: HTMLImageElement,
   detector: UseIrisDetectorResult | null,
   eye: 'left' | 'right',
 ): OneShotResult {
   let irisRadiusPx = 0
   if (detector?.ready) {
-    const result = detector.detect(bitmap)
+    const result = detector.detect(img)
     const landmarks = result?.faceLandmarks?.[0] ?? null
     if (landmarks) {
-      irisRadiusPx = getIrisRadiusPx(landmarks, eye, bitmap.width, bitmap.height)
+      // naturalWidth/naturalHeight = dimensões reais do arquivo, não as
+      // CSS-rendered. MediaPipe normaliza pra essas dimensões.
+      irisRadiusPx = getIrisRadiusPx(landmarks, eye, img.naturalWidth, img.naturalHeight)
     }
   }
   return { irisRadiusPx, score: irisSizeScore(irisRadiusPx) }
@@ -128,13 +130,6 @@ export function CaptureClient({
 
   const slot: Slot = SEQUENCE[Math.min(slotIndex, SEQUENCE.length - 1)]
 
-  const interstitialVariant: InterstitialVariant =
-    capturedCount === 0 && slotIndex === 0
-      ? 'first'
-      : slotIndex === 3
-        ? 'eye-transition'
-        : 'mid-slot'
-
   // ---------------------------------------------------------------------------
   // Handlers
   // ---------------------------------------------------------------------------
@@ -150,14 +145,19 @@ export function CaptureClient({
 
     setPhase('analyzing')
 
-    let bitmap: ImageBitmap | null = null
-    try {
-      bitmap = await createImageBitmap(file)
-      const { irisRadiusPx, score } = detectIris(bitmap, detectorRef.current, slot.eye)
-      const width = bitmap.width
-      const height = bitmap.height
+    // URL da preview persiste até confirm/redo (revogada nesses handlers).
+    const imageUrl = URL.createObjectURL(file)
+    const img = new Image()
+    img.src = imageUrl
 
-      const imageUrl = URL.createObjectURL(file)
+    try {
+      // decode() resolve quando o decode termina e os pixels estão em memória.
+      // naturalWidth/naturalHeight são as dimensões REAIS do arquivo
+      // (independente de CSS) — usadas pelo getIrisRadiusPx e pela análise.
+      await img.decode()
+      const { irisRadiusPx, score } = detectIris(img, detectorRef.current, slot.eye)
+      const width = img.naturalWidth
+      const height = img.naturalHeight
       const currentSlotIdx = slotIndex
 
       setPendingPreview({
@@ -172,7 +172,6 @@ export function CaptureClient({
       setPhase('previewing')
 
       // Análise pós-captura roda sobre o ORIGINAL completo (sem crop).
-      // irisRadiusPx é o raio em pixels absolutos do JPEG original.
       void analyzeCapturedJpeg(file, irisRadiusPx)
         .then((analysis) => {
           setPendingPreview(prev =>
@@ -182,10 +181,9 @@ export function CaptureClient({
         .catch(() => { /* best-effort */ })
     } catch (err) {
       console.error('[capture-client] file process error:', err)
+      URL.revokeObjectURL(imageUrl)
       toast.error('Falha ao processar imagem. Tente novamente.')
       setPhase('instruction')
-    } finally {
-      bitmap?.close()
     }
   }, [slot.eye, slotIndex])
 
@@ -293,7 +291,19 @@ export function CaptureClient({
   // ---------------------------------------------------------------------------
   return (
     <div className="relative flex-1 flex flex-col bg-background">
-      <header className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3 pt-[env(safe-area-inset-top)]">
+      {/* Tip de iluminação fixa em TODAS as telas de captura. z-[60] fica
+          acima dos overlays de fase (interstitial z-50, preview z-40). */}
+      <div
+        role="note"
+        className="absolute top-0 left-0 right-0 z-[60] pt-[env(safe-area-inset-top)] bg-amber-500/95 backdrop-blur-sm border-b border-amber-700/30"
+      >
+        <p className="px-4 py-1.5 text-xs font-medium text-amber-950 text-center">
+          Mantenha a luz de frente ou lateral — nunca atrás do paciente
+        </p>
+      </div>
+
+      {/* Header fica colado embaixo do tip banner. */}
+      <header className="absolute top-[calc(env(safe-area-inset-top)+30px)] left-0 right-0 z-[55] flex items-center justify-between px-4 py-2">
         <span className="text-sm text-foreground/80 truncate max-w-[60%]">{clientName}</span>
         <Link
           href="/leituras"
@@ -306,13 +316,12 @@ export function CaptureClient({
 
       {phase === 'instruction' && (
         <>
-          <div className="absolute left-0 right-0 top-[calc(env(safe-area-inset-top)+44px)] z-40 flex justify-center">
+          <div className="absolute left-0 right-0 top-[calc(env(safe-area-inset-top)+88px)] z-[58] flex justify-center">
             <CaptureProgress currentIndex={slotIndex} capturedCount={capturedCount} />
           </div>
           <AngleInterstitial
             nextSlot={slot}
             slotIndex={slotIndex}
-            variant={interstitialVariant}
             onProceed={openCamera}
           />
         </>

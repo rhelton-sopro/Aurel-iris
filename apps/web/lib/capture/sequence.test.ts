@@ -4,7 +4,7 @@ import {
   getResumeSlotIndex,
   isOuterEyeTransition,
   getSlotProgressLabel,
-  getInterstitialCopy,
+  getSlotInstructionCopy,
   EYE_LABEL,
   ANGLE_LABEL,
 } from './sequence'
@@ -135,20 +135,43 @@ describe('getSlotProgressLabel', () => {
   })
 })
 
-describe('getInterstitialCopy', () => {
-  it('returns left copy verbatim', () => {
-    const copy = getInterstitialCopy('left')
-    expect(copy.heading).toBe('Vamos para o olho esquerdo')
-    expect(copy.cta).toBe('Pronto, vou capturar')
-    expect(copy.subtitle).toContain('olho esquerdo')
+describe('getSlotInstructionCopy', () => {
+  it('foto 1 (left/frontal) instrui rosto para frente + olho ESQUERDO', () => {
+    const copy = getSlotInstructionCopy({ eye: 'left', angle: 'frontal' }, 0)
+    expect(copy.heading).toContain('Foto 1 de 6')
+    expect(copy.heading).toContain('ESQUERDO')
+    expect(copy.heading).toContain('Frente')
+    expect(copy.subtitle).toContain('olho ESQUERDO aberto')
+    expect(copy.subtitle).toContain('Luz de frente ou lateral')
+    expect(copy.cta).toBe('Abrir câmera')
   })
-  it('returns right copy', () => {
-    const copy = getInterstitialCopy('right')
-    expect(copy.heading).toBe('Vamos para o olho direito')
-    expect(copy.cta).toBe('Pronto, vou capturar')
+
+  it('foto 2 (left/lateral) instrui virar 90° para a direita', () => {
+    const copy = getSlotInstructionCopy({ eye: 'left', angle: 'lateral' }, 1)
+    expect(copy.heading).toContain('Foto 2 de 6')
+    expect(copy.heading).toContain('Direita')
+    expect(copy.subtitle).toContain('~90° para a direita')
+    expect(copy.subtitle).toContain('câmera frontal ao olho')
   })
-  it('cta is identical for both eyes', () => {
-    expect(getInterstitialCopy('left').cta).toBe(getInterstitialCopy('right').cta)
+
+  it('foto 3 (left/backlight) instrui virar 90° para a esquerda', () => {
+    const copy = getSlotInstructionCopy({ eye: 'left', angle: 'backlight' }, 2)
+    expect(copy.heading).toContain('Foto 3 de 6')
+    expect(copy.heading).toContain('Esquerda')
+    expect(copy.subtitle).toContain('~90° para a esquerda')
+  })
+
+  it('foto 4 (right/frontal) repete o padrão para olho DIREITO', () => {
+    const copy = getSlotInstructionCopy({ eye: 'right', angle: 'frontal' }, 3)
+    expect(copy.heading).toContain('Foto 4 de 6')
+    expect(copy.heading).toContain('DIREITO')
+    expect(copy.subtitle).toContain('olho DIREITO aberto')
+  })
+
+  it('cta é "Abrir câmera" em todas as fotos', () => {
+    for (let i = 0; i < SEQUENCE.length; i++) {
+      expect(getSlotInstructionCopy(SEQUENCE[i], i).cta).toBe('Abrir câmera')
+    }
   })
 })
 
@@ -157,9 +180,9 @@ describe('labels', () => {
     expect(EYE_LABEL.left).toBe('esquerdo')
     expect(EYE_LABEL.right).toBe('direito')
   })
-  it('ANGLE_LABEL maps to pt-BR', () => {
-    expect(ANGLE_LABEL.frontal).toBe('frontal')
-    expect(ANGLE_LABEL.lateral).toBe('lateral')
-    expect(ANGLE_LABEL.backlight).toBe('contraluz')
+  it('ANGLE_LABEL reflete a ROTAÇÃO DO PACIENTE (não ângulo de câmera)', () => {
+    expect(ANGLE_LABEL.frontal).toBe('frente')
+    expect(ANGLE_LABEL.lateral).toBe('direita')
+    expect(ANGLE_LABEL.backlight).toBe('esquerda')
   })
 })
