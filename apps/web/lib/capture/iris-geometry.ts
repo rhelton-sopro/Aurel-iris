@@ -52,6 +52,33 @@ export function getIrisRadius(landmarks: Landmark[], eye: Eye): number {
 }
 
 /**
+ * Raio da íris em PIXELS reais do frame de vídeo.
+ * Diferente de getIrisRadius (que retorna unidade normalizada mista x*W vs y*H),
+ * esta função projeta cada landmark normalizado em pixels e calcula a distância
+ * euclidiana real. Necessária para comparar com o círculo guia desenhado em
+ * vmin do viewport (que corresponde a uma fração fixa do min(videoW, videoH)
+ * sob `object-cover`).
+ */
+export function getIrisRadiusPx(
+  landmarks: Landmark[],
+  eye: Eye,
+  videoW: number,
+  videoH: number
+): number {
+  const center = landmarks[IRIS_LANDMARKS[eye].center]
+  if (!center || videoW <= 0 || videoH <= 0) return 0
+  const radii = IRIS_LANDMARKS[eye].contour.map(i => {
+    const lm = landmarks[i]
+    if (!lm) return 0
+    const dx = (lm.x - center.x) * videoW
+    const dy = (lm.y - center.y) * videoH
+    return Math.sqrt(dx * dx + dy * dy)
+  })
+  if (radii.length === 0) return 0
+  return radii.reduce((a, b) => a + b, 0) / radii.length
+}
+
+/**
  * Centeredness: 1.0 quando o centro da íris coincide com overlayCenter; cai linear
  * quando se afasta. Default overlayCenter (0.5, 0.5) — overlay circular no centro
  * do viewport.

@@ -7,16 +7,15 @@ import { X } from 'lucide-react'
 import { toast } from 'sonner'
 import { CameraView } from '@/components/capture/CameraView'
 import { QualityIndicator } from '@/components/capture/QualityIndicator'
-import { LiveFeedbackMessage } from '@/components/capture/LiveFeedbackMessage'
 import { CaptureProgress } from '@/components/capture/CaptureProgress'
 import { AngleOverlay } from '@/components/capture/AngleOverlay'
 import { AngleInterstitial } from '@/components/capture/AngleInterstitial'
 import { CapturePreview } from '@/components/capture/CapturePreview'
+import { GuideCircle } from '@/components/capture/GuideCircle'
+import { EyeAngleLabel } from '@/components/capture/EyeAngleLabel'
 import {
   computeQualityCheck,
   overallScore,
-  dominantFailure,
-  feedbackMessage,
   type QualityCheck,
 } from '@/lib/capture/quality-scoring'
 import {
@@ -27,7 +26,10 @@ import {
   isOuterEyeTransition,
   getSlotProgressLabel,
 } from '@/lib/capture/sequence'
+import { getIrisRadiusPx } from '@/lib/capture/iris-geometry'
+import { getExposureDirection } from '@/lib/capture/exposure'
 import { compressFrameToJpeg } from '@/lib/capture/jpeg-compress'
+import { analyzeCapturedJpeg, type PostCaptureAnalysis } from '@/lib/capture/post-capture-analysis'
 import { uploadWithRetry } from '@/lib/capture/upload'
 import { createClient } from '@/lib/supabase/client'
 import type { UseIrisDetectorResult } from '@/hooks/use-iris-detector'
@@ -36,6 +38,47 @@ import { useStableQualityGate } from '@/hooks/use-quality-score'
 const IrisDetector = dynamic(() => import('@/components/capture/IrisDetector'), {
   ssr: false,
 })
+
+// ---------------------------------------------------------------------------
+// Critérios de bloqueio (avaliados em ordem de prioridade)
+// ---------------------------------------------------------------------------
+
+/**
+ * Círculo guia desenhado em 60vmin de diâmetro → raio = 30vmin = 30% do
+ * min(viewportW, viewportH). Sob `object-cover`, o min do viewport mapeia 1:1
+ * para o min(videoW, videoH), então o raio do guia em pixels do vídeo é
+ * `min(videoW, videoH) * 0.30`.
+ */
+const GUIDE_RADIUS_FRAC_OF_MIN_DIM = 0.30
+
+/** Íris deve preencher pelo menos 40% do raio do círculo guia. */
+const MIN_IRIS_FILL_FACTOR = 0.40
+
+/** Score de nitidez mínimo (sharpnessScore = variance/80; 0.15 ≈ variance 12 = claramente borrado). */
+const SHARPNESS_BLOCK_THRESHOLD = 0.15
+
+type BlockingReason = 'distance' | 'exposure' | 'sharpness' | null
+
+function computeBlockingReason(
+  check: QualityCheck | null,
+  irisFillRatio: number,
+  exposureDir: 'low' | 'high' | 'ok',
+): BlockingReason {
+  if (!check || !check.irisDetected || irisFillRatio < MIN_IRIS_FILL_FACTOR) return 'distance'
+  if (exposureDir === 'low') return 'exposure'
+  if (check.sharpness < SHARPNESS_BLOCK_THRESHOLD) return 'sharpness'
+  return null
+}
+
+const BLOCKING_LABEL: Record<NonNullable<BlockingReason>, string> = {
+  distance: 'Aproxime mais — cubra pelo menos 40% do guia',
+  exposure: 'Ambiente muito escuro — procure mais luz',
+  sharpness: 'Imagem borrada — segure firme o celular',
+}
+
+// ---------------------------------------------------------------------------
+// Tipos
+// ---------------------------------------------------------------------------
 
 interface CapturedSlot { eye: string; angle: string }
 
@@ -47,10 +90,6 @@ interface CaptureClientProps {
   resumeMode: boolean
 }
 
-const ANALYSIS_W = 256
-const ANALYSIS_H = 256
-const PREVIEW_MS = 2000
-
 interface PendingPreview {
   blob: Blob
   imageUrl: string
@@ -58,7 +97,17 @@ interface PendingPreview {
   width: number
   height: number
   slotIndex: number
+  /** null enquanto a análise pós-captura ainda não retornou */
+  analysis: PostCaptureAnalysis | null
 }
+
+const ANALYSIS_W = 256
+const ANALYSIS_H = 256
+const PREVIEW_MS = 2000
+
+// ---------------------------------------------------------------------------
+// Componente
+// ---------------------------------------------------------------------------
 
 export function CaptureClient({
   readingId,
@@ -71,7 +120,6 @@ export function CaptureClient({
   const analysisCanvasRef = React.useRef<HTMLCanvasElement | null>(null)
   const detectorRef = React.useRef<UseIrisDetectorResult | null>(null)
 
-  // Cliente Supabase browser (memoized)
   const supabase = React.useMemo(() => createClient(), [])
 
   const initialIndex = React.useMemo(() => {
@@ -89,15 +137,23 @@ export function CaptureClient({
   const [check, setCheck] = React.useState<QualityCheck | null>(null)
   const [pendingPreview, setPendingPreview] = React.useState<PendingPreview | null>(null)
 
-  /**
-   * AbortController por slot — permite cancelar upload anterior em tap-to-redo.
-   * T-03-07-02: cada slot tem seu AbortController; novo upload aborta o anterior.
-   */
+  // Critérios de bloqueio
+  const [irisFillRatio, setIrisFillRatio] = React.useState(0)
+  const [exposureDir, setExposureDir] = React.useState<'low' | 'high' | 'ok'>('ok')
+
+  // Mantém o raio da íris em px do frame original (usado pela análise pós-captura)
+  const lastIrisRadiusPxRef = React.useRef(0)
+
   const slotAbortRefs = React.useRef<Map<number, AbortController>>(new Map())
+
+  // Ref síncrono para blockingReason — evita closure stale no captureGate callback
+  const blockingRef = React.useRef<BlockingReason>('distance')
 
   const slot: Slot = SEQUENCE[Math.min(slotIndex, SEQUENCE.length - 1)]
 
-  // Loop de inferência por frame — apenas durante streaming
+  // ---------------------------------------------------------------------------
+  // Loop de inferência por frame
+  // ---------------------------------------------------------------------------
   React.useEffect(() => {
     const video = videoRef.current
     if (!video) return
@@ -129,9 +185,25 @@ export function CaptureClient({
           const sy = (video.videoHeight - minDim) / 2
           ctx.drawImage(video, sx, sy, minDim, minDim, 0, 0, ANALYSIS_W, ANALYSIS_H)
           const imageData = ctx.getImageData(0, 0, ANALYSIS_W, ANALYSIS_H)
+
           const c = computeQualityCheck(landmarks, slot.eye, imageData, ANALYSIS_W, ANALYSIS_H)
           setCheck(c)
           setScore(overallScore(c))
+
+          // Raio da íris em pixels reais do frame; comparado contra o raio do
+          // círculo guia projetado em pixels do vídeo (sob object-cover).
+          const videoW = video.videoWidth
+          const videoH = video.videoHeight
+          const irisRadiusPx = landmarks && c.irisDetected
+            ? getIrisRadiusPx(landmarks, slot.eye, videoW, videoH)
+            : 0
+          lastIrisRadiusPxRef.current = irisRadiusPx
+          const guideRadiusPx = Math.min(videoW, videoH) * GUIDE_RADIUS_FRAC_OF_MIN_DIM
+          const ratio = guideRadiusPx > 0 ? irisRadiusPx / guideRadiusPx : 0
+          setIrisFillRatio(ratio)
+
+          // Direção da exposição para critério de iluminação
+          setExposureDir(getExposureDirection(imageData))
         }
       }
       const videoEx = video as HTMLVideoElement & {
@@ -155,16 +227,20 @@ export function CaptureClient({
     }
   }, [phase, slot.eye])
 
-  /**
-   * Captura frame atual do <video>, comprime, mostra preview, sobe em background.
-   * D-09: Upload NÃO bloqueia transição para próximo slot.
-   * T-03-07-03: toast mostra apenas '{N}/6' — sem storage_path ou therapistId.
-   */
+  // Blocking reason derivado — mantém ref síncrono atualizado
+  const blockingReason = React.useMemo(
+    () => computeBlockingReason(check, irisFillRatio, exposureDir),
+    [check, irisFillRatio, exposureDir],
+  )
+  React.useEffect(() => { blockingRef.current = blockingReason }, [blockingReason])
+
+  // ---------------------------------------------------------------------------
+  // Captura
+  // ---------------------------------------------------------------------------
   const captureCurrentFrame = React.useCallback(async () => {
     const video = videoRef.current
     if (!video || video.videoWidth === 0) return
 
-    // 1. Comprimir frame
     let compressed
     try {
       compressed = await compressFrameToJpeg(video, video.videoWidth, video.videoHeight)
@@ -177,8 +253,9 @@ export function CaptureClient({
     const imageUrl = URL.createObjectURL(compressed.blob)
     const currentSlotIdx = slotIndex
     const currentScore = score
+    const irisRadiusPxAtCapture = lastIrisRadiusPxRef.current
+    const videoW = video.videoWidth
 
-    // 2. Mostrar preview imediato — não bloqueia
     setPendingPreview({
       blob: compressed.blob,
       imageUrl,
@@ -186,16 +263,36 @@ export function CaptureClient({
       width: compressed.width,
       height: compressed.height,
       slotIndex: currentSlotIdx,
+      analysis: null,
     })
     setPhase('previewing')
 
-    // 3. Cancelar upload anterior do MESMO slot (race em tap-to-redo — T-03-07-02)
+    // Análise pós-captura (best-effort, em paralelo com upload).
+    // Quando hasAlert=true, CapturePreview suspende auto-timeout e mostra
+    // botões "Refazer" / "Continuar assim".
+    void analyzeCapturedJpeg(
+      compressed.blob,
+      irisRadiusPxAtCapture,
+      compressed.width,
+      compressed.height,
+      videoW,
+    )
+      .then((analysis) => {
+        setPendingPreview(prev =>
+          prev && prev.slotIndex === currentSlotIdx
+            ? { ...prev, analysis }
+            : prev,
+        )
+      })
+      .catch(() => {
+        // Análise é best-effort; falha não atrapalha o fluxo
+      })
+
     const previousAbort = slotAbortRefs.current.get(currentSlotIdx)
     if (previousAbort) previousAbort.abort()
     const ac = new AbortController()
     slotAbortRefs.current.set(currentSlotIdx, ac)
 
-    // T-03-07-03: toast mostra apenas 'N/6' — sem paths ou IDs
     const toastId = toast.loading(`Salvando imagem ${currentSlotIdx + 1}/6...`)
 
     void uploadWithRetry({
@@ -220,9 +317,7 @@ export function CaptureClient({
           toast.dismiss(toastId)
           return
         }
-        // T-03-07-03: log apenas eye/angle, sem storage_path
         console.error('[capture-client] upload error — eye:', SEQUENCE[currentSlotIdx].eye, 'angle:', SEQUENCE[currentSlotIdx].angle)
-        // T-03-07-04: toast persistente com CTA para retry manual
         toast.error(`Falha ao salvar imagem ${currentSlotIdx + 1}/6. Toque para tentar novamente.`, {
           id: toastId,
           duration: Infinity,
@@ -230,13 +325,8 @@ export function CaptureClient({
       })
   }, [slotIndex, score, supabase, therapistId, readingId, slot.eye, slot.angle])
 
-  /**
-   * Avança para o próximo slot — chamado após preview timeout (sem tap-to-redo).
-   */
   const advanceToNextSlot = React.useCallback(() => {
-    if (pendingPreview?.imageUrl) {
-      URL.revokeObjectURL(pendingPreview.imageUrl)
-    }
+    if (pendingPreview?.imageUrl) URL.revokeObjectURL(pendingPreview.imageUrl)
     setPendingPreview(null)
     setCapturedCount(c => c + 1)
 
@@ -253,33 +343,26 @@ export function CaptureClient({
     setSlotIndex(next)
   }, [slotIndex, pendingPreview])
 
-  /**
-   * Tap-to-redo durante preview: cancela upload do slot atual, libera URL,
-   * volta para streaming sem incrementar capturedCount.
-   * T-03-07-02: AbortController cancela upload obsoleto.
-   */
   const redoCurrent = React.useCallback(() => {
     const previousAbort = slotAbortRefs.current.get(slotIndex)
     if (previousAbort) {
       previousAbort.abort()
       slotAbortRefs.current.delete(slotIndex)
     }
-    if (pendingPreview?.imageUrl) {
-      URL.revokeObjectURL(pendingPreview.imageUrl)
-    }
+    if (pendingPreview?.imageUrl) URL.revokeObjectURL(pendingPreview.imageUrl)
     setPendingPreview(null)
     setPhase('streaming')
     captureGate.reset()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slotIndex, pendingPreview])
 
-  // Auto-trigger real — gate dispara captureCurrentFrame
+  // Auto-trigger — verifica critérios de bloqueio antes de disparar
   const captureGate = useStableQualityGate(score, () => {
     if (phase !== 'streaming') return
+    if (blockingRef.current !== null) return
     void captureCurrentFrame()
   })
 
-  // Quando entra em 'overlay', auto-volta para 'streaming' após 2.5s
   React.useEffect(() => {
     if (phase !== 'overlay') return
     const id = window.setTimeout(() => {
@@ -287,11 +370,9 @@ export function CaptureClient({
       captureGate.reset()
     }, 2500)
     return () => window.clearTimeout(id)
-  // captureGate.reset é estável (useCallback no hook), ok no dep array
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase])
 
-  // Reset gate ao entrar em fases não-streaming
   React.useEffect(() => {
     if (phase === 'interstitial' || phase === 'previewing' || phase === 'finalizing') {
       captureGate.reset()
@@ -299,7 +380,6 @@ export function CaptureClient({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase])
 
-  // Cleanup em unmount: revoga URLs pendentes + aborta todos os uploads
   React.useEffect(() => {
     const abortMap = slotAbortRefs.current
     return () => {
@@ -308,8 +388,21 @@ export function CaptureClient({
     }
   }, [])
 
-  const message = check ? feedbackMessage(dominantFailure(check)) : 'Aguarde — preparando câmera...'
+  // ---------------------------------------------------------------------------
+  // Botão de captura
+  // ---------------------------------------------------------------------------
+  const buttonLabel = blockingReason !== null
+    ? BLOCKING_LABEL[blockingReason]
+    : `Pronto · ${Math.round(score * 100)}%`
 
+  const handleManualCapture = React.useCallback(() => {
+    if (phase !== 'streaming' || blockingRef.current !== null) return
+    void captureCurrentFrame()
+  }, [phase, captureCurrentFrame])
+
+  // ---------------------------------------------------------------------------
+  // Render
+  // ---------------------------------------------------------------------------
   return (
     <div className="relative flex-1 flex flex-col">
       <header className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3 pt-[env(safe-area-inset-top)]">
@@ -325,14 +418,34 @@ export function CaptureClient({
 
       <CameraView videoRef={videoRef} />
 
+      {/* Círculo guia grande — sempre visível durante streaming */}
+      {phase === 'streaming' && <GuideCircle score={score} />}
+
       {phase === 'streaming' && (
         <>
+          {/* Chip persistente eye/angle + QualityIndicator + progress */}
           <div className="absolute left-0 right-0 z-20 pt-[calc(env(safe-area-inset-top)+44px)] flex flex-col items-center gap-3">
+            <EyeAngleLabel slot={slot} currentIndex={slotIndex} />
             <QualityIndicator score={score} />
             <CaptureProgress currentIndex={slotIndex} capturedCount={capturedCount} />
           </div>
-          <div className="absolute left-0 right-0 bottom-[calc(env(safe-area-inset-bottom)+96px)] z-20 flex justify-center px-4">
-            <LiveFeedbackMessage message={message} />
+
+          {/* Botão de captura — desabilitado quando critérios não satisfeitos */}
+          <div className="absolute left-0 right-0 bottom-[calc(env(safe-area-inset-bottom)+16px)] z-20 flex justify-center px-6">
+            <button
+              type="button"
+              onClick={handleManualCapture}
+              disabled={blockingReason !== null}
+              aria-label={blockingReason !== null ? buttonLabel : 'Capturar foto'}
+              className={[
+                'w-full max-w-xs rounded-full py-3 px-5 text-sm font-medium text-center transition-all duration-200',
+                blockingReason !== null
+                  ? 'bg-black/50 text-white/55 backdrop-blur-sm cursor-not-allowed'
+                  : 'bg-white text-black shadow-lg active:scale-95',
+              ].join(' ')}
+            >
+              {buttonLabel}
+            </button>
           </div>
         </>
       )}
@@ -355,6 +468,7 @@ export function CaptureClient({
           onRedo={redoCurrent}
           onTimeout={advanceToNextSlot}
           durationMs={PREVIEW_MS}
+          analysis={pendingPreview.analysis}
         />
       )}
 
