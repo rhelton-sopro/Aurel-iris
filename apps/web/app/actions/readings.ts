@@ -87,6 +87,42 @@ export async function finalizeReadingAction(
 }
 
 /**
+ * Persiste as reading_images após upload do cliente para o Storage.
+ * Usa upsert em (reading_id, eye, angle) para suportar retake sem duplicar linhas.
+ */
+export async function saveReadingImagesAction(
+  readingId: string,
+  images: { eye: string; angle: string; storagePath: string; qualityScore: number; width: number; height: number }[]
+): Promise<{ error?: string }> {
+  const supabase = await createClient()
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (!user || authError) redirect('/login')
+
+  const parsed = readingIdSchema.safeParse({ reading_id: readingId })
+  if (!parsed.success) return { error: 'reading_id inválido' }
+
+  const rows = images.map(img => ({
+    reading_id: parsed.data.reading_id,
+    eye: img.eye,
+    angle: img.angle,
+    storage_path: img.storagePath,
+    quality_score: img.qualityScore,
+    width: img.width,
+    height: img.height,
+  }))
+
+  const { error } = await supabase
+    .from('reading_images')
+    .upsert(rows, { onConflict: 'reading_id,eye,angle' })
+
+  if (error) return { error: error.message }
+
+  revalidatePath('/leituras')
+  revalidatePath(`/leituras/${parsed.data.reading_id}`)
+  return {}
+}
+
+/**
  * Descarta um reading rascunho:
  *   1) Lista storage_paths via reading_images (RLS filtra para apenas próprios)
  *   2) Remove os blobs do bucket iris-captures (RLS de storage também valida)

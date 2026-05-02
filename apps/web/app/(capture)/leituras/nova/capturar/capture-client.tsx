@@ -29,6 +29,8 @@ import {
 } from '@/lib/capture/sequence'
 import { getIrisCenter, getIrisRadius } from '@/lib/capture/iris-geometry'
 import type { UseIrisDetectorResult } from '@/hooks/use-iris-detector'
+import { createClient } from '@/lib/supabase/client'
+import { saveReadingImagesAction } from '@/app/actions/readings'
 
 const IrisDetector = dynamic(() => import('@/components/capture/IrisDetector'), {
   ssr: false,
@@ -49,9 +51,18 @@ const ANALYSIS_H = 256
 /** Score mínimo para o botão ficar verde ("pronto para capturar") */
 const CAPTURE_READY_SCORE = 0.65
 
+function dataURLToBlob(dataURL: string): Blob {
+  const [header, b64] = dataURL.split(',')
+  const mime = header.match(/:(.*?);/)?.[1] ?? 'image/jpeg'
+  const raw = atob(b64)
+  const arr = new Uint8Array(raw.length)
+  for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i)
+  return new Blob([arr], { type: mime })
+}
+
 export function CaptureClient({
   readingId,
-  therapistId: _therapistId,
+  therapistId,
   clientName,
   capturedSlots: initialCaptured,
   resumeMode: _resumeMode,
@@ -61,6 +72,10 @@ export function CaptureClient({
   const analysisCanvasRef = React.useRef<HTMLCanvasElement | null>(null)
   const detectorRef = React.useRef<UseIrisDetectorResult | null>(null)
   const irisHoldRef = React.useRef<{ cx: number; cy: number; r: number; expiresAt: number } | null>(null)
+  // Full-res captures para upload (não precisam de re-render)
+  const captureDataURLs = React.useRef<({ url: string; width: number; height: number } | null)[]>(
+    Array(SEQUENCE.length).fill(null)
+  )
 
   const initialIndex = React.useMemo(() => {
     const idx = getResumeSlotIndex(initialCaptured)
@@ -85,6 +100,8 @@ export function CaptureClient({
   const [lastThumb, setLastThumb] = React.useState<string | null>(null)
   const [flashActive, setFlashActive] = React.useState(false)
   const [retakeMode, setRetakeMode] = React.useState(false)
+  const [submitting, setSubmitting] = React.useState(false)
+  const [submitError, setSubmitError] = React.useState<string | null>(null)
 
   const slot: Slot = SEQUENCE[Math.min(slotIndex, SEQUENCE.length - 1)]
 
@@ -215,6 +232,22 @@ export function CaptureClient({
     }
     setThumbScores(prev => { const n = [...prev]; n[capturedIdx] = capturedScore; return n })
 
+    // Captura full-res para upload (máx 1920px no lado maior)
+    const vid = videoRef.current
+    if (vid && vid.videoWidth > 0) {
+      const maxDim = 1920
+      const sc = Math.min(1, maxDim / Math.max(vid.videoWidth, vid.videoHeight))
+      const fc = document.createElement('canvas')
+      fc.width = Math.round(vid.videoWidth * sc)
+      fc.height = Math.round(vid.videoHeight * sc)
+      fc.getContext('2d')?.drawImage(vid, 0, 0, fc.width, fc.height)
+      captureDataURLs.current[capturedIdx] = {
+        url: fc.toDataURL('image/jpeg', 0.85),
+        width: fc.width,
+        height: fc.height,
+      }
+    }
+
     // Flash visual + haptic feedback
     setFlashActive(true)
     if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(100)
@@ -241,6 +274,36 @@ export function CaptureClient({
     setRetakeMode(true)
     setPhase('streaming')
   }, [])
+
+  // Upload das 6 fotos e persistência no banco
+  const handleConfirm = React.useCallback(async () => {
+    setSubmitting(true)
+    setSubmitError(null)
+    try {
+      const supabase = createClient()
+      const imageRows: { eye: string; angle: string; storagePath: string; qualityScore: number; width: number; height: number }[] = []
+
+      for (let i = 0; i < SEQUENCE.length; i++) {
+        const cap = captureDataURLs.current[i]
+        if (!cap) continue
+        const s = SEQUENCE[i]
+        const storagePath = `${therapistId}/${readingId}/${s.eye}_${s.angle}.jpg`
+        const blob = dataURLToBlob(cap.url)
+        const { error } = await supabase.storage
+          .from('iris-captures')
+          .upload(storagePath, blob, { contentType: 'image/jpeg', upsert: true })
+        if (error) { setSubmitError(error.message); setSubmitting(false); return }
+        imageRows.push({ eye: s.eye, angle: s.angle, storagePath, qualityScore: thumbScores[i], width: cap.width, height: cap.height })
+      }
+
+      const result = await saveReadingImagesAction(readingId, imageRows)
+      if (result.error) { setSubmitError(result.error); setSubmitting(false); return }
+      router.push('/leituras')
+    } catch (e) {
+      setSubmitError(e instanceof Error ? e.message : 'Erro inesperado')
+      setSubmitting(false)
+    }
+  }, [readingId, therapistId, thumbScores])
 
   const message = check ? feedbackMessage(dominantFailure(check)) : 'Aguarde — preparando câmera...'
   const captureReady = score >= CAPTURE_READY_SCORE
@@ -424,12 +487,16 @@ export function CaptureClient({
                 {thumbScores.filter(sc => sc < 0.40).length} foto(s) com qualidade ruim — considere refazer
               </p>
             )}
+            {submitError && (
+              <p className="text-xs text-center text-destructive">{submitError}</p>
+            )}
             <button
               type="button"
-              onClick={() => router.push('/leituras')}
-              className="w-full bg-primary text-primary-foreground rounded-xl py-3 font-semibold text-sm"
+              onClick={handleConfirm}
+              disabled={submitting}
+              className="w-full bg-primary text-primary-foreground rounded-xl py-3 font-semibold text-sm disabled:opacity-60"
             >
-              Confirmar e enviar
+              {submitting ? 'Enviando...' : 'Confirmar e enviar'}
             </button>
           </div>
         </div>
