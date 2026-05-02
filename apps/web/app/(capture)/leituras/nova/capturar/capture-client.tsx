@@ -44,34 +44,56 @@ const IrisDetector = dynamic(() => import('@/components/capture/IrisDetector'), 
 // ---------------------------------------------------------------------------
 
 /**
- * Círculo guia desenhado em 60vmin de diâmetro → raio = 30vmin = 30% do
- * min(viewportW, viewportH). Sob `object-cover`, o min do viewport mapeia 1:1
- * para o min(videoW, videoH), então o raio do guia em pixels do vídeo é
- * `min(videoW, videoH) * 0.30`.
+ * Raio do círculo guia = 30vmin = 30% de `min(window.innerWidth, innerHeight)`.
+ * O guia é desenhado em CSS (60vmin de diâmetro) — por isso o denominador do
+ * irisFillRatio precisa ser em px CSS do viewport, não em px do vídeo.
  */
-const GUIDE_RADIUS_FRAC_OF_MIN_DIM = 0.30
+const GUIDE_RADIUS_FRAC = 0.30
 
 /** Íris deve preencher pelo menos 40% do raio do círculo guia. */
 const MIN_IRIS_FILL_FACTOR = 0.40
 
+/**
+ * Score ≥ 0.70 (Boa/Excelente) bypassa o gate de distância. O score já avalia
+ * o frame como um todo; nessa faixa, irisFillRatio não deve sobrescrever.
+ */
+const SCORE_BYPASS_THRESHOLD = 0.70
+
 /** Score de nitidez mínimo (sharpnessScore = variance/80; 0.15 ≈ variance 12 = claramente borrado). */
 const SHARPNESS_BLOCK_THRESHOLD = 0.15
 
-type BlockingReason = 'distance' | 'exposure' | 'sharpness' | null
+/** Janela após perder os landmarks da íris para classificar como "too_close". */
+const TOO_CLOSE_GRACE_MS = 1000
+/** Score anterior mínimo para classificar como too_close (vs. "perdeu o rosto"). */
+const TOO_CLOSE_PREV_SCORE = 0.50
+/** Score neutro exibido em modo too_close — não zera para evitar UX confusa. */
+const TOO_CLOSE_NEUTRAL_SCORE = 0.30
+
+type BlockingReason = 'distance' | 'too_close' | 'exposure' | 'sharpness' | null
 
 function computeBlockingReason(
   check: QualityCheck | null,
   irisFillRatio: number,
   exposureDir: 'low' | 'high' | 'ok',
+  tooClose: boolean,
+  qualityScore: number,
 ): BlockingReason {
-  if (!check || !check.irisDetected || irisFillRatio < MIN_IRIS_FILL_FACTOR) return 'distance'
+  // too_close tem prioridade — íris saiu do guia, recuar é a única ação útil
+  if (tooClose) return 'too_close'
+
+  // Score alto avalia o frame como um todo — bypassa o gate de distância
+  if (qualityScore < SCORE_BYPASS_THRESHOLD) {
+    if (!check || !check.irisDetected || irisFillRatio < MIN_IRIS_FILL_FACTOR) return 'distance'
+  }
+
   if (exposureDir === 'low') return 'exposure'
-  if (check.sharpness < SHARPNESS_BLOCK_THRESHOLD) return 'sharpness'
+  if (check && check.sharpness < SHARPNESS_BLOCK_THRESHOLD) return 'sharpness'
   return null
 }
 
 const BLOCKING_LABEL: Record<NonNullable<BlockingReason>, string> = {
   distance: 'Aproxime mais — cubra pelo menos 40% do guia',
+  too_close: 'Recue um pouco — íris saiu do guia',
   exposure: 'Ambiente muito escuro — procure mais luz',
   sharpness: 'Imagem borrada — segure firme o celular',
 }
@@ -140,9 +162,14 @@ export function CaptureClient({
   // Critérios de bloqueio
   const [irisFillRatio, setIrisFillRatio] = React.useState(0)
   const [exposureDir, setExposureDir] = React.useState<'low' | 'high' | 'ok'>('ok')
+  const [tooClose, setTooClose] = React.useState(false)
 
   // Mantém o raio da íris em px do frame original (usado pela análise pós-captura)
   const lastIrisRadiusPxRef = React.useRef(0)
+  // História recente — distingue "too_close" (perdeu landmarks com score alto)
+  // de "sem face" (nunca detectou ou está há muito tempo sem detectar).
+  const lastValidScoreRef = React.useRef(0)
+  const lastIrisDetectedAtRef = React.useRef(0)
 
   const slotAbortRefs = React.useRef<Map<number, AbortController>>(new Map())
 
@@ -188,19 +215,44 @@ export function CaptureClient({
 
           const c = computeQualityCheck(landmarks, slot.eye, imageData, ANALYSIS_W, ANALYSIS_H)
           setCheck(c)
-          setScore(overallScore(c))
 
-          // Raio da íris em pixels reais do frame; comparado contra o raio do
-          // círculo guia projetado em pixels do vídeo (sob object-cover).
-          const videoW = video.videoWidth
-          const videoH = video.videoHeight
-          const irisRadiusPx = landmarks && c.irisDetected
-            ? getIrisRadiusPx(landmarks, slot.eye, videoW, videoH)
-            : 0
-          lastIrisRadiusPxRef.current = irisRadiusPx
-          const guideRadiusPx = Math.min(videoW, videoH) * GUIDE_RADIUS_FRAC_OF_MIN_DIM
-          const ratio = guideRadiusPx > 0 ? irisRadiusPx / guideRadiusPx : 0
-          setIrisFillRatio(ratio)
+          const nowMs = performance.now()
+          if (c.irisDetected) {
+            const newScore = overallScore(c)
+            setScore(newScore)
+            lastValidScoreRef.current = newScore
+            lastIrisDetectedAtRef.current = nowMs
+            setTooClose(false)
+
+            const irisRadiusPx = landmarks
+              ? getIrisRadiusPx(landmarks, slot.eye, video.videoWidth, video.videoHeight)
+              : 0
+            lastIrisRadiusPxRef.current = irisRadiusPx
+
+            // Denominador em px CSS do viewport, onde o guia 60vmin é desenhado.
+            const cssMinDim = Math.min(window.innerWidth, window.innerHeight)
+            const guideRadiusCss = cssMinDim * GUIDE_RADIUS_FRAC
+            const ratio = guideRadiusCss > 0 ? irisRadiusPx / guideRadiusCss : 0
+            setIrisFillRatio(ratio)
+          } else {
+            // MediaPipe perdeu landmarks. Se score recente estava alto, é provável
+            // que o usuário ficou perto demais (íris saiu do frame); se não, é
+            // perda de rosto / posicionamento ruim.
+            const sinceDetect = nowMs - lastIrisDetectedAtRef.current
+            const isTooClose =
+              lastIrisDetectedAtRef.current > 0 &&
+              sinceDetect < TOO_CLOSE_GRACE_MS &&
+              lastValidScoreRef.current > TOO_CLOSE_PREV_SCORE
+            if (isTooClose) {
+              setScore(TOO_CLOSE_NEUTRAL_SCORE)
+              setTooClose(true)
+            } else {
+              setScore(0)
+              setTooClose(false)
+            }
+            lastIrisRadiusPxRef.current = 0
+            setIrisFillRatio(0)
+          }
 
           // Direção da exposição para critério de iluminação
           setExposureDir(getExposureDirection(imageData))
@@ -229,8 +281,8 @@ export function CaptureClient({
 
   // Blocking reason derivado — mantém ref síncrono atualizado
   const blockingReason = React.useMemo(
-    () => computeBlockingReason(check, irisFillRatio, exposureDir),
-    [check, irisFillRatio, exposureDir],
+    () => computeBlockingReason(check, irisFillRatio, exposureDir, tooClose, score),
+    [check, irisFillRatio, exposureDir, tooClose, score],
   )
   React.useEffect(() => { blockingRef.current = blockingReason }, [blockingReason])
 
