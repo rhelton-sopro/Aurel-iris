@@ -58,11 +58,12 @@ export function getIrisRadius(landmarks: Landmark[], eye: Eye): number {
  * Centeredness: 1.0 quando o centro da íris coincide com overlayCenter; cai linear
  * quando se afasta. Default overlayCenter (0.5, 0.5) — overlay circular no centro
  * do viewport.
+ * maxAcceptable=0.15: câmera traseira mobile exige área de aceitação maior (vs 0.10 de lab).
  */
 export function computeCenteredness(
   center: Landmark | null,
   overlayCenter: { x: number; y: number } = { x: 0.5, y: 0.5 },
-  maxAcceptable = 0.10
+  maxAcceptable = 0.15
 ): number {
   if (!center) return 0
   const dx = center.x - overlayCenter.x
@@ -72,28 +73,30 @@ export function computeCenteredness(
 }
 
 /**
- * Distance OK: 1.0 quando o raio observado está dentro de ±15% do raio target;
- * cai linearmente fora dessa faixa. Razão (RESEARCH §Sub-score 3):
- *   - target 0.15 = ~15% da menor dimensão do viewport (UI-SPEC overlay 60vmin / max 360px)
- *   - >1.15 (perto) ou <0.85 (longe) começa a perder pontos.
+ * Distance OK: 1.0 quando o raio observado está dentro de ±40% do raio target;
+ * cai linearmente fora dessa faixa.
+ * Calibrado para câmera mobile real:
+ *   - target 0.08 = íris a distância confortável (~15–25cm) num frame de rosto
+ *   - tolerância ±40%: ratio∈[0.60, 1.40] → score=1.0 (não precisa ser exato)
+ *   - zero abaixo de ratio=0.20 (muito longe) ou acima de ratio=3.0 (encostado)
  */
-export function computeDistanceOk(observedRadius: number, targetRadius = 0.15): number {
+export function computeDistanceOk(observedRadius: number, targetRadius = 0.08): number {
   if (targetRadius <= 0 || observedRadius <= 0) return 0
   const ratio = observedRadius / targetRadius
-  if (ratio < 0.5 || ratio > 2.0) return 0
-  // Tolerância 0.15 = ratio∈[0.85, 1.15] → score=1.0
+  if (ratio < 0.20 || ratio > 3.0) return 0
   const dev = Math.abs(ratio - 1)
-  if (dev <= 0.15) return 1
-  return Math.max(0, 1 - (dev - 0.15) * 2)
+  if (dev <= 0.40) return 1
+  return Math.max(0, 1 - (dev - 0.40) / 0.60)
 }
 
 /**
  * Direção da distância para a copy (longe vs perto).
+ * Thresholds alinhados com tolerância de computeDistanceOk (±40%).
  */
-export function getDistanceDirection(observedRadius: number, targetRadius = 0.15): 'far' | 'close' | 'ok' {
+export function getDistanceDirection(observedRadius: number, targetRadius = 0.08): 'far' | 'close' | 'ok' {
   const ratio = observedRadius / targetRadius
-  if (ratio < 0.85) return 'far'
-  if (ratio > 1.15) return 'close'
+  if (ratio < 0.60) return 'far'
+  if (ratio > 1.40) return 'close'
   return 'ok'
 }
 

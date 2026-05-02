@@ -39,9 +39,11 @@ export function laplacianVariance(imageData: ImageData): number {
 
 /**
  * Normaliza variance → 0..1.
- *   variance < 100 → score < 0.5 (SPEC limiar de "nítido")
- *   variance >= 200 → score = 1.0 (excellent)
+ * Calibrado para câmera mobile real (iPhone/Android rear cam com JPEG decode):
+ *   variance < 40  → desfocado (score < 0.5)
+ *   variance >= 80 → nítido o suficiente (score = 1.0)
+ * Câmeras DSLR/lab atingem variance >200; mobile comprimido tipicamente 30–80.
  */
 export function sharpnessScore(variance: number): number {
-  return Math.max(0, Math.min(1, variance / 200))
+  return Math.max(0, Math.min(1, variance / 80))
 }

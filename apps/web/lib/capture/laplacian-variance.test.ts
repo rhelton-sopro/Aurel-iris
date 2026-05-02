@@ -43,7 +43,8 @@ describe('laplacianVariance', () => {
 
 describe('sharpnessScore', () => {
   it('variance 0 → 0', () => expect(sharpnessScore(0)).toBe(0))
-  it('variance 200 → 1', () => expect(sharpnessScore(200)).toBe(1))
-  it('variance 100 → 0.5', () => expect(sharpnessScore(100)).toBe(0.5))
+  it('variance 80 → 1 (mobile saturation point)', () => expect(sharpnessScore(80)).toBe(1))
+  it('variance 200 → clamped to 1', () => expect(sharpnessScore(200)).toBe(1))
+  it('variance 40 → 0.5 (mobile blur threshold)', () => expect(sharpnessScore(40)).toBeCloseTo(0.5))
   it('variance 1000 → clamped to 1', () => expect(sharpnessScore(1000)).toBe(1))
 })
