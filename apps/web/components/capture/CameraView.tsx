@@ -37,13 +37,7 @@ export function CameraView({ videoRef }: CameraViewProps) {
         </div>
       )}
 
-      {/* Overlay circular guia — UI-SPEC: borda branca/80, sem fill */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 flex items-center justify-center"
-      >
-        <div className="aspect-square w-[60vmin] max-w-[360px] rounded-full border-2 border-white/80 shadow-[0_0_0_9999px_rgba(0,0,0,0.35)]" />
-      </div>
+
     </div>
   )
 }

@@ -24,6 +24,7 @@ import {
   getResumeSlotIndex,
   isOuterEyeTransition,
 } from '@/lib/capture/sequence'
+import { getIrisCenter, getIrisRadius } from '@/lib/capture/iris-geometry'
 import type { UseIrisDetectorResult } from '@/hooks/use-iris-detector'
 import { useStableQualityGate } from '@/hooks/use-quality-score'
 
@@ -72,6 +73,7 @@ export function CaptureClient({
   const [capturedCount, setCapturedCount] = React.useState(initialCaptured.length)
   const [score, setScore] = React.useState(0)
   const [check, setCheck] = React.useState<QualityCheck | null>(null)
+  const [irisPos, setIrisPos] = React.useState<{ cx: number; cy: number; r: number } | null>(null)
 
   const slot: Slot = SEQUENCE[Math.min(slotIndex, SEQUENCE.length - 1)]
 
@@ -93,6 +95,26 @@ export function CaptureClient({
       if (det?.ready && video.readyState >= 2 && video.videoWidth > 0 && video.videoHeight > 0) {
         const result = det.detect(video, now)
         const landmarks = result?.faceLandmarks?.[0] ?? null
+
+        // Iris overlay — mapeia coordenadas normalizadas para pixels considerando object-cover
+        const lm = landmarks ?? []
+        const irisCenter = getIrisCenter(lm, slot.eye)
+        const irisRaw = irisCenter ? getIrisRadius(lm, slot.eye) : 0
+        if (irisCenter && irisRaw > 0 && video.offsetWidth > 0) {
+          const cW = video.offsetWidth
+          const cH = video.offsetHeight
+          const vW = video.videoWidth
+          const vH = video.videoHeight
+          const scale = Math.max(cW / vW, cH / vH)
+          setIrisPos({
+            cx: (cW - vW * scale) / 2 + irisCenter.x * vW * scale,
+            cy: (cH - vH * scale) / 2 + irisCenter.y * vH * scale,
+            r: irisRaw * vW * scale,
+          })
+        } else {
+          setIrisPos(null)
+        }
+
         if (!analysisCanvasRef.current) {
           analysisCanvasRef.current = document.createElement('canvas')
           analysisCanvasRef.current.width = ANALYSIS_W
@@ -200,6 +222,37 @@ export function CaptureClient({
       </header>
 
       <CameraView videoRef={videoRef} />
+
+      {/* Iris guide — segue a íris detectada; cor varia com o score */}
+      {phase !== 'interstitial' && phase !== 'finalizing' && (
+        irisPos != null ? (
+          <div
+            aria-hidden="true"
+            className={`pointer-events-none absolute rounded-full border-2 transition-colors duration-300 ${
+              score < 0.40
+                ? 'border-red-500'
+                : score < 0.75
+                ? 'border-amber-400'
+                : 'border-emerald-500'
+            }`}
+            style={{
+              width: irisPos.r * 2,
+              height: irisPos.r * 2,
+              left: irisPos.cx - irisPos.r,
+              top: irisPos.cy - irisPos.r,
+              zIndex: 15,
+            }}
+          />
+        ) : (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 flex items-center justify-center"
+            style={{ zIndex: 15 }}
+          >
+            <div className="aspect-square w-[60vmin] max-w-[360px] rounded-full border-2 border-white/40 shadow-[0_0_0_9999px_rgba(0,0,0,0.35)]" />
+          </div>
+        )
+      )}
 
       {/* QualityIndicator + CaptureProgress no topo (ocultos durante interstitial e finalizing) */}
       {phase !== 'interstitial' && phase !== 'finalizing' && (
