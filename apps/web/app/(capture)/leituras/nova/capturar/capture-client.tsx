@@ -387,13 +387,14 @@ export function CaptureClient({
             type="button"
             onClick={handleCapture}
             aria-label="Capturar foto"
-            className={`rounded-full border-4 w-20 h-20 flex items-center justify-center text-white text-xs font-semibold text-center leading-tight transition-colors duration-300 ${
+            className={`rounded-full border-4 w-20 h-20 flex flex-col items-center justify-center gap-0.5 text-white transition-colors duration-300 ${
               captureReady
                 ? 'bg-emerald-500/90 border-white shadow-lg shadow-emerald-500/40 animate-pulse'
                 : 'bg-white/20 border-white/50'
             }`}
           >
-            {captureReady ? 'Pronto!' : 'Capturar'}
+            <span className="text-xs font-semibold leading-none">{captureReady ? 'Pronto!' : 'Capturar'}</span>
+            <span className="text-[11px] tabular-nums opacity-80 leading-none">{(score * 100).toFixed(0)}%</span>
           </button>
         </div>
       )}

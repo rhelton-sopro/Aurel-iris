@@ -1,24 +1,21 @@
 /**
- * Iris landmark indices canônicos (MediaPipe FaceLandmarker oficial).
- * Convenção crítica: POV do SUJEITO, não do espectador.
- *
- * Verificado em github.com/google-ai-edge/mediapipe master/face_landmarks_connections.ts:
- * - 468 = left iris center (esquerdo do sujeito); 469-472 = left iris contour
- * - 473 = right iris center (direito do sujeito); 474-477 = right iris contour
- *
- * Nota: algumas fontes e versões antigas do SPEC citam os índices invertidos (left=473, right=468).
- * Esta lib usa a convenção MediaPipe oficial (left=468, right=473) — POV do sujeito.
+ * Iris landmark indices (MediaPipe FaceLandmarker).
+ * Convenção: POV da CÂMERA TRASEIRA (não espelhada) — validado por teste empírico no iPhone.
+ * - O olho que aparece no LADO ESQUERDO da tela = olho DIREITO da pessoa
+ * - MediaPipe numera os landmarks pelo lado da IMAGEM (câmera), não pelo lado do sujeito:
+ *   468 = iris no LADO DIREITO da imagem = olho ESQUERDO da pessoa
+ *   473 = iris no LADO ESQUERDO da imagem = olho DIREITO da pessoa
  */
 export type Eye = 'left' | 'right'
 
 export const IRIS_LANDMARKS = {
-  left: { center: 468, contour: [469, 470, 471, 472] },
-  right: { center: 473, contour: [474, 475, 476, 477] },
+  left:  { center: 473, contour: [474, 475, 476, 477] },  // lado esquerdo da tela = olho esq. da pessoa
+  right: { center: 468, contour: [469, 470, 471, 472] },  // lado direito da tela = olho dir. da pessoa
 } as const
 
 export const EYELID_LANDMARKS = {
-  left: { upper: 159, lower: 145 },
-  right: { upper: 386, lower: 374 },
+  left:  { upper: 386, lower: 374 },
+  right: { upper: 159, lower: 145 },
 } as const
 
 export interface Landmark {
@@ -80,28 +77,36 @@ export function computeCenteredness(
  *   - Assimétrico: longe penaliza mais (iris sem detalhe); perto penaliza menos
  *     (íris transborda levemente → ainda tem detalhe suficiente)
  */
+/**
+ * Perto = melhor para iridologia (mais detalhe da íris).
+ * Score cresce monotonicamente conforme a íris se aproxima do tamanho-alvo;
+ * não penaliza quando a íris está maior que o alvo (outros sub-scores
+ * — sharpness e occlusion — capturam os efeitos reais de estar muito perto).
+ *
+ * ratio < 0.10  → 0 (íris quase invisível)
+ * ratio 0.10–0.50 → linear 0→1
+ * ratio ≥ 0.50  → 1 (no alvo ou além = sempre bom)
+ */
+/**
+ * Íris preenchendo ≥ 25% do raio-alvo já recebe score 1.0.
+ * Para iridologia: perto = sempre melhor. Limiar baixo evita penalizar
+ * capturas válidas com câmera muito próxima.
+ */
 export function computeDistanceOk(observedRadius: number, targetRadius = 0.12): number {
   if (targetRadius <= 0 || observedRadius <= 0) return 0
   const ratio = observedRadius / targetRadius
-  if (ratio < 0.10 || ratio > 2.5) return 0
-  const dev = ratio - 1
-  if (Math.abs(dev) <= 0.50) return 1
-  if (dev < 0) {
-    // Muito longe — penalidade moderada (ratio: 0.50 → 0.10, score: 1 → 0)
-    return Math.max(0, 1 - (-dev - 0.50) / 0.40)
-  }
-  // Muito perto — penalidade mais suave (ratio: 1.50 → 2.50, score: 1 → 0)
-  return Math.max(0, 1 - (dev - 0.50) / 1.0)
+  if (ratio < 0.05) return 0
+  if (ratio >= 0.25) return 1.0
+  return (ratio - 0.05) / 0.20
 }
 
 /**
- * Direção da distância para a copy (longe vs perto).
- * Alinhado com a tolerância assimétrica de computeDistanceOk.
+ * Direção da distância para a copy.
+ * Sem penalidade por "muito perto" — só penaliza longe.
  */
 export function getDistanceDirection(observedRadius: number, targetRadius = 0.12): 'far' | 'close' | 'ok' {
   const ratio = observedRadius / targetRadius
   if (ratio < 0.50) return 'far'
-  if (ratio > 1.50) return 'close'
   return 'ok'
 }
 
