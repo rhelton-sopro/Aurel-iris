@@ -21,25 +21,25 @@ describe('useStableQualityGate', () => {
     expect(onTrigger).not.toHaveBeenCalled()
   })
 
-  it('does not trigger when score crosses gate but falls before 400ms', () => {
+  it('does not trigger when score crosses gate but falls before 200ms', () => {
     const onTrigger = vi.fn()
     const { rerender } = renderHook(({ score }) => useStableQualityGate(score, onTrigger), {
       initialProps: { score: 0.50 },
     })
     rerender({ score: 0.80 })
-    act(() => { vi.advanceTimersByTime(200) })
+    act(() => { vi.advanceTimersByTime(100) })
     rerender({ score: 0.60 })
     act(() => { vi.advanceTimersByTime(400) })
     expect(onTrigger).not.toHaveBeenCalled()
   })
 
-  it('triggers exactly once after 400ms continuous above gate', () => {
+  it('triggers exactly once after 200ms continuous above gate', () => {
     const onTrigger = vi.fn()
     const { rerender } = renderHook(({ score }) => useStableQualityGate(score, onTrigger), {
       initialProps: { score: 0.50 },
     })
     rerender({ score: 0.85 })
-    act(() => { vi.advanceTimersByTime(450) })
+    act(() => { vi.advanceTimersByTime(250) })
     expect(onTrigger).toHaveBeenCalledTimes(1)
     // Continuar score alto não dispara de novo
     act(() => { vi.advanceTimersByTime(1000) })

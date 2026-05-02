@@ -74,6 +74,7 @@ export function CaptureClient({
   const [score, setScore] = React.useState(0)
   const [check, setCheck] = React.useState<QualityCheck | null>(null)
   const [irisPos, setIrisPos] = React.useState<{ cx: number; cy: number; r: number } | null>(null)
+  const [lastThumb, setLastThumb] = React.useState<string | null>(null)
 
   const slot: Slot = SEQUENCE[Math.min(slotIndex, SEQUENCE.length - 1)]
 
@@ -182,9 +183,9 @@ export function CaptureClient({
   // Stub do auto-trigger — em 03-07 capturará Canvas.toBlob + upload + insert
   const captureGate = useStableQualityGate(score, () => {
     if (phase !== 'streaming') return
-    console.log(
-      `[capture-client] STUB: capturing slot ${slot.eye}/${slot.angle} (idx ${slotIndex}, score ${score.toFixed(2)})`
-    )
+    if (analysisCanvasRef.current) {
+      setLastThumb(analysisCanvasRef.current.toDataURL('image/jpeg', 0.7))
+    }
     advanceToNextSlot()
   })
 
@@ -292,6 +293,22 @@ export function CaptureClient({
         <div className="absolute inset-0 z-50 bg-background flex flex-col items-center justify-center gap-4 text-foreground">
           <h1 className="text-xl font-semibold">6 de 6 imagens registradas</h1>
           <p className="text-sm text-muted-foreground">Finalizando leitura...</p>
+        </div>
+      )}
+
+      {/* Thumbnail da última captura — canto inferior esquerdo */}
+      {lastThumb && phase !== 'interstitial' && phase !== 'finalizing' && (
+        <div
+          className="absolute z-20 rounded-lg overflow-hidden border-2 border-white/60 shadow-lg"
+          style={{
+            bottom: 'calc(env(safe-area-inset-bottom) + 20px)',
+            left: 16,
+            width: 56,
+            height: 56,
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={lastThumb} alt="Última captura" className="w-full h-full object-cover" />
         </div>
       )}
 
