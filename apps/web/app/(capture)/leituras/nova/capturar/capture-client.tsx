@@ -10,7 +10,11 @@ import { finalizeReadingAction } from '@/app/actions/readings'
 import { AngleInterstitial } from '@/components/capture/AngleInterstitial'
 import { CapturePreview } from '@/components/capture/CapturePreview'
 import { CaptureProgress } from '@/components/capture/CaptureProgress'
-import { analyzeCapturedJpeg, type PostCaptureAnalysis } from '@/lib/capture/post-capture-analysis'
+import {
+  analyzeCapturedJpeg,
+  scaleDetectedIrisRadius,
+  type PostCaptureAnalysis,
+} from '@/lib/capture/post-capture-analysis'
 import { uploadWithRetry } from '@/lib/capture/upload'
 import { createClient } from '@/lib/supabase/client'
 import { getIrisRadiusPx } from '@/lib/capture/iris-geometry'
@@ -35,8 +39,12 @@ const IrisDetector = dynamic(() => import('@/components/capture/IrisDetector'), 
 const IRIS_EXCELLENT_PX = 600
 /** Raio em px que vale score 0.5 (Aceitável) — bate com IRIS_RADIUS_ALERT_PX. */
 const IRIS_ACCEPTABLE_PX = 300
-/** Score quando MediaPipe não detectou íris (não bloqueia o usuário, só alerta). */
-const NO_IRIS_FALLBACK_SCORE = 0.30
+/**
+ * Score quando MediaPipe não detectou íris alguma. Neutro (50%) — sinaliza
+ * "verifique enquadramento" via overlay sem bloquear nem rebaixar a percepção
+ * do usuário injustamente.
+ */
+const NO_IRIS_FALLBACK_SCORE = 0.50
 
 function irisSizeScore(irisRadiusPx: number): number {
   if (irisRadiusPx <= 0) return NO_IRIS_FALLBACK_SCORE
@@ -57,16 +65,16 @@ function detectIris(
   detector: UseIrisDetectorResult | null,
   eye: 'left' | 'right',
 ): OneShotResult {
-  let irisRadiusPx = 0
+  let rawRadius = 0
   if (detector?.ready) {
     const result = detector.detect(img)
     const landmarks = result?.faceLandmarks?.[0] ?? null
     if (landmarks) {
-      // naturalWidth/naturalHeight = dimensões reais do arquivo, não as
-      // CSS-rendered. MediaPipe normaliza pra essas dimensões.
-      irisRadiusPx = getIrisRadiusPx(landmarks, eye, img.naturalWidth, img.naturalHeight)
+      rawRadius = getIrisRadiusPx(landmarks, eye, img.naturalWidth, img.naturalHeight)
     }
   }
+  // Escala pro espaço de px reais do arquivo (MediaPipe opera em ~512px ref).
+  const irisRadiusPx = scaleDetectedIrisRadius(rawRadius, img.naturalWidth)
   return { irisRadiusPx, score: irisSizeScore(irisRadiusPx) }
 }
 

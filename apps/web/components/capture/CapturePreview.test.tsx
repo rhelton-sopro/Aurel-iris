@@ -46,6 +46,7 @@ describe('CapturePreview', () => {
       sharpnessThreshold: 200,
       sharpnessAlert: true,
       irisAlert: true,
+      irisUndetectedAlert: false,
       hasAlert: true,
     }
     render(
@@ -62,6 +63,32 @@ describe('CapturePreview', () => {
     expect(screen.getByText(/Íris pequena/)).toBeInTheDocument()
   })
 
+  it('shows undetected message when MediaPipe failed (irisRadiusPx=0)', () => {
+    const analysis: PostCaptureAnalysis = {
+      laplacianVariance: 250,
+      irisRadiusPx: 0,
+      imageWidth: 3840,
+      imageHeight: 2160,
+      sharpnessThreshold: 200,
+      sharpnessAlert: false,
+      irisAlert: false,
+      irisUndetectedAlert: true,
+      hasAlert: true,
+    }
+    render(
+      <CapturePreview
+        imageUrl="blob:test"
+        qualityScore={0.50}
+        analysis={analysis}
+        onRedo={vi.fn()}
+        onConfirm={vi.fn()}
+      />
+    )
+    expect(screen.getByText(/Não foi possível detectar a íris/)).toBeInTheDocument()
+    // Não deve mostrar "Íris pequena" simultaneamente — flags são mutuamente exclusivas
+    expect(screen.queryByText(/Íris pequena/)).not.toBeInTheDocument()
+  })
+
   it('does not show alert when analysis has no issues', () => {
     const analysis: PostCaptureAnalysis = {
       laplacianVariance: 250,
@@ -71,6 +98,7 @@ describe('CapturePreview', () => {
       sharpnessThreshold: 200,
       sharpnessAlert: false,
       irisAlert: false,
+      irisUndetectedAlert: false,
       hasAlert: false,
     }
     render(

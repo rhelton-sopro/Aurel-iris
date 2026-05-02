@@ -45,9 +45,14 @@ export function CapturePreview({
   const level: QualityLevel = levelFromScore(qualityScore)
   const showAlert = analysis?.hasAlert === true
 
+  // Iris-detection-failed e iris-too-small são mutuamente exclusivos.
   const reasons: string[] = []
+  if (analysis?.irisUndetectedAlert) {
+    reasons.push('Não foi possível detectar a íris — verifique o enquadramento')
+  } else if (analysis?.irisAlert) {
+    reasons.push('Íris pequena — aproxime mais')
+  }
   if (analysis?.sharpnessAlert) reasons.push('Imagem pouco nítida')
-  if (analysis?.irisAlert) reasons.push('Íris pequena — aproxime mais')
 
   return (
     <div
