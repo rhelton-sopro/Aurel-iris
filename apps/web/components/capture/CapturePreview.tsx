@@ -47,7 +47,7 @@ export function CapturePreview({
 
   const reasons: string[] = []
   if (analysis?.sharpnessAlert) reasons.push('Imagem pouco nítida')
-  if (analysis?.irisAlert) reasons.push('Íris pequena no enquadramento')
+  if (analysis?.irisAlert) reasons.push('Íris pequena — aproxime mais')
 
   return (
     <div

@@ -10,13 +10,10 @@ import { finalizeReadingAction } from '@/app/actions/readings'
 import { AngleInterstitial, type InterstitialVariant } from '@/components/capture/AngleInterstitial'
 import { CapturePreview } from '@/components/capture/CapturePreview'
 import { CaptureProgress } from '@/components/capture/CaptureProgress'
-import { compressFrameToJpeg } from '@/lib/capture/jpeg-compress'
-import { cropBitmapAroundIris } from '@/lib/capture/iris-crop'
-import { laplacianVariance, sharpnessScore } from '@/lib/capture/laplacian-variance'
 import { analyzeCapturedJpeg, type PostCaptureAnalysis } from '@/lib/capture/post-capture-analysis'
 import { uploadWithRetry } from '@/lib/capture/upload'
 import { createClient } from '@/lib/supabase/client'
-import { getIrisCenterPx, getIrisRadiusPx } from '@/lib/capture/iris-geometry'
+import { getIrisRadiusPx } from '@/lib/capture/iris-geometry'
 import {
   SEQUENCE,
   getResumeSlotIndex,
@@ -30,82 +27,45 @@ const IrisDetector = dynamic(() => import('@/components/capture/IrisDetector'), 
 })
 
 // ---------------------------------------------------------------------------
-// Helpers
+// Score one-shot baseado APENAS no raio absoluto da íris detectada.
+// (Sharpness aparece via alerta da analyzeCapturedJpeg, não via badge.)
 // ---------------------------------------------------------------------------
 
-const ANALYSIS_DIM = 256
-/** Razão alvo iris/min(W,H) que vale score 1.0 no termo de distância. */
-const TARGET_IRIS_FRACTION = 0.20
+/** Raio em px que vale score 1.0 (Excelente) — bate com threshold da análise. */
+const IRIS_EXCELLENT_PX = 600
+/** Raio em px que vale score 0.5 (Aceitável) — bate com IRIS_RADIUS_ALERT_PX. */
+const IRIS_ACCEPTABLE_PX = 300
+/** Score quando MediaPipe não detectou íris (não bloqueia o usuário, só alerta). */
+const NO_IRIS_FALLBACK_SCORE = 0.30
 
-interface OneShotResult {
-  irisCenter: { x: number; y: number } | null
-  irisRadius: number
-  score: number
-  irisFraction: number
-  sharpness: number
+function irisSizeScore(irisRadiusPx: number): number {
+  if (irisRadiusPx <= 0) return NO_IRIS_FALLBACK_SCORE
+  if (irisRadiusPx >= IRIS_EXCELLENT_PX) return 1.0
+  if (irisRadiusPx >= IRIS_ACCEPTABLE_PX) {
+    return 0.5 + 0.5 * ((irisRadiusPx - IRIS_ACCEPTABLE_PX) / (IRIS_EXCELLENT_PX - IRIS_ACCEPTABLE_PX))
+  }
+  return 0.5 * (irisRadiusPx / IRIS_ACCEPTABLE_PX)
 }
 
-/**
- * Roda detecção MediaPipe + Laplacian no bitmap recém-capturado e devolve um
- * score 0..1 que mistura "íris detectada e bem dimensionada" com "imagem nítida".
- *
- * Substitui o score acumulado do streaming (que não existe no fluxo de input
- * nativo). Fica disponível ao caller para alimentar pendingPreview.qualityScore
- * e ser exibido no badge da CapturePreview.
- */
-function analyzeOneShot(
+interface OneShotResult {
+  irisRadiusPx: number
+  score: number
+}
+
+function detectIris(
   bitmap: ImageBitmap,
   detector: UseIrisDetectorResult | null,
   eye: 'left' | 'right',
 ): OneShotResult {
-  let irisCenter: { x: number; y: number } | null = null
-  let irisRadius = 0
+  let irisRadiusPx = 0
   if (detector?.ready) {
     const result = detector.detect(bitmap)
     const landmarks = result?.faceLandmarks?.[0] ?? null
     if (landmarks) {
-      irisCenter = getIrisCenterPx(landmarks, eye, bitmap.width, bitmap.height)
-      irisRadius = getIrisRadiusPx(landmarks, eye, bitmap.width, bitmap.height)
+      irisRadiusPx = getIrisRadiusPx(landmarks, eye, bitmap.width, bitmap.height)
     }
   }
-
-  // Sharpness: Laplacian num square 256×256 do centro do bitmap.
-  let sharpness = 0
-  const minDim = Math.min(bitmap.width, bitmap.height)
-  if (minDim > 0) {
-    const sx = (bitmap.width - minDim) / 2
-    const sy = (bitmap.height - minDim) / 2
-    const canvas = document.createElement('canvas')
-    canvas.width = ANALYSIS_DIM
-    canvas.height = ANALYSIS_DIM
-    const ctx = canvas.getContext('2d', { alpha: false })
-    if (ctx) {
-      ctx.drawImage(bitmap, sx, sy, minDim, minDim, 0, 0, ANALYSIS_DIM, ANALYSIS_DIM)
-      const data = ctx.getImageData(0, 0, ANALYSIS_DIM, ANALYSIS_DIM)
-      sharpness = sharpnessScore(laplacianVariance(data))
-    }
-  }
-
-  const irisFraction = irisRadius > 0 && minDim > 0 ? irisRadius / minDim : 0
-  const distanceComponent = Math.min(1, irisFraction / TARGET_IRIS_FRACTION)
-
-  // Sem íris detectada: score baseado só em sharpness, com piso baixo.
-  // Com íris: 60% distância + 40% nitidez.
-  const score = irisCenter
-    ? 0.60 * distanceComponent + 0.40 * sharpness
-    : Math.max(0.20, sharpness * 0.5)
-
-  return { irisCenter, irisRadius, score, irisFraction, sharpness }
-}
-
-function bitmapToFullCanvas(bitmap: ImageBitmap): HTMLCanvasElement | null {
-  const canvas = document.createElement('canvas')
-  canvas.width = bitmap.width
-  canvas.height = bitmap.height
-  const ctx = canvas.getContext('2d', { alpha: false })
-  if (!ctx) return null
-  ctx.drawImage(bitmap, 0, 0)
-  return canvas
+  return { irisRadiusPx, score: irisSizeScore(irisRadiusPx) }
 }
 
 // ---------------------------------------------------------------------------
@@ -125,19 +85,15 @@ interface CaptureClientProps {
 }
 
 interface PendingPreview {
-  /** Blob do recortado, comprimido — usado pra preview e upload */
-  croppedBlob: Blob
-  /** Object URL do recortado para a tag <img> */
+  /** JPEG ORIGINAL da câmera nativa, sem recompressão. Usado pra preview e upload. */
+  blob: Blob
   imageUrl: string
   qualityScore: number
-  croppedWidth: number
-  croppedHeight: number
+  /** Dimensões reais do JPEG original. */
+  width: number
+  height: number
   slotIndex: number
   analysis: PostCaptureAnalysis | null
-  /** Foto original (full frame) — sobe em paralelo ao recortado */
-  originalBlob: Blob | null
-  /** Raio da íris no JPEG recortado (passado pra analyzeCapturedJpeg) */
-  irisRadiusInJpeg: number
 }
 
 // ---------------------------------------------------------------------------
@@ -197,57 +153,27 @@ export function CaptureClient({
     let bitmap: ImageBitmap | null = null
     try {
       bitmap = await createImageBitmap(file)
-      const oneShot = analyzeOneShot(bitmap, detectorRef.current, slot.eye)
+      const { irisRadiusPx, score } = detectIris(bitmap, detectorRef.current, slot.eye)
+      const width = bitmap.width
+      const height = bitmap.height
 
-      // Crop centrado na íris quando detectada; senão usa frame inteiro.
-      let cropCanvas: HTMLCanvasElement | null = null
-      let irisRadiusInCrop = oneShot.irisRadius
-      if (oneShot.irisCenter && oneShot.irisRadius > 0) {
-        const cropResult = cropBitmapAroundIris(bitmap, oneShot.irisCenter, oneShot.irisRadius)
-        if (cropResult) {
-          cropCanvas = cropResult.canvas
-          irisRadiusInCrop = cropResult.irisRadiusInCrop
-        }
-      }
-      if (!cropCanvas) {
-        cropCanvas = bitmapToFullCanvas(bitmap)
-        irisRadiusInCrop = 0
-      }
-      if (!cropCanvas) {
-        throw new Error('Falha ao montar canvas do crop')
-      }
-
-      const compressed = await compressFrameToJpeg(cropCanvas, cropCanvas.width, cropCanvas.height)
-      const compressionScale = cropCanvas.width > 0
-        ? compressed.width / cropCanvas.width
-        : 1
-      const irisRadiusInJpeg = irisRadiusInCrop * compressionScale
-
-      const imageUrl = URL.createObjectURL(compressed.blob)
+      const imageUrl = URL.createObjectURL(file)
       const currentSlotIdx = slotIndex
 
       setPendingPreview({
-        croppedBlob: compressed.blob,
+        blob: file,
         imageUrl,
-        qualityScore: oneShot.score,
-        croppedWidth: compressed.width,
-        croppedHeight: compressed.height,
+        qualityScore: score,
+        width,
+        height,
         slotIndex: currentSlotIdx,
         analysis: null,
-        originalBlob: file,
-        irisRadiusInJpeg,
       })
       setPhase('previewing')
 
-      // Análise pós-captura (Laplacian + irisRatio). streamingScore=0 garante
-      // que o caminho de bypass não é ativado — overlay aparece quando há alerta.
-      void analyzeCapturedJpeg(
-        compressed.blob,
-        irisRadiusInJpeg,
-        compressed.width,
-        compressed.height,
-        0,
-      )
+      // Análise pós-captura roda sobre o ORIGINAL completo (sem crop).
+      // irisRadiusPx é o raio em pixels absolutos do JPEG original.
+      void analyzeCapturedJpeg(file, irisRadiusPx)
         .then((analysis) => {
           setPendingPreview(prev =>
             prev && prev.slotIndex === currentSlotIdx ? { ...prev, analysis } : prev,
@@ -268,7 +194,7 @@ export function CaptureClient({
     if (!preview) return
     const currentSlotIdx = preview.slotIndex
 
-    // Upload em background — recortado (sempre) + original (quando disponível).
+    // Upload em background — único arquivo (original).
     const previousAbort = slotAbortRefs.current.get(currentSlotIdx)
     if (previousAbort) previousAbort.abort()
     const ac = new AbortController()
@@ -278,10 +204,9 @@ export function CaptureClient({
 
     const uploadP = uploadWithRetry({
       supabase,
-      croppedBlob: preview.croppedBlob,
-      croppedWidth: preview.croppedWidth,
-      croppedHeight: preview.croppedHeight,
-      originalBlob: preview.originalBlob ?? undefined,
+      blob: preview.blob,
+      width: preview.width,
+      height: preview.height,
       therapistId,
       readingId,
       eye: SEQUENCE[currentSlotIdx].eye,
@@ -331,12 +256,10 @@ export function CaptureClient({
     }
     setPendingPreview(null)
     setPhase('instruction')
-    // Reabre câmera nativa imediatamente — pula a interstitial pra UX fluida.
+    // Reabre câmera nativa imediatamente.
     window.setTimeout(() => fileInputRef.current?.click(), 50)
   }, [pendingPreview, slotIndex])
 
-  // Quando entra em 'finalizing': aguarda uploads pendentes, chama
-  // finalizeReadingAction e redireciona pra /leituras.
   React.useEffect(() => {
     if (phase !== 'finalizing') return
     if (finalizingTriggeredRef.current) return

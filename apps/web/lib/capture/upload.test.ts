@@ -14,14 +14,16 @@ function makeMockSupabase(opts: { storageFails?: boolean; dbFails?: boolean } = 
     storage: { from: vi.fn(() => ({ upload })) },
     from: vi.fn(() => ({ upsert })),
     _spies: { upload, upsert },
-  } as unknown as SupabaseClient<Database> & { _spies: { upload: ReturnType<typeof vi.fn>; upsert: ReturnType<typeof vi.fn> } }
+  } as unknown as SupabaseClient<Database> & {
+    _spies: { upload: ReturnType<typeof vi.fn>; upsert: ReturnType<typeof vi.fn> }
+  }
 }
 
 const baseArgs = (sb: SupabaseClient<Database>): UploadArgs => ({
   supabase: sb,
-  croppedBlob: new Blob([new Uint8Array(10)], { type: 'image/jpeg' }),
-  croppedWidth: 1024,
-  croppedHeight: 1024,
+  blob: new Blob([new Uint8Array(10)], { type: 'image/jpeg' }),
+  width: 3840,
+  height: 2160,
   therapistId: '11111111-1111-1111-1111-111111111111',
   readingId: '22222222-2222-2222-2222-222222222222',
   eye: 'right',
@@ -30,12 +32,14 @@ const baseArgs = (sb: SupabaseClient<Database>): UploadArgs => ({
 })
 
 describe('uploadCaptureImage', () => {
-  it('uploads to iris-captures bucket with correct path', async () => {
+  it('uploads to iris-captures bucket at originais/ subfolder', async () => {
     const sb = makeMockSupabase()
     await uploadCaptureImage(baseArgs(sb))
     expect((sb as unknown as { storage: { from: ReturnType<typeof vi.fn> } }).storage.from).toHaveBeenCalledWith('iris-captures')
     const callArgs = (sb as unknown as { _spies: { upload: ReturnType<typeof vi.fn> } })._spies.upload.mock.calls[0]
-    expect(callArgs[0]).toBe('11111111-1111-1111-1111-111111111111/22222222-2222-2222-2222-222222222222/recortadas/right_frontal.jpg')
+    expect(callArgs[0]).toBe(
+      '11111111-1111-1111-1111-111111111111/22222222-2222-2222-2222-222222222222/originais/right_frontal.jpg',
+    )
     expect(callArgs[2]).toMatchObject({ contentType: 'image/jpeg', upsert: true })
   })
 
@@ -48,13 +52,15 @@ describe('uploadCaptureImage', () => {
       eye: 'right',
       angle: 'frontal',
       quality_score: 0.85,
-      storage_path: expect.stringContaining('right_frontal.jpg'),
+      width: 3840,
+      height: 2160,
+      storage_path: expect.stringContaining('originais/right_frontal.jpg'),
     })
   })
 
   it('throws on storage error', async () => {
     const sb = makeMockSupabase({ storageFails: true })
-    await expect(uploadCaptureImage(baseArgs(sb))).rejects.toThrow(/storage recortado falhou/)
+    await expect(uploadCaptureImage(baseArgs(sb))).rejects.toThrow(/storage falhou/)
   })
 
   it('throws on db error', async () => {
@@ -75,7 +81,6 @@ describe('uploadWithRetry', () => {
     vi.useFakeTimers()
     let calls = 0
     const sb = makeMockSupabase()
-    const originalFrom = (sb as unknown as { storage: { from: ReturnType<typeof vi.fn> } }).storage.from
     ;(sb as unknown as { storage: { from: ReturnType<typeof vi.fn> } }).storage.from = vi.fn(() => ({
       upload: vi.fn(async () => {
         calls++
@@ -88,7 +93,6 @@ describe('uploadWithRetry', () => {
     await vi.advanceTimersByTimeAsync(2000)
     await promise
     expect(calls).toBe(2)
-    void originalFrom
 
     vi.useRealTimers()
   })
@@ -97,7 +101,7 @@ describe('uploadWithRetry', () => {
     vi.useFakeTimers()
     const sb = makeMockSupabase({ storageFails: true })
     const promise = uploadWithRetry(baseArgs(sb), 2)
-    const exp = expect(promise).rejects.toThrow(/storage recortado falhou/)
+    const exp = expect(promise).rejects.toThrow(/storage falhou/)
     await vi.advanceTimersByTimeAsync(5000)
     await exp
     vi.useRealTimers()
