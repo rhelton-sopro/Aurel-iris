@@ -73,30 +73,35 @@ export function computeCenteredness(
 }
 
 /**
- * Distance OK: 1.0 quando o raio observado está dentro de ±40% do raio target;
- * cai linearmente fora dessa faixa.
- * Calibrado para câmera mobile real:
- *   - target 0.08 = íris a distância confortável (~15–25cm) num frame de rosto
- *   - tolerância ±40%: ratio∈[0.60, 1.40] → score=1.0 (não precisa ser exato)
- *   - zero abaixo de ratio=0.20 (muito longe) ou acima de ratio=3.0 (encostado)
+ * Distance OK: calibrado para câmera mobile real em uso iridológico.
+ *   - target 0.12 ≈ raio normalizado da íris quando preenche o overlay circular
+ *     (~10–15cm com câmera traseira de iPhone — câmera consegue focar)
+ *   - Tolerância ±50%: ratio∈[0.50, 1.50] → score=1.0
+ *   - Assimétrico: longe penaliza mais (iris sem detalhe); perto penaliza menos
+ *     (íris transborda levemente → ainda tem detalhe suficiente)
  */
-export function computeDistanceOk(observedRadius: number, targetRadius = 0.08): number {
+export function computeDistanceOk(observedRadius: number, targetRadius = 0.12): number {
   if (targetRadius <= 0 || observedRadius <= 0) return 0
   const ratio = observedRadius / targetRadius
-  if (ratio < 0.20 || ratio > 3.0) return 0
-  const dev = Math.abs(ratio - 1)
-  if (dev <= 0.40) return 1
-  return Math.max(0, 1 - (dev - 0.40) / 0.60)
+  if (ratio < 0.10 || ratio > 2.5) return 0
+  const dev = ratio - 1
+  if (Math.abs(dev) <= 0.50) return 1
+  if (dev < 0) {
+    // Muito longe — penalidade moderada (ratio: 0.50 → 0.10, score: 1 → 0)
+    return Math.max(0, 1 - (-dev - 0.50) / 0.40)
+  }
+  // Muito perto — penalidade mais suave (ratio: 1.50 → 2.50, score: 1 → 0)
+  return Math.max(0, 1 - (dev - 0.50) / 1.0)
 }
 
 /**
  * Direção da distância para a copy (longe vs perto).
- * Thresholds alinhados com tolerância de computeDistanceOk (±40%).
+ * Alinhado com a tolerância assimétrica de computeDistanceOk.
  */
-export function getDistanceDirection(observedRadius: number, targetRadius = 0.08): 'far' | 'close' | 'ok' {
+export function getDistanceDirection(observedRadius: number, targetRadius = 0.12): 'far' | 'close' | 'ok' {
   const ratio = observedRadius / targetRadius
-  if (ratio < 0.60) return 'far'
-  if (ratio > 1.40) return 'close'
+  if (ratio < 0.50) return 'far'
+  if (ratio > 1.50) return 'close'
   return 'ok'
 }
 

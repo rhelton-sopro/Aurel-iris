@@ -82,7 +82,7 @@ export function overallScore(c: QualityCheck): number {
  * @param frame ImageData de uma janela de análise (recomendado 256×256 centrada na íris)
  * @param frameWidthPx largura do frame original em px (para reflexInCenter)
  * @param frameHeightPx altura do frame original em px
- * @param irisRadiusTarget raio target normalizado (default 0.08 — calibrado para câmera mobile real)
+ * @param irisRadiusTarget raio target normalizado (default 0.12 — íris preenchendo overlay circular a ~10–15cm)
  */
 export function computeQualityCheck(
   landmarks: Landmark[] | null,
@@ -90,7 +90,7 @@ export function computeQualityCheck(
   frame: ImageData,
   frameWidthPx: number,
   frameHeightPx: number,
-  irisRadiusTarget = 0.08
+  irisRadiusTarget = 0.12
 ): QualityCheck {
   if (!landmarks || landmarks.length <= IRIS_LANDMARKS[eye].center) {
     return {

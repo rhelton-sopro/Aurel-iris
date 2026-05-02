@@ -75,6 +75,11 @@ export function CaptureClient({ readingId, therapistId: _therapistId, clientName
           ctx.drawImage(video, sx, sy, minDim, minDim, 0, 0, ANALYSIS_W, ANALYSIS_H)
           const imageData = ctx.getImageData(0, 0, ANALYSIS_W, ANALYSIS_H)
           const c = computeQualityCheck(landmarks, currentEye, imageData, ANALYSIS_W, ANALYSIS_H)
+          // [calibration] remover após calibrar irisRadiusTarget
+          if (process.env.NODE_ENV !== 'production') {
+            const { getIrisRadius } = await import('@/lib/capture/iris-geometry')
+            console.log('[iris-radius]', getIrisRadius(landmarks, currentEye).toFixed(4), '| score', overallScore(c).toFixed(2), '| dist', c.irisDistanceOk.toFixed(2))
+          }
           setCheck(c)
           setScore(overallScore(c))
         }
