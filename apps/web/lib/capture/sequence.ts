@@ -108,13 +108,26 @@ export function getInterstitialCopy(toEye: Eye): { heading: string; subtitle: st
 
 /**
  * Copy da tela inicial de instrução, exibida UMA VEZ antes da 1ª captura.
- * Usa o mesmo padrão visual do AngleInterstitial mas comunica o início do
- * fluxo (eye + ângulo + dica de aproximação).
  */
 export function getFirstInterstitialCopy(slot: Slot): { heading: string; subtitle: string; cta: string } {
   return {
     heading: `Vamos começar pelo olho ${EYE_LABEL[slot.eye]}`,
-    subtitle: `Primeiro ângulo: ${ANGLE_LABEL[slot.angle]}. Aproxime o celular até a íris preencher o círculo guia.`,
-    cta: 'Estou pronto',
+    subtitle: `Primeiro ângulo: ${ANGLE_LABEL[slot.angle]}. Aproxime o celular até a íris ocupar o centro do enquadramento.`,
+    cta: 'Abrir câmera',
+  }
+}
+
+/**
+ * Copy entre fotos do mesmo olho (slots 1, 2, 4, 5 da sequência canônica).
+ * Indica o progresso e o ângulo da próxima foto.
+ */
+export function getMidSlotInterstitialCopy(
+  slot: Slot,
+  slotIndex: number,
+): { heading: string; subtitle: string; cta: string } {
+  return {
+    heading: `Olho ${EYE_LABEL[slot.eye]} · ${ANGLE_LABEL[slot.angle]}`,
+    subtitle: `Foto ${slotIndex + 1} de ${SEQUENCE.length}. Aproxime o celular até a íris ocupar o centro do enquadramento.`,
+    cta: 'Abrir câmera',
   }
 }

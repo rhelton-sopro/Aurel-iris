@@ -4,28 +4,42 @@ import * as React from 'react'
 import { Button } from '@/components/ui/button'
 import { AngleIcon } from './AngleIcon'
 import type { Slot } from '@/lib/capture/sequence'
-import { getInterstitialCopy, getFirstInterstitialCopy } from '@/lib/capture/sequence'
+import {
+  getInterstitialCopy,
+  getFirstInterstitialCopy,
+  getMidSlotInterstitialCopy,
+} from '@/lib/capture/sequence'
+
+export type InterstitialVariant = 'first' | 'eye-transition' | 'mid-slot'
 
 interface AngleInterstitialProps {
   /** Slot que vai começar após o CTA */
   nextSlot: Slot
+  /** Índice 0-based do slot — usado pela copy 'mid-slot' (formato "Foto X de N"). */
+  slotIndex: number
   /** Callback chamado quando o usuário toca no CTA */
   onProceed: () => void
   /**
-   * Quando true, usa a copy da TELA INICIAL ("Vamos começar pelo olho... Primeiro ângulo: ...")
-   * exibida antes da 1ª captura. Quando false (default), usa a copy de TRANSIÇÃO
-   * entre olhos (direito → esquerdo).
+   * Qual copy usar:
+   *  - 'first':         Antes da 1ª foto ("Vamos começar pelo olho... Primeiro ângulo... / Abrir câmera")
+   *  - 'eye-transition': Transição entre olhos (slot 3, esq → dir).
+   *  - 'mid-slot':      Demais slots (1, 2, 4, 5) — instrução curta com progresso.
    */
-  isFirst?: boolean
+  variant: InterstitialVariant
 }
 
 /**
- * Tela fullscreen exibida (a) antes da 1ª captura ou (b) na transição entre olhos.
- * CONTEXT D-10: câmera para, instrução visual com CTA.
- * UI-SPEC §AngleInterstitial: fade + slide-up 300ms, CTA h-12 full-width na bottom safe area.
+ * Tela fullscreen exibida antes de cada foto do fluxo de captura nativa.
+ * Mostra o ângulo + olho + CTA. UI-SPEC §AngleInterstitial: ícone 96×96,
+ * heading + subtitle, CTA h-12 full-width na bottom safe area.
  */
-export function AngleInterstitial({ nextSlot, onProceed, isFirst = false }: AngleInterstitialProps) {
-  const copy = isFirst ? getFirstInterstitialCopy(nextSlot) : getInterstitialCopy(nextSlot.eye)
+export function AngleInterstitial({ nextSlot, slotIndex, onProceed, variant }: AngleInterstitialProps) {
+  const copy =
+    variant === 'first'
+      ? getFirstInterstitialCopy(nextSlot)
+      : variant === 'eye-transition'
+        ? getInterstitialCopy(nextSlot.eye)
+        : getMidSlotInterstitialCopy(nextSlot, slotIndex)
 
   return (
     <div
@@ -35,7 +49,6 @@ export function AngleInterstitial({ nextSlot, onProceed, isFirst = false }: Angl
       className="absolute inset-0 z-50 bg-background text-foreground flex flex-col items-center justify-center px-6 py-12 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-300"
     >
       <div className="flex flex-col items-center gap-8 max-w-sm w-full">
-        {/* Ícone grande 96×96 — UI-SPEC §AngleInterstitial */}
         <AngleIcon
           eye={nextSlot.eye}
           angle={nextSlot.angle}
@@ -47,7 +60,6 @@ export function AngleInterstitial({ nextSlot, onProceed, isFirst = false }: Angl
         </div>
       </div>
 
-      {/* CTA na bottom safe area — UI-SPEC: Button h-12 full-width */}
       <div className="mt-12 w-full max-w-sm pb-[env(safe-area-inset-bottom)]">
         <Button
           onClick={onProceed}

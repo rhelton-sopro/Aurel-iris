@@ -11,42 +11,30 @@
 const CROP_SIDE_FACTOR = 5
 
 /**
- * Faz snapshot do frame atual do vídeo e devolve um canvas quadrado centrado
- * na íris. Quando o crop encosta na borda do vídeo, é clampado e perde
- * quadratura — não invalida (a íris ainda fica visível, apenas off-center).
+ * Crop centrado na íris em um ImageBitmap já decodificado.
  *
- * Retorna `null` se o vídeo não estiver pronto, se o canvas 2D context não
- * estiver disponível, ou se o crop resultante for de área zero.
+ * Usado pelo capture-client (input nativo): o bitmap é decodificado uma vez
+ * para rodar a detecção MediaPipe e reutilizado aqui para o crop, evitando
+ * a 2ª decodificação que `cropBlobAroundIris` exigiria.
  *
- * Quando `irisCenterPx`/`irisRadiusPx` não estão disponíveis (gate deveria ter
- * bloqueado, mas por segurança), faz snapshot do frame inteiro.
+ * NÃO chama `bitmap.close()` — o caller é dono do ciclo de vida do bitmap.
  */
-export function snapshotAndCropAroundIris(
-  video: HTMLVideoElement,
-  irisCenterPx: { x: number; y: number } | null,
+export function cropBitmapAroundIris(
+  bitmap: ImageBitmap,
+  irisCenterPx: { x: number; y: number },
   irisRadiusPx: number,
-): HTMLCanvasElement | null {
-  const videoW = video.videoWidth
-  const videoH = video.videoHeight
-  if (videoW <= 0 || videoH <= 0) return null
+): { canvas: HTMLCanvasElement; irisRadiusInCrop: number } | null {
+  if (irisRadiusPx <= 0 || bitmap.width <= 0 || bitmap.height <= 0) return null
 
-  let x = 0
-  let y = 0
-  let w = videoW
-  let h = videoH
-
-  if (irisCenterPx && irisRadiusPx > 0) {
-    const side = CROP_SIDE_FACTOR * irisRadiusPx
-    x = Math.round(irisCenterPx.x - side / 2)
-    y = Math.round(irisCenterPx.y - side / 2)
-    w = Math.round(side)
-    h = Math.round(side)
-    // Clamp aos limites do vídeo
-    if (x < 0) { w += x; x = 0 }
-    if (y < 0) { h += y; y = 0 }
-    if (x + w > videoW) w = videoW - x
-    if (y + h > videoH) h = videoH - y
-  }
+  const side = CROP_SIDE_FACTOR * irisRadiusPx
+  let x = Math.round(irisCenterPx.x - side / 2)
+  let y = Math.round(irisCenterPx.y - side / 2)
+  let w = Math.round(side)
+  let h = Math.round(side)
+  if (x < 0) { w += x; x = 0 }
+  if (y < 0) { h += y; y = 0 }
+  if (x + w > bitmap.width) w = bitmap.width - x
+  if (y + h > bitmap.height) h = bitmap.height - y
 
   if (w <= 0 || h <= 0) return null
 
@@ -55,17 +43,14 @@ export function snapshotAndCropAroundIris(
   canvas.height = h
   const ctx = canvas.getContext('2d', { alpha: false })
   if (!ctx) return null
-  ctx.drawImage(video, x, y, w, h, 0, 0, w, h)
-  return canvas
+  ctx.drawImage(bitmap, x, y, w, h, 0, 0, w, h)
+  return { canvas, irisRadiusInCrop: irisRadiusPx }
 }
 
 /**
- * Crop centrado na íris em um Blob (foto em alta resolução). Decodifica o
- * blob, recorta o quadrado centrado e devolve canvas + metadados.
- *
- * Usado pelo pipeline pós-takePhoto: o original em alta-res é decodificado,
- * cortado, e o canvas resultante alimenta `compressFrameToJpeg` para gerar
- * o JPEG final do recorte.
+ * Crop centrado na íris em um Blob. Mantido para callers que ainda não
+ * decodificaram o blob; quando o bitmap já está disponível, prefira
+ * `cropBitmapAroundIris` (sem 2ª decodificação).
  */
 export async function cropBlobAroundIris(
   blob: Blob,
@@ -75,41 +60,15 @@ export async function cropBlobAroundIris(
   irisRadiusPx: number,
 ): Promise<{ canvas: HTMLCanvasElement; irisRadiusInCrop: number } | null> {
   if (irisRadiusPx <= 0 || blobW <= 0 || blobH <= 0) return null
-
   let bitmap: ImageBitmap
   try {
     bitmap = await createImageBitmap(blob)
   } catch {
     return null
   }
-
-  const side = CROP_SIDE_FACTOR * irisRadiusPx
-  let x = Math.round(irisCenterPx.x - side / 2)
-  let y = Math.round(irisCenterPx.y - side / 2)
-  let w = Math.round(side)
-  let h = Math.round(side)
-  if (x < 0) { w += x; x = 0 }
-  if (y < 0) { h += y; y = 0 }
-  if (x + w > blobW) w = blobW - x
-  if (y + h > blobH) h = blobH - y
-
-  if (w <= 0 || h <= 0) {
-    bitmap.close()
-    return null
-  }
-
-  const canvas = document.createElement('canvas')
-  canvas.width = w
-  canvas.height = h
-  const ctx = canvas.getContext('2d', { alpha: false })
-  if (!ctx) {
-    bitmap.close()
-    return null
-  }
-  ctx.drawImage(bitmap, x, y, w, h, 0, 0, w, h)
+  const result = cropBitmapAroundIris(bitmap, irisCenterPx, irisRadiusPx)
   bitmap.close()
-
-  return { canvas, irisRadiusInCrop: irisRadiusPx }
+  return result
 }
 
 export const IRIS_CROP_DEFAULTS = {

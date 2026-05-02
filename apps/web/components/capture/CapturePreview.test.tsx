@@ -1,60 +1,83 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { CapturePreview } from './CapturePreview'
+import type { PostCaptureAnalysis } from '@/lib/capture/post-capture-analysis'
 
 describe('CapturePreview', () => {
-  beforeEach(() => { vi.useFakeTimers() })
-  afterEach(() => { vi.useRealTimers() })
-
   it('renders the image and quality badge', () => {
     render(
-      <CapturePreview imageUrl="blob:test" qualityScore={0.95} onRedo={vi.fn()} onTimeout={vi.fn()} />
+      <CapturePreview imageUrl="blob:test" qualityScore={0.95} onRedo={vi.fn()} onConfirm={vi.fn()} />
     )
     expect(screen.getByAltText('Foto capturada')).toHaveAttribute('src', 'blob:test')
-    expect(screen.getByText('Excelente')).toBeInTheDocument()
+    expect(screen.getByText(/Excelente/)).toBeInTheDocument()
   })
 
   it('renders "Boa" badge for score 0.80', () => {
     render(
-      <CapturePreview imageUrl="blob:test" qualityScore={0.80} onRedo={vi.fn()} onTimeout={vi.fn()} />
+      <CapturePreview imageUrl="blob:test" qualityScore={0.80} onRedo={vi.fn()} onConfirm={vi.fn()} />
     )
-    expect(screen.getByText('Boa')).toBeInTheDocument()
+    expect(screen.getByText(/Boa/)).toBeInTheDocument()
   })
 
-  it('calls onRedo when clicked', () => {
+  it('calls onRedo when "Refazer" is clicked', () => {
     const onRedo = vi.fn()
     render(
-      <CapturePreview imageUrl="blob:test" qualityScore={0.85} onRedo={onRedo} onTimeout={vi.fn()} />
+      <CapturePreview imageUrl="blob:test" qualityScore={0.85} onRedo={onRedo} onConfirm={vi.fn()} />
     )
-    fireEvent.click(screen.getByRole('button', { name: /Tocar para refazer/ }))
+    fireEvent.click(screen.getByRole('button', { name: /Refazer/ }))
     expect(onRedo).toHaveBeenCalled()
   })
 
-  it('calls onTimeout after default 2000ms', () => {
-    const onTimeout = vi.fn()
+  it('calls onConfirm when "Confirmar" is clicked', () => {
+    const onConfirm = vi.fn()
     render(
-      <CapturePreview imageUrl="blob:test" qualityScore={0.85} onRedo={vi.fn()} onTimeout={onTimeout} />
+      <CapturePreview imageUrl="blob:test" qualityScore={0.85} onRedo={vi.fn()} onConfirm={onConfirm} />
     )
-    expect(onTimeout).not.toHaveBeenCalled()
-    vi.advanceTimersByTime(2010)
-    expect(onTimeout).toHaveBeenCalledTimes(1)
+    fireEvent.click(screen.getByRole('button', { name: /Confirmar/ }))
+    expect(onConfirm).toHaveBeenCalled()
   })
 
-  it('respects custom durationMs', () => {
-    const onTimeout = vi.fn()
+  it('shows alert reasons when analysis flags issues', () => {
+    const analysis: PostCaptureAnalysis = {
+      laplacianVariance: 50,
+      irisRatio: 0.10,
+      streamingScore: 0,
+      sharpnessAlert: true,
+      irisAlert: true,
+      hasAlert: true,
+    }
     render(
-      <CapturePreview imageUrl="blob:test" qualityScore={0.85} onRedo={vi.fn()} onTimeout={onTimeout} durationMs={1000} />
+      <CapturePreview
+        imageUrl="blob:test"
+        qualityScore={0.50}
+        analysis={analysis}
+        onRedo={vi.fn()}
+        onConfirm={vi.fn()}
+      />
     )
-    vi.advanceTimersByTime(500)
-    expect(onTimeout).not.toHaveBeenCalled()
-    vi.advanceTimersByTime(600)
-    expect(onTimeout).toHaveBeenCalledTimes(1)
+    expect(screen.getByText(/Qualidade abaixo do ideal/)).toBeInTheDocument()
+    expect(screen.getByText(/Imagem pouco nítida/)).toBeInTheDocument()
+    expect(screen.getByText(/Íris pequena/)).toBeInTheDocument()
   })
 
-  it('shows "Tocar para refazer" text', () => {
+  it('does not show alert when analysis has no issues', () => {
+    const analysis: PostCaptureAnalysis = {
+      laplacianVariance: 100,
+      irisRatio: 0.20,
+      streamingScore: 0.85,
+      sharpnessAlert: false,
+      irisAlert: false,
+      hasAlert: false,
+    }
     render(
-      <CapturePreview imageUrl="blob:test" qualityScore={0.85} onRedo={vi.fn()} onTimeout={vi.fn()} />
+      <CapturePreview
+        imageUrl="blob:test"
+        qualityScore={0.85}
+        analysis={analysis}
+        onRedo={vi.fn()}
+        onConfirm={vi.fn()}
+      />
     )
-    expect(screen.getByText('Tocar para refazer')).toBeInTheDocument()
+    expect(screen.queryByText(/Qualidade abaixo do ideal/)).not.toBeInTheDocument()
   })
 })

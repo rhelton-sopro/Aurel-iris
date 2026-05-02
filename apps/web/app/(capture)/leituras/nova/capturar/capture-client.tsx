@@ -7,35 +7,22 @@ import { useRouter } from 'next/navigation'
 import { X } from 'lucide-react'
 import { toast } from 'sonner'
 import { finalizeReadingAction } from '@/app/actions/readings'
-import { CameraView } from '@/components/capture/CameraView'
-import { QualityIndicator } from '@/components/capture/QualityIndicator'
-import { CaptureProgress } from '@/components/capture/CaptureProgress'
-import { AngleOverlay } from '@/components/capture/AngleOverlay'
-import { AngleInterstitial } from '@/components/capture/AngleInterstitial'
+import { AngleInterstitial, type InterstitialVariant } from '@/components/capture/AngleInterstitial'
 import { CapturePreview } from '@/components/capture/CapturePreview'
-import { GuideCircle } from '@/components/capture/GuideCircle'
-import { EyeAngleLabel } from '@/components/capture/EyeAngleLabel'
-import {
-  computeQualityCheck,
-  overallScore,
-  type QualityCheck,
-} from '@/lib/capture/quality-scoring'
-import {
-  SEQUENCE,
-  type Slot,
-  type SlotPhase,
-  getResumeSlotIndex,
-  isOuterEyeTransition,
-  getSlotProgressLabel,
-} from '@/lib/capture/sequence'
-import { getIrisRadiusPx, getIrisCenterPx } from '@/lib/capture/iris-geometry'
-import { getExposureDirection } from '@/lib/capture/exposure'
+import { CaptureProgress } from '@/components/capture/CaptureProgress'
 import { compressFrameToJpeg } from '@/lib/capture/jpeg-compress'
-import { snapshotAndCropAroundIris, cropBlobAroundIris } from '@/lib/capture/iris-crop'
-import { takePhotoBlob } from '@/lib/capture/take-photo'
+import { cropBitmapAroundIris } from '@/lib/capture/iris-crop'
+import { laplacianVariance, sharpnessScore } from '@/lib/capture/laplacian-variance'
 import { analyzeCapturedJpeg, type PostCaptureAnalysis } from '@/lib/capture/post-capture-analysis'
 import { uploadWithRetry } from '@/lib/capture/upload'
 import { createClient } from '@/lib/supabase/client'
+import { getIrisCenterPx, getIrisRadiusPx } from '@/lib/capture/iris-geometry'
+import {
+  SEQUENCE,
+  getResumeSlotIndex,
+  getSlotProgressLabel,
+  type Slot,
+} from '@/lib/capture/sequence'
 import type { UseIrisDetectorResult } from '@/hooks/use-iris-detector'
 
 const IrisDetector = dynamic(() => import('@/components/capture/IrisDetector'), {
@@ -43,67 +30,89 @@ const IrisDetector = dynamic(() => import('@/components/capture/IrisDetector'), 
 })
 
 // ---------------------------------------------------------------------------
-// Critérios de bloqueio (avaliados em ordem de prioridade)
+// Helpers
 // ---------------------------------------------------------------------------
 
-/**
- * Raio do círculo guia = 30vmin = 30% de `min(window.innerWidth, innerHeight)`.
- * O guia é desenhado em CSS (60vmin de diâmetro) — por isso o denominador do
- * irisFillRatio precisa ser em px CSS do viewport, não em px do vídeo.
- */
-const GUIDE_RADIUS_FRAC = 0.30
+const ANALYSIS_DIM = 256
+/** Razão alvo iris/min(W,H) que vale score 1.0 no termo de distância. */
+const TARGET_IRIS_FRACTION = 0.20
 
-/** Íris deve preencher pelo menos 40% do raio do círculo guia. */
-const MIN_IRIS_FILL_FACTOR = 0.40
-
-/**
- * Score ≥ 0.70 (Boa/Excelente) bypassa o gate de distância. O score já avalia
- * o frame como um todo; nessa faixa, irisFillRatio não deve sobrescrever.
- */
-const SCORE_BYPASS_THRESHOLD = 0.70
-
-/** Score de nitidez mínimo (sharpnessScore = variance/80; 0.15 ≈ variance 12 = claramente borrado). */
-const SHARPNESS_BLOCK_THRESHOLD = 0.15
-
-/** Janela após perder os landmarks da íris para classificar como "too_close". */
-const TOO_CLOSE_GRACE_MS = 1000
-/** Score anterior mínimo para classificar como too_close (vs. "perdeu o rosto"). */
-const TOO_CLOSE_PREV_SCORE = 0.50
-/** Score neutro exibido em modo too_close — não zera para evitar UX confusa. */
-const TOO_CLOSE_NEUTRAL_SCORE = 0.30
-
-type BlockingReason = 'distance' | 'too_close' | 'exposure' | 'sharpness' | null
-
-function computeBlockingReason(
-  check: QualityCheck | null,
-  irisFillRatio: number,
-  exposureDir: 'low' | 'high' | 'ok',
-  tooClose: boolean,
-  qualityScore: number,
-): BlockingReason {
-  // too_close tem prioridade — íris saiu do guia, recuar é a única ação útil
-  if (tooClose) return 'too_close'
-
-  // Score alto avalia o frame como um todo — bypassa o gate de distância
-  if (qualityScore < SCORE_BYPASS_THRESHOLD) {
-    if (!check || !check.irisDetected || irisFillRatio < MIN_IRIS_FILL_FACTOR) return 'distance'
-  }
-
-  if (exposureDir === 'low') return 'exposure'
-  if (check && check.sharpness < SHARPNESS_BLOCK_THRESHOLD) return 'sharpness'
-  return null
+interface OneShotResult {
+  irisCenter: { x: number; y: number } | null
+  irisRadius: number
+  score: number
+  irisFraction: number
+  sharpness: number
 }
 
-const BLOCKING_LABEL: Record<NonNullable<BlockingReason>, string> = {
-  distance: 'Aproxime mais — cubra pelo menos 40% do guia',
-  too_close: 'Recue um pouco — íris saiu do guia',
-  exposure: 'Ambiente muito escuro — procure mais luz',
-  sharpness: 'Imagem borrada — segure firme o celular',
+/**
+ * Roda detecção MediaPipe + Laplacian no bitmap recém-capturado e devolve um
+ * score 0..1 que mistura "íris detectada e bem dimensionada" com "imagem nítida".
+ *
+ * Substitui o score acumulado do streaming (que não existe no fluxo de input
+ * nativo). Fica disponível ao caller para alimentar pendingPreview.qualityScore
+ * e ser exibido no badge da CapturePreview.
+ */
+function analyzeOneShot(
+  bitmap: ImageBitmap,
+  detector: UseIrisDetectorResult | null,
+  eye: 'left' | 'right',
+): OneShotResult {
+  let irisCenter: { x: number; y: number } | null = null
+  let irisRadius = 0
+  if (detector?.ready) {
+    const result = detector.detect(bitmap)
+    const landmarks = result?.faceLandmarks?.[0] ?? null
+    if (landmarks) {
+      irisCenter = getIrisCenterPx(landmarks, eye, bitmap.width, bitmap.height)
+      irisRadius = getIrisRadiusPx(landmarks, eye, bitmap.width, bitmap.height)
+    }
+  }
+
+  // Sharpness: Laplacian num square 256×256 do centro do bitmap.
+  let sharpness = 0
+  const minDim = Math.min(bitmap.width, bitmap.height)
+  if (minDim > 0) {
+    const sx = (bitmap.width - minDim) / 2
+    const sy = (bitmap.height - minDim) / 2
+    const canvas = document.createElement('canvas')
+    canvas.width = ANALYSIS_DIM
+    canvas.height = ANALYSIS_DIM
+    const ctx = canvas.getContext('2d', { alpha: false })
+    if (ctx) {
+      ctx.drawImage(bitmap, sx, sy, minDim, minDim, 0, 0, ANALYSIS_DIM, ANALYSIS_DIM)
+      const data = ctx.getImageData(0, 0, ANALYSIS_DIM, ANALYSIS_DIM)
+      sharpness = sharpnessScore(laplacianVariance(data))
+    }
+  }
+
+  const irisFraction = irisRadius > 0 && minDim > 0 ? irisRadius / minDim : 0
+  const distanceComponent = Math.min(1, irisFraction / TARGET_IRIS_FRACTION)
+
+  // Sem íris detectada: score baseado só em sharpness, com piso baixo.
+  // Com íris: 60% distância + 40% nitidez.
+  const score = irisCenter
+    ? 0.60 * distanceComponent + 0.40 * sharpness
+    : Math.max(0.20, sharpness * 0.5)
+
+  return { irisCenter, irisRadius, score, irisFraction, sharpness }
+}
+
+function bitmapToFullCanvas(bitmap: ImageBitmap): HTMLCanvasElement | null {
+  const canvas = document.createElement('canvas')
+  canvas.width = bitmap.width
+  canvas.height = bitmap.height
+  const ctx = canvas.getContext('2d', { alpha: false })
+  if (!ctx) return null
+  ctx.drawImage(bitmap, 0, 0)
+  return canvas
 }
 
 // ---------------------------------------------------------------------------
 // Tipos
 // ---------------------------------------------------------------------------
+
+type Phase = 'instruction' | 'analyzing' | 'previewing' | 'finalizing'
 
 interface CapturedSlot { eye: string; angle: string }
 
@@ -116,21 +125,20 @@ interface CaptureClientProps {
 }
 
 interface PendingPreview {
-  blob: Blob
+  /** Blob do recortado, comprimido — usado pra preview e upload */
+  croppedBlob: Blob
+  /** Object URL do recortado para a tag <img> */
   imageUrl: string
   qualityScore: number
-  width: number
-  height: number
+  croppedWidth: number
+  croppedHeight: number
   slotIndex: number
-  /** null enquanto a análise pós-captura ainda não retornou */
   analysis: PostCaptureAnalysis | null
+  /** Foto original (full frame) — sobe em paralelo ao recortado */
+  originalBlob: Blob | null
+  /** Raio da íris no JPEG recortado (passado pra analyzeCapturedJpeg) */
+  irisRadiusInJpeg: number
 }
-
-const ANALYSIS_W = 256
-const ANALYSIS_H = 256
-const PREVIEW_MS = 2000
-/** Duração do "freeze" pós-tap (snapshot exibido com borda pulsante). */
-const FREEZE_MS = 300
 
 // ---------------------------------------------------------------------------
 // Componente
@@ -143,11 +151,8 @@ export function CaptureClient({
   capturedSlots: initialCaptured,
   resumeMode: _resumeMode,
 }: CaptureClientProps) {
-  const videoRef = React.useRef<HTMLVideoElement>(null)
-  const analysisCanvasRef = React.useRef<HTMLCanvasElement | null>(null)
-  const detectorRef = React.useRef<UseIrisDetectorResult | null>(null)
-
   const supabase = React.useMemo(() => createClient(), [])
+  const router = useRouter()
 
   const initialIndex = React.useMemo(() => {
     const idx = getResumeSlotIndex(initialCaptured)
@@ -155,234 +160,115 @@ export function CaptureClient({
   }, [initialCaptured])
 
   const [slotIndex, setSlotIndex] = React.useState(initialIndex)
-  const [phase, setPhase] = React.useState<SlotPhase>(() => {
-    // Tela inicial de instrução antes da 1ª captura.
-    if (initialIndex === 0 && initialCaptured.length === 0) return 'interstitial'
-    // Transição direito → esquerdo já capturada (resume após apenas right-eye).
-    if (initialIndex >= 3 && initialCaptured.every(c => c.eye !== 'left')) return 'interstitial'
-    return 'streaming'
-  })
+  const [phase, setPhase] = React.useState<Phase>('instruction')
   const [capturedCount, setCapturedCount] = React.useState(initialCaptured.length)
-  const [score, setScore] = React.useState(0)
-  const [check, setCheck] = React.useState<QualityCheck | null>(null)
   const [pendingPreview, setPendingPreview] = React.useState<PendingPreview | null>(null)
 
-  // Critérios de bloqueio
-  const [irisFillRatio, setIrisFillRatio] = React.useState(0)
-  const [exposureDir, setExposureDir] = React.useState<'low' | 'high' | 'ok'>('ok')
-  const [tooClose, setTooClose] = React.useState(false)
-
-  // Mantém o raio e o centro da íris em px do frame original; usados pelo
-  // snapshot+crop no momento do tap e pela análise pós-captura.
-  const lastIrisRadiusPxRef = React.useRef(0)
-  const lastIrisCenterPxRef = React.useRef<{ x: number; y: number } | null>(null)
-  // História recente — distingue "too_close" (perdeu landmarks com score alto)
-  // de "sem face" (nunca detectou ou está há muito tempo sem detectar).
-  const lastValidScoreRef = React.useRef(0)
-  const lastIrisDetectedAtRef = React.useRef(0)
-
-  // Contexto do frame congelado entre o tap e o disparo da captura real (300ms).
-  // `previewCrop` = canvas low-res (snapshot do video) usado para o freeze visual
-  // e como fallback caso takePhotoBlob falhe.
-  const freezeContextRef = React.useRef<{
-    previewCrop: HTMLCanvasElement
-    irisCenter: { x: number; y: number } | null
-    irisRadius: number
-    streamingScore: number
-  } | null>(null)
-  // Canvas exibido durante a fase 'freezing' — sempre montado, mostrado via CSS.
-  const freezeDisplayCanvasRef = React.useRef<HTMLCanvasElement | null>(null)
-
+  const detectorRef = React.useRef<UseIrisDetectorResult | null>(null)
+  const fileInputRef = React.useRef<HTMLInputElement>(null)
   const slotAbortRefs = React.useRef<Map<number, AbortController>>(new Map())
-  // Promises de upload em curso por slot — finalize aguarda todas antes de redirecionar.
   const uploadPromisesRef = React.useRef<Map<number, Promise<unknown>>>(new Map())
-  // Flag para evitar disparar finalize duas vezes em re-render.
   const finalizingTriggeredRef = React.useRef(false)
-  const router = useRouter()
-
-  // Ref síncrono para blockingReason — evita closure stale no captureGate callback
-  const blockingRef = React.useRef<BlockingReason>('distance')
 
   const slot: Slot = SEQUENCE[Math.min(slotIndex, SEQUENCE.length - 1)]
 
-  // ---------------------------------------------------------------------------
-  // Loop de inferência por frame
-  // ---------------------------------------------------------------------------
-  React.useEffect(() => {
-    const video = videoRef.current
-    if (!video) return
-    if (phase !== 'streaming') return
-
-    let handle: number | null = null
-    const proto = HTMLVideoElement.prototype as unknown as {
-      requestVideoFrameCallback?: (cb: (now: number) => void) => number
-      cancelVideoFrameCallback?: (id: number) => void
-    }
-    const supportsRVFC = typeof proto.requestVideoFrameCallback === 'function'
-
-    const tick = (now: number) => {
-      const det = detectorRef.current
-      if (det?.ready && video.readyState >= 2 && video.videoWidth > 0 && video.videoHeight > 0) {
-        const result = det.detect(video, now)
-        const landmarks = result?.faceLandmarks?.[0] ?? null
-
-        if (!analysisCanvasRef.current) {
-          analysisCanvasRef.current = document.createElement('canvas')
-          analysisCanvasRef.current.width = ANALYSIS_W
-          analysisCanvasRef.current.height = ANALYSIS_H
-        }
-        const canvas = analysisCanvasRef.current
-        const ctx = canvas.getContext('2d', { alpha: false })
-        if (ctx) {
-          const minDim = Math.min(video.videoWidth, video.videoHeight)
-          const sx = (video.videoWidth - minDim) / 2
-          const sy = (video.videoHeight - minDim) / 2
-          ctx.drawImage(video, sx, sy, minDim, minDim, 0, 0, ANALYSIS_W, ANALYSIS_H)
-          const imageData = ctx.getImageData(0, 0, ANALYSIS_W, ANALYSIS_H)
-
-          const c = computeQualityCheck(landmarks, slot.eye, imageData, ANALYSIS_W, ANALYSIS_H)
-          setCheck(c)
-
-          const nowMs = performance.now()
-          if (c.irisDetected) {
-            const newScore = overallScore(c)
-            setScore(newScore)
-            lastValidScoreRef.current = newScore
-            lastIrisDetectedAtRef.current = nowMs
-            setTooClose(false)
-
-            const irisRadiusPx = landmarks
-              ? getIrisRadiusPx(landmarks, slot.eye, video.videoWidth, video.videoHeight)
-              : 0
-            lastIrisRadiusPxRef.current = irisRadiusPx
-            lastIrisCenterPxRef.current = landmarks
-              ? getIrisCenterPx(landmarks, slot.eye, video.videoWidth, video.videoHeight)
-              : null
-
-            // Denominador em px CSS do viewport, onde o guia 60vmin é desenhado.
-            const cssMinDim = Math.min(window.innerWidth, window.innerHeight)
-            const guideRadiusCss = cssMinDim * GUIDE_RADIUS_FRAC
-            const ratio = guideRadiusCss > 0 ? irisRadiusPx / guideRadiusCss : 0
-            setIrisFillRatio(ratio)
-          } else {
-            // MediaPipe perdeu landmarks. Se score recente estava alto, é provável
-            // que o usuário ficou perto demais (íris saiu do frame); se não, é
-            // perda de rosto / posicionamento ruim.
-            const sinceDetect = nowMs - lastIrisDetectedAtRef.current
-            const isTooClose =
-              lastIrisDetectedAtRef.current > 0 &&
-              sinceDetect < TOO_CLOSE_GRACE_MS &&
-              lastValidScoreRef.current > TOO_CLOSE_PREV_SCORE
-            if (isTooClose) {
-              setScore(TOO_CLOSE_NEUTRAL_SCORE)
-              setTooClose(true)
-            } else {
-              setScore(0)
-              setTooClose(false)
-            }
-            lastIrisRadiusPxRef.current = 0
-            lastIrisCenterPxRef.current = null
-            setIrisFillRatio(0)
-          }
-
-          // Direção da exposição para critério de iluminação
-          setExposureDir(getExposureDirection(imageData))
-        }
-      }
-      const videoEx = video as HTMLVideoElement & {
-        requestVideoFrameCallback?: (cb: (now: number) => void) => number
-      }
-      handle = supportsRVFC && videoEx.requestVideoFrameCallback
-        ? videoEx.requestVideoFrameCallback(tick)
-        : requestAnimationFrame(tick)
-    }
-    const videoEx = video as HTMLVideoElement & {
-      requestVideoFrameCallback?: (cb: (now: number) => void) => number
-      cancelVideoFrameCallback?: (id: number) => void
-    }
-    handle = supportsRVFC && videoEx.requestVideoFrameCallback
-      ? videoEx.requestVideoFrameCallback(tick)
-      : requestAnimationFrame(tick)
-    return () => {
-      if (handle == null) return
-      if (supportsRVFC && videoEx.cancelVideoFrameCallback) videoEx.cancelVideoFrameCallback(handle)
-      else cancelAnimationFrame(handle)
-    }
-  }, [phase, slot.eye])
-
-  // Blocking reason derivado — mantém ref síncrono atualizado
-  const blockingReason = React.useMemo(
-    () => computeBlockingReason(check, irisFillRatio, exposureDir, tooClose, score),
-    [check, irisFillRatio, exposureDir, tooClose, score],
-  )
-  React.useEffect(() => { blockingRef.current = blockingReason }, [blockingReason])
+  const interstitialVariant: InterstitialVariant =
+    capturedCount === 0 && slotIndex === 0
+      ? 'first'
+      : slotIndex === 3
+        ? 'eye-transition'
+        : 'mid-slot'
 
   // ---------------------------------------------------------------------------
-  // Captura
+  // Handlers
   // ---------------------------------------------------------------------------
-  /**
-   * Recebe o crop em alta-res (canvas), o blob original opcional, e dispara:
-   *  - compressão + análise + preview do recorte
-   *  - upload paralelo de RECORTADO (sempre) + ORIGINAL (quando disponível)
-   *
-   * Quando `originalBlob` é null (takePhotoBlob falhou), só o recorte é salvo —
-   * UI permanece funcional mas o pipeline da Fase 5 perde a versão original.
-   */
-  const captureCurrentFrame = React.useCallback(async (input: {
-    cropCanvas: HTMLCanvasElement
-    irisRadiusInCrop: number
-    streamingScore: number
-    originalBlob: Blob | null
-  }) => {
-    const { cropCanvas, irisRadiusInCrop, streamingScore, originalBlob } = input
-    if (cropCanvas.width === 0 || cropCanvas.height === 0) return
 
-    let compressed
+  const openCamera = React.useCallback(() => {
+    fileInputRef.current?.click()
+  }, [])
+
+  const handleFileSelected = React.useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+
+    setPhase('analyzing')
+
+    let bitmap: ImageBitmap | null = null
     try {
-      compressed = await compressFrameToJpeg(cropCanvas, cropCanvas.width, cropCanvas.height)
-    } catch {
-      console.error('[capture-client] compress error — slot:', slotIndex)
-      toast.error('Falha ao processar imagem. Tente novamente.')
-      return
-    }
+      bitmap = await createImageBitmap(file)
+      const oneShot = analyzeOneShot(bitmap, detectorRef.current, slot.eye)
 
-    const imageUrl = URL.createObjectURL(compressed.blob)
-    const currentSlotIdx = slotIndex
+      // Crop centrado na íris quando detectada; senão usa frame inteiro.
+      let cropCanvas: HTMLCanvasElement | null = null
+      let irisRadiusInCrop = oneShot.irisRadius
+      if (oneShot.irisCenter && oneShot.irisRadius > 0) {
+        const cropResult = cropBitmapAroundIris(bitmap, oneShot.irisCenter, oneShot.irisRadius)
+        if (cropResult) {
+          cropCanvas = cropResult.canvas
+          irisRadiusInCrop = cropResult.irisRadiusInCrop
+        }
+      }
+      if (!cropCanvas) {
+        cropCanvas = bitmapToFullCanvas(bitmap)
+        irisRadiusInCrop = 0
+      }
+      if (!cropCanvas) {
+        throw new Error('Falha ao montar canvas do crop')
+      }
 
-    // Raio da íris no JPEG recortado: raio no canvas × scale da compressão.
-    const compressionScale = cropCanvas.width > 0
-      ? compressed.width / cropCanvas.width
-      : 1
-    const irisRadiusInJpeg = irisRadiusInCrop * compressionScale
+      const compressed = await compressFrameToJpeg(cropCanvas, cropCanvas.width, cropCanvas.height)
+      const compressionScale = cropCanvas.width > 0
+        ? compressed.width / cropCanvas.width
+        : 1
+      const irisRadiusInJpeg = irisRadiusInCrop * compressionScale
 
-    setPendingPreview({
-      blob: compressed.blob,
-      imageUrl,
-      qualityScore: streamingScore,
-      width: compressed.width,
-      height: compressed.height,
-      slotIndex: currentSlotIdx,
-      analysis: null,
-    })
-    setPhase('previewing')
+      const imageUrl = URL.createObjectURL(compressed.blob)
+      const currentSlotIdx = slotIndex
 
-    // Análise pós-captura (best-effort, em paralelo com upload).
-    void analyzeCapturedJpeg(
-      compressed.blob,
-      irisRadiusInJpeg,
-      compressed.width,
-      compressed.height,
-      streamingScore,
-    )
-      .then((analysis) => {
-        setPendingPreview(prev =>
-          prev && prev.slotIndex === currentSlotIdx
-            ? { ...prev, analysis }
-            : prev,
-        )
+      setPendingPreview({
+        croppedBlob: compressed.blob,
+        imageUrl,
+        qualityScore: oneShot.score,
+        croppedWidth: compressed.width,
+        croppedHeight: compressed.height,
+        slotIndex: currentSlotIdx,
+        analysis: null,
+        originalBlob: file,
+        irisRadiusInJpeg,
       })
-      .catch(() => { /* best-effort */ })
+      setPhase('previewing')
 
+      // Análise pós-captura (Laplacian + irisRatio). streamingScore=0 garante
+      // que o caminho de bypass não é ativado — overlay aparece quando há alerta.
+      void analyzeCapturedJpeg(
+        compressed.blob,
+        irisRadiusInJpeg,
+        compressed.width,
+        compressed.height,
+        0,
+      )
+        .then((analysis) => {
+          setPendingPreview(prev =>
+            prev && prev.slotIndex === currentSlotIdx ? { ...prev, analysis } : prev,
+          )
+        })
+        .catch(() => { /* best-effort */ })
+    } catch (err) {
+      console.error('[capture-client] file process error:', err)
+      toast.error('Falha ao processar imagem. Tente novamente.')
+      setPhase('instruction')
+    } finally {
+      bitmap?.close()
+    }
+  }, [slot.eye, slotIndex])
+
+  const handleConfirm = React.useCallback(() => {
+    const preview = pendingPreview
+    if (!preview) return
+    const currentSlotIdx = preview.slotIndex
+
+    // Upload em background — recortado (sempre) + original (quando disponível).
     const previousAbort = slotAbortRefs.current.get(currentSlotIdx)
     if (previousAbort) previousAbort.abort()
     const ac = new AbortController()
@@ -392,15 +278,15 @@ export function CaptureClient({
 
     const uploadP = uploadWithRetry({
       supabase,
-      croppedBlob: compressed.blob,
-      croppedWidth: compressed.width,
-      croppedHeight: compressed.height,
-      originalBlob: originalBlob ?? undefined,
+      croppedBlob: preview.croppedBlob,
+      croppedWidth: preview.croppedWidth,
+      croppedHeight: preview.croppedHeight,
+      originalBlob: preview.originalBlob ?? undefined,
       therapistId,
       readingId,
       eye: SEQUENCE[currentSlotIdx].eye,
       angle: SEQUENCE[currentSlotIdx].angle,
-      qualityScore: streamingScore,
+      qualityScore: preview.qualityScore,
       signal: ac.signal,
     })
     uploadPromisesRef.current.set(currentSlotIdx, uploadP)
@@ -416,119 +302,38 @@ export function CaptureClient({
           return
         }
         console.error('[capture-client] upload error — eye:', SEQUENCE[currentSlotIdx].eye, 'angle:', SEQUENCE[currentSlotIdx].angle)
-        toast.error(`Falha ao salvar imagem ${currentSlotIdx + 1}/6. Toque para tentar novamente.`, {
+        toast.error(`Falha ao salvar imagem ${currentSlotIdx + 1}/6. Tente refazer.`, {
           id: toastId,
           duration: Infinity,
         })
       })
-  }, [slotIndex, supabase, therapistId, readingId])
 
-  const advanceToNextSlot = React.useCallback(() => {
-    if (pendingPreview?.imageUrl) URL.revokeObjectURL(pendingPreview.imageUrl)
+    // Avança o slot.
+    URL.revokeObjectURL(preview.imageUrl)
     setPendingPreview(null)
     setCapturedCount(c => c + 1)
 
     const next = slotIndex + 1
     if (next >= SEQUENCE.length) {
       setPhase('finalizing')
-      return
-    }
-    if (isOuterEyeTransition(slotIndex, next)) {
-      setPhase('interstitial')
     } else {
-      setPhase('overlay')
+      setSlotIndex(next)
+      setPhase('instruction')
     }
-    setSlotIndex(next)
-  }, [slotIndex, pendingPreview])
+  }, [pendingPreview, slotIndex, supabase, therapistId, readingId])
 
-  const redoCurrent = React.useCallback(() => {
+  const handleRedo = React.useCallback(() => {
+    if (pendingPreview?.imageUrl) URL.revokeObjectURL(pendingPreview.imageUrl)
     const previousAbort = slotAbortRefs.current.get(slotIndex)
     if (previousAbort) {
       previousAbort.abort()
       slotAbortRefs.current.delete(slotIndex)
     }
-    if (pendingPreview?.imageUrl) URL.revokeObjectURL(pendingPreview.imageUrl)
     setPendingPreview(null)
-    setPhase('streaming')
-  }, [slotIndex, pendingPreview])
-
-  React.useEffect(() => {
-    if (phase !== 'overlay') return
-    const id = window.setTimeout(() => {
-      setPhase('streaming')
-    }, 2500)
-    return () => window.clearTimeout(id)
-  }, [phase])
-
-  // Durante a fase 'freezing': em paralelo com o timer de 300ms, dispara
-  // takePhotoBlob (alta-res) + cropBlobAroundIris. Quando ambos terminam,
-  // chama captureCurrentFrame com original + crop high-res. Se takePhoto
-  // falhar, cai para o crop low-res do snapshot do video (freezeContext.previewCrop).
-  React.useEffect(() => {
-    if (phase !== 'freezing') return
-    const ctx = freezeContextRef.current
-    const video = videoRef.current
-    if (!ctx || !video) return
-
-    let cancelled = false
-
-    const work = async () => {
-      const startedAt = performance.now()
-
-      let highResOriginal: Blob | null = null
-      let highResCropCanvas: HTMLCanvasElement | null = null
-      let highResIrisRadius = ctx.irisRadius
-
-      try {
-        const photo = await takePhotoBlob(video)
-        if (cancelled) return
-        if (ctx.irisCenter && ctx.irisRadius > 0) {
-          // Escala coords de íris (computadas em coords do video) para coords da foto.
-          const irisCenterInPhoto = {
-            x: ctx.irisCenter.x * photo.scaleX,
-            y: ctx.irisCenter.y * photo.scaleY,
-          }
-          // Para o raio, usa a média dos scales (assume aspect preservado;
-          // quando diverge, perdemos um pouco de precisão).
-          const radiusScale = (photo.scaleX + photo.scaleY) / 2
-          const irisRadiusInPhoto = ctx.irisRadius * radiusScale
-
-          const cropResult = await cropBlobAroundIris(
-            photo.blob,
-            photo.width,
-            photo.height,
-            irisCenterInPhoto,
-            irisRadiusInPhoto,
-          )
-          if (cropResult) {
-            highResOriginal = photo.blob
-            highResCropCanvas = cropResult.canvas
-            highResIrisRadius = cropResult.irisRadiusInCrop
-          }
-        }
-      } catch (e) {
-        console.warn('[capture-client] takePhoto/crop falhou — usando fallback low-res:', e)
-      }
-
-      // Garante FREEZE_MS mínimo de feedback visual antes de transicionar.
-      const elapsed = performance.now() - startedAt
-      if (elapsed < FREEZE_MS) {
-        await new Promise(r => setTimeout(r, FREEZE_MS - elapsed))
-      }
-
-      if (cancelled) return
-
-      void captureCurrentFrame({
-        cropCanvas: highResCropCanvas ?? ctx.previewCrop,
-        irisRadiusInCrop: highResIrisRadius,
-        streamingScore: ctx.streamingScore,
-        originalBlob: highResOriginal,
-      })
-    }
-    void work()
-
-    return () => { cancelled = true }
-  }, [phase, captureCurrentFrame])
+    setPhase('instruction')
+    // Reabre câmera nativa imediatamente — pula a interstitial pra UX fluida.
+    window.setTimeout(() => fileInputRef.current?.click(), 50)
+  }, [pendingPreview, slotIndex])
 
   // Quando entra em 'finalizing': aguarda uploads pendentes, chama
   // finalizeReadingAction e redireciona pra /leituras.
@@ -539,9 +344,7 @@ export function CaptureClient({
 
     const run = async () => {
       const pending = Array.from(uploadPromisesRef.current.values())
-      if (pending.length > 0) {
-        await Promise.allSettled(pending)
-      }
+      if (pending.length > 0) await Promise.allSettled(pending)
       const result = await finalizeReadingAction(readingId)
       if (result.error) {
         toast.error(`Falha ao finalizar leitura: ${result.error}`)
@@ -563,152 +366,52 @@ export function CaptureClient({
   }, [])
 
   // ---------------------------------------------------------------------------
-  // Botão de captura
-  // ---------------------------------------------------------------------------
-  const buttonLabel = blockingReason !== null
-    ? BLOCKING_LABEL[blockingReason]
-    : `Pronto · ${Math.round(score * 100)}%`
-
-  const handleManualCapture = React.useCallback(() => {
-    if (phase !== 'streaming' || blockingRef.current !== null) return
-    const video = videoRef.current
-    if (!video) return
-
-    // Snapshot + crop low-res do video element para EXIBIÇÃO IMEDIATA no freeze.
-    // O save real usa o crop do takePhotoBlob (alta-res), feito em paralelo
-    // dentro da useEffect de 'freezing'.
-    const previewCrop = snapshotAndCropAroundIris(
-      video,
-      lastIrisCenterPxRef.current,
-      lastIrisRadiusPxRef.current,
-    )
-    if (!previewCrop) {
-      toast.error('Falha ao capturar frame. Tente novamente.')
-      return
-    }
-
-    const display = freezeDisplayCanvasRef.current
-    if (display) {
-      display.width = previewCrop.width
-      display.height = previewCrop.height
-      const dctx = display.getContext('2d', { alpha: false })
-      dctx?.drawImage(previewCrop, 0, 0)
-    }
-
-    freezeContextRef.current = {
-      previewCrop,
-      irisCenter: lastIrisCenterPxRef.current,
-      irisRadius: lastIrisRadiusPxRef.current,
-      streamingScore: score,
-    }
-    setPhase('freezing')
-  }, [phase, score])
-
-  // ---------------------------------------------------------------------------
   // Render
   // ---------------------------------------------------------------------------
   return (
-    <div className="relative flex-1 flex flex-col">
+    <div className="relative flex-1 flex flex-col bg-background">
       <header className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3 pt-[env(safe-area-inset-top)]">
-        <span className="text-sm text-white/80 truncate max-w-[60%]">{clientName}</span>
+        <span className="text-sm text-foreground/80 truncate max-w-[60%]">{clientName}</span>
         <Link
           href="/leituras"
           aria-label="Cancelar leitura"
-          className="rounded-full bg-black/50 backdrop-blur-sm p-2 text-white"
+          className="rounded-full bg-muted p-2 text-foreground"
         >
           <X className="h-5 w-5" />
         </Link>
       </header>
 
-      <CameraView videoRef={videoRef} />
-
-      {/* Freeze overlay — canvas sempre montado para que o ref esteja disponível
-          no momento do tap; mostrado só durante phase='freezing' (300ms). */}
-      <div
-        aria-hidden={phase !== 'freezing'}
-        className={[
-          'absolute inset-0 z-40 bg-black flex items-center justify-center',
-          'transition-opacity duration-150',
-          phase === 'freezing'
-            ? 'opacity-100'
-            : 'opacity-0 pointer-events-none',
-        ].join(' ')}
-      >
-        <div className="relative max-w-[90vw] max-h-[80vh]">
-          <canvas
-            ref={freezeDisplayCanvasRef}
-            className="block max-w-full max-h-full rounded-lg"
-          />
-          {phase === 'freezing' && (
-            <div
-              aria-hidden="true"
-              className="absolute inset-0 rounded-lg ring-4 ring-emerald-400 motion-safe:animate-pulse pointer-events-none"
-            />
-          )}
-        </div>
-      </div>
-
-      {/* Círculo guia grande — sempre visível durante streaming */}
-      {phase === 'streaming' && <GuideCircle score={score} />}
-
-      {phase === 'streaming' && (
+      {phase === 'instruction' && (
         <>
-          {/* Chip persistente eye/angle + QualityIndicator + progress */}
-          <div className="absolute left-0 right-0 z-20 pt-[calc(env(safe-area-inset-top)+44px)] flex flex-col items-center gap-3">
-            <EyeAngleLabel slot={slot} currentIndex={slotIndex} />
-            <QualityIndicator score={score} />
+          <div className="absolute left-0 right-0 top-[calc(env(safe-area-inset-top)+44px)] z-40 flex justify-center">
             <CaptureProgress currentIndex={slotIndex} capturedCount={capturedCount} />
           </div>
-
-          {/* Botão de captura — desabilitado quando critérios não satisfeitos */}
-          <div className="absolute left-0 right-0 bottom-[calc(env(safe-area-inset-bottom)+16px)] z-20 flex justify-center px-6">
-            <button
-              type="button"
-              onClick={handleManualCapture}
-              disabled={blockingReason !== null}
-              aria-label={blockingReason !== null ? buttonLabel : 'Capturar foto'}
-              className={[
-                'w-full max-w-xs rounded-full py-3 px-5 text-sm font-medium text-center transition-all duration-200',
-                blockingReason !== null
-                  ? 'bg-black/50 text-white/55 backdrop-blur-sm cursor-not-allowed'
-                  : 'bg-white text-black shadow-lg active:scale-95',
-              ].join(' ')}
-            >
-              {buttonLabel}
-            </button>
-          </div>
+          <AngleInterstitial
+            nextSlot={slot}
+            slotIndex={slotIndex}
+            variant={interstitialVariant}
+            onProceed={openCamera}
+          />
         </>
       )}
 
-      {phase === 'overlay' && (
-        <>
-          <div className="absolute left-0 right-0 z-20 pt-[calc(env(safe-area-inset-top)+44px)] flex flex-col items-center gap-3">
-            <CaptureProgress currentIndex={slotIndex} capturedCount={capturedCount} />
-          </div>
-          <div className="absolute top-[calc(env(safe-area-inset-top)+120px)] left-1/2 -translate-x-1/2 z-25 max-w-[90%]">
-            <AngleOverlay slot={slot} resetKey={`${slot.eye}_${slot.angle}`} />
-          </div>
-        </>
+      {phase === 'analyzing' && (
+        <div className="absolute inset-0 z-40 bg-background flex flex-col items-center justify-center gap-4 text-foreground">
+          <div
+            aria-hidden="true"
+            className="h-12 w-12 rounded-full border-4 border-primary/30 border-t-primary motion-safe:animate-spin"
+          />
+          <p className="text-sm text-muted-foreground">Analisando captura...</p>
+        </div>
       )}
 
       {phase === 'previewing' && pendingPreview && (
         <CapturePreview
           imageUrl={pendingPreview.imageUrl}
           qualityScore={pendingPreview.qualityScore}
-          onRedo={redoCurrent}
-          onTimeout={advanceToNextSlot}
-          durationMs={PREVIEW_MS}
           analysis={pendingPreview.analysis}
-        />
-      )}
-
-      {phase === 'interstitial' && (
-        <AngleInterstitial
-          nextSlot={slot}
-          isFirst={capturedCount === 0 && slotIndex === 0}
-          onProceed={() => {
-            setPhase('streaming')
-          }}
+          onRedo={handleRedo}
+          onConfirm={handleConfirm}
         />
       )}
 
@@ -719,9 +422,18 @@ export function CaptureClient({
         </div>
       )}
 
-      <IrisDetector
-        onReady={(api) => { detectorRef.current = api }}
+      {/* Hidden input — acionado por openCamera */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={handleFileSelected}
+        className="hidden"
+        aria-hidden="true"
       />
+
+      <IrisDetector onReady={(api) => { detectorRef.current = api }} />
     </div>
   )
 }

@@ -174,6 +174,48 @@ export async function discardReadingAction(
 
 
 /**
+ * Apaga readings com 0/6 imagens criados há mais de 1 hora (do terapeuta atual).
+ * Chamado no carregamento de /leituras para garbage-collect rascunhos abandonados
+ * antes da 1ª foto. Não toca em readings com pelo menos 1 imagem capturada.
+ *
+ * Não emite revalidatePath nem redirect — apenas limpeza silenciosa.
+ */
+export async function cleanupStaleEmptyReadingsAction(): Promise<{ deleted: number }> {
+  const supabase = await createClient()
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (!user || authError) return { deleted: 0 }
+
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString()
+
+  const { data: stale } = await supabase
+    .from('readings')
+    .select('id, reading_images(count)')
+    .eq('therapist_id', user.id)
+    .eq('status', 'pending')
+    .lt('created_at', oneHourAgo)
+
+  if (!stale || stale.length === 0) return { deleted: 0 }
+
+  const idsToDelete = stale
+    .filter((r) => {
+      const count = (r.reading_images?.[0]?.count as number | undefined) ?? 0
+      return count === 0
+    })
+    .map((r) => r.id)
+
+  if (idsToDelete.length === 0) return { deleted: 0 }
+
+  const { error } = await supabase.from('readings').delete().in('id', idsToDelete)
+  if (error) {
+    // Best-effort: log e segue. Falha não deve quebrar a página.
+    console.warn('[cleanupStaleEmptyReadings] erro:', error.message)
+    return { deleted: 0 }
+  }
+
+  return { deleted: idsToDelete.length }
+}
+
+/**
  * Retorna o rascunho mais recente do terapeuta (CONTEXT D-12 — recovery banner).
  * Critério: status='pending' AND count(reading_images) < 6.
  * Usa nested resource expansion do PostgREST para count.

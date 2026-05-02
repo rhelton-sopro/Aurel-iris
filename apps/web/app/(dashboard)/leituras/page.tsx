@@ -11,6 +11,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
+import { cleanupStaleEmptyReadingsAction } from '@/app/actions/readings'
 
 const STATUS_LABEL: Record<string, string> = {
   pending: 'Pendente',
@@ -28,7 +29,12 @@ const STATUS_CLASS: Record<string, string> = {
   edited: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
 }
 
+const RASCUNHO_CLASS = 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300'
+
 export default async function LeiturasPage() {
+  // GC silencioso: apaga rascunhos com 0/6 fotos criados há > 1h.
+  await cleanupStaleEmptyReadingsAction()
+
   const supabase = await createClient()
 
   const { data: readings } = await supabase
@@ -72,6 +78,7 @@ export default async function LeiturasPage() {
               <TableHead>Data</TableHead>
               <TableHead>Fotos</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead className="w-32" />
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -79,6 +86,15 @@ export default async function LeiturasPage() {
               const client = Array.isArray(r.client) ? r.client[0] : r.client
               const count = (r.reading_images?.[0]?.count as number | undefined) ?? 0
               const status = r.status ?? 'pending'
+              // Rascunho = pending com captura parcial (1..5 / 6).
+              const isRascunho = status === 'pending' && count > 0 && count < 6
+              const badgeClass = isRascunho
+                ? RASCUNHO_CLASS
+                : STATUS_CLASS[status] ?? STATUS_CLASS['pending']
+              const badgeLabel = isRascunho
+                ? 'Rascunho'
+                : STATUS_LABEL[status] ?? status
+
               return (
                 <TableRow key={r.id}>
                   <TableCell className="font-medium">
@@ -97,10 +113,20 @@ export default async function LeiturasPage() {
                   <TableCell>
                     <span className={cn(
                       'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
-                      STATUS_CLASS[status] ?? STATUS_CLASS['pending']
+                      badgeClass,
                     )}>
-                      {STATUS_LABEL[status] ?? status}
+                      {badgeLabel}
                     </span>
+                  </TableCell>
+                  <TableCell>
+                    {isRascunho && (
+                      <Link
+                        href={`/leituras/nova/capturar?reading=${r.id}`}
+                        className={cn(buttonVariants({ size: 'sm' }))}
+                      >
+                        Continuar
+                      </Link>
+                    )}
                   </TableCell>
                 </TableRow>
               )
