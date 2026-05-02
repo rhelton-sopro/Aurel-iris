@@ -43,10 +43,19 @@ describe('compressFrameToJpeg', () => {
     expect(r.height).toBe(1024)
   })
 
-  it('downscales portrait 1080x1920 → 1152x2048', async () => {
+  it('does not upscale portrait 1080x1920 (both dims < 2048)', async () => {
     const fakeVideo = {} as HTMLVideoElement
     const r = await compressFrameToJpeg(fakeVideo, 1080, 1920)
-    expect(r.width).toBe(1152)
+    // max(1080,1920) = 1920 < 2048 → sem downscale
+    expect(r.width).toBe(1080)
+    expect(r.height).toBe(1920)
+  })
+
+  it('downscales portrait 2160x3840 → 1080x1920 (preserves aspect)', async () => {
+    const fakeVideo = {} as HTMLVideoElement
+    const r = await compressFrameToJpeg(fakeVideo, 2160, 3840)
+    // max(2160,3840) = 3840 > 2048 → ratio = 2048/3840 ≈ 0.5333
+    expect(r.width).toBe(Math.round(2160 * 2048 / 3840))
     expect(r.height).toBe(2048)
   })
 
