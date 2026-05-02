@@ -3,8 +3,10 @@
 import * as React from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { X } from 'lucide-react'
 import { toast } from 'sonner'
+import { finalizeReadingAction } from '@/app/actions/readings'
 import { CameraView } from '@/components/capture/CameraView'
 import { QualityIndicator } from '@/components/capture/QualityIndicator'
 import { CaptureProgress } from '@/components/capture/CaptureProgress'
@@ -185,6 +187,11 @@ export function CaptureClient({
   const freezeDisplayCanvasRef = React.useRef<HTMLCanvasElement | null>(null)
 
   const slotAbortRefs = React.useRef<Map<number, AbortController>>(new Map())
+  // Promises de upload em curso por slot — finalize aguarda todas antes de redirecionar.
+  const uploadPromisesRef = React.useRef<Map<number, Promise<unknown>>>(new Map())
+  // Flag para evitar disparar finalize duas vezes em re-render.
+  const finalizingTriggeredRef = React.useRef(false)
+  const router = useRouter()
 
   // Ref síncrono para blockingReason — evita closure stale no captureGate callback
   const blockingRef = React.useRef<BlockingReason>('distance')
@@ -375,7 +382,7 @@ export function CaptureClient({
 
     const toastId = toast.loading(`Salvando imagem ${currentSlotIdx + 1}/6...`)
 
-    void uploadWithRetry({
+    const uploadP = uploadWithRetry({
       supabase,
       blob: compressed.blob,
       therapistId,
@@ -387,6 +394,8 @@ export function CaptureClient({
       height: compressed.height,
       signal: ac.signal,
     })
+    uploadPromisesRef.current.set(currentSlotIdx, uploadP)
+    void uploadP
       .then(() => {
         if (ac.signal.aborted) return
         toast.success('Imagem salva.', { id: toastId, duration: 2000 })
@@ -452,6 +461,30 @@ export function CaptureClient({
     }, FREEZE_MS)
     return () => window.clearTimeout(id)
   }, [phase, captureCurrentFrame])
+
+  // Quando entra em 'finalizing': aguarda uploads pendentes, chama
+  // finalizeReadingAction e redireciona pra /leituras.
+  React.useEffect(() => {
+    if (phase !== 'finalizing') return
+    if (finalizingTriggeredRef.current) return
+    finalizingTriggeredRef.current = true
+
+    const run = async () => {
+      const pending = Array.from(uploadPromisesRef.current.values())
+      if (pending.length > 0) {
+        await Promise.allSettled(pending)
+      }
+      const result = await finalizeReadingAction(readingId)
+      if (result.error) {
+        toast.error(`Falha ao finalizar leitura: ${result.error}`)
+        finalizingTriggeredRef.current = false
+        return
+      }
+      toast.success('Leitura registrada.')
+      router.push('/leituras')
+    }
+    void run()
+  }, [phase, readingId, router])
 
   React.useEffect(() => {
     const abortMap = slotAbortRefs.current
