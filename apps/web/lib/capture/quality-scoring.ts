@@ -50,15 +50,15 @@ export function levelFromScore(score: number): QualityLevel {
 }
 
 /**
- * Pesos exatos (RESEARCH §Fórmula).
- * Soma: 0.20 + 0.20 + 0.20 + 0.15 + 0.15 + 0.10 = 1.00
+ * Pesos (soma = 1.00). Reflexo removido como critério negativo — câmera mobile
+ * quase sempre gera reflexo e penalizava capturas boas em condições reais.
+ * Peso do reflexo redistribuído para distância (principal indicador de qualidade iridológica).
  */
 export const WEIGHTS = {
   centeredness: 0.20,
-  distance: 0.20,
+  distance: 0.35,
   sharpness: 0.20,
   exposure: 0.15,
-  reflex: 0.15, // peso quando ausente; quando presente → 0
   occlusion: 0.10,
 } as const
 
@@ -69,7 +69,6 @@ export function overallScore(c: QualityCheck): number {
     WEIGHTS.distance * c.irisDistanceOk +
     WEIGHTS.sharpness * c.sharpness +
     WEIGHTS.exposure * c.exposure +
-    WEIGHTS.reflex * (c.reflexInIrisCenter ? 0 : 1) +
     WEIGHTS.occlusion * (1 - c.eyelidOcclusion)
   )
 }
@@ -156,7 +155,6 @@ export function dominantFailure(c: QualityCheck, frame?: ImageData, observedRadi
     distance: WEIGHTS.distance * (1 - c.irisDistanceOk),
     sharpness: WEIGHTS.sharpness * (1 - c.sharpness),
     exposure: WEIGHTS.exposure * (1 - c.exposure),
-    reflex: c.reflexInIrisCenter ? WEIGHTS.reflex : 0,
     eyelid: WEIGHTS.occlusion * c.eyelidOcclusion,
   } as const
 
@@ -171,7 +169,7 @@ export function dominantFailure(c: QualityCheck, frame?: ImageData, observedRadi
         if (dir === 'far') return 'distance_far'
         if (dir === 'close') return 'distance_close'
       }
-      return 'distance_far' // fallback
+      return 'distance_far'
     case 'sharpness': return 'sharpness'
     case 'exposure':
       if (frame) {
@@ -179,8 +177,7 @@ export function dominantFailure(c: QualityCheck, frame?: ImageData, observedRadi
         if (dir === 'low') return 'exposure_low'
         if (dir === 'high') return 'exposure_high'
       }
-      return 'exposure_low' // fallback
-    case 'reflex': return 'reflex'
+      return 'exposure_low'
     case 'eyelid': return 'eyelid'
     default: return 'iris_missing'
   }

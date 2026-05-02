@@ -22,6 +22,7 @@ export type SlotPhase =
   | 'streaming'
   | 'overlay'
   | 'interstitial'
+  | 'reviewing'
   | 'finalizing'
   | 'complete'
 

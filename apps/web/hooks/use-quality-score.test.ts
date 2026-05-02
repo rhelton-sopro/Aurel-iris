@@ -13,10 +13,10 @@ describe('useStableQualityGate', () => {
   it('does not trigger when score stays below gate', () => {
     const onTrigger = vi.fn()
     const { rerender } = renderHook(({ score }) => useStableQualityGate(score, onTrigger), {
-      initialProps: { score: 0.50 },
+      initialProps: { score: 0.30 },
     })
     act(() => { vi.advanceTimersByTime(800) })
-    rerender({ score: 0.60 })
+    rerender({ score: 0.45 })
     act(() => { vi.advanceTimersByTime(800) })
     expect(onTrigger).not.toHaveBeenCalled()
   })
@@ -24,11 +24,11 @@ describe('useStableQualityGate', () => {
   it('does not trigger when score crosses gate but falls before 200ms', () => {
     const onTrigger = vi.fn()
     const { rerender } = renderHook(({ score }) => useStableQualityGate(score, onTrigger), {
-      initialProps: { score: 0.50 },
+      initialProps: { score: 0.30 },
     })
     rerender({ score: 0.80 })
     act(() => { vi.advanceTimersByTime(100) })
-    rerender({ score: 0.60 })
+    rerender({ score: 0.40 })
     act(() => { vi.advanceTimersByTime(400) })
     expect(onTrigger).not.toHaveBeenCalled()
   })

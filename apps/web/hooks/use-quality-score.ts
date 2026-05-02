@@ -20,7 +20,7 @@ export interface StableQualityGateResult {
 }
 
 const DEFAULT_STABILITY_MS = 200
-const DEFAULT_GATE = 0.65
+const DEFAULT_GATE = 0.50
 
 /**
  * Gate de auto-captura: dispara onTrigger uma única vez quando `score` permanece

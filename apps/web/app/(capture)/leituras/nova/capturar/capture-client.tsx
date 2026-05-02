@@ -55,6 +55,8 @@ export function CaptureClient({
   const videoRef = React.useRef<HTMLVideoElement>(null)
   const analysisCanvasRef = React.useRef<HTMLCanvasElement | null>(null)
   const detectorRef = React.useRef<UseIrisDetectorResult | null>(null)
+  // Mantém última posição conhecida da íris por 500ms após perda de landmarks
+  const irisHoldRef = React.useRef<{ cx: number; cy: number; r: number; expiresAt: number } | null>(null)
 
   // Inicializa slotIndex baseado no que já foi capturado (D-12 + resume)
   const initialIndex = React.useMemo(() => {
@@ -75,6 +77,7 @@ export function CaptureClient({
   const [check, setCheck] = React.useState<QualityCheck | null>(null)
   const [irisPos, setIrisPos] = React.useState<{ cx: number; cy: number; r: number } | null>(null)
   const [lastThumb, setLastThumb] = React.useState<string | null>(null)
+  const [reviewThumb, setReviewThumb] = React.useState<string | null>(null)
 
   const slot: Slot = SEQUENCE[Math.min(slotIndex, SEQUENCE.length - 1)]
 
@@ -101,19 +104,29 @@ export function CaptureClient({
         const lm = landmarks ?? []
         const irisCenter = getIrisCenter(lm, slot.eye)
         const irisRaw = irisCenter ? getIrisRadius(lm, slot.eye) : 0
+        const nowMs = typeof performance !== 'undefined' ? performance.now() : Date.now()
         if (irisCenter && irisRaw > 0 && video.offsetWidth > 0) {
           const cW = video.offsetWidth
           const cH = video.offsetHeight
           const vW = video.videoWidth
           const vH = video.videoHeight
           const scale = Math.max(cW / vW, cH / vH)
-          setIrisPos({
+          const newPos = {
             cx: (cW - vW * scale) / 2 + irisCenter.x * vW * scale,
             cy: (cH - vH * scale) / 2 + irisCenter.y * vH * scale,
             r: irisRaw * vW * scale,
-          })
+          }
+          irisHoldRef.current = { ...newPos, expiresAt: nowMs + 500 }
+          setIrisPos(newPos)
         } else {
-          setIrisPos(null)
+          // Mantém última posição por 500ms (câmera muito próxima perde landmarks)
+          const held = irisHoldRef.current
+          if (held && nowMs < held.expiresAt) {
+            setIrisPos({ cx: held.cx, cy: held.cy, r: held.r })
+          } else {
+            irisHoldRef.current = null
+            setIrisPos(null)
+          }
         }
 
         if (!analysisCanvasRef.current) {
@@ -162,13 +175,11 @@ export function CaptureClient({
     }
   }, [phase, slot.eye])
 
-  // Avança para o próximo slot — chamado pelo trigger stub OU por debug
+  // Avança para o próximo slot após review
   const advanceToNextSlot = React.useCallback(() => {
     const next = slotIndex + 1
     if (next >= SEQUENCE.length) {
       setPhase('finalizing')
-      // 03-08 cuida da finalização real (chama finalizeReadingAction + redirect)
-      // Por ora apenas marca e exibe a tela de finalização stub
       return
     }
     if (isOuterEyeTransition(slotIndex, next)) {
@@ -180,14 +191,31 @@ export function CaptureClient({
     setCapturedCount(c => c + 1)
   }, [slotIndex])
 
-  // Stub do auto-trigger — em 03-07 capturará Canvas.toBlob + upload + insert
-  const captureGate = useStableQualityGate(score, () => {
+  // Ref estável para advanceToNextSlot — usado dentro de timeouts
+  const advanceRef = React.useRef(advanceToNextSlot)
+  React.useEffect(() => { advanceRef.current = advanceToNextSlot }, [advanceToNextSlot])
+
+  // Captura um frame e entra na fase de revisão visual
+  const handleCapture = React.useCallback(() => {
     if (phase !== 'streaming') return
-    if (analysisCanvasRef.current) {
-      setLastThumb(analysisCanvasRef.current.toDataURL('image/jpeg', 0.7))
-    }
-    advanceToNextSlot()
-  })
+    const thumb = analysisCanvasRef.current?.toDataURL('image/jpeg', 0.7) ?? null
+    setLastThumb(thumb)
+    setReviewThumb(thumb)
+    setPhase('reviewing')
+  }, [phase])
+
+  const captureGate = useStableQualityGate(score, handleCapture)
+
+  // reviewing: exibe foto por 1.5s, depois avança para próximo slot
+  React.useEffect(() => {
+    if (phase !== 'reviewing') return
+    captureGate.reset()
+    const id = window.setTimeout(() => {
+      setReviewThumb(null)
+      advanceRef.current()
+    }, 1500)
+    return () => window.clearTimeout(id)
+  }, [phase, captureGate])
 
   // Quando entra em 'overlay', auto-volta para 'streaming' após 2.5s + reset gate
   React.useEffect(() => {
@@ -199,7 +227,7 @@ export function CaptureClient({
     return () => window.clearTimeout(id)
   }, [phase, captureGate])
 
-  // Reset gate quando entra em interstitial ou finalizing (não dispara enquanto está parado)
+  // Reset gate quando entra em interstitial ou finalizing
   React.useEffect(() => {
     if (phase === 'interstitial' || phase === 'finalizing') {
       captureGate.reset()
@@ -225,7 +253,7 @@ export function CaptureClient({
       <CameraView videoRef={videoRef} />
 
       {/* Iris guide — segue a íris detectada; cor varia com o score */}
-      {phase !== 'interstitial' && phase !== 'finalizing' && (
+      {phase !== 'interstitial' && phase !== 'finalizing' && phase !== 'reviewing' && (
         irisPos != null ? (
           <div
             aria-hidden="true"
@@ -255,8 +283,8 @@ export function CaptureClient({
         )
       )}
 
-      {/* QualityIndicator + CaptureProgress no topo (ocultos durante interstitial e finalizing) */}
-      {phase !== 'interstitial' && phase !== 'finalizing' && (
+      {/* QualityIndicator + CaptureProgress no topo (ocultos durante interstitial, reviewing e finalizing) */}
+      {phase !== 'interstitial' && phase !== 'finalizing' && phase !== 'reviewing' && (
         <div className="absolute left-0 right-0 z-20 pt-[calc(env(safe-area-inset-top)+44px)] flex flex-col items-center gap-3">
           <QualityIndicator score={score} />
           <CaptureProgress currentIndex={slotIndex} capturedCount={capturedCount} />
@@ -296,8 +324,34 @@ export function CaptureClient({
         </div>
       )}
 
+      {/* Botão manual — fallback se auto-trigger não disparar */}
+      {phase === 'streaming' && (
+        <div className="absolute left-1/2 -translate-x-1/2 z-20" style={{ bottom: 'calc(env(safe-area-inset-bottom) + 24px)' }}>
+          <button
+            type="button"
+            onClick={handleCapture}
+            className="rounded-full bg-white/25 backdrop-blur-sm border-2 border-white/60 w-20 h-20 flex items-center justify-center text-white text-xs font-semibold text-center leading-tight"
+          >
+            Capturar agora
+          </button>
+        </div>
+      )}
+
+      {/* Reviewing: foto capturada em tela cheia por 1.5s */}
+      {phase === 'reviewing' && reviewThumb && (
+        <div className="absolute inset-0 z-50 bg-black flex flex-col">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={reviewThumb} alt="Foto capturada" className="flex-1 object-contain" />
+          <div className="flex justify-center pb-[calc(env(safe-area-inset-bottom)+16px)] pt-3">
+            <span className="text-white/80 text-sm bg-white/15 rounded-full px-5 py-1.5">
+              Registrado — avançando...
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* Thumbnail da última captura — canto inferior esquerdo */}
-      {lastThumb && phase !== 'interstitial' && phase !== 'finalizing' && (
+      {lastThumb && phase !== 'interstitial' && phase !== 'finalizing' && phase !== 'reviewing' && (
         <div
           className="absolute z-20 rounded-lg overflow-hidden border-2 border-white/60 shadow-lg"
           style={{
