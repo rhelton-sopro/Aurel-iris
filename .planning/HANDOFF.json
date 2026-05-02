@@ -1,0 +1,47 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-05-02T00:43:15.834Z",
+  "phase": "03",
+  "phase_name": "captura-mobile-pwa",
+  "phase_dir": ".planning/phases/03-captura-mobile-pwa",
+  "plan": 5,
+  "task": 4,
+  "total_tasks": 4,
+  "status": "paused",
+  "completed_tasks": [
+    {"id": 1, "name": "lib/capture pure libs + TDD tests (41 tests)", "status": "done", "commit": "b081f53"},
+    {"id": 2, "name": "MediaPipe hooks + IrisDetector + useQualityScore + WASM assets", "status": "done", "commit": "3f17e3f"},
+    {"id": 3, "name": "QualityIndicator + LiveFeedbackMessage + capture-client inference loop", "status": "done", "commit": "78f7da4"},
+    {"id": 4, "name": "checkpoint:human-verify — awaiting iPhone UAT approval", "status": "in_progress", "progress": "awaiting user to test on iPhone and report OK"}
+  ],
+  "remaining_tasks": [],
+  "blockers": [
+    {
+      "description": "03-05 checkpoint:human-verify pendente — usuário precisa testar no iPhone e reportar OK antes de prosseguir para Wave 5 (03-06)",
+      "type": "human_action",
+      "workaround": "none — gate obrigatório"
+    }
+  ],
+  "human_actions_pending": [
+    {
+      "action": "Testar deploy na Vercel no iPhone: câmera abre, barra de qualidade reage, console mostra [iris-radius] com valor quando íris preenche o círculo",
+      "context": "Checkpoint:human-verify do plan 03-05. Após UAT OK, prosseguir para Wave 5 (03-06 — sequência guiada de 6 capturas)",
+      "blocking": true
+    },
+    {
+      "action": "Reportar valor de [iris-radius] do console quando íris preenche o círculo guia",
+      "context": "Log diagnóstico adicionado em capture-client.tsx para calibrar irisRadiusTarget definitivamente. Se valor >> 0.12, ajustar targetRadius.",
+      "blocking": false
+    }
+  ],
+  "decisions": [
+    {"decision": "sharpnessScore saturation 200→80", "rationale": "câmera mobile JPEG retorna variância 30–80 mesmo nítida", "phase": "03"},
+    {"decision": "computeCenteredness maxAcceptable 0.10→0.15", "rationale": "câmera traseira mobile exige área de aceitação mais larga", "phase": "03"},
+    {"decision": "irisRadiusTarget 0.15→0.08→0.12 (final)", "rationale": "0.08 premiava 25cm; 0.12 é melhor estimativa para íris preencher o overlay a 10–15cm", "phase": "03"},
+    {"decision": "tolerância assimétrica ±50% (longe penaliza mais, perto penaliza menos)", "rationale": "para iridologia, perto é melhor que longe — câmera consegue focar a ≥8cm", "phase": "03"},
+    {"decision": "worktrees habilitados, parallelization true", "rationale": "cada wave tem 1 plan — parallelism não aplicável nesta fase", "phase": "03"}
+  ],
+  "uncommitted_files": [],
+  "next_action": "Verificar resposta do usuário sobre UAT 03-05. Se OK: marcar 03-05 completo no ROADMAP, spawnar Wave 5 executor para 03-06 (sequência guiada). Se issues: corrigir e republicar.",
+  "context_notes": "Sessão focou em infraestrutura de deploy (Vercel env vars, vercelignore fix) e calibração iterativa de thresholds de qualidade. Os thresholds ainda podem precisar de ajuste fino baseado no valor real de [iris-radius] do console. Plans 03-06..03-08 não iniciados."
+}
