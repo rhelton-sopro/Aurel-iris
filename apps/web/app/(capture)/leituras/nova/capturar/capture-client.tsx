@@ -26,14 +26,14 @@ import {
   isOuterEyeTransition,
   getSlotProgressLabel,
 } from '@/lib/capture/sequence'
-import { getIrisRadiusPx } from '@/lib/capture/iris-geometry'
+import { getIrisRadiusPx, getIrisCenterPx } from '@/lib/capture/iris-geometry'
 import { getExposureDirection } from '@/lib/capture/exposure'
 import { compressFrameToJpeg } from '@/lib/capture/jpeg-compress'
+import { snapshotAndCropAroundIris } from '@/lib/capture/iris-crop'
 import { analyzeCapturedJpeg, type PostCaptureAnalysis } from '@/lib/capture/post-capture-analysis'
 import { uploadWithRetry } from '@/lib/capture/upload'
 import { createClient } from '@/lib/supabase/client'
 import type { UseIrisDetectorResult } from '@/hooks/use-iris-detector'
-import { useStableQualityGate } from '@/hooks/use-quality-score'
 
 const IrisDetector = dynamic(() => import('@/components/capture/IrisDetector'), {
   ssr: false,
@@ -126,6 +126,8 @@ interface PendingPreview {
 const ANALYSIS_W = 256
 const ANALYSIS_H = 256
 const PREVIEW_MS = 2000
+/** Duração do "freeze" pós-tap (snapshot exibido com borda pulsante). */
+const FREEZE_MS = 300
 
 // ---------------------------------------------------------------------------
 // Componente
@@ -164,12 +166,23 @@ export function CaptureClient({
   const [exposureDir, setExposureDir] = React.useState<'low' | 'high' | 'ok'>('ok')
   const [tooClose, setTooClose] = React.useState(false)
 
-  // Mantém o raio da íris em px do frame original (usado pela análise pós-captura)
+  // Mantém o raio e o centro da íris em px do frame original; usados pelo
+  // snapshot+crop no momento do tap e pela análise pós-captura.
   const lastIrisRadiusPxRef = React.useRef(0)
+  const lastIrisCenterPxRef = React.useRef<{ x: number; y: number } | null>(null)
   // História recente — distingue "too_close" (perdeu landmarks com score alto)
   // de "sem face" (nunca detectou ou está há muito tempo sem detectar).
   const lastValidScoreRef = React.useRef(0)
   const lastIrisDetectedAtRef = React.useRef(0)
+
+  // Contexto do frame congelado entre o tap e o disparo da captura real (300ms).
+  const freezeContextRef = React.useRef<{
+    canvas: HTMLCanvasElement
+    irisRadius: number
+    streamingScore: number
+  } | null>(null)
+  // Canvas exibido durante a fase 'freezing' — sempre montado, mostrado via CSS.
+  const freezeDisplayCanvasRef = React.useRef<HTMLCanvasElement | null>(null)
 
   const slotAbortRefs = React.useRef<Map<number, AbortController>>(new Map())
 
@@ -228,6 +241,9 @@ export function CaptureClient({
               ? getIrisRadiusPx(landmarks, slot.eye, video.videoWidth, video.videoHeight)
               : 0
             lastIrisRadiusPxRef.current = irisRadiusPx
+            lastIrisCenterPxRef.current = landmarks
+              ? getIrisCenterPx(landmarks, slot.eye, video.videoWidth, video.videoHeight)
+              : null
 
             // Denominador em px CSS do viewport, onde o guia 60vmin é desenhado.
             const cssMinDim = Math.min(window.innerWidth, window.innerHeight)
@@ -251,6 +267,7 @@ export function CaptureClient({
               setTooClose(false)
             }
             lastIrisRadiusPxRef.current = 0
+            lastIrisCenterPxRef.current = null
             setIrisFillRatio(0)
           }
 
@@ -289,29 +306,40 @@ export function CaptureClient({
   // ---------------------------------------------------------------------------
   // Captura
   // ---------------------------------------------------------------------------
-  const captureCurrentFrame = React.useCallback(async () => {
-    const video = videoRef.current
-    if (!video || video.videoWidth === 0) return
+  /**
+   * Comprime o crop produzido pelo snapshot, dispara upload e análise pós-captura.
+   * Recebe os artefatos do freeze (canvas cropado, raio da íris no source,
+   * score do streaming) — não depende mais do estado live nem do videoRef.
+   */
+  const captureCurrentFrame = React.useCallback(async (
+    cropCanvas: HTMLCanvasElement,
+    irisRadiusInCrop: number,
+    streamingScore: number,
+  ) => {
+    if (cropCanvas.width === 0 || cropCanvas.height === 0) return
 
     let compressed
     try {
-      compressed = await compressFrameToJpeg(video, video.videoWidth, video.videoHeight)
+      compressed = await compressFrameToJpeg(cropCanvas, cropCanvas.width, cropCanvas.height)
     } catch {
-      console.error('[capture-client] compress error — eye:', slot.eye, 'angle:', slot.angle)
+      console.error('[capture-client] compress error — slot:', slotIndex)
       toast.error('Falha ao processar imagem. Tente novamente.')
       return
     }
 
     const imageUrl = URL.createObjectURL(compressed.blob)
     const currentSlotIdx = slotIndex
-    const currentScore = score
-    const irisRadiusPxAtCapture = lastIrisRadiusPxRef.current
-    const videoW = video.videoWidth
+
+    // Raio da íris no JPEG: raio no canvas source × scale da compressão.
+    const compressionScale = cropCanvas.width > 0
+      ? compressed.width / cropCanvas.width
+      : 1
+    const irisRadiusInJpeg = irisRadiusInCrop * compressionScale
 
     setPendingPreview({
       blob: compressed.blob,
       imageUrl,
-      qualityScore: currentScore,
+      qualityScore: streamingScore,
       width: compressed.width,
       height: compressed.height,
       slotIndex: currentSlotIdx,
@@ -320,14 +348,14 @@ export function CaptureClient({
     setPhase('previewing')
 
     // Análise pós-captura (best-effort, em paralelo com upload).
-    // Quando hasAlert=true, CapturePreview suspende auto-timeout e mostra
-    // botões "Refazer" / "Continuar assim".
+    // Quando streamingScore ≥ 0.70, analyzeCapturedJpeg suprime o overlay
+    // — só mostra alerta para frames de qualidade incerta.
     void analyzeCapturedJpeg(
       compressed.blob,
-      irisRadiusPxAtCapture,
+      irisRadiusInJpeg,
       compressed.width,
       compressed.height,
-      videoW,
+      streamingScore,
     )
       .then((analysis) => {
         setPendingPreview(prev =>
@@ -354,7 +382,7 @@ export function CaptureClient({
       readingId,
       eye: SEQUENCE[currentSlotIdx].eye,
       angle: SEQUENCE[currentSlotIdx].angle,
-      qualityScore: currentScore,
+      qualityScore: streamingScore,
       width: compressed.width,
       height: compressed.height,
       signal: ac.signal,
@@ -375,7 +403,7 @@ export function CaptureClient({
           duration: Infinity,
         })
       })
-  }, [slotIndex, score, supabase, therapistId, readingId, slot.eye, slot.angle])
+  }, [slotIndex, supabase, therapistId, readingId])
 
   const advanceToNextSlot = React.useCallback(() => {
     if (pendingPreview?.imageUrl) URL.revokeObjectURL(pendingPreview.imageUrl)
@@ -404,33 +432,26 @@ export function CaptureClient({
     if (pendingPreview?.imageUrl) URL.revokeObjectURL(pendingPreview.imageUrl)
     setPendingPreview(null)
     setPhase('streaming')
-    captureGate.reset()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slotIndex, pendingPreview])
-
-  // Auto-trigger — verifica critérios de bloqueio antes de disparar
-  const captureGate = useStableQualityGate(score, () => {
-    if (phase !== 'streaming') return
-    if (blockingRef.current !== null) return
-    void captureCurrentFrame()
-  })
 
   React.useEffect(() => {
     if (phase !== 'overlay') return
     const id = window.setTimeout(() => {
       setPhase('streaming')
-      captureGate.reset()
     }, 2500)
     return () => window.clearTimeout(id)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase])
 
+  // Após 300ms na fase 'freezing', dispara compress + upload + análise.
   React.useEffect(() => {
-    if (phase === 'interstitial' || phase === 'previewing' || phase === 'finalizing') {
-      captureGate.reset()
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase])
+    if (phase !== 'freezing') return
+    const id = window.setTimeout(() => {
+      const ctx = freezeContextRef.current
+      if (!ctx) return
+      void captureCurrentFrame(ctx.canvas, ctx.irisRadius, ctx.streamingScore)
+    }, FREEZE_MS)
+    return () => window.clearTimeout(id)
+  }, [phase, captureCurrentFrame])
 
   React.useEffect(() => {
     const abortMap = slotAbortRefs.current
@@ -449,8 +470,36 @@ export function CaptureClient({
 
   const handleManualCapture = React.useCallback(() => {
     if (phase !== 'streaming' || blockingRef.current !== null) return
-    void captureCurrentFrame()
-  }, [phase, captureCurrentFrame])
+    const video = videoRef.current
+    if (!video) return
+
+    // Snapshot + crop centrado na íris (lado = 2.5 × diâmetro).
+    const cropped = snapshotAndCropAroundIris(
+      video,
+      lastIrisCenterPxRef.current,
+      lastIrisRadiusPxRef.current,
+    )
+    if (!cropped) {
+      toast.error('Falha ao capturar frame. Tente novamente.')
+      return
+    }
+
+    // Espelha o crop no canvas de exibição (visível durante 'freezing').
+    const display = freezeDisplayCanvasRef.current
+    if (display) {
+      display.width = cropped.width
+      display.height = cropped.height
+      const dctx = display.getContext('2d', { alpha: false })
+      dctx?.drawImage(cropped, 0, 0)
+    }
+
+    freezeContextRef.current = {
+      canvas: cropped,
+      irisRadius: lastIrisRadiusPxRef.current,
+      streamingScore: score,
+    }
+    setPhase('freezing')
+  }, [phase, score])
 
   // ---------------------------------------------------------------------------
   // Render
@@ -469,6 +518,32 @@ export function CaptureClient({
       </header>
 
       <CameraView videoRef={videoRef} />
+
+      {/* Freeze overlay — canvas sempre montado para que o ref esteja disponível
+          no momento do tap; mostrado só durante phase='freezing' (300ms). */}
+      <div
+        aria-hidden={phase !== 'freezing'}
+        className={[
+          'absolute inset-0 z-40 bg-black flex items-center justify-center',
+          'transition-opacity duration-150',
+          phase === 'freezing'
+            ? 'opacity-100'
+            : 'opacity-0 pointer-events-none',
+        ].join(' ')}
+      >
+        <div className="relative max-w-[90vw] max-h-[80vh]">
+          <canvas
+            ref={freezeDisplayCanvasRef}
+            className="block max-w-full max-h-full rounded-lg"
+          />
+          {phase === 'freezing' && (
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 rounded-lg ring-4 ring-emerald-400 motion-safe:animate-pulse pointer-events-none"
+            />
+          )}
+        </div>
+      </div>
 
       {/* Círculo guia grande — sempre visível durante streaming */}
       {phase === 'streaming' && <GuideCircle score={score} />}
@@ -529,7 +604,6 @@ export function CaptureClient({
           nextSlot={slot}
           onProceed={() => {
             setPhase('streaming')
-            captureGate.reset()
           }}
         />
       )}

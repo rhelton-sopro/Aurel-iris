@@ -3,6 +3,7 @@
 import * as React from 'react'
 import { RefreshCw } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import {
   type QualityLevel,
   levelFromScore,
@@ -117,21 +118,23 @@ export function CapturePreview({
                 <li key={r}>• {r}</li>
               ))}
             </ul>
-            <button
-              type="button"
-              onClick={onRedo}
-              className="w-full rounded-full bg-white text-black py-2.5 px-4 font-semibold text-sm active:scale-95 transition-transform"
-            >
-              Refazer
-            </button>
-            <div className="mt-2 flex justify-center">
-              <button
-                type="button"
+            {/* Dois botões de mesmo tamanho. "Refazer" primário (ação recomendada);
+                "Continuar assim" secundário neutro (escolha consciente). */}
+            <div className="flex gap-2">
+              <Button
+                onClick={onRedo}
+                variant="default"
+                className="flex-1 h-11 text-sm font-semibold"
+              >
+                Refazer
+              </Button>
+              <Button
                 onClick={onTimeout}
-                className="text-xs text-white/60 underline underline-offset-2 py-1 px-2"
+                variant="secondary"
+                className="flex-1 h-11 text-sm font-semibold"
               >
                 Continuar assim
-              </button>
+              </Button>
             </div>
           </div>
         </div>

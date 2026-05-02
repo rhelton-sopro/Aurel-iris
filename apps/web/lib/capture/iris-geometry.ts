@@ -79,6 +79,22 @@ export function getIrisRadiusPx(
 }
 
 /**
+ * Centro da íris em PIXELS do frame de vídeo. Usado pelo crop pós-captura
+ * (Fase 5 do produto: a imagem salva é centrada na íris, sem rosto inteiro).
+ */
+export function getIrisCenterPx(
+  landmarks: Landmark[],
+  eye: Eye,
+  videoW: number,
+  videoH: number
+): { x: number; y: number } | null {
+  const center = landmarks[IRIS_LANDMARKS[eye].center]
+  if (!center || videoW <= 0 || videoH <= 0) return null
+  if (!Number.isFinite(center.x) || !Number.isFinite(center.y)) return null
+  return { x: center.x * videoW, y: center.y * videoH }
+}
+
+/**
  * Centeredness: 1.0 quando o centro da íris coincide com overlayCenter; cai linear
  * quando se afasta. Default overlayCenter (0.5, 0.5) — overlay circular no centro
  * do viewport.
