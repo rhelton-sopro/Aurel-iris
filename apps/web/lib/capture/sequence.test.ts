@@ -14,12 +14,12 @@ describe('SEQUENCE', () => {
     expect(SEQUENCE).toHaveLength(6)
   })
 
-  it('starts with right/frontal', () => {
-    expect(SEQUENCE[0]).toEqual({ eye: 'right', angle: 'frontal' })
+  it('starts with left/frontal (olho esquerdo do paciente = direita da tela)', () => {
+    expect(SEQUENCE[0]).toEqual({ eye: 'left', angle: 'frontal' })
   })
 
-  it('ends with left/backlight', () => {
-    expect(SEQUENCE[5]).toEqual({ eye: 'left', angle: 'backlight' })
+  it('ends with right/backlight', () => {
+    expect(SEQUENCE[5]).toEqual({ eye: 'right', angle: 'backlight' })
   })
 
   it('has no duplicate slots', () => {
@@ -27,10 +27,10 @@ describe('SEQUENCE', () => {
     expect(new Set(keys).size).toBe(SEQUENCE.length)
   })
 
-  it('puts all right slots before left slots', () => {
-    const firstLeft = SEQUENCE.findIndex(s => s.eye === 'left')
-    const lastRight = SEQUENCE.map((s, i) => ({ s, i })).filter(x => x.s.eye === 'right').pop()?.i ?? -1
-    expect(lastRight).toBeLessThan(firstLeft)
+  it('puts all left slots before right slots', () => {
+    const firstRight = SEQUENCE.findIndex(s => s.eye === 'right')
+    const lastLeft = SEQUENCE.map((s, i) => ({ s, i })).filter(x => x.s.eye === 'left').pop()?.i ?? -1
+    expect(lastLeft).toBeLessThan(firstRight)
   })
 
   it('covers all 3 angles per eye', () => {
@@ -40,9 +40,9 @@ describe('SEQUENCE', () => {
     expect(left).toEqual(['backlight', 'frontal', 'lateral'])
   })
 
-  it('has 3 right slots then 3 left slots in consecutive order', () => {
+  it('has 3 left slots then 3 right slots in consecutive order', () => {
     const eyes = SEQUENCE.map(s => s.eye)
-    expect(eyes).toEqual(['right', 'right', 'right', 'left', 'left', 'left'])
+    expect(eyes).toEqual(['left', 'left', 'left', 'right', 'right', 'right'])
   })
 })
 
@@ -51,10 +51,19 @@ describe('getResumeSlotIndex', () => {
     expect(getResumeSlotIndex([])).toBe(0)
   })
 
-  it('returns 2 when right/frontal and right/lateral are captured', () => {
+  it('returns 0 when left/frontal and left/lateral captured (left eye first now)', () => {
+    // Com nova SEQUENCE (left first), right/frontal e right/lateral estão nos índices 3 e 4.
+    // Se apenas right/* capturados, o primeiro ausente da SEQUENCE é left/frontal (índice 0).
     expect(getResumeSlotIndex([
       { eye: 'right', angle: 'frontal' },
       { eye: 'right', angle: 'lateral' },
+    ])).toBe(0)
+  })
+
+  it('returns 2 when left/frontal and left/lateral are captured', () => {
+    expect(getResumeSlotIndex([
+      { eye: 'left', angle: 'frontal' },
+      { eye: 'left', angle: 'lateral' },
     ])).toBe(2)
   })
 
@@ -63,35 +72,35 @@ describe('getResumeSlotIndex', () => {
   })
 
   it('returns first MISSING slot even if captured contains later slots out of order', () => {
-    // Pulou o right/lateral e capturou os outros — primeiro ausente é index 1 (right/lateral)
+    // Pulou o left/lateral e capturou os outros — primeiro ausente é index 1 (left/lateral)
     const captured = [
-      { eye: 'right', angle: 'frontal' },
-      { eye: 'right', angle: 'backlight' },
       { eye: 'left', angle: 'frontal' },
+      { eye: 'left', angle: 'backlight' },
+      { eye: 'right', angle: 'frontal' },
     ]
     expect(getResumeSlotIndex(captured)).toBe(1)
   })
 
   it('ignores unknown slots in captured', () => {
     const captured = [
-      { eye: 'right', angle: 'frontal' },
-      { eye: 'right', angle: 'unknown_angle' },
+      { eye: 'left', angle: 'frontal' },
+      { eye: 'left', angle: 'unknown_angle' },
     ]
     expect(getResumeSlotIndex(captured)).toBe(1)
   })
 
-  it('returns 3 when first 3 right slots are captured', () => {
+  it('returns 3 when first 3 left slots are captured', () => {
     const captured = [
-      { eye: 'right', angle: 'frontal' },
-      { eye: 'right', angle: 'lateral' },
-      { eye: 'right', angle: 'backlight' },
+      { eye: 'left', angle: 'frontal' },
+      { eye: 'left', angle: 'lateral' },
+      { eye: 'left', angle: 'backlight' },
     ]
     expect(getResumeSlotIndex(captured)).toBe(3)
   })
 })
 
 describe('isOuterEyeTransition', () => {
-  it('true when crossing index 2 → 3 (right/backlight → left/frontal)', () => {
+  it('true when crossing index 2 → 3 (left/backlight → right/frontal)', () => {
     expect(isOuterEyeTransition(2, 3)).toBe(true)
   })
   it('false within right (0 → 1)', () => {

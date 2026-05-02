@@ -26,17 +26,18 @@ export type SlotPhase =
   | 'complete'
 
 /**
- * Sequência canônica de 6 capturas (CONTEXT D-10 + ROADMAP Fase 3 success criterion #4).
- * Ordem fixa: 3 ângulos do olho direito → 3 do olho esquerdo.
+ * Sequência canônica de 6 capturas.
+ * Começa pelo olho esquerdo do paciente (aparece à DIREITA na tela com câmera traseira),
+ * depois olho direito do paciente (aparece à ESQUERDA na tela).
  * AngleInterstitial fullscreen aparece ANTES do índice 3 (transição de olho).
  */
 export const SEQUENCE: readonly Slot[] = [
-  { eye: 'right', angle: 'frontal' },
-  { eye: 'right', angle: 'lateral' },
-  { eye: 'right', angle: 'backlight' },
   { eye: 'left', angle: 'frontal' },
   { eye: 'left', angle: 'lateral' },
   { eye: 'left', angle: 'backlight' },
+  { eye: 'right', angle: 'frontal' },
+  { eye: 'right', angle: 'lateral' },
+  { eye: 'right', angle: 'backlight' },
 ] as const
 
 export const EYE_LABEL: Record<Eye, string> = {
@@ -70,7 +71,7 @@ export function getResumeSlotIndex(captured: { eye: string; angle: string }[]): 
 export function isOuterEyeTransition(fromIndex: number, toIndex: number): boolean {
   if (fromIndex < 0 || fromIndex >= SEQUENCE.length) return false
   if (toIndex < 0 || toIndex >= SEQUENCE.length) return false
-  return SEQUENCE[fromIndex].eye === 'right' && SEQUENCE[toIndex].eye === 'left'
+  return SEQUENCE[fromIndex].eye !== SEQUENCE[toIndex].eye
 }
 
 /**
