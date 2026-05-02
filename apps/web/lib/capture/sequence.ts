@@ -11,15 +11,17 @@ export interface Slot {
 /**
  * Fase da state machine do capture-client (CONTEXT D-10).
  * idle        → câmera ainda não iniciada
- * streaming   → câmera ativa, captura manual disponível
+ * streaming   → câmera ativa, auto-trigger ativo
+ * previewing  → CapturePreview visível (2s preview pós-captura, D-09)
  * overlay     → AngleOverlay visível entre ângulos do mesmo olho (~2.5s)
  * interstitial→ AngleInterstitial fullscreen na transição de olho
- * finalizing  → 6/6 capturas concluídas, tela de revisão com grid
+ * finalizing  → 6/6 capturas concluídas
  * complete    → leitura confirmada
  */
 export type SlotPhase =
   | 'idle'
   | 'streaming'
+  | 'previewing'
   | 'overlay'
   | 'interstitial'
   | 'finalizing'
