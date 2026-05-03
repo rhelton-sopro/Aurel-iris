@@ -6,19 +6,38 @@ import { redirect } from 'next/navigation'
 import {
   createReadingSchema,
   readingIdSchema,
+  CAPTURE_METHODS,
+  type CaptureMethod,
   type ReadingFormState,
   type DraftReading,
 } from './readings.schemas'
 
+// CONTEXT D-04 (Fase 4): types/database.ts tipa capture_method como string|null
+// (Supabase nao captura o CHECK constraint do enum). Narrow seguro: valida contra
+// CAPTURE_METHODS e cai em 'mobile_camera' se vier valor inesperado (defesa em
+// profundidade — em prod o CHECK do banco impede valores fora da whitelist).
+function narrowCaptureMethod(value: string | null | undefined): CaptureMethod {
+  return value && (CAPTURE_METHODS as readonly string[]).includes(value)
+    ? (value as CaptureMethod)
+    : 'mobile_camera'
+}
+
 export type { ReadingFormState, DraftReading } from './readings.schemas'
 
 /**
- * Cria um reading com status='pending', capture_method='mobile_camera'.
+ * Cria um reading com status='pending' e capture_method derivado do FormData.
  * CONTEXT D-08: criação acontece ANTES da 1ª foto, para que reading_id
  * vire parte do storage_path desde o início (D-storage).
  *
- * Ao concluir, redireciona para /leituras/nova/capturar?reading=<id>
- * (rota implementada no plan 03-04).
+ * CONTEXT D-03 (Fase 4): aceita campo `method` no FormData (hidden input ou
+ * value de submit-button) ∈ {'mobile_camera', 'desktop_upload'}. Default
+ * 'mobile_camera' (no schema) garante compat retroativa com chamadas Fase 3
+ * que não enviam o campo. Imutabilidade no draft (D-04) é responsabilidade
+ * do page.tsx do upload (guard se reading.capture_method !== 'desktop_upload').
+ *
+ * Ao concluir, redireciona condicionalmente:
+ *   - method='mobile_camera' → /leituras/nova/capturar?reading=<id> (Fase 3, plan 03-04)
+ *   - method='desktop_upload' → /leituras/nova/upload?reading=<id> (Fase 4, plan 04-05)
  */
 export async function createReadingAction(
   _prevState: ReadingFormState,
@@ -31,8 +50,14 @@ export async function createReadingAction(
     redirect('/login')
   }
 
+  // CONTEXT D-03: lê method do FormData. `formData.get` retorna null quando
+  // ausente; passar `undefined` ativa o default do Zod (`.default('mobile_camera')`).
+  // Tampering (T-04-02-01) é mitigado pelo z.enum — valor fora da whitelist
+  // faz safeParse falhar e retorna error sem inserir.
+  const rawMethod = formData.get('method')
   const parsed = createReadingSchema.safeParse({
     client_id: formData.get('client_id'),
+    method: rawMethod ?? undefined,
   })
   if (!parsed.success) {
     return { error: parsed.error.flatten().fieldErrors }
@@ -47,7 +72,8 @@ export async function createReadingAction(
       client_id: parsed.data.client_id,
       therapist_id: user.id,
       status: 'pending',
-      capture_method: 'mobile_camera',
+      // CONTEXT D-03: capture_method vem do schema validado (não mais hardcoded).
+      capture_method: parsed.data.method,
     })
     .select('id')
     .single()
@@ -57,8 +83,12 @@ export async function createReadingAction(
   }
 
   revalidatePath('/leituras')
+  // CONTEXT D-03: routing por método. Desktop -> /upload, mobile (default) -> /capturar.
   // redirect lança throw — não retorna; tipo de retorno explícito mantido para clareza.
-  redirect(`/leituras/nova/capturar?reading=${reading.id}`)
+  const destination = parsed.data.method === 'desktop_upload'
+    ? `/leituras/nova/upload?reading=${reading.id}`
+    : `/leituras/nova/capturar?reading=${reading.id}`
+  redirect(destination)
 }
 
 /**
@@ -219,6 +249,10 @@ export async function cleanupStaleEmptyReadingsAction(): Promise<{ deleted: numb
  * Retorna o rascunho mais recente do terapeuta (CONTEXT D-12 — recovery banner).
  * Critério: status='pending' AND count(reading_images) < 6.
  * Usa nested resource expansion do PostgREST para count.
+ *
+ * CONTEXT D-15 (Fase 4): retorna `capture_method` no payload — consumido pelo
+ * RecoveryBanner (Fase 9) para rotear "Continuar" para /upload?reading=&resume=true
+ * (desktop) ou /capturar?reading=&resume=true (mobile).
  */
 export async function getDraftReading(): Promise<DraftReading | null> {
   const supabase = await createClient()
@@ -231,6 +265,7 @@ export async function getDraftReading(): Promise<DraftReading | null> {
       id,
       created_at,
       client_id,
+      capture_method,
       client:clients(full_name),
       reading_images(count)
     `)
@@ -253,6 +288,9 @@ export async function getDraftReading(): Promise<DraftReading | null> {
         client_id: r.client_id,
         client_name: clientObj?.full_name ?? 'Cliente',
         imagesCaptured: captured,
+        // CONTEXT D-15: RecoveryBanner usa capture_method para rotear /upload vs /capturar.
+        // narrowCaptureMethod garante o tipo CaptureMethod (DB pode retornar string|null).
+        capture_method: narrowCaptureMethod(r.capture_method),
       }
     }
   }
