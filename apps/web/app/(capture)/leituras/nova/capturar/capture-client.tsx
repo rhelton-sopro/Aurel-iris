@@ -25,9 +25,12 @@ import {
 // ---------------------------------------------------------------------------
 // Score do badge derivado APENAS do irisRadiusPx (já escalado pra px reais
 // pelo analyzeCapturedJpeg). Sharpness aparece via alerta da análise.
+//
+// Decisão de domínio (UAT 03): íris detectada em tamanho aceitável é
+// suficiente — não cobramos "excelência" via banda separada. Detection
+// correta + ≥ acceptable = score 100%.
 // ---------------------------------------------------------------------------
 
-const IRIS_EXCELLENT_PX = 600
 const IRIS_ACCEPTABLE_PX = 300
 /**
  * Score quando a pupila não foi detectada. Neutro (50%) — sinaliza problema
@@ -37,10 +40,8 @@ const NO_IRIS_FALLBACK_SCORE = 0.50
 
 function irisSizeScore(irisRadiusPx: number): number {
   if (irisRadiusPx <= 0) return NO_IRIS_FALLBACK_SCORE
-  if (irisRadiusPx >= IRIS_EXCELLENT_PX) return 1.0
-  if (irisRadiusPx >= IRIS_ACCEPTABLE_PX) {
-    return 0.5 + 0.5 * ((irisRadiusPx - IRIS_ACCEPTABLE_PX) / (IRIS_EXCELLENT_PX - IRIS_ACCEPTABLE_PX))
-  }
+  if (irisRadiusPx >= IRIS_ACCEPTABLE_PX) return 1.0
+  // Detectada mas pequena: scale linear até IRIS_ACCEPTABLE_PX.
   return 0.5 * (irisRadiusPx / IRIS_ACCEPTABLE_PX)
 }
 

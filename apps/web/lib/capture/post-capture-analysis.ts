@@ -4,29 +4,28 @@
  * NÃO bloqueia o fluxo — produz alertas sugestivos exibidos pela CapturePreview
  * para o usuário decidir refazer ou continuar.
  *
- * Critérios atuais:
+ * Critérios:
  *
- * - Largura > 2000px (câmera nativa 4K, caso típico):
- *     Pupil detection BYPASSADA — confiabilidade insuficiente em íris claras
- *     (verde/azul/cinza), gerava falsos negativos crônicos no UAT 03 (test 7,
- *     8, 10). Sentinela irisRadiusPx=Infinity → irisSizeScore=1.0, sem
- *     alerta de íris pequena. Apenas Laplacian variance (threshold 200) avalia.
- *     Domain rationale: AngleInterstitial guia o usuário a apontar a câmera
- *     para o olho; resolução 4K garante pixels suficientes pra iridologia
- *     mesmo em wide-shot. Edge case (foto distante de rosto inteiro) aceito
- *     como improvável dada a UX guiada.
+ * - Pupil detection roda em todas as resoluções (canvas 512×512 sempre).
+ *     irisRadiusPx é estimado da pupila e escalado para px reais do arquivo.
  *
- * - Largura ≤ 2000px (fallback de canvas downscaled, raro):
- *     Mantém pupil detection. Thresholds:
- *       0px (não detectada) → alerta "Não foi possível detectar..."
- *       < 300px             → alerta "Íris pequena — aproxime mais"
- *       300–600px           → aceitável
- *       > 600px             → excelente
- *     Laplacian threshold 80 (mais leniente).
+ * - Score / alertas baseados em irisRadiusPx:
+ *     0px (não detectada) → alerta "Não foi possível detectar..." (score 50%)
+ *                            Caso típico: foto de rosto inteiro / sem olho no frame
+ *     < IRIS_RADIUS_ALERT_PX → alerta "Íris pequena — aproxime mais" (score < 1)
+ *     ≥ IRIS_RADIUS_ALERT_PX → score 1.0 (sem alerta), considerado tamanho ok
  *
- * Histórico: detecção de pupila substituiu MediaPipe FaceLandmarker (que
- * também falhava em íris claras). Ambas abordagens em browser são imprecisas
- * para serem gate de qualidade — daí o bypass em alta resolução.
+ *     Decisão de domínio (UAT 03): se a íris foi detectada em tamanho aceitável,
+ *     é suficiente — não cobramos "excelência" via threshold separado. Detection
+ *     correta + tamanho razoável basta para análise iridológica.
+ *
+ * - Nitidez (Laplacian variance, calibrada pela resolução do original):
+ *     largura > 2000px (câmera nativa)  → threshold 200
+ *     largura ≤ 2000px (fallback canvas) → threshold 80
+ *
+ * Histórico: pupil detection substituiu MediaPipe FaceLandmarker (commit 499e95d).
+ * Houve uma tentativa de bypass em alta resolução (278369d, revertida em 90a59b7+
+ * — bypass era lenient demais, deixava passar fotos de rosto inteiro).
  */
 
 import { laplacianVariance } from './laplacian-variance'
@@ -103,24 +102,14 @@ export async function analyzeCapturedJpeg(blob: Blob): Promise<PostCaptureAnalys
   const imageData = ctx.getImageData(0, 0, ANALYSIS_DIM, ANALYSIS_DIM)
   URL.revokeObjectURL(url)
 
-  let irisRadiusPx: number
-  if (imageWidth > HIGH_RES_WIDTH_BOUNDARY) {
-    // Câmera nativa 4K: bypass pupil detection (gerava falsos negativos
-    // crônicos em íris claras — UAT 03 issues 7/8/10). Sentinela Infinity
-    // → irisSizeScore=1.0 e nenhum alerta de íris dispara em makeResult.
-    // Apenas Laplacian variance (threshold 200) avalia qualidade.
-    irisRadiusPx = Number.POSITIVE_INFINITY
-  } else {
-    // Fallback de baixa resolução: mantém pupil detection.
-    // Detecção da pupila no canvas + estimativa do raio da íris (proporção 3.5×).
-    // Escala pra px reais do arquivo: o canvas representa um quadrado de lado
-    // `minSrc` (em px do arquivo), redimensionado pra ANALYSIS_DIM. Razão de
-    // escala = minSrc / ANALYSIS_DIM.
-    const pupil = detectPupilFromImageData(imageData)
-    const irisRadiusInCanvas = pupilToIrisRadius(pupil.pupilRadiusInCanvas)
-    const canvasToFileScale = minSrc / ANALYSIS_DIM
-    irisRadiusPx = irisRadiusInCanvas * canvasToFileScale
-  }
+  // Pupil detection no canvas + estimativa do raio da íris (proporção 3.5×).
+  // Escala pra px reais do arquivo: o canvas representa um quadrado de lado
+  // `minSrc` (em px do arquivo), redimensionado pra ANALYSIS_DIM. Razão de
+  // escala = minSrc / ANALYSIS_DIM.
+  const pupil = detectPupilFromImageData(imageData)
+  const irisRadiusInCanvas = pupilToIrisRadius(pupil.pupilRadiusInCanvas)
+  const canvasToFileScale = minSrc / ANALYSIS_DIM
+  const irisRadiusPx = irisRadiusInCanvas * canvasToFileScale
 
   const variance = laplacianVariance(imageData)
   const cameraDetection = await cameraDetectionPromise
