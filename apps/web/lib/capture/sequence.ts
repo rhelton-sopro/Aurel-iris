@@ -9,6 +9,13 @@ export interface Slot {
 }
 
 /**
+ * Modo de captura: 'camera' (Fase 3 — getUserMedia/<input capture>) ou
+ * 'upload' (Fase 4 — dropzone client-side). Afeta apenas a copy de UI;
+ * a SEQUENCE e os identificadores de slot são idênticos.
+ */
+export type CaptureMode = 'camera' | 'upload'
+
+/**
  * Fase da state machine do capture-client (CONTEXT D-10).
  * idle        → câmera ainda não iniciada
  * streaming   → câmera ativa, aguardando o usuário apertar o botão manual
@@ -109,6 +116,7 @@ export function getSlotProgressLabel(slotIndex: number): string {
 export function getSlotInstructionCopy(
   slot: Slot,
   slotIndex: number,
+  mode: CaptureMode = 'camera',
 ): { heading: string; subtitle: string; cta: string } {
   const eyeUpper = slot.eye === 'left' ? 'ESQUERDO' : 'DIREITO'
 
@@ -132,6 +140,6 @@ export function getSlotInstructionCopy(
   return {
     heading: `Foto ${slotIndex + 1} de ${SEQUENCE.length} — Olho ${eyeUpper} · ${angleLabel}`,
     subtitle,
-    cta: 'Abrir câmera',
+    cta: mode === 'upload' ? 'Selecionar arquivo' : 'Abrir câmera',
   }
 }
