@@ -29,7 +29,11 @@
  */
 
 import { laplacianVariance } from './laplacian-variance'
-import { detectPupilFromImageData, pupilToIrisRadius } from './pupil-detection'
+import {
+  detectPupilFromImageData,
+  pupilToIrisRadius,
+  type PupilDetection,
+} from './pupil-detection'
 import { detectCameraSource, type CameraDetectionResult } from './camera-detection'
 
 const ANALYSIS_DIM = 512
@@ -57,6 +61,10 @@ export interface PostCaptureAnalysis {
   hasAlert: boolean
   /** Resultado da detecção de câmera de origem via EXIF. */
   cameraDetection: CameraDetectionResult
+  /** Diagnóstico do detector de pupila — exposto pro debug overlay no preview. */
+  pupilDebug: PupilDetection['debug']
+  /** Threshold Otsu efetivamente usado (após clamp). */
+  pupilThreshold: number
 }
 
 /**
@@ -76,12 +84,19 @@ export async function analyzeCapturedJpeg(blob: Blob): Promise<PostCaptureAnalys
   const img = new Image()
   img.src = url
 
+  // Default debug pra paths de early-exit (decode falhou, sem ctx).
+  const fallbackPupilDebug: PupilDetection['debug'] = {
+    status: 'no_candidate',
+    contrast: 0,
+    componentsFound: 0,
+  }
+
   try {
     await img.decode()
   } catch {
     URL.revokeObjectURL(url)
     const cameraDetection = await cameraDetectionPromise
-    return makeResult(0, 0, 0, 0, cameraDetection)
+    return makeResult(0, 0, 0, 0, cameraDetection, fallbackPupilDebug, 0)
   }
 
   const imageWidth = img.naturalWidth
@@ -94,7 +109,7 @@ export async function analyzeCapturedJpeg(blob: Blob): Promise<PostCaptureAnalys
   if (!ctx) {
     URL.revokeObjectURL(url)
     const cameraDetection = await cameraDetectionPromise
-    return makeResult(0, 0, imageWidth, imageHeight, cameraDetection)
+    return makeResult(0, 0, imageWidth, imageHeight, cameraDetection, fallbackPupilDebug, 0)
   }
 
   // Center-crop quadrado do arquivo + downscale pra 512×512.
@@ -116,7 +131,15 @@ export async function analyzeCapturedJpeg(blob: Blob): Promise<PostCaptureAnalys
 
   const variance = laplacianVariance(imageData)
   const cameraDetection = await cameraDetectionPromise
-  return makeResult(variance, irisRadiusPx, imageWidth, imageHeight, cameraDetection)
+  return makeResult(
+    variance,
+    irisRadiusPx,
+    imageWidth,
+    imageHeight,
+    cameraDetection,
+    pupil.debug,
+    pupil.thresholdUsed,
+  )
 }
 
 function makeResult(
@@ -125,6 +148,8 @@ function makeResult(
   imageWidth: number,
   imageHeight: number,
   cameraDetection: CameraDetectionResult,
+  pupilDebug: PupilDetection['debug'],
+  pupilThreshold: number,
 ): PostCaptureAnalysis {
   const sharpnessThreshold =
     imageWidth > HIGH_RES_WIDTH_BOUNDARY
@@ -148,6 +173,8 @@ function makeResult(
     irisUndetectedAlert,
     hasAlert: sharpnessAlert || irisAlert || irisUndetectedAlert,
     cameraDetection,
+    pupilDebug,
+    pupilThreshold,
   }
 }
 

@@ -40,6 +40,8 @@ const OTSU_MAX_THRESHOLD = 90
     sombras sutis têm contraste <30. UAT 03: foto de mesa marcava 100%. */
 const PUPIL_MIN_CONTRAST = 30
 
+export type PupilDetectionStatus = 'success' | 'low_contrast' | 'no_candidate'
+
 export interface PupilDetection {
   /** Centro do cluster em px do canvas analisado. null se não detectado. */
   center: { x: number; y: number } | null
@@ -47,6 +49,16 @@ export interface PupilDetection {
   pupilRadiusInCanvas: number
   /** Threshold Otsu efetivamente usado (após clamp). Útil para diagnóstico. */
   thresholdUsed: number
+  /** Status diagnóstico — sempre populado para debug em produção. */
+  debug: {
+    status: PupilDetectionStatus
+    /** Diferença de luminância média entre fg e bg (0-255). */
+    contrast: number
+    /** Total de connected components encontrados (após threshold). */
+    componentsFound: number
+    /** Tamanho do cluster vencedor em px do canvas (se status=success). */
+    bestSize?: number
+  }
 }
 
 /**
@@ -148,7 +160,12 @@ export function detectPupilFromImageData(imageData: ImageData): PupilDetection {
       darkCount,
       brightCount,
     })
-    return { center: null, pupilRadiusInCanvas: 0, thresholdUsed: threshold }
+    return {
+      center: null,
+      pupilRadiusInCanvas: 0,
+      thresholdUsed: threshold,
+      debug: { status: 'low_contrast', contrast: Math.round(contrast), componentsFound: 0 },
+    }
   }
 
   // 2. Connected components (4-connected, iterative DFS).
@@ -246,7 +263,16 @@ export function detectPupilFromImageData(imageData: ImageData): PupilDetection {
       contrast: Math.round(contrast),
       componentsFound: nextLabel - 1,
     })
-    return { center: null, pupilRadiusInCanvas: 0, thresholdUsed: threshold }
+    return {
+      center: null,
+      pupilRadiusInCanvas: 0,
+      thresholdUsed: threshold,
+      debug: {
+        status: 'no_candidate',
+        contrast: Math.round(contrast),
+        componentsFound: nextLabel - 1,
+      },
+    }
   }
 
   const size = sizes[bestLbl]
@@ -261,7 +287,17 @@ export function detectPupilFromImageData(imageData: ImageData): PupilDetection {
     center: { x: Math.round(center.x), y: Math.round(center.y) },
     clusterSize: size,
   })
-  return { center, pupilRadiusInCanvas: radius, thresholdUsed: threshold }
+  return {
+    center,
+    pupilRadiusInCanvas: radius,
+    thresholdUsed: threshold,
+    debug: {
+      status: 'success',
+      contrast: Math.round(contrast),
+      componentsFound: nextLabel - 1,
+      bestSize: size,
+    },
+  }
 }
 
 export function pupilToIrisRadius(pupilRadius: number): number {

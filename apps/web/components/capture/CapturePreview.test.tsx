@@ -49,6 +49,8 @@ describe('CapturePreview', () => {
       irisUndetectedAlert: false,
       hasAlert: true,
       cameraDetection: { kind: 'rear', source: 'exif' },
+      pupilDebug: { status: 'success', contrast: 90, componentsFound: 3, bestSize: 250 },
+      pupilThreshold: 60,
     }
     render(
       <CapturePreview
@@ -76,6 +78,8 @@ describe('CapturePreview', () => {
       irisUndetectedAlert: true,
       hasAlert: true,
       cameraDetection: { kind: 'rear', source: 'exif' },
+      pupilDebug: { status: 'success', contrast: 90, componentsFound: 3, bestSize: 250 },
+      pupilThreshold: 60,
     }
     render(
       <CapturePreview
@@ -103,6 +107,8 @@ describe('CapturePreview', () => {
       irisUndetectedAlert: false,
       hasAlert: false,
       cameraDetection: { kind: 'rear', source: 'exif' },
+      pupilDebug: { status: 'success', contrast: 90, componentsFound: 3, bestSize: 250 },
+      pupilThreshold: 60,
     }
     render(
       <CapturePreview

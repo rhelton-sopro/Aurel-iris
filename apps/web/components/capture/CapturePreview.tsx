@@ -75,6 +75,24 @@ export function CapturePreview({
         {LEVEL_LABEL[level]} · {Math.round(qualityScore * 100)}%
       </Badge>
 
+      {/* Debug overlay — UAT 03 round 5+. Mostra dados do detector pra
+          diagnóstico em devices sem console (iPhone Chrome). Remove ou gate
+          com ?debug=1 quando estabilizar. */}
+      {analysis && (
+        <div className="absolute top-[calc(env(safe-area-inset-top)+12px)] right-3 max-w-[60%] bg-black/80 text-green-300 font-mono text-[10px] leading-tight px-2 py-1.5 rounded">
+          <div>pupil: {analysis.pupilDebug.status}</div>
+          <div>th={analysis.pupilThreshold} ct={analysis.pupilDebug.contrast}</div>
+          <div>radius={Math.round(analysis.irisRadiusPx)}px (alert &lt;200)</div>
+          {analysis.pupilDebug.bestSize !== undefined && (
+            <div>cluster={analysis.pupilDebug.bestSize}px</div>
+          )}
+          <div>comps={analysis.pupilDebug.componentsFound}</div>
+          <div>sharp={Math.round(analysis.laplacianVariance)} (th {analysis.sharpnessThreshold})</div>
+          <div>cam={analysis.cameraDetection.kind}/{analysis.cameraDetection.source}</div>
+          <div>img={analysis.imageWidth}×{analysis.imageHeight}</div>
+        </div>
+      )}
+
       <div className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-[calc(env(safe-area-inset-bottom)+24px)] px-4">
         <div className="rounded-2xl bg-black/85 backdrop-blur-sm p-4 max-w-sm w-full">
           {showAlert && reasons.length > 0 && (
