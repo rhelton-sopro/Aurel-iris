@@ -55,11 +55,26 @@ function LoginForm() {
     })
 
     if (error) {
+      // Loga erro completo no console pra diagnóstico (status code, message,
+      // name) — não vaza dados sensíveis porque é client-side e só roda no
+      // próprio browser do user.
+      console.error('[login] signInWithOtp error:', {
+        message: error.message,
+        status: error.status,
+        name: error.name,
+        code: (error as { code?: string }).code,
+      })
+
       // Supabase retorna erro quando email não existe (com shouldCreateUser: false)
       if (error.message.toLowerCase().includes('not found') || error.status === 422) {
         setFormError('Não encontramos uma conta com este e-mail.')
+      } else if (error.status === 429 || error.message.toLowerCase().includes('rate limit')) {
+        setFormError('Muitas tentativas. Aguarde alguns minutos e tente novamente.')
       } else {
-        setFormError('Ocorreu um erro. Tente novamente.')
+        // Em vez de mensagem genérica, expõe os detalhes do erro pra
+        // diagnóstico em prod (status code + message). Pode ser ajustado
+        // depois quando estabilizar.
+        setFormError(`Erro ao enviar link: ${error.message} (status ${error.status ?? 'desconhecido'})`)
       }
       return
     }
