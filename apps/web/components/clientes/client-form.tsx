@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { BirthDateSelect } from '@/components/clientes/birth-date-select'
 import { cn } from '@/lib/utils'
 import type { ClientFormState } from '@/app/actions/clients'
 import type { Database } from '@/types/database'
@@ -32,7 +33,13 @@ type Client = Database['public']['Tables']['clients']['Row']
 
 const clientSchema = z.object({
   full_name: z.string().min(1, 'Nome é obrigatório'),
-  birth_date: z.string().optional(),
+  birth_date: z
+    .string()
+    .optional()
+    .refine(
+      (s) => !s || new Date(`${s}T00:00:00`) <= new Date(),
+      'Data de nascimento não pode estar no futuro',
+    ),
   gender: z.enum(['masculino', 'feminino', 'outro', 'não_informado']).optional(),
   notes: z.string().max(2000).optional(),
 })
@@ -95,7 +102,10 @@ export function ClientForm({ mode, client, action }: ClientFormProps) {
               <FormItem>
                 <FormLabel>Data de nascimento</FormLabel>
                 <FormControl>
-                  <Input type="date" {...field} />
+                  <BirthDateSelect
+                    value={field.value ?? ''}
+                    onChange={field.onChange}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
