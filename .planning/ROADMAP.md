@@ -118,7 +118,31 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
   2. Validação rejeita arquivos não-imagem ou acima do limite definido, com mensagem clara em pt-BR.
   3. Após submit, leitura criada tem `capture_method='desktop_upload'` e até 6 entradas em `reading_images` com `eye` e `angle` definidos pela UI de associação.
   4. Mesmo bucket privado por terapeuta + URLs assinadas usados; nenhuma diferença observável a jusante (a Fase 5 consegue consumir leitura criada por upload desktop).
-**Plans**: TBD
+**Plans:** 7 plans em 5 waves
+
+**Wave 1 — Fundação lib + server action (paralelos)**
+- [ ] 04-01-PLAN.md — lib/upload/validate-file.ts (MIME + tamanho 25MB) + lib/upload/heic-to-jpeg.ts (dynamic import heic2any) + testes vitest. CONTEXT D-10, D-11, D-12.
+- [ ] 04-02-PLAN.md — readings.schemas.ts e readings.ts: createReadingSchema aceita method enum + getDraftReading retorna capture_method (forward Fase 9). CONTEXT D-03, D-04, D-15.
+
+**Wave 2 — UI primitives (paralelos)**
+- [ ] 04-03-PLAN.md — components/upload/UploadDropzone.tsx (drag+drop+click + a11y) + testes vitest. CONTEXT D-05, D-10.
+- [ ] 04-04-PLAN.md — adaptar getSlotInstructionCopy + AngleInterstitial + CapturePreview com prop opcional mode ('camera' | 'upload') sem regredir Fase 3. CONTEXT D-05, D-09.
+
+**Wave 3 — Wizard assembly** *(blocked on Waves 1+2)*
+- [ ] 04-05-PLAN.md — app/(dashboard)/leituras/nova/upload/page.tsx (server component substitui placeholder) + upload-client.tsx (state machine clone do capture-client + dropzone). CONTEXT D-04, D-05, D-06, D-07, D-09, D-13, D-14.
+
+**Wave 4 — Entry point** *(blocked on Wave 1)*
+- [ ] 04-06-PLAN.md — new-reading-form.tsx: auto-detect (matchMedia coarse+hover) + dois CTAs com hidden input method + escape link. CONTEXT D-01, D-02, D-03.
+
+**Wave 5 — Recovery hook + UAT** *(blocked on Waves 3+4)*
+- [ ] 04-07-PLAN.md — smoke test do shape de DraftReading (forward Fase 9 RecoveryBanner) + 04-UAT.md com 14 cenários + checkpoint manual founder. CONTEXT D-15.
+
+**Cross-cutting constraints (must_haves presentes em ≥2 plans):**
+- Vocabulário proibido LGPD ausente em todas as strings novas (auditável via `pnpm audit:vocabulary`).
+- Storage path canônico `{therapist_id}/{reading_id}/originais/{eye}_{angle}.jpg` consistente com Fase 3 (auditável via `grep buildOriginalStoragePath`).
+- HEIC lib carregada APENAS via dynamic import (`await import('heic2any')`) — não vaza pro bundle do (dashboard) (auditável via `pnpm build` output).
+- capture_method validado no schema Zod do createReadingAction antes de qualquer insert (não aceitar valores fora do enum).
+- RecoveryBanner UI deferido pra Fase 9 (Plan 04-07 entrega apenas o backend hook).
 **UI hint**: yes
 
 ### Fase 5: Pipeline de visão (Modal)
@@ -200,7 +224,7 @@ Fases executam em ordem numérica: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 �
 | 1. Setup | 6/6 | ✅ Concluída | — |
 | 2. Auth + Dashboard básico | 4/4 | ✅ Concluída | — |
 | 3. Captura mobile (PWA) | 8/8* | ✅ Concluída via UAT | 2026-05-03 |
-| 4. Upload desktop | 0/TBD | 🎯 Próxima | — |
+| 4. Upload desktop | 0/7 | 🎯 Próxima | — |
 | 5. Pipeline de visão (Modal) | 0/TBD | Não iniciada | — |
 | 6. RAG — Ingestão | 0/TBD | Não iniciada | — |
 | 7. Análise LLM | 0/TBD | Não iniciada | — |
