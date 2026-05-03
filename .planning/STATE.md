@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-03T22:30:00.000Z"
+last_updated: "2026-05-03T22:56:53Z"
 progress:
   total_phases: 9
   completed_phases: 3
   total_plans: 25
-  completed_plans: 22
-  percent: 41
+  completed_plans: 23
+  percent: 42
 ---
 
 # Estado do projeto
@@ -19,37 +19,37 @@ progress:
 Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 
 **Valor central:** Cada cliente atendido produz um JSON de features genuinamente diferente, e por isso cada relatório é genuinamente diferente. Pipeline de visão objetivo + LLM ancorado em RAG é o coração do produto.
-**Foco atual:** Fase 4 (Upload desktop) — em execução, 4/7 plans concluídos. Wave 2 fechada.
+**Foco atual:** Fase 4 (Upload desktop) — em execução, 5/7 plans concluídos. Wave 3 fechada. UPLOAD-01 e UPLOAD-02 entregues.
 
 ## Posição atual
 
 Fase: 4 de 9 — **EM EXECUÇÃO** (Upload desktop)
-Plan corrente: 04-05 (próximo); 04-04 concluído em 2026-05-03.
+Plan corrente: 04-06 (próximo); 04-05 concluído em 2026-05-03.
 Próxima fase: Fase 5 (Pipeline de visão / Modal)
-Status: Executing — Wave 1 completa (04-01 ✓ + 04-02 ✓). **Wave 2 fechada** (04-03 ✓ UploadDropzone + 04-04 ✓ capture mode prop). Próximo: Wave 3 (04-05 wizard assembly) e Wave 4 (04-06 entry point) em paralelo, depois Wave 5 (04-07 UAT). Modo sequencial — Windows/PowerShell sem worktrees.
-Última atividade: 2026-05-03 — Plan 04-04 concluído (capture components mode prop). 3 commits (9b0c904 RED Task 1, ca6c851 GREEN Task 1 sequence.ts, 4fef196 Task 2 AngleInterstitial+CapturePreview). 9 testes novos (6 sequence + 3 CapturePreview) — 63/63 testes verdes em components/capture + sequence. Backward compat 100%: capture-client.tsx (Fase 3) NÃO foi modificado, default `mode='camera'` preserva strings originais. Tipo `CaptureMode = 'camera' | 'upload'` exportado de lib/capture/sequence.ts como fonte única de verdade. Zero auto-fixes Rule 1/2/3 — plano executado exatamente como escrito.
+Status: Executing — Wave 1 completa (04-01 ✓ + 04-02 ✓). Wave 2 fechada (04-03 ✓ UploadDropzone + 04-04 ✓ capture mode prop). **Wave 3 fechada** (04-05 ✓ wizard assembly — page.tsx + upload-client.tsx ponta-a-ponta). Próximo: Wave 4 (04-06 entry point /leituras/nova com auto-detect e CTAs duplos), depois Wave 5 (04-07 UAT). Modo sequencial — Windows/PowerShell sem worktrees.
+Última atividade: 2026-05-03 — Plan 04-05 concluído (upload wizard page + client). 2 commits (5ece1f7 page.tsx server component, 459df6f upload-client.tsx wizard). 466 linhas total (85 page + 381 client). State machine `Phase = 'instruction'|'analyzing'|'previewing'|'finalizing'` clonada do capture-client com 3 substituições cirúrgicas: UploadDropzone na phase='instruction', handleFileAccepted (validateUploadFile -> convertHeicToJpeg -> analyzeCapturedJpeg), CapturePreview mode='upload'. AngleInterstitial NÃO renderizado (alert de câmera traseira/flash mobile-only não se aplica). Build OK com bundle splitting validado: heic2any em chunk dedicado de 1.35MB, rota /upload First Load = 3.4 kB (paridade com /capturar). 63/63 testes Fase 3 verdes — zero regressão. Vocabulário LGPD limpo nos 2 arquivos novos. Zero auto-fixes Rule 1/2/3 — plano executado exatamente como escrito.
 
-Progresso: [████░░░░░░] 41% (3/9 fases + 4/7 plans Fase 4)
+Progresso: [████░░░░░░] 42% (3/9 fases + 5/7 plans Fase 4)
 
 ## Métricas de performance
 
 **Velocidade:**
 
-- Total de plans concluídos: 10
+- Total de plans concluídos: 11
 - Duração média: ~10 min/plan
-- Tempo total de execução: ~132 min
+- Tempo total de execução: ~152 min
 
 **Por fase:**
 
 | Fase | Plans | Total | Média/plan |
 |-------|-------|-------|------------|
 | 1 — Setup | 6 | ~75 min | ~12 min |
-| 4 — Upload desktop | 4 (parcial) | ~57 min | ~14 min |
+| 4 — Upload desktop | 5 (parcial) | ~77 min | ~15 min |
 
 **Tendência recente:**
 
-- Últimos plans: 04-04 (~30 min ativo / ~80 min wall-clock incluindo rate limit, 2 tasks, 3 commits — 1 RED prévio + GREEN + Task 2, 9 testes novos verdes, zero auto-fixes), 04-03 (5 min, 1 task TDD, 2 commits, 10 testes verdes, 4 auto-fixes Rule 2 a11y hardening), 04-02 (12 min, 2 tasks, 4 commits TDD, 12 testes verdes, 2 auto-fixes Rule 2/3 narrowing defensivo).
-- Tendência: 04-04 mais lento por interrupção de rate limit (continuation cleanly handled — verificou HEAD, retomou direto para GREEN sem retrabalho); 04-03 mais rápido por componente UI puro. Ambos no envelope esperado para a fase.
+- Últimos plans: 04-05 (~20 min, 2 tasks, 2 commits, 466 linhas total, build OK + bundle splitting validado, 63/63 testes Fase 3 verdes, zero auto-fixes), 04-04 (~30 min ativo / ~80 min wall-clock incluindo rate limit, 2 tasks, 3 commits — 1 RED prévio + GREEN + Task 2, 9 testes novos verdes, zero auto-fixes), 04-03 (5 min, 1 task TDD, 2 commits, 10 testes verdes, 4 auto-fixes Rule 2 a11y hardening).
+- Tendência: 04-05 dentro do envelope esperado para wizard assembly (clone cirúrgico do capture-client com 3 substituições + assembly de 4 deps Wave 1+2). Foi 4× mais rápido que 04-04 (que teve rate limit). Sem TDD por design do PLAN — cobertura virá via UAT 04-07.
 
 *Atualizado após a conclusão de cada plan.*
 
@@ -70,6 +70,9 @@ Decisões recentes que afetam o trabalho atual:
 - **Plan 04-03 (2026-05-03):** Pattern de componente UI puro estabelecido em `apps/web/components/upload/`: zero imports de `lib/upload/*` ou `lib/capture/*` — componente repassa `File` via callback `onFileAccepted` para o caller (upload-client em Wave 3) decidir validação. Defesa em camadas: `validateUploadFile` (04-01) é a primeira barreira; VLM gate é a segunda; Storage RLS é a terceira. `data-dragover='true|false'` como contrato semântico de teste em vez de asserção de classe Tailwind.
 - **Plan 04-03 (2026-05-03):** Hardening proativo a11y para componente custom com `role="button"`: `tabIndex={disabled ? -1 : 0}` + `onKeyDown` (Enter/Space → click) + `focus-visible:ring-2 ring-primary ring-offset-2`. Padrão WCAG-correto para qualquer dropzone/control não-nativo; replicar nos próximos componentes UI custom. Threat T-04-03-04 mitigado.
 - **Plan 04-04 (2026-05-03):** Pattern de adaptação cirúrgica de componentes Fase 3 para Fase 4 via prop opcional `mode?: CaptureMode` com default `'camera'` no parâmetro/destructuring — zero impacto em call sites existentes (capture-client.tsx Fase 3 não foi tocado; default preserva strings originais). Tipo `CaptureMode = 'camera' | 'upload'` exportado de `lib/capture/sequence.ts` como fonte única de verdade reutilizável por todos os componentes downstream. CONTEXT D-05 (reuso) honrado sem duplicar AngleInterstitial nem CapturePreview.
+- **Plan 04-05 (2026-05-03):** Clone cirúrgico viável: clonar `capture-client.tsx` (350 linhas) preservando `Phase` state machine, refs (`slotAbortRefs`, `uploadPromisesRef`, `finalizingTriggeredRef`), `executeUpload`, `handleRedo`, useEffects de finalização e cleanup — substituindo APENAS (a) `<input capture>` por `UploadDropzone`, (b) `handleFileSelected (ChangeEvent)` por `handleFileAccepted (File)` com pipeline `validateUploadFile -> convertHeicToJpeg -> analyzeCapturedJpeg`, (c) `CapturePreview mode='upload'`. Resultado: 381 linhas, paralelismo 1:1 com capture-client (auditável via diff). Pattern reutilizável se Fase futura precisar de outra fonte (ex: import de galeria, captura via webcam — basta novo handler de input).
+- **Plan 04-05 (2026-05-03):** AngleInterstitial **NÃO** é renderizado em fluxo de upload mesmo após Plan 04-04 ter adicionado `mode` prop. Razão: o alert hardcoded "Use a câmera traseira · Nunca utilize o flash" do JSX é mobile-only — terapeuta no desktop está subindo foto pré-existente e não tem câmera traseira/flash. A prop `mode` afeta apenas o CTA via `getSlotInstructionCopy`, não remove o alert. Solução adotada: heading inline (`Foto N de 6 — Olho ESQUERDO · Frente`) + UploadDropzone visível diretamente na phase='instruction'. Mantém o componente AngleInterstitial inalterado para fluxo mobile.
+- **Plan 04-05 (2026-05-03):** Bundle splitting de heic2any **VALIDADO em produção via `pnpm build`**: heic2any aparece em chunk dedicado de 1.35 MB (`7ef09c20.*.js`), separado do bundle inicial. Rota `/leituras/nova/upload` First Load JS = 3.4 kB + 228 kB shared (paridade com `/capturar` 3.56 kB) — confirmação de evidência do dynamic import correto em `lib/upload/heic-to-jpeg.ts` (Plan 04-01). CONTEXT D-11 honrado.
 
 ### Todos pendentes
 
@@ -94,11 +97,11 @@ Nenhum ainda.
 
 ## Continuidade de sessão
 
-Última sessão: 2026-05-03 (21:14–22:30 UTC) — **Plan 04-04 concluído** (capture components mode prop). Wave 2 fechada.
+Última sessão: 2026-05-03 (22:36–22:56 UTC) — **Plan 04-05 concluído** (upload wizard page + client). Wave 3 fechada. UPLOAD-01 e UPLOAD-02 entregues.
 
-Stopped at: 04-04-SUMMARY.md gerado, STATE.md+ROADMAP.md atualizados; pronto para retomar com **Plan 04-05 (Wave 3 — wizard assembly)** ou **Plan 04-06 (Wave 4 — entry point)** que podem rodar em paralelo. UPLOAD-01 segue "Em progresso" até 04-05 integrar dropzone+preview no upload-client.
+Stopped at: 04-05-SUMMARY.md gerado, STATE.md+ROADMAP.md+REQUIREMENTS.md atualizados; pronto para retomar com **Plan 04-06 (Wave 4 — entry point)** que tem dependência apenas em Wave 1 (já completa) — pode iniciar imediatamente. Depois Wave 5 (04-07 UAT smoke) que depende de Waves 3+4.
 
-Resume file: `.planning/phases/04-upload-desktop/04-05-*-PLAN.md` ou `04-06-*-PLAN.md` (a determinar pelo orquestrador da próxima sessão).
+Resume file: `.planning/phases/04-upload-desktop/04-06-*-PLAN.md`.
 
 ---
 

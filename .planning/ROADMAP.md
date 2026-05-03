@@ -129,7 +129,7 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
 - [x] 04-04-PLAN.md — adaptar getSlotInstructionCopy + AngleInterstitial + CapturePreview com prop opcional mode ('camera' | 'upload') sem regredir Fase 3. CONTEXT D-05, D-09. **Concluído 2026-05-03 (9 testes novos verdes — 6 sequence + 3 CapturePreview; 63/63 testes em components/capture+sequence; backward compat 100% — capture-client.tsx Fase 3 não tocado; CaptureMode type exportado como fonte única). Wave 2 fechada.**
 
 **Wave 3 — Wizard assembly** *(blocked on Waves 1+2)*
-- [ ] 04-05-PLAN.md — app/(dashboard)/leituras/nova/upload/page.tsx (server component substitui placeholder) + upload-client.tsx (state machine clone do capture-client + dropzone). CONTEXT D-04, D-05, D-06, D-07, D-09, D-13, D-14.
+- [x] 04-05-PLAN.md — app/(dashboard)/leituras/nova/upload/page.tsx (server component substitui placeholder) + upload-client.tsx (state machine clone do capture-client + dropzone). CONTEXT D-04, D-05, D-06, D-07, D-09, D-13, D-14. **Concluído 2026-05-03 (page.tsx 85 linhas com 4 guards inc. D-04 redirect; upload-client.tsx 381 linhas reutilizando state machine + analyzeCapturedJpeg + uploadWithRetry verbatim; bundle splitting confirmado — heic2any em chunk dedicado de 1.35MB; 63/63 testes Fase 3 verdes — zero regressão; build /upload First Load 3.4 kB; UPLOAD-01 e UPLOAD-02 entregues).**
 
 **Wave 4 — Entry point** *(blocked on Wave 1)*
 - [ ] 04-06-PLAN.md — new-reading-form.tsx: auto-detect (matchMedia coarse+hover) + dois CTAs com hidden input method + escape link. CONTEXT D-01, D-02, D-03.
@@ -224,7 +224,7 @@ Fases executam em ordem numérica: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 �
 | 1. Setup | 6/6 | ✅ Concluída | — |
 | 2. Auth + Dashboard básico | 4/4 | ✅ Concluída | — |
 | 3. Captura mobile (PWA) | 8/8* | ✅ Concluída via UAT | 2026-05-03 |
-| 4. Upload desktop | 4/7 | 🎯 Em execução | — |
+| 4. Upload desktop | 5/7 | 🎯 Em execução | — |
 | 5. Pipeline de visão (Modal) | 0/TBD | Não iniciada | — |
 | 6. RAG — Ingestão | 0/TBD | Não iniciada | — |
 | 7. Análise LLM | 0/TBD | Não iniciada | — |

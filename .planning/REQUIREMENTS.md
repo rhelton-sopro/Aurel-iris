@@ -39,8 +39,8 @@ Requisitos para o release inicial. Cada um mapeia para exatamente uma fase do ro
 
 ### Upload desktop (Fase 4 — Upload desktop)
 
-- [ ] **UPLOAD-01**: Terapeuta pode iniciar leitura via dropzone desktop, com preview e validação de tipo/tamanho.
-- [ ] **UPLOAD-02**: Upload desktop produz a mesma estrutura de armazenamento (`reading_images` com `eye`, `angle`, `storage_path`) que captura mobile, marcando `readings.capture_method='desktop_upload'`.
+- [x] **UPLOAD-01**: Terapeuta pode iniciar leitura via dropzone desktop, com preview e validação de tipo/tamanho.
+- [x] **UPLOAD-02**: Upload desktop produz a mesma estrutura de armazenamento (`reading_images` com `eye`, `angle`, `storage_path`) que captura mobile, marcando `readings.capture_method='desktop_upload'`.
 
 ### Pipeline de visão (Fase 5 — Pipeline de visão / Modal)
 
@@ -140,8 +140,8 @@ Excluídos explicitamente. Documentado para evitar reintrodução.
 | CAPTURE-04 | Fase 3 | Pendente |
 | CAPTURE-05 | Fase 3 | Pendente |
 | CAPTURE-06 | Fase 3 | Pendente |
-| UPLOAD-01 | Fase 4 | Em progresso (04-01 entregou validação MIME+25MB+HEIC fallback; dropzone+preview ainda pendentes em 04-03/04-05) |
-| UPLOAD-02 | Fase 4 | Em progresso (04-02 entregou suporte server-side: createReadingAction grava `capture_method='desktop_upload'` via FormData + getDraftReading expõe `capture_method`; UI que monta o FormData e o wizard que produz `reading_images` ainda pendentes em 04-05/04-06) |
+| UPLOAD-01 | Fase 4 | ✅ Completo (Plan 04-05, 2026-05-03) — page.tsx server component (4 guards inc. D-04) + upload-client.tsx (state machine + UploadDropzone + validateUploadFile + convertHeicToJpeg + analyzeCapturedJpeg VLM gate + CapturePreview mode='upload'); pipeline ponta-a-ponta com preview e validação MIME/size 25MB |
+| UPLOAD-02 | Fase 4 | ✅ Completo (Plan 04-05, 2026-05-03) — uploadWithRetry (Fase 3) consumido verbatim insere 6 linhas em `reading_images` com path canônico `{therapist_id}/{reading_id}/originais/{eye}_{angle}.jpg` via upsert (reading_id, eye, angle); `capture_method='desktop_upload'` gravado por createReadingAction (Plan 04-02) |
 | VISION-01 | Fase 5 | Pendente |
 | VISION-02 | Fase 5 | Pendente |
 | VISION-03 | Fase 5 | Pendente |
