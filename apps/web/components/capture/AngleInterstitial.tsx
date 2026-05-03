@@ -49,7 +49,7 @@ export function AngleInterstitial({ nextSlot, slotIndex, onProceed }: AngleInter
           <AlertTriangle className="h-6 w-6 mt-0.5 shrink-0 text-destructive" aria-hidden="true" />
           <div className="text-left space-y-1.5">
             <p className="text-base font-bold text-destructive uppercase tracking-wide">
-              Use a câmera traseira · Nunca o flash
+              Use a câmera traseira · Nunca utilize o flash
             </p>
             <p className="text-sm text-destructive/90">
               Não use a câmera frontal (selfie). O flash gera reflexo que cobre a íris e invalida a leitura.
