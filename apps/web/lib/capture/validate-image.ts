@@ -13,6 +13,8 @@
  *   4. Timeout 5s — failure mode é fallback pra valid:true (graceful)
  */
 
+import type { QualityLevel } from './quality-scoring'
+
 const VALIDATION_DIM = 512
 const REQUEST_TIMEOUT_MS = 5000
 
@@ -24,13 +26,12 @@ export type ValidationReason =
   | 'reflexo_total'
   | 'olho_fechado'
 
-/** Reasons que BLOQUEIAM o botão Confirmar (sem chance de continuar).
-    UAT 03 round 8: muito_longe foi promovido a hard-block — foto de rosto
-    inteiro não serve pra iridologia mesmo se terapeuta clicasse Confirmar. */
+/** Reasons que BLOQUEIAM o botão Confirmar (sem chance de continuar). */
 export const BLOCKING_REASONS: readonly string[] = ['sem_olho', 'olho_fechado', 'muito_longe']
 
 export interface ValidationResult {
-  valid: boolean
+  /** Classificação do VLM. quality='ruim' = rejeição. */
+  quality: QualityLevel
   reason: ValidationReason | string
   /** Marca o resultado quando veio de fallback (rede/timeout/erro), não do VLM. */
   source: 'vlm' | 'fallback'
@@ -38,9 +39,14 @@ export interface ValidationResult {
   error?: string
 }
 
+/** Helper: VLM rejeitou (quality='ruim'). */
+export function isVlmRejection(result: ValidationResult): boolean {
+  return result.source === 'vlm' && result.quality === 'ruim'
+}
+
 /** Helper: VLM rejeitou com razão que impede o usuário de avançar. */
 export function isBlockingRejection(result: ValidationResult): boolean {
-  return result.source === 'vlm' && !result.valid && BLOCKING_REASONS.includes(result.reason)
+  return isVlmRejection(result) && BLOCKING_REASONS.includes(result.reason)
 }
 
 /**
@@ -86,16 +92,22 @@ async function resizeBlobToBase64(blob: Blob): Promise<string> {
  * erro de rede/timeout — não bloqueia o terapeuta.
  */
 export async function validateImageWithClaude(blob: Blob): Promise<ValidationResult> {
+  // Fallback graceful em qualquer falha de rede/timeout/parse: assume 'boa'
+  // (não 'excelente' — não temos base pra afirmar isso) e não bloqueia o
+  // terapeuta. Source='fallback' sinaliza no debug overlay que não houve
+  // validação real.
+  const fallback = (error: string): ValidationResult => ({
+    quality: 'boa',
+    reason: 'olho_detectado',
+    source: 'fallback',
+    error,
+  })
+
   let imageBase64: string
   try {
     imageBase64 = await resizeBlobToBase64(blob)
   } catch (err) {
-    return {
-      valid: true,
-      reason: 'outro',
-      source: 'fallback',
-      error: `resize failed: ${(err as Error).message}`,
-    }
+    return fallback(`resize failed: ${(err as Error).message}`)
   }
 
   const controller = new AbortController()
@@ -112,32 +124,21 @@ export async function validateImageWithClaude(blob: Blob): Promise<ValidationRes
 
     if (!res.ok) {
       const errText = await res.text().catch(() => `HTTP ${res.status}`)
-      return {
-        valid: true,
-        reason: 'outro',
-        source: 'fallback',
-        error: `api error: ${res.status} ${errText.slice(0, 100)}`,
-      }
+      return fallback(`api error: ${res.status} ${errText.slice(0, 100)}`)
     }
 
-    const data = (await res.json()) as { valid?: unknown; reason?: unknown }
-    if (typeof data.valid !== 'boolean' || typeof data.reason !== 'string') {
-      return {
-        valid: true,
-        reason: 'outro',
-        source: 'fallback',
-        error: 'invalid response shape',
-      }
+    const data = (await res.json()) as { quality?: unknown; reason?: unknown }
+    if (typeof data.quality !== 'string' || typeof data.reason !== 'string') {
+      return fallback('invalid response shape')
     }
-    return { valid: data.valid, reason: data.reason, source: 'vlm' }
+    return {
+      quality: data.quality as QualityLevel,
+      reason: data.reason,
+      source: 'vlm',
+    }
   } catch (err) {
     window.clearTimeout(timeoutId)
     const isAbort = (err as Error)?.name === 'AbortError'
-    return {
-      valid: true,
-      reason: 'outro',
-      source: 'fallback',
-      error: isAbort ? 'timeout' : `network: ${(err as Error).message}`,
-    }
+    return fallback(isAbort ? 'timeout' : `network: ${(err as Error).message}`)
   }
 }

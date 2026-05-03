@@ -23,20 +23,26 @@ import {
 } from '@/lib/capture/sequence'
 
 // ---------------------------------------------------------------------------
-// Score do badge derivado exclusivamente da validação VLM. UAT 03 round 8:
-// Laplacian variance removido — Claude Haiku já avalia nitidez via
-// reason='borrado', sinal duplicado era confuso.
+// Score do badge derivado da quality classificada pelo VLM. UAT 03 round 9:
+// Claude Haiku 4.5 retorna {quality, reason} em vez de {valid, reason} —
+// graduação de qualidade vem direto do modelo, não é mais binária.
 //
-// VLM valid (source='vlm') = 1.0
-// VLM valid (source='fallback', rede falhou) = 0.7 (não penaliza por rede)
-// VLM invalid = 0.3
+// Thresholds em quality-scoring.ts:levelFromScore:
+//   < 0.40 → ruim, < 0.75 → regular, < 0.90 → boa, >= 0.90 → excelente
+// Score escolhido pra cair no centro de cada banda.
 // ---------------------------------------------------------------------------
 
+import type { QualityLevel } from '@/lib/capture/quality-scoring'
+
+const QUALITY_TO_SCORE: Record<QualityLevel, number> = {
+  ruim: 0.20,
+  regular: 0.55,
+  boa: 0.82,
+  excelente: 0.95,
+}
+
 function computeQualityScore(analysis: PostCaptureAnalysis): number {
-  const { vlmValidation } = analysis
-  if (!vlmValidation.valid) return 0.3
-  if (vlmValidation.source === 'fallback') return 0.7
-  return 1.0
+  return QUALITY_TO_SCORE[analysis.vlmValidation.quality]
 }
 
 // ---------------------------------------------------------------------------

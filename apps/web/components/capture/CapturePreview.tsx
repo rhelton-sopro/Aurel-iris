@@ -94,7 +94,7 @@ export function CapturePreview({
           quando estabilizar. */}
       {analysis && (
         <div className="absolute top-[calc(env(safe-area-inset-top)+12px)] right-3 max-w-[60%] bg-black/80 text-green-300 font-mono text-[10px] leading-tight px-2 py-1.5 rounded">
-          <div>vlm: {analysis.vlmValidation.valid ? 'valid' : 'INVALID'}</div>
+          <div>quality: {analysis.vlmValidation.quality}</div>
           <div>reason: {analysis.vlmValidation.reason}</div>
           <div>src: {analysis.vlmValidation.source}</div>
           {analysis.vlmValidation.error && (

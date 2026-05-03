@@ -44,7 +44,7 @@ describe('CapturePreview', () => {
       vlmInvalidAlert: true,
       hasAlert: true,
       cameraDetection: { kind: 'rear', source: 'exif' },
-      vlmValidation: { valid: false, reason: 'sem_olho', source: 'vlm' },
+      vlmValidation: { quality: 'ruim', reason: 'sem_olho', source: 'vlm' },
     }
     render(
       <CapturePreview
@@ -68,7 +68,7 @@ describe('CapturePreview', () => {
       vlmInvalidAlert: true,
       hasAlert: true,
       cameraDetection: { kind: 'rear', source: 'exif' },
-      vlmValidation: { valid: false, reason: 'olho_fechado', source: 'vlm' },
+      vlmValidation: { quality: 'ruim', reason: 'olho_fechado', source: 'vlm' },
     }
     render(
       <CapturePreview
@@ -90,7 +90,7 @@ describe('CapturePreview', () => {
       vlmInvalidAlert: true,
       hasAlert: true,
       cameraDetection: { kind: 'rear', source: 'exif' },
-      vlmValidation: { valid: false, reason: 'muito_longe', source: 'vlm' },
+      vlmValidation: { quality: 'ruim', reason: 'muito_longe', source: 'vlm' },
     }
     render(
       <CapturePreview
@@ -113,7 +113,7 @@ describe('CapturePreview', () => {
       vlmInvalidAlert: true,
       hasAlert: true,
       cameraDetection: { kind: 'rear', source: 'exif' },
-      vlmValidation: { valid: false, reason: 'borrado', source: 'vlm' },
+      vlmValidation: { quality: 'ruim', reason: 'borrado', source: 'vlm' },
     }
     render(
       <CapturePreview
@@ -138,7 +138,7 @@ describe('CapturePreview', () => {
       vlmInvalidAlert: false,
       hasAlert: false,
       cameraDetection: { kind: 'rear', source: 'exif' },
-      vlmValidation: { valid: true, reason: 'olho_detectado', source: 'fallback', error: 'timeout' },
+      vlmValidation: { quality: 'boa', reason: 'olho_detectado', source: 'fallback', error: 'timeout' },
     }
     render(
       <CapturePreview
@@ -159,7 +159,7 @@ describe('CapturePreview', () => {
       vlmInvalidAlert: false,
       hasAlert: false,
       cameraDetection: { kind: 'rear', source: 'exif' },
-      vlmValidation: { valid: true, reason: 'olho_detectado', source: 'vlm' },
+      vlmValidation: { quality: 'excelente', reason: 'olho_detectado', source: 'vlm' },
     }
     render(
       <CapturePreview

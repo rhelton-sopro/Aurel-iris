@@ -70,7 +70,7 @@ export async function analyzeCapturedJpeg(blob: Blob): Promise<PostCaptureAnalys
 
   const cameraDetection = await cameraDetectionPromise
   const vlmValidation = await vlmValidationPromise
-  const vlmInvalidAlert = !vlmValidation.valid
+  const vlmInvalidAlert = vlmValidation.quality === 'ruim'
 
   return {
     imageWidth,

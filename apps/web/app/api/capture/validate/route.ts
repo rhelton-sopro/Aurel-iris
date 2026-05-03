@@ -17,31 +17,43 @@ const MAX_TOKENS = 256
 // se Anthropic ficar pendurado.
 const REQUEST_TIMEOUT_MS = 8000
 
-const SYSTEM_PROMPT = `Esta imagem é adequada para análise iridológica?
-Avalie seguindo exatamente estes critérios:
+// Prompt compacto (~150 tokens) com critério clínico explícito de borrado
+// (UAT 03 round 8: foto borrada não disparava reason='borrado' com prompt
+// genérico "suficientemente nítida"). "Fibras radiais ilegíveis por desfoque"
+// é critério iridológico concreto que Claude consegue verificar.
+const SYSTEM_PROMPT = `Avalie a foto para análise iridológica. Retorne APENAS JSON, sem markdown:
+{"quality":"<ruim|regular|boa|excelente>","reason":"<reason>"}
 
-ACEITAR (valid: true) quando:
-- Há um olho humano visível na imagem
-- A íris ocupa pelo menos 15% da menor dimensão da imagem
-- A íris está suficientemente nítida para ver detalhes
+quality "ruim" (com reason correspondente):
+- sem_olho: sem olho humano na imagem
+- muito_longe: íris ocupa <15% da menor dimensão da imagem
+- olho_fechado: pálpebra fechada ou íris coberta
+- reflexo_total: reflexo cobre toda a área da íris
+- borrado: fibras radiais da íris ilegíveis por desfoque
 
-REJEITAR (valid: false) quando:
-- Não há olho humano na imagem (objeto, paisagem, flor, etc)
-- O rosto está tão distante que a íris é menor que 15% da imagem
-- O olho está completamente fechado ou coberto
-- A íris está completamente obstruída por reflexo ou sombra
-
-Responda APENAS com JSON, sem markdown e sem prefixo:
-{"valid": <boolean>, "reason": "<one of: 'olho_detectado' | 'sem_olho' | 'muito_longe' | 'borrado' | 'reflexo_total' | 'olho_fechado'>"}`
+caso contrário, reason "olho_detectado" e:
+- excelente: íris >30% da menor dimensão, fibras radiais nítidas, reflexo mínimo
+- boa: íris 15-30%, fibras radiais visíveis (leve reflexo OK)
+- regular: íris >=15% com leve borramento ou reflexo parcial`
 
 interface ValidateRequestBody {
   imageBase64?: unknown
 }
 
 interface VLMJsonResponse {
-  valid?: unknown
+  quality?: unknown
   reason?: unknown
 }
+
+const VALID_QUALITY_VALUES = ['ruim', 'regular', 'boa', 'excelente'] as const
+const VALID_REASON_VALUES = [
+  'olho_detectado',
+  'sem_olho',
+  'muito_longe',
+  'borrado',
+  'reflexo_total',
+  'olho_fechado',
+] as const
 
 export async function POST(request: NextRequest) {
   // Auth gate — só terapeuta autenticado consome o endpoint (e a quota Anthropic).
@@ -131,12 +143,22 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  if (typeof parsed.valid !== 'boolean' || typeof parsed.reason !== 'string') {
+  if (typeof parsed.quality !== 'string' || typeof parsed.reason !== 'string') {
     return NextResponse.json(
-      { error: 'VLM JSON missing valid/reason', received: parsed },
+      { error: 'VLM JSON missing quality/reason', received: parsed },
       { status: 502 },
     )
   }
 
-  return NextResponse.json({ valid: parsed.valid, reason: parsed.reason })
+  // Clamp pra valores conhecidos. Claude às vezes retorna variantes ('boa.' com
+  // ponto, ou tradução sutil); fallback pra 'regular' garante shape estável
+  // pra UI sem quebrar pipeline.
+  const quality = (VALID_QUALITY_VALUES as readonly string[]).includes(parsed.quality)
+    ? (parsed.quality as (typeof VALID_QUALITY_VALUES)[number])
+    : 'regular'
+  const reason = (VALID_REASON_VALUES as readonly string[]).includes(parsed.reason)
+    ? (parsed.reason as (typeof VALID_REASON_VALUES)[number])
+    : 'olho_detectado'
+
+  return NextResponse.json({ quality, reason })
 }
