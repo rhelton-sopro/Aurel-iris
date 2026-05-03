@@ -9,6 +9,15 @@ import { finalizeReadingAction } from '@/app/actions/readings'
 import { AngleInterstitial } from '@/components/capture/AngleInterstitial'
 import { CapturePreview } from '@/components/capture/CapturePreview'
 import { CaptureProgress } from '@/components/capture/CaptureProgress'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import {
   analyzeCapturedJpeg,
   type PostCaptureAnalysis,
@@ -95,6 +104,9 @@ export function CaptureClient({
   const [phase, setPhase] = React.useState<Phase>('instruction')
   const [capturedCount, setCapturedCount] = React.useState(initialCaptured.length)
   const [pendingPreview, setPendingPreview] = React.useState<PendingPreview | null>(null)
+  // Aberto quando EXIF não conseguiu identificar front/rear (kind === 'unknown').
+  // Pede confirmação manual ao usuário antes de aceitar a foto.
+  const [cameraConfirmDialogOpen, setCameraConfirmDialogOpen] = React.useState(false)
 
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   const slotAbortRefs = React.useRef<Map<number, AbortController>>(new Map())
@@ -120,10 +132,20 @@ export function CaptureClient({
 
     const imageUrl = URL.createObjectURL(file)
     try {
-      // Análise faz tudo: decode + pupil detection + Laplacian + dims reais.
-      // O irisRadiusPx vem ESCALADO pra px reais (sem necessidade de detecção
-      // adicional aqui no client).
+      // Análise faz tudo: decode + pupil detection + Laplacian + dims reais
+      // + EXIF camera detection. O irisRadiusPx vem ESCALADO pra px reais.
       const analysis = await analyzeCapturedJpeg(file)
+
+      // Bloqueio de câmera frontal detectada via EXIF (iPhone ~100% confiável).
+      // Falha precoce: nem mostra preview — toast + volta pra instrução.
+      // Caso 'unknown' (EXIF inconclusivo) é tratado no handleConfirm via dialog.
+      if (analysis.cameraDetection.kind === 'front') {
+        URL.revokeObjectURL(imageUrl)
+        toast.error('Use a câmera traseira do dispositivo. Câmera frontal detectada — refaça a foto.')
+        setPhase('instruction')
+        return
+      }
+
       const score = irisSizeScore(analysis.irisRadiusPx)
       const currentSlotIdx = slotIndex
 
@@ -145,7 +167,10 @@ export function CaptureClient({
     }
   }, [slotIndex])
 
-  const handleConfirm = React.useCallback(() => {
+  // Lógica de upload — chamada direta quando cameraDetection é 'rear', OU
+  // após confirmação manual via dialog quando 'unknown'. NÃO deve ser chamada
+  // diretamente pelo CapturePreview (use handleConfirm que faz o gate).
+  const executeUpload = React.useCallback(() => {
     const preview = pendingPreview
     if (!preview) return
     const currentSlotIdx = preview.slotIndex
@@ -201,6 +226,19 @@ export function CaptureClient({
     }
   }, [pendingPreview, slotIndex, supabase, therapistId, readingId])
 
+  // Gate de câmera: se EXIF foi inconclusivo, abre dialog de confirmação manual
+  // antes de subir. Caso 'rear' (detectado) ou já confirmado → executeUpload direto.
+  // 'front' nunca chega aqui porque é bloqueado em handleFileSelected.
+  const handleConfirm = React.useCallback(() => {
+    const preview = pendingPreview
+    if (!preview) return
+    if (preview.analysis.cameraDetection.kind === 'unknown') {
+      setCameraConfirmDialogOpen(true)
+      return
+    }
+    executeUpload()
+  }, [pendingPreview, executeUpload])
+
   const handleRedo = React.useCallback(() => {
     if (pendingPreview?.imageUrl) URL.revokeObjectURL(pendingPreview.imageUrl)
     const previousAbort = slotAbortRefs.current.get(slotIndex)
@@ -212,6 +250,17 @@ export function CaptureClient({
     setPhase('instruction')
     window.setTimeout(() => fileInputRef.current?.click(), 50)
   }, [pendingPreview, slotIndex])
+
+  // Handlers do dialog de confirmação manual de câmera (caso EXIF unknown).
+  const handleCameraConfirmedRear = React.useCallback(() => {
+    setCameraConfirmDialogOpen(false)
+    executeUpload()
+  }, [executeUpload])
+
+  const handleCameraConfirmedRedo = React.useCallback(() => {
+    setCameraConfirmDialogOpen(false)
+    handleRedo()
+  }, [handleRedo])
 
   React.useEffect(() => {
     if (phase !== 'finalizing') return
@@ -322,6 +371,26 @@ export function CaptureClient({
         className="hidden"
         aria-hidden="true"
       />
+
+      <Dialog open={cameraConfirmDialogOpen} onOpenChange={setCameraConfirmDialogOpen}>
+        <DialogContent showCloseButton={false}>
+          <DialogHeader>
+            <DialogTitle>Confirme a câmera usada</DialogTitle>
+            <DialogDescription>
+              Não foi possível detectar automaticamente se a foto veio da câmera traseira do dispositivo.
+              A câmera traseira é obrigatória para a leitura — fotos selfie não servem para análise iridológica.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCameraConfirmedRedo}>
+              Refazer com traseira
+            </Button>
+            <Button onClick={handleCameraConfirmedRear}>
+              Sim, usei traseira
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

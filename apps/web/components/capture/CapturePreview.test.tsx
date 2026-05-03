@@ -48,6 +48,7 @@ describe('CapturePreview', () => {
       irisAlert: true,
       irisUndetectedAlert: false,
       hasAlert: true,
+      cameraDetection: { kind: 'rear', source: 'exif' },
     }
     render(
       <CapturePreview
@@ -74,6 +75,7 @@ describe('CapturePreview', () => {
       irisAlert: false,
       irisUndetectedAlert: true,
       hasAlert: true,
+      cameraDetection: { kind: 'rear', source: 'exif' },
     }
     render(
       <CapturePreview
@@ -100,6 +102,7 @@ describe('CapturePreview', () => {
       irisAlert: false,
       irisUndetectedAlert: false,
       hasAlert: false,
+      cameraDetection: { kind: 'rear', source: 'exif' },
     }
     render(
       <CapturePreview
