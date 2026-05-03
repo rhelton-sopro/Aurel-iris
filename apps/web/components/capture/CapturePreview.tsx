@@ -44,7 +44,9 @@ export function CapturePreview({
   analysis,
 }: CapturePreviewProps) {
   const level: QualityLevel = levelFromScore(qualityScore)
-  const showAlert = analysis?.hasAlert === true
+  // Mostra alerta também para quality=regular (warning informativo, sem block).
+  const isRegularQuality = analysis?.vlmValidation?.quality === 'regular'
+  const showAlert = analysis?.hasAlert === true || isRegularQuality
 
   // Reasons UI: motivo humano-legível baseado na razão retornada pelo VLM.
   const reasons: string[] = []
@@ -59,6 +61,12 @@ export function CapturePreview({
       olho_fechado: 'Olho fechado ou coberto — abra o olho completamente',
     }
     reasons.push(messages[r] ?? `Foto rejeitada: ${r}`)
+  }
+  // Mensagem específica pra qualidade 'regular'. Atualmente o único critério
+  // do prompt é "reflexo parcial cobre 30-70% da íris". Se no futuro 'regular'
+  // ganhar outros gatilhos, ampliar este branch.
+  if (isRegularQuality) {
+    reasons.push('Reflexo parcial atrapalha a leitura da íris — tente mudar o ângulo da luz')
   }
 
   // Bloqueio do Confirmar: sem_olho, olho_fechado e muito_longe são rejeições

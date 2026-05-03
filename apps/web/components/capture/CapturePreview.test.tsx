@@ -175,6 +175,29 @@ describe('CapturePreview', () => {
     expect(screen.getByRole('button', { name: /Confirmar/ })).not.toBeDisabled()
   })
 
+  it('shows reflexo parcial message when quality is regular (no block)', () => {
+    const analysis: PostCaptureAnalysis = {
+      imageWidth: 3840,
+      imageHeight: 2160,
+      vlmInvalidAlert: false,
+      hasAlert: false,
+      cameraDetection: { kind: 'rear', source: 'exif' },
+      vlmValidation: { quality: 'regular', reason: 'olho_detectado', source: 'vlm' },
+    }
+    render(
+      <CapturePreview
+        imageUrl="blob:test"
+        qualityScore={0.55}
+        analysis={analysis}
+        onRedo={vi.fn()}
+        onConfirm={vi.fn()}
+      />
+    )
+    expect(screen.getByText(/Reflexo parcial atrapalha/)).toBeInTheDocument()
+    expect(screen.getByText(/Qualidade abaixo do ideal/)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Confirmar/ })).not.toBeDisabled()
+  })
+
   it('does not show alert when analysis has no issues', () => {
     const analysis: PostCaptureAnalysis = {
       imageWidth: 3840,
