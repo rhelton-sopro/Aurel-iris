@@ -57,8 +57,16 @@ export function isBlockingRejection(result: ValidationResult): boolean {
 }
 
 /**
- * Resize do blob original pra 512×512 (center-crop quadrado + downscale).
+ * Resize aspect-preserving do blob original. NÃO corta nada — a foto inteira
+ * vai pro VLM. Maior dimensão vira VALIDATION_DIM (512), menor é proporcional.
+ *
+ * Exemplo: 4032×3024 (4:3) → 512×384 (~196k px, ~262 tokens — vs ~349 tokens
+ * do center-crop 512×512 anterior). Economia de ~25% em image tokens.
+ *
  * Resultado é base64 sem prefixo `data:image/...`.
+ *
+ * NOTA: o blob ORIGINAL 4K que vai pro Supabase Storage (uploadWithRetry) é
+ * outro objeto, não é tocado aqui. Esta função só prepara o que vai pro VLM.
  */
 async function resizeBlobToBase64(blob: Blob): Promise<string> {
   const url = URL.createObjectURL(blob)
@@ -71,20 +79,21 @@ async function resizeBlobToBase64(blob: Blob): Promise<string> {
     throw new Error(`decode failed: ${(err as Error).message}`)
   }
 
+  const longEdge = Math.max(img.naturalWidth, img.naturalHeight)
+  // Não up-scale: se imagem já é menor que VALIDATION_DIM, mantém como está.
+  const scale = longEdge > VALIDATION_DIM ? VALIDATION_DIM / longEdge : 1
+  const w = Math.max(1, Math.round(img.naturalWidth * scale))
+  const h = Math.max(1, Math.round(img.naturalHeight * scale))
+
   const canvas = document.createElement('canvas')
-  canvas.width = VALIDATION_DIM
-  canvas.height = VALIDATION_DIM
+  canvas.width = w
+  canvas.height = h
   const ctx = canvas.getContext('2d', { alpha: false })
   if (!ctx) {
     URL.revokeObjectURL(url)
     throw new Error('canvas 2d context unavailable')
   }
-
-  // Center-crop quadrado + downscale pra 512×512.
-  const minSrc = Math.min(img.naturalWidth, img.naturalHeight)
-  const sx = (img.naturalWidth - minSrc) / 2
-  const sy = (img.naturalHeight - minSrc) / 2
-  ctx.drawImage(img, sx, sy, minSrc, minSrc, 0, 0, VALIDATION_DIM, VALIDATION_DIM)
+  ctx.drawImage(img, 0, 0, w, h)
   URL.revokeObjectURL(url)
 
   // canvas.toDataURL retorna 'data:image/jpeg;base64,...' — extrai só o base64.
