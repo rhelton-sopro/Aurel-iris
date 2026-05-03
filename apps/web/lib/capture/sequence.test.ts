@@ -7,6 +7,7 @@ import {
   getSlotInstructionCopy,
   EYE_LABEL,
   ANGLE_LABEL,
+  type CaptureMode,
 } from './sequence'
 
 describe('SEQUENCE', () => {
@@ -172,6 +173,42 @@ describe('getSlotInstructionCopy', () => {
     for (let i = 0; i < SEQUENCE.length; i++) {
       expect(getSlotInstructionCopy(SEQUENCE[i], i).cta).toBe('Abrir câmera')
     }
+  })
+})
+
+describe('getSlotInstructionCopy mode parameter (Fase 4)', () => {
+  const slot = { eye: 'left' as const, angle: 'frontal' as const }
+
+  it('defaults to mode=camera with cta="Abrir câmera"', () => {
+    const copy = getSlotInstructionCopy(slot, 0)
+    expect(copy.cta).toBe('Abrir câmera')
+  })
+
+  it('returns cta="Abrir câmera" for explicit mode=camera', () => {
+    const copy = getSlotInstructionCopy(slot, 0, 'camera')
+    expect(copy.cta).toBe('Abrir câmera')
+  })
+
+  it('returns cta="Selecionar arquivo" for mode=upload', () => {
+    const copy = getSlotInstructionCopy(slot, 0, 'upload')
+    expect(copy.cta).toBe('Selecionar arquivo')
+  })
+
+  it('mode does NOT affect heading or subtitle', () => {
+    const camera = getSlotInstructionCopy(slot, 0, 'camera')
+    const upload = getSlotInstructionCopy(slot, 0, 'upload')
+    expect(camera.heading).toBe(upload.heading)
+    expect(camera.subtitle).toBe(upload.subtitle)
+  })
+
+  it('CaptureMode type exports correctly', () => {
+    const m: CaptureMode = 'upload'
+    expect(m).toBe('upload')
+  })
+
+  it('handles mode independently of slot eye/angle', () => {
+    const right = getSlotInstructionCopy({ eye: 'right', angle: 'lateral' }, 4, 'upload')
+    expect(right.cta).toBe('Selecionar arquivo')
   })
 })
 
