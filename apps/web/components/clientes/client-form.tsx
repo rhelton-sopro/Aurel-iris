@@ -24,7 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { BirthDateSelect } from '@/components/clientes/birth-date-select'
+import { BirthDateInput } from '@/components/clientes/birth-date-input'
 import { cn } from '@/lib/utils'
 import type { ClientFormState } from '@/app/actions/clients'
 import type { Database } from '@/types/database'
@@ -102,7 +102,7 @@ export function ClientForm({ mode, client, action }: ClientFormProps) {
               <FormItem>
                 <FormLabel>Data de nascimento</FormLabel>
                 <FormControl>
-                  <BirthDateSelect
+                  <BirthDateInput
                     value={field.value ?? ''}
                     onChange={field.onChange}
                   />
