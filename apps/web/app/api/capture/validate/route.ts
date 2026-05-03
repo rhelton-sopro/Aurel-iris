@@ -17,27 +17,26 @@ const MAX_TOKENS = 256
 // se Anthropic ficar pendurado.
 const REQUEST_TIMEOUT_MS = 8000
 
-// Prompt compacto com critérios clínicos calibrados em UAT 03:
-//   - round 8: critério funcional de borrado ("fibras radiais ilegíveis")
-//   - round 9: graduação 4 níveis vem do VLM (não score binário)
-//   - round 10: thresholds % calibrados (12/15/25)
-//   - round 11: dois_olhos rejection + rosto inteiro explícito + borrado
-//     mais rigoroso (qualquer leve desfoque, "se em dúvida, marque borrado")
+// Prompt compacto com critérios MUTUAMENTE EXCLUSIVOS (UAT 03 round 12):
+//   - muito_longe é SÓ sobre framing/tamanho — nunca sobre nitidez
+//   - borrado é SÓ sobre nitidez — nunca sobre tamanho
+//   - banda 'boa' alargada (12-25%) pra cobrir close típico de iPhone
+//   - 'regular' agora cobre apenas reflexo parcial (não tamanho limítrofe)
 const SYSTEM_PROMPT = `Avalie a foto para análise iridológica. Retorne APENAS JSON, sem markdown:
 {"quality":"<ruim|regular|boa|excelente>","reason":"<reason>"}
 
 quality "ruim" (com reason correspondente):
 - sem_olho: sem olho humano na imagem
-- dois_olhos: dois olhos visíveis na foto (deve ser apenas um olho em close)
-- muito_longe: rosto inteiro ou contexto facial amplo na foto, OU íris <12% da menor dimensão, OU fibras radiais não distinguíveis
+- dois_olhos: ambos os olhos visíveis (deve haver apenas um em close)
+- muito_longe: rosto inteiro/contexto facial amplo na foto, OU íris ocupa <12% da menor dimensão. NÃO use este reason por causa de desfoque — use 'borrado'.
 - olho_fechado: pálpebra fechada ou íris coberta
-- reflexo_total: reflexo cobre toda a área da íris
-- borrado: fibras radiais da íris não claramente nítidas (qualquer leve desfoque conta — se houver dúvida, marque borrado)
+- reflexo_total: reflexo cobre >70% da área da íris
+- borrado: fibras radiais da íris claramente desfocadas (movimento ou foco). Use SEMPRE este reason quando houver desfoque, nunca 'muito_longe'.
 
 caso contrário, reason "olho_detectado" e:
 - excelente: íris >25% da menor dimensão, fibras radiais nítidas, reflexo mínimo
-- boa: íris 15-25%, fibras radiais visíveis (leve reflexo OK)
-- regular: íris 12-15%, OU >=15% com leve reflexo parcial`
+- boa: íris 12-25% da menor dimensão, fibras radiais visíveis (leve reflexo OK — câmera mobile típica gera reflexo)
+- regular: reflexo parcial cobre 30-70% da íris (mas a íris ainda é legível)`
 
 interface ValidateRequestBody {
   imageBase64?: unknown
