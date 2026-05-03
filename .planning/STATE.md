@@ -24,9 +24,9 @@ Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 ## Posição atual
 
 Fase: 3 de 9 — **CONCLUÍDA** (Captura mobile / PWA)
-Próxima: Fase 4 (Upload desktop)
-Status: Phase 3 complete, ready to plan Phase 4
-Última atividade: 2026-05-03 — UAT 03 fechado em 13 testes + 20 rodadas de calibração do gate VLM. Captura completa funcional iPhone Safari (PWA standalone iOS); fluxo nativo + Claude Haiku 4.5 validation + finalize → /leituras.
+Próxima: Fase 4 (Upload desktop) — **CONTEXT capturado em 2026-05-03**
+Status: Phase 4 context gathered, ready to plan
+Última atividade: 2026-05-03 — Discuss-phase Fase 4 fechado em 4 áreas (entry point + auto-detect/escape, wizard sequencial paralelo ao mobile, VLM Haiku 4.5 hard block reusado, HEIC client-side + limite 25MB). 14 decisões locked em CONTEXT.md.
 
 Progresso: [███░░░░░░░] 33% (3/9 fases)
 
