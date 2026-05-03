@@ -34,9 +34,11 @@ quality "ruim" (com reason correspondente):
 - borrado: fibras radiais da íris claramente desfocadas (movimento ou foco). Use SEMPRE este reason quando houver desfoque, nunca 'muito_longe'.
 
 caso contrário, reason "olho_detectado" e:
-- excelente: íris >25% da menor dimensão, fibras radiais nítidas, reflexo mínimo
-- boa: íris 12-25% da menor dimensão, fibras radiais visíveis (leve reflexo OK — câmera mobile típica gera reflexo)
-- regular: reflexo parcial cobre 30-70% da íris (mas a íris ainda é legível)`
+- excelente: íris ≥20% da menor dimensão E fibras radiais nítidas. Specular highlights localizados (pequenos pontos de luz da câmera) são OK e NÃO impedem 'excelente'.
+- boa: íris ≥12% da menor dimensão E fibras radiais visíveis. Reflexo leve disperso é OK.
+- regular: SOMENTE quando reflexo cobre pelo menos 30% da área da íris (mas <70%) e atrapalha a leitura.
+
+Em caso de dúvida entre excelente/boa/regular, prefira 'boa'. Não rebaixe para 'regular' por causa de reflexo pequeno ou textura levemente menos nítida — esses casos são 'boa'.`
 
 interface ValidateRequestBody {
   imageBase64?: unknown
