@@ -49,10 +49,10 @@ export function AngleInterstitial({ nextSlot, slotIndex, onProceed }: AngleInter
           <AlertTriangle className="h-6 w-6 mt-0.5 shrink-0 text-destructive" aria-hidden="true" />
           <div className="text-left space-y-1.5">
             <p className="text-base font-bold text-destructive uppercase tracking-wide">
-              Use a câmera traseira
+              Use a câmera traseira · Nunca o flash
             </p>
             <p className="text-sm text-destructive/90">
-              Não use a câmera frontal (selfie). Vire o celular com a câmera traseira apontando para o olho do paciente.
+              Não use a câmera frontal (selfie). O flash gera reflexo que cobre a íris e invalida a leitura.
             </p>
             <p className="text-sm text-destructive/90 pt-1 border-t border-destructive/20">
               Se o exame é da sua íris, peça a alguém para tirar a foto para você.
