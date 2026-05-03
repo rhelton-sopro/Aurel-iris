@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { AngleIcon } from './AngleIcon'
 import type { Slot } from '@/lib/capture/sequence'
@@ -39,6 +40,12 @@ export function AngleInterstitial({ nextSlot, slotIndex, onProceed }: AngleInter
         <div className="text-center space-y-3">
           <h1 className="text-xl font-semibold">{copy.heading}</h1>
           <p className="text-base text-muted-foreground">{copy.subtitle}</p>
+          <p className="flex items-start justify-center gap-1.5 text-sm font-medium text-destructive pt-2">
+            <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" aria-hidden="true" />
+            <span>
+              Use a câmera traseira — vire o celular com a câmera apontando para o olho do paciente
+            </span>
+          </p>
         </div>
       </div>
 

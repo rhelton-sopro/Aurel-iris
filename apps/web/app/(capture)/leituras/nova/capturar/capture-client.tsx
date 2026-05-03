@@ -1,7 +1,6 @@
 'use client'
 
 import * as React from 'react'
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { X } from 'lucide-react'
@@ -12,37 +11,27 @@ import { CapturePreview } from '@/components/capture/CapturePreview'
 import { CaptureProgress } from '@/components/capture/CaptureProgress'
 import {
   analyzeCapturedJpeg,
-  scaleDetectedIrisRadius,
   type PostCaptureAnalysis,
 } from '@/lib/capture/post-capture-analysis'
 import { uploadWithRetry } from '@/lib/capture/upload'
 import { createClient } from '@/lib/supabase/client'
-import { getIrisRadiusPx } from '@/lib/capture/iris-geometry'
 import {
   SEQUENCE,
   getResumeSlotIndex,
   getSlotProgressLabel,
   type Slot,
 } from '@/lib/capture/sequence'
-import type { UseIrisDetectorResult } from '@/hooks/use-iris-detector'
-
-const IrisDetector = dynamic(() => import('@/components/capture/IrisDetector'), {
-  ssr: false,
-})
 
 // ---------------------------------------------------------------------------
-// Score one-shot baseado APENAS no raio absoluto da íris detectada.
-// (Sharpness aparece via alerta da analyzeCapturedJpeg, não via badge.)
+// Score do badge derivado APENAS do irisRadiusPx (já escalado pra px reais
+// pelo analyzeCapturedJpeg). Sharpness aparece via alerta da análise.
 // ---------------------------------------------------------------------------
 
-/** Raio em px que vale score 1.0 (Excelente) — bate com threshold da análise. */
 const IRIS_EXCELLENT_PX = 600
-/** Raio em px que vale score 0.5 (Aceitável) — bate com IRIS_RADIUS_ALERT_PX. */
 const IRIS_ACCEPTABLE_PX = 300
 /**
- * Score quando MediaPipe não detectou íris alguma. Neutro (50%) — sinaliza
- * "verifique enquadramento" via overlay sem bloquear nem rebaixar a percepção
- * do usuário injustamente.
+ * Score quando a pupila não foi detectada. Neutro (50%) — sinaliza problema
+ * de enquadramento via overlay sem rebaixar a percepção do usuário injustamente.
  */
 const NO_IRIS_FALLBACK_SCORE = 0.50
 
@@ -53,29 +42,6 @@ function irisSizeScore(irisRadiusPx: number): number {
     return 0.5 + 0.5 * ((irisRadiusPx - IRIS_ACCEPTABLE_PX) / (IRIS_EXCELLENT_PX - IRIS_ACCEPTABLE_PX))
   }
   return 0.5 * (irisRadiusPx / IRIS_ACCEPTABLE_PX)
-}
-
-interface OneShotResult {
-  irisRadiusPx: number
-  score: number
-}
-
-function detectIris(
-  img: HTMLImageElement,
-  detector: UseIrisDetectorResult | null,
-  eye: 'left' | 'right',
-): OneShotResult {
-  let rawRadius = 0
-  if (detector?.ready) {
-    const result = detector.detect(img)
-    const landmarks = result?.faceLandmarks?.[0] ?? null
-    if (landmarks) {
-      rawRadius = getIrisRadiusPx(landmarks, eye, img.naturalWidth, img.naturalHeight)
-    }
-  }
-  // Escala pro espaço de px reais do arquivo (MediaPipe opera em ~512px ref).
-  const irisRadiusPx = scaleDetectedIrisRadius(rawRadius, img.naturalWidth)
-  return { irisRadiusPx, score: irisSizeScore(irisRadiusPx) }
 }
 
 // ---------------------------------------------------------------------------
@@ -103,7 +69,7 @@ interface PendingPreview {
   width: number
   height: number
   slotIndex: number
-  analysis: PostCaptureAnalysis | null
+  analysis: PostCaptureAnalysis
 }
 
 // ---------------------------------------------------------------------------
@@ -130,7 +96,6 @@ export function CaptureClient({
   const [capturedCount, setCapturedCount] = React.useState(initialCaptured.length)
   const [pendingPreview, setPendingPreview] = React.useState<PendingPreview | null>(null)
 
-  const detectorRef = React.useRef<UseIrisDetectorResult | null>(null)
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   const slotAbortRefs = React.useRef<Map<number, AbortController>>(new Map())
   const uploadPromisesRef = React.useRef<Map<number, Promise<unknown>>>(new Map())
@@ -153,54 +118,38 @@ export function CaptureClient({
 
     setPhase('analyzing')
 
-    // URL da preview persiste até confirm/redo (revogada nesses handlers).
     const imageUrl = URL.createObjectURL(file)
-    const img = new Image()
-    img.src = imageUrl
-
     try {
-      // decode() resolve quando o decode termina e os pixels estão em memória.
-      // naturalWidth/naturalHeight são as dimensões REAIS do arquivo
-      // (independente de CSS) — usadas pelo getIrisRadiusPx e pela análise.
-      await img.decode()
-      const { irisRadiusPx, score } = detectIris(img, detectorRef.current, slot.eye)
-      const width = img.naturalWidth
-      const height = img.naturalHeight
+      // Análise faz tudo: decode + pupil detection + Laplacian + dims reais.
+      // O irisRadiusPx vem ESCALADO pra px reais (sem necessidade de detecção
+      // adicional aqui no client).
+      const analysis = await analyzeCapturedJpeg(file)
+      const score = irisSizeScore(analysis.irisRadiusPx)
       const currentSlotIdx = slotIndex
 
       setPendingPreview({
         blob: file,
         imageUrl,
         qualityScore: score,
-        width,
-        height,
+        width: analysis.imageWidth,
+        height: analysis.imageHeight,
         slotIndex: currentSlotIdx,
-        analysis: null,
+        analysis,
       })
       setPhase('previewing')
-
-      // Análise pós-captura roda sobre o ORIGINAL completo (sem crop).
-      void analyzeCapturedJpeg(file, irisRadiusPx)
-        .then((analysis) => {
-          setPendingPreview(prev =>
-            prev && prev.slotIndex === currentSlotIdx ? { ...prev, analysis } : prev,
-          )
-        })
-        .catch(() => { /* best-effort */ })
     } catch (err) {
-      console.error('[capture-client] file process error:', err)
+      console.error('[capture-client] analyze error:', err)
       URL.revokeObjectURL(imageUrl)
       toast.error('Falha ao processar imagem. Tente novamente.')
       setPhase('instruction')
     }
-  }, [slot.eye, slotIndex])
+  }, [slotIndex])
 
   const handleConfirm = React.useCallback(() => {
     const preview = pendingPreview
     if (!preview) return
     const currentSlotIdx = preview.slotIndex
 
-    // Upload em background — único arquivo (original).
     const previousAbort = slotAbortRefs.current.get(currentSlotIdx)
     if (previousAbort) previousAbort.abort()
     const ac = new AbortController()
@@ -239,7 +188,6 @@ export function CaptureClient({
         })
       })
 
-    // Avança o slot.
     URL.revokeObjectURL(preview.imageUrl)
     setPendingPreview(null)
     setCapturedCount(c => c + 1)
@@ -262,7 +210,6 @@ export function CaptureClient({
     }
     setPendingPreview(null)
     setPhase('instruction')
-    // Reabre câmera nativa imediatamente.
     window.setTimeout(() => fileInputRef.current?.click(), 50)
   }, [pendingPreview, slotIndex])
 
@@ -299,8 +246,7 @@ export function CaptureClient({
   // ---------------------------------------------------------------------------
   return (
     <div className="relative flex-1 flex flex-col bg-background">
-      {/* Tip de iluminação fixa em TODAS as telas de captura. z-[60] fica
-          acima dos overlays de fase (interstitial z-50, preview z-40). */}
+      {/* Tip de iluminação fixa em TODAS as telas de captura. */}
       <div
         role="note"
         className="absolute top-0 left-0 right-0 z-[60] pt-[env(safe-area-inset-top)] bg-amber-500/95 backdrop-blur-sm border-b border-amber-700/30"
@@ -310,7 +256,6 @@ export function CaptureClient({
         </p>
       </div>
 
-      {/* Header fica colado embaixo do tip banner. */}
       <header className="absolute top-[calc(env(safe-area-inset-top)+30px)] left-0 right-0 z-[55] flex items-center justify-between px-4 py-2">
         <span className="text-sm text-foreground/80 truncate max-w-[60%]">{clientName}</span>
         <Link
@@ -362,7 +307,6 @@ export function CaptureClient({
         </div>
       )}
 
-      {/* Hidden input — acionado por openCamera */}
       <input
         ref={fileInputRef}
         type="file"
@@ -372,8 +316,6 @@ export function CaptureClient({
         className="hidden"
         aria-hidden="true"
       />
-
-      <IrisDetector onReady={(api) => { detectorRef.current = api }} />
     </div>
   )
 }
