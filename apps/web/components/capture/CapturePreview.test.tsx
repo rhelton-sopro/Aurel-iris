@@ -37,25 +37,22 @@ describe('CapturePreview', () => {
     expect(onConfirm).toHaveBeenCalled()
   })
 
-  it('shows alert reasons when analysis flags issues', () => {
+  it('shows VLM rejection + sharpness when both alerts fire', () => {
     const analysis: PostCaptureAnalysis = {
       laplacianVariance: 50,
-      irisRadiusPx: 200,
       imageWidth: 3840,
       imageHeight: 2160,
       sharpnessThreshold: 200,
       sharpnessAlert: true,
-      irisAlert: true,
-      irisUndetectedAlert: false,
+      vlmInvalidAlert: true,
       hasAlert: true,
       cameraDetection: { kind: 'rear', source: 'exif' },
-      pupilDebug: { status: 'success', contrast: 90, componentsFound: 3, bestSize: 250 },
-      pupilThreshold: 60,
+      vlmValidation: { valid: false, reason: 'sem olho', source: 'vlm' },
     }
     render(
       <CapturePreview
         imageUrl="blob:test"
-        qualityScore={0.50}
+        qualityScore={0.30}
         analysis={analysis}
         onRedo={vi.fn()}
         onConfirm={vi.fn()}
@@ -63,52 +60,44 @@ describe('CapturePreview', () => {
     )
     expect(screen.getByText(/Qualidade abaixo do ideal/)).toBeInTheDocument()
     expect(screen.getByText(/Imagem pouco nítida/)).toBeInTheDocument()
-    expect(screen.getByText(/Íris pequena/)).toBeInTheDocument()
+    expect(screen.getByText(/Foto não contém um olho/)).toBeInTheDocument()
   })
 
-  it('shows undetected message when MediaPipe failed (irisRadiusPx=0)', () => {
+  it('shows VLM-specific reason when reason is "muito longe"', () => {
     const analysis: PostCaptureAnalysis = {
       laplacianVariance: 250,
-      irisRadiusPx: 0,
       imageWidth: 3840,
       imageHeight: 2160,
       sharpnessThreshold: 200,
       sharpnessAlert: false,
-      irisAlert: false,
-      irisUndetectedAlert: true,
+      vlmInvalidAlert: true,
       hasAlert: true,
       cameraDetection: { kind: 'rear', source: 'exif' },
-      pupilDebug: { status: 'success', contrast: 90, componentsFound: 3, bestSize: 250 },
-      pupilThreshold: 60,
+      vlmValidation: { valid: false, reason: 'muito longe', source: 'vlm' },
     }
     render(
       <CapturePreview
         imageUrl="blob:test"
-        qualityScore={0.50}
+        qualityScore={0.30}
         analysis={analysis}
         onRedo={vi.fn()}
         onConfirm={vi.fn()}
       />
     )
-    expect(screen.getByText(/Não foi possível detectar a íris/)).toBeInTheDocument()
-    // Não deve mostrar "Íris pequena" simultaneamente — flags são mutuamente exclusivas
-    expect(screen.queryByText(/Íris pequena/)).not.toBeInTheDocument()
+    expect(screen.getByText(/Olho muito distante/)).toBeInTheDocument()
   })
 
   it('does not show alert when analysis has no issues', () => {
     const analysis: PostCaptureAnalysis = {
       laplacianVariance: 250,
-      irisRadiusPx: 500,
       imageWidth: 3840,
       imageHeight: 2160,
       sharpnessThreshold: 200,
       sharpnessAlert: false,
-      irisAlert: false,
-      irisUndetectedAlert: false,
+      vlmInvalidAlert: false,
       hasAlert: false,
       cameraDetection: { kind: 'rear', source: 'exif' },
-      pupilDebug: { status: 'success', contrast: 90, componentsFound: 3, bestSize: 250 },
-      pupilThreshold: 60,
+      vlmValidation: { valid: true, reason: 'olho detectado', source: 'vlm' },
     }
     render(
       <CapturePreview

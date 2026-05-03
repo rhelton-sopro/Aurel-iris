@@ -23,26 +23,24 @@ import {
 } from '@/lib/capture/sequence'
 
 // ---------------------------------------------------------------------------
-// Score do badge derivado APENAS do irisRadiusPx (já escalado pra px reais
-// pelo analyzeCapturedJpeg). Sharpness aparece via alerta da análise.
+// Score do badge derivado da validação VLM + sharpness. Sem mais cálculo
+// pixel-based de raio da íris — UAT 03 (5 rondas) provou que pupil detection
+// no browser é frágil demais. Substituído por Claude Haiku 4.5 server-side.
 //
-// Decisão de domínio (UAT 03): íris detectada em tamanho aceitável é
-// suficiente — não cobramos "excelência" via banda separada. Detection
-// correta + ≥ acceptable = score 100%.
+// VLM valid + sharp ok = 1.0
+// VLM valid + sharp baixa = 0.7
+// VLM invalid = 0.3
+// VLM fallback (rede falhou) = 0.7 (não penaliza por culpa da rede)
 // ---------------------------------------------------------------------------
 
-const IRIS_ACCEPTABLE_PX = 200
-/**
- * Score quando a pupila não foi detectada. Neutro (50%) — sinaliza problema
- * de enquadramento via overlay sem rebaixar a percepção do usuário injustamente.
- */
-const NO_IRIS_FALLBACK_SCORE = 0.50
-
-function irisSizeScore(irisRadiusPx: number): number {
-  if (irisRadiusPx <= 0) return NO_IRIS_FALLBACK_SCORE
-  if (irisRadiusPx >= IRIS_ACCEPTABLE_PX) return 1.0
-  // Detectada mas pequena: scale linear até IRIS_ACCEPTABLE_PX.
-  return 0.5 * (irisRadiusPx / IRIS_ACCEPTABLE_PX)
+function computeQualityScore(analysis: PostCaptureAnalysis): number {
+  const { vlmValidation, sharpnessAlert } = analysis
+  if (vlmValidation.source === 'fallback') {
+    // Erro de rede / timeout — confia no terapeuta + sharpness signal.
+    return sharpnessAlert ? 0.5 : 0.7
+  }
+  if (!vlmValidation.valid) return 0.3
+  return sharpnessAlert ? 0.7 : 1.0
 }
 
 // ---------------------------------------------------------------------------
@@ -121,13 +119,11 @@ export function CaptureClient({
 
     const imageUrl = URL.createObjectURL(file)
     try {
-      // Análise faz tudo: decode + pupil detection + Laplacian + dims reais
-      // + EXIF camera detection. O irisRadiusPx vem ESCALADO pra px reais.
+      // Análise paralela: Laplacian + EXIF camera detection + VLM validation.
+      // VLM substitui pupil detection (falha pixel-based em UAT 03).
       const analysis = await analyzeCapturedJpeg(file)
 
       // Bloqueio de câmera frontal detectada via EXIF (iPhone ~100% confiável).
-      // Falha precoce: nem mostra preview — toast + volta pra instrução.
-      // Caso 'unknown' (EXIF inconclusivo) é tratado no handleConfirm via dialog.
       if (analysis.cameraDetection.kind === 'front') {
         URL.revokeObjectURL(imageUrl)
         toast.error('Use a câmera traseira do dispositivo. Câmera frontal detectada — refaça a foto.')
@@ -135,7 +131,7 @@ export function CaptureClient({
         return
       }
 
-      const score = irisSizeScore(analysis.irisRadiusPx)
+      const score = computeQualityScore(analysis)
       const currentSlotIdx = slotIndex
 
       setPendingPreview({

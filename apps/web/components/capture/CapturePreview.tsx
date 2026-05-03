@@ -45,12 +45,18 @@ export function CapturePreview({
   const level: QualityLevel = levelFromScore(qualityScore)
   const showAlert = analysis?.hasAlert === true
 
-  // Iris-detection-failed e iris-too-small são mutuamente exclusivos.
+  // Reasons UI: VLM rejection (com motivo do Claude) + Laplacian sharpness.
   const reasons: string[] = []
-  if (analysis?.irisUndetectedAlert) {
-    reasons.push('Não foi possível detectar a íris — verifique o enquadramento')
-  } else if (analysis?.irisAlert) {
-    reasons.push('Íris pequena — aproxime mais')
+  if (analysis?.vlmInvalidAlert && analysis.vlmValidation) {
+    const r = analysis.vlmValidation.reason
+    const messages: Record<string, string> = {
+      'sem olho': 'Foto não contém um olho claramente visível',
+      'muito longe': 'Olho muito distante — aproxime a câmera',
+      'borrado': 'Foto borrada — refaça com a câmera mais firme',
+      'reflexo excessivo': 'Reflexo grande sobre a íris — mude o ângulo da luz',
+      'outro': 'Foto não adequada para análise iridológica',
+    }
+    reasons.push(messages[r] ?? `Foto rejeitada: ${r}`)
   }
   if (analysis?.sharpnessAlert) reasons.push('Imagem pouco nítida')
 
@@ -75,18 +81,17 @@ export function CapturePreview({
         {LEVEL_LABEL[level]} · {Math.round(qualityScore * 100)}%
       </Badge>
 
-      {/* Debug overlay — UAT 03 round 5+. Mostra dados do detector pra
-          diagnóstico em devices sem console (iPhone Chrome). Remove ou gate
-          com ?debug=1 quando estabilizar. */}
+      {/* Debug overlay — UAT 03. Mostra dados de validação pra diagnóstico
+          em devices sem console (iPhone Chrome). Remove ou gate com ?debug=1
+          quando estabilizar. */}
       {analysis && (
         <div className="absolute top-[calc(env(safe-area-inset-top)+12px)] right-3 max-w-[60%] bg-black/80 text-green-300 font-mono text-[10px] leading-tight px-2 py-1.5 rounded">
-          <div>pupil: {analysis.pupilDebug.status}</div>
-          <div>th={analysis.pupilThreshold} ct={analysis.pupilDebug.contrast}</div>
-          <div>radius={Math.round(analysis.irisRadiusPx)}px (alert &lt;200)</div>
-          {analysis.pupilDebug.bestSize !== undefined && (
-            <div>cluster={analysis.pupilDebug.bestSize}px</div>
+          <div>vlm: {analysis.vlmValidation.valid ? 'valid' : 'INVALID'}</div>
+          <div>reason: {analysis.vlmValidation.reason}</div>
+          <div>src: {analysis.vlmValidation.source}</div>
+          {analysis.vlmValidation.error && (
+            <div className="text-red-300">err: {analysis.vlmValidation.error.slice(0, 40)}</div>
           )}
-          <div>comps={analysis.pupilDebug.componentsFound}</div>
           <div>sharp={Math.round(analysis.laplacianVariance)} (th {analysis.sharpnessThreshold})</div>
           <div>cam={analysis.cameraDetection.kind}/{analysis.cameraDetection.source}</div>
           <div>img={analysis.imageWidth}×{analysis.imageHeight}</div>
