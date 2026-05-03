@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-last_updated: "2026-05-02T00:41:18.710Z"
+status: phase_complete
+last_updated: "2026-05-03T00:00:00.000Z"
 progress:
-  total_phases: 3
-  completed_phases: 2
+  total_phases: 9
+  completed_phases: 3
   total_plans: 18
-  completed_plans: 15
-  percent: 83
+  completed_plans: 18
+  percent: 33
 ---
 
 # Estado do projeto
@@ -19,16 +19,16 @@ progress:
 Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 
 **Valor central:** Cada cliente atendido produz um JSON de features genuinamente diferente, e por isso cada relatório é genuinamente diferente. Pipeline de visão objetivo + LLM ancorado em RAG é o coração do produto.
-**Foco atual:** Fase 3 — Captura mobile (PWA), planejada e pronta para executar.
+**Foco atual:** Fase 3 fechada via UAT (2026-05-03). Próximo: Fase 4 — Upload desktop.
 
 ## Posição atual
 
-Fase: 3 de 9 (Captura mobile / PWA)
-Plan: 0 de 8 na fase atual
-Status: Executing Phase 03
-Última atividade: 2026-05-01 — Fase 3 planejada: 8 plans em 8 waves (Wave 0 vitest+migration → PWA shell → entry points → camera shell → MediaPipe core → sequência guiada → captura+upload → recovery+finalize).
+Fase: 3 de 9 — **CONCLUÍDA** (Captura mobile / PWA)
+Próxima: Fase 4 (Upload desktop)
+Status: Phase 3 complete, ready to plan Phase 4
+Última atividade: 2026-05-03 — UAT 03 fechado em 13 testes + 20 rodadas de calibração do gate VLM. Captura completa funcional iPhone Safari (PWA standalone iOS); fluxo nativo + Claude Haiku 4.5 validation + finalize → /leituras.
 
-Progresso: [██░░░░░░░░] 11% (1/9 fases)
+Progresso: [███░░░░░░░] 33% (3/9 fases)
 
 ## Métricas de performance
 
@@ -71,6 +71,9 @@ Nenhum ainda.
 - **Sem ADRs ratificados:** as 21 constraints do SPEC (Next.js / Supabase / Modal / Sonnet 4.6 / Voyage / Stripe / Resend) estão como `locked: false`. Não bloqueia execução, mas qualquer plan-phase deve estar consciente de que pode formalmente re-decidir via ADR — particularmente antes da Fase 5 (Modal) e Fase 7 (LLM), onde a escolha tem maior impacto técnico.
 - **Revisão jurídica healthtech (~R$ 2–4k) recomendada antes de qualquer rollout externo na Fase 9.** Não é pré-requisito para dogfooding interno do fundador (Estágio 1), mas é gate para Estágio 2.
 - **Corpus RAG seed (Fase 6) depende de obter PDFs de Jensen Vol. 1 e Battello em pt** — verificar disponibilidade legal/licenciamento antes de ingerir.
+- **Fase 3 — Plan 03-08 (RecoveryBanner + PWAInstallBanner + listagem rascunhos):** features não foram implementadas como originalmente planejadas. finalizeReadingAction foi absorvida em fixes pós-execução. RecoveryBanner D-12 (banner de recovery após interrupção) e PWAInstallBanner D-14 (CTA de install nag) ficaram como **dívida de polish** pra retomar antes do beta externo (Estágio 2 / Fase 9).
+- **Fase 3 — PWA standalone Android Chrome:** install funciona mas abre com URL bar (não modo standalone). Hipótese: SW não registra em prod, ou ícone 404, ou start_url redireciona. iOS Safari funciona normal. Investigar antes do beta externo.
+- **Custo VLM em produção:** ~$0.0008/foto via Claude Haiku 4.5. Projeção: ~$21/mês com 100 terapeutas × 30 sessões × 6 fotos. Aceitável pra Estágio 1+2.
 
 ## Itens diferidos
 
@@ -82,6 +85,16 @@ Nenhum (bootstrap inicial, sem milestone anterior).
 
 ## Continuidade de sessão
 
-Última sessão: 2026-05-01
-Parou em: **Fase 3 (Captura mobile / PWA) planejada e pronta para executar**. 8 plans em 8 waves cobrindo todas as 6 CAPTURE requirements: Wave 0 (vitest + migration 0004 com bucket `iris-captures` privado + RLS folder + unique constraint reading_images) → Wave 1 (PWA shell com Serwist) → Wave 2 (server actions + entry pages) → Wave 3 (camera shell + useCamera + CameraDeniedScreen) → Wave 4 (MediaPipe FaceLandmarker lazy-loaded + 7 sub-scores + 400ms gate) → Wave 5 (sequência guiada 6 capturas) → Wave 6 (compressão JPEG 0.85/2048px + Storage upload) → Wave 7 (RecoveryBanner + PWAInstallBanner + finalize). Plan-checker passou com 5 warnings cosméticos (0 blockers). Stack novo: `@mediapipe/tasks-vision` 0.10.35 + `@serwist/next` 9.5.10 + `sonner` 2.0.7. Plans 03-04..03-08 são `autonomous: false` (UAT manual em iPhone+Android obrigatória). Note: Fase 2 ainda tem plans listados como concluídos no STATE histórico mas tracking real do execute precisa ser revisitado — esta sessão focou em Fase 3 plan only.
-Arquivo de retomada: `.planning/phases/03-captura-mobile-pwa/03-01-PLAN.md` — próxima ação é `/clear` + `/gsd-execute-phase 3`.
+Última sessão: 2026-05-03 — **Fase 3 fechada via UAT 03**.
+
+**Pivôs arquiteturais durante UAT (sem replanning formal):**
+- MediaPipe FaceLandmarker → pupil detection pixel-based → Otsu adaptativo → bypass → **Claude Haiku 4.5 VLM via /api/capture/validate** (4 iterações; última solução é a definitiva).
+- Streaming PWA com live quality gate → **câmera nativa via `<input capture="environment">`** com análise pós-captura.
+- Removido: Laplacian variance, useCamera, CameraView, CameraDeniedScreen, IrisDetector, RecoveryBanner, PWAInstallBanner.
+- Adicionado: `@anthropic-ai/sdk@0.92.0`, `exifr@7.1.3` (front-cam detection), `app/api/capture/validate/route.ts`, `lib/capture/validate-image.ts`, `lib/capture/camera-detection.ts`, `lib/capture/post-capture-analysis.ts`.
+
+**UAT 03 cobertura:** 13 testes principais (cold start, PWA install iOS Safari, fluxo cliente→captura→preview→finalize→storage, timezone). 1 issue conhecido (PWA standalone Android, não-blocking pra Estágio 1).
+
+**20 commits de calibração** culminando em VLM gate confiável: detecta sem_olho, dois_olhos, muito_longe, olho_fechado, reflexo_total, borrado; classifica quality em ruim/regular/boa/excelente.
+
+Próxima ação: `/clear` + `/gsd-discuss-phase 4` ou `/gsd-plan-phase 4` (Upload desktop — dropzone produzindo a mesma estrutura `reading_images` da Fase 3).

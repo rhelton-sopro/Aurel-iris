@@ -14,9 +14,9 @@ A métrica de sucesso primária do MVP **não é** o lançamento beta com 10–2
 
 A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção da ferramenta de planejamento. O mapeamento Fase v1 ↔ Fase SPEC está explícito em cada bloco.
 
-- [ ] **Fase 1: Setup** — Infraestrutura (contas, env vars, Next.js init, migration do schema).
-- [ ] **Fase 2: Auth + Dashboard básico** — Magic-link auth e CRUD de clientes do terapeuta.
-- [ ] **Fase 3: Captura mobile (PWA)** — App instalável com captura validada on-device de 3 ângulos × 2 olhos.
+- [x] **Fase 1: Setup** — Infraestrutura (contas, env vars, Next.js init, migration do schema).
+- [x] **Fase 2: Auth + Dashboard básico** — Magic-link auth e CRUD de clientes do terapeuta.
+- [x] **Fase 3: Captura mobile (PWA)** — App instalável com captura via câmera nativa + validação Claude Haiku 4.5 VLM. Concluída 2026-05-03.
 - [ ] **Fase 4: Upload desktop** — Dropzone desktop produzindo a mesma estrutura de leitura.
 - [ ] **Fase 5: Pipeline de visão (Modal)** — Serviço Modal `analyze_iris` produzindo o JSON canônico de features.
 - [ ] **Fase 6: RAG — Ingestão da base de conhecimento** — Corpus iridológico chunked, embedded e indexado em pgvector.
@@ -98,7 +98,7 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
 - [ ] 03-07-PLAN.md — Compressão JPEG + storage-path + upload com retry + CapturePreview (2s + tap-to-redo D-09) + sonner toast + integração captura real no capture-client
 
 **Wave 7 — Recovery + finalize** *(blocked on Wave 6)*
-- [ ] 03-08-PLAN.md — RecoveryBanner (D-12) + listagem /leituras com rascunhos + PWAInstallBanner (D-14) + finalize do reading no 6º slot
+- [~] 03-08-PLAN.md — RecoveryBanner (D-12) + listagem /leituras com rascunhos + PWAInstallBanner (D-14) + finalize do reading no 6º slot. **Scope reduzido durante UAT 03 (2026-05-03):** finalize implementada em fixes pós-execução; RecoveryBanner D-12 e PWAInstallBanner D-14 deferidos pra Fase 9 (polish pré-beta).
 
 **Cross-cutting constraints (must_haves presentes em ≥2 plans):**
 - Vocabulário proibido LGPD ("diagnóstico", "tratamento", "cura") ausente em todos os arquivos novos (auditável via grep `pnpm audit:vocabulary`).
@@ -197,12 +197,14 @@ Fases executam em ordem numérica: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 �
 
 | Fase | Plans concluídos | Status | Concluída em |
 |-------|------------------|--------|--------------|
-| 1. Setup | 0/TBD | Não iniciada | — |
-| 2. Auth + Dashboard básico | 0/4 | Planejada | — |
-| 3. Captura mobile (PWA) | 0/8 | Planejada | — |
-| 4. Upload desktop | 0/TBD | Não iniciada | — |
+| 1. Setup | 6/6 | ✅ Concluída | — |
+| 2. Auth + Dashboard básico | 4/4 | ✅ Concluída | — |
+| 3. Captura mobile (PWA) | 8/8* | ✅ Concluída via UAT | 2026-05-03 |
+| 4. Upload desktop | 0/TBD | 🎯 Próxima | — |
 | 5. Pipeline de visão (Modal) | 0/TBD | Não iniciada | — |
 | 6. RAG — Ingestão | 0/TBD | Não iniciada | — |
 | 7. Análise LLM | 0/TBD | Não iniciada | — |
 | 8. Pagamento + LGPD | 0/TBD | Não iniciada | — |
 | 9. Polish + dogfooding + beta | 0/TBD | Não iniciada | — |
+
+\* **Fase 3 nota**: Plans 03-01 a 03-07 executados normalmente. Plan 03-08 (RecoveryBanner D-12, PWAInstallBanner D-14, listagem rascunhos) teve scope reduzido durante UAT — finalizeReadingAction foi absorvida em fixes pós-execução. RecoveryBanner e PWAInstallBanner deferidos para Fase 9 (polish pré-beta). Captura mobile principal funcional pós-UAT 03 (20 rounds de calibração do gate VLM Claude Haiku 4.5). Único issue conhecido: PWA standalone Android Chrome (instala mas abre com URL bar). Não bloqueia Estágio 1 (dogfood iPhone Safari).
