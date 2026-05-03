@@ -9,15 +9,6 @@ import { finalizeReadingAction } from '@/app/actions/readings'
 import { AngleInterstitial } from '@/components/capture/AngleInterstitial'
 import { CapturePreview } from '@/components/capture/CapturePreview'
 import { CaptureProgress } from '@/components/capture/CaptureProgress'
-import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
 import {
   analyzeCapturedJpeg,
   type PostCaptureAnalysis,
@@ -104,9 +95,6 @@ export function CaptureClient({
   const [phase, setPhase] = React.useState<Phase>('instruction')
   const [capturedCount, setCapturedCount] = React.useState(initialCaptured.length)
   const [pendingPreview, setPendingPreview] = React.useState<PendingPreview | null>(null)
-  // Aberto quando EXIF não conseguiu identificar front/rear (kind === 'unknown').
-  // Pede confirmação manual ao usuário antes de aceitar a foto.
-  const [cameraConfirmDialogOpen, setCameraConfirmDialogOpen] = React.useState(false)
 
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   const slotAbortRefs = React.useRef<Map<number, AbortController>>(new Map())
@@ -226,18 +214,12 @@ export function CaptureClient({
     }
   }, [pendingPreview, slotIndex, supabase, therapistId, readingId])
 
-  // Gate de câmera: se EXIF foi inconclusivo, abre dialog de confirmação manual
-  // antes de subir. Caso 'rear' (detectado) ou já confirmado → executeUpload direto.
-  // 'front' nunca chega aqui porque é bloqueado em handleFileSelected.
-  const handleConfirm = React.useCallback(() => {
-    const preview = pendingPreview
-    if (!preview) return
-    if (preview.analysis.cameraDetection.kind === 'unknown') {
-      setCameraConfirmDialogOpen(true)
-      return
-    }
-    executeUpload()
-  }, [pendingPreview, executeUpload])
+  // Gate de câmera: 'front' é bloqueado em handleFileSelected (toast + reject).
+  // 'unknown' (EXIF stripado por iOS, ou device sem LensModel) confia no aviso
+  // bold em destaque que o AngleInterstitial mostra antes de cada captura.
+  // Removido o dialog de confirmação manual a pedido do user (UAT Test 10):
+  // 6 dialogs por sessão eram fricção excessiva.
+  const handleConfirm = executeUpload
 
   const handleRedo = React.useCallback(() => {
     if (pendingPreview?.imageUrl) URL.revokeObjectURL(pendingPreview.imageUrl)
@@ -250,17 +232,6 @@ export function CaptureClient({
     setPhase('instruction')
     window.setTimeout(() => fileInputRef.current?.click(), 50)
   }, [pendingPreview, slotIndex])
-
-  // Handlers do dialog de confirmação manual de câmera (caso EXIF unknown).
-  const handleCameraConfirmedRear = React.useCallback(() => {
-    setCameraConfirmDialogOpen(false)
-    executeUpload()
-  }, [executeUpload])
-
-  const handleCameraConfirmedRedo = React.useCallback(() => {
-    setCameraConfirmDialogOpen(false)
-    handleRedo()
-  }, [handleRedo])
 
   React.useEffect(() => {
     if (phase !== 'finalizing') return
@@ -301,15 +272,18 @@ export function CaptureClient({
   // ---------------------------------------------------------------------------
   return (
     <div className="relative flex-1 flex flex-col bg-background">
-      {/* Tip de iluminação fixa em TODAS as telas de captura. */}
-      <div
-        role="note"
-        className="absolute top-0 left-0 right-0 z-[60] pt-[env(safe-area-inset-top)] bg-amber-500/95 backdrop-blur-sm border-b border-amber-700/30"
-      >
-        <p className="px-4 py-1.5 text-xs font-medium text-amber-950 text-center">
-          Mantenha a luz de frente ou lateral — nunca atrás do paciente
-        </p>
-      </div>
+      {/* Tip de iluminação — escondido durante phase=previewing pra não cobrir
+          o badge de qualidade do CapturePreview (UAT 03 issue de overlap). */}
+      {phase !== 'previewing' && (
+        <div
+          role="note"
+          className="absolute top-0 left-0 right-0 z-[60] pt-[env(safe-area-inset-top)] bg-amber-500/95 backdrop-blur-sm border-b border-amber-700/30"
+        >
+          <p className="px-4 py-1.5 text-xs font-medium text-amber-950 text-center">
+            Mantenha a luz de frente ou lateral — nunca atrás do paciente
+          </p>
+        </div>
+      )}
 
       <header className="absolute top-[calc(env(safe-area-inset-top)+30px)] left-0 right-0 z-[55] flex items-center justify-between px-4 py-2">
         <span className="text-sm text-foreground/80 truncate max-w-[60%]">{clientName}</span>
@@ -372,25 +346,6 @@ export function CaptureClient({
         aria-hidden="true"
       />
 
-      <Dialog open={cameraConfirmDialogOpen} onOpenChange={setCameraConfirmDialogOpen}>
-        <DialogContent showCloseButton={false}>
-          <DialogHeader>
-            <DialogTitle>Confirme a câmera usada</DialogTitle>
-            <DialogDescription>
-              Não foi possível detectar automaticamente se a foto veio da câmera traseira do dispositivo.
-              A câmera traseira é obrigatória para a leitura — fotos selfie não servem para análise iridológica.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={handleCameraConfirmedRedo}>
-              Refazer com traseira
-            </Button>
-            <Button onClick={handleCameraConfirmedRear}>
-              Sim, usei traseira
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }

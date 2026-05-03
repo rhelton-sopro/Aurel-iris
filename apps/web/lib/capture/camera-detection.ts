@@ -36,12 +36,28 @@ interface MinimalExif {
 
 export async function detectCameraSource(blob: Blob): Promise<CameraDetectionResult> {
   let exif: MinimalExif | undefined
+  let exifError: unknown = null
   try {
     // Pick array pattern: pede só os 2 campos necessários — leve e tipado.
     exif = (await exifr.parse(blob, ['LensModel', 'LensMake'])) as
       | MinimalExif
       | undefined
-  } catch {
+  } catch (err) {
+    exifError = err
+  }
+
+  // Logging diagnóstico (temporário) pra investigar UAT issue: iOS pode estar
+  // strippando EXIF na captura via <input capture="environment">. Permite ver
+  // no console o que efetivamente foi lido.
+  // eslint-disable-next-line no-console
+  console.log('[camera-detection] exif read:', {
+    error: exifError,
+    raw: exif,
+    blobSize: blob.size,
+    blobType: blob.type,
+  })
+
+  if (exifError) {
     return { kind: 'unknown', source: 'exif-missing' }
   }
 

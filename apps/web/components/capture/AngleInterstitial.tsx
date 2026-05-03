@@ -40,12 +40,21 @@ export function AngleInterstitial({ nextSlot, slotIndex, onProceed }: AngleInter
         <div className="text-center space-y-3">
           <h1 className="text-xl font-semibold">{copy.heading}</h1>
           <p className="text-base text-muted-foreground">{copy.subtitle}</p>
-          <p className="flex items-start justify-center gap-1.5 text-sm font-medium text-destructive pt-2">
-            <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" aria-hidden="true" />
-            <span>
-              Use a câmera traseira — vire o celular com a câmera apontando para o olho do paciente
-            </span>
-          </p>
+        </div>
+
+        <div
+          role="alert"
+          className="w-full bg-destructive/10 border-2 border-destructive rounded-lg px-4 py-3 flex items-start gap-2.5"
+        >
+          <AlertTriangle className="h-6 w-6 mt-0.5 shrink-0 text-destructive" aria-hidden="true" />
+          <div className="text-left space-y-1">
+            <p className="text-base font-bold text-destructive uppercase tracking-wide">
+              Use a câmera traseira
+            </p>
+            <p className="text-sm text-destructive/90">
+              Não use a câmera frontal (selfie). Vire o celular com a câmera traseira apontando para o olho do paciente.
+            </p>
+          </div>
         </div>
       </div>
 
