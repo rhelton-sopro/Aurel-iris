@@ -125,7 +125,7 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
 - [x] 04-02-PLAN.md — readings.schemas.ts e readings.ts: createReadingSchema aceita method enum + getDraftReading retorna capture_method (forward Fase 9). CONTEXT D-03, D-04, D-15. **Concluído 2026-05-03 (12/12 testes verdes; CAPTURE_METHODS const tuple + narrowCaptureMethod helper para defesa em profundidade contra string|null do Supabase).**
 
 **Wave 2 — UI primitives (paralelos)**
-- [ ] 04-03-PLAN.md — components/upload/UploadDropzone.tsx (drag+drop+click + a11y) + testes vitest. CONTEXT D-05, D-10.
+- [x] 04-03-PLAN.md — components/upload/UploadDropzone.tsx (drag+drop+click + a11y) + testes vitest. CONTEXT D-05, D-10. **Concluído 2026-05-03 (10/10 testes vitest verdes; a11y completa role=button+tabIndex+aria-disabled+keyboard+focus-visible; componente puramente apresentacional sem imports de lib/upload).**
 - [ ] 04-04-PLAN.md — adaptar getSlotInstructionCopy + AngleInterstitial + CapturePreview com prop opcional mode ('camera' | 'upload') sem regredir Fase 3. CONTEXT D-05, D-09.
 
 **Wave 3 — Wizard assembly** *(blocked on Waves 1+2)*
