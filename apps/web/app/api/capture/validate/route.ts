@@ -31,14 +31,16 @@ quality "ruim" (com reason correspondente):
 - muito_longe: íris ocupa <12% da menor dimensão da imagem. NÃO use este reason por causa de desfoque (use 'borrado'). NÃO use por contexto facial visível ao redor do olho — close-ups legítimos podem mostrar um pouco de bochecha ou sobrancelha; só importa o tamanho relativo da íris.
 - olho_fechado: pálpebra fechada ou íris coberta
 - reflexo_total: reflexo cobre >70% da área da íris
-- borrado: fibras radiais da íris claramente desfocadas (movimento ou foco). Use SEMPRE este reason quando houver desfoque, nunca 'muito_longe'.
+- borrado: fibras radiais da íris com qualquer perda perceptível de nitidez — mesmo leve. Fibras devem ser definidas e legíveis; se aparecem suaves, difusas ou com blur de movimento/foco, classifique como 'borrado'. Nitidez é critério clínico crítico para iridologia. Use SEMPRE este reason quando houver desfoque, nunca 'muito_longe'.
 
 caso contrário, reason "olho_detectado" e:
 - excelente: íris ≥20% da menor dimensão E fibras radiais nítidas. Specular highlights localizados (pequenos pontos de luz da câmera) são OK e NÃO impedem 'excelente'.
 - boa: íris ≥12% da menor dimensão E fibras radiais visíveis. Reflexo leve disperso é OK.
 - regular: SOMENTE quando reflexo cobre pelo menos 30% da área da íris (mas <70%) e atrapalha a leitura.
 
-Em caso de dúvida entre excelente/boa/regular, prefira 'boa'. Não rebaixe para 'regular' por causa de reflexo pequeno ou textura levemente menos nítida — esses casos são 'boa'.`
+Tie-breakers (ordem importa):
+1. Se há QUALQUER perda visível de nitidez nas fibras radiais → 'borrado' (ruim). Aplique este antes dos demais.
+2. Em caso de dúvida entre excelente/boa/regular, prefira 'boa'. Não rebaixe para 'regular' por reflexo pequeno.`
 
 interface ValidateRequestBody {
   imageBase64?: unknown
