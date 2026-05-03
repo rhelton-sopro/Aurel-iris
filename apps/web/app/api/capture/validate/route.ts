@@ -28,7 +28,7 @@ const SYSTEM_PROMPT = `Avalie a foto para análise iridológica. Retorne APENAS 
 quality "ruim" (com reason correspondente):
 - sem_olho: sem olho humano na imagem
 - dois_olhos: ambos os olhos visíveis (deve haver apenas um em close)
-- muito_longe: rosto inteiro/contexto facial amplo na foto, OU íris ocupa <12% da menor dimensão. NÃO use este reason por causa de desfoque — use 'borrado'.
+- muito_longe: íris ocupa <12% da menor dimensão da imagem. NÃO use este reason por causa de desfoque (use 'borrado'). NÃO use por contexto facial visível ao redor do olho — close-ups legítimos podem mostrar um pouco de bochecha ou sobrancelha; só importa o tamanho relativo da íris.
 - olho_fechado: pálpebra fechada ou íris coberta
 - reflexo_total: reflexo cobre >70% da área da íris
 - borrado: fibras radiais da íris claramente desfocadas (movimento ou foco). Use SEMPRE este reason quando houver desfoque, nunca 'muito_longe'.
