@@ -52,7 +52,8 @@ export function CapturePreview({
     const r = analysis.vlmValidation.reason
     const messages: Record<string, string> = {
       sem_olho: 'Foto não contém um olho — refaça apontando para o olho do paciente',
-      muito_longe: 'Olho muito distante — aproxime a câmera',
+      dois_olhos: 'Apenas um olho por foto — refaça com close de um único olho',
+      muito_longe: 'Rosto/olho muito distante — aproxime a câmera para um close apenas do olho',
       borrado: 'Foto borrada — refaça com a câmera mais firme',
       reflexo_total: 'Reflexo cobre a íris inteira — mude o ângulo da luz',
       olho_fechado: 'Olho fechado ou coberto — abra o olho completamente',

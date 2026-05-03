@@ -17,27 +17,27 @@ const MAX_TOKENS = 256
 // se Anthropic ficar pendurado.
 const REQUEST_TIMEOUT_MS = 8000
 
-// Prompt compacto com critério clínico explícito de borrado e thresholds
-// calibrados em UAT 03:
-//   - round 8: "fibras radiais ilegíveis por desfoque" (era "suficientemente
-//     nítida", muito frouxo)
-//   - round 9: graduação 4 níveis vem do VLM (não do score binário)
-//   - round 10: rejection 15→12%, excelente 30→25%, regular cobre 12-15%
-//     (foto levemente mais distante mas boa qualidade caía em ruim antes)
+// Prompt compacto com critérios clínicos calibrados em UAT 03:
+//   - round 8: critério funcional de borrado ("fibras radiais ilegíveis")
+//   - round 9: graduação 4 níveis vem do VLM (não score binário)
+//   - round 10: thresholds % calibrados (12/15/25)
+//   - round 11: dois_olhos rejection + rosto inteiro explícito + borrado
+//     mais rigoroso (qualquer leve desfoque, "se em dúvida, marque borrado")
 const SYSTEM_PROMPT = `Avalie a foto para análise iridológica. Retorne APENAS JSON, sem markdown:
 {"quality":"<ruim|regular|boa|excelente>","reason":"<reason>"}
 
 quality "ruim" (com reason correspondente):
 - sem_olho: sem olho humano na imagem
-- muito_longe: íris ocupa <12% da menor dimensão OU fibras radiais não distinguíveis
+- dois_olhos: dois olhos visíveis na foto (deve ser apenas um olho em close)
+- muito_longe: rosto inteiro ou contexto facial amplo na foto, OU íris <12% da menor dimensão, OU fibras radiais não distinguíveis
 - olho_fechado: pálpebra fechada ou íris coberta
 - reflexo_total: reflexo cobre toda a área da íris
-- borrado: fibras radiais da íris ilegíveis por desfoque
+- borrado: fibras radiais da íris não claramente nítidas (qualquer leve desfoque conta — se houver dúvida, marque borrado)
 
 caso contrário, reason "olho_detectado" e:
 - excelente: íris >25% da menor dimensão, fibras radiais nítidas, reflexo mínimo
 - boa: íris 15-25%, fibras radiais visíveis (leve reflexo OK)
-- regular: íris 12-15%, OU >=15% com leve borramento ou reflexo parcial`
+- regular: íris 12-15%, OU >=15% com leve reflexo parcial`
 
 interface ValidateRequestBody {
   imageBase64?: unknown
@@ -52,6 +52,7 @@ const VALID_QUALITY_VALUES = ['ruim', 'regular', 'boa', 'excelente'] as const
 const VALID_REASON_VALUES = [
   'olho_detectado',
   'sem_olho',
+  'dois_olhos',
   'muito_longe',
   'borrado',
   'reflexo_total',

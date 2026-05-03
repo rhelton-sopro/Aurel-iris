@@ -61,6 +61,29 @@ describe('CapturePreview', () => {
     expect(confirmButton).toBeDisabled()
   })
 
+  it('blocks Confirmar when VLM rejects with dois_olhos (hard reject)', () => {
+    const analysis: PostCaptureAnalysis = {
+      imageWidth: 3840,
+      imageHeight: 2160,
+      vlmInvalidAlert: true,
+      hasAlert: true,
+      cameraDetection: { kind: 'rear', source: 'exif' },
+      vlmValidation: { quality: 'ruim', reason: 'dois_olhos', source: 'vlm' },
+    }
+    render(
+      <CapturePreview
+        imageUrl="blob:test"
+        qualityScore={0.20}
+        analysis={analysis}
+        onRedo={vi.fn()}
+        onConfirm={vi.fn()}
+      />
+    )
+    expect(screen.getByText(/Apenas um olho por foto/)).toBeInTheDocument()
+    expect(screen.getByText(/Foto rejeitada/)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Confirmar/ })).toBeDisabled()
+  })
+
   it('blocks Confirmar when VLM rejects with olho_fechado (hard reject)', () => {
     const analysis: PostCaptureAnalysis = {
       imageWidth: 3840,
@@ -101,7 +124,7 @@ describe('CapturePreview', () => {
         onConfirm={vi.fn()}
       />
     )
-    expect(screen.getByText(/Olho muito distante/)).toBeInTheDocument()
+    expect(screen.getByText(/Rosto\/olho muito distante/)).toBeInTheDocument()
     expect(screen.getByText(/Foto rejeitada/)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Confirmar/ })).toBeDisabled()
   })

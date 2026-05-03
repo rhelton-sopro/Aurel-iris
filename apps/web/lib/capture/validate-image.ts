@@ -21,13 +21,20 @@ const REQUEST_TIMEOUT_MS = 5000
 export type ValidationReason =
   | 'olho_detectado'
   | 'sem_olho'
+  | 'dois_olhos'
   | 'muito_longe'
   | 'borrado'
   | 'reflexo_total'
   | 'olho_fechado'
 
-/** Reasons que BLOQUEIAM o botão Confirmar (sem chance de continuar). */
-export const BLOCKING_REASONS: readonly string[] = ['sem_olho', 'olho_fechado', 'muito_longe']
+/** Reasons que BLOQUEIAM o botão Confirmar (sem chance de continuar).
+    UAT 03 round 11: dois_olhos adicionado — captura é por olho individual. */
+export const BLOCKING_REASONS: readonly string[] = [
+  'sem_olho',
+  'dois_olhos',
+  'olho_fechado',
+  'muito_longe',
+]
 
 export interface ValidationResult {
   /** Classificação do VLM. quality='ruim' = rejeição. */
