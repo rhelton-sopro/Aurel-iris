@@ -21,3 +21,19 @@ Out-of-scope discoveries logged during plan execution. Do NOT fix in current pla
 2. Tighten the audit-vocabulary regex to skip comments (riskier — false negatives in JSX where comments and copy can blur).
 
 **Status:** Logged 2026-05-03 by plan-04-01 executor.
+
+## tsc errors em lib/capture/quality-scoring.test.ts (Fase 3)
+
+**Discovered during:** Plan 04-02 execution (Task 2 verification — `pnpm tsc --noEmit -p .`)
+**Files affected (pre-existing, not modified by 04-02):**
+
+- `apps/web/lib/capture/quality-scoring.test.ts:47:15` — `Property 'reflex' does not exist on type ...`
+- `apps/web/lib/capture/quality-scoring.test.ts:54:62` — idem
+
+**Nature:** Test references `WEIGHTS.reflex` mas `quality-scoring.ts` exporta apenas `centeredness/distance/sharpness/exposure/occlusion` (sem `reflex`). Resíduo da pivô VLM da Fase 3 (UAT 03), onde `reflex_total` virou razão do VLM em vez de score numérico.
+
+**Why deferred:** Pre-existente — verificado via `git stash + tsc` em tree limpo: os mesmos 2 erros aparecem antes da plan 04-02 começar. Fora do scope boundary do executor (arquivo nem nas dependências da plan 04-02).
+
+**Recommended action:** Plan de cleanup da Fase 3 (ou fold em uma plan futura que toca quality-scoring) para remover as referências obsoletas a `WEIGHTS.reflex` em `quality-scoring.test.ts`.
+
+**Status:** Logged 2026-05-03 by plan-04-02 executor.
