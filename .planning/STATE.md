@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: phase_complete
+status: ready_to_execute
 last_updated: "2026-05-03T00:00:00.000Z"
 progress:
   total_phases: 9
   completed_phases: 3
-  total_plans: 18
+  total_plans: 25
   completed_plans: 18
   percent: 33
 ---
@@ -19,14 +19,14 @@ progress:
 Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 
 **Valor central:** Cada cliente atendido produz um JSON de features genuinamente diferente, e por isso cada relatório é genuinamente diferente. Pipeline de visão objetivo + LLM ancorado em RAG é o coração do produto.
-**Foco atual:** Fase 3 fechada via UAT (2026-05-03). Próximo: Fase 4 — Upload desktop.
+**Foco atual:** Fase 4 (Upload desktop) — 7 plans em 5 waves, prontos para execução.
 
 ## Posição atual
 
 Fase: 3 de 9 — **CONCLUÍDA** (Captura mobile / PWA)
-Próxima: Fase 4 (Upload desktop) — **CONTEXT capturado em 2026-05-03**
-Status: Phase 4 context gathered, ready to plan
-Última atividade: 2026-05-03 — Discuss-phase Fase 4 fechado em 4 áreas (entry point + auto-detect/escape, wizard sequencial paralelo ao mobile, VLM Haiku 4.5 hard block reusado, HEIC client-side + limite 25MB). 14 decisões locked em CONTEXT.md.
+Próxima: Fase 4 (Upload desktop) — **PLANEJADA em 2026-05-03**
+Status: Ready to execute (7 plans, 5 waves; checker pass com 2 WARNINGs aceitas: PATTERNS.md doc note corrigida; testes vitest dedicados para upload-client/new-reading-form deferidos para UAT em Plan 04-07)
+Última atividade: 2026-05-03 — `/gsd-plan-phase 4 --skip-ui` concluído. Pattern mapper produziu 04-PATTERNS.md (14/15 analogs). Planner gerou 7 plans (Wave 1: 04-01 lib + 04-02 schema; Wave 2: 04-03 dropzone + 04-04 mode prop; Wave 3: 04-05 wizard; Wave 4: 04-06 entry-point; Wave 5: 04-07 recovery hook + UAT). UPLOAD-01 e UPLOAD-02 cobertos. Threat models (ASVS L1) presentes em todos os plans. RecoveryBanner UI segue deferido para Fase 9; Fase 4 entrega apenas o backend hook.
 
 Progresso: [███░░░░░░░] 33% (3/9 fases)
 

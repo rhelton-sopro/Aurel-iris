@@ -10,6 +10,20 @@
 > abaixo documenta *quais linhas copiar*, quais props adaptar e quais behaviors
 > são idênticos sem alteração.
 
+> ⚠ **Escopo: RecoveryBanner.tsx NÃO é entregue nesta fase.**
+> O `components/recovery/RecoveryBanner.tsx` aparece mapeado abaixo (linha do
+> File Classification + seção "Pattern Assignments") porque a UI de recovery
+> precisa rotear por `capture_method` (D-15). Mas o componente UI propriamente
+> dito foi explicitamente **deferido para a Fase 9** (polish pré-beta) per
+> ROADMAP.md, STATE.md e o plano 03-08 da Fase 3. A Fase 4 entrega APENAS o
+> backend hook que viabiliza o roteamento futuro:
+> - Plan 04-02 estende `getDraftReading` para retornar `capture_method`.
+> - Plan 04-07 adiciona smoke test do shape `DraftReading.capture_method`.
+>
+> Executores: **NÃO criem `components/recovery/RecoveryBanner.tsx` nesta fase.**
+> A entrada abaixo serve como mapa de referência para quando o componente for
+> implementado na Fase 9.
+
 ---
 
 ## File Classification
