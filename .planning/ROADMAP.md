@@ -126,7 +126,7 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
 
 **Wave 2 — UI primitives (paralelos)**
 - [x] 04-03-PLAN.md — components/upload/UploadDropzone.tsx (drag+drop+click + a11y) + testes vitest. CONTEXT D-05, D-10. **Concluído 2026-05-03 (10/10 testes vitest verdes; a11y completa role=button+tabIndex+aria-disabled+keyboard+focus-visible; componente puramente apresentacional sem imports de lib/upload).**
-- [ ] 04-04-PLAN.md — adaptar getSlotInstructionCopy + AngleInterstitial + CapturePreview com prop opcional mode ('camera' | 'upload') sem regredir Fase 3. CONTEXT D-05, D-09.
+- [x] 04-04-PLAN.md — adaptar getSlotInstructionCopy + AngleInterstitial + CapturePreview com prop opcional mode ('camera' | 'upload') sem regredir Fase 3. CONTEXT D-05, D-09. **Concluído 2026-05-03 (9 testes novos verdes — 6 sequence + 3 CapturePreview; 63/63 testes em components/capture+sequence; backward compat 100% — capture-client.tsx Fase 3 não tocado; CaptureMode type exportado como fonte única). Wave 2 fechada.**
 
 **Wave 3 — Wizard assembly** *(blocked on Waves 1+2)*
 - [ ] 04-05-PLAN.md — app/(dashboard)/leituras/nova/upload/page.tsx (server component substitui placeholder) + upload-client.tsx (state machine clone do capture-client + dropzone). CONTEXT D-04, D-05, D-06, D-07, D-09, D-13, D-14.
@@ -224,7 +224,7 @@ Fases executam em ordem numérica: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 �
 | 1. Setup | 6/6 | ✅ Concluída | — |
 | 2. Auth + Dashboard básico | 4/4 | ✅ Concluída | — |
 | 3. Captura mobile (PWA) | 8/8* | ✅ Concluída via UAT | 2026-05-03 |
-| 4. Upload desktop | 2/7 | 🎯 Em execução | — |
+| 4. Upload desktop | 4/7 | 🎯 Em execução | — |
 | 5. Pipeline de visão (Modal) | 0/TBD | Não iniciada | — |
 | 6. RAG — Ingestão | 0/TBD | Não iniciada | — |
 | 7. Análise LLM | 0/TBD | Não iniciada | — |

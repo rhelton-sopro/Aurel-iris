@@ -37,3 +37,5 @@ Out-of-scope discoveries logged during plan execution. Do NOT fix in current pla
 **Recommended action:** Plan de cleanup da Fase 3 (ou fold em uma plan futura que toca quality-scoring) para remover as referências obsoletas a `WEIGHTS.reflex` em `quality-scoring.test.ts`.
 
 **Status:** Logged 2026-05-03 by plan-04-02 executor.
+
+**Update 2026-05-03 (plan-04-04 executor):** os mesmos resíduos `WEIGHTS.reflex` causam **3 falhas runtime** em `pnpm test:run lib/capture/quality-scoring.test.ts` (linhas 47, 54, 110), além dos 2 erros tsc já registrados. Confirmadas como pré-existentes via `git stash + pnpm test:run` em tree limpo no commit `ca6c851` (após Task 1 GREEN da plan 04-04, antes da Task 2). Mesmo cleanup resolve ambos. Não bloqueia plan 04-04.
