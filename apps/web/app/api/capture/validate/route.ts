@@ -84,6 +84,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'imageBase64 too large' }, { status: 413 })
   }
 
+  // Diagnóstico de custo (UAT 03 round 13): verifica que o resize 512×512 do
+  // client está chegando aqui. Esperado ~40-110KB pra JPEG quality 0.85 do
+  // canvas 512×512. Se aparecer >300KB, o resize falhou e estamos enviando
+  // o JPEG original 4K — explosão de tokens.
+  console.log('[vlm] imageBase64 length (bytes):', body.imageBase64.length)
+
   const apiKey = process.env.ANTHROPIC_API_KEY
   if (!apiKey) {
     return NextResponse.json(
@@ -124,6 +130,13 @@ export async function POST(request: NextRequest) {
       { status: 502 },
     )
   }
+
+  // Diagnóstico de custo: log tokens efetivamente cobrados pelo Anthropic.
+  // input_tokens = system prompt + image + user message wrapping
+  // output_tokens = JSON retornado
+  // cache_* = se prompt caching estiver ativo (não estamos usando ainda)
+  // Esperado pra resize 512×512 + prompt atual: ~500-560 input + ~20 output.
+  console.log('[vlm] usage:', response.usage, 'model:', response.model)
 
   // Extrai texto da resposta (assistant message com text blocks).
   const textBlock = response.content.find((b) => b.type === 'text')
