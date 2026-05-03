@@ -53,7 +53,28 @@ export default function SignupPage() {
     })
 
     if (error) {
-      setFormError('Ocorreu um erro. Tente novamente.')
+      // Loga erro completo no console pra diagnóstico (status code, message,
+      // name) — não vaza dados sensíveis porque é client-side e só roda no
+      // próprio browser do user. Mesmo padrão de login/page.tsx (#267ff50).
+      console.error('[signup] signInWithOtp error:', {
+        message: error.message,
+        status: error.status,
+        name: error.name,
+        code: (error as { code?: string }).code,
+      })
+
+      if (error.status === 429 || error.message.toLowerCase().includes('rate limit')) {
+        setFormError('Muitas tentativas. Aguarde alguns minutos e tente novamente.')
+      } else if (error.message.toLowerCase().includes('already registered') || error.message.toLowerCase().includes('user already')) {
+        setFormError('Este e-mail já tem conta. Use a tela de login.')
+      } else if (error.message.toLowerCase().includes('signups') && error.message.toLowerCase().includes('disabled')) {
+        setFormError('Cadastros estão desabilitados no momento. Contate o administrador.')
+      } else {
+        // Em vez de mensagem genérica, expõe os detalhes do erro pra
+        // diagnóstico em prod (status code + message). Pode ser ajustado
+        // depois quando estabilizar.
+        setFormError(`Erro ao criar conta: ${error.message} (status ${error.status ?? 'desconhecido'})`)
+      }
       return
     }
 
