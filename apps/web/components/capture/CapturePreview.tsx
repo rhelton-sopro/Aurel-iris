@@ -46,7 +46,7 @@ export function CapturePreview({
   const level: QualityLevel = levelFromScore(qualityScore)
   const showAlert = analysis?.hasAlert === true
 
-  // Reasons UI: VLM rejection (com motivo do Claude) + Laplacian sharpness.
+  // Reasons UI: motivo humano-legível baseado na razão retornada pelo VLM.
   const reasons: string[] = []
   if (analysis?.vlmInvalidAlert && analysis.vlmValidation) {
     const r = analysis.vlmValidation.reason
@@ -59,12 +59,11 @@ export function CapturePreview({
     }
     reasons.push(messages[r] ?? `Foto rejeitada: ${r}`)
   }
-  if (analysis?.sharpnessAlert) reasons.push('Imagem pouco nítida')
 
-  // Bloqueio do Confirmar: sem_olho e olho_fechado são rejeições "duras" —
-  // não faz sentido permitir avançar. muito_longe / borrado / reflexo_total
-  // são alertas (warning) — usuário pode confirmar e seguir se entender que
-  // está aceitável (decisão clínica do iridologista).
+  // Bloqueio do Confirmar: sem_olho, olho_fechado e muito_longe são rejeições
+  // "duras" — não faz sentido permitir avançar. borrado / reflexo_total são
+  // warnings — usuário pode confirmar e seguir se entender que está
+  // aceitável (decisão clínica do iridologista).
   const isBlocked = analysis?.vlmValidation
     ? isBlockingRejection(analysis.vlmValidation)
     : false
@@ -101,7 +100,6 @@ export function CapturePreview({
           {analysis.vlmValidation.error && (
             <div className="text-red-300">err: {analysis.vlmValidation.error.slice(0, 40)}</div>
           )}
-          <div>sharp={Math.round(analysis.laplacianVariance)} (th {analysis.sharpnessThreshold})</div>
           <div>cam={analysis.cameraDetection.kind}/{analysis.cameraDetection.source}</div>
           <div>img={analysis.imageWidth}×{analysis.imageHeight}</div>
         </div>

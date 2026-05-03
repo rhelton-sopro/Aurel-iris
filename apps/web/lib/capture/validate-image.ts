@@ -24,8 +24,10 @@ export type ValidationReason =
   | 'reflexo_total'
   | 'olho_fechado'
 
-/** Reasons que BLOQUEIAM o botão Confirmar (sem chance de continuar). */
-export const BLOCKING_REASONS: readonly string[] = ['sem_olho', 'olho_fechado']
+/** Reasons que BLOQUEIAM o botão Confirmar (sem chance de continuar).
+    UAT 03 round 8: muito_longe foi promovido a hard-block — foto de rosto
+    inteiro não serve pra iridologia mesmo se terapeuta clicasse Confirmar. */
+export const BLOCKING_REASONS: readonly string[] = ['sem_olho', 'olho_fechado', 'muito_longe']
 
 export interface ValidationResult {
   valid: boolean

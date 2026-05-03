@@ -39,11 +39,8 @@ describe('CapturePreview', () => {
 
   it('blocks Confirmar when VLM rejects with sem_olho (hard reject)', () => {
     const analysis: PostCaptureAnalysis = {
-      laplacianVariance: 250,
       imageWidth: 3840,
       imageHeight: 2160,
-      sharpnessThreshold: 200,
-      sharpnessAlert: false,
       vlmInvalidAlert: true,
       hasAlert: true,
       cameraDetection: { kind: 'rear', source: 'exif' },
@@ -66,11 +63,8 @@ describe('CapturePreview', () => {
 
   it('blocks Confirmar when VLM rejects with olho_fechado (hard reject)', () => {
     const analysis: PostCaptureAnalysis = {
-      laplacianVariance: 250,
       imageWidth: 3840,
       imageHeight: 2160,
-      sharpnessThreshold: 200,
-      sharpnessAlert: false,
       vlmInvalidAlert: true,
       hasAlert: true,
       cameraDetection: { kind: 'rear', source: 'exif' },
@@ -89,13 +83,10 @@ describe('CapturePreview', () => {
     expect(screen.getByRole('button', { name: /Confirmar/ })).toBeDisabled()
   })
 
-  it('allows Confirmar when VLM rejects with muito_longe (soft warning)', () => {
+  it('blocks Confirmar when VLM rejects with muito_longe (hard reject após round 8)', () => {
     const analysis: PostCaptureAnalysis = {
-      laplacianVariance: 250,
       imageWidth: 3840,
       imageHeight: 2160,
-      sharpnessThreshold: 200,
-      sharpnessAlert: false,
       vlmInvalidAlert: true,
       hasAlert: true,
       cameraDetection: { kind: 'rear', source: 'exif' },
@@ -111,6 +102,29 @@ describe('CapturePreview', () => {
       />
     )
     expect(screen.getByText(/Olho muito distante/)).toBeInTheDocument()
+    expect(screen.getByText(/Foto rejeitada/)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Confirmar/ })).toBeDisabled()
+  })
+
+  it('allows Confirmar when VLM rejects with borrado (soft warning)', () => {
+    const analysis: PostCaptureAnalysis = {
+      imageWidth: 3840,
+      imageHeight: 2160,
+      vlmInvalidAlert: true,
+      hasAlert: true,
+      cameraDetection: { kind: 'rear', source: 'exif' },
+      vlmValidation: { valid: false, reason: 'borrado', source: 'vlm' },
+    }
+    render(
+      <CapturePreview
+        imageUrl="blob:test"
+        qualityScore={0.30}
+        analysis={analysis}
+        onRedo={vi.fn()}
+        onConfirm={vi.fn()}
+      />
+    )
+    expect(screen.getByText(/Foto borrada/)).toBeInTheDocument()
     expect(screen.getByText(/Qualidade abaixo do ideal/)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Confirmar/ })).not.toBeDisabled()
   })
@@ -119,11 +133,8 @@ describe('CapturePreview', () => {
     // Source='fallback' nunca é hard-block — não bloqueia o terapeuta por
     // falha de rede. valid:true também garante que não vira alert.
     const analysis: PostCaptureAnalysis = {
-      laplacianVariance: 250,
       imageWidth: 3840,
       imageHeight: 2160,
-      sharpnessThreshold: 200,
-      sharpnessAlert: false,
       vlmInvalidAlert: false,
       hasAlert: false,
       cameraDetection: { kind: 'rear', source: 'exif' },
@@ -143,11 +154,8 @@ describe('CapturePreview', () => {
 
   it('does not show alert when analysis has no issues', () => {
     const analysis: PostCaptureAnalysis = {
-      laplacianVariance: 250,
       imageWidth: 3840,
       imageHeight: 2160,
-      sharpnessThreshold: 200,
-      sharpnessAlert: false,
       vlmInvalidAlert: false,
       hasAlert: false,
       cameraDetection: { kind: 'rear', source: 'exif' },

@@ -23,24 +23,20 @@ import {
 } from '@/lib/capture/sequence'
 
 // ---------------------------------------------------------------------------
-// Score do badge derivado da validação VLM + sharpness. Sem mais cálculo
-// pixel-based de raio da íris — UAT 03 (5 rondas) provou que pupil detection
-// no browser é frágil demais. Substituído por Claude Haiku 4.5 server-side.
+// Score do badge derivado exclusivamente da validação VLM. UAT 03 round 8:
+// Laplacian variance removido — Claude Haiku já avalia nitidez via
+// reason='borrado', sinal duplicado era confuso.
 //
-// VLM valid + sharp ok = 1.0
-// VLM valid + sharp baixa = 0.7
+// VLM valid (source='vlm') = 1.0
+// VLM valid (source='fallback', rede falhou) = 0.7 (não penaliza por rede)
 // VLM invalid = 0.3
-// VLM fallback (rede falhou) = 0.7 (não penaliza por culpa da rede)
 // ---------------------------------------------------------------------------
 
 function computeQualityScore(analysis: PostCaptureAnalysis): number {
-  const { vlmValidation, sharpnessAlert } = analysis
-  if (vlmValidation.source === 'fallback') {
-    // Erro de rede / timeout — confia no terapeuta + sharpness signal.
-    return sharpnessAlert ? 0.5 : 0.7
-  }
+  const { vlmValidation } = analysis
   if (!vlmValidation.valid) return 0.3
-  return sharpnessAlert ? 0.7 : 1.0
+  if (vlmValidation.source === 'fallback') return 0.7
+  return 1.0
 }
 
 // ---------------------------------------------------------------------------
