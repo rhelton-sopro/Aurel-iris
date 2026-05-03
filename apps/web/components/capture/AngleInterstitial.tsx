@@ -58,13 +58,16 @@ export function AngleInterstitial({ nextSlot, slotIndex, onProceed }: AngleInter
         </div>
       </div>
 
-      <div className="mt-12 w-full max-w-sm pb-[env(safe-area-inset-bottom)]">
+      <div className="mt-12 w-full max-w-sm pb-[env(safe-area-inset-bottom)] space-y-3">
         <Button
           onClick={onProceed}
           className="w-full h-12 text-base"
         >
           {copy.cta}
         </Button>
+        <p className="text-xs text-muted-foreground text-center px-2">
+          Se o exame é da sua íris, peça a alguém para tirar a foto para você.
+        </p>
       </div>
     </div>
   )
