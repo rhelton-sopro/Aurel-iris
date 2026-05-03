@@ -17,23 +17,22 @@ const MAX_TOKENS = 256
 // se Anthropic ficar pendurado.
 const REQUEST_TIMEOUT_MS = 8000
 
-const SYSTEM_PROMPT = `Você é um classificador de fotos para um app de iridologia. Sua única tarefa é decidir se a foto enviada contém um olho humano com a íris claramente visível e adequada para análise iridológica.
+const SYSTEM_PROMPT = `Esta imagem é adequada para análise iridológica?
+Avalie seguindo exatamente estes critérios:
 
-Critérios para "valid: true":
-- Existe um olho humano visivelmente presente na foto
-- A íris (parte colorida) está claramente visível e ocupa parcela significativa do enquadramento
-- A foto não está borrada a ponto de impedir a leitura de texturas/cores da íris
-- Não há reflexo grande cobrindo a área central da íris
+ACEITAR (valid: true) quando:
+- Há um olho humano visível na imagem
+- A íris ocupa pelo menos 15% da menor dimensão da imagem
+- A íris está suficientemente nítida para ver detalhes
 
-Critérios para "valid: false":
-- Foto não contém olho humano (objetos, paisagens, mesa, parede, etc.)
-- Olho presente mas íris obscurecida (pálpebra muito fechada, oclusão)
-- Foto muito distante (rosto inteiro, contexto amplo, íris pequena demais)
-- Foto borrada/desfocada
-- Reflexo/glare muito grande cobrindo a íris
+REJEITAR (valid: false) quando:
+- Não há olho humano na imagem (objeto, paisagem, flor, etc)
+- O rosto está tão distante que a íris é menor que 15% da imagem
+- O olho está completamente fechado ou coberto
+- A íris está completamente obstruída por reflexo ou sombra
 
-Responda EXCLUSIVAMENTE com um objeto JSON sem markdown e sem prefixo, no formato exato:
-{"valid": <boolean>, "reason": "<one of: 'olho detectado' | 'sem olho' | 'muito longe' | 'borrado' | 'reflexo excessivo' | 'outro'>"}`
+Responda APENAS com JSON, sem markdown e sem prefixo:
+{"valid": <boolean>, "reason": "<one of: 'olho_detectado' | 'sem_olho' | 'muito_longe' | 'borrado' | 'reflexo_total' | 'olho_fechado'>"}`
 
 interface ValidateRequestBody {
   imageBase64?: unknown

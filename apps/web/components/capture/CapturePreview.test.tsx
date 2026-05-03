@@ -37,17 +37,17 @@ describe('CapturePreview', () => {
     expect(onConfirm).toHaveBeenCalled()
   })
 
-  it('shows VLM rejection + sharpness when both alerts fire', () => {
+  it('blocks Confirmar when VLM rejects with sem_olho (hard reject)', () => {
     const analysis: PostCaptureAnalysis = {
-      laplacianVariance: 50,
+      laplacianVariance: 250,
       imageWidth: 3840,
       imageHeight: 2160,
       sharpnessThreshold: 200,
-      sharpnessAlert: true,
+      sharpnessAlert: false,
       vlmInvalidAlert: true,
       hasAlert: true,
       cameraDetection: { kind: 'rear', source: 'exif' },
-      vlmValidation: { valid: false, reason: 'sem olho', source: 'vlm' },
+      vlmValidation: { valid: false, reason: 'sem_olho', source: 'vlm' },
     }
     render(
       <CapturePreview
@@ -58,12 +58,13 @@ describe('CapturePreview', () => {
         onConfirm={vi.fn()}
       />
     )
-    expect(screen.getByText(/Qualidade abaixo do ideal/)).toBeInTheDocument()
-    expect(screen.getByText(/Imagem pouco nítida/)).toBeInTheDocument()
+    expect(screen.getByText(/Foto rejeitada/)).toBeInTheDocument()
     expect(screen.getByText(/Foto não contém um olho/)).toBeInTheDocument()
+    const confirmButton = screen.getByRole('button', { name: /Confirmar/ })
+    expect(confirmButton).toBeDisabled()
   })
 
-  it('shows VLM-specific reason when reason is "muito longe"', () => {
+  it('blocks Confirmar when VLM rejects with olho_fechado (hard reject)', () => {
     const analysis: PostCaptureAnalysis = {
       laplacianVariance: 250,
       imageWidth: 3840,
@@ -73,7 +74,32 @@ describe('CapturePreview', () => {
       vlmInvalidAlert: true,
       hasAlert: true,
       cameraDetection: { kind: 'rear', source: 'exif' },
-      vlmValidation: { valid: false, reason: 'muito longe', source: 'vlm' },
+      vlmValidation: { valid: false, reason: 'olho_fechado', source: 'vlm' },
+    }
+    render(
+      <CapturePreview
+        imageUrl="blob:test"
+        qualityScore={0.30}
+        analysis={analysis}
+        onRedo={vi.fn()}
+        onConfirm={vi.fn()}
+      />
+    )
+    expect(screen.getByText(/Olho fechado ou coberto/)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Confirmar/ })).toBeDisabled()
+  })
+
+  it('allows Confirmar when VLM rejects with muito_longe (soft warning)', () => {
+    const analysis: PostCaptureAnalysis = {
+      laplacianVariance: 250,
+      imageWidth: 3840,
+      imageHeight: 2160,
+      sharpnessThreshold: 200,
+      sharpnessAlert: false,
+      vlmInvalidAlert: true,
+      hasAlert: true,
+      cameraDetection: { kind: 'rear', source: 'exif' },
+      vlmValidation: { valid: false, reason: 'muito_longe', source: 'vlm' },
     }
     render(
       <CapturePreview
@@ -85,6 +111,34 @@ describe('CapturePreview', () => {
       />
     )
     expect(screen.getByText(/Olho muito distante/)).toBeInTheDocument()
+    expect(screen.getByText(/Qualidade abaixo do ideal/)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Confirmar/ })).not.toBeDisabled()
+  })
+
+  it('allows Confirmar when VLM fallback (network failure)', () => {
+    // Source='fallback' nunca é hard-block — não bloqueia o terapeuta por
+    // falha de rede. valid:true também garante que não vira alert.
+    const analysis: PostCaptureAnalysis = {
+      laplacianVariance: 250,
+      imageWidth: 3840,
+      imageHeight: 2160,
+      sharpnessThreshold: 200,
+      sharpnessAlert: false,
+      vlmInvalidAlert: false,
+      hasAlert: false,
+      cameraDetection: { kind: 'rear', source: 'exif' },
+      vlmValidation: { valid: true, reason: 'olho_detectado', source: 'fallback', error: 'timeout' },
+    }
+    render(
+      <CapturePreview
+        imageUrl="blob:test"
+        qualityScore={0.70}
+        analysis={analysis}
+        onRedo={vi.fn()}
+        onConfirm={vi.fn()}
+      />
+    )
+    expect(screen.getByRole('button', { name: /Confirmar/ })).not.toBeDisabled()
   })
 
   it('does not show alert when analysis has no issues', () => {
@@ -97,7 +151,7 @@ describe('CapturePreview', () => {
       vlmInvalidAlert: false,
       hasAlert: false,
       cameraDetection: { kind: 'rear', source: 'exif' },
-      vlmValidation: { valid: true, reason: 'olho detectado', source: 'vlm' },
+      vlmValidation: { valid: true, reason: 'olho_detectado', source: 'vlm' },
     }
     render(
       <CapturePreview

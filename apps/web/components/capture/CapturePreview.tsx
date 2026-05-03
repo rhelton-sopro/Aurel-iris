@@ -11,6 +11,7 @@ import {
   LEVEL_LABEL,
 } from '@/lib/capture/quality-scoring'
 import type { PostCaptureAnalysis } from '@/lib/capture/post-capture-analysis'
+import { isBlockingRejection } from '@/lib/capture/validate-image'
 
 interface CapturePreviewProps {
   /** URL (object URL) do blob capturado */
@@ -50,15 +51,23 @@ export function CapturePreview({
   if (analysis?.vlmInvalidAlert && analysis.vlmValidation) {
     const r = analysis.vlmValidation.reason
     const messages: Record<string, string> = {
-      'sem olho': 'Foto não contém um olho claramente visível',
-      'muito longe': 'Olho muito distante — aproxime a câmera',
-      'borrado': 'Foto borrada — refaça com a câmera mais firme',
-      'reflexo excessivo': 'Reflexo grande sobre a íris — mude o ângulo da luz',
-      'outro': 'Foto não adequada para análise iridológica',
+      sem_olho: 'Foto não contém um olho — refaça apontando para o olho do paciente',
+      muito_longe: 'Olho muito distante — aproxime a câmera',
+      borrado: 'Foto borrada — refaça com a câmera mais firme',
+      reflexo_total: 'Reflexo cobre a íris inteira — mude o ângulo da luz',
+      olho_fechado: 'Olho fechado ou coberto — abra o olho completamente',
     }
     reasons.push(messages[r] ?? `Foto rejeitada: ${r}`)
   }
   if (analysis?.sharpnessAlert) reasons.push('Imagem pouco nítida')
+
+  // Bloqueio do Confirmar: sem_olho e olho_fechado são rejeições "duras" —
+  // não faz sentido permitir avançar. muito_longe / borrado / reflexo_total
+  // são alertas (warning) — usuário pode confirmar e seguir se entender que
+  // está aceitável (decisão clínica do iridologista).
+  const isBlocked = analysis?.vlmValidation
+    ? isBlockingRejection(analysis.vlmValidation)
+    : false
 
   return (
     <div
@@ -102,8 +111,12 @@ export function CapturePreview({
         <div className="rounded-2xl bg-black/85 backdrop-blur-sm p-4 max-w-sm w-full">
           {showAlert && reasons.length > 0 && (
             <>
-              <p className="text-sm text-white font-semibold mb-2">
-                Qualidade abaixo do ideal
+              <p
+                className={`text-sm font-semibold mb-2 ${
+                  isBlocked ? 'text-red-300' : 'text-white'
+                }`}
+              >
+                {isBlocked ? 'Foto rejeitada — refaça' : 'Qualidade abaixo do ideal'}
               </p>
               <ul className="text-xs text-white/80 space-y-1 mb-4">
                 {reasons.map((r) => (
@@ -114,7 +127,9 @@ export function CapturePreview({
           )}
 
           {/* Dois botões de mesmo tamanho.
-              "Refazer" secundário (reabre câmera). "Confirmar" primário (avança). */}
+              "Refazer" secundário (reabre câmera). "Confirmar" primário (avança).
+              Confirmar é DESABILITADO quando VLM rejeitou com razão dura
+              (sem_olho ou olho_fechado) — não faz sentido aceitar foto sem olho. */}
           <div className="flex gap-2">
             <Button
               onClick={onRedo}
@@ -126,6 +141,8 @@ export function CapturePreview({
             <Button
               onClick={onConfirm}
               variant="default"
+              disabled={isBlocked}
+              aria-disabled={isBlocked}
               className="flex-1 h-11 text-sm font-semibold"
             >
               Confirmar

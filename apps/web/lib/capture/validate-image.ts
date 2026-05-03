@@ -17,12 +17,15 @@ const VALIDATION_DIM = 512
 const REQUEST_TIMEOUT_MS = 5000
 
 export type ValidationReason =
-  | 'olho detectado'
-  | 'sem olho'
-  | 'muito longe'
+  | 'olho_detectado'
+  | 'sem_olho'
+  | 'muito_longe'
   | 'borrado'
-  | 'reflexo excessivo'
-  | 'outro'
+  | 'reflexo_total'
+  | 'olho_fechado'
+
+/** Reasons que BLOQUEIAM o botão Confirmar (sem chance de continuar). */
+export const BLOCKING_REASONS: readonly string[] = ['sem_olho', 'olho_fechado']
 
 export interface ValidationResult {
   valid: boolean
@@ -31,6 +34,11 @@ export interface ValidationResult {
   source: 'vlm' | 'fallback'
   /** Erro humano-legível quando source='fallback'. */
   error?: string
+}
+
+/** Helper: VLM rejeitou com razão que impede o usuário de avançar. */
+export function isBlockingRejection(result: ValidationResult): boolean {
+  return result.source === 'vlm' && !result.valid && BLOCKING_REASONS.includes(result.reason)
 }
 
 /**
