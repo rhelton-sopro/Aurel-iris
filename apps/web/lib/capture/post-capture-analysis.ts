@@ -128,7 +128,11 @@ function makeResult(
       ? SHARPNESS_THRESHOLD_HIGH_RES
       : SHARPNESS_THRESHOLD_LOW_RES
   const sharpnessAlert = variance < sharpnessThreshold
-  const irisUndetectedAlert = irisRadiusPx <= 0
+  // irisUndetectedAlert SÓ dispara com dupla evidência: pupila não detectada
+  // E foto borrada. Foto nítida sem detecção é provavelmente caso edge do
+  // detector (íris clara extrema, reflexo); confiamos na visão do usuário.
+  // Foto borrada E sem detecção é quase certamente foto ruim — alerta vale.
+  const irisUndetectedAlert = irisRadiusPx <= 0 && sharpnessAlert
   const irisAlert = irisRadiusPx > 0 && irisRadiusPx < IRIS_RADIUS_ALERT_PX
   return {
     laplacianVariance: variance,
