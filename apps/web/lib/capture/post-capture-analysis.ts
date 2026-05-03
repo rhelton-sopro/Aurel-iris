@@ -33,7 +33,10 @@ import { detectPupilFromImageData, pupilToIrisRadius } from './pupil-detection'
 import { detectCameraSource, type CameraDetectionResult } from './camera-detection'
 
 const ANALYSIS_DIM = 512
-const IRIS_RADIUS_ALERT_PX = 300
+/** Threshold para alerta "íris pequena". Reduzido de 300 → 200 (UAT 03 round 5
+    feedback: critério estava rigoroso demais, gerando false negatives em
+    fotos boas). Pupila correspondente: 200/3.5 ≈ 57px no arquivo. */
+const IRIS_RADIUS_ALERT_PX = 200
 const SHARPNESS_THRESHOLD_HIGH_RES = 200
 const SHARPNESS_THRESHOLD_LOW_RES = 80
 const HIGH_RES_WIDTH_BOUNDARY = 2000

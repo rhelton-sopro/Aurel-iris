@@ -31,7 +31,7 @@ import {
 // correta + ≥ acceptable = score 100%.
 // ---------------------------------------------------------------------------
 
-const IRIS_ACCEPTABLE_PX = 300
+const IRIS_ACCEPTABLE_PX = 200
 /**
  * Score quando a pupila não foi detectada. Neutro (50%) — sinaliza problema
  * de enquadramento via overlay sem rebaixar a percepção do usuário injustamente.

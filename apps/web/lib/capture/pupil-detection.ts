@@ -26,13 +26,19 @@ const PUPIL_TO_IRIS_RATIO = 3.5
 /** Tamanhos mínimo/máximo do cluster em px (no canvas 512×512). */
 const MIN_COMPONENT_SIZE = 50
 const MAX_COMPONENT_SIZE = 8000
-/** Aspect ratio mínimo (largura/altura) para considerar circular. */
-const MIN_ASPECT = 0.4
+/** Aspect ratio mínimo (largura/altura) — pupila real é circular (~1.0).
+    0.6 rejeita sombras alongadas / arestas de objetos não-redondos (UAT 03:
+    foto de mesa estava sendo detectada com 0.4). */
+const MIN_ASPECT = 0.6
 /** Distância máxima do centro do canvas, em fração da largura. */
 const MAX_CENTER_DISTANCE_FRAC = 0.4
 /** Bounds para sanity-check do threshold Otsu (evita extremos absurdos). */
 const OTSU_MIN_THRESHOLD = 15
 const OTSU_MAX_THRESHOLD = 90
+/** Diferença mínima de luminância média entre foreground (escuro) e background.
+    Pupila real tem alto contraste (>=70). Cenas uniformes (mesa, parede) com
+    sombras sutis têm contraste <30. UAT 03: foto de mesa marcava 100%. */
+const PUPIL_MIN_CONTRAST = 30
 
 export interface PupilDetection {
   /** Centro do cluster em px do canvas analisado. null se não detectado. */
@@ -110,9 +116,39 @@ export function detectPupilFromImageData(imageData: ImageData): PupilDetection {
 
   // 1c. Máscara binária usando o threshold computado. Convenção Otsu: threshold
   // é o ÚLTIMO valor da classe de fundo (escura), portanto inclusive (<=).
+  // Computa também médias de luminância das 2 classes pra check de contraste.
   const dark = new Uint8Array(total)
+  let darkSum = 0
+  let darkCount = 0
+  let brightSum = 0
+  let brightCount = 0
   for (let p = 0; p < total; p++) {
-    if (lumCache[p] <= threshold) dark[p] = 1
+    const l = lumCache[p]
+    if (l <= threshold) {
+      dark[p] = 1
+      darkSum += l
+      darkCount++
+    } else {
+      brightSum += l
+      brightCount++
+    }
+  }
+
+  // 1d. Contraste insuficiente entre fg/bg → cena sem pupila real (mesa, parede).
+  // Pupila real tem alto contraste; sombras sutis em superfícies uniformes
+  // têm contraste baixo. Falha rápida com diagnóstico.
+  const meanDark = darkCount > 0 ? darkSum / darkCount : 0
+  const meanBright = brightCount > 0 ? brightSum / brightCount : 255
+  const contrast = meanBright - meanDark
+  if (contrast < PUPIL_MIN_CONTRAST) {
+    // eslint-disable-next-line no-console
+    console.log('[pupil-detection] rejected: low contrast', {
+      threshold,
+      contrast: Math.round(contrast),
+      darkCount,
+      brightCount,
+    })
+    return { center: null, pupilRadiusInCanvas: 0, thresholdUsed: threshold }
   }
 
   // 2. Connected components (4-connected, iterative DFS).
@@ -203,12 +239,28 @@ export function detectPupilFromImageData(imageData: ImageData): PupilDetection {
     }
   }
 
-  if (bestLbl === -1) return { center: null, pupilRadiusInCanvas: 0, thresholdUsed: threshold }
+  if (bestLbl === -1) {
+    // eslint-disable-next-line no-console
+    console.log('[pupil-detection] rejected: no candidate passed filters', {
+      threshold,
+      contrast: Math.round(contrast),
+      componentsFound: nextLabel - 1,
+    })
+    return { center: null, pupilRadiusInCanvas: 0, thresholdUsed: threshold }
+  }
 
   const size = sizes[bestLbl]
   const center = { x: sumX[bestLbl] / size, y: sumY[bestLbl] / size }
   // Raio = média entre half-width e half-height do bounding box.
   const radius = ((maxX[bestLbl] - minX[bestLbl]) + (maxY[bestLbl] - minY[bestLbl])) / 4
+  // eslint-disable-next-line no-console
+  console.log('[pupil-detection] success', {
+    threshold,
+    contrast: Math.round(contrast),
+    radius: Math.round(radius),
+    center: { x: Math.round(center.x), y: Math.round(center.y) },
+    clusterSize: size,
+  })
   return { center, pupilRadiusInCanvas: radius, thresholdUsed: threshold }
 }
 
@@ -224,4 +276,5 @@ export const PUPIL_DETECTION_DEFAULTS = {
   MAX_CENTER_DISTANCE_FRAC,
   OTSU_MIN_THRESHOLD,
   OTSU_MAX_THRESHOLD,
+  PUPIL_MIN_CONTRAST,
 } as const
