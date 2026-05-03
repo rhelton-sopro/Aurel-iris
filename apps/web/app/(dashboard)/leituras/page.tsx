@@ -1,7 +1,7 @@
 import Link from 'next/link'
-import { format } from 'date-fns'
 import { createClient } from '@/lib/supabase/server'
 import { buttonVariants } from '@/components/ui/button'
+import { LocalDateTime } from '@/components/ui/local-date-time'
 import {
   Table,
   TableBody,
@@ -12,6 +12,13 @@ import {
 } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
 import { cleanupStaleEmptyReadingsAction } from '@/app/actions/readings'
+
+/**
+ * Página dinâmica: a lista deve refletir leituras criadas neste mesmo request
+ * (cenário comum: usuário acabou de finalizar captura e navegou pra cá). Sem
+ * `force-dynamic`, o RSC cache do Next.js pode servir uma versão pré-captura.
+ */
+export const dynamic = 'force-dynamic'
 
 const STATUS_LABEL: Record<string, string> = {
   pending: 'Pendente',
@@ -101,9 +108,7 @@ export default async function LeiturasPage() {
                     {client?.full_name ?? <span className="text-muted-foreground">—</span>}
                   </TableCell>
                   <TableCell className="text-muted-foreground">
-                    {r.created_at
-                      ? format(new Date(r.created_at), 'dd/MM/yyyy HH:mm')
-                      : '—'}
+                    <LocalDateTime iso={r.created_at} />
                   </TableCell>
                   <TableCell>
                     <span className={count < 6 ? 'text-muted-foreground' : 'text-foreground'}>

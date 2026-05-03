@@ -219,6 +219,9 @@ export function CaptureClient({
     finalizingTriggeredRef.current = true
 
     const run = async () => {
+      // Aguarda TODOS os uploads completarem (storage + INSERT em reading_images
+      // já estão dentro do uploadCaptureImage). Só depois chama finalize +
+      // navega — garante que /leituras vai ler a nova leitura no SELECT.
       const pending = Array.from(uploadPromisesRef.current.values())
       if (pending.length > 0) await Promise.allSettled(pending)
       const result = await finalizeReadingAction(readingId)
@@ -229,6 +232,9 @@ export function CaptureClient({
       }
       toast.success('Leitura registrada.')
       router.push('/leituras')
+      // router.refresh() invalida o RSC cache do client; sem isso uma navegação
+      // soft pode renderizar /leituras com a lista pré-captura.
+      router.refresh()
     }
     void run()
   }, [phase, readingId, router])
