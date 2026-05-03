@@ -38,7 +38,7 @@ export function DashboardHeader({ fullName, trialEndsAt, subscriptionStatus }: D
   }
 
   return (
-    <header className="h-14 border-b flex items-center justify-between px-4">
+    <header className="h-[calc(3.5rem+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] border-b flex items-center justify-between px-4">
       <div className="flex items-center gap-2">
         <SidebarTrigger />
       </div>
