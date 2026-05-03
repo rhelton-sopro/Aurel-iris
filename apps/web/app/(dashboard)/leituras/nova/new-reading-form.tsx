@@ -69,7 +69,11 @@ export function NewReadingForm({ clients, preselectedClientId }: NewReadingFormP
                 <Select name="client_id" value={field.value || null} onValueChange={field.onChange}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecione o cliente" />
+                      <SelectValue placeholder="Selecione o cliente">
+                        {(value: string | null) =>
+                          clients.find((c) => c.id === value)?.full_name ?? 'Selecione o cliente'
+                        }
+                      </SelectValue>
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
