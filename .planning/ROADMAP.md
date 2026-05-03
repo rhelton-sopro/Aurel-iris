@@ -122,7 +122,7 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
 
 **Wave 1 — Fundação lib + server action (paralelos)**
 - [x] 04-01-PLAN.md — lib/upload/validate-file.ts (MIME + tamanho 25MB) + lib/upload/heic-to-jpeg.ts (dynamic import heic2any) + testes vitest. CONTEXT D-10, D-11, D-12. **Concluído 2026-05-03 (13/13 testes verdes; heic2any@0.0.4 aprovado fora da janela de 24m via checkpoint:decision).**
-- [ ] 04-02-PLAN.md — readings.schemas.ts e readings.ts: createReadingSchema aceita method enum + getDraftReading retorna capture_method (forward Fase 9). CONTEXT D-03, D-04, D-15.
+- [x] 04-02-PLAN.md — readings.schemas.ts e readings.ts: createReadingSchema aceita method enum + getDraftReading retorna capture_method (forward Fase 9). CONTEXT D-03, D-04, D-15. **Concluído 2026-05-03 (12/12 testes verdes; CAPTURE_METHODS const tuple + narrowCaptureMethod helper para defesa em profundidade contra string|null do Supabase).**
 
 **Wave 2 — UI primitives (paralelos)**
 - [ ] 04-03-PLAN.md — components/upload/UploadDropzone.tsx (drag+drop+click + a11y) + testes vitest. CONTEXT D-05, D-10.
@@ -224,7 +224,7 @@ Fases executam em ordem numérica: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 �
 | 1. Setup | 6/6 | ✅ Concluída | — |
 | 2. Auth + Dashboard básico | 4/4 | ✅ Concluída | — |
 | 3. Captura mobile (PWA) | 8/8* | ✅ Concluída via UAT | 2026-05-03 |
-| 4. Upload desktop | 1/7 | 🎯 Em execução | — |
+| 4. Upload desktop | 2/7 | 🎯 Em execução | — |
 | 5. Pipeline de visão (Modal) | 0/TBD | Não iniciada | — |
 | 6. RAG — Ingestão | 0/TBD | Não iniciada | — |
 | 7. Análise LLM | 0/TBD | Não iniciada | — |

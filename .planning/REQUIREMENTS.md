@@ -141,7 +141,7 @@ Excluídos explicitamente. Documentado para evitar reintrodução.
 | CAPTURE-05 | Fase 3 | Pendente |
 | CAPTURE-06 | Fase 3 | Pendente |
 | UPLOAD-01 | Fase 4 | Em progresso (04-01 entregou validação MIME+25MB+HEIC fallback; dropzone+preview ainda pendentes em 04-03/04-05) |
-| UPLOAD-02 | Fase 4 | Pendente |
+| UPLOAD-02 | Fase 4 | Em progresso (04-02 entregou suporte server-side: createReadingAction grava `capture_method='desktop_upload'` via FormData + getDraftReading expõe `capture_method`; UI que monta o FormData e o wizard que produz `reading_images` ainda pendentes em 04-05/04-06) |
 | VISION-01 | Fase 5 | Pendente |
 | VISION-02 | Fase 5 | Pendente |
 | VISION-03 | Fase 5 | Pendente |
