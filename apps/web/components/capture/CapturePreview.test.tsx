@@ -219,3 +219,40 @@ describe('CapturePreview', () => {
     expect(screen.queryByText(/Qualidade abaixo do ideal/)).not.toBeInTheDocument()
   })
 })
+
+describe('CapturePreview mode prop (Fase 4)', () => {
+  it('renders "Refazer" by default (mode omitted)', () => {
+    render(
+      <CapturePreview imageUrl="blob:test" qualityScore={0.85} onRedo={vi.fn()} onConfirm={vi.fn()} />
+    )
+    expect(screen.getByRole('button', { name: 'Refazer' })).toBeInTheDocument()
+  })
+
+  it('renders "Trocar arquivo" when mode=upload', () => {
+    render(
+      <CapturePreview
+        imageUrl="blob:test"
+        qualityScore={0.85}
+        onRedo={vi.fn()}
+        onConfirm={vi.fn()}
+        mode="upload"
+      />
+    )
+    expect(screen.getByRole('button', { name: 'Trocar arquivo' })).toBeInTheDocument()
+  })
+
+  it('still calls onRedo when "Trocar arquivo" is clicked (mode=upload)', () => {
+    const onRedo = vi.fn()
+    render(
+      <CapturePreview
+        imageUrl="blob:test"
+        qualityScore={0.85}
+        onRedo={onRedo}
+        onConfirm={vi.fn()}
+        mode="upload"
+      />
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Trocar arquivo' }))
+    expect(onRedo).toHaveBeenCalled()
+  })
+})

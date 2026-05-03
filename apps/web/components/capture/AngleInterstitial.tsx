@@ -4,7 +4,7 @@ import * as React from 'react'
 import { AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { AngleIcon } from './AngleIcon'
-import type { Slot } from '@/lib/capture/sequence'
+import type { Slot, CaptureMode } from '@/lib/capture/sequence'
 import { getSlotInstructionCopy } from '@/lib/capture/sequence'
 
 interface AngleInterstitialProps {
@@ -14,6 +14,8 @@ interface AngleInterstitialProps {
   slotIndex: number
   /** Callback chamado quando o usuário toca no CTA */
   onProceed: () => void
+  /** Modo de captura — afeta apenas a copy do CTA. Default 'camera' (Fase 3). */
+  mode?: CaptureMode
 }
 
 /**
@@ -21,8 +23,8 @@ interface AngleInterstitialProps {
  * Copy é específica do slot (frente/direita 90°/esquerda 90°), comunicando
  * a rotação do paciente — a câmera fica sempre frontal ao olho.
  */
-export function AngleInterstitial({ nextSlot, slotIndex, onProceed }: AngleInterstitialProps) {
-  const copy = getSlotInstructionCopy(nextSlot, slotIndex)
+export function AngleInterstitial({ nextSlot, slotIndex, onProceed, mode }: AngleInterstitialProps) {
+  const copy = getSlotInstructionCopy(nextSlot, slotIndex, mode)
 
   return (
     <div

@@ -12,6 +12,7 @@ import {
 } from '@/lib/capture/quality-scoring'
 import type { PostCaptureAnalysis } from '@/lib/capture/post-capture-analysis'
 import { isBlockingRejection } from '@/lib/capture/validate-image'
+import type { CaptureMode } from '@/lib/capture/sequence'
 
 interface CapturePreviewProps {
   /** URL (object URL) do blob capturado */
@@ -26,6 +27,11 @@ interface CapturePreviewProps {
    * acima dos botões (não bloqueia — usuário ainda pode confirmar).
    */
   analysis?: PostCaptureAnalysis | null
+  /**
+   * Modo de captura. Quando 'upload', botão Refazer mostra "Trocar arquivo".
+   * Default 'camera' preserva comportamento Fase 3.
+   */
+  mode?: CaptureMode
 }
 
 /**
@@ -42,6 +48,7 @@ export function CapturePreview({
   onRedo,
   onConfirm,
   analysis,
+  mode,
 }: CapturePreviewProps) {
   const level: QualityLevel = levelFromScore(qualityScore)
   // Mostra alerta também para quality=regular (warning informativo, sem block).
@@ -143,7 +150,7 @@ export function CapturePreview({
               variant="secondary"
               className="flex-1 h-11 text-sm font-semibold"
             >
-              Refazer
+              {mode === 'upload' ? 'Trocar arquivo' : 'Refazer'}
             </Button>
             <Button
               onClick={onConfirm}
