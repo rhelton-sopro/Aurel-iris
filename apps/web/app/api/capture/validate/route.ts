@@ -17,24 +17,27 @@ const MAX_TOKENS = 256
 // se Anthropic ficar pendurado.
 const REQUEST_TIMEOUT_MS = 8000
 
-// Prompt compacto (~150 tokens) com critério clínico explícito de borrado
-// (UAT 03 round 8: foto borrada não disparava reason='borrado' com prompt
-// genérico "suficientemente nítida"). "Fibras radiais ilegíveis por desfoque"
-// é critério iridológico concreto que Claude consegue verificar.
+// Prompt compacto com critério clínico explícito de borrado e thresholds
+// calibrados em UAT 03:
+//   - round 8: "fibras radiais ilegíveis por desfoque" (era "suficientemente
+//     nítida", muito frouxo)
+//   - round 9: graduação 4 níveis vem do VLM (não do score binário)
+//   - round 10: rejection 15→12%, excelente 30→25%, regular cobre 12-15%
+//     (foto levemente mais distante mas boa qualidade caía em ruim antes)
 const SYSTEM_PROMPT = `Avalie a foto para análise iridológica. Retorne APENAS JSON, sem markdown:
 {"quality":"<ruim|regular|boa|excelente>","reason":"<reason>"}
 
 quality "ruim" (com reason correspondente):
 - sem_olho: sem olho humano na imagem
-- muito_longe: íris ocupa <15% da menor dimensão da imagem
+- muito_longe: íris ocupa <12% da menor dimensão OU fibras radiais não distinguíveis
 - olho_fechado: pálpebra fechada ou íris coberta
 - reflexo_total: reflexo cobre toda a área da íris
 - borrado: fibras radiais da íris ilegíveis por desfoque
 
 caso contrário, reason "olho_detectado" e:
-- excelente: íris >30% da menor dimensão, fibras radiais nítidas, reflexo mínimo
-- boa: íris 15-30%, fibras radiais visíveis (leve reflexo OK)
-- regular: íris >=15% com leve borramento ou reflexo parcial`
+- excelente: íris >25% da menor dimensão, fibras radiais nítidas, reflexo mínimo
+- boa: íris 15-25%, fibras radiais visíveis (leve reflexo OK)
+- regular: íris 12-15%, OU >=15% com leve borramento ou reflexo parcial`
 
 interface ValidateRequestBody {
   imageBase64?: unknown
