@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-04T19:00:00.000Z"
+last_updated: "2026-05-04T20:00:00.000Z"
 progress:
   total_phases: 10
   completed_phases: 4
   total_plans: 42
-  completed_plans: 36
-  percent: 86
+  completed_plans: 39
+  percent: 93
 ---
 
 # Estado do projeto
@@ -19,17 +19,17 @@ progress:
 Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 
 **Valor central:** Cada cliente atendido produz um JSON de features genuinamente diferente, e por isso cada relatório é genuinamente diferente. Pipeline de visão objetivo + LLM ancorado em RAG é o coração do produto.
-**Foco atual:** Fase 5 (Pipeline de visão / Modal) — **EM EXECUÇÃO** desde 2026-05-04. Wave 0 ✓ + Wave 1 ✓ + Wave 2a ✓ (11/17 plans). Próximo: Wave 2b (`05-12` webhook + `05-13` finalizeReadingAction + `05-14` UI — 3 plans paralelos).
+**Foco atual:** Fase 5 (Pipeline de visão / Modal) — **EM EXECUÇÃO** desde 2026-05-04. Wave 0 + Wave 1 + Wave 2 inteira ✓ (14/17 plans). Próximo: Wave 3 (`05-15` CI + `05-16` LGPD audit cross-tree + `05-17` founder smoke).
 
 ## Posição atual
 
 Fase: 5 de 10 — **EM EXECUÇÃO** (Pipeline de visão / Modal)
-Plan: 11/17 (Wave 0 ✓ + Wave 1 ✓ + Wave 2a ✓ : 05-11 trigger route)
-Próxima ação: spawn de Wave 2b (`05-12` webhook receiver + `05-13` finalizeReadingAction integration + `05-14` UI StatusBadge+ReprocessButton — 3 plans paralelos, sem overlap em files_modified, todos dependem só de 05-11). Depois Wave 3 (CI + audit + smoke: 05-15..05-17).
-Status: executing — Wave 2a fechada com 05-11 (modal-client + POST /api/readings/[id]/process trigger route). 13/13 vitest verdes nos novos tests. Suíte apps/web: 219/222 passando (3 pre-existing failures em lib/capture/quality-scoring.test.ts da Fase 3 legacy — deferred). audit:vocabulary limpo após fix do regex word-boundary + move de jensen-reference.md para .planning/research/.
-Última atividade: 2026-05-04 — Wave 2a concluída inline (Bash sandbox bloqueou o agent na 4a tentativa desta sessão). modal-client.ts thin HTTP wrapper com Modal-Key/Modal-Secret proxy auth + AbortController timeout 10s + ModalTriggerError class. Trigger route POST /api/readings/[id]/process com state machine 5-saídas (401/404x3/502/202), pre/post-spawn UPDATE D-T5, signed URLs TTL 600s D-T6, rollback D-E1.
+Plan: 14/17 (Wave 0 ✓ + Wave 1 ✓ + Wave 2 ✓ inteira)
+Próxima ação: spawn de Wave 3 (`05-15` GH Actions vision-service-tests.yml + `05-16` D-E1 error_summary catalog + extended LGPD audit + `05-17` founder smoke procedure + .env.example finalization). Os 3 plans podem rodar paralelos (sem overlap em files_modified — .github/workflows/, vision-service/data/error_summary.json, vision-service/README.md).
+Status: executing — Wave 2 fechada (Next.js integration completa). Suíte apps/web: 260/263 passando (3 pre-existing failures em quality-scoring.test.ts da Fase 3 legacy; +41 tests novos da Wave 2, sem regressões). vision-service: 98/98 verde. audit:vocabulary limpo.
+Última atividade: 2026-05-04 — Wave 2 concluída em 3 sub-waves: 2a (05-11 trigger route — 13 tests) + 2b (05-12 webhook 16 tests, 05-13 finalize integration 6 novos tests adicionados ao test suite existente, 05-14 StatusBadge 12 + ReprocessButton 7 = 19 tests). Pipeline end-to-end agora wireado: finalizeReadingAction → POST /api/readings/[id]/process → Modal analyze_iris_endpoint → run_pipeline (T4 GPU) → _post_webhook HMAC → POST /api/vision/webhook → atomic UPDATE D-F5 → revalidatePath('/leituras') → StatusBadge atualiza. ReprocessButton para failed states retriga via mesma route.
 
-Progresso: [█████████░] 86% (4/10 fases concluídas + 11/17 plans Fase 5 — 36/42 plans do milestone v1.0)
+Progresso: [█████████░] 93% (4/10 fases concluídas + 14/17 plans Fase 5 — 39/42 plans do milestone v1.0)
 
 **Backlog de longo prazo (registrado mas NÃO ativo):** Fase 10 — Sistema de Aprendizagem Clínica (planejada para depois de Fase 9 fechar; ver `.planning/phases/10-aprendizagem-clinica/10-CONTEXT.md`). Captura de dados pré-requisito a partir da Fase 7 (relatório gerado vs. entregue + diff de edições humanas) precisa ser embutida no design da Fase 7.
 

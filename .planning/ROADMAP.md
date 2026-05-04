@@ -165,7 +165,7 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
   - **Wave 1c** *(depende toda Wave 1 — CONCLUÍDA 2026-05-04)*: [x] 05-10 modal_app orchestration (analyze_iris_endpoint FastAPI POST + run_pipeline T4 GPU worker com per-eye try/except D-F1 + _post_webhook HMAC Stripe convention + _classify_error_summary D-E1 catalog pt-BR + face_landmarker.task pre-baked + supabase removido per D-T6; 10 testes D-X2). **Wave 1 inteira fechada — pipeline Python 100% implementado.**
 - **Wave 2** *(Next.js integration — depende Wave 1; subdividida em 2a/2b por dependências internas)*:
   - **Wave 2a** *(05-12/13/14 dependem de 05-11; CONCLUÍDA 2026-05-04)*: [x] 05-11 trigger route + lib/vision/modal-client.ts (state machine 5-saídas: 401/404x3/502/202; D-T5 pre/post-spawn UPDATE; D-T6 TTL 600s; D-E1 rollback; 13 vitest tests)
-  - **Wave 2b** *(paralelo — 3 plans dependem apenas de 05-11)*: 05-12 webhook route (HMAC + Zod superRefine + status guard D-T4 + atomic UPDATE D-F5), 05-13 finalizeReadingAction integration (closes Fase 5: TODO line 112), 05-14 UI StatusBadge + ReprocessButton em /leituras
+  - **Wave 2b** *(paralelo — CONCLUÍDA 2026-05-04)*: [x] 05-12 webhook route (HMAC verifyHmacSignature + Zod superRefine + D-T4 status guard + D-F5 atomic UPDATE + revalidatePath; 16 vitest tests), [x] 05-13 finalizeReadingAction integration (closes TODO line 112; trigger fire-and-forget, D-T2 redirect, D-T1 decoupling para soft-warn em fail; 6 novos tests), [x] 05-14 UI StatusBadge (5 variants pt-BR + Rascunho override + tooltip D-F2; 12 tests) + ReprocessButton (POST trigger + router.refresh; 7 tests) + leituras/page.tsx integration. **Wave 2 inteira fechada — pipeline end-to-end wireado (finalize → trigger → Modal → webhook → atomic UPDATE → UI atualiza).**
 - **Wave 3** *(CI + audit + smoke — depende Wave 1+2)*: 05-15 GH Actions vision-service-tests.yml, 05-16 D-E1 error_summary catalog + extended LGPD audit, 05-17 founder smoke procedure + .env.example finalization
 
 **Cross-cutting constraints** *(truths repeated across multiple plans — gates verificáveis durante execução):*
@@ -261,7 +261,7 @@ Fases v1 executam em ordem numérica: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 
 | 2. Auth + Dashboard básico | 4/4 | ✅ Concluída | — |
 | 3. Captura mobile (PWA) | 8/8* | ✅ Concluída via UAT | 2026-05-03 |
 | 4. Upload desktop | 7/7 | ✅ Concluída via UAT + gsd-verifier | 2026-05-03 |
-| 5. Pipeline de visão (Modal) | 11/17 | Em execução (Wave 0 ✓ + Wave 1 ✓ + Wave 2a ✓; Wave 2b next) | — |
+| 5. Pipeline de visão (Modal) | 14/17 | Em execução (Wave 0 ✓ + Wave 1 ✓ + Wave 2 ✓; Wave 3 next) | — |
 | 6. RAG — Ingestão | 0/TBD | Não iniciada | — |
 | 7. Análise LLM | 0/TBD | Não iniciada | — |
 | 8. Pagamento + LGPD | 0/TBD | Não iniciada | — |
