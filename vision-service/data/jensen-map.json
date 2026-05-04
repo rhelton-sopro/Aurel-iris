@@ -7,11 +7,11 @@
     "2": ["cerebelo", "lobo temporal direito", "ouvido direito"],
     "3": ["face direita", "ouvido externo direito", "mandíbula direita"],
     "4": ["pescoço direito", "tireoide direita", "amígdala direita"],
-    "5": ["ombro direito", "braço direito", "pulmão lóbulo superior direito"],
+    "5": ["ombro direito", "braço direito", "pulmão lóbulo superior direito", "bexiga", "órgãos pélvicos", "útero ou próstata"],
     "6": ["apêndice", "válvula ileocecal", "intestino delgado direito", "cólon ascendente"],
     "7": ["fígado", "vesícula biliar", "diafragma direito"],
     "8": ["rim direito", "suprarrenal direita", "pâncreas cabeça"],
-    "9": ["bexiga", "órgãos pélvicos", "útero ou próstata"],
+    "9": ["pulmão", "pleura", "brônquios", "tórax direito"],
     "10": ["perna direita", "joelho direito", "pé direito"],
     "11": ["coluna lombar", "região renal posterior", "ovário direito ou testículo direito"],
     "12": ["cérebro posterior", "região occipital", "medula espinhal superior"]
