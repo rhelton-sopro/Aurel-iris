@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-04T17:00:00.000Z"
+last_updated: "2026-05-04T18:00:00.000Z"
 progress:
-  total_phases: 9
+  total_phases: 10
   completed_phases: 4
   total_plans: 42
-  completed_plans: 34
-  percent: 81
+  completed_plans: 35
+  percent: 83
 ---
 
 # Estado do projeto
@@ -19,17 +19,19 @@ progress:
 Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 
 **Valor central:** Cada cliente atendido produz um JSON de features genuinamente diferente, e por isso cada relatório é genuinamente diferente. Pipeline de visão objetivo + LLM ancorado em RAG é o coração do produto.
-**Foco atual:** Fase 5 (Pipeline de visão / Modal) — **EM EXECUÇÃO** desde 2026-05-04. Wave 0 ✓ + Wave 1a ✓ + Wave 1b ✓ (9/17 plans). Próximo: Wave 1c (05-10 modal_app).
+**Foco atual:** Fase 5 (Pipeline de visão / Modal) — **EM EXECUÇÃO** desde 2026-05-04. Wave 0 ✓ + Wave 1 ✓ inteira (10/17 plans). Próximo: Wave 2 (Next.js integration: 05-11..05-14).
 
 ## Posição atual
 
-Fase: 5 de 9 — **EM EXECUÇÃO** (Pipeline de visão / Modal)
-Plan: 9/17 (Wave 0 ✓ + Wave 1a ✓ + Wave 1b ✓)
-Próxima ação: spawn de Wave 1c (`05-10` modal_app — orchestrator que une as 6 stages num único endpoint Modal `analyze_iris`). Depois Wave 2 (Next.js integration: 05-11..05-14), Wave 3 (CI + audit + smoke: 05-15..05-17).
-Status: executing — Wave 1b fechada via founder UAT (D-J3 checkpoint:human-verify aprovado com 1 fix em right h9 = pulmao/pleura/bronquios/torax). 88/88 pytest verdes em vision-service (4 skips esperados). audit:vocabulary limpo.
-Última atividade: 2026-05-04 — Wave 1b concluída: 05-09 features (extract_all + compute_asymmetry + classify_iris_color via LAB k-means; jensen-map.json pt-BR aprovado pelo founder com correção em right h9). 20 novos tests (6 iris_maps + 14 features incluindo B4 anti-regression). Worktree base ficou stale (Bash bloqueado para o agent), orchestrator finalizou aplicando os 5 arquivos novos direto em main.
+Fase: 5 de 10 — **EM EXECUÇÃO** (Pipeline de visão / Modal)
+Plan: 10/17 (Wave 0 ✓ + Wave 1 ✓: 1a+1b+1c)
+Próxima ação: spawn de Wave 2 (`05-11` Next.js trigger route + `05-12` webhook receiver + `05-13` finalizeReadingAction integration + `05-14` UI StatusBadge — 4 plans, paralelizáveis com cuidado nas dependências internas). Depois Wave 3 (CI + audit + smoke: 05-15..05-17).
+Status: executing — Wave 1c fechada com 05-10 modal_app orchestrator. Pipeline Python 100% implementado (todos os 4 VISION requirements 01-04 funcionalmente atendidos). 97/98 pytest verdes (1 known-issue em `test_real_tree_is_clean` por `vision-service/data/jensen-reference.md` untracked com vocab proibido — não bloqueia, ver 05-10-SUMMARY.md "Issues Encountered").
+Última atividade: 2026-05-04 — Wave 1c concluída: 05-10 modal_app (run_pipeline T4 GPU worker + analyze_iris_endpoint FastAPI POST + _post_webhook HMAC + _classify_error_summary D-E1 catalog + _load_image lazy fetcher). 10 novos tests cobrindo importabilidade sem secrets, B2/B3/B5 anti-regressions, Stripe sign convention. supabase removido do Modal image (D-T6). face_landmarker.task pre-baked em /models/ (Pitfall 2). Bash sandbox bloqueou os agents 2x (mesmo com bypassPermissions) — orchestrator implementou inline.
 
-Progresso: [████████░░] 81% (4/9 fases concluídas + 9/17 plans Fase 5 — 34/42 plans do milestone v1.0)
+Progresso: [████████░░] 83% (4/10 fases concluídas + 10/17 plans Fase 5 — 35/42 plans do milestone v1.0)
+
+**Backlog de longo prazo (registrado mas NÃO ativo):** Fase 10 — Sistema de Aprendizagem Clínica (planejada para depois de Fase 9 fechar; ver `.planning/phases/10-aprendizagem-clinica/10-CONTEXT.md`). Captura de dados pré-requisito a partir da Fase 7 (relatório gerado vs. entregue + diff de edições humanas) precisa ser embutida no design da Fase 7.
 
 ## Métricas de performance
 

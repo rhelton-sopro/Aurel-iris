@@ -23,6 +23,7 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
 - [ ] **Fase 7: Análise LLM** — Relatório iridológico em pt-BR gerado por Claude Sonnet 4.6 ancorado em features + RAG.
 - [ ] **Fase 8: Pagamento + LGPD** — Stripe BR (BRL+PIX) com trial 14d e termo de consentimento + direitos LGPD.
 - [ ] **Fase 9: Polish + dogfooding + beta** — Onboarding, e-mail transacional, uso semanal real pelo fundador, depois beta com 10–20 terapeutas.
+- [ ] **Fase 10: Sistema de Aprendizagem Clínica** *(planejada — backlog de longo prazo, executar depois da Fase 9 fechar)* — Captura de diff entre relatório gerado e entregue → descoberta de heurísticas emergentes + scoring clínico próprio + sugestões pré-preenchidas. Transforma o produto de "software de iridologia" em "sistema proprietário de análise iridológica" intransponível. **Pré-requisito de captura de dados embutido na Fase 7** (relatório_gerado, relatório_entregue, zonas_editadas, tipo_edição). Ver `.planning/phases/10-aprendizagem-clinica/10-CONTEXT.md`.
 
 ## Detalhes das fases
 
@@ -161,7 +162,7 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
 - **Wave 1** *(pipeline implementation — depende Wave 0; subdividida em 1a/1b/1c por dependências internas)*:
   - **Wave 1a** *(paralelo; depende só de 05-01 — CONCLUÍDA 2026-05-04)*: [x] 05-03 Pydantic IrisFeatures schemas (16 classes, 22 tests), [x] 05-04 detect (MediaPipe FaceLandmarker iris 468–477/473–477, D-X3 hybrid), [x] 05-05 segment (HoughCircles + fallback D-F1, Pitfall 7 closest-to-seed, 10 tests), [x] 05-06 compose (photometric weighted average com ANGLE_WEIGHTS, 10 tests), [x] 05-07 normalize (Daugman polar 64×512 via cv2.remap vetorizado, 10 tests <50ms), [x] 05-08 enhance (CLAHE LAB L-channel, hue preservado, 7 tests). **68/68 pytest verdes em vision-service.**
   - **Wave 1b** *(depende 05-03; bloqueante para 05-10 — CONCLUÍDA 2026-05-04 via founder UAT)*: [x] 05-09 features (extract_all + compute_asymmetry + classify_iris_color via LAB k-means; jensen-map.json pt-BR aprovado pelo founder com 1 fix em right h9 = pulmão/pleura/brônquios/tórax direito; 20 tests incluindo B4 anti-regression)
-  - **Wave 1c** *(depende toda Wave 1)*: 05-10 modal_app orchestration (analyze_iris_endpoint + .spawn + _post_webhook com vision_features kwarg + WEBHOOK_BASE_URL)
+  - **Wave 1c** *(depende toda Wave 1 — CONCLUÍDA 2026-05-04)*: [x] 05-10 modal_app orchestration (analyze_iris_endpoint FastAPI POST + run_pipeline T4 GPU worker com per-eye try/except D-F1 + _post_webhook HMAC Stripe convention + _classify_error_summary D-E1 catalog pt-BR + face_landmarker.task pre-baked + supabase removido per D-T6; 10 testes D-X2). **Wave 1 inteira fechada — pipeline Python 100% implementado.**
 - **Wave 2** *(Next.js integration — depende Wave 1)*: 05-11 trigger route + lib/vision/modal-client.ts, 05-12 webhook route (HMAC + Zod superRefine + status guard D-T4 + atomic UPDATE D-F5), 05-13 finalizeReadingAction integration (closes Fase 5: TODO line 112), 05-14 UI StatusBadge + ReprocessButton em /leituras
 - **Wave 3** *(CI + audit + smoke — depende Wave 1+2)*: 05-15 GH Actions vision-service-tests.yml, 05-16 D-E1 error_summary catalog + extended LGPD audit, 05-17 founder smoke procedure + .env.example finalization
 
@@ -228,10 +229,29 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
 **Plans**: TBD
 **UI hint**: yes
 
+### Fase 10: Sistema de Aprendizagem Clínica *(planejada — pós-Fase 9)*
+**Mapeamento SPEC:** N/A (fase pós-MVP, surgida pós-bootstrap como diferencial estratégico de longo prazo).
+**Goal**: Construir um sistema de aprendizagem clínica que aprende com cada edição humana do relatório (diff entre gerado e entregue), descobre heurísticas emergentes (correlações features↔achados clínicos não documentados pelo Jensen), cria um scoring clínico próprio (modelo leve treinável incrementalmente) e sugere automaticamente (pré-preenche seções, sinaliza zonas críticas, identifica combinações raras). Transforma o produto de "software de iridologia" em "sistema proprietário de análise iridológica" intransponível.
+**Depends on**: Fase 9 fechada **com Estágio 1 (dogfooding) consolidado**. Pré-requisito de captura de dados embutido na Fase 7 (relatório_gerado, relatório_entregue, timestamp_gerado/entregue, zonas_editadas, tipo_edição). **Sem esses campos persistidos desde a Fase 7, cada leitura é uma anotação perdida para sempre.**
+**Princípios não-negociáveis:**
+  - Simplicidade operacional — invisível ao terapeuta (não deve sentir que está "treinando um modelo")
+  - Privacidade by design — anonimização e consentimento explícito (aproveita a infra LGPD da Fase 8)
+  - Incremental — funciona com 10 leituras, melhora com 1000
+  - Auditável — terapeuta vê "por que o sistema sugeriu X"
+  - Reversível — qualquer heurística aprendida pode ser descartada
+**Success Criteria** (alvo direcional, refinar no plan-phase):
+  1. Após 100+ leituras anotadas com diff, o sistema sugere 1+ heurística emergente que diverge do Jensen e é validada pelo fundador como clinicamente útil.
+  2. Pré-preenchimento de relatório reduz tempo médio de edição humana em ≥ 30% após N leituras (N a definir).
+  3. Modelo leve (scikit-learn / XGBoost ou similar — planner decide) re-treina sem GPU em ≤ 5 minutos.
+  4. Painel de auditoria mostra cada heurística aprendida com contagem de evidências + opção de descarte.
+**Plans**: TBD (planejar em /gsd-plan-phase 10 quando Fase 9 fechar)
+**Contexto detalhado**: ver `.planning/phases/10-aprendizagem-clinica/10-CONTEXT.md` (criado 2026-05-04 a partir de input do fundador).
+**Meta de longo prazo**: primeiro sistema de iridologia baseado em evidências computacionais de câmera de celular em população brasileira contemporânea — divergindo do Jensen onde os dados mostrarem padrões diferentes da teoria clássica.
+
 ## Progresso
 
 **Ordem de execução:**
-Fases executam em ordem numérica: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9.
+Fases v1 executam em ordem numérica: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9. Fase 10 (Aprendizagem Clínica) é **post-MVP** — só inicia após Fase 9 fechar com dogfooding consolidado.
 
 | Fase | Plans concluídos | Status | Concluída em |
 |-------|------------------|--------|--------------|
@@ -239,10 +259,11 @@ Fases executam em ordem numérica: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 �
 | 2. Auth + Dashboard básico | 4/4 | ✅ Concluída | — |
 | 3. Captura mobile (PWA) | 8/8* | ✅ Concluída via UAT | 2026-05-03 |
 | 4. Upload desktop | 7/7 | ✅ Concluída via UAT + gsd-verifier | 2026-05-03 |
-| 5. Pipeline de visão (Modal) | 9/17 | Em execução (Wave 0 ✓ + Wave 1a ✓ + Wave 1b ✓) | — |
+| 5. Pipeline de visão (Modal) | 10/17 | Em execução (Wave 0 ✓ + Wave 1 ✓; Wave 2 next) | — |
 | 6. RAG — Ingestão | 0/TBD | Não iniciada | — |
 | 7. Análise LLM | 0/TBD | Não iniciada | — |
 | 8. Pagamento + LGPD | 0/TBD | Não iniciada | — |
 | 9. Polish + dogfooding + beta | 0/TBD | Não iniciada | — |
+| 10. Sistema de Aprendizagem Clínica | 0/TBD | **Backlog (planejada — pós-Fase 9)** | — |
 
 \* **Fase 3 nota**: Plans 03-01 a 03-07 executados normalmente. Plan 03-08 (RecoveryBanner D-12, PWAInstallBanner D-14, listagem rascunhos) teve scope reduzido durante UAT — finalizeReadingAction foi absorvida em fixes pós-execução. RecoveryBanner e PWAInstallBanner deferidos para Fase 9 (polish pré-beta). Captura mobile principal funcional pós-UAT 03 (20 rounds de calibração do gate VLM Claude Haiku 4.5). Único issue conhecido: PWA standalone Android Chrome (instala mas abre com URL bar). Não bloqueia Estágio 1 (dogfood iPhone Safari).
