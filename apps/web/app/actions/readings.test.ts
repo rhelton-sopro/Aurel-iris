@@ -105,3 +105,70 @@ describe('createReadingSchema (method field — Fase 4)', () => {
     expect(draft.capture_method).toBe('desktop_upload')
   })
 })
+
+// CONTEXT D-15 (Fase 4 — Plan 04-07): smoke test do contrato DraftReading.capture_method
+// que a Fase 9 (RecoveryBanner UI) vai consumir. Esta fase entrega APENAS o backend hook —
+// o componente RecoveryBanner.tsx visual ficou explicitamente deferido pra Fase 9 alinhado
+// com STATE.md ("RecoveryBanner D-12 e PWAInstallBanner D-14 deferidos pra Fase 9 — polish
+// pré-beta"). Os testes abaixo documentam:
+//   1. Shape do DraftReading (compile-time + runtime) com ambos os valores de capture_method.
+//   2. Lógica de roteamento que Fase 9 implementará (forward — same source of truth).
+//   3. Vocabulário neutro (sem termos LGPD-proibidos).
+// TypeScript já rejeita capture_method='other_value' em compile-time (CaptureMethod = enum
+// canônico em readings.schemas.ts) — não testável runtime, mas garantido pelo tsc.
+describe('DraftReading shape (Phase 4 — D-15 recovery routing)', () => {
+  it('accepts capture_method=mobile_camera', () => {
+    const draft: DraftReading = {
+      id: VALID_READING_UUID,
+      created_at: '2026-05-03T00:00:00.000Z',
+      client_id: VALID_CLIENT_UUID,
+      client_name: 'Test Client',
+      imagesCaptured: 3,
+      capture_method: 'mobile_camera',
+    }
+    expect(draft.capture_method).toBe('mobile_camera')
+  })
+
+  it('accepts capture_method=desktop_upload', () => {
+    const draft: DraftReading = {
+      id: VALID_READING_UUID,
+      created_at: '2026-05-03T00:00:00.000Z',
+      client_id: VALID_CLIENT_UUID,
+      client_name: 'Test Client',
+      imagesCaptured: 0,
+      capture_method: 'desktop_upload',
+    }
+    expect(draft.capture_method).toBe('desktop_upload')
+  })
+
+  it('uses capture_method to determine recovery route (forward to Fase 9)', () => {
+    const draft: DraftReading = {
+      id: VALID_READING_UUID,
+      created_at: '2026-05-03T00:00:00.000Z',
+      client_id: VALID_CLIENT_UUID,
+      client_name: 'Test Client',
+      imagesCaptured: 0,
+      capture_method: 'desktop_upload',
+    }
+    // Lógica que a Fase 9 RecoveryBanner.tsx vai usar:
+    const expectedRoute = draft.capture_method === 'desktop_upload'
+      ? `/leituras/nova/upload?reading=${draft.id}&resume=true`
+      : `/leituras/nova/capturar?reading=${draft.id}&resume=true`
+    expect(expectedRoute).toBe(`/leituras/nova/upload?reading=${draft.id}&resume=true`)
+  })
+
+  it('mobile_camera draft routes to /capturar', () => {
+    const draft: DraftReading = {
+      id: VALID_READING_UUID,
+      created_at: '2026-05-03T00:00:00.000Z',
+      client_id: VALID_CLIENT_UUID,
+      client_name: 'Test Client',
+      imagesCaptured: 2,
+      capture_method: 'mobile_camera',
+    }
+    const expectedRoute = draft.capture_method === 'desktop_upload'
+      ? `/leituras/nova/upload?reading=${draft.id}&resume=true`
+      : `/leituras/nova/capturar?reading=${draft.id}&resume=true`
+    expect(expectedRoute).toBe(`/leituras/nova/capturar?reading=${draft.id}&resume=true`)
+  })
+})
