@@ -1,36 +1,437 @@
-"""
-Stage 6/6: Feature extraction.
+"""Stage 6/6: Feature extraction.
 
 Produces the per-eye block of the canonical features JSON (SPEC §4.3):
 constitution, iris_color, fiber_density, collarette, pupil, sectors[],
 rings, global_signs, image_quality.
 
-MVP techniques (SPEC §4.4):
-  - HSV clustering for iris_color.
-  - OpenCV heuristics (adaptive threshold + morphology) for lacunas/criptas.
-  - Constitutional palette comparison for constitution.
+Techniques (SPEC §4.4 / RESEARCH.md):
+  - LAB k-means (Pattern 8) for iris_color — KMEANS_K=3.
+  - OpenCV heuristics (dark threshold + connected components) for lacunas/criptas.
+  - Sobel magnitude for fiber_density.
+  - Jensen sector map per-eye for sectors[*].zones (D-J4).
 
-Status: skeleton.
+Asymmetry (D-A1/D-A2):
+  - compute_asymmetry(results) consumes plain dict eye blocks — NO attribute
+    access on result blocks (B4 anti-regression). Uses dict subscripts / .get()
+    exclusively.
+
+References:
+  - SPEC §4.3 — canonical per-eye payload shape
+  - RESEARCH.md Pattern 8 — LAB k-means color classification
+  - CONTEXT.md D-A1/D-A2 — asymmetry naming convention
+  - CONTEXT.md D-F1 — soft degradation per eye
+"""
+from __future__ import annotations
+
+import functools
+from typing import Optional
+
+import cv2
+import numpy as np
+
+# ---------------------------------------------------------------------------
+# Module constants (D-X3 calibration anchors — exposed for tuning)
+# ---------------------------------------------------------------------------
+
+KMEANS_K: int = 3
+"""Number of clusters for LAB k-means color classification (RESEARCH Pattern 8)."""
+
+LACUNA_DARK_THRESHOLD: int = 60
+"""uint8 pixel value below which a region is a lacuna candidate."""
+
+LACUNA_MIN_AREA: int = 30
+"""Minimum connected-component area (pixels) to qualify as a lacuna."""
+
+FIBER_DENSITY_BANDS: tuple[float, float, float] = (0.4, 0.65, 0.85)
+"""Score boundaries for esparsa | media | media-densa | densa buckets."""
+
+IRIS_COLOR_LABELS: tuple[str, ...] = ("azul", "castanho", "verde-mosaico", "misto")
+"""Canonical primary iris color values."""
+
+IRIS_COLOR_LAB_CENTROIDS: dict[str, tuple[int, int, int]] = {
+    "azul": (220, 130, 110),
+    "castanho": (90, 145, 160),
+    "verde-mosaico": (140, 110, 145),
+}
+"""Heuristic LAB anchor centroids for color classification.
+'misto' is the fallback when distances to all three are within 10% of each other.
 """
 
 
-def extract_all(enhanced_image, composite_image):
-    """
-    Extract the full per-eye features block.
+# ---------------------------------------------------------------------------
+# classify_iris_color — RESEARCH Pattern 8
+# ---------------------------------------------------------------------------
+
+def classify_iris_color(
+    masked_image: np.ndarray,
+    iris_circle: Optional[tuple[float, float, float]] = None,
+) -> dict:
+    """Classify iris primary/secondary color via LAB k-means.
 
     Args:
-        enhanced_image: output of pipeline.enhance.clahe.
-        composite_image: output of pipeline.compose.photometric_combine
-                         (kept for color analysis pre-CLAHE).
+        masked_image: RGB uint8 array of the segmented iris region.
+        iris_circle: Optional (cx, cy, r) tuple for central_heterochromia detection.
 
     Returns:
-        Dict matching SPEC §4.3 per-eye shape:
-          constitution, iris_color, fiber_density, collarette, pupil,
-          sectors, rings, global_signs, image_quality.
+        dict with keys: primary, secondary (Optional[str]), central_heterochromia (bool).
+    """
+    # Convert RGB -> LAB
+    lab = cv2.cvtColor(masked_image, cv2.COLOR_RGB2LAB)
+    pixels = lab.reshape(-1, 3).astype(np.float32)
+
+    # Run k-means
+    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 100, 0.2)
+    _, labels, centers = cv2.kmeans(
+        pixels,
+        KMEANS_K,
+        None,
+        criteria,
+        10,
+        cv2.KMEANS_RANDOM_CENTERS,
+    )
+
+    # Find cluster sizes
+    counts = np.bincount(labels.flatten())
+    sorted_idx = np.argsort(-counts)  # descending by size
+
+    primary_center = centers[sorted_idx[0]]
+    secondary_center = centers[sorted_idx[1]] if KMEANS_K > 1 else None
+
+    def _nearest_color(center: np.ndarray) -> str:
+        dists = {
+            name: float(np.linalg.norm(center - np.array(anchor, dtype=np.float32)))
+            for name, anchor in IRIS_COLOR_LAB_CENTROIDS.items()
+        }
+        min_dist = min(dists.values())
+        # If two closest centroids are within 10% of each other -> misto
+        sorted_dists = sorted(dists.values())
+        if len(sorted_dists) >= 2 and sorted_dists[1] <= sorted_dists[0] * 1.1:
+            return "misto"
+        return min(dists, key=lambda k: dists[k])
+
+    primary = _nearest_color(primary_center)
+
+    secondary: Optional[str] = None
+    if secondary_center is not None:
+        sec_color = _nearest_color(secondary_center)
+        if sec_color != primary:
+            secondary = sec_color
+
+    # central_heterochromia: MVP returns False when no iris_circle provided
+    central_heterochromia = False
+
+    return {
+        "primary": primary,
+        "secondary": secondary,
+        "central_heterochromia": central_heterochromia,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Private helpers
+# ---------------------------------------------------------------------------
+
+def _detect_findings_in_sector(
+    enhanced_polar: np.ndarray,
+    sector_idx: int,
+) -> list[dict]:
+    """Detect lacunas in a single sector of the polar-unwrapped iris image.
+
+    Args:
+        enhanced_polar: RGB uint8 polar image (H x W x 3).
+        sector_idx: 0-based sector index (0..11).
+
+    Returns:
+        List of finding dicts (may be empty).
+    """
+    H, W = enhanced_polar.shape[:2]
+    col_start = sector_idx * (W // 12)
+    col_end = (sector_idx + 1) * (W // 12)
+    sector_slice = enhanced_polar[:, col_start:col_end]
+
+    gray = cv2.cvtColor(sector_slice, cv2.COLOR_RGB2GRAY)
+    mask = (gray < LACUNA_DARK_THRESHOLD).astype(np.uint8)
+
+    num, _, stats, _ = cv2.connectedComponentsWithStats(mask, connectivity=8)
+
+    findings: list[dict] = []
+    for i in range(1, num):  # skip label 0 (background)
+        area = int(stats[i, cv2.CC_STAT_AREA])
+        if area >= LACUNA_MIN_AREA:
+            findings.append({
+                "type": "lacuna",
+                "depth": "grau_1",
+                "size_mm": float(area / 100.0),
+            })
+    return findings
+
+
+def _compute_fiber_density(enhanced_polar: np.ndarray) -> dict:
+    """Estimate fiber density via Sobel gradient magnitude.
+
+    Args:
+        enhanced_polar: RGB uint8 polar image.
+
+    Returns:
+        dict with score (float [0,1]) and interpretation (str).
+    """
+    gray = cv2.cvtColor(enhanced_polar, cv2.COLOR_RGB2GRAY).astype(np.float32)
+    grad_x = cv2.Sobel(gray, cv2.CV_32F, 1, 0)
+    grad_y = cv2.Sobel(gray, cv2.CV_32F, 0, 1)
+    mag = np.sqrt(grad_x ** 2 + grad_y ** 2)
+    score = float(np.clip(mag.mean() / 50.0, 0.0, 1.0))
+
+    if score < FIBER_DENSITY_BANDS[0]:
+        interpretation = "esparsa"
+    elif score < FIBER_DENSITY_BANDS[1]:
+        interpretation = "media"
+    elif score < FIBER_DENSITY_BANDS[2]:
+        interpretation = "media-densa"
+    else:
+        interpretation = "densa"
+
+    return {"score": score, "interpretation": interpretation}
+
+
+def _classify_constitution(iris_color: dict, fiber_density: dict) -> dict:
+    """Heuristic Jensen constitution classification.
+
+    Args:
+        iris_color: output of classify_iris_color.
+        fiber_density: output of _compute_fiber_density.
+
+    Returns:
+        dict with primary (str), confidence (float), indicators (list[str]).
+    """
+    primary_color = iris_color.get("primary", "misto")
+    interpretation = fiber_density.get("interpretation", "media")
+
+    indicators: list[str] = []
+
+    if primary_color == "azul":
+        indicators.append("coloracao_azul_clara")
+        if interpretation in ("esparsa", "media"):
+            constitution = "linfatica"
+            confidence = 0.8 if iris_color.get("secondary") is None else 0.7
+        else:
+            constitution = "mista"
+            confidence = 0.6
+    elif primary_color == "castanho":
+        indicators.append("coloracao_castanha")
+        constitution = "hematogenea"
+        confidence = 0.7
+    else:
+        indicators.append("coloracao_mista_ou_verde")
+        constitution = "mista"
+        confidence = 0.6
+
+    if interpretation in ("media", "media-densa"):
+        indicators.append("fibras_finas_radiais")
+
+    return {
+        "primary": constitution,
+        "confidence": confidence,
+        "indicators": indicators,
+    }
+
+
+def _build_collarette() -> dict:
+    """Return MVP collarette defaults.
+
+    Fixture-driven calibration (D-X3) will replace these defaults in a follow-up.
+    The Pydantic schema accepts these values.
+    """
+    return {
+        "shape": "regular",
+        "diameter_ratio": 0.32,
+        "decentralization": "centrada",
+    }
+
+
+def _build_pupil(composite: dict) -> dict:
+    """Build pupil block from composite dict.
+
+    Args:
+        composite: dict with optional 'pupil_circle' and 'iris_circle' keys.
+
+    Returns:
+        dict with centralization, shape, size_ratio.
+    """
+    pupil_circle = composite.get("pupil_circle")
+    iris_circle = composite.get("iris_circle")
+
+    if pupil_circle is None or iris_circle is None:
+        return {"centralization": "centrada", "shape": "circular", "size_ratio": 0.18}
+
+    r_pupil = float(pupil_circle[2])
+    r_iris = float(iris_circle[2])
+    size_ratio = float(np.clip(r_pupil / r_iris if r_iris > 0 else 0.18, 0.0, 1.0))
+    return {"centralization": "centrada", "shape": "circular", "size_ratio": size_ratio}
+
+
+def _build_rings(enhanced_polar: np.ndarray) -> dict:
+    """Return MVP rings defaults.
+
+    Calibration TODO: detect nerve rings via radial gradient profile.
+    """
+    return {
+        "nerve_rings": {"present": False, "count": None, "intensity": None},
+        "lymphatic_rosary": {"present": False},
+        "sodium_ring": {"present": False},
+        "senile_arc": {"present": False},
+    }
+
+
+def _build_global_signs() -> dict:
+    """Return MVP global signs defaults."""
+    return {
+        "radii_solaris": [],
+        "transversal_signs": [],
+        "tofus": [],
+    }
+
+
+def _build_image_quality(warnings: list[str], composite: dict) -> dict:
+    """Build image_quality block.
+
+    composite_score = 0.85 minus 0.1 per warning, clipped to [0, 1].
+    """
+    score = float(np.clip(0.85 - 0.1 * len(warnings), 0.0, 1.0))
+    return {"composite_score": score, "warnings": list(warnings)}
+
+
+# ---------------------------------------------------------------------------
+# Public API
+# ---------------------------------------------------------------------------
+
+def extract_all(
+    enhanced_image: np.ndarray,
+    composite_image: dict,
+    jensen_map: dict,
+    eye: str,
+    *,
+    warnings: Optional[list[str]] = None,
+) -> dict:
+    """Extract full per-eye features block.
+
+    Args:
+        enhanced_image: RGB uint8 polar image from pipeline.enhance.clahe.
+        composite_image: dict from pipeline.compose.photometric_combine with
+            keys: segmented_image (np.ndarray), iris_circle (tuple|None),
+            pupil_circle (tuple|None).
+        jensen_map: loaded Jensen map dict (from iris_maps.load_jensen_map).
+        eye: "right" or "left".
+        warnings: accumulated pipeline warnings (D-PM1, D-F1).
+
+    Returns:
+        Plain Python dict matching SPEC §4.3 EyeFeatures shape.
+        Validates via EyeFeatures.model_validate(result).
 
     Raises:
-        NotImplementedError: Phase 5 implements this.
+        ValueError: if eye not in {"right", "left"} or jensen_map missing eye key.
     """
-    raise NotImplementedError(
-        "pipeline.features.extract_all — implement in Phase 5"
+    if eye not in ("right", "left"):
+        raise ValueError("features_invalid_eye")
+    if eye not in jensen_map:
+        raise ValueError("features_jensen_map_missing_eye")
+
+    warnings = warnings if warnings is not None else []
+
+    iris_color = classify_iris_color(
+        composite_image["segmented_image"],
+        iris_circle=composite_image.get("iris_circle"),
     )
+    fiber_density = _compute_fiber_density(enhanced_image)
+    constitution = _classify_constitution(iris_color, fiber_density)
+    collarette = _build_collarette()
+    pupil = _build_pupil(composite_image)
+
+    sectors = []
+    for hour in range(1, 13):
+        zones = list(jensen_map[eye][str(hour)])
+        findings = _detect_findings_in_sector(enhanced_image, hour - 1)
+        sectors.append({
+            "hour": hour,
+            "zones": zones,
+            "findings": findings,
+        })
+
+    rings = _build_rings(enhanced_image)
+    global_signs = _build_global_signs()
+    image_quality = _build_image_quality(warnings, composite_image)
+
+    return {
+        "constitution": constitution,
+        "iris_color": iris_color,
+        "fiber_density": fiber_density,
+        "collarette": collarette,
+        "pupil": pupil,
+        "sectors": sectors,
+        "rings": rings,
+        "global_signs": global_signs,
+        "image_quality": image_quality,
+    }
+
+
+def compute_asymmetry(results: dict) -> list[str]:
+    """Compute asymmetry notes between right and left eye feature blocks.
+
+    Args:
+        results: dict with keys "right_eye" and "left_eye", each being either
+            None or a plain Python dict (the output of extract_all).
+            IMPORTANT: Uses dict subscripts and .get() only — NEVER attribute
+            access (B4 anti-regression).
+
+    Returns:
+        list[str] of asymmetry notes in pt-BR snake_case (D-A1).
+        Empty list when no asymmetries detected (D-A2).
+    """
+    right = results.get("right_eye")
+    left = results.get("left_eye")
+
+    # Unilateral cases
+    if right is None and left is not None:
+        return ["unilateral_analysis_only_left_eye"]
+    if left is None and right is not None:
+        return ["unilateral_analysis_only_right_eye"]
+    if right is None and left is None:
+        return []
+
+    notes: list[str] = []
+
+    # Iris color asymmetry
+    right_primary = right.get("iris_color", {}).get("primary")
+    left_primary = left.get("iris_color", {}).get("primary")
+    if (
+        right_primary is not None
+        and left_primary is not None
+        and right_primary != left_primary
+        and right_primary != "misto"
+        and left_primary != "misto"
+    ):
+        notes.append(f"cor_assimetrica_{right_primary}_direito_{left_primary}_esquerdo")
+
+    # Sector lacuna asymmetry
+    right_sectors = right["sectors"]
+    left_sectors = left["sectors"]
+    for h in range(1, 13):
+        right_findings = right_sectors[h - 1]["findings"]
+        left_findings = left_sectors[h - 1]["findings"]
+        right_has_lacuna = any(f["type"] == "lacuna" for f in right_findings)
+        left_has_lacuna = any(f["type"] == "lacuna" for f in left_findings)
+        if right_has_lacuna and not left_findings:
+            notes.append(f"lacuna_unilateral_setor_{h}_direito")
+        elif left_has_lacuna and not right_findings:
+            notes.append(f"lacuna_unilateral_setor_{h}_esquerdo")
+
+    # Fiber density asymmetry
+    right_score = right.get("fiber_density", {}).get("score")
+    left_score = left.get("fiber_density", {}).get("score")
+    if (
+        right_score is not None
+        and left_score is not None
+        and abs(right_score - left_score) > 0.2
+    ):
+        notes.append("densidade_fibras_assimetrica")
+
+    return notes
