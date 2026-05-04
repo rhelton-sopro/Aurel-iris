@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: phase_complete
-last_updated: "2026-05-04T00:30:00Z"
+status: planning
+last_updated: "2026-05-04T11:08:49.234Z"
 progress:
   total_phases: 9
   completed_phases: 4
-  total_plans: 25
+  total_plans: 42
   completed_plans: 25
-  percent: 56
+  percent: 60
 ---
 
 # Estado do projeto
@@ -23,10 +23,10 @@ Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 
 ## Posição atual
 
-Fase: 4 de 9 — **CONCLUÍDA** (Upload desktop)
-Próxima fase: Fase 5 (Pipeline de visão / Modal) — pronta para iniciar (requer Fase 4 + Fase 3 concluídas).
-Status: phase_complete — Phase 4 fechada 2026-05-03. UAT founder approved + gsd-verifier passed (relatório em `.planning/phases/04-upload-desktop/04-VERIFICATION.md`). 7/7 plans, 5 waves; sequencial em Windows/PowerShell.
-Última atividade: 2026-05-04 — Plan 04-07 fechado (`approved` ao checkpoint:human-verify). gsd-verifier confirmou: 4/4 success criteria, 2/2 requirements (UPLOAD-01, UPLOAD-02), 5/5 cross-cutting constraints honrados. 39/39 testes Phase 4 verdes. heic2any em chunk dedicado 1.35 MB confirmado. RecoveryBanner UI deferido conforme planejado para Fase 9.
+Fase: 5 de 9 — **PLANEJADA** (Pipeline de visão / Modal)
+Próxima ação: `/gsd-execute-phase 5` — executar 17 plans em 4 waves.
+Status: planning_complete — Phase 5 plans 05-01 a 05-17 prontos para execução. RESEARCH+PATTERNS+VALIDATION criados; plan-checker iter 2 passou (5 blockers de iter 1 resolvidos via revisão cirúrgica).
+Última atividade: 2026-05-04 — Phase 5 plan-phase concluído. 17 plans em 4 waves (Wave 0 infra, Wave 1 pipeline 6 etapas + schemas, Wave 2 trigger+webhook+integration+UI, Wave 3 CI+audit+smoke). Todas as 4 REQ-IDs cobertas (VISION-01..04); todas as 23 decisões CONTEXT cobertas; todos os 5 success criteria ROADMAP mapeados.
 
 Progresso: [█████░░░░░] 56% (4/9 fases — 25/25 plans concluídos do milestone v1.0)
 
@@ -101,10 +101,12 @@ Nenhum ainda.
 Última sessão: 2026-05-04 (00:04–00:10 UTC) — **Plan 04-07 Tasks 1+2 concluídas; aguardando checkpoint manual founder.** Wave 5 código-completa. UPLOAD-01 e UPLOAD-02 entregues (validação UAT manual pendente).
 
 Stopped at: 04-07-SUMMARY.md gerado como **partial** (status: awaiting-uat-checkpoint), STATE.md+ROADMAP.md atualizados refletindo aguarda. **Próxima ação não-automática:** founder executa `.planning/phases/04-upload-desktop/04-UAT.md` em sessão real (mínimo MVP — cenários 1, 3, 5, 6, 8, 9, 10, 11, 14) e responde:
+
 - "approved" → orchestrator pode marcar 04-07 como `[x]`, fechar Fase 4, e avançar para Fase 5 (Pipeline de visão Modal)
 - "needs-fix: <descrição>" → planejar uma rodada de gap closure antes de fechar a fase
 
 Smoke automated rodadas neste plan:
+
 - `pnpm test:run app/actions/readings.test.ts` → 16/16 verde
 - Smoke completo `pnpm test:run` (apps/web) → 187/190 (3 falhas pré-existentes em quality-scoring.test.ts — Fase 3, deferred)
 - `pnpm tsc --noEmit -p .` → 2 erros pré-existentes (mesmos, deferred)
@@ -118,6 +120,7 @@ Resume file pós-UAT: `.planning/phases/04-upload-desktop/04-07-SUMMARY.md` (rec
 Sessão anterior (2026-05-03 manhã): **Fase 3 fechada via UAT 03**.
 
 **Pivôs arquiteturais durante UAT (sem replanning formal):**
+
 - MediaPipe FaceLandmarker → pupil detection pixel-based → Otsu adaptativo → bypass → **Claude Haiku 4.5 VLM via /api/capture/validate** (4 iterações; última solução é a definitiva).
 - Streaming PWA com live quality gate → **câmera nativa via `<input capture="environment">`** com análise pós-captura.
 - Removido: Laplacian variance, useCamera, CameraView, CameraDeniedScreen, IrisDetector, RecoveryBanner, PWAInstallBanner.
