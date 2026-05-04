@@ -158,7 +158,10 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
   5. Trigger end-to-end: terapeuta finaliza captura/upload → `readings.status` transita `pending → processing → ready` sem intervenção manual; `vision_features` populado.
 **Plans**: 17 plans em 4 waves
 - **Wave 0** *(test infra + security primitives — paralelo; CONCLUÍDA 2026-05-04)*: [x] 05-01 vision-service test scaffolding (pytest + fixtures + audit script — 10/10 testes verdes), [x] 05-02 apps/web service-role Supabase client + lib/vision/hmac.ts (HmacVerificationResult discriminated union — 19/19 testes verdes). 05-03 (Pydantic schemas) movido para Wave 1 conforme frontmatter.
-- **Wave 1** *(pipeline implementation — paralelo entre etapas; depende Wave 0)*: 05-04 detect (MediaPipe FaceLandmarker iris 468–477/473–477), 05-05 segment (HoughCircles + fallback), 05-06 compose (photometric weighted average), 05-07 normalize (Daugman polar 64×512), 05-08 enhance (CLAHE LAB L-channel), 05-09 features (extract_all + jensen-map.json + iris_maps.py + compute_asymmetry dict-subscript), 05-10 modal_app orchestration (analyze_iris_endpoint + .spawn + _post_webhook com vision_features kwarg + WEBHOOK_BASE_URL)
+- **Wave 1** *(pipeline implementation — depende Wave 0; subdividida em 1a/1b/1c por dependências internas)*:
+  - **Wave 1a** *(paralelo; depende só de 05-01 — CONCLUÍDA 2026-05-04)*: [x] 05-03 Pydantic IrisFeatures schemas (16 classes, 22 tests), [x] 05-04 detect (MediaPipe FaceLandmarker iris 468–477/473–477, D-X3 hybrid), [x] 05-05 segment (HoughCircles + fallback D-F1, Pitfall 7 closest-to-seed, 10 tests), [x] 05-06 compose (photometric weighted average com ANGLE_WEIGHTS, 10 tests), [x] 05-07 normalize (Daugman polar 64×512 via cv2.remap vetorizado, 10 tests <50ms), [x] 05-08 enhance (CLAHE LAB L-channel, hue preservado, 7 tests). **68/68 pytest verdes em vision-service.**
+  - **Wave 1b** *(depende 05-03; bloqueante para 05-10)*: 05-09 features (extract_all + jensen-map.json + iris_maps.py + compute_asymmetry dict-subscript) — `checkpoint:human-verify` antes de fechar
+  - **Wave 1c** *(depende toda Wave 1)*: 05-10 modal_app orchestration (analyze_iris_endpoint + .spawn + _post_webhook com vision_features kwarg + WEBHOOK_BASE_URL)
 - **Wave 2** *(Next.js integration — depende Wave 1)*: 05-11 trigger route + lib/vision/modal-client.ts, 05-12 webhook route (HMAC + Zod superRefine + status guard D-T4 + atomic UPDATE D-F5), 05-13 finalizeReadingAction integration (closes Fase 5: TODO line 112), 05-14 UI StatusBadge + ReprocessButton em /leituras
 - **Wave 3** *(CI + audit + smoke — depende Wave 1+2)*: 05-15 GH Actions vision-service-tests.yml, 05-16 D-E1 error_summary catalog + extended LGPD audit, 05-17 founder smoke procedure + .env.example finalization
 
@@ -236,7 +239,7 @@ Fases executam em ordem numérica: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 �
 | 2. Auth + Dashboard básico | 4/4 | ✅ Concluída | — |
 | 3. Captura mobile (PWA) | 8/8* | ✅ Concluída via UAT | 2026-05-03 |
 | 4. Upload desktop | 7/7 | ✅ Concluída via UAT + gsd-verifier | 2026-05-03 |
-| 5. Pipeline de visão (Modal) | 2/17 | Em execução (Wave 0 ✓) | — |
+| 5. Pipeline de visão (Modal) | 8/17 | Em execução (Wave 0 ✓ + Wave 1a ✓) | — |
 | 6. RAG — Ingestão | 0/TBD | Não iniciada | — |
 | 7. Análise LLM | 0/TBD | Não iniciada | — |
 | 8. Pagamento + LGPD | 0/TBD | Não iniciada | — |

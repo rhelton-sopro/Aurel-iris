@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-04T13:00:00.000Z"
+last_updated: "2026-05-04T16:00:00.000Z"
 progress:
   total_phases: 9
   completed_phases: 4
   total_plans: 42
-  completed_plans: 27
-  percent: 64
+  completed_plans: 33
+  percent: 79
 ---
 
 # Estado do projeto
@@ -19,17 +19,17 @@ progress:
 Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 
 **Valor central:** Cada cliente atendido produz um JSON de features genuinamente diferente, e por isso cada relatório é genuinamente diferente. Pipeline de visão objetivo + LLM ancorado em RAG é o coração do produto.
-**Foco atual:** Fase 5 (Pipeline de visão / Modal) — **EM EXECUÇÃO** desde 2026-05-04. Wave 0 (05-01 + 05-02) concluída; aguardando confirmação do usuário para Wave 1a.
+**Foco atual:** Fase 5 (Pipeline de visão / Modal) — **EM EXECUÇÃO** desde 2026-05-04. Wave 0 ✓ + Wave 1a ✓ (8/17 plans). Próximo: Wave 1b (05-09 features com checkpoint:human-verify).
 
 ## Posição atual
 
 Fase: 5 de 9 — **EM EXECUÇÃO** (Pipeline de visão / Modal)
-Plan: 2/17 (Wave 0 completa)
-Próxima ação: aguardando "continue" do usuário para spawn de Wave 1a (05-03..05-08, 6 plans paralelos).
-Status: executing — Wave 0 mergeada em main (commits 51f5a51 + 00f43c5). Próximo: Wave 1a (pipeline schemas + 5 stages independentes), depois Wave 1b (05-09 features com checkpoint), depois Wave 1c (05-10 modal_app).
-Última atividade: 2026-05-04 — Wave 0 concluída. 05-01 vision-service test infra (10/10 pytest verdes; audit:vocabulary CLI funcional). 05-02 apps/web service-role + HMAC (19/19 vitest verdes; discriminated union pattern). Recovery feito de um bad-merge inicial em branch stale agent-ae868b6c096eba96f — main restaurada via reflog para f597353 antes dos merges corretos.
+Plan: 8/17 (Wave 0 ✓ + Wave 1a ✓)
+Próxima ação: spawn de Wave 1b (`05-09` features — gate humano via `checkpoint:human-verify` antes de fechar). Depois Wave 1c (`05-10` modal_app), Wave 2 (Next.js integration), Wave 3 (CI + audit + smoke).
+Status: executing — Wave 1a mergeada em main (6 commits chore: merge 05-03..05-08). 68/68 pytest verdes em vision-service (4 skips esperados: 3× MediaPipe model não-local, 1× fixture pendente). audit:vocabulary limpo.
+Última atividade: 2026-05-04 — Wave 1a concluída em paralelo (~5–25 min/plan): 05-03 Pydantic schemas (22 tests, 16 classes Pydantic v2 espelhando SPEC §4.3), 05-04 MediaPipe FaceLandmarker detect (D-X3 hybrid, 478 landmarks, IoU≥0.7 metric), 05-05 HoughCircles segment com fallback D-F1 + Pitfall 7 closest-to-seed (10 tests, HOUGH_DEFAULTS exportado), 05-06 photometric compose com ANGLE_WEIGHTS (10 tests), 05-07 Daugman polar normalize 64×512 via cv2.remap vetorizado (10 tests, perf <50ms), 05-08 LAB-space CLAHE no L-channel (7 tests, hue preservado).
 
-Progresso: [██████░░░░] 64% (4/9 fases concluídas + 2/17 plans Fase 5 — 27/42 plans do milestone v1.0)
+Progresso: [████████░░] 79% (4/9 fases concluídas + 8/17 plans Fase 5 — 33/42 plans do milestone v1.0)
 
 ## Métricas de performance
 
