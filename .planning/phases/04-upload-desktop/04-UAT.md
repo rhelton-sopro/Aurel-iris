@@ -1,6 +1,6 @@
 # Fase 4 — UAT (User Acceptance Testing)
 
-**Status:** Pronto para execução manual pelo founder após Plans 04-01 a 04-07 concluídos.
+**Status:** ✅ Aprovado pelo founder em 2026-05-03 (resposta `approved` ao checkpoint do Plan 04-07).
 
 **Pré-requisitos:**
 - Branch da Fase 4 buildando localmente (`pnpm dev` no apps/web).

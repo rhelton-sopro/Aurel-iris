@@ -8,7 +8,7 @@ tags:
   - recovery
   - uat
   - smoke-test
-  - awaiting-checkpoint
+  - approved
 
 # Dependency graph
 requires:
@@ -54,12 +54,13 @@ duration: ~5min (até o checkpoint; tempo total da Fase 4 calculado abaixo)
 completed: 2026-05-03
 
 # Status
-status: awaiting-uat-checkpoint
+status: complete
 checkpoint:
   type: human-verify
-  gate: blocking
-  resume-signal: "approved | needs-fix: <descrição>"
-  founder-action: "Executar UAT manual seguindo .planning/phases/04-upload-desktop/04-UAT.md"
+  gate: resolved
+  resolved-on: 2026-05-03
+  resolved-by: founder
+  resume-signal-received: "approved"
 
 requirements-completed:
   - UPLOAD-01
