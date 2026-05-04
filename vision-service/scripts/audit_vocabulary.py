@@ -16,8 +16,14 @@ from pathlib import Path
 
 # Forbidden terms encoded to avoid self-detection (this file is in SCAN_DIRS).
 # Concatenated at runtime — do not expand to literals in this file.
-_FORBIDDEN = "|".join(["diagn[" + "ó" + "o]stico", "tratamento", "cura"])
-PATTERN = re.compile(_FORBIDDEN, re.IGNORECASE)
+# Word-boundary anchors (\b) prevent false positives like "escuras" / "obscura"
+# matching the substring "cura". The audit fires only on the standalone words.
+_FORBIDDEN = "|".join([
+    r"\bdiagn[" + "ó" + r"o]stico\b",
+    r"\btratamento\b",
+    r"\bcura\b",
+])
+PATTERN = re.compile(_FORBIDDEN, re.IGNORECASE | re.UNICODE)
 EXTENSIONS = {".py", ".json", ".md"}
 SCAN_DIRS = ["pipeline", "data", "scripts", "tests/fixtures"]
 SKIP_DIRS = {"__pycache__", ".pytest_cache", "node_modules"}
