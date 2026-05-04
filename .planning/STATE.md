@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-last_updated: "2026-05-04T11:08:49.234Z"
+status: executing
+last_updated: "2026-05-04T13:00:00.000Z"
 progress:
   total_phases: 9
   completed_phases: 4
   total_plans: 42
-  completed_plans: 25
-  percent: 60
+  completed_plans: 27
+  percent: 64
 ---
 
 # Estado do projeto
@@ -19,16 +19,17 @@ progress:
 Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 
 **Valor central:** Cada cliente atendido produz um JSON de features genuinamente diferente, e por isso cada relatório é genuinamente diferente. Pipeline de visão objetivo + LLM ancorado em RAG é o coração do produto.
-**Foco atual:** Fase 4 (Upload desktop) — **CONCLUÍDA** 2026-05-03 via UAT founder + gsd-verifier passed (4/4 success criteria, 2/2 requirements UPLOAD-01/02). Próximo: Fase 5 (Pipeline de visão / Modal).
+**Foco atual:** Fase 5 (Pipeline de visão / Modal) — **EM EXECUÇÃO** desde 2026-05-04. Wave 0 (05-01 + 05-02) concluída; aguardando confirmação do usuário para Wave 1a.
 
 ## Posição atual
 
-Fase: 5 de 9 — **PLANEJADA** (Pipeline de visão / Modal)
-Próxima ação: `/gsd-execute-phase 5` — executar 17 plans em 4 waves.
-Status: planning_complete — Phase 5 plans 05-01 a 05-17 prontos para execução. RESEARCH+PATTERNS+VALIDATION criados; plan-checker iter 2 passou (5 blockers de iter 1 resolvidos via revisão cirúrgica).
-Última atividade: 2026-05-04 — Phase 5 plan-phase concluído. 17 plans em 4 waves (Wave 0 infra, Wave 1 pipeline 6 etapas + schemas, Wave 2 trigger+webhook+integration+UI, Wave 3 CI+audit+smoke). Todas as 4 REQ-IDs cobertas (VISION-01..04); todas as 23 decisões CONTEXT cobertas; todos os 5 success criteria ROADMAP mapeados.
+Fase: 5 de 9 — **EM EXECUÇÃO** (Pipeline de visão / Modal)
+Plan: 2/17 (Wave 0 completa)
+Próxima ação: aguardando "continue" do usuário para spawn de Wave 1a (05-03..05-08, 6 plans paralelos).
+Status: executing — Wave 0 mergeada em main (commits 51f5a51 + 00f43c5). Próximo: Wave 1a (pipeline schemas + 5 stages independentes), depois Wave 1b (05-09 features com checkpoint), depois Wave 1c (05-10 modal_app).
+Última atividade: 2026-05-04 — Wave 0 concluída. 05-01 vision-service test infra (10/10 pytest verdes; audit:vocabulary CLI funcional). 05-02 apps/web service-role + HMAC (19/19 vitest verdes; discriminated union pattern). Recovery feito de um bad-merge inicial em branch stale agent-ae868b6c096eba96f — main restaurada via reflog para f597353 antes dos merges corretos.
 
-Progresso: [█████░░░░░] 56% (4/9 fases — 25/25 plans concluídos do milestone v1.0)
+Progresso: [██████░░░░] 64% (4/9 fases concluídas + 2/17 plans Fase 5 — 27/42 plans do milestone v1.0)
 
 ## Métricas de performance
 
@@ -98,36 +99,23 @@ Nenhum ainda.
 
 ## Continuidade de sessão
 
-Última sessão: 2026-05-04 (00:04–00:10 UTC) — **Plan 04-07 Tasks 1+2 concluídas; aguardando checkpoint manual founder.** Wave 5 código-completa. UPLOAD-01 e UPLOAD-02 entregues (validação UAT manual pendente).
+Última sessão: 2026-05-04 — **Fase 5 Wave 0 (05-01 + 05-02) concluída** e mergeada em main (commits `51f5a51` + `00f43c5`). Status: `executing`; 2/17 plans Fase 5; 27/42 plans v1.0.
 
-Stopped at: 04-07-SUMMARY.md gerado como **partial** (status: awaiting-uat-checkpoint), STATE.md+ROADMAP.md atualizados refletindo aguarda. **Próxima ação não-automática:** founder executa `.planning/phases/04-upload-desktop/04-UAT.md` em sessão real (mínimo MVP — cenários 1, 3, 5, 6, 8, 9, 10, 11, 14) e responde:
+Stopped at: aguardando confirmação do usuário para spawnar **Wave 1a** (`05-03..05-08` — 6 plans paralelos: Pydantic schemas + detect/segment/compose/normalize/enhance). Próximo gate humano natural: Wave 1b (05-09 features) tem `checkpoint:human-verify`; antes disso é execução paralela limpa.
 
-- "approved" → orchestrator pode marcar 04-07 como `[x]`, fechar Fase 4, e avançar para Fase 5 (Pipeline de visão Modal)
-- "needs-fix: <descrição>" → planejar uma rodada de gap closure antes de fechar a fase
+Recovery feito de bad-merge inicial em branch stale `agent-ae868b6c096eba96f` — main restaurada via reflog para `f597353` antes dos merges corretos. `HANDOFF.json` legado da Fase 3 removido.
 
-Smoke automated rodadas neste plan:
+Smoke verde rodado em Wave 0:
 
-- `pnpm test:run app/actions/readings.test.ts` → 16/16 verde
-- Smoke completo `pnpm test:run` (apps/web) → 187/190 (3 falhas pré-existentes em quality-scoring.test.ts — Fase 3, deferred)
-- `pnpm tsc --noEmit -p .` → 2 erros pré-existentes (mesmos, deferred)
-- `pnpm audit:vocabulary` → 8 ocorrências pré-existentes em comentários técnicos Fase 3 (deferred)
-- `pnpm build` → exit 0; chunk `7ef09c20.*.js` (1.35 MB) confirma heic2any em bundle separado
+- 05-01 vision-service test infra → 10/10 pytest verdes; `audit:vocabulary` CLI funcional
+- 05-02 apps/web service-role + HMAC → 19/19 vitest verdes; pattern discriminated union `HmacVerificationResult`
 
-Resume file pós-UAT: `.planning/phases/04-upload-desktop/04-07-SUMMARY.md` (recebe addendum) ou `.planning/phases/05-*/05-CONTEXT.md` (Fase 5 inicia após approve).
+Resume file: `.planning/phases/05-pipeline-visao-modal/05-CONTEXT.md` (planejamento de fase) + `05-{NN}-PLAN.md` para cada plan ativo.
+
+Próxima ação: `/gsd-execute-phase 5` retoma Wave 1a (executor detecta Wave 0 ✓ e spawna 6 plans paralelos).
 
 ---
 
-Sessão anterior (2026-05-03 manhã): **Fase 3 fechada via UAT 03**.
+Sessão anterior (2026-05-04 madrugada UTC): **Fase 4 (Upload desktop) fechada** via UAT founder + gsd-verifier passed (4/4 success criteria, 2/2 requirements UPLOAD-01/02). 7/7 plans concluídos. Smoke: `pnpm build` verde, bundle splitting de heic2any validado (chunk dedicado 1.35 MB).
 
-**Pivôs arquiteturais durante UAT (sem replanning formal):**
-
-- MediaPipe FaceLandmarker → pupil detection pixel-based → Otsu adaptativo → bypass → **Claude Haiku 4.5 VLM via /api/capture/validate** (4 iterações; última solução é a definitiva).
-- Streaming PWA com live quality gate → **câmera nativa via `<input capture="environment">`** com análise pós-captura.
-- Removido: Laplacian variance, useCamera, CameraView, CameraDeniedScreen, IrisDetector, RecoveryBanner, PWAInstallBanner.
-- Adicionado: `@anthropic-ai/sdk@0.92.0`, `exifr@7.1.3` (front-cam detection), `app/api/capture/validate/route.ts`, `lib/capture/validate-image.ts`, `lib/capture/camera-detection.ts`, `lib/capture/post-capture-analysis.ts`.
-
-**UAT 03 cobertura:** 13 testes principais (cold start, PWA install iOS Safari, fluxo cliente→captura→preview→finalize→storage, timezone). 1 issue conhecido (PWA standalone Android, não-blocking pra Estágio 1).
-
-**20 commits de calibração** culminando em VLM gate confiável: detecta sem_olho, dois_olhos, muito_longe, olho_fechado, reflexo_total, borrado; classifica quality em ruim/regular/boa/excelente.
-
-Próxima ação: `/gsd-execute-plan 4 2` (plan 04-02) ou `/gsd-execute-phase 4` para retomar a wave inteira.
+Sessão anterior anterior (2026-05-03 manhã): **Fase 3 fechada via UAT 03**. 20 commits de calibração culminando em VLM gate confiável (Claude Haiku 4.5 via /api/capture/validate). PWA standalone Android pendente como dívida não-blocking pra Estágio 1.

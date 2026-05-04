@@ -157,7 +157,7 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
   4. Webhook callback do Modal valida HMAC, atualiza `readings.vision_features`, define `readings.status='ready'` (ou `failed` em erro) e preenche `processed_at`.
   5. Trigger end-to-end: terapeuta finaliza captura/upload → `readings.status` transita `pending → processing → ready` sem intervenção manual; `vision_features` populado.
 **Plans**: 17 plans em 4 waves
-- **Wave 0** *(test infra + security primitives — paralelo)*: 05-01 vision-service test scaffolding (pytest + fixtures + audit script), 05-02 apps/web service-role Supabase client + lib/vision/hmac.ts (HmacVerificationResult discriminated union), 05-03 Pydantic IrisFeatures schemas
+- **Wave 0** *(test infra + security primitives — paralelo; CONCLUÍDA 2026-05-04)*: [x] 05-01 vision-service test scaffolding (pytest + fixtures + audit script — 10/10 testes verdes), [x] 05-02 apps/web service-role Supabase client + lib/vision/hmac.ts (HmacVerificationResult discriminated union — 19/19 testes verdes). 05-03 (Pydantic schemas) movido para Wave 1 conforme frontmatter.
 - **Wave 1** *(pipeline implementation — paralelo entre etapas; depende Wave 0)*: 05-04 detect (MediaPipe FaceLandmarker iris 468–477/473–477), 05-05 segment (HoughCircles + fallback), 05-06 compose (photometric weighted average), 05-07 normalize (Daugman polar 64×512), 05-08 enhance (CLAHE LAB L-channel), 05-09 features (extract_all + jensen-map.json + iris_maps.py + compute_asymmetry dict-subscript), 05-10 modal_app orchestration (analyze_iris_endpoint + .spawn + _post_webhook com vision_features kwarg + WEBHOOK_BASE_URL)
 - **Wave 2** *(Next.js integration — depende Wave 1)*: 05-11 trigger route + lib/vision/modal-client.ts, 05-12 webhook route (HMAC + Zod superRefine + status guard D-T4 + atomic UPDATE D-F5), 05-13 finalizeReadingAction integration (closes Fase 5: TODO line 112), 05-14 UI StatusBadge + ReprocessButton em /leituras
 - **Wave 3** *(CI + audit + smoke — depende Wave 1+2)*: 05-15 GH Actions vision-service-tests.yml, 05-16 D-E1 error_summary catalog + extended LGPD audit, 05-17 founder smoke procedure + .env.example finalization
@@ -236,7 +236,7 @@ Fases executam em ordem numérica: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 �
 | 2. Auth + Dashboard básico | 4/4 | ✅ Concluída | — |
 | 3. Captura mobile (PWA) | 8/8* | ✅ Concluída via UAT | 2026-05-03 |
 | 4. Upload desktop | 7/7 | ✅ Concluída via UAT + gsd-verifier | 2026-05-03 |
-| 5. Pipeline de visão (Modal) | 0/17 | Planejada | — |
+| 5. Pipeline de visão (Modal) | 2/17 | Em execução (Wave 0 ✓) | — |
 | 6. RAG — Ingestão | 0/TBD | Não iniciada | — |
 | 7. Análise LLM | 0/TBD | Não iniciada | — |
 | 8. Pagamento + LGPD | 0/TBD | Não iniciada | — |
