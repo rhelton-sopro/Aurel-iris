@@ -166,7 +166,7 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
 - **Wave 2** *(Next.js integration — depende Wave 1; subdividida em 2a/2b por dependências internas)*:
   - **Wave 2a** *(05-12/13/14 dependem de 05-11; CONCLUÍDA 2026-05-04)*: [x] 05-11 trigger route + lib/vision/modal-client.ts (state machine 5-saídas: 401/404x3/502/202; D-T5 pre/post-spawn UPDATE; D-T6 TTL 600s; D-E1 rollback; 13 vitest tests)
   - **Wave 2b** *(paralelo — CONCLUÍDA 2026-05-04)*: [x] 05-12 webhook route (HMAC verifyHmacSignature + Zod superRefine + D-T4 status guard + D-F5 atomic UPDATE + revalidatePath; 16 vitest tests), [x] 05-13 finalizeReadingAction integration (closes TODO line 112; trigger fire-and-forget, D-T2 redirect, D-T1 decoupling para soft-warn em fail; 6 novos tests), [x] 05-14 UI StatusBadge (5 variants pt-BR + Rascunho override + tooltip D-F2; 12 tests) + ReprocessButton (POST trigger + router.refresh; 7 tests) + leituras/page.tsx integration. **Wave 2 inteira fechada — pipeline end-to-end wireado (finalize → trigger → Modal → webhook → atomic UPDATE → UI atualiza).**
-- **Wave 3** *(CI + audit + smoke — depende Wave 1+2)*: 05-15 GH Actions vision-service-tests.yml, 05-16 D-E1 error_summary catalog + extended LGPD audit, 05-17 founder smoke procedure + .env.example finalization
+- **Wave 3** *(CI + audit + smoke — depende Wave 1+2; CONCLUÍDA 2026-05-04)*: [x] 05-15 GH Actions vision-service-tests.yml (Python 3.11 + pytest + LGPD audit gate, paths filter vision-service/**), [x] 05-16 D-E1 error_summary catalog externalizado para vision-service/data/error_summary.json (versioned v0.1.0) + lru_cached loader pipeline/error_summary.py + modal_app.py rewireado (no inline pt-BR literals), [x] 05-17 vision-service/README.md founder smoke procedure (markdown checklist, 244 linhas) + vision-service/.env.example (MODAL_WEBHOOK_SECRET + WEBHOOK_BASE_URL com docs inline). **Wave 3 inteira fechada — Fase 5 código-completa (17/17). Aguardando /gsd-verify-work 5 + founder smoke.**
 
 **Cross-cutting constraints** *(truths repeated across multiple plans — gates verificáveis durante execução):*
 - JSON output conforms to SPEC §4.3 schema (validated by Pydantic IrisFeatures) — 05-03, 05-10, 05-12, 05-17
@@ -261,7 +261,7 @@ Fases v1 executam em ordem numérica: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 
 | 2. Auth + Dashboard básico | 4/4 | ✅ Concluída | — |
 | 3. Captura mobile (PWA) | 8/8* | ✅ Concluída via UAT | 2026-05-03 |
 | 4. Upload desktop | 7/7 | ✅ Concluída via UAT + gsd-verifier | 2026-05-03 |
-| 5. Pipeline de visão (Modal) | 14/17 | Em execução (Wave 0 ✓ + Wave 1 ✓ + Wave 2 ✓; Wave 3 next) | — |
+| 5. Pipeline de visão (Modal) | 17/17 | Código-completa; aguardando verify-work + founder smoke | — |
 | 6. RAG — Ingestão | 0/TBD | Não iniciada | — |
 | 7. Análise LLM | 0/TBD | Não iniciada | — |
 | 8. Pagamento + LGPD | 0/TBD | Não iniciada | — |

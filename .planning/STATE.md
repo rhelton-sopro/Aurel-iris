@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-04T20:00:00.000Z"
+last_updated: "2026-05-04T21:00:00.000Z"
 progress:
   total_phases: 10
   completed_phases: 4
   total_plans: 42
-  completed_plans: 39
-  percent: 93
+  completed_plans: 42
+  percent: 100
 ---
 
 # Estado do projeto
@@ -19,17 +19,17 @@ progress:
 Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 
 **Valor central:** Cada cliente atendido produz um JSON de features genuinamente diferente, e por isso cada relatório é genuinamente diferente. Pipeline de visão objetivo + LLM ancorado em RAG é o coração do produto.
-**Foco atual:** Fase 5 (Pipeline de visão / Modal) — **EM EXECUÇÃO** desde 2026-05-04. Wave 0 + Wave 1 + Wave 2 inteira ✓ (14/17 plans). Próximo: Wave 3 (`05-15` CI + `05-16` LGPD audit cross-tree + `05-17` founder smoke).
+**Foco atual:** Fase 5 (Pipeline de visão / Modal) — **CÓDIGO-COMPLETA 2026-05-04 (17/17 plans)**. Aguardando `/gsd-verify-work 5` para validação automatizada contra ROADMAP success criteria; depois founder smoke (modal deploy → trigger reading real → webhook callback) antes de marcar a fase concluída.
 
 ## Posição atual
 
-Fase: 5 de 10 — **EM EXECUÇÃO** (Pipeline de visão / Modal)
-Plan: 14/17 (Wave 0 ✓ + Wave 1 ✓ + Wave 2 ✓ inteira)
-Próxima ação: spawn de Wave 3 (`05-15` GH Actions vision-service-tests.yml + `05-16` D-E1 error_summary catalog + extended LGPD audit + `05-17` founder smoke procedure + .env.example finalization). Os 3 plans podem rodar paralelos (sem overlap em files_modified — .github/workflows/, vision-service/data/error_summary.json, vision-service/README.md).
-Status: executing — Wave 2 fechada (Next.js integration completa). Suíte apps/web: 260/263 passando (3 pre-existing failures em quality-scoring.test.ts da Fase 3 legacy; +41 tests novos da Wave 2, sem regressões). vision-service: 98/98 verde. audit:vocabulary limpo.
-Última atividade: 2026-05-04 — Wave 2 concluída em 3 sub-waves: 2a (05-11 trigger route — 13 tests) + 2b (05-12 webhook 16 tests, 05-13 finalize integration 6 novos tests adicionados ao test suite existente, 05-14 StatusBadge 12 + ReprocessButton 7 = 19 tests). Pipeline end-to-end agora wireado: finalizeReadingAction → POST /api/readings/[id]/process → Modal analyze_iris_endpoint → run_pipeline (T4 GPU) → _post_webhook HMAC → POST /api/vision/webhook → atomic UPDATE D-F5 → revalidatePath('/leituras') → StatusBadge atualiza. ReprocessButton para failed states retriga via mesma route.
+Fase: 5 de 10 — **CÓDIGO-COMPLETA** (Pipeline de visão / Modal); aguardando verify + smoke
+Plan: 17/17 (Wave 0 ✓ + Wave 1 ✓ + Wave 2 ✓ + Wave 3 ✓)
+Próxima ação: `/gsd-verify-work 5` (verificação automática contra ROADMAP success criteria 1-5). Após approve, founder executa o smoke procedure (`vision-service/README.md`) → `modal deploy` → trigger reading real → marca Fase 5 ✅.
+Status: code-complete — Wave 3 fechada (CI workflow + D-E1 catalog externalizado + founder smoke runbook + .env.example finalizado). Suítes: vision-service 135/139 (4 expected skips: 3× MediaPipe model não-local, 1× segment fixture); apps/web 260/263 (3 pre-existing Phase 3 quality-scoring legacy — deferred). audit:vocabulary limpo cross-tree.
+Última atividade: 2026-05-04 — Wave 3 concluída: 05-15 GH Actions vision-service-tests.yml (Python 3.11 + pytest + LGPD audit gate), 05-16 D-E1 catalog externalizado para vision-service/data/error_summary.json + lru_cached loader em pipeline/error_summary.py + modal_app.py rewireado (no inline pt-BR literals), 05-17 README.md founder smoke procedure (244 linhas, markdown checklist) + vision-service/.env.example (MODAL_WEBHOOK_SECRET + WEBHOOK_BASE_URL com docs inline). Bash sandbox bloqueou todos os agents da Wave 3 mas Writes pegaram — orchestrator finalizou tudo inline (commits + tests + SUMMARY.mds para 05-16 e 05-17 cujos agents pegaram rate-limit antes do SUMMARY).
 
-Progresso: [█████████░] 93% (4/10 fases concluídas + 14/17 plans Fase 5 — 39/42 plans do milestone v1.0)
+Progresso: [██████████] 100% (4/10 fases concluídas + 17/17 plans Fase 5 código-completa — 42/42 plans do milestone v1.0). Aguardando verify-work + founder smoke para fechar Fase 5.
 
 **Backlog de longo prazo (registrado mas NÃO ativo):** Fase 10 — Sistema de Aprendizagem Clínica (planejada para depois de Fase 9 fechar; ver `.planning/phases/10-aprendizagem-clinica/10-CONTEXT.md`). Captura de dados pré-requisito a partir da Fase 7 (relatório gerado vs. entregue + diff de edições humanas) precisa ser embutida no design da Fase 7.
 
