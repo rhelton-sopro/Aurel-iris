@@ -12,6 +12,8 @@ import {
 } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
 import { cleanupStaleEmptyReadingsAction } from '@/app/actions/readings'
+import { StatusBadge, type ReadingStatus } from '@/components/readings/StatusBadge'
+import { ReprocessButton } from '@/components/readings/ReprocessButton'
 
 /**
  * Página dinâmica: a lista deve refletir leituras criadas neste mesmo request
@@ -19,24 +21,6 @@ import { cleanupStaleEmptyReadingsAction } from '@/app/actions/readings'
  * `force-dynamic`, o RSC cache do Next.js pode servir uma versão pré-captura.
  */
 export const dynamic = 'force-dynamic'
-
-const STATUS_LABEL: Record<string, string> = {
-  pending: 'Pendente',
-  processing: 'Processando',
-  ready: 'Pronta',
-  failed: 'Falhou',
-  edited: 'Editada',
-}
-
-const STATUS_CLASS: Record<string, string> = {
-  pending: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300',
-  processing: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-  ready: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300',
-  failed: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
-  edited: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
-}
-
-const RASCUNHO_CLASS = 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300'
 
 export default async function LeiturasPage() {
   // GC silencioso: apaga rascunhos com 0/6 fotos criados há > 1h.
@@ -50,6 +34,7 @@ export default async function LeiturasPage() {
       id,
       status,
       created_at,
+      vision_features,
       client:clients(full_name),
       reading_images(count)
     `)
@@ -95,12 +80,9 @@ export default async function LeiturasPage() {
               const status = r.status ?? 'pending'
               // Rascunho = pending com captura parcial (1..5 / 6).
               const isRascunho = status === 'pending' && count > 0 && count < 6
-              const badgeClass = isRascunho
-                ? RASCUNHO_CLASS
-                : STATUS_CLASS[status] ?? STATUS_CLASS['pending']
-              const badgeLabel = isRascunho
-                ? 'Rascunho'
-                : STATUS_LABEL[status] ?? status
+              const errorSummary =
+                (r.vision_features as { processing_metadata?: { error_summary?: string } } | null)
+                  ?.processing_metadata?.error_summary ?? null
 
               return (
                 <TableRow key={r.id}>
@@ -116,12 +98,11 @@ export default async function LeiturasPage() {
                     </span>
                   </TableCell>
                   <TableCell>
-                    <span className={cn(
-                      'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium',
-                      badgeClass,
-                    )}>
-                      {badgeLabel}
-                    </span>
+                    <StatusBadge
+                      status={(status as ReadingStatus) ?? 'pending'}
+                      isRascunho={isRascunho}
+                      errorSummary={errorSummary}
+                    />
                   </TableCell>
                   <TableCell>
                     {isRascunho && (
@@ -131,6 +112,12 @@ export default async function LeiturasPage() {
                       >
                         Continuar
                       </Link>
+                    )}
+                    {status === 'failed' && (
+                      <ReprocessButton
+                        readingId={r.id}
+                        status={status as ReadingStatus}
+                      />
                     )}
                   </TableCell>
                 </TableRow>
