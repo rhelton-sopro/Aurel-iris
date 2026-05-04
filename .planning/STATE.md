@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-04T18:00:00.000Z"
+last_updated: "2026-05-04T19:00:00.000Z"
 progress:
   total_phases: 10
   completed_phases: 4
   total_plans: 42
-  completed_plans: 35
-  percent: 83
+  completed_plans: 36
+  percent: 86
 ---
 
 # Estado do projeto
@@ -19,17 +19,17 @@ progress:
 Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 
 **Valor central:** Cada cliente atendido produz um JSON de features genuinamente diferente, e por isso cada relatório é genuinamente diferente. Pipeline de visão objetivo + LLM ancorado em RAG é o coração do produto.
-**Foco atual:** Fase 5 (Pipeline de visão / Modal) — **EM EXECUÇÃO** desde 2026-05-04. Wave 0 ✓ + Wave 1 ✓ inteira (10/17 plans). Próximo: Wave 2 (Next.js integration: 05-11..05-14).
+**Foco atual:** Fase 5 (Pipeline de visão / Modal) — **EM EXECUÇÃO** desde 2026-05-04. Wave 0 ✓ + Wave 1 ✓ + Wave 2a ✓ (11/17 plans). Próximo: Wave 2b (`05-12` webhook + `05-13` finalizeReadingAction + `05-14` UI — 3 plans paralelos).
 
 ## Posição atual
 
 Fase: 5 de 10 — **EM EXECUÇÃO** (Pipeline de visão / Modal)
-Plan: 10/17 (Wave 0 ✓ + Wave 1 ✓: 1a+1b+1c)
-Próxima ação: spawn de Wave 2 (`05-11` Next.js trigger route + `05-12` webhook receiver + `05-13` finalizeReadingAction integration + `05-14` UI StatusBadge — 4 plans, paralelizáveis com cuidado nas dependências internas). Depois Wave 3 (CI + audit + smoke: 05-15..05-17).
-Status: executing — Wave 1c fechada com 05-10 modal_app orchestrator. Pipeline Python 100% implementado (todos os 4 VISION requirements 01-04 funcionalmente atendidos). 97/98 pytest verdes (1 known-issue em `test_real_tree_is_clean` por `vision-service/data/jensen-reference.md` untracked com vocab proibido — não bloqueia, ver 05-10-SUMMARY.md "Issues Encountered").
-Última atividade: 2026-05-04 — Wave 1c concluída: 05-10 modal_app (run_pipeline T4 GPU worker + analyze_iris_endpoint FastAPI POST + _post_webhook HMAC + _classify_error_summary D-E1 catalog + _load_image lazy fetcher). 10 novos tests cobrindo importabilidade sem secrets, B2/B3/B5 anti-regressions, Stripe sign convention. supabase removido do Modal image (D-T6). face_landmarker.task pre-baked em /models/ (Pitfall 2). Bash sandbox bloqueou os agents 2x (mesmo com bypassPermissions) — orchestrator implementou inline.
+Plan: 11/17 (Wave 0 ✓ + Wave 1 ✓ + Wave 2a ✓ : 05-11 trigger route)
+Próxima ação: spawn de Wave 2b (`05-12` webhook receiver + `05-13` finalizeReadingAction integration + `05-14` UI StatusBadge+ReprocessButton — 3 plans paralelos, sem overlap em files_modified, todos dependem só de 05-11). Depois Wave 3 (CI + audit + smoke: 05-15..05-17).
+Status: executing — Wave 2a fechada com 05-11 (modal-client + POST /api/readings/[id]/process trigger route). 13/13 vitest verdes nos novos tests. Suíte apps/web: 219/222 passando (3 pre-existing failures em lib/capture/quality-scoring.test.ts da Fase 3 legacy — deferred). audit:vocabulary limpo após fix do regex word-boundary + move de jensen-reference.md para .planning/research/.
+Última atividade: 2026-05-04 — Wave 2a concluída inline (Bash sandbox bloqueou o agent na 4a tentativa desta sessão). modal-client.ts thin HTTP wrapper com Modal-Key/Modal-Secret proxy auth + AbortController timeout 10s + ModalTriggerError class. Trigger route POST /api/readings/[id]/process com state machine 5-saídas (401/404x3/502/202), pre/post-spawn UPDATE D-T5, signed URLs TTL 600s D-T6, rollback D-E1.
 
-Progresso: [████████░░] 83% (4/10 fases concluídas + 10/17 plans Fase 5 — 35/42 plans do milestone v1.0)
+Progresso: [█████████░] 86% (4/10 fases concluídas + 11/17 plans Fase 5 — 36/42 plans do milestone v1.0)
 
 **Backlog de longo prazo (registrado mas NÃO ativo):** Fase 10 — Sistema de Aprendizagem Clínica (planejada para depois de Fase 9 fechar; ver `.planning/phases/10-aprendizagem-clinica/10-CONTEXT.md`). Captura de dados pré-requisito a partir da Fase 7 (relatório gerado vs. entregue + diff de edições humanas) precisa ser embutida no design da Fase 7.
 
