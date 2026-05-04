@@ -1,0 +1,51 @@
+name: vision-service tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'vision-service/**'
+      - '.github/workflows/vision-service-tests.yml'
+  pull_request:
+    paths:
+      - 'vision-service/**'
+      - '.github/workflows/vision-service-tests.yml'
+
+# CI is read-only against the repo. No deploy, no token writes.
+permissions:
+  contents: read
+
+jobs:
+  pytest:
+    name: pytest + LGPD vocab audit (Python 3.11, CPU-only)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11']
+    defaults:
+      run:
+        working-directory: vision-service
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: vision-service/requirements.txt
+
+      # CPU-only — no CUDA, no torch+cuda, no Modal cloud (D-X2).
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run pytest
+        run: python -m pytest tests/ -v
+
+      # LGPD audit runs even if pytest fails (catches both kinds of regression in one run).
+      - name: LGPD vocabulary audit
+        if: always()
+        run: python scripts/audit_vocabulary.py
