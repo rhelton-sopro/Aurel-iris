@@ -1,0 +1,33 @@
+{
+  "map_name": "jensen",
+  "version": "0.1.0-draft",
+  "source": "Jensen, B. — Iridologia Vol. 1 (edição 1982, pt-BR)",
+  "right": {
+    "1": ["cérebro frontal", "lobo frontal", "área de inteligência mental"],
+    "2": ["cerebelo", "lobo temporal direito", "ouvido direito"],
+    "3": ["face direita", "ouvido externo direito", "mandíbula direita"],
+    "4": ["pescoço direito", "tireoide direita", "amígdala direita"],
+    "5": ["ombro direito", "braço direito", "pulmão lóbulo superior direito"],
+    "6": ["apêndice", "válvula ileocecal", "intestino delgado direito", "cólon ascendente"],
+    "7": ["fígado", "vesícula biliar", "diafragma direito"],
+    "8": ["rim direito", "suprarrenal direita", "pâncreas cabeça"],
+    "9": ["bexiga", "órgãos pélvicos", "útero ou próstata"],
+    "10": ["perna direita", "joelho direito", "pé direito"],
+    "11": ["coluna lombar", "região renal posterior", "ovário direito ou testículo direito"],
+    "12": ["cérebro posterior", "região occipital", "medula espinhal superior"]
+  },
+  "left": {
+    "1": ["cérebro frontal", "lobo frontal", "área de inteligência mental"],
+    "2": ["cerebelo", "lobo temporal esquerdo", "ouvido esquerdo"],
+    "3": ["face esquerda", "ouvido externo esquerdo", "mandíbula esquerda"],
+    "4": ["pescoço esquerdo", "tireoide esquerda", "amígdala esquerda"],
+    "5": ["ombro esquerdo", "braço esquerdo", "pulmão lóbulo superior esquerdo"],
+    "6": ["intestino delgado esquerdo", "cólon descendente", "cólon transverso"],
+    "7": ["baço", "diafragma esquerdo", "estômago lado esquerdo"],
+    "8": ["rim esquerdo", "suprarrenal esquerda", "pâncreas cauda"],
+    "9": ["coração", "esternônio", "região peitoral esquerda"],
+    "10": ["perna esquerda", "joelho esquerdo", "pé esquerdo"],
+    "11": ["coluna lombar", "região renal posterior", "ovário esquerdo ou testículo esquerdo"],
+    "12": ["cérebro posterior", "região occipital", "medula espinhal superior"]
+  }
+}
