@@ -17,7 +17,7 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
 - [x] **Fase 1: Setup** — Infraestrutura (contas, env vars, Next.js init, migration do schema).
 - [x] **Fase 2: Auth + Dashboard básico** — Magic-link auth e CRUD de clientes do terapeuta.
 - [x] **Fase 3: Captura mobile (PWA)** — App instalável com captura via câmera nativa + validação Claude Haiku 4.5 VLM. Concluída 2026-05-03.
-- [ ] **Fase 4: Upload desktop** — Dropzone desktop produzindo a mesma estrutura de leitura.
+- [x] **Fase 4: Upload desktop** — Dropzone desktop produzindo a mesma estrutura de leitura. Concluída 2026-05-03 (UAT founder + gsd-verifier passed).
 - [ ] **Fase 5: Pipeline de visão (Modal)** — Serviço Modal `analyze_iris` produzindo o JSON canônico de features.
 - [ ] **Fase 6: RAG — Ingestão da base de conhecimento** — Corpus iridológico chunked, embedded e indexado em pgvector.
 - [ ] **Fase 7: Análise LLM** — Relatório iridológico em pt-BR gerado por Claude Sonnet 4.6 ancorado em features + RAG.
@@ -224,7 +224,7 @@ Fases executam em ordem numérica: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 �
 | 1. Setup | 6/6 | ✅ Concluída | — |
 | 2. Auth + Dashboard básico | 4/4 | ✅ Concluída | — |
 | 3. Captura mobile (PWA) | 8/8* | ✅ Concluída via UAT | 2026-05-03 |
-| 4. Upload desktop | 7/7 | 🟡 UAT aprovado, aguardando gsd-verifier | — |
+| 4. Upload desktop | 7/7 | ✅ Concluída via UAT + gsd-verifier | 2026-05-03 |
 | 5. Pipeline de visão (Modal) | 0/TBD | Não iniciada | — |
 | 6. RAG — Ingestão | 0/TBD | Não iniciada | — |
 | 7. Análise LLM | 0/TBD | Não iniciada | — |

@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-last_updated: "2026-05-04T00:10:00Z"
+status: phase_complete
+last_updated: "2026-05-04T00:30:00Z"
 progress:
   total_phases: 9
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 25
-  completed_plans: 24
-  percent: 47
+  completed_plans: 25
+  percent: 56
 ---
 
 # Estado do projeto
@@ -19,17 +19,16 @@ progress:
 Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 
 **Valor central:** Cada cliente atendido produz um JSON de features genuinamente diferente, e por isso cada relatório é genuinamente diferente. Pipeline de visão objetivo + LLM ancorado em RAG é o coração do produto.
-**Foco atual:** Fase 4 (Upload desktop) — em execução, 7/7 plans código-completos (Wave 5 fechada para automação). Plan 04-07 com Tasks 1+2 concluídas; aguardando checkpoint manual founder (UAT em sessão real). UPLOAD-01 e UPLOAD-02 entregues, validação manual final pendente.
+**Foco atual:** Fase 4 (Upload desktop) — **CONCLUÍDA** 2026-05-03 via UAT founder + gsd-verifier passed (4/4 success criteria, 2/2 requirements UPLOAD-01/02). Próximo: Fase 5 (Pipeline de visão / Modal).
 
 ## Posição atual
 
-Fase: 4 de 9 — **AGUARDANDO UAT** (Upload desktop — código completo)
-Plan corrente: 04-07 (Tasks 1+2 ✓ — Task 3 checkpoint manual aguardando founder).
-Próxima fase: Fase 5 (Pipeline de visão / Modal) — desbloqueada após "approved" no checkpoint.
-Status: Executing/awaiting-UAT — Wave 1 completa (04-01 ✓ + 04-02 ✓). Wave 2 fechada (04-03 ✓ UploadDropzone + 04-04 ✓ capture mode prop). Wave 3 fechada (04-05 ✓ wizard assembly). **Wave 4 fechada** (04-06 ✓ entry point /leituras/nova). **Wave 5 código-completa** (04-07 Tasks 1+2 — smoke test 16/16 verde + 04-UAT.md 14 cenários). Awaiting checkpoint:human-verify — founder valida fluxo desktop em sessão real seguindo `.planning/phases/04-upload-desktop/04-UAT.md` cenários críticos 1, 3, 5, 6, 8, 9, 10, 11, 14. Modo sequencial — Windows/PowerShell sem worktrees.
-Última atividade: 2026-05-04 — Plan 04-07 Tasks 1+2 concluídas. 2 commits (21156b7 test smoke DraftReading 4 testes novos verdes; a48e792 docs 04-UAT.md 250 linhas 14 cenários). Smoke automated final: `pnpm test:run app/actions/readings.test.ts` 16/16 verde; `pnpm tsc` zero novos erros (2 erros pré-existentes Fase 3 em quality-scoring.test.ts permanecem — deferred); `pnpm audit:vocabulary` mostra 8 ocorrências pré-existentes Fase 3 em comentários técnicos (não em strings UI — deferred); `pnpm build` exit 0 com chunk dedicado heic2any 1.35 MB (`7ef09c20.*.js`) confirmando bundle splitting. Zero auto-fixes Rule 1/2/3 — plano executado verbatim. SUMMARY 04-07 marcado partial (status: awaiting-uat-checkpoint) — addendum vai pousar após "approved" do founder com resultado dos cenários, contagem de reading_images do dogfood, e tempo total da Fase 4.
+Fase: 4 de 9 — **CONCLUÍDA** (Upload desktop)
+Próxima fase: Fase 5 (Pipeline de visão / Modal) — pronta para iniciar (requer Fase 4 + Fase 3 concluídas).
+Status: phase_complete — Phase 4 fechada 2026-05-03. UAT founder approved + gsd-verifier passed (relatório em `.planning/phases/04-upload-desktop/04-VERIFICATION.md`). 7/7 plans, 5 waves; sequencial em Windows/PowerShell.
+Última atividade: 2026-05-04 — Plan 04-07 fechado (`approved` ao checkpoint:human-verify). gsd-verifier confirmou: 4/4 success criteria, 2/2 requirements (UPLOAD-01, UPLOAD-02), 5/5 cross-cutting constraints honrados. 39/39 testes Phase 4 verdes. heic2any em chunk dedicado 1.35 MB confirmado. RecoveryBanner UI deferido conforme planejado para Fase 9.
 
-Progresso: [█████░░░░░] 47% (3/9 fases + 7/7 plans Fase 4 código-completos, aguardando UAT)
+Progresso: [█████░░░░░] 56% (4/9 fases — 25/25 plans concluídos do milestone v1.0)
 
 ## Métricas de performance
 
