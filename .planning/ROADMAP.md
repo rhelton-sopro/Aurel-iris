@@ -135,7 +135,7 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
 - [x] 04-06-PLAN.md — new-reading-form.tsx: auto-detect (matchMedia coarse+hover) + dois CTAs com hidden input method + escape link. CONTEXT D-01, D-02, D-03. **Concluído 2026-05-03 (1 commit feat efb1f08; 73+/10− linhas; useEffect matchMedia com cleanup; texto dinâmico em ambos os CTAs; build /leituras/nova 3.98 kB First Load; 160/160 testes verdes excluindo pré-existente Fase 3; UPLOAD-01 e UPLOAD-02 mantidos completos). Wave 4 fechada.**
 
 **Wave 5 — Recovery hook + UAT** *(blocked on Waves 3+4)*
-- [ ] 04-07-PLAN.md — smoke test do shape de DraftReading (forward Fase 9 RecoveryBanner) + 04-UAT.md com 14 cenários + checkpoint manual founder. CONTEXT D-15.
+- [~] 04-07-PLAN.md — smoke test do shape de DraftReading (forward Fase 9 RecoveryBanner) + 04-UAT.md com 14 cenários + checkpoint manual founder. CONTEXT D-15. **Tasks 1+2 concluídas 2026-05-03 (commits 21156b7 test smoke 16/16 verde; a48e792 docs 04-UAT.md 14 cenários; 04-07-SUMMARY.md partial). AGUARDANDO checkpoint:human-verify do founder — execução manual do UAT em sessão real é o último gate da Fase 4.**
 
 **Cross-cutting constraints (must_haves presentes em ≥2 plans):**
 - Vocabulário proibido LGPD ausente em todas as strings novas (auditável via `pnpm audit:vocabulary`).

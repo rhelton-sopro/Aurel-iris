@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-03T23:35:00Z"
+last_updated: "2026-05-04T00:10:00Z"
 progress:
   total_phases: 9
   completed_phases: 3
   total_plans: 25
   completed_plans: 24
-  percent: 43
+  percent: 47
 ---
 
 # Estado do projeto
@@ -19,17 +19,17 @@ progress:
 Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 
 **Valor central:** Cada cliente atendido produz um JSON de features genuinamente diferente, e por isso cada relatório é genuinamente diferente. Pipeline de visão objetivo + LLM ancorado em RAG é o coração do produto.
-**Foco atual:** Fase 4 (Upload desktop) — em execução, 6/7 plans concluídos. Wave 4 fechada. UPLOAD-01 e UPLOAD-02 entregues.
+**Foco atual:** Fase 4 (Upload desktop) — em execução, 7/7 plans código-completos (Wave 5 fechada para automação). Plan 04-07 com Tasks 1+2 concluídas; aguardando checkpoint manual founder (UAT em sessão real). UPLOAD-01 e UPLOAD-02 entregues, validação manual final pendente.
 
 ## Posição atual
 
-Fase: 4 de 9 — **EM EXECUÇÃO** (Upload desktop)
-Plan corrente: 04-07 (próximo — UAT); 04-06 concluído em 2026-05-03.
-Próxima fase: Fase 5 (Pipeline de visão / Modal)
-Status: Executing — Wave 1 completa (04-01 ✓ + 04-02 ✓). Wave 2 fechada (04-03 ✓ UploadDropzone + 04-04 ✓ capture mode prop). Wave 3 fechada (04-05 ✓ wizard assembly — page.tsx + upload-client.tsx ponta-a-ponta). **Wave 4 fechada** (04-06 ✓ entry point /leituras/nova com auto-detect matchMedia + dois CTAs + escape link). Próximo: Wave 5 (04-07 UAT smoke + checkpoint manual founder). Modo sequencial — Windows/PowerShell sem worktrees.
-Última atividade: 2026-05-03 — Plan 04-06 concluído (entry point auto-detect + dois CTAs). 1 commit (efb1f08 feat new-reading-form). 73+/10− linhas. useEffect com `window.matchMedia('(pointer: coarse) and (hover: none)')` + cleanup do listener; SSR-safe default 'mobile_camera'; hidden input `<input type="hidden" name="method"/>` consumido por createReadingAction (Plan 04-02); botão de escape via `<button type="submit" name="method" value="<oposto>">` que sobrescreve hidden input via HTML form behavior canônico (Pattern G); texto dinâmico em ambos os CTAs. Botão "Cancelar" removido (decisão registrada). Build OK: /leituras/nova First Load 3.98 kB. 160/160 testes verdes excluindo pré-existente da Fase 3 (quality-scoring.test.ts — confirmado out-of-scope via stash em tree limpo). Vocabulário LGPD limpo no arquivo (8 ocorrências globais já registradas em deferred-items.md desde 04-01). Zero auto-fixes Rule 1/2/3 — plano executado exatamente como escrito (Tier ZERO desvio).
+Fase: 4 de 9 — **AGUARDANDO UAT** (Upload desktop — código completo)
+Plan corrente: 04-07 (Tasks 1+2 ✓ — Task 3 checkpoint manual aguardando founder).
+Próxima fase: Fase 5 (Pipeline de visão / Modal) — desbloqueada após "approved" no checkpoint.
+Status: Executing/awaiting-UAT — Wave 1 completa (04-01 ✓ + 04-02 ✓). Wave 2 fechada (04-03 ✓ UploadDropzone + 04-04 ✓ capture mode prop). Wave 3 fechada (04-05 ✓ wizard assembly). **Wave 4 fechada** (04-06 ✓ entry point /leituras/nova). **Wave 5 código-completa** (04-07 Tasks 1+2 — smoke test 16/16 verde + 04-UAT.md 14 cenários). Awaiting checkpoint:human-verify — founder valida fluxo desktop em sessão real seguindo `.planning/phases/04-upload-desktop/04-UAT.md` cenários críticos 1, 3, 5, 6, 8, 9, 10, 11, 14. Modo sequencial — Windows/PowerShell sem worktrees.
+Última atividade: 2026-05-04 — Plan 04-07 Tasks 1+2 concluídas. 2 commits (21156b7 test smoke DraftReading 4 testes novos verdes; a48e792 docs 04-UAT.md 250 linhas 14 cenários). Smoke automated final: `pnpm test:run app/actions/readings.test.ts` 16/16 verde; `pnpm tsc` zero novos erros (2 erros pré-existentes Fase 3 em quality-scoring.test.ts permanecem — deferred); `pnpm audit:vocabulary` mostra 8 ocorrências pré-existentes Fase 3 em comentários técnicos (não em strings UI — deferred); `pnpm build` exit 0 com chunk dedicado heic2any 1.35 MB (`7ef09c20.*.js`) confirmando bundle splitting. Zero auto-fixes Rule 1/2/3 — plano executado verbatim. SUMMARY 04-07 marcado partial (status: awaiting-uat-checkpoint) — addendum vai pousar após "approved" do founder com resultado dos cenários, contagem de reading_images do dogfood, e tempo total da Fase 4.
 
-Progresso: [████░░░░░░] 43% (3/9 fases + 6/7 plans Fase 4)
+Progresso: [█████░░░░░] 47% (3/9 fases + 7/7 plans Fase 4 código-completos, aguardando UAT)
 
 ## Métricas de performance
 
@@ -99,11 +99,20 @@ Nenhum ainda.
 
 ## Continuidade de sessão
 
-Última sessão: 2026-05-03 (23:03–23:35 UTC) — **Plan 04-06 concluído** (entry point auto-detect + dois CTAs). Wave 4 fechada. UPLOAD-01 e UPLOAD-02 mantidos completos.
+Última sessão: 2026-05-04 (00:04–00:10 UTC) — **Plan 04-07 Tasks 1+2 concluídas; aguardando checkpoint manual founder.** Wave 5 código-completa. UPLOAD-01 e UPLOAD-02 entregues (validação UAT manual pendente).
 
-Stopped at: 04-06-SUMMARY.md gerado, STATE.md+ROADMAP.md atualizados; pronto para retomar com **Plan 04-07 (Wave 5 — UAT smoke + checkpoint manual founder)** que depende de Waves 3+4 (ambas completas) — pode iniciar imediatamente. Após 04-07, Fase 4 fechada e próximo é Fase 5 (Pipeline de visão Modal).
+Stopped at: 04-07-SUMMARY.md gerado como **partial** (status: awaiting-uat-checkpoint), STATE.md+ROADMAP.md atualizados refletindo aguarda. **Próxima ação não-automática:** founder executa `.planning/phases/04-upload-desktop/04-UAT.md` em sessão real (mínimo MVP — cenários 1, 3, 5, 6, 8, 9, 10, 11, 14) e responde:
+- "approved" → orchestrator pode marcar 04-07 como `[x]`, fechar Fase 4, e avançar para Fase 5 (Pipeline de visão Modal)
+- "needs-fix: <descrição>" → planejar uma rodada de gap closure antes de fechar a fase
 
-Resume file: `.planning/phases/04-upload-desktop/04-07-*-PLAN.md`.
+Smoke automated rodadas neste plan:
+- `pnpm test:run app/actions/readings.test.ts` → 16/16 verde
+- Smoke completo `pnpm test:run` (apps/web) → 187/190 (3 falhas pré-existentes em quality-scoring.test.ts — Fase 3, deferred)
+- `pnpm tsc --noEmit -p .` → 2 erros pré-existentes (mesmos, deferred)
+- `pnpm audit:vocabulary` → 8 ocorrências pré-existentes em comentários técnicos Fase 3 (deferred)
+- `pnpm build` → exit 0; chunk `7ef09c20.*.js` (1.35 MB) confirma heic2any em bundle separado
+
+Resume file pós-UAT: `.planning/phases/04-upload-desktop/04-07-SUMMARY.md` (recebe addendum) ou `.planning/phases/05-*/05-CONTEXT.md` (Fase 5 inicia após approve).
 
 ---
 
