@@ -20,10 +20,17 @@ def expected() -> dict:
 @pytest.fixture(scope="session")
 def iris_images() -> dict:
     """All fixture JPEGs as {stem: np.ndarray RGB}. Empty when no fixtures
-    are committed yet (founder records them per D-X1)."""
+    are committed yet (founder records them per D-X1).
+
+    cv2 is only imported when JPEG files are present — avoids ImportError
+    on dev machines without opencv-python-headless installed (Rule 1 fix).
+    """
+    jpeg_paths = sorted(IRIS_DIR.glob("*.jpg"))
+    if not jpeg_paths:
+        return {}
     import cv2  # local import — heavy module, only needed when fixtures exist
     imgs: dict = {}
-    for p in sorted(IRIS_DIR.glob("*.jpg")):
+    for p in jpeg_paths:
         bgr = cv2.imread(str(p))
         if bgr is None:
             continue
