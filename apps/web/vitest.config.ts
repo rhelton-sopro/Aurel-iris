@@ -21,6 +21,9 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, '.'),
+      // server-only throws in non-Next.js environments (jsdom / vitest).
+      // Map to a no-op shim so server-side modules can be unit-tested.
+      'server-only': path.resolve(__dirname, 'tests/__mocks__/server-only.ts'),
     },
   },
 })
