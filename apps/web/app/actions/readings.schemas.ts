@@ -25,6 +25,7 @@ export const readingIdSchema = z.object({
 export type ReadingFormState = {
   error?: Record<string, string[]> | string | null
   readingId?: string
+  warning?: string
 }
 
 export type DraftReading = {

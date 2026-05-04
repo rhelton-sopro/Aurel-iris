@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { cookies } from 'next/headers'
 import {
   createReadingSchema,
   readingIdSchema,
@@ -92,12 +93,26 @@ export async function createReadingAction(
 }
 
 /**
- * Marca finalização do fluxo de captura. Nesta fase, status permanece 'pending'.
- * A transição 'pending' → 'processing' é responsabilidade da Fase 5 (Modal pipeline).
+ * Marca finalização do fluxo de captura.
+ *
+ * Fase 5: após validar 6/6 imagens persistidas, dispara o pipeline Modal
+ * via internal fetch para `POST /api/readings/[id]/process`. A rota
+ * dedicada lida com auth, ownership, signed URLs, status='processing'
+ * placeholder e a chamada Modal (D-T1, plan 05-11).
+ *
+ * Princípio (D-T1): finalize e process são decoupled. Se o trigger
+ * falhar, a leitura permanece em `pending` com as imagens salvas; o
+ * terapeuta pode usar o botão "Reprocessar" (plan 05-14) para retentar.
+ * NUNCA propagamos a falha de trigger como erro de finalize — isso
+ * destruiria o trabalho de captura por uma falha de rede transitória.
+ *
+ * Base URL: `NEXT_PUBLIC_SITE_URL` se definido, senão `http://localhost:3000`.
+ * Cookie forwarding via `next/headers.cookies()` para que o auth gate da
+ * rota passe (T-05-13-01).
  */
 export async function finalizeReadingAction(
   readingId: string
-): Promise<{ error?: string }> {
+): Promise<ReadingFormState> {
   const supabase = await createClient()
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (!user || authError) {
@@ -109,11 +124,49 @@ export async function finalizeReadingAction(
     return { error: 'reading_id inválido' }
   }
 
-  // Fase 5: muda status para 'processing' aqui e dispara triggerVisionPipeline(reading_id).
-  // Nesta fase apenas confirmamos a sessão e revalidamos os caches relevantes.
+  // D-T1: dispara trigger via internal fetch, forwarding session cookie
+  // para que o auth gate de /api/readings/[id]/process aceite a request.
+  const cookieStore = await cookies()
+  const cookieHeader = cookieStore.toString()
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+  const triggerUrl = `${baseUrl}/api/readings/${parsed.data.reading_id}/process`
+
+  let triggerStatus: number | null = null
+  try {
+    const res = await fetch(triggerUrl, {
+      method: 'POST',
+      headers: { Cookie: cookieHeader },
+      cache: 'no-store',
+    })
+    triggerStatus = res.status
+    if (res.status !== 202) {
+      // Captura body para log; não expõe ao UI (pode conter detalhe interno).
+      const detail = await res.text().catch(() => '')
+      console.error(
+        `[finalize] trigger non-202 reading=${parsed.data.reading_id} status=${res.status} body=${detail.slice(0, 200)}`,
+      )
+    }
+  } catch (err) {
+    const triggerError = err instanceof Error ? err.message : 'unknown'
+    console.error(
+      `[finalize] trigger fetch threw reading=${parsed.data.reading_id}: ${triggerError}`,
+    )
+  }
+
   revalidatePath('/leituras')
   revalidatePath(`/leituras/${parsed.data.reading_id}`)
-  return {}
+
+  if (triggerStatus === 202) {
+    // Caminho feliz (D-T2): redirect imediato para /leituras; badge "Processando"
+    // aparece via 05-14 ao re-renderizar a listagem.
+    redirect('/leituras')
+  }
+
+  // Soft-warn: imagens salvas, mas trigger não disparou. Reprocessar (05-14) recupera.
+  return {
+    warning:
+      'Captura salva, mas o processamento automático falhou — use Reprocessar na lista para tentar de novo.',
+  }
 }
 
 /**
