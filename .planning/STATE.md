@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-03T22:56:53Z"
+last_updated: "2026-05-03T23:35:00Z"
 progress:
   total_phases: 9
   completed_phases: 3
   total_plans: 25
-  completed_plans: 23
-  percent: 42
+  completed_plans: 24
+  percent: 43
 ---
 
 # Estado do projeto
@@ -19,37 +19,37 @@ progress:
 Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 
 **Valor central:** Cada cliente atendido produz um JSON de features genuinamente diferente, e por isso cada relatório é genuinamente diferente. Pipeline de visão objetivo + LLM ancorado em RAG é o coração do produto.
-**Foco atual:** Fase 4 (Upload desktop) — em execução, 5/7 plans concluídos. Wave 3 fechada. UPLOAD-01 e UPLOAD-02 entregues.
+**Foco atual:** Fase 4 (Upload desktop) — em execução, 6/7 plans concluídos. Wave 4 fechada. UPLOAD-01 e UPLOAD-02 entregues.
 
 ## Posição atual
 
 Fase: 4 de 9 — **EM EXECUÇÃO** (Upload desktop)
-Plan corrente: 04-06 (próximo); 04-05 concluído em 2026-05-03.
+Plan corrente: 04-07 (próximo — UAT); 04-06 concluído em 2026-05-03.
 Próxima fase: Fase 5 (Pipeline de visão / Modal)
-Status: Executing — Wave 1 completa (04-01 ✓ + 04-02 ✓). Wave 2 fechada (04-03 ✓ UploadDropzone + 04-04 ✓ capture mode prop). **Wave 3 fechada** (04-05 ✓ wizard assembly — page.tsx + upload-client.tsx ponta-a-ponta). Próximo: Wave 4 (04-06 entry point /leituras/nova com auto-detect e CTAs duplos), depois Wave 5 (04-07 UAT). Modo sequencial — Windows/PowerShell sem worktrees.
-Última atividade: 2026-05-03 — Plan 04-05 concluído (upload wizard page + client). 2 commits (5ece1f7 page.tsx server component, 459df6f upload-client.tsx wizard). 466 linhas total (85 page + 381 client). State machine `Phase = 'instruction'|'analyzing'|'previewing'|'finalizing'` clonada do capture-client com 3 substituições cirúrgicas: UploadDropzone na phase='instruction', handleFileAccepted (validateUploadFile -> convertHeicToJpeg -> analyzeCapturedJpeg), CapturePreview mode='upload'. AngleInterstitial NÃO renderizado (alert de câmera traseira/flash mobile-only não se aplica). Build OK com bundle splitting validado: heic2any em chunk dedicado de 1.35MB, rota /upload First Load = 3.4 kB (paridade com /capturar). 63/63 testes Fase 3 verdes — zero regressão. Vocabulário LGPD limpo nos 2 arquivos novos. Zero auto-fixes Rule 1/2/3 — plano executado exatamente como escrito.
+Status: Executing — Wave 1 completa (04-01 ✓ + 04-02 ✓). Wave 2 fechada (04-03 ✓ UploadDropzone + 04-04 ✓ capture mode prop). Wave 3 fechada (04-05 ✓ wizard assembly — page.tsx + upload-client.tsx ponta-a-ponta). **Wave 4 fechada** (04-06 ✓ entry point /leituras/nova com auto-detect matchMedia + dois CTAs + escape link). Próximo: Wave 5 (04-07 UAT smoke + checkpoint manual founder). Modo sequencial — Windows/PowerShell sem worktrees.
+Última atividade: 2026-05-03 — Plan 04-06 concluído (entry point auto-detect + dois CTAs). 1 commit (efb1f08 feat new-reading-form). 73+/10− linhas. useEffect com `window.matchMedia('(pointer: coarse) and (hover: none)')` + cleanup do listener; SSR-safe default 'mobile_camera'; hidden input `<input type="hidden" name="method"/>` consumido por createReadingAction (Plan 04-02); botão de escape via `<button type="submit" name="method" value="<oposto>">` que sobrescreve hidden input via HTML form behavior canônico (Pattern G); texto dinâmico em ambos os CTAs. Botão "Cancelar" removido (decisão registrada). Build OK: /leituras/nova First Load 3.98 kB. 160/160 testes verdes excluindo pré-existente da Fase 3 (quality-scoring.test.ts — confirmado out-of-scope via stash em tree limpo). Vocabulário LGPD limpo no arquivo (8 ocorrências globais já registradas em deferred-items.md desde 04-01). Zero auto-fixes Rule 1/2/3 — plano executado exatamente como escrito (Tier ZERO desvio).
 
-Progresso: [████░░░░░░] 42% (3/9 fases + 5/7 plans Fase 4)
+Progresso: [████░░░░░░] 43% (3/9 fases + 6/7 plans Fase 4)
 
 ## Métricas de performance
 
 **Velocidade:**
 
-- Total de plans concluídos: 11
+- Total de plans concluídos: 12
 - Duração média: ~10 min/plan
-- Tempo total de execução: ~152 min
+- Tempo total de execução: ~182 min
 
 **Por fase:**
 
 | Fase | Plans | Total | Média/plan |
 |-------|-------|-------|------------|
 | 1 — Setup | 6 | ~75 min | ~12 min |
-| 4 — Upload desktop | 5 (parcial) | ~77 min | ~15 min |
+| 4 — Upload desktop | 6 (parcial) | ~107 min | ~18 min |
 
 **Tendência recente:**
 
-- Últimos plans: 04-05 (~20 min, 2 tasks, 2 commits, 466 linhas total, build OK + bundle splitting validado, 63/63 testes Fase 3 verdes, zero auto-fixes), 04-04 (~30 min ativo / ~80 min wall-clock incluindo rate limit, 2 tasks, 3 commits — 1 RED prévio + GREEN + Task 2, 9 testes novos verdes, zero auto-fixes), 04-03 (5 min, 1 task TDD, 2 commits, 10 testes verdes, 4 auto-fixes Rule 2 a11y hardening).
-- Tendência: 04-05 dentro do envelope esperado para wizard assembly (clone cirúrgico do capture-client com 3 substituições + assembly de 4 deps Wave 1+2). Foi 4× mais rápido que 04-04 (que teve rate limit). Sem TDD por design do PLAN — cobertura virá via UAT 04-07.
+- Últimos plans: 04-06 (~30 min, 1 task, 1 commit, +73 −10 linhas, build OK /leituras/nova 3.98 kB, 160/160 testes verdes excluindo pré-existente Fase 3, zero auto-fixes — execução verbatim do PLAN), 04-05 (~20 min, 2 tasks, 2 commits, 466 linhas total, build OK + bundle splitting validado, 63/63 testes Fase 3 verdes, zero auto-fixes), 04-04 (~30 min ativo / ~80 min wall-clock incluindo rate limit, 2 tasks, 3 commits — 1 RED prévio + GREEN + Task 2, 9 testes novos verdes, zero auto-fixes), 04-03 (5 min, 1 task TDD, 2 commits, 10 testes verdes, 4 auto-fixes Rule 2 a11y hardening).
+- Tendência: 04-06 dentro do envelope esperado para entry-point form (1 arquivo, 1 task, sem TDD por design). Sem deviations — PLAN escrito com action verbatim viabilizou execução direta. Cobertura UI virá via UAT 04-07 (próximo).
 
 *Atualizado após a conclusão de cada plan.*
 
@@ -73,6 +73,8 @@ Decisões recentes que afetam o trabalho atual:
 - **Plan 04-05 (2026-05-03):** Clone cirúrgico viável: clonar `capture-client.tsx` (350 linhas) preservando `Phase` state machine, refs (`slotAbortRefs`, `uploadPromisesRef`, `finalizingTriggeredRef`), `executeUpload`, `handleRedo`, useEffects de finalização e cleanup — substituindo APENAS (a) `<input capture>` por `UploadDropzone`, (b) `handleFileSelected (ChangeEvent)` por `handleFileAccepted (File)` com pipeline `validateUploadFile -> convertHeicToJpeg -> analyzeCapturedJpeg`, (c) `CapturePreview mode='upload'`. Resultado: 381 linhas, paralelismo 1:1 com capture-client (auditável via diff). Pattern reutilizável se Fase futura precisar de outra fonte (ex: import de galeria, captura via webcam — basta novo handler de input).
 - **Plan 04-05 (2026-05-03):** AngleInterstitial **NÃO** é renderizado em fluxo de upload mesmo após Plan 04-04 ter adicionado `mode` prop. Razão: o alert hardcoded "Use a câmera traseira · Nunca utilize o flash" do JSX é mobile-only — terapeuta no desktop está subindo foto pré-existente e não tem câmera traseira/flash. A prop `mode` afeta apenas o CTA via `getSlotInstructionCopy`, não remove o alert. Solução adotada: heading inline (`Foto N de 6 — Olho ESQUERDO · Frente`) + UploadDropzone visível diretamente na phase='instruction'. Mantém o componente AngleInterstitial inalterado para fluxo mobile.
 - **Plan 04-05 (2026-05-03):** Bundle splitting de heic2any **VALIDADO em produção via `pnpm build`**: heic2any aparece em chunk dedicado de 1.35 MB (`7ef09c20.*.js`), separado do bundle inicial. Rota `/leituras/nova/upload` First Load JS = 3.4 kB + 228 kB shared (paridade com `/capturar` 3.56 kB) — confirmação de evidência do dynamic import correto em `lib/upload/heic-to-jpeg.ts` (Plan 04-01). CONTEXT D-11 honrado.
+- **Plan 04-06 (2026-05-03):** Pattern de auto-detect device com link de escape em ambos os lados estabelecido em `new-reading-form.tsx`: `useEffect` com `window.matchMedia('(pointer: coarse) and (hover: none)')` (mais robusto que User-Agent — cobre iPad em modo desktop), SSR-safe default `'mobile_camera'`, listener `'change'` com cleanup. Pattern de **dois submits no mesmo form** via override de hidden input por `<button type="submit" name="method" value="<oposto>">` — quando o botão é clicado, browser inclui SEU value no FormData e o hidden input com mesmo `name` é sobrescrito (HTML form behavior canônico, Pattern G de 04-PATTERNS.md). Zero JS adicional para o caminho de escape — funciona com JS desabilitado.
+- **Plan 04-06 (2026-05-03):** Decisão de remover botão "Cancelar" do form de nova leitura: usuário em `/leituras/nova` chegou aqui por escolha (clicou em "Nova leitura" no sidebar ou em `/clientes/[id]`); "voltar" é responsabilidade do browser back button. Imports relacionados (`Link`, `buttonVariants`, `cn`) removidos consistentemente — sem dead code. Decisão registrada nos comments do PLAN — pode voltar como Link discreto se UI review reclamar. Padrão de "fluxo unidirecional sem cancelar redundante" pode ser aplicado a outros forms se houver consenso.
 
 ### Todos pendentes
 
@@ -97,11 +99,11 @@ Nenhum ainda.
 
 ## Continuidade de sessão
 
-Última sessão: 2026-05-03 (22:36–22:56 UTC) — **Plan 04-05 concluído** (upload wizard page + client). Wave 3 fechada. UPLOAD-01 e UPLOAD-02 entregues.
+Última sessão: 2026-05-03 (23:03–23:35 UTC) — **Plan 04-06 concluído** (entry point auto-detect + dois CTAs). Wave 4 fechada. UPLOAD-01 e UPLOAD-02 mantidos completos.
 
-Stopped at: 04-05-SUMMARY.md gerado, STATE.md+ROADMAP.md+REQUIREMENTS.md atualizados; pronto para retomar com **Plan 04-06 (Wave 4 — entry point)** que tem dependência apenas em Wave 1 (já completa) — pode iniciar imediatamente. Depois Wave 5 (04-07 UAT smoke) que depende de Waves 3+4.
+Stopped at: 04-06-SUMMARY.md gerado, STATE.md+ROADMAP.md atualizados; pronto para retomar com **Plan 04-07 (Wave 5 — UAT smoke + checkpoint manual founder)** que depende de Waves 3+4 (ambas completas) — pode iniciar imediatamente. Após 04-07, Fase 4 fechada e próximo é Fase 5 (Pipeline de visão Modal).
 
-Resume file: `.planning/phases/04-upload-desktop/04-06-*-PLAN.md`.
+Resume file: `.planning/phases/04-upload-desktop/04-07-*-PLAN.md`.
 
 ---
 
