@@ -3,7 +3,8 @@ phase: 05-pipeline-visao-modal
 plan: "09"
 subsystem: vision-service
 tags: [vision, pipeline, features, jensen, lab-kmeans, lgpd-vocab]
-status: awaiting-human-verify
+status: approved
+checkpoint:human-verify: "approved 2026-05-04 with one fix (right h9 = pulmao/pleura/bronquios/torax direito; displaced bexiga/orgaos pelvicos to right h5)"
 
 requires:
   - phase: 05-pipeline-visao-modal
@@ -185,21 +186,19 @@ None. `extract_all` and `compute_asymmetry` are fully implemented; the prior `ra
 
 ---
 
-## ⚠ CHECKPOINT: HUMAN-VERIFY (D-J3)
+## ✅ CHECKPOINT: HUMAN-VERIFY (D-J3) — APPROVED 2026-05-04
 
-**Plan 05-09 is code-complete and tests-green, but NOT marked `[x]` in ROADMAP until the founder approves the content of `vision-service/data/jensen-map.json`.**
+Founder UAT response: `needs-fix` (one correction) → `approved` after fix applied.
 
-The Jensen map is iridology domain knowledge — the orchestrator cannot self-validate the hour→zone correctness. The founder is the qualified iridologist on this project and must confirm:
+**Correction applied (commit `f7002a1`):**
+- right h9 changed from `bexiga · órgãos pélvicos · útero ou próstata` → `pulmão · pleura · brônquios · tórax direito` (Jensen Vol. 1 anchoring)
+- displaced bexiga/órgãos pélvicos zones appended to right h5 (alongside ombro/braço; JSON shape is per-hour without concentric layering)
 
-1. The 12 sectors per eye correctly mirror Jensen Vol. 1 (1982 pt-BR)
-2. The known asymmetries (right h7 fígado, left h9 coração, etc.) are correctly placed
-3. Vocabulary is acceptable for downstream LLM consumption (no diagnostic claims, just anatomical zones)
+Tests still green post-fix: 20/20 (test_known_jensen_asymmetries unaffected). audit:vocabulary OK.
 
-**Founder response options at the orchestrator:**
-- **`approved`** — orchestrator marks 05-09 `[x]`, advances to Wave 1c (05-10 modal_app)
-- **`needs-fix: <description>`** — orchestrator opens a small follow-up plan to revise jensen-map.json per founder's correction
+Plan 05-09 is now closed. Advances to Wave 1c (05-10 modal_app).
 
 ---
 
 *Phase: 05-pipeline-visao-modal*
-*Awaiting human-verify: 2026-05-04*
+*Approved: 2026-05-04*
