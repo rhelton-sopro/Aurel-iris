@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   createReadingSchema,
   readingIdSchema,
@@ -6,6 +6,32 @@ import {
   type CaptureMethod,
   type DraftReading,
 } from './readings.schemas'
+
+// Mocks hoisted por vitest — declarados aqui para cobrir a action import abaixo.
+vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }))
+vi.mock('next/navigation', () => ({
+  redirect: vi.fn((path: string) => {
+    // Espelha Next.js redirect() — lança para curto-circuitar o corpo da action.
+    throw new Error(`NEXT_REDIRECT:${path}`)
+  }),
+}))
+vi.mock('next/headers', () => ({
+  cookies: vi.fn(async () => ({
+    toString: () => 'sb-access-token=test-token; sb-refresh-token=test-refresh',
+  })),
+}))
+vi.mock('@/lib/supabase/server', () => ({
+  createClient: vi.fn(async () => ({
+    auth: {
+      getUser: vi.fn().mockResolvedValue({
+        data: { user: { id: 'user-1' } },
+        error: null,
+      }),
+    },
+  })),
+}))
+
+import { finalizeReadingAction } from './readings'
 
 // UUIDs válidos RFC 9562 (v4): 3o bloco começa com 4, 4o bloco começa com 8/9/a/b
 // Zod v4 usa regex RFC estrita — UUIDs sintéticos como 1111..1111 são rejeitados.
@@ -170,5 +196,92 @@ describe('DraftReading shape (Phase 4 — D-15 recovery routing)', () => {
       ? `/leituras/nova/upload?reading=${draft.id}&resume=true`
       : `/leituras/nova/capturar?reading=${draft.id}&resume=true`
     expect(expectedRoute).toBe(`/leituras/nova/capturar?reading=${draft.id}&resume=true`)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Phase 5 (plan 05-13): finalizeReadingAction trigger semantics
+// ---------------------------------------------------------------------------
+
+const READING_ID = '550e8400-e29b-41d4-a716-446655440000'
+const ORIGINAL_FETCH = globalThis.fetch
+
+describe('finalizeReadingAction — Phase 5 trigger', () => {
+  beforeEach(() => {
+    process.env.NEXT_PUBLIC_SITE_URL = 'https://aurel-iris.test'
+  })
+  afterEach(() => {
+    globalThis.fetch = ORIGINAL_FETCH
+    vi.clearAllMocks()
+  })
+
+  it('calls POST /api/readings/<id>/process exactly once with cookie + no-store cache', async () => {
+    const fetchMock = vi.fn(async () => new Response(null, { status: 202 }))
+    globalThis.fetch = fetchMock as typeof globalThis.fetch
+
+    await expect(finalizeReadingAction(READING_ID)).rejects.toThrow(
+      /NEXT_REDIRECT:\/leituras/,
+    )
+
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    const [url, init] = fetchMock.mock.calls[0]!
+    expect(url).toBe(`https://aurel-iris.test/api/readings/${READING_ID}/process`)
+    expect((init as RequestInit).method).toBe('POST')
+    const headers = (init as RequestInit).headers as Record<string, string>
+    expect(headers.Cookie).toContain('sb-access-token=test-token')
+    expect((init as RequestInit).cache).toBe('no-store')
+  })
+
+  it('redirects to /leituras on 202 (D-T2)', async () => {
+    globalThis.fetch = vi.fn(async () => new Response(null, { status: 202 })) as typeof globalThis.fetch
+
+    await expect(finalizeReadingAction(READING_ID)).rejects.toThrow(
+      /NEXT_REDIRECT:\/leituras/,
+    )
+  })
+
+  it('returns soft-warn on 502 — no redirect, no error throw', async () => {
+    globalThis.fetch = vi.fn(async () =>
+      new Response('Modal trigger failed', { status: 502 }),
+    ) as typeof globalThis.fetch
+
+    const result = await finalizeReadingAction(READING_ID)
+    expect(result).toEqual({
+      warning: expect.stringContaining(
+        'Captura salva, mas o processamento automático falhou',
+      ),
+    })
+  })
+
+  it('returns soft-warn on 4xx — no redirect, no error throw', async () => {
+    globalThis.fetch = vi.fn(async () =>
+      new Response('Reading not found', { status: 404 }),
+    ) as typeof globalThis.fetch
+
+    const result = await finalizeReadingAction(READING_ID)
+    expect(result).toMatchObject({
+      warning: expect.stringContaining('Reprocessar'),
+    })
+  })
+
+  it('returns soft-warn on fetch network throw — never propagates', async () => {
+    globalThis.fetch = vi.fn(async () => {
+      throw new TypeError('Failed to fetch')
+    }) as typeof globalThis.fetch
+
+    const result = await finalizeReadingAction(READING_ID)
+    expect(result).toMatchObject({
+      warning: expect.stringContaining('Reprocessar'),
+    })
+  })
+
+  it('returns error (not warning) when reading_id is invalid (Zod gate) — trigger NOT called', async () => {
+    const fetchMock = vi.fn(async () => new Response(null, { status: 202 }))
+    globalThis.fetch = fetchMock as typeof globalThis.fetch
+
+    const result = await finalizeReadingAction('not-a-uuid')
+    expect(result).toMatchObject({ error: 'reading_id inválido' })
+    // CRITICAL: trigger NOT called when validation fails.
+    expect(fetchMock).not.toHaveBeenCalled()
   })
 })
