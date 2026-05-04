@@ -40,6 +40,7 @@ import time
 from io import BytesIO
 
 import modal
+from pipeline.error_summary import ERROR_SUMMARY
 
 
 app = modal.App("aurel-iris-vision")
@@ -135,17 +136,21 @@ def _load_image(url: str):
 
 
 def _classify_error_summary(warnings: list[str]) -> str:
-    """Map warning patterns to D-E1 pt-BR catalog (LGPD-compliant)."""
+    """Map warning patterns to D-E1 pt-BR catalog (LGPD-compliant).
+
+    Returns one of the 5 locked strings from ERROR_SUMMARY (pipeline.error_summary).
+    No pt-BR literals are inlined here — all strings come from the catalog.
+    """
     joined = " ".join(warnings).lower()
     if "no_face_detected" in joined or "mediapipe_no_face" in joined:
-        return "Olhos não detectados nas fotos"
+        return ERROR_SUMMARY["eyes_not_detected"]
     if "timeout" in joined:
-        return "Tempo limite excedido — tente novamente"
+        return ERROR_SUMMARY["timeout"]
     if "format" in joined or "decode" in joined or "load_image" in joined:
-        return "Imagens em formato inválido"
+        return ERROR_SUMMARY["invalid_format"]
     if "low_light" in joined or "image_quality" in joined:
-        return "Imagens com pouca luz — tente recapturar"
-    return "Falha temporária no processamento — tente novamente"
+        return ERROR_SUMMARY["low_light"]
+    return ERROR_SUMMARY["transient"]
 
 
 @app.function(image=image, gpu="T4", timeout=120)

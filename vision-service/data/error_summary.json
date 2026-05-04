@@ -1,0 +1,11 @@
+{
+  "catalog_name": "aurel_iris_error_summary",
+  "version": "0.1.0",
+  "strings": {
+    "low_light": "Imagens com pouca luz — tente recapturar",
+    "eyes_not_detected": "Olhos não detectados nas fotos",
+    "timeout": "Tempo limite excedido — tente novamente",
+    "transient": "Falha temporária no processamento — tente novamente",
+    "invalid_format": "Imagens em formato inválido"
+  }
+}
