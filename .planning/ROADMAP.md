@@ -187,7 +187,7 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
   4. `retrieveRelevantKnowledge(features, reportSections)` retorna até 30 chunks deduplicados (~15k tokens) em ≤ 3s (D-R5; ≤ 2s p95 D-N4 early-warning) com queries Família A (visuais) + B (templates por seção D-R2B), reranking voyage-rerank-2.5 (D-N2 graceful fallback) e pesos D-R4 (clinical_data 1.5×, alta_prioridade 1.1×, dimensoes intersect 1.2×).
   5. Spot-check: para feature simulada `lacuna no setor 7 (fígado)`, os top-5 chunks retornados são reconhecidamente relevantes a fígado/lacuna em obras clássicas (founder UAT em `06-UAT.md`).
 **Plans:** 14 plans em 5 waves
-- [ ] 06-01-PLAN.md — Wave 0 test scaffolding (10 pytest + 4 vitest stubs + synthetic PDF fixture) (Wave 0)
+- [x] 06-01-PLAN.md — Wave 0 test scaffolding (10 pytest + 4 vitest stubs + synthetic PDF fixture) (Wave 0). **Concluído 2026-05-05** (2 commits `7dd6287` pytest stubs + `f242400` vitest stubs + fixtures; 49 pytest skipped + 32 vitest todos; pytest e vitest exit 0; LGPD audit limpo no fixture; 14 Wave-0 checkboxes flipadas em 06-VALIDATION.md).
 - [ ] 06-02-PLAN.md — Canonical data: vocabularies.json + jensen-reference.md + section-queries.ts + types.ts (Wave 0)
 - [ ] 06-03-PLAN.md — Deps (voyageai, PyMuPDF, anthropic, etc.) + manifest_assist.py + books_manifest.json (Wave 0)
 - [ ] 06-04-PLAN.md — pdf_extractor.py + chunker.py + content_hash canonicalization (Wave 1)
@@ -276,7 +276,7 @@ Fases v1 executam em ordem numérica: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 
 | 3. Captura mobile (PWA) | 8/8* | ✅ Concluída via UAT | 2026-05-03 |
 | 4. Upload desktop | 7/7 | ✅ Concluída via UAT + gsd-verifier | 2026-05-03 |
 | 5. Pipeline de visão (Modal) | 17/17 | Código-completa; aguardando verify-work + founder smoke | — |
-| 6. RAG — Ingestão | 0/TBD | Não iniciada | — |
+| 6. RAG — Ingestão | 1/14 | Em execução (Wave 0 iniciada) | — |
 | 7. Análise LLM | 0/TBD | Não iniciada | — |
 | 8. Pagamento + LGPD | 0/TBD | Não iniciada | — |
 | 9. Polish + dogfooding + beta | 0/TBD | Não iniciada | — |

@@ -3,7 +3,7 @@ phase: 6
 slug: rag-ingestao
 status: draft
 nyquist_compliant: false
-wave_0_complete: false
+wave_0_complete: true
 created: 2026-05-05
 ---
 
@@ -74,20 +74,20 @@ created: 2026-05-05
 
 **Files to create as test scaffolding (Wave 0 — before pipeline implementation):**
 
-- [ ] `vision-service/tests/test_ingest_extract.py` — RAG-01 PDF + DOCX extraction
-- [ ] `vision-service/tests/test_chunker.py` — RAG-01 chunking strategy + boundary preservation (D-C1..C3)
-- [ ] `vision-service/tests/test_books_manifest.py` — D-M1 schema + file existence
-- [ ] `vision-service/tests/test_embedder.py` — RAG-02 Voyage batching + dim assertions (D-E1)
-- [ ] `vision-service/tests/test_idempotency.py` — D-E2 content_hash dedup
-- [ ] `vision-service/tests/test_budget.py` — D-G1 hardcap (US$ 5 embedding)
-- [ ] `vision-service/tests/test_persist.py` — integration test against local supabase (or test container)
-- [ ] `vision-service/tests/test_vocabularies.py` — D-T2..T5 vocabulary enforcement
-- [ ] **`vision-service/tests/test_contextualizer.py`** — D-N1 Contextual Retrieval (sentence generation, cache hit rate)
-- [ ] **`vision-service/tests/test_contextualize_budget.py`** — D-N1 dedicated hardcap (US$ 15 Contextual Retrieval)
-- [ ] `apps/web/lib/rag/search.test.ts` — RAG-04 retrieve contract + D-R5 latency budget
-- [ ] `apps/web/lib/rag/build-queries.test.ts` — D-R2 Family A+B query generation
-- [ ] `apps/web/lib/rag/score-weights.test.ts` — D-R4 weighting
-- [ ] **`apps/web/lib/rag/rerank.test.ts`** — D-N2 voyage-rerank-2.5 reorder + fallback + latency
+- [x] `vision-service/tests/test_ingest_extract.py` — RAG-01 PDF + DOCX extraction (06-01 scaffold; flips in 06-04)
+- [x] `vision-service/tests/test_chunker.py` — RAG-01 chunking strategy + boundary preservation (D-C1..C3) (06-01 scaffold; flips in 06-04)
+- [x] `vision-service/tests/test_books_manifest.py` — D-M1 schema + file existence (06-01 scaffold; flips in 06-03)
+- [x] `vision-service/tests/test_embedder.py` — RAG-02 Voyage batching + dim assertions (D-E1) (06-01 scaffold; flips in 06-05)
+- [x] `vision-service/tests/test_idempotency.py` — D-E2 content_hash dedup (06-01 scaffold; flips in 06-04)
+- [x] `vision-service/tests/test_budget.py` — D-G1 hardcap (US$ 5 embedding) (06-01 scaffold; flips in 06-05)
+- [x] `vision-service/tests/test_persist.py` — integration test against local supabase (or test container) (06-01 scaffold; flips in 06-07)
+- [x] `vision-service/tests/test_vocabularies.py` — D-T2..T5 vocabulary enforcement (06-01 scaffold; flips in 06-02)
+- [x] **`vision-service/tests/test_contextualizer.py`** — D-N1 Contextual Retrieval (sentence generation, cache hit rate) (06-01 scaffold; flips in 06-06)
+- [x] **`vision-service/tests/test_contextualize_budget.py`** — D-N1 dedicated hardcap (US$ 15 Contextual Retrieval) (06-01 scaffold; flips in 06-05)
+- [x] `apps/web/lib/rag/search.test.ts` — RAG-04 retrieve contract + D-R5 latency budget (06-01 scaffold; flips in 06-11)
+- [x] `apps/web/lib/rag/build-queries.test.ts` — D-R2 Family A+B query generation (06-01 scaffold; flips in 06-10)
+- [x] `apps/web/lib/rag/score-weights.test.ts` — D-R4 weighting (06-01 scaffold; flips in 06-10)
+- [x] **`apps/web/lib/rag/rerank.test.ts`** — D-N2 voyage-rerank-2.5 reorder + fallback + latency (06-01 scaffold; flips in 06-11)
 
 **Data files to create (Wave 0):**
 

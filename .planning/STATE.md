@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-05T13:35:00.000Z"
+last_updated: "2026-05-05T14:30:00.000Z"
 progress:
   total_phases: 10
   completed_phases: 4
   total_plans: 56
-  completed_plans: 42
-  percent: 75
+  completed_plans: 43
+  percent: 77
 ---
 
 # Estado do projeto
@@ -19,22 +19,24 @@ progress:
 Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 
 **Valor central:** Cada cliente atendido produz um JSON de features genuinamente diferente, e por isso cada relatório é genuinamente diferente. Pipeline de visão objetivo + LLM ancorado em RAG é o coração do produto.
-**Foco atual:** Fase 6 (RAG — Ingestão) — **PLANEJADA 2026-05-05 (14 plans em 5 waves; ninja stack adopted: Contextual Retrieval D-N1 + Reranking D-N2; HyDE D-N3 deferred Fase 9)**. Aguardando `/gsd-execute-phase 6` para iniciar. Em paralelo, Fase 5 ainda aguarda `/gsd-verify-work 5` + founder smoke procedure.
+**Foco atual:** Fase 6 (RAG — Ingestão) — **EM EXECUÇÃO 2026-05-05 (Wave 0 iniciada; 1/14 plans completos: 06-01 test scaffolding)**. Em paralelo, Fase 5 ainda aguarda `/gsd-verify-work 5` + founder smoke procedure.
 
 ## Posição atual
 
-Fase: 6 de 10 — **PLANEJADA** (RAG — Ingestão da base de conhecimento)
-Plan: 14/14 plans em 5 waves (Wave 0 test scaffolding + canonical data; Wave 1 core libs; Wave 2 migration 0005; Wave 3 orchestration + retrieval; Wave 4 audit + UAT + docs)
-Próxima ação: `/gsd-execute-phase 6` (executor detecta nenhuma wave executada e spawna Wave 0 — 3 plans paralelos: 06-01 test stubs, 06-02 vocabularies + types, 06-03 deps + manifest).
-Status: ready-to-execute. Plan-checker passed iteration 2/3 (1 BLOCKER + 6 WARNINGS de iteração 1 todos endereçados; sem regressões). Coverage gates verdes — RAG-01..04 cobertos, todas as decisões D-S1..D-N5 referenciadas.
+Fase: 6 de 10 — **EM EXECUÇÃO** (RAG — Ingestão da base de conhecimento)
+Plan: 1/14 plans concluídos. Wave 0 em andamento — 06-01 (test scaffolding) ✅ concluído; 06-02 (canonical data: vocabularies + types) e 06-03 (deps + manifest) pendentes.
+Próxima ação: `/gsd-execute-phase 6` continua Wave 0 spawnando 06-02 + 06-03 em paralelo (ambos independentes do 06-01 já concluído).
+Status: 06-01 entregou 14 test files (10 pytest skipped + 4 vitest todo) + 2 fixtures. pytest exit 0 (49 skipped) e vitest exit 0 (32 todos). Cada subsequent plan executor agora pode `grep "Wave 0 — flip in 06-XX-PLAN"` para identificar seus testes e flipá-los GREEN.
 
 **Background:** Fase 5 (Pipeline de visão / Modal) continua **CÓDIGO-COMPLETA 2026-05-04 (17/17 plans)**, aguardando `/gsd-verify-work 5` + founder smoke. Não bloqueia início da Fase 6 (Fase 6 só depende de Fase 1 — pgvector + knowledge_chunks já existem desde Fase 1).
 Status: code-complete — Wave 3 fechada (CI workflow + D-E1 catalog externalizado + founder smoke runbook + .env.example finalizado). Suítes: vision-service 135/139 (4 expected skips: 3× MediaPipe model não-local, 1× segment fixture); apps/web 260/263 (3 pre-existing Phase 3 quality-scoring legacy — deferred). audit:vocabulary limpo cross-tree.
-Última atividade: 2026-05-05 — Fase 6 planejada via `/gsd-plan-phase 6`. CONTEXT.md (15 decisões: 10 base D-S1..D-M1 + 5 ninja D-N1..D-N5), RESEARCH.md (1005 linhas inicial + ninja-pass section sobre HyDE/Contextual/Reranking + 14 Open Questions todas RESOLVED), PATTERNS.md (37 files mapeados — 32 com analogs), VALIDATION.md (Nyquist scaffolding com 14 Wave-0 test files), 14 PLAN.md (06-01..06-14). Founder decidiu Ninja Pass durante discuss-phase: D-N1 Contextual Retrieval ADOPT + relax escopado de D-T1 (custo \$3-9 one-time), D-N2 voyage-rerank-2.5 ADOPT (free tier ~12mo, +12.70%% sobre Cohere v3.5), D-N3 HyDE DEFER Fase 9 (preserva envelope \$30-80/mês). Plan-checker iteração 1: 1 BLOCKER + 6 WARNINGS (BLOCKER procedural sobre Open Questions heading; WARNINGS sobre drift detection, mode mixing, auth bypass, v1 limitations callout, word-boundary regex). Iteração 2: VERIFICATION PASSED — fixes aplicados sem regressões.
+Última atividade: 2026-05-05 — Plan 06-01 (Wave 0 test scaffolding) concluído. 14 test files committed (commits `7dd6287` pytest stubs + `f242400` vitest stubs + fixtures). pytest exit 0 (49 skipped, todos com reason `Wave 0 — flip in 06-XX-PLAN`); vitest exit 0 (32 todos). Fixtures `sample_book.txt` (synthetic 3-section iridology text, LGPD audit clean) e `sample_book.pdf` (67-byte placeholder, regenerated em 06-04 com PyMuPDF). VALIDATION.md frontmatter atualizado para `wave_0_complete: true`; 14 Wave-0 checkboxes flipadas. Zero deviations — plano executado verbatim com 2 ajustes copy editor menores no fixture (Birello em vez de Battello per CONTEXT D-S2; "eixo de avaliação" em vez de "diagnose holística" para neutralidade canônica).
 
-Atividade anterior: 2026-05-04 — Fase 5 Wave 3 concluída (05-15 GH Actions, 05-16 catalog externalizado, 05-17 README founder smoke + .env.example).
+Atividade anterior: 2026-05-05 — Fase 6 planejada via `/gsd-plan-phase 6`. CONTEXT.md (15 decisões: 10 base D-S1..D-M1 + 5 ninja D-N1..D-N5), RESEARCH.md (1005 linhas inicial + ninja-pass section sobre HyDE/Contextual/Reranking + 14 Open Questions todas RESOLVED), PATTERNS.md (37 files mapeados — 32 com analogs), VALIDATION.md (Nyquist scaffolding com 14 Wave-0 test files), 14 PLAN.md (06-01..06-14). Founder decidiu Ninja Pass durante discuss-phase: D-N1 Contextual Retrieval ADOPT + relax escopado de D-T1 (custo \$3-9 one-time), D-N2 voyage-rerank-2.5 ADOPT (free tier ~12mo, +12.70%% sobre Cohere v3.5), D-N3 HyDE DEFER Fase 9 (preserva envelope \$30-80/mês). Plan-checker iteração 1: 1 BLOCKER + 6 WARNINGS (BLOCKER procedural sobre Open Questions heading; WARNINGS sobre drift detection, mode mixing, auth bypass, v1 limitations callout, word-boundary regex). Iteração 2: VERIFICATION PASSED — fixes aplicados sem regressões.
 
-Progresso: [██████████] 100% (4/10 fases concluídas + 17/17 plans Fase 5 código-completa — 42/42 plans do milestone v1.0). Aguardando verify-work + founder smoke para fechar Fase 5.
+Atividade anterior anterior: 2026-05-04 — Fase 5 Wave 3 concluída (05-15 GH Actions, 05-16 catalog externalizado, 05-17 README founder smoke + .env.example).
+
+Progresso: [██████████] 100% (4/10 fases concluídas + 17/17 plans Fase 5 código-completa + 1/14 plans Fase 6 — 43/43 plans do milestone v1.0 closed). Aguardando verify-work + founder smoke para fechar Fase 5.
 
 **Backlog de longo prazo (registrado mas NÃO ativo):** Fase 10 — Sistema de Aprendizagem Clínica (planejada para depois de Fase 9 fechar; ver `.planning/phases/10-aprendizagem-clinica/10-CONTEXT.md`). Captura de dados pré-requisito a partir da Fase 7 (relatório gerado vs. entregue + diff de edições humanas) precisa ser embutida no design da Fase 7.
 
@@ -82,6 +84,7 @@ Decisões recentes que afetam o trabalho atual:
 - **Plan 04-05 (2026-05-03):** Bundle splitting de heic2any **VALIDADO em produção via `pnpm build`**: heic2any aparece em chunk dedicado de 1.35 MB (`7ef09c20.*.js`), separado do bundle inicial. Rota `/leituras/nova/upload` First Load JS = 3.4 kB + 228 kB shared (paridade com `/capturar` 3.56 kB) — confirmação de evidência do dynamic import correto em `lib/upload/heic-to-jpeg.ts` (Plan 04-01). CONTEXT D-11 honrado.
 - **Plan 04-06 (2026-05-03):** Pattern de auto-detect device com link de escape em ambos os lados estabelecido em `new-reading-form.tsx`: `useEffect` com `window.matchMedia('(pointer: coarse) and (hover: none)')` (mais robusto que User-Agent — cobre iPad em modo desktop), SSR-safe default `'mobile_camera'`, listener `'change'` com cleanup. Pattern de **dois submits no mesmo form** via override de hidden input por `<button type="submit" name="method" value="<oposto>">` — quando o botão é clicado, browser inclui SEU value no FormData e o hidden input com mesmo `name` é sobrescrito (HTML form behavior canônico, Pattern G de 04-PATTERNS.md). Zero JS adicional para o caminho de escape — funciona com JS desabilitado.
 - **Plan 04-06 (2026-05-03):** Decisão de remover botão "Cancelar" do form de nova leitura: usuário em `/leituras/nova` chegou aqui por escolha (clicou em "Nova leitura" no sidebar ou em `/clientes/[id]`); "voltar" é responsabilidade do browser back button. Imports relacionados (`Link`, `buttonVariants`, `cn`) removidos consistentemente — sem dead code. Decisão registrada nos comments do PLAN — pode voltar como Link discreto se UI review reclamar. Padrão de "fluxo unidirecional sem cancelar redundante" pode ser aplicado a outros forms se houver consenso.
+- **Plan 06-01 (2026-05-05):** Pattern de "Wave 0 RED scaffolding com skip-with-plan-id" estabelecido para Fase 6: cada test file usa `pytest.mark.skip(reason="Wave 0 — flip in 06-XX-PLAN")` (Python) ou `it.todo("...")` (TypeScript) com plan ID embutido na razão, então executores subsequentes fazem `grep "Wave 0 — flip in 06-04-PLAN"` para identificar exatamente seus testes. Pattern de **lazy-import-inside-test** (`from scripts.lib.X import Y` dentro do corpo do método) garante que pytest collects sem ImportError antes do módulo existir — mirrors Phase 5 `test_error_summary.py`. Plan emitiu 14 test files (10 pytest + 4 vitest) totalizando 81 stubs — Nyquist sampling agora é satisfiable em qualquer subsequent plan da fase. Sample_book.txt como spec textual da fixture sample_book.pdf (regenerada deterministicamente em 06-04 com PyMuPDF) é pattern reutilizável para qualquer fase futura que precise de fixture binária regenerável.
 
 ### Todos pendentes
 
