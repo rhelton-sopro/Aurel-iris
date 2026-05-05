@@ -102,3 +102,23 @@ class TestVocabularies:
             re.IGNORECASE | re.UNICODE,
         )
         assert forbidden.search(text) is None, "Forbidden LGPD vocab in vocabularies.json"
+
+    def test_sinais_referenciados_supersets_jensen_reference_md(self):
+        # vocabularies.json sinais_referenciados MUST contain every sign present
+        # in vision-service/data/jensen-reference.md (founder-approved canonical
+        # registry — must stay in sync). Drift breaks loud and clear.
+        import json
+        import re
+        from pathlib import Path
+        vocab_path = Path(__file__).parent.parent / "scripts" / "data" / "vocabularies.json"
+        ref_path = Path(__file__).parent.parent / "data" / "jensen-reference.md"
+        vocab = json.loads(vocab_path.read_text(encoding="utf-8"))
+        ref_text = ref_path.read_text(encoding="utf-8")
+        # Match `- \`<name>\`` bullet lines (single-token, backtick-wrapped)
+        ref_signs = set(re.findall(r"^- `([^`]+)`", ref_text, re.MULTILINE))
+        vocab_signs = set(vocab["sinais_referenciados"])
+        missing = ref_signs - vocab_signs
+        assert not missing, (
+            f"vocabularies.json sinais_referenciados missing entries from "
+            f"jensen-reference.md (sync invariant): {sorted(missing)}"
+        )
