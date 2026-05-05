@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-05T15:30:00.000Z"
+last_updated: "2026-05-05T16:00:00.000Z"
 progress:
   total_phases: 10
   completed_phases: 4
   total_plans: 56
-  completed_plans: 44
+  completed_plans: 45
   percent: 79
 ---
 
@@ -19,14 +19,14 @@ progress:
 Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 
 **Valor central:** Cada cliente atendido produz um JSON de features genuinamente diferente, e por isso cada relatório é genuinamente diferente. Pipeline de visão objetivo + LLM ancorado em RAG é o coração do produto.
-**Foco atual:** Fase 6 (RAG — Ingestão) — **EM EXECUÇÃO 2026-05-05 (Wave 0 em progresso; 2/14 plans completos: 06-01 test scaffolding + 06-02 canonical data)**. Em paralelo, Fase 5 ainda aguarda `/gsd-verify-work 5` + founder smoke procedure.
+**Foco atual:** Fase 6 (RAG — Ingestão) — **EM EXECUÇÃO 2026-05-05 (Wave 0 CONCLUÍDA; 3/14 plans completos: 06-01 test scaffolding + 06-02 canonical data + 06-03 deps + manifest)**. Em paralelo, Fase 5 ainda aguarda `/gsd-verify-work 5` + founder smoke procedure.
 
 ## Posição atual
 
 Fase: 6 de 10 — **EM EXECUÇÃO** (RAG — Ingestão da base de conhecimento)
-Plan: 2/14 plans concluídos. Wave 0 em andamento — 06-01 (test scaffolding) ✅ concluído; 06-02 (canonical data) ✅ concluído; 06-03 (deps + manifest) pendente.
-Próxima ação: `/gsd-execute-phase 6` continua Wave 0 spawnando 06-03 (último Wave 0; depois Wave 1 abre com 06-04..06-06 paralelos).
-Status: 06-02 entregou 4 frozen-v1 canonical files (vocabularies.json v0.1.1 + jensen-reference.md 24 sinais + types.ts 7 ReportSections + section-queries.ts) com founder-gate completo. test_vocabularies.py flipado GREEN com 7/7 + regression guards (assert version=='0.1.1' + founder_additions issubset). pytest 142 passed/46 skipped (baseline match); audit_vocabulary clean; tsc clean para lib/rag; vitest 32 todos preserved.
+Plan: 3/14 plans concluídos. **Wave 0 CONCLUÍDA** — 06-01 (test scaffolding) ✅ + 06-02 (canonical data) ✅ + 06-03 (deps + manifest) ✅. Wave 1 desbloqueada: 06-04..06-06 podem rodar em paralelo.
+Próxima ação: `/gsd-execute-phase 6` abre Wave 1 spawnando 06-04 (pdf_extractor + chunker), 06-05 (budget + embedder) e 06-06 (contextualizer + manifest.py loader) em paralelo.
+Status: 06-03 entregou 8 deps Python pinned (voyageai/PyMuPDF/pdfplumber/docx2txt/tiktoken/supabase/psycopg2-binary/anthropic) + voyageai TS SDK + 4 root rag:* scripts + manifest_assist.py CLI + books_manifest.json v0.1.1 founder-validated com 18 entries (7 alta_prioridade, 2 skip, 1 pdfplumber override em #8 dictionary). Founder edits aplicados: 7 autor fills, 2 ano corrections (#4 2008→2012, #16 1985→2005), #7 Bernard-Jensen-Iridology-pdf alta_prioridade flipped false→true (Jensen Vol.1/Vol.2 core), #10 IRIDOLOGIA-PSICOTERAPEUTICA reclassificado escola Brasileira→Italiana (Lo Rito spaziorischio), #16 endocrinology reclassificado Jensen→Andrews-britânica, version bumped 0.1.0→0.1.1. pytest 142 passed/46 skipped (baseline match); audit_vocabulary clean; manifest schema validation OK 18 entries.
 
 **Background:** Fase 5 (Pipeline de visão / Modal) continua **CÓDIGO-COMPLETA 2026-05-04 (17/17 plans)**, aguardando `/gsd-verify-work 5` + founder smoke. Não bloqueia início da Fase 6 (Fase 6 só depende de Fase 1 — pgvector + knowledge_chunks já existem desde Fase 1).
 Status: code-complete — Wave 3 fechada (CI workflow + D-E1 catalog externalizado + founder smoke runbook + .env.example finalizado). Suítes: vision-service 135/139 (4 expected skips: 3× MediaPipe model não-local, 1× segment fixture); apps/web 260/263 (3 pre-existing Phase 3 quality-scoring legacy — deferred). audit:vocabulary limpo cross-tree.
