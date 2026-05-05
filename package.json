@@ -11,7 +11,11 @@
     "build": "pnpm --filter web build",
     "start": "pnpm --filter web start",
     "lint": "pnpm --filter web lint",
-    "type-check": "pnpm --filter web exec tsc --noEmit"
+    "type-check": "pnpm --filter web exec tsc --noEmit",
+    "rag:ingest": "cd vision-service && python -m scripts.ingest_knowledge",
+    "rag:purge": "cd vision-service && python -m scripts.ingest_knowledge --purge",
+    "rag:spot-check": "pnpm --filter web exec tsx scripts/rag-spot-check.ts",
+    "audit:vocabulary:db": "node apps/web/scripts/audit-vocabulary-db.mjs"
   },
   "devDependencies": {
     "pg": "^8.20.0"
