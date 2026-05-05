@@ -190,7 +190,7 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
 - [x] 06-01-PLAN.md — Wave 0 test scaffolding (10 pytest + 4 vitest stubs + synthetic PDF fixture) (Wave 0). **Concluído 2026-05-05** (2 commits `7dd6287` pytest stubs + `f242400` vitest stubs + fixtures; 49 pytest skipped + 32 vitest todos; pytest e vitest exit 0; LGPD audit limpo no fixture; 14 Wave-0 checkboxes flipadas em 06-VALIDATION.md).
 - [x] 06-02-PLAN.md — Canonical data: vocabularies.json + jensen-reference.md + section-queries.ts + types.ts (Wave 0). **Concluído 2026-05-05** via founder-gate (3 commits `b4065f1` baseline vocabularies + `a9f42c5` types/section-queries + `f09d0ad` founder edits; vocabularies.json v0.1.1 com 24 sinais e 7 ReportSections incluindo nutricao_carencias; +3 sinais founder-approved (pterigium_pigmentar, nevus, criptas_radiais); test_vocabularies.py 7/7 GREEN com regression guards; 5/5 verification gates passed).
 - [x] 06-03-PLAN.md — Deps (voyageai, PyMuPDF, anthropic, etc.) + manifest_assist.py + books_manifest.json (Wave 0). **Concluído 2026-05-05** via founder-gate (3 commits `8859f90` deps + `e256e1e` bootstrap + `0d748c3` founder edits; 8 Python deps pinned + voyageai TS SDK + 4 root rag:* scripts; books_manifest.json v0.1.1 com 18 entries founder-validated, 7 alta_prioridade incluindo #7 Bernard-Jensen-pdf flipped, 2 skip duplicates, 1 pdfplumber override em #8 dictionary, 7 autor fills, 2 ano corrections, 2 escola reclassifications #10 Italiana e #16 Andrews-britânica; pytest baseline 142/46 mantido; audit_vocabulary clean).
-- [ ] 06-04-PLAN.md — pdf_extractor.py + chunker.py + content_hash canonicalization (Wave 1)
+- [x] 06-04-PLAN.md — pdf_extractor.py + chunker.py + content_hash canonicalization (Wave 1). **Concluído 2026-05-05** (3 commits `648a2ec` extractor + `da05ed5` chunker + `75f9b09` test flips; 3 módulos Python em `scripts/lib/` + sample_book.pdf regenerado 67→3538 bytes / 0→4 páginas via `_make_sample_pdf.py`; 13 stubs Wave 0 → 20 testes GREEN; content_hash LOCKED em sha256(text.strip().encode('utf-8')) verificado contra digest hardcoded de "hello"; D-C1 honrado 300-700 tokens com overlap 80 dentro de seção e sem overlap entre capítulos; 6 algorithmic refinements aplicados como Rule 1 fixes durante execução; pytest 162/33 era 142/46; audit_vocabulary clean).
 - [ ] 06-05-PLAN.md — budget.py (VoyageBudgetGuard $5 + ContextualBudgetGuard $15) + embedder.py voyage-3 (Wave 1)
 - [ ] 06-06-PLAN.md — contextualizer.py (D-N1 Anthropic Haiku 4.5) + manifest.py Pydantic loader (Wave 1)
 - [ ] 06-07-PLAN.md — [BLOCKING] migration 0005 (content_hash + source_type + RPC match_knowledge_chunks) + persister.py (Wave 2)
@@ -276,7 +276,7 @@ Fases v1 executam em ordem numérica: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 
 | 3. Captura mobile (PWA) | 8/8* | ✅ Concluída via UAT | 2026-05-03 |
 | 4. Upload desktop | 7/7 | ✅ Concluída via UAT + gsd-verifier | 2026-05-03 |
 | 5. Pipeline de visão (Modal) | 17/17 | Código-completa; aguardando verify-work + founder smoke | — |
-| 6. RAG — Ingestão | 3/14 | Em execução (Wave 0 ✅ CONCLUÍDA — 06-01 + 06-02 + 06-03; Wave 1 desbloqueada) | — |
+| 6. RAG — Ingestão | 4/14 | Em execução (Wave 0 ✅ CONCLUÍDA + Wave 1 em progresso — 06-01..06-03 ✅; 06-04 ✅; 06-05 + 06-06 pendentes) | — |
 | 7. Análise LLM | 0/TBD | Não iniciada | — |
 | 8. Pagamento + LGPD | 0/TBD | Não iniciada | — |
 | 9. Polish + dogfooding + beta | 0/TBD | Não iniciada | — |
