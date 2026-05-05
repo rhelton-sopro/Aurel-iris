@@ -1,0 +1,66 @@
+{
+  "vocabularies_name": "rag_controlled_vocabularies",
+  "version": "0.1.0",
+  "constituicao_referenciada": [
+    "linfatica",
+    "biliar",
+    "hematogina",
+    "mix-biliar",
+    "neurogenica",
+    "miasmatica"
+  ],
+  "setores_referenciados": [
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "h7",
+    "h8",
+    "h9",
+    "h10",
+    "h11",
+    "h12"
+  ],
+  "sinais_referenciados": [
+    "lacuna_aberta",
+    "lacuna_fechada",
+    "cripta",
+    "ponta_lanca",
+    "raios_solaris",
+    "anel_tensao",
+    "anel_psorico",
+    "anel_nervoso",
+    "anel_linfatico",
+    "arco_senil",
+    "arco_de_pelo",
+    "mancha_pigmentar",
+    "mancha_psorica",
+    "mancha_uremica",
+    "vascularizacao_anormal",
+    "colarete_irregular",
+    "colarete_dilatado",
+    "defeito_pupilar",
+    "achatamento_pupilar",
+    "heterocromia_central",
+    "heterocromia_setorial"
+  ],
+  "dimensoes": [
+    "fisica",
+    "psicossomatica",
+    "transgeracional",
+    "constitucional",
+    "energetica",
+    "comportamental"
+  ],
+  "escola_origem": [
+    "Jensen",
+    "Rayid",
+    "Italiana",
+    "Alemã",
+    "Brasileira",
+    "Espanhola",
+    "Andrews-britânica"
+  ]
+}

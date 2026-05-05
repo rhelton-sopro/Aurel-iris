@@ -1,7 +1,8 @@
 """Tests for D-T2..T5 vocabulary enforcement (RAG-01).
 
-Wave 0 scaffolding (06-01-PLAN). Each test currently SKIPS with the
-implementation plan number that will turn it GREEN.
+Wave 0 scaffolding (06-01-PLAN). Flipped GREEN in 06-02-PLAN once
+vision-service/scripts/data/vocabularies.json landed with founder-approved
+canonical lists (D-T2..T5).
 
 Covers (read from vision-service/scripts/data/vocabularies.json):
   - constituicao_referenciada — D-T2 verbatim list of 6 entries
@@ -12,11 +13,9 @@ Covers (read from vision-service/scripts/data/vocabularies.json):
   - LGPD: no forbidden vocab in vocabularies.json
 """
 from __future__ import annotations
-import pytest
 
 
 class TestVocabularies:
-    @pytest.mark.skip(reason="Wave 0 — flip in 06-02-PLAN")
     def test_vocabularies_json_loads_without_error(self):
         import json
         from pathlib import Path
@@ -29,7 +28,6 @@ class TestVocabularies:
         assert "escola_origem" in data
         assert "sinais_referenciados" in data
 
-    @pytest.mark.skip(reason="Wave 0 — flip in 06-02-PLAN")
     def test_constituicao_referenciada_canonical_list(self):
         # D-T2 verbatim
         import json
@@ -41,7 +39,6 @@ class TestVocabularies:
             "mix-biliar", "neurogenica", "miasmatica",
         ]
 
-    @pytest.mark.skip(reason="Wave 0 — flip in 06-02-PLAN")
     def test_setores_referenciados_h1_through_h12(self):
         # D-T3 verbatim — Jensen clock notation
         import json
@@ -53,7 +50,6 @@ class TestVocabularies:
             "h7", "h8", "h9", "h10", "h11", "h12",
         ]
 
-    @pytest.mark.skip(reason="Wave 0 — flip in 06-02-PLAN")
     def test_dimensoes_canonical_list(self):
         # D-T5 verbatim
         import json
@@ -65,7 +61,6 @@ class TestVocabularies:
             "constitucional", "energetica", "comportamental",
         ]
 
-    @pytest.mark.skip(reason="Wave 0 — flip in 06-02-PLAN")
     def test_escola_origem_canonical_list(self):
         # D-T5 verbatim — exact 7 schools
         import json
@@ -77,7 +72,6 @@ class TestVocabularies:
             "Brasileira", "Espanhola", "Andrews-britânica",
         ]
 
-    @pytest.mark.skip(reason="Wave 0 — flip in 06-02-PLAN")
     def test_sinais_referenciados_includes_baseline_signs(self):
         # D-T4 baseline; founder validates full list in 06-02
         import json
@@ -87,7 +81,6 @@ class TestVocabularies:
         baseline = {"lacuna_aberta", "cripta", "anel_tensao", "arco_senil"}
         assert baseline.issubset(set(data["sinais_referenciados"]))
 
-    @pytest.mark.skip(reason="Wave 0 — flip in 06-02-PLAN")
     def test_no_forbidden_vocab_in_vocabularies_json(self):
         # LGPD-06: no diagnóstico/tratamento/cura in canonical vocab
         import re
