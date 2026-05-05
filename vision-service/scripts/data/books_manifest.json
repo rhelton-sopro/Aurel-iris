@@ -1,6 +1,6 @@
 {
   "catalog_name": "books_manifest",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "books": {
     "Bernard Jensen Iridology Simplified": {
       "filename": "157928975-Bernard-Jensen-Iridology-Simplified.pdf",
@@ -16,7 +16,7 @@
     },
     "Manual Para La Practica de La Iridologia e Book 20130216121213": {
       "filename": "253815491-Manual-Para-La-Practica-de-La-Iridologia-e-Book-20130216121213.pdf",
-      "autor": "Unknown",
+      "autor": "Moraga Gajardo",
       "escola": "Espanhola",
       "idioma": "es",
       "ano": 2010,
@@ -36,19 +36,19 @@
       "extrator": "pymupdf",
       "skip": false,
       "ocr_required": false,
-      "notas": "Congresso 2015 — papers multi-autorais"
+      "notas": "congress proceedings, multiple authors"
     },
     "A Iridologia Em Defesa Da Vida": {
       "filename": "311503284-A-Iridologia-Em-Defesa-Da-Vida.pdf",
-      "autor": "Unknown",
+      "autor": "Miryan Cunha Chagas",
       "escola": "Brasileira",
       "idioma": "pt",
-      "ano": 2008,
+      "ano": 2012,
       "alta_prioridade": true,
       "extrator": "pymupdf",
       "skip": false,
       "ocr_required": false,
-      "notas": "Referência brasileira contemporânea"
+      "notas": "TCC UNI 2012, only pt-BR clinical reference in corpus"
     },
     "IridENews5 pdf": {
       "filename": "379580615-IridENews5-pdf.pdf",
@@ -60,7 +60,7 @@
       "extrator": "pymupdf",
       "skip": false,
       "ocr_required": false,
-      "notas": "Boletim multilíngue — founder confirma escola"
+      "notas": "newsletter, not a textbook — lower retrieval value"
     },
     "Bernard Jensen": {
       "filename": "380006870-Bernard-Jensen.docx",
@@ -72,7 +72,7 @@
       "extrator": "docx2txt",
       "skip": true,
       "ocr_required": false,
-      "notas": "DOCX duplicado do PDF acima (RESEARCH Pitfall 12)"
+      "notas": "DOCX duplicado do PDF abaixo (RESEARCH Pitfall 12)"
     },
     "Bernard Jensen Iridology pdf": {
       "filename": "458440796-Bernard-Jensen-Iridology-pdf.pdf",
@@ -80,11 +80,11 @@
       "escola": "Jensen",
       "idioma": "en",
       "ano": 1982,
-      "alta_prioridade": false,
+      "alta_prioridade": true,
       "extrator": "pymupdf",
       "skip": false,
       "ocr_required": false,
-      "notas": "PDF do volume principal Jensen"
+      "notas": "Volume principal Jensen — core reference; alta prioridade for retrieval boost"
     },
     "dictionary of iridology pdf": {
       "filename": "458445717-dictionary-of-iridology-pdf.pdf",
@@ -93,7 +93,7 @@
       "idioma": "en",
       "ano": 1990,
       "alta_prioridade": true,
-      "extrator": "pymupdf",
+      "extrator": "pdfplumber",
       "skip": false,
       "ocr_required": false,
       "notas": "Glossário canônico Jensen — termos técnicos"
@@ -108,19 +108,19 @@
       "extrator": "pymupdf",
       "skip": false,
       "ocr_required": false,
-      "notas": "Cobre dimensão psicoemocional (D-S3)"
+      "notas": "Cobre dimensão psicoemocional + transgeracional (D-S3); única referência pt-BR emocional do corpus"
     },
     "IRIDOLOGIA PSICOTERAPEUTICA METODO VETORIAL": {
       "filename": "554336056-IRIDOLOGIA-PSICOTERAPEUTICA-METODO-VETORIAL.pdf",
       "autor": "Unknown",
-      "escola": "Brasileira",
+      "escola": "Italiana",
       "idioma": "pt",
       "ano": 2015,
       "alta_prioridade": false,
       "extrator": "pymupdf",
       "skip": false,
       "ocr_required": false,
-      "notas": "Método vetorial brasileiro"
+      "notas": "Método vetorial — Lo Rito-derived (spaziorischio methodology)"
     },
     "iridiologia aplicada pratica": {
       "filename": "666347520-iridiologia-aplicada-pratica.pdf",
@@ -172,7 +172,7 @@
     },
     "What the Eye Reveals": {
       "filename": "693664824-What-the-Eye-Reveals.pdf",
-      "autor": "Unknown",
+      "autor": "Denny Johnson",
       "escola": "Rayid",
       "idioma": "en",
       "ano": 1995,
@@ -184,10 +184,10 @@
     },
     "endocrinology and iridology": {
       "filename": "727258853-endocrinology-and-iridology.docx",
-      "autor": "Unknown",
-      "escola": "Jensen",
+      "autor": "John Andrews",
+      "escola": "Andrews-britânica",
       "idioma": "en",
-      "ano": 1985,
+      "ano": 2005,
       "alta_prioridade": false,
       "extrator": "docx2txt",
       "skip": false,
