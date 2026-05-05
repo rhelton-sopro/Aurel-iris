@@ -177,16 +177,30 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
 
 ### Fase 6: RAG — Ingestão da base de conhecimento
 **Mapeamento SPEC:** Fase 5 — RAG ingestão (2–3 dias).
-**Goal**: Os PDFs seed (Jensen Vol. 1 + Battello Iridologia Clínica) estão chunked, embedded e indexados em `knowledge_chunks`, prontos para serem recuperados por `retrieveRelevantKnowledge`.
+**Goal**: Os PDFs seed (18 PDFs em D:\Projetos\Iridologista\livros\) estão chunked, embedded e indexados em `knowledge_chunks`, prontos para serem recuperados por `retrieveRelevantKnowledge(features, reportSections)`.
 **Depends on**: Fase 1 (precisa do `pgvector` e da tabela `knowledge_chunks` com índice HNSW).
 **Requirements**: RAG-01, RAG-02, RAG-03, RAG-04
 **Success Criteria** (o que deve ser verdade):
-  1. `scripts/ingest-knowledge.ts` rodado uma vez gera chunks com size ~500 tokens e overlap 80, respeitando prioridade `chapter → section → paragraph`; cada chunk tem 3–5 tags geradas pelo LLM.
-  2. `knowledge_chunks` tem registros para Jensen e Battello, com `source_book`, `source_chapter`, `source_page` e `metadata` (autor, escola, idioma) preenchidos.
-  3. Embeddings têm dimensão 1024 e foram inseridos via batches Voyage de até 128 textos sem erro de quota; custo total de indexação inicial ≤ ~US$ 25.
-  4. `retrieveRelevantKnowledge(features)` retorna até 30 chunks deduplicados (~15k tokens) em ≤ 3 segundos para uma `vision_features` típica, com queries derivadas de constituição, achados por setor (`findings.length > 0`) e sinais globais.
-  5. Spot-check: para uma feature simulada com `lacuna no setor 7 (fígado)`, os top-5 chunks retornados são reconhecidamente relevantes a fígado/lacuna em obras clássicas (validação pelo fundador).
-**Plans**: TBD
+  1. `vision-service/scripts/ingest_knowledge.py` rodado uma vez gera chunks com size ~500 tokens (flex 300-700) e overlap 80, respeitando prioridade `chapter → section → paragraph`; tagging de vocabulário acontece em sessão Claude Code separada (D-T1).
+  2. `knowledge_chunks` tem registros para 18 livros do acervo (D-S1), com `source_book`, `source_chapter`, `source_page`, `source_type='biblioteca'` e `metadata` (autor, escola, idioma, ano) preenchidos.
+  3. Embeddings têm dimensão 1024 (`voyage-3`) e foram inseridos via batches de até 128; custo total ≤ US$ 5 (D-G1) + ≤ US$ 15 Contextual Retrieval (D-N1).
+  4. `retrieveRelevantKnowledge(features, reportSections)` retorna até 30 chunks deduplicados (~15k tokens) em ≤ 3s (D-R5; ≤ 2s p95 D-N4 early-warning) com queries Família A (visuais) + B (templates por seção D-R2B), reranking voyage-rerank-2.5 (D-N2 graceful fallback) e pesos D-R4 (clinical_data 1.5×, alta_prioridade 1.1×, dimensoes intersect 1.2×).
+  5. Spot-check: para feature simulada `lacuna no setor 7 (fígado)`, os top-5 chunks retornados são reconhecidamente relevantes a fígado/lacuna em obras clássicas (founder UAT em `06-UAT.md`).
+**Plans:** 14 plans em 5 waves
+- [ ] 06-01-PLAN.md — Wave 0 test scaffolding (10 pytest + 4 vitest stubs + synthetic PDF fixture) (Wave 0)
+- [ ] 06-02-PLAN.md — Canonical data: vocabularies.json + jensen-reference.md + section-queries.ts + types.ts (Wave 0)
+- [ ] 06-03-PLAN.md — Deps (voyageai, PyMuPDF, anthropic, etc.) + manifest_assist.py + books_manifest.json (Wave 0)
+- [ ] 06-04-PLAN.md — pdf_extractor.py + chunker.py + content_hash canonicalization (Wave 1)
+- [ ] 06-05-PLAN.md — budget.py (VoyageBudgetGuard $5 + ContextualBudgetGuard $15) + embedder.py voyage-3 (Wave 1)
+- [ ] 06-06-PLAN.md — contextualizer.py (D-N1 Anthropic Haiku 4.5) + manifest.py Pydantic loader (Wave 1)
+- [ ] 06-07-PLAN.md — [BLOCKING] migration 0005 (content_hash + source_type + RPC match_knowledge_chunks) + persister.py (Wave 2)
+- [ ] 06-08-PLAN.md — ingest_knowledge.py CLI orchestrator + founder runs full ingest (Wave 3)
+- [ ] 06-09-PLAN.md — embed.ts (voyage-3 pinned matching Python) (Wave 3)
+- [ ] 06-10-PLAN.md — build-queries.ts (Family A+B) + score-weights.ts (D-R4) (Wave 3)
+- [ ] 06-11-PLAN.md — rerank.ts (D-N2 graceful) + search.ts server action (Wave 3)
+- [ ] 06-12-PLAN.md — audit:vocabulary extension (scripts/data + lib/rag) + audit-vocabulary-db.mjs (Wave 4)
+- [ ] 06-13-PLAN.md — REQUIREMENTS.md + STATE.md updates + rag-spot-check.ts + 06-UAT.md founder gate (Wave 4)
+- [ ] 06-14-PLAN.md — vision-service/README.md RAG runbook section (Wave 4)
 
 ### Fase 7: Análise LLM
 **Mapeamento SPEC:** Fase 6 — Análise LLM (3–5 dias).
