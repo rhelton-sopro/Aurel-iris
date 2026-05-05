@@ -1036,71 +1036,71 @@ Para Iris Codex (5000 chunks, multilíngue, clínico especializado), recomendaç
 
 ---
 
-## Open Questions for Planner
+## Open Questions for Planner (RESOLVED)
 
-These are points where the research surfaced uncertainty that the founder/planner should resolve before execute. None are blockers; all have a default fallback.
+> All 14 questions resolved 2026-05-05. Q1–Q10 resolved by applying documented "Default if no answer" fallbacks during planning. Q11–Q14 (Ninja Pass) resolved via founder decisions reflected in CONTEXT addendum D-N1..N5. Per-question resolution status appended below.
 
-1. **voyage-3 vs voyage-3.5 — small but real choice.**
+1. **voyage-3 vs voyage-3.5 — small but real choice.** **RESOLVED:** stay on `voyage-3` (D-E1 default applied). Plans 06-05 and 06-09 hardcode `EMBEDDING_MODEL = "voyage-3"`.
    - **Why it matters:** Same dimension (1024), same price ($0.06/1M), same API, same SDK call (just change the model name string). voyage-3.5 has +2.66% measured multilingual recall, helpful for cross-lingual (en/it/es → pt-BR queries) which is Fase 6's exact use case.
    - **Default if no answer:** stay on voyage-3 per CONTEXT D-E1.
    - **Recommendation:** ask founder. If they have no preference, choose voyage-3.5. Risk of switch is zero (drop-in replacement, identical contract).
    - **Decision impact:** changes the constant `EMBEDDING_MODEL` in 2 files.
 
-2. **input_type parameter — adopt or skip?**
+2. **input_type parameter — adopt or skip?** **RESOLVED:** adopt. Plans 06-05 (Python embedder) and 06-09 (TS embed) set `input_type='document'` in ingestion and `input_type='query'` in retrieval.
    - **Why it matters:** Free recall improvement (Voyage docs claim). Standard practice. Not in CONTEXT.
    - **Default if no answer:** adopt. Set `input_type="document"` in ingestion + `input_type="query"` in retrieval. Document in plan as "free improvement, standard practice."
    - **Decision impact:** one extra parameter in two SDK calls.
 
-3. **Tag-text injection at chunk text-end — adopt or skip?**
+3. **Tag-text injection at chunk text-end — adopt or skip?** **RESOLVED:** skip (default applied). Reavaliar se UAT 06-13 mostrar gaps em queries lexicais raras.
    - **Why it matters:** Appending `[Tags: lacuna_aberta, anel_tensao, h7]` as a final line of the chunk text BEFORE embedding gives the embedder lexical anchors that improve recall on rare iridological jargon. Hedge against cross-lingual idiom mismatch.
    - **Default if no answer:** skip. Adds complexity; voyage-3+ is already strong on iridology terminology.
    - **Recommendation:** founder decides. If retrieval UAT (Success Criterion 5: "lacuna no setor 7 → top-5 chunks fígado/lacuna") fails, revisit.
    - **Decision impact:** changes the chunk text seen by embedder + content_hash. Re-ingest required to switch on.
 
-4. **DOCX handling: skip both, or ingest both?**
+4. **DOCX handling: skip both, or ingest both?** **RESOLVED:** founder decides per-book in Plan 06-03 founder gate (Task 3) when filling `books_manifest.json`. Default: include `endocrinology-and-iridology.docx` (no PDF equivalent), skip `Bernard-Jensen.docx` (likely redundant with PDF version).
    - **Why it matters:** Two DOCX in acervo (`Bernard-Jensen.docx`, `endocrinology-and-iridology.docx`). Likely overlap with PDFs of similar names (`458440796-Bernard-Jensen-Iridology-pdf.pdf`, `727258853-endocrinology-and-iridology.docx`).
    - **Wait — `endocrinology-and-iridology.docx` is the only version of that book.** No PDF equivalent in the acervo. Likely needs ingestion. Whereas `Bernard-Jensen.docx` MAY be redundant with `458440796-Bernard-Jensen-Iridology-pdf.pdf`.
    - **Default:** founder decides per book during Wave 0 manifest fill. Default: include `endocrinology-and-iridology.docx`, skip `Bernard-Jensen.docx`.
    - **Decision impact:** manifest entries; whether to install python-docx or docx2txt.
 
-5. **Pre-flight token estimation — run or skip?**
+5. **Pre-flight token estimation — run or skip?** **RESOLVED:** skip (default applied). BudgetGuard intercepts at first cross of US$5; idempotency means re-running picks up.
    - **Why it matters:** Calling `vo.count_tokens()` on all 5000 chunks before embedding adds ~30s and one round-trip per book. Catches hardcap-overrun before partial DB writes.
    - **Default:** skip. The BudgetGuard intercepts at first cross of $5; idempotency means re-running picks up. Upside of pre-flight is small for a 1-shot ingestion that is <$1 expected.
    - **Decision impact:** one extra method in BudgetGuard. Trivial to add later.
 
-6. **`hnsw.ef_search` value: 100, 150, or 200?**
+6. **`hnsw.ef_search` value: 100, 150, or 200?** **RESOLVED:** 100 (default applied). Plan 06-07 migration `match_knowledge_chunks` RPC includes `SET LOCAL hnsw.ef_search = 100`. Tunable later via `CREATE OR REPLACE FUNCTION` without migration.
    - **Why it matters:** Lower = faster, lower recall. Higher = slower, higher recall. Default is 40 (likely too low). Research recommends 100 for our scale.
    - **Default if no answer:** 100. Tunable later by editing the RPC function (no migration needed if we use `create or replace function`).
    - **Decision impact:** integer constant in the RPC SQL.
 
-7. **RPC function migration timing: 0005 combined or 0005+0006?**
+7. **RPC function migration timing: 0005 combined or 0005+0006?** **RESOLVED:** combined into 0005 (default applied). Plan 06-07 single migration `0005_knowledge_chunks_content_hash_and_source_type.sql` covers schema changes + RPC.
    - **Why it matters:** D-P1 schema changes (alter table) and the new `match_knowledge_chunks` RPC are two independent concerns; some teams keep schema migrations separate from function definitions. Both styles are acceptable.
    - **Default:** combine into 0005 (same feature). Simpler ledger.
    - **Decision impact:** file count.
 
-8. **`content_hash` index type: implicit btree from UNIQUE, or explicit btree?**
+8. **`content_hash` index type: implicit btree from UNIQUE, or explicit btree?** **RESOLVED:** implicit btree from UNIQUE constraint (default applied). Plan 06-07 migration relies on UNIQUE-implicit index; no separate `CREATE INDEX`.
    - **Why it matters:** UNIQUE constraint already creates a btree-backed index. No need to add separate `create index`. CONTEXT D-P1 example does NOT add a separate index — confirmed correct.
    - **Default:** rely on UNIQUE-implicit index. Done.
    - **No decision needed.**
 
-9. **Test fixtures for chunker: real Jensen excerpt vs synthetic?**
+9. **Test fixtures for chunker: real Jensen excerpt vs synthetic?** **RESOLVED:** synthetic stub PDF (default applied). Plan 06-01 creates `vision-service/tests/fixtures/sample.pdf` (small, generated, copyright-free) with hardcoded chapter/section markers for chunker assertions.
    - **Why it matters:** Chunker tests need a representative "iridology PDF text" to assert chapter/section detection. Real excerpts are copyrighted; synthetic loses fidelity.
    - **Default:** synthetic stub PDF (a few-page file with hardcoded chapter/section markers we craft). Test fixture under `vision-service/tests/fixtures/sample.pdf` (small, generated, not under copyright). Test asserts the chunker recognizes the markers.
    - **Decision impact:** small fixture-creation task in Wave 0.
 
-10. **Should `apps/web/lib/rag/section-queries.ts` be versioned alongside the Fase 7 super prompt?**
+10. **Should `apps/web/lib/rag/section-queries.ts` be versioned alongside the Fase 7 super prompt?** **RESOLVED:** yes — Plan 06-02 freezes v1 set of section slugs (`['constituicao', 'psicoemocional', 'transgeracional', 'simbolico', 'mensagem_final', ...]`) as part of Fase 6 deliverable; consumed by Fase 7 as stable contract.
     - **Why it matters:** D-R2 says yes. But Fase 7 isn't designed yet. Plan should freeze a v1 set of section slugs (`['constituicao', 'psicoemocional', 'transgeracional', 'simbolico', 'mensagem_final', ...]`) so Fase 6 can build templates against a stable contract.
     - **Default:** plan defines the slug list as part of Fase 6, founder validates, becomes input to Fase 7.
     - **Decision impact:** small upfront design effort; reduces rework in Fase 7.
 
-11. **HyDE (Hypothetical Document Embedding) — adopt for Family B queries?** [NINJA PASS]
+11. **HyDE (Hypothetical Document Embedding) — adopt for Family B queries?** [NINJA PASS] **RESOLVED 2026-05-05 (founder):** DEFER to Fase 9 polish (CONTEXT D-N3). Latência + custo apertam o envelope $30–80/mês de PROJECT.md. Reabrir se UAT Fase 7 mostrar gaps em queries Família B.
     - **Why it matters:** Family B queries (psicoemocional, transgeracional, simbólico, mensagem_final) are abstract themes without dense iridological lexical anchors. HyDE expands them via Sonnet 4.6 into hypothetical iridologist descriptions before embedding, improving recall for cross-lingual + abstract matching. Family A (visual findings) stays plain — features already lexically dense.
     - **Cost impact:** ~$54/mês a 100 terapeutas × 30 sessões. Latência: +2s por query Família B (mitigado por paralelização com Família A).
     - **Default if no answer:** Adopt-with-modifications (Family B only). Cache LRU local.
     - **Decision impact:** new file `apps/web/lib/rag/hyde.ts`; one Anthropic SDK dependency; performance test gate ≤3s.
     - **CONTEXT compatibility:** ✅ no conflict (HyDE is runtime, D-T1 covers ingestion only).
 
-12. **Contextual Retrieval (Anthropic) — adopt with D-T1 relax?** [NINJA PASS — ⚠ CONFLICT WITH D-T1]
+12. **Contextual Retrieval (Anthropic) — adopt with D-T1 relax?** [NINJA PASS — ⚠ CONFLICT WITH D-T1] **RESOLVED 2026-05-05 (founder):** ADOPT — relax D-T1 escopado a Contextual Retrieval (CONTEXT D-N1). Vocabulary tagging D-T2..T5 stays Claude Code session-only. Implementation in Plan 06-06 (`contextualizer.py`); dedicated hardcap US$15 in Plan 06-05/06-08.
     - **Why it matters:** Anthropic measured 35% reduction in failure rate top-20. Compounded with reranking → 67% reduction. For our specialized clinical multilingual corpus, this is the single highest-ROI quality lever available.
     - **Cost impact:** ~$3–9 USD one-time at ingestion (Haiku 4.5 + prompt caching). $0 runtime.
     - **⚠ CONFLICT:** D-T1 explicitly forbids API calls during curation/ingestion ("toda a curadoria + tagging roda DENTRO do Claude Code (sessão atual). Sem chamadas API."). Contextual Retrieval requires ~5000 API calls.
@@ -1111,14 +1111,14 @@ These are points where the research surfaced uncertainty that the founder/planne
       - **(b) Relax D-T1 only for Contextual Retrieval — RECOMMENDED**
       - (c) Manual context generation in Claude Code — rejected (5000 chunks × manual prompt = 1000+ hours)
 
-13. **Reranking (voyage-rerank-2.5) — bring forward from `<deferred>` into Phase 6?** [NINJA PASS — ⚠ CONFLICT WITH `<deferred>`]
+13. **Reranking (voyage-rerank-2.5) — bring forward from `<deferred>` into Phase 6?** [NINJA PASS — ⚠ CONFLICT WITH `<deferred>`] **RESOLVED 2026-05-05 (founder):** ADOPT — bring forward into Phase 6 (CONTEXT D-N2). Free tier ~12mo, +12.70% sobre Cohere v3.5, sinérgico com D-N1. Implementation in Plan 06-11 (`rerank.ts` with graceful fallback).
     - **Why it matters:** First 200M tokens free per Voyage account → covers ~12+ months of dogfooding at zero cost. After free tier exhausts, ~$22/mês at 100 therapists. Sinergia composta com Contextual Retrieval (67% failure-rate reduction).
     - **Cost impact:** $0 for foreseeable horizon (free tier). +600ms latency per query (within D-R5 ≤3s budget when paralelized).
     - **⚠ CONFLICT with `<deferred>`:** CONTEXT explicitly defers ranker as "fora do MVP — top-K=5/query + dedup + cap=30 com pesos é suficiente. Reavaliar se Fase 7 mostrar ruído."
     - **Default if no answer:** **Adopt-now (bring into Phase 6 scope).** Free tier + sinergia com Contextual + 1 SDK call to implement.
     - **Decision impact:** new file `apps/web/lib/rag/rerank.ts`; voyageai SDK already required for embedding; plan adds reranking call between pgvector retrieval and D-R4 weights.
 
-14. **Compound strategy — full ninja stack vs partial?** [NINJA PASS — composite recommendation]
+14. **Compound strategy — full ninja stack vs partial?** [NINJA PASS — composite recommendation] **RESOLVED 2026-05-05 (founder):** Adopt 12+13 (Contextual + Reranking); skip 11 (HyDE). Compound expected: ~+30% NDCG@10, ~$25/mês prod, ~1.5s latency (margin confortável vs D-R5 cap 3s). CONTEXT D-N4 codifica latency budget; D-N5 codifica compound failure-rate reduction expected.
     - **If 11+12+13 all adopted:** ~+40% NDCG@10 (estimated), ~$60–80/mês production cost (within PROJECT.md AI envelope $30–80, **margin tight — monitor**), latency ~2.9s (within D-R5 cap of 3s, tight).
     - **If only 12+13 adopted (skip HyDE):** ~+30% NDCG@10, ~$25/mês, latency ~1.5s (comfortable margin).
     - **Recommendation:** Adopt 12+13 in Phase 6 (high ROI, comfortable budget); make 11 a Wave-late opt-in once 12+13 perform measurably and we know how much latency budget we have left.
