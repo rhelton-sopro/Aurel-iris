@@ -61,6 +61,7 @@ export type Database = {
       knowledge_chunks: {
         Row: {
           content: string
+          content_hash: string | null
           created_at: string | null
           embedding: string | null
           id: string
@@ -68,9 +69,11 @@ export type Database = {
           source_book: string
           source_chapter: string | null
           source_page: number | null
+          source_type: string
         }
         Insert: {
           content: string
+          content_hash?: string | null
           created_at?: string | null
           embedding?: string | null
           id?: string
@@ -78,9 +81,11 @@ export type Database = {
           source_book: string
           source_chapter?: string | null
           source_page?: number | null
+          source_type?: string
         }
         Update: {
           content?: string
+          content_hash?: string | null
           created_at?: string | null
           embedding?: string | null
           id?: string
@@ -88,6 +93,7 @@ export type Database = {
           source_book?: string
           source_chapter?: string | null
           source_page?: number | null
+          source_type?: string
         }
         Relationships: []
       }
@@ -286,7 +292,23 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      match_knowledge_chunks: {
+        Args: {
+          match_count?: number
+          match_threshold?: number
+          query_embedding: string
+        }
+        Returns: {
+          content: string
+          id: string
+          metadata: Json
+          score: number
+          source_book: string
+          source_chapter: string
+          source_page: number
+          source_type: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
