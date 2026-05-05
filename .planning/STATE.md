@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-04T21:00:00.000Z"
+last_updated: "2026-05-05T13:35:00.000Z"
 progress:
   total_phases: 10
   completed_phases: 4
-  total_plans: 42
+  total_plans: 56
   completed_plans: 42
-  percent: 100
+  percent: 75
 ---
 
 # Estado do projeto
@@ -19,15 +19,20 @@ progress:
 Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 
 **Valor central:** Cada cliente atendido produz um JSON de features genuinamente diferente, e por isso cada relatório é genuinamente diferente. Pipeline de visão objetivo + LLM ancorado em RAG é o coração do produto.
-**Foco atual:** Fase 5 (Pipeline de visão / Modal) — **CÓDIGO-COMPLETA 2026-05-04 (17/17 plans)**. Aguardando `/gsd-verify-work 5` para validação automatizada contra ROADMAP success criteria; depois founder smoke (modal deploy → trigger reading real → webhook callback) antes de marcar a fase concluída.
+**Foco atual:** Fase 6 (RAG — Ingestão) — **PLANEJADA 2026-05-05 (14 plans em 5 waves; ninja stack adopted: Contextual Retrieval D-N1 + Reranking D-N2; HyDE D-N3 deferred Fase 9)**. Aguardando `/gsd-execute-phase 6` para iniciar. Em paralelo, Fase 5 ainda aguarda `/gsd-verify-work 5` + founder smoke procedure.
 
 ## Posição atual
 
-Fase: 5 de 10 — **CÓDIGO-COMPLETA** (Pipeline de visão / Modal); aguardando verify + smoke
-Plan: 17/17 (Wave 0 ✓ + Wave 1 ✓ + Wave 2 ✓ + Wave 3 ✓)
-Próxima ação: `/gsd-verify-work 5` (verificação automática contra ROADMAP success criteria 1-5). Após approve, founder executa o smoke procedure (`vision-service/README.md`) → `modal deploy` → trigger reading real → marca Fase 5 ✅.
+Fase: 6 de 10 — **PLANEJADA** (RAG — Ingestão da base de conhecimento)
+Plan: 14/14 plans em 5 waves (Wave 0 test scaffolding + canonical data; Wave 1 core libs; Wave 2 migration 0005; Wave 3 orchestration + retrieval; Wave 4 audit + UAT + docs)
+Próxima ação: `/gsd-execute-phase 6` (executor detecta nenhuma wave executada e spawna Wave 0 — 3 plans paralelos: 06-01 test stubs, 06-02 vocabularies + types, 06-03 deps + manifest).
+Status: ready-to-execute. Plan-checker passed iteration 2/3 (1 BLOCKER + 6 WARNINGS de iteração 1 todos endereçados; sem regressões). Coverage gates verdes — RAG-01..04 cobertos, todas as decisões D-S1..D-N5 referenciadas.
+
+**Background:** Fase 5 (Pipeline de visão / Modal) continua **CÓDIGO-COMPLETA 2026-05-04 (17/17 plans)**, aguardando `/gsd-verify-work 5` + founder smoke. Não bloqueia início da Fase 6 (Fase 6 só depende de Fase 1 — pgvector + knowledge_chunks já existem desde Fase 1).
 Status: code-complete — Wave 3 fechada (CI workflow + D-E1 catalog externalizado + founder smoke runbook + .env.example finalizado). Suítes: vision-service 135/139 (4 expected skips: 3× MediaPipe model não-local, 1× segment fixture); apps/web 260/263 (3 pre-existing Phase 3 quality-scoring legacy — deferred). audit:vocabulary limpo cross-tree.
-Última atividade: 2026-05-04 — Wave 3 concluída: 05-15 GH Actions vision-service-tests.yml (Python 3.11 + pytest + LGPD audit gate), 05-16 D-E1 catalog externalizado para vision-service/data/error_summary.json + lru_cached loader em pipeline/error_summary.py + modal_app.py rewireado (no inline pt-BR literals), 05-17 README.md founder smoke procedure (244 linhas, markdown checklist) + vision-service/.env.example (MODAL_WEBHOOK_SECRET + WEBHOOK_BASE_URL com docs inline). Bash sandbox bloqueou todos os agents da Wave 3 mas Writes pegaram — orchestrator finalizou tudo inline (commits + tests + SUMMARY.mds para 05-16 e 05-17 cujos agents pegaram rate-limit antes do SUMMARY).
+Última atividade: 2026-05-05 — Fase 6 planejada via `/gsd-plan-phase 6`. CONTEXT.md (15 decisões: 10 base D-S1..D-M1 + 5 ninja D-N1..D-N5), RESEARCH.md (1005 linhas inicial + ninja-pass section sobre HyDE/Contextual/Reranking + 14 Open Questions todas RESOLVED), PATTERNS.md (37 files mapeados — 32 com analogs), VALIDATION.md (Nyquist scaffolding com 14 Wave-0 test files), 14 PLAN.md (06-01..06-14). Founder decidiu Ninja Pass durante discuss-phase: D-N1 Contextual Retrieval ADOPT + relax escopado de D-T1 (custo \$3-9 one-time), D-N2 voyage-rerank-2.5 ADOPT (free tier ~12mo, +12.70%% sobre Cohere v3.5), D-N3 HyDE DEFER Fase 9 (preserva envelope \$30-80/mês). Plan-checker iteração 1: 1 BLOCKER + 6 WARNINGS (BLOCKER procedural sobre Open Questions heading; WARNINGS sobre drift detection, mode mixing, auth bypass, v1 limitations callout, word-boundary regex). Iteração 2: VERIFICATION PASSED — fixes aplicados sem regressões.
+
+Atividade anterior: 2026-05-04 — Fase 5 Wave 3 concluída (05-15 GH Actions, 05-16 catalog externalizado, 05-17 README founder smoke + .env.example).
 
 Progresso: [██████████] 100% (4/10 fases concluídas + 17/17 plans Fase 5 código-completa — 42/42 plans do milestone v1.0). Aguardando verify-work + founder smoke para fechar Fase 5.
 
