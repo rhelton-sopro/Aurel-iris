@@ -1,96 +1,126 @@
-"""Tests for D-N1 Contextual Retrieval (RAG-02 Ninja Pass).
+"""Tests for vision-service/scripts/lib/contextualizer.py — D-N1.
 
-Wave 0 scaffolding (06-01-PLAN). Each test currently SKIPS with the
-implementation plan number that will turn it GREEN.
-
-Covers:
-  - situate_chunk returns string from Anthropic Haiku 4.5 response
-  - Chapter passed in cached system block (cache_control={'type': 'ephemeral'})
-  - Default model 'claude-haiku-4-5' (D-N1 + PATTERNS line 317)
-  - Budget guard receives correct token counts (input/cached/output)
-  - PROMPT_TEMPLATE matches Anthropic canonical (RESEARCH lines 723–730)
+Wave 0 stubs (06-01) used a `client=` parameter. PLAN 06-06 establishes the
+authoritative API: `situate_chunk(chunk_text, chapter_text, *, guard, model=...)`
+where the anthropic client is constructed internally from `ANTHROPIC_API_KEY`.
+Tests patch `anthropic.Anthropic` to inject the mock — pure unit tests, no real API.
 """
 from __future__ import annotations
+
+from unittest.mock import MagicMock, patch
+
 import pytest
 
+from scripts.lib.budget import BudgetExceeded, ContextualBudgetGuard
+from scripts.lib.contextualizer import PROMPT_TEMPLATE, situate_chunk
 
-class TestContextualizer:
-    @pytest.mark.skip(reason="Wave 0 — flip in 06-06-PLAN")
-    def test_situate_chunk_returns_string_when_anthropic_succeeds(self, monkeypatch):
-        from scripts.lib.contextualizer import situate_chunk  # noqa: F401
-        from unittest.mock import MagicMock
-        mock_anthropic = MagicMock()
-        mock_response = MagicMock()
-        mock_response.content = [MagicMock(text="Trecho do CAPÍTULO I sobre constituição biliar")]
-        mock_response.usage.input_tokens = 50
-        mock_response.usage.cache_read_input_tokens = 1000
-        mock_response.usage.output_tokens = 25
-        mock_anthropic.messages.create.return_value = mock_response
-        result = situate_chunk(client=mock_anthropic, chapter_text="...", chunk_text="...")
-        assert isinstance(result, str)
-        assert result.startswith("Trecho")
 
-    @pytest.mark.skip(reason="Wave 0 — flip in 06-06-PLAN")
+def make_fake_anthropic_response(*, text: str, in_tokens=100, cache_tokens=50, out_tokens=20):
+    response = MagicMock()
+    response.content = [MagicMock(text=text)]
+    response.usage.input_tokens = in_tokens
+    response.usage.cache_read_input_tokens = cache_tokens
+    response.usage.output_tokens = out_tokens
+    return response
+
+
+class TestSituateChunk:
+    def test_situate_chunk_returns_string(self, monkeypatch):
+        monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+        fake_client = MagicMock()
+        fake_client.messages.create.return_value = make_fake_anthropic_response(text="  test context  ")
+        with patch("anthropic.Anthropic", return_value=fake_client):
+            guard = ContextualBudgetGuard()
+            result = situate_chunk("chunk text", "chapter text", guard=guard)
+        assert result == "test context"
+
     def test_situate_chunk_passes_chapter_in_cached_system_block(self, monkeypatch):
-        # D-N1 + PATTERNS lines 326–334: cache_control={'type': 'ephemeral'} on chapter block
-        from scripts.lib.contextualizer import situate_chunk  # noqa: F401
-        from unittest.mock import MagicMock
-        mock_anthropic = MagicMock()
-        mock_response = MagicMock()
-        mock_response.content = [MagicMock(text="contexto")]
-        mock_response.usage.input_tokens = 10
-        mock_response.usage.cache_read_input_tokens = 0
-        mock_response.usage.output_tokens = 5
-        mock_anthropic.messages.create.return_value = mock_response
-        situate_chunk(client=mock_anthropic, chapter_text="capítulo inteiro", chunk_text="trecho")
-        kwargs = mock_anthropic.messages.create.call_args.kwargs
-        # System block must contain cached chapter content
-        system = kwargs.get("system", [])
-        assert any(
-            isinstance(block, dict) and block.get("cache_control") == {"type": "ephemeral"}
-            for block in system
-        )
+        monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+        fake_client = MagicMock()
+        fake_client.messages.create.return_value = make_fake_anthropic_response(text="ctx")
+        with patch("anthropic.Anthropic", return_value=fake_client):
+            guard = ContextualBudgetGuard()
+            situate_chunk("the chunk", "FULL CHAPTER TEXT", guard=guard)
+        kwargs = fake_client.messages.create.call_args.kwargs
+        system_blocks = kwargs["system"]
+        assert isinstance(system_blocks, list) and len(system_blocks) == 2
+        cached_block = system_blocks[1]
+        assert cached_block["cache_control"] == {"type": "ephemeral"}
+        assert "FULL CHAPTER TEXT" in cached_block["text"]
 
-    @pytest.mark.skip(reason="Wave 0 — flip in 06-06-PLAN")
     def test_situate_chunk_uses_haiku_4_5_by_default(self, monkeypatch):
-        # D-N1 + PATTERNS line 317
-        from scripts.lib.contextualizer import situate_chunk  # noqa: F401
-        from unittest.mock import MagicMock
-        mock_anthropic = MagicMock()
-        mock_response = MagicMock()
-        mock_response.content = [MagicMock(text="x")]
-        mock_response.usage.input_tokens = 1
-        mock_response.usage.cache_read_input_tokens = 0
-        mock_response.usage.output_tokens = 1
-        mock_anthropic.messages.create.return_value = mock_response
-        situate_chunk(client=mock_anthropic, chapter_text="c", chunk_text="t")
-        kwargs = mock_anthropic.messages.create.call_args.kwargs
-        assert kwargs["model"] == "claude-haiku-4-5"
+        monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+        fake_client = MagicMock()
+        fake_client.messages.create.return_value = make_fake_anthropic_response(text="ctx")
+        with patch("anthropic.Anthropic", return_value=fake_client):
+            guard = ContextualBudgetGuard()
+            situate_chunk("c", "ch", guard=guard)
+        assert fake_client.messages.create.call_args.kwargs["model"] == "claude-haiku-4-5"
 
-    @pytest.mark.skip(reason="Wave 0 — flip in 06-06-PLAN")
+    def test_situate_chunk_honors_override_model(self, monkeypatch):
+        monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+        fake_client = MagicMock()
+        fake_client.messages.create.return_value = make_fake_anthropic_response(text="ctx")
+        with patch("anthropic.Anthropic", return_value=fake_client):
+            guard = ContextualBudgetGuard()
+            situate_chunk("c", "ch", guard=guard, model="claude-sonnet-4-6")
+        assert fake_client.messages.create.call_args.kwargs["model"] == "claude-sonnet-4-6"
+
     def test_situate_chunk_calls_guard_add_with_token_counts(self, monkeypatch):
-        # ContextualBudgetGuard receives input/cached/output from response.usage
-        from scripts.lib.contextualizer import situate_chunk  # noqa: F401
-        from unittest.mock import MagicMock
-        mock_anthropic = MagicMock()
-        mock_response = MagicMock()
-        mock_response.content = [MagicMock(text="ctx")]
-        mock_response.usage.input_tokens = 50
-        mock_response.usage.cache_read_input_tokens = 1500
-        mock_response.usage.output_tokens = 30
-        mock_anthropic.messages.create.return_value = mock_response
-        mock_guard = MagicMock()
-        situate_chunk(
-            client=mock_anthropic, chapter_text="c", chunk_text="t", guard=mock_guard,
+        monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+        fake_client = MagicMock()
+        fake_client.messages.create.return_value = make_fake_anthropic_response(
+            text="ctx", in_tokens=200, cache_tokens=80, out_tokens=15
         )
-        mock_guard.add.assert_called_once()
-        kwargs = mock_guard.add.call_args.kwargs
-        assert kwargs["input_tokens"] == 50
-        assert kwargs["cached_tokens"] == 1500
-        assert kwargs["output_tokens"] == 30
+        guard = MagicMock(spec=ContextualBudgetGuard)
+        with patch("anthropic.Anthropic", return_value=fake_client):
+            situate_chunk("c", "ch", guard=guard)
+        guard.add.assert_called_once_with(input_tokens=200, cached_tokens=80, output_tokens=15)
 
-    @pytest.mark.skip(reason="Wave 0 — flip in 06-06-PLAN")
     def test_prompt_template_matches_anthropic_canonical(self):
-        # RESEARCH lines 723–730 verbatim — <chunk>{chunk}</chunk> required
-        from scripts.lib.contextualizer import PROMPT_TEMPLATE  # noqa: F401
+        # RESEARCH lines 723-730 verbatim
         assert "<chunk>{chunk}</chunk>" in PROMPT_TEMPLATE
+        assert "Please give a short succinct context" in PROMPT_TEMPLATE
+        assert "succinct context and nothing else" in PROMPT_TEMPLATE
+
+    def test_raises_when_anthropic_api_key_missing(self, monkeypatch):
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+        guard = ContextualBudgetGuard()
+        with pytest.raises(RuntimeError, match="ANTHROPIC_API_KEY is not set"):
+            situate_chunk("c", "ch", guard=guard)
+
+    def test_propagates_budget_exceeded(self, monkeypatch):
+        monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+        fake_client = MagicMock()
+        fake_client.messages.create.return_value = make_fake_anthropic_response(text="ctx")
+        guard = MagicMock(spec=ContextualBudgetGuard)
+        guard.add.side_effect = BudgetExceeded("contextual hardcap")
+        with patch("anthropic.Anthropic", return_value=fake_client):
+            with pytest.raises(BudgetExceeded, match="contextual hardcap"):
+                situate_chunk("c", "ch", guard=guard)
+
+    def test_response_text_is_stripped(self, monkeypatch):
+        monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+        fake_client = MagicMock()
+        fake_client.messages.create.return_value = make_fake_anthropic_response(text="\n  context here\n")
+        with patch("anthropic.Anthropic", return_value=fake_client):
+            guard = ContextualBudgetGuard()
+            result = situate_chunk("c", "ch", guard=guard)
+        assert result == "context here"
+
+    def test_handles_none_cache_read_tokens_defensively(self, monkeypatch):
+        # Defensive getattr fallback: when SDK returns None for cache_read_input_tokens,
+        # guard.add must receive 0 (not None) to keep budget arithmetic intact.
+        monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+        fake_client = MagicMock()
+        fake_response = MagicMock()
+        fake_response.content = [MagicMock(text="ctx")]
+        fake_response.usage.input_tokens = 50
+        fake_response.usage.cache_read_input_tokens = None  # SDK quirk
+        fake_response.usage.output_tokens = 10
+        fake_client.messages.create.return_value = fake_response
+        guard = MagicMock(spec=ContextualBudgetGuard)
+        with patch("anthropic.Anthropic", return_value=fake_client):
+            situate_chunk("c", "ch", guard=guard)
+        kwargs = guard.add.call_args.kwargs
+        assert kwargs["cached_tokens"] == 0  # not None
