@@ -1,6 +1,6 @@
 {
   "vocabularies_name": "rag_controlled_vocabularies",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "constituicao_referenciada": [
     "linfatica",
     "biliar",
@@ -44,7 +44,10 @@
     "defeito_pupilar",
     "achatamento_pupilar",
     "heterocromia_central",
-    "heterocromia_setorial"
+    "heterocromia_setorial",
+    "pterigium_pigmentar",
+    "nevus",
+    "criptas_radiais"
   ],
   "dimensoes": [
     "fisica",

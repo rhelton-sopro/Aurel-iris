@@ -19,6 +19,7 @@ export type ReportSection =
   | 'simbolico'
   | 'mensagem_final'
   | 'mental_cognitivo'
+  | 'nutricao_carencias'
 
 export interface KnowledgeChunkMetadata {
   autor: string

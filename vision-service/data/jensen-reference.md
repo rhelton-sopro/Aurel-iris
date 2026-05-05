@@ -1,7 +1,7 @@
 # Sinais Iridológicos Canônicos — Aurel Iris (Phase 6 D-T4)
 
 **Founder approval date:** 2026-05-05
-**Vocabulary version:** 0.1.0
+**Vocabulary version:** 0.1.1
 **Status:** locked — additions require founder approval + bump version + re-audit.
 
 This file is the source of truth for the `metadata.sinais_referenciados` array.
@@ -12,6 +12,7 @@ não-canônicos vão em `metadata.tags_livres`, NUNCA inventar entrada nova aqui
 - `lacuna_aberta`
 - `lacuna_fechada`
 - `cripta`
+- `criptas_radiais`
 
 ## Pontas e raios
 - `ponta_lanca`
@@ -25,10 +26,12 @@ não-canônicos vão em `metadata.tags_livres`, NUNCA inventar entrada nova aqui
 - `arco_senil`
 - `arco_de_pelo`
 
-## Manchas
+## Manchas e pigmentações
 - `mancha_pigmentar`
 - `mancha_psorica`
 - `mancha_uremica`
+- `pterigium_pigmentar`
+- `nevus`
 
 ## Vasos e colarete
 - `vascularizacao_anormal`

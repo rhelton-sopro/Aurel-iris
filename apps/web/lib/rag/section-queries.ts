@@ -44,4 +44,8 @@ export const SECTION_QUERY_TEMPLATES: Record<
   mensagem_final: (f) => [
     `${f.constitution.primary} orientação holística geral`,
   ],
+  nutricao_carencias: (f) => [
+    `${f.constitution.primary} carências nutricionais associadas`,
+    `${f.constitution.primary} deficiências de minerais e oligoelementos`,
+  ],
 }

@@ -27,6 +27,11 @@ class TestVocabularies:
         assert "dimensoes" in data
         assert "escola_origem" in data
         assert "sinais_referenciados" in data
+        # Versioning convention (D-T6) — bumps require founder approval + re-tag.
+        # 0.1.1 reflects the founder-gate edits in 06-02 (3 sinais added,
+        # nutricao_carencias section added on TS side).
+        assert data["vocabularies_name"] == "rag_controlled_vocabularies"
+        assert data["version"] == "0.1.1"
 
     def test_constituicao_referenciada_canonical_list(self):
         # D-T2 verbatim
@@ -80,6 +85,11 @@ class TestVocabularies:
         data = json.loads(path.read_text(encoding="utf-8"))
         baseline = {"lacuna_aberta", "cripta", "anel_tensao", "arco_senil"}
         assert baseline.issubset(set(data["sinais_referenciados"]))
+        # 06-02 founder-gate additions (2026-05-05) — bumps version to 0.1.1.
+        # These three sinais were proposed by the founder during the human-verify
+        # checkpoint and must remain in the canonical list (regression guard).
+        founder_additions = {"pterigium_pigmentar", "nevus", "criptas_radiais"}
+        assert founder_additions.issubset(set(data["sinais_referenciados"]))
 
     def test_no_forbidden_vocab_in_vocabularies_json(self):
         # LGPD-06: no diagnóstico/tratamento/cura in canonical vocab
