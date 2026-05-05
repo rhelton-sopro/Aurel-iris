@@ -1,0 +1,17 @@
+CAPÍTULO I — Introdução à Iridologia
+
+A iridologia é uma técnica de avaliação holística que utiliza a observação da íris ocular para identificar padrões constitucionais e tendências de funcionamento orgânico. Bernard Jensen, considerado o pai da iridologia americana moderna, sistematizou o mapeamento setorial baseado na divisão da íris em 12 horas, espelhando o relógio. Esta divisão permite associar cada região a sistemas e órgãos específicos do corpo humano. Os textos clássicos de Jensen, Birello, Lo Rito e outros autores europeus fornecem o vocabulário canônico que o pipeline RAG deste projeto indexa.
+
+A íris contém milhares de fibras cuja densidade, coloração e padrão indicam a constituição do indivíduo. As três constituições primárias — linfática, biliar e hematogina — descrevem padrões de resposta sistêmica que dialogam com escolas de naturologia e antropomedicina.
+
+CAPÍTULO II — Setores Iridais
+
+1.1 Setor 7 — Fígado
+
+O setor 7 corresponde anatomicamente ao fígado, vesícula biliar e conduto hepático no olho direito. Sinais como lacunas abertas e raios solaris nesta região sugerem padrões funcionais que merecem investigação na anamnese, sem caracterizar afirmação clínica. A escola italiana, representada por Birello e Lo Rito em Iridologia del Profondo, expande o setor 7 incorporando dimensão psicoemocional ligada ao arquétipo do fígado.
+
+A combinação de constituição biliar com sinais marcados no setor 7 fornece eixo de avaliação holística — sempre apresentada como hipótese investigativa, não como afirmação categórica.
+
+1.2 Lacunas e Criptas
+
+Lacunas são depressões na trama fibrilar da íris, classificadas em abertas (com bordas menos definidas) e fechadas (bordas marcadas). Criptas são depressões mais profundas, frequentemente em forma de losango ou diamante. Ambos os sinais, na linguagem iridológica clássica, indicam pontos de menor densidade fibrilar — interpretáveis como
