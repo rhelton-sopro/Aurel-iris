@@ -124,3 +124,46 @@ class TestSituateChunk:
             situate_chunk("c", "ch", guard=guard)
         kwargs = guard.add.call_args.kwargs
         assert kwargs["cached_tokens"] == 0  # not None
+
+    def test_truncates_chapter_context_when_over_anthropic_limit(self, monkeypatch, capsys):
+        # Bug encountered during 06-08 full ingest: Spanish manual produced
+        # 407 chunks all with chapter=None (regex didn't catch "CAPÍTULO"),
+        # and the aggregated chapter_text overflowed Anthropic's 200K window
+        # (209,605 tokens for that single book → API 400 error).
+        # Fix: truncate chapter_text to MAX_CONTEXT_TOKENS before send.
+        from scripts.lib.contextualizer import MAX_CONTEXT_TOKENS, _TRUNCATION_WARNED_KEYS
+        _TRUNCATION_WARNED_KEYS.clear()  # reset between tests
+        monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+        fake_client = MagicMock()
+        fake_client.messages.create.return_value = make_fake_anthropic_response(text="ctx")
+        # Build a chapter_text that is well over the cap. cl100k_base is roughly
+        # 4 chars/token for ASCII; 250K tokens ≈ 1M chars.
+        oversized = "lorem ipsum dolor sit amet consectetur adipiscing elit " * 50_000
+        with patch("anthropic.Anthropic", return_value=fake_client):
+            guard = ContextualBudgetGuard()
+            situate_chunk("the chunk", oversized, guard=guard)
+        # The cached system block must contain the TRUNCATED text, not the original
+        sent_text = fake_client.messages.create.call_args.kwargs["system"][1]["text"]
+        # Body of the <document> tag — count tokens
+        import tiktoken
+        enc = tiktoken.get_encoding("cl100k_base")
+        sent_tokens = len(enc.encode(sent_text))
+        # sent_text wraps with <document>...</document>, so tolerance for the wrapper
+        assert sent_tokens <= MAX_CONTEXT_TOKENS + 100, f"sent {sent_tokens} > cap {MAX_CONTEXT_TOKENS}"
+        # Warning emitted to stderr
+        captured = capsys.readouterr()
+        assert "WARNING" in captured.err and "MAX_CONTEXT_TOKENS" not in captured.err  # human-readable msg
+
+    def test_does_not_truncate_when_under_limit(self, monkeypatch, capsys):
+        from scripts.lib.contextualizer import _TRUNCATION_WARNED_KEYS
+        _TRUNCATION_WARNED_KEYS.clear()
+        monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+        fake_client = MagicMock()
+        fake_client.messages.create.return_value = make_fake_anthropic_response(text="ctx")
+        normal_chapter = "small chapter body " * 100  # well under cap
+        with patch("anthropic.Anthropic", return_value=fake_client):
+            situate_chunk("c", normal_chapter, guard=ContextualBudgetGuard())
+        sent_text = fake_client.messages.create.call_args.kwargs["system"][1]["text"]
+        assert normal_chapter in sent_text  # original text preserved verbatim
+        captured = capsys.readouterr()
+        assert "WARNING" not in captured.err  # no warning when under cap
