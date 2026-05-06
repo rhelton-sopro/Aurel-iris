@@ -1,6 +1,6 @@
 {
   "catalog_name": "books_manifest",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "books": {
     "Bernard Jensen Iridology Simplified": {
       "filename": "157928975-Bernard-Jensen-Iridology-Simplified.pdf",
@@ -8,11 +8,11 @@
       "escola": "Jensen",
       "idioma": "en",
       "ano": 1980,
-      "alta_prioridade": true,
+      "alta_prioridade": false,
       "extrator": "pymupdf",
-      "skip": false,
-      "ocr_required": false,
-      "notas": "Texto-base da escola americana — alta prioridade no boost retrieval"
+      "skip": true,
+      "ocr_required": true,
+      "notas": "scan-only PDF (45 pages, 0 text) — OCR deferred per CONTEXT D-S; Jensen lineage covered by Bernard Jensen Iridology pdf (#7, 573 text pages)"
     },
     "Manual Para La Practica de La Iridologia e Book 20130216121213": {
       "filename": "253815491-Manual-Para-La-Practica-de-La-Iridologia-e-Book-20130216121213.pdf",
@@ -92,11 +92,11 @@
       "escola": "Jensen",
       "idioma": "en",
       "ano": 1990,
-      "alta_prioridade": true,
+      "alta_prioridade": false,
       "extrator": "pdfplumber",
-      "skip": false,
-      "ocr_required": false,
-      "notas": "Glossário canônico Jensen — termos técnicos"
+      "skip": true,
+      "ocr_required": true,
+      "notas": "scan-only PDF (133 pages, 0 text via pdfplumber) — OCR deferred per CONTEXT D-S; glossary content not retrievable in v1"
     },
     "Iridologia Psicoemocional livro compa tivel bekup": {
       "filename": "533825014-Iridologia-Psicoemocional-livro-compa-tivel-bekup.pdf",
@@ -130,9 +130,9 @@
       "ano": 2010,
       "alta_prioridade": false,
       "extrator": "pymupdf",
-      "skip": false,
-      "ocr_required": false,
-      "notas": ""
+      "skip": true,
+      "ocr_required": true,
+      "notas": "scan-only PDF (173 pages, 0 text) — OCR deferred per CONTEXT D-S"
     },
     "Manual de Iridologia 1": {
       "filename": "672958813-Manual-de-Iridologia-1.pdf",
@@ -142,9 +142,9 @@
       "ano": 2005,
       "alta_prioridade": false,
       "extrator": "pymupdf",
-      "skip": false,
-      "ocr_required": false,
-      "notas": ""
+      "skip": true,
+      "ocr_required": true,
+      "notas": "scan-only PDF (248 pages, 0 text) — OCR deferred per CONTEXT D-S"
     },
     "iridologia mod 03 (1)": {
       "filename": "689712209-iridologia-mod-03 (1).pdf",

@@ -99,10 +99,10 @@ class TestBooksManifest:
         assert isinstance(manifest, BooksManifest)
         assert manifest.catalog_name == "books_manifest"
 
-    def test_manifest_version_is_0_1_1(self):
-        # 06-03 founder gate locked v0.1.1 (mirrors vocabularies.json bump)
+    def test_manifest_version_is_0_1_2(self):
+        # 06-08 manifest fix bumped to v0.1.2 (4 scan-only PDFs marked skip+ocr_required)
         manifest = load_manifest()
-        assert manifest.version == "0.1.1"
+        assert manifest.version == "0.1.2"
 
     def test_lru_cached_returns_same_instance(self):
         m1 = load_manifest()
