@@ -82,11 +82,18 @@ class ContextualBudgetGuard:
     """
 
     HARDCAP_USD = 15.00
-    PRICE_INPUT_PER_1M = 0.25
-    PRICE_CACHE_WRITE_5MIN_PER_1M = 0.3125
-    PRICE_CACHE_WRITE_1H_PER_1M = 0.625
-    PRICE_CACHE_READ_PER_1M = 0.025
-    PRICE_OUTPUT_PER_1M = 1.25
+    # Haiku 4.5 pricing — verified 2026-05-05 against Anthropic console.
+    # Founder-corrected on 06-08: prior constants reflected old Haiku 3 pricing
+    # (3.2× too low across all buckets), causing the internal $15 hardcap to
+    # fire at ~$48 actual spend. The wrong constants did NOT cause the $15-20
+    # burn observed earlier — that came from cache_creation_input_tokens being
+    # untracked entirely (fixed in 8da720b). But they are the reason this
+    # cost forecast (~$2.54 internal for full corpus) was 3.2× too optimistic.
+    PRICE_INPUT_PER_1M = 0.80
+    PRICE_CACHE_WRITE_5MIN_PER_1M = 1.00       # 1.25× input — Anthropic standard ratio
+    PRICE_CACHE_WRITE_1H_PER_1M = 2.00         # 2× the 5-min rate — assumption pending dashboard verification
+    PRICE_CACHE_READ_PER_1M = 0.08             # 0.10× input
+    PRICE_OUTPUT_PER_1M = 4.00                 # 5× input — Anthropic standard ratio
 
     def __init__(self) -> None:
         self.input_tokens = 0
