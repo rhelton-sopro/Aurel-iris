@@ -66,8 +66,18 @@ def process_chunks_into_rows(
     """Yield row dicts ready for embedding. Applies D-N1 prefix when guard supplied.
 
     chapter_text_map provides {chapter_name: full_chapter_text} for prompt caching.
-    content_hash is computed on the FINAL chunk text (with contextual prefix when
-    present) so re-runs are idempotent at the exact wording that was embedded.
+    content_hash is computed on the SOURCE text (chunk.text) — NOT on the final
+    text with contextual prefix. Reason: Haiku 4.5 contextual sentences are
+    non-deterministic across runs (slight variation each call, even at low
+    temperature), so hashing the prefixed text breaks the on-conflict dedup
+    contract — same source produces different hashes per run, leading to
+    duplicate rows in the DB. Hashing the source restores idempotency: same
+    source chunk → same content_hash → ON CONFLICT DO NOTHING fires correctly.
+    The `content` field stores the full prefixed text (what the embedder sees);
+    only the dedup key is sourced from the unprefixed text.
+    Implication: once a chunk is in the DB, subsequent re-runs (with or without
+    contextual) cannot replace its stored `content` without explicit --purge,
+    matching the existing pre-flight mode-mismatch protection contract.
     """
     for chunk in chunks:
         chunk_text = chunk.text
@@ -77,12 +87,13 @@ def process_chunks_into_rows(
             contextual_sentence = situate_chunk(
                 chunk_text, chapter_full, guard=contextual_guard,
             )
-            # Prepend contextual sentence -- content_hash uses the FINAL text
+            # Prepend contextual sentence -- content_hash uses SOURCE text below
+            # so non-deterministic contextual variation doesn't fragment the dedup
             chunk_text = f"[Contexto: {contextual_sentence}]\n\n{chunk.text}"
 
         row = {
             "content": chunk_text,
-            "content_hash": content_hash(chunk_text),
+            "content_hash": content_hash(chunk.text),
             "source_book": book_key,
             "source_chapter": chunk.chapter,
             "source_page": chunk.page,

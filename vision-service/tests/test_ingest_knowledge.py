@@ -319,3 +319,69 @@ class TestArgparse:
         for call in fake_client.table.return_value.select.return_value.in_.call_args_list:
             batch_arg = call.args[1]  # .in_("content_hash", batch_arg)
             assert len(batch_arg) <= HASH_LOOKUP_BATCH_SIZE
+
+    def test_content_hash_uses_source_text_not_contextual_prefix(self, monkeypatch):
+        """Bug surfaced during 06-08 contextual re-ingest test: Haiku 4.5 produces
+        non-deterministic contextual sentences across runs (slight wording variation
+        even at low temperature). When content_hash was computed on the FINAL text
+        (with contextual prefix), the same source chunk produced different hashes
+        across runs → ON CONFLICT DO NOTHING didn't fire → duplicate rows in DB
+        (founder saw 160 chunks for a book that should have had 80).
+
+        Fix: hash the SOURCE chunk.text (unprefixed) so re-runs are idempotent
+        regardless of contextual variation. The `content` field still stores the
+        prefixed text — only the dedup key is sourced from the unprefixed text.
+        """
+        from scripts.ingest_knowledge import process_chunks_into_rows
+        from scripts.lib.budget import ContextualBudgetGuard
+        from scripts.lib.chunker import Chunk, content_hash
+        from scripts.lib.manifest import BookEntry
+
+        chunk = Chunk(
+            text="lacuna aberta no setor 7 sugere fragilidade hepática",
+            chapter="Chapter 1", section=None, page=10, tokens_estimated=15,
+        )
+        entry = BookEntry(
+            filename="t.pdf", autor="A", escola="Jensen", idioma="pt",
+            ano=2010, alta_prioridade=False, extrator="pymupdf",
+            skip=False, ocr_required=False, notas="",
+        )
+        # Each run patches situate_chunk (the Anthropic call site) to return a
+        # different contextual sentence. content_hash must stay stable.
+        def _make_guard():
+            g = MagicMock(spec=ContextualBudgetGuard)
+            g.HARDCAP_USD = 15.0
+            return g
+
+        # Run 1: situate_chunk returns "Esta seção fala sobre fígado"
+        with patch("scripts.ingest_knowledge.situate_chunk", return_value="Esta seção fala sobre fígado"):
+            rows_run1 = list(process_chunks_into_rows(
+                [chunk], book_key="K", entry=entry,
+                contextual_guard=_make_guard(),
+                chapter_text_map={"Chapter 1": "irrelevant chapter text"},
+            ))
+        # Run 2: situate_chunk returns DIFFERENT wording (simulates Haiku non-determinism)
+        with patch("scripts.ingest_knowledge.situate_chunk", return_value="Trecho discute condições hepáticas"):
+            rows_run2 = list(process_chunks_into_rows(
+                [chunk], book_key="K", entry=entry,
+                contextual_guard=_make_guard(),
+                chapter_text_map={"Chapter 1": "irrelevant chapter text"},
+            ))
+        # Run 3: --no-contextual mode, no prefix
+        rows_run3 = list(process_chunks_into_rows(
+            [chunk], book_key="K", entry=entry,
+            contextual_guard=None,
+            chapter_text_map={"Chapter 1": "irrelevant chapter text"},
+        ))
+        # All three hashes must be equal AND match sha256 of source
+        expected_hash = content_hash(chunk.text)
+        assert rows_run1[0]["content_hash"] == expected_hash
+        assert rows_run2[0]["content_hash"] == expected_hash
+        assert rows_run3[0]["content_hash"] == expected_hash
+        # But the `content` field DIFFERS across runs (contextual wording captured)
+        assert rows_run1[0]["content"] != rows_run2[0]["content"]
+        assert rows_run1[0]["content"] != rows_run3[0]["content"]
+        # Run 1 + 2 are prefixed, Run 3 is bare source
+        assert rows_run1[0]["content"].startswith("[Contexto: Esta")
+        assert rows_run2[0]["content"].startswith("[Contexto: Trecho")
+        assert rows_run3[0]["content"] == chunk.text
