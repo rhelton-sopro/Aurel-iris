@@ -191,6 +191,83 @@ class TestArgparse:
         mock_check.assert_not_called()
         assert rc == 0
 
+    def test_skips_contextual_when_chapter_exceeds_tier1_tpm_threshold(self, monkeypatch, capsys):
+        """Per-book D-N1 skip: when chapter context > MAX_CONTEXT_TOKENS_TIER1_TPM,
+        ingest_book passes contextual_guard=None to process_chunks_into_rows so
+        chunks embed without contextual prefix instead of 429-ing on Tier 1 50K TPM."""
+        from scripts.ingest_knowledge import ingest_book
+        from scripts.lib.budget import ContextualBudgetGuard, VoyageBudgetGuard
+        from scripts.lib.contextualizer import MAX_CONTEXT_TOKENS_TIER1_TPM
+        from scripts.lib.manifest import BookEntry
+
+        # Build a fake "chapter" with > MAX_CONTEXT_TOKENS_TIER1_TPM tokens.
+        # cl100k_base ~ 4 chars/token; 50K tokens ≈ 200K chars.
+        # "lorem " is 1 token; 50K repeats > 40K cap.
+        oversized_text = "lorem " * 50_000
+        entry = BookEntry(
+            filename="big.pdf", autor="A", escola="Jensen", idioma="es",
+            ano=2010, alta_prioridade=False, extrator="pymupdf",
+            skip=False, ocr_required=False, notas="",
+        )
+        # Stub out the actual extract/chunk/embed/upsert so ingest_book runs
+        # only the chapter-tokens accounting + skip-decision branch.
+        from scripts.lib.chunker import Chunk
+        fake_chunks = [Chunk(text=oversized_text, chapter=None, section=None, page=1, tokens_estimated=50_000)]
+        with patch("scripts.ingest_knowledge.extract_book", return_value=[]), \
+             patch("scripts.ingest_knowledge.chunk_book", return_value=fake_chunks), \
+             patch("scripts.ingest_knowledge.process_chunks_into_rows") as mock_process:
+            mock_process.return_value = iter([])  # no rows so nothing to embed/persist
+            ingest_book(
+                "Spanish Manual",
+                entry,
+                acervo=None,  # extract_book is stubbed
+                voyage_guard=VoyageBudgetGuard(),
+                contextual_guard=ContextualBudgetGuard(),
+                dry_run=True,
+                limit_chunks_remaining=None,
+            )
+
+        # Caller passed real ContextualBudgetGuard; orchestrator must downgrade
+        # to None for this book because chapter_text > threshold.
+        kwargs = mock_process.call_args.kwargs
+        assert kwargs["contextual_guard"] is None, (
+            f"expected contextual_guard=None for oversized book, got {kwargs['contextual_guard']!r}"
+        )
+        captured = capsys.readouterr()
+        assert "SKIP contextual" in captured.err
+        assert "Spanish Manual" in captured.err
+        # Threshold appears in log with thousands-separator comma formatting
+        assert f"{MAX_CONTEXT_TOKENS_TIER1_TPM:,}" in captured.err
+
+    def test_keeps_contextual_when_chapter_under_tier1_tpm_threshold(self, monkeypatch, capsys):
+        """Inverse of the skip test: small chapters retain D-N1 (guard passed through)."""
+        from scripts.ingest_knowledge import ingest_book
+        from scripts.lib.budget import ContextualBudgetGuard, VoyageBudgetGuard
+        from scripts.lib.manifest import BookEntry
+        from scripts.lib.chunker import Chunk
+
+        small_chunk = Chunk(text="small body " * 50, chapter="Chapter 1", section=None, page=1, tokens_estimated=100)
+        entry = BookEntry(
+            filename="small.pdf", autor="A", escola="Jensen", idioma="en",
+            ano=2010, alta_prioridade=False, extrator="pymupdf",
+            skip=False, ocr_required=False, notas="",
+        )
+        guard = ContextualBudgetGuard()
+        with patch("scripts.ingest_knowledge.extract_book", return_value=[]), \
+             patch("scripts.ingest_knowledge.chunk_book", return_value=[small_chunk]), \
+             patch("scripts.ingest_knowledge.process_chunks_into_rows") as mock_process:
+            mock_process.return_value = iter([])
+            ingest_book(
+                "Small Book", entry, acervo=None,
+                voyage_guard=VoyageBudgetGuard(), contextual_guard=guard,
+                dry_run=True, limit_chunks_remaining=None,
+            )
+
+        # Small book: original guard passed through unchanged.
+        assert mock_process.call_args.kwargs["contextual_guard"] is guard
+        captured = capsys.readouterr()
+        assert "SKIP contextual" not in captured.err
+
     def test_filter_already_indexed_skips_existing_hashes(self, monkeypatch):
         """filter_already_indexed must drop rows whose content_hash already exists."""
         from scripts.ingest_knowledge import filter_already_indexed

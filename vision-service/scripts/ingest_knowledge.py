@@ -32,8 +32,8 @@ from scripts.lib.budget import (
     ContextualBudgetGuard,
     VoyageBudgetGuard,
 )
-from scripts.lib.chunker import Chunk, chunk_book, content_hash
-from scripts.lib.contextualizer import situate_chunk
+from scripts.lib.chunker import Chunk, chunk_book, content_hash, count_tokens
+from scripts.lib.contextualizer import MAX_CONTEXT_TOKENS_TIER1_TPM, situate_chunk
 from scripts.lib.embedder import BATCH_SIZE, embed_batch
 from scripts.lib.manifest import BookEntry, load_manifest
 from scripts.lib.pdf_extractor import extract_docx, extract_pdf
@@ -155,12 +155,34 @@ def ingest_book(
         chapter_text_map.setdefault(chunk.chapter, "")
         chapter_text_map[chunk.chapter] += chunk.text + "\n\n"
 
+    # Per-book D-N1 viability check: Anthropic Tier 1 caps input at 50K TPM and
+    # cache_creation_input_tokens count toward that bucket. A first-call with a
+    # 175K-token chapter would consume 175K TPM in one call → 429. When the
+    # largest aggregated chapter exceeds the safe threshold, skip contextual
+    # for this entire book (chunks still get embedded by Voyage; just without
+    # the contextual prefix). Future improvement: per-chapter skip, or
+    # configurable threshold via env var when account is upgraded to higher tier.
+    effective_contextual_guard = contextual_guard
+    if contextual_guard is not None:
+        max_chapter_tokens = max(
+            (count_tokens(t) for t in chapter_text_map.values()),
+            default=0,
+        )
+        if max_chapter_tokens > MAX_CONTEXT_TOKENS_TIER1_TPM:
+            print(
+                f'[contextualizer] SKIP contextual for "{book_key}" -- '
+                f'chapter too large for Tier 1 rate limit '
+                f'({max_chapter_tokens:,} tokens > {MAX_CONTEXT_TOKENS_TIER1_TPM:,} cap)',
+                file=sys.stderr,
+            )
+            effective_contextual_guard = None
+
     rows = list(
         process_chunks_into_rows(
             chunks,
             book_key=book_key,
             entry=entry,
-            contextual_guard=contextual_guard,
+            contextual_guard=effective_contextual_guard,
             chapter_text_map=chapter_text_map,
         )
     )

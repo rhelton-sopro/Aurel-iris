@@ -31,6 +31,15 @@ PROMPT_TEMPLATE = (
 # tiktoken cl100k_base (used here) and Anthropic's tokenizer.
 MAX_CONTEXT_TOKENS = 175_000
 
+# Anthropic Tier 1 rate limit: 50K input tokens per minute, and
+# cache_creation_input_tokens DO count against that bucket. A first-call
+# sending a 50K-token chapter would consume the entire per-minute window in
+# one shot → 429. The orchestrator (ingest_knowledge.py) checks per-book and
+# skips contextual when max chapter context exceeds this threshold; chunks
+# still embed via Voyage but without the D-N1 prefix. Lift this threshold
+# (or remove the check) once the account moves to a higher tier.
+MAX_CONTEXT_TOKENS_TIER1_TPM = 40_000
+
 # Cache the truncation-warning per book_id (or per book filename) so the log
 # shows the warning once per book instead of once per chunk (407× spam).
 _TRUNCATION_WARNED_KEYS: set[int] = set()
