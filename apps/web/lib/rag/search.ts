@@ -37,7 +37,9 @@ export interface RetrieveArgs {
 
 /**
  * Hardcoded set of book names marked alta_prioridade in books_manifest.json
- * (06-03 founder gate, manifest version 0.1.1). If founder updates the manifest,
+ * (manifest version 0.1.2 — 06-08 commit `64d54e5` flipped 2 scan-only books
+ * to skip:true / alta_prioridade:false: "Bernard Jensen Iridology Simplified"
+ * and "dictionary of iridology pdf"). If founder updates the manifest,
  * this set MUST be updated in lockstep — the W3 drift detection test in
  * `search.test.ts` reads the manifest at test-time and asserts equality to
  * catch any drift loudly.
@@ -50,10 +52,8 @@ export interface RetrieveArgs {
  * if the founder's edit cadence on the manifest grows.
  */
 export const ALTA_PRIORIDADE_BOOKS: ReadonlySet<string> = new Set([
-  'Bernard Jensen Iridology Simplified',
   'A Iridologia Em Defesa Da Vida',
   'Bernard Jensen Iridology pdf',
-  'dictionary of iridology pdf',
   'Iridologia Psicoemocional livro compa tivel bekup',
   'What the Eye Reveals',
   'Iridologia Del Profondo Birello Lucio Rito Daniele Lo 2007 Enea Edizioni 84f083031f5e812f466e932 1',

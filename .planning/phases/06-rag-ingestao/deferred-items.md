@@ -37,4 +37,4 @@ the TS Set or rolling back the manifest — both architectural decisions that
 `books_manifest.json` (founder editorial call). Either choice is one
 single-line edit + test re-run.
 
-**Status:** Open (deferred to 06-13 or founder edit).
+**Status:** RESOLVED 2026-05-05 in 06-13. Updated `ALTA_PRIORIDADE_BOOKS` in `apps/web/lib/rag/search.ts` to mirror manifest v0.1.2 — removed `Bernard Jensen Iridology Simplified` and `dictionary of iridology pdf` (both flipped to `skip: true / alta_prioridade: false` in 06-08 commit `64d54e5`), keeping the 5 books that remain `alta_prioridade: true` in v0.1.2. W3 drift detection test now green.

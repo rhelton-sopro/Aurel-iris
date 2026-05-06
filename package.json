@@ -14,7 +14,7 @@
     "type-check": "pnpm --filter web exec tsc --noEmit",
     "rag:ingest": "cd vision-service && python -m scripts.ingest_knowledge",
     "rag:purge": "cd vision-service && python -m scripts.ingest_knowledge --purge",
-    "rag:spot-check": "pnpm --filter web exec tsx scripts/rag-spot-check.ts",
+    "rag:spot-check": "curl -fsS -H \"x-spot-check-token: ${RAG_SPOT_CHECK_TOKEN}\" http://localhost:3000/api/admin/rag-spot-check",
     "audit:vocabulary:db": "node apps/web/scripts/audit-vocabulary-db.mjs"
   },
   "devDependencies": {
