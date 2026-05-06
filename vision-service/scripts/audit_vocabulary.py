@@ -25,7 +25,7 @@ _FORBIDDEN = "|".join([
 ])
 PATTERN = re.compile(_FORBIDDEN, re.IGNORECASE | re.UNICODE)
 EXTENSIONS = {".py", ".json", ".md"}
-SCAN_DIRS = ["pipeline", "data", "scripts", "tests/fixtures"]
+SCAN_DIRS = ["pipeline", "data", "scripts", "scripts/data", "tests/fixtures"]
 SKIP_DIRS = {"__pycache__", ".pytest_cache", "node_modules"}
 # This file must be excluded — it references the forbidden pattern for matching purposes.
 SKIP_FILES = {Path(__file__).name}
