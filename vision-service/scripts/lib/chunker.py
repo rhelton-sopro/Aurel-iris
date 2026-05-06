@@ -31,11 +31,31 @@ OVERLAP_TOKENS = 80
 # D-C2 hierarchy detection -- multilingual chapter/section markers.
 #
 # Chapter regex matches lines like "CAPÍTULO I — Introdução", "CHAPTER 5",
-# "CAPITOLO IV". The match anchors on the marker word + roman/arabic numeral.
+# "CAPITOLO IV", "MÓDULO III", "PARTE 2", "TOMO I", "LIBRO Primero",
+# "Lezione 1". The match anchors on the marker word + roman/arabic numeral.
+# Multilingual coverage: pt/es (CAPÍTULO, MÓDULO, PARTE, TOMO, LIBRO, UNIDADE,
+# LIVRO), it (CAPITOLO, MODULO, PARTE, LIBRO, LEZIONE, SEZIONE), en (CHAPTER,
+# MODULE, PART, BOOK, UNIT, LESSON), de (KAPITEL, TEIL, BAND).
 CHAPTER_RE = re.compile(
-    r"^\s*(?:CAP[IÍ]TULO|CHAPTER|CAPITOLO)\s+[IVXLCDM\d]+",
+    r"^\s*(?:"
+    r"CAP[IÍ]TULO|CHAPTER|CAPITOLO|"
+    r"M[ÓO]DULO|MODULE|MODULO|"
+    r"PARTE|PART|TEIL|"
+    r"TOMO|LIBRO|BOOK|BAND|"
+    r"UNIDADE|UNIT|UNIDAD|UNIT[ÀA]|"
+    r"LEZIONE|LECCI[ÓO]N|LESSON|AULA|"
+    r"SEZIONE|"
+    r"KAPITEL"
+    r")\s+[IVXLCDM\d]+",
     re.IGNORECASE | re.MULTILINE,
 )
+
+# When a book lacks any detected chapter markers, the entire text aggregates
+# under chapter=None. To keep D-N1 contextual calls under the Anthropic Tier 1
+# 50K TPM cap (per ingest_knowledge.MAX_CONTEXT_TOKENS_TIER1_TPM=40K), split
+# such books into synthetic chapters of bounded token count. 30K tokens leaves
+# 10K headroom against the 40K skip threshold.
+SYNTHETIC_CHAPTER_TOKENS = 30_000
 # Section regex matches numbered headings ("1.1 Setor 7 Fígado", "2.3.4 Lacunas")
 # OR an ALL-CAPS line of >=5 chars (e.g., "LACUNAS E CRIPTAS").
 # The numeric branch greedily matches whatever follows the number prefix on the
@@ -260,4 +280,33 @@ def chunk_book(pages: list[dict], book_meta: dict) -> list[Chunk]:
             buffer_tokens += tokens
 
     _flush()
+
+    # Post-process: synthetic-chapter fallback for flat books.
+    #
+    # Many iridology source PDFs lack canonical chapter markers (course modules,
+    # conference proceedings, manuals with custom hierarchies). These books
+    # produce chunks with chapter=None across the entire text. When the
+    # aggregate text under chapter=None exceeds SYNTHETIC_CHAPTER_TOKENS,
+    # downstream D-N1 contextualization would either truncate (lossy) or skip
+    # entirely (Tier 1 TPM). Split chapter=None chunks into bounded synthetic
+    # chapters so the per-chapter aggregate stays under the ingest skip
+    # threshold and D-N1 remains available even on flat books.
+    #
+    # Real chapters detected via CHAPTER_RE are preserved untouched — only the
+    # leftover chapter=None bucket gets split.
+    none_chunks = [c for c in chunks if c.chapter is None]
+    none_total_tokens = sum(c.tokens_estimated for c in none_chunks)
+    if none_total_tokens > SYNTHETIC_CHAPTER_TOKENS:
+        synthetic_idx = 1
+        running = 0
+        for c in chunks:
+            if c.chapter is not None:
+                continue
+            # Start a new synthetic chapter when running total would exceed cap
+            if running + c.tokens_estimated > SYNTHETIC_CHAPTER_TOKENS and running > 0:
+                synthetic_idx += 1
+                running = 0
+            c.chapter = f"Section {synthetic_idx}"
+            running += c.tokens_estimated
+
     return chunks

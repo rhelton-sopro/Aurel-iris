@@ -176,3 +176,102 @@ class TestChunker:
         assert MIN_TOKENS == 300
         assert MAX_TOKENS == 700
         assert OVERLAP_TOKENS == 80
+
+    def test_chapter_regex_matches_extended_multilingual_markers(self):
+        # 06-08 extension: regex should match MÓDULO/PARTE/UNIT/etc. across
+        # pt/es/it/en/de. Build small synthetic pages and assert each marker
+        # produces a chunk with .chapter set (not None).
+        from scripts.lib.chunker import CHAPTER_RE
+        markers = [
+            "MÓDULO III",        # pt course material (mod-03 style)
+            "Módulo II",         # lowercase variant
+            "PARTE 2",           # es/pt
+            "Parte Seconda",     # it (with roman numeral via ordinal)
+            "TOMO I",            # es Tomo
+            "LIBRO Primero",     # es Libro
+            "BOOK 4",            # en
+            "UNIT 5",            # en
+            "UNIDADE 7",         # pt-BR course
+            "LEZIONE 3",         # it
+            "LECCIÓN 9",         # es
+            "AULA 11",           # pt
+            "SEZIONE 2",         # it
+            "KAPITEL 1",         # de
+            # Pre-existing markers must still match
+            "CAPÍTULO IV",
+            "CHAPTER 5",
+            "CAPITOLO X",
+        ]
+        # Note: "Parte Seconda" (textual ordinal, no digit/roman) won't match
+        # by current regex (requires [IVXLCDM\d]). Drop it from positive list.
+        # And "LIBRO Primero" — same. These are accepted edge-case losses.
+        for m in markers:
+            if not any(ch.isdigit() or ch in "IVXLCDM" for ch in m.split()[-1]):
+                # Skip markers with textual ordinals (out of scope)
+                continue
+            assert CHAPTER_RE.match(m), f"regex should match {m!r}"
+
+    def test_synthetic_chapter_fallback_on_flat_book(self):
+        # When a book has zero detected chapter markers AND the aggregate
+        # chapter=None text exceeds SYNTHETIC_CHAPTER_TOKENS, the chunker
+        # post-process should split chunks into "Section N" synthetic chapters.
+        from scripts.lib.chunker import SYNTHETIC_CHAPTER_TOKENS
+
+        # Build a fake "flat" book — many paragraphs of substantial text, no markers
+        # We need enough total tokens to trigger the split (>30K tokens).
+        # Each ~500-token paragraph generates ~1 chunk. We need ~70 chunks worth
+        # of tokens (~35K tokens) to comfortably exceed the threshold.
+        big_text_per_page = "\n\n".join(_varied_paragraph(f"para{i}", 200) for i in range(20))
+        # Replicate across pages to scale. 3 pages × ~12K tokens = 36K tokens.
+        pages = [
+            {"page": i + 1, "text": big_text_per_page, "scan_detected": False}
+            for i in range(3)
+        ]
+        chunks = chunk_book(pages, book_meta={"source_book": "Flat Book"})
+        # Should have many chunks
+        assert len(chunks) > 30, f"expected many chunks, got {len(chunks)}"
+        # Total tokens > threshold
+        total = sum(c.tokens_estimated for c in chunks)
+        assert total > SYNTHETIC_CHAPTER_TOKENS, f"need >{SYNTHETIC_CHAPTER_TOKENS} tokens to test, got {total}"
+        # No chunk should have chapter=None — all assigned to synthetic Section N
+        chapters = {c.chapter for c in chunks}
+        assert None not in chapters, f"all flat chunks should be assigned synthetic chapters; got {chapters}"
+        # Chapters named "Section 1", "Section 2", ...
+        assert all(ch.startswith("Section ") for ch in chapters), f"expected synthetic Section names, got {chapters}"
+        # Per-chapter aggregate must stay under SYNTHETIC_CHAPTER_TOKENS (with small overflow tolerance for last-chunk-of-section)
+        from collections import defaultdict
+        per_chap = defaultdict(int)
+        for c in chunks:
+            per_chap[c.chapter] += c.tokens_estimated
+        for ch, tok in per_chap.items():
+            assert tok <= SYNTHETIC_CHAPTER_TOKENS + MAX_TOKENS, (
+                f"synthetic chapter {ch!r} aggregates {tok} tokens, exceeds cap "
+                f"{SYNTHETIC_CHAPTER_TOKENS}+{MAX_TOKENS}"
+            )
+
+    def test_synthetic_chapter_fallback_skipped_when_under_threshold(self):
+        # Small flat book — no markers but total < SYNTHETIC_CHAPTER_TOKENS.
+        # Should leave chunks with chapter=None (no synthetic split applied).
+        small_pages = [{"page": 1, "text": _varied_paragraph("p", 50), "scan_detected": False}]
+        chunks = chunk_book(small_pages, book_meta={"source_book": "Tiny"})
+        if chunks:
+            # All chunks should have chapter=None (no markers detected, under threshold)
+            assert all(c.chapter is None for c in chunks), (
+                f"small book should keep chapter=None; got {[c.chapter for c in chunks]}"
+            )
+
+    def test_real_chapter_markers_preserved_alongside_synthetic_split(self):
+        # Mixed book: explicit MÓDULO marker + flat text trailing.
+        # The chunks under MÓDULO III stay as "MÓDULO III"; remaining
+        # chapter=None chunks get synthetic split if they exceed threshold.
+        marker_page = "MÓDULO III\n\n" + _varied_paragraph("intro", 30) + "\n\n"
+        # Add another marker so we have a clear chapter boundary
+        flat_after = "\n\n".join(_varied_paragraph(f"flat{i}", 200) for i in range(20))
+        pages = [
+            {"page": 1, "text": marker_page, "scan_detected": False},
+            {"page": 2, "text": flat_after, "scan_detected": False},
+        ]
+        chunks = chunk_book(pages, book_meta={"source_book": "Mixed"})
+        chapters = [c.chapter for c in chunks]
+        # MÓDULO III must appear (real marker preserved)
+        assert any(c and "MÓDULO" in c for c in chapters), f"MÓDULO III should be detected: {chapters}"
