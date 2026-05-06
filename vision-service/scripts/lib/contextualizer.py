@@ -101,6 +101,11 @@ def situate_chunk(
 
     import anthropic  # lazy
     client = anthropic.Anthropic(api_key=api_key)
+    # 1-hour TTL cache (vs default 5-min ephemeral). Under Tier 1 50K TPM
+    # throttling, processing all chunks in a 30K-token chapter can exceed 5 min,
+    # causing mid-chapter cache expiry and forced re-creation. 1h TTL pays
+    # 2× cache-write price ONCE per chapter and survives the throttle window.
+    # Net cost is dramatically lower than repeated 5-min cache_creation calls.
     response = client.messages.create(
         model=model,
         max_tokens=200,
@@ -112,7 +117,7 @@ def situate_chunk(
             {
                 "type": "text",
                 "text": f"<document>{truncated_text}</document>",
-                "cache_control": {"type": "ephemeral"},
+                "cache_control": {"type": "ephemeral", "ttl": "1h"},
             },
         ],
         messages=[
@@ -125,14 +130,48 @@ def situate_chunk(
             }
         ],
     )
-    # Anthropic SDK returns usage with input_tokens, cache_read_input_tokens (when caching), output_tokens.
-    # Defensive getattr — if SDK rev exposes a different attribute, guard charges 0 cached tokens
-    # (overestimates cost as full price → triggers budget guards earlier, conservative behavior).
+    # Extract usage breakdown. Anthropic 2025-26 SDK exposes 4 token buckets:
+    #   - input_tokens:                regular non-cached input (chunk + instruction in user msg)
+    #   - cache_creation_input_tokens: tokens written to cache this call (paid 1.25× or 2.5×)
+    #   - cache_read_input_tokens:     tokens read from cache (paid 0.1×)
+    #   - output_tokens:               generated response
+    # Prior to this fix, cache_creation_input_tokens was untracked → guard
+    # hardcap watched the wrong number while real cost ran 10× higher.
     usage = response.usage
+    input_tokens = getattr(usage, "input_tokens", 0)
+    output_tokens = getattr(usage, "output_tokens", 0)
+    cache_read_tokens = getattr(usage, "cache_read_input_tokens", 0) or 0
+    cache_creation_total = getattr(usage, "cache_creation_input_tokens", 0) or 0
+    # The SDK also exposes a structured usage.cache_creation with .ephemeral_5m_input_tokens
+    # and .ephemeral_1h_input_tokens (when present). When unavailable, default the
+    # whole creation to the active TTL (this call always uses 1h cache_control).
+    cc_struct = getattr(usage, "cache_creation", None)
+    if cc_struct is not None:
+        cache_creation_5min = getattr(cc_struct, "ephemeral_5m_input_tokens", 0) or 0
+        cache_creation_1h = getattr(cc_struct, "ephemeral_1h_input_tokens", 0) or 0
+    else:
+        # Older SDK: lump under 1h since that's what we set
+        cache_creation_5min = 0
+        cache_creation_1h = cache_creation_total
+
     guard.add(
-        input_tokens=getattr(usage, "input_tokens", 0),
-        cached_tokens=getattr(usage, "cache_read_input_tokens", 0) or 0,
-        output_tokens=getattr(usage, "output_tokens", 0),
+        input_tokens=input_tokens,
+        cached_tokens=cache_read_tokens,
+        output_tokens=output_tokens,
+        cache_creation_5min_tokens=cache_creation_5min,
+        cache_creation_1h_tokens=cache_creation_1h,
     )
+
+    # Per-call diagnostic logging (env-gated to avoid log spam in production runs).
+    # Set RAG_INGEST_DEBUG_CACHE=1 to verify cache hit/miss pattern during smoke tests.
+    if os.environ.get("RAG_INGEST_DEBUG_CACHE") == "1":
+        verdict = "HIT" if cache_read_tokens > 0 else ("CREATE" if cache_creation_total > 0 else "MISS")
+        print(
+            f"[contextualizer] {verdict} | input={input_tokens} "
+            f"cache_creation={cache_creation_total} (5m={cache_creation_5min}/1h={cache_creation_1h}) "
+            f"cache_read={cache_read_tokens} output={output_tokens}",
+            file=sys.stderr,
+        )
+
     # response.content is a list of content blocks; the first is text in canonical Anthropic responses.
     return response.content[0].text.strip()

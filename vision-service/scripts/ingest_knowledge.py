@@ -392,7 +392,15 @@ def main(argv: list[str] | None = None) -> int:
         f'across {len(books_to_run)} books, ${voyage_guard.cost_usd:.4f} voyage cost'
     )
     if contextual_guard is not None:
-        summary += f', ${contextual_guard.cost_usd:.4f} contextual cost'
+        summary += (
+            f', ${contextual_guard.cost_usd:.4f} contextual cost '
+            f'(calls={contextual_guard.calls}, cache_hit_rate={contextual_guard.cache_hit_rate:.0%}, '
+            f'cache_creation_5m={contextual_guard.cache_creation_5min_tokens:,}, '
+            f'cache_creation_1h={contextual_guard.cache_creation_1h_tokens:,}, '
+            f'cached_reads={contextual_guard.cached_tokens:,}, '
+            f'input={contextual_guard.input_tokens:,}, '
+            f'output={contextual_guard.output_tokens:,})'
+        )
     print(summary)
     return 0
 

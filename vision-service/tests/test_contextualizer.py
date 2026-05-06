@@ -15,12 +15,27 @@ from scripts.lib.budget import BudgetExceeded, ContextualBudgetGuard
 from scripts.lib.contextualizer import PROMPT_TEMPLATE, situate_chunk
 
 
-def make_fake_anthropic_response(*, text: str, in_tokens=100, cache_tokens=50, out_tokens=20):
+def make_fake_anthropic_response(
+    *,
+    text: str,
+    in_tokens=100,
+    cache_tokens=50,
+    out_tokens=20,
+    cache_creation_5m=0,
+    cache_creation_1h=0,
+):
     response = MagicMock()
     response.content = [MagicMock(text=text)]
     response.usage.input_tokens = in_tokens
     response.usage.cache_read_input_tokens = cache_tokens
     response.usage.output_tokens = out_tokens
+    # cache_creation_input_tokens is the legacy lump field; the structured
+    # usage.cache_creation breaks it down by TTL bucket.
+    response.usage.cache_creation_input_tokens = cache_creation_5m + cache_creation_1h
+    response.usage.cache_creation = MagicMock(
+        ephemeral_5m_input_tokens=cache_creation_5m,
+        ephemeral_1h_input_tokens=cache_creation_1h,
+    )
     return response
 
 
@@ -45,7 +60,9 @@ class TestSituateChunk:
         system_blocks = kwargs["system"]
         assert isinstance(system_blocks, list) and len(system_blocks) == 2
         cached_block = system_blocks[1]
-        assert cached_block["cache_control"] == {"type": "ephemeral"}
+        # 06-08 fix: switched from default 5-min ephemeral to 1h TTL because
+        # Tier 1 50K TPM throttling stretches per-chapter processing past 5 min.
+        assert cached_block["cache_control"] == {"type": "ephemeral", "ttl": "1h"}
         assert "FULL CHAPTER TEXT" in cached_block["text"]
 
     def test_situate_chunk_uses_haiku_4_5_by_default(self, monkeypatch):
@@ -70,12 +87,19 @@ class TestSituateChunk:
         monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
         fake_client = MagicMock()
         fake_client.messages.create.return_value = make_fake_anthropic_response(
-            text="ctx", in_tokens=200, cache_tokens=80, out_tokens=15
+            text="ctx", in_tokens=200, cache_tokens=80, out_tokens=15,
+            cache_creation_5m=0, cache_creation_1h=12000,
         )
         guard = MagicMock(spec=ContextualBudgetGuard)
         with patch("anthropic.Anthropic", return_value=fake_client):
             situate_chunk("c", "ch", guard=guard)
-        guard.add.assert_called_once_with(input_tokens=200, cached_tokens=80, output_tokens=15)
+        # 06-08 fix: guard.add now receives 5 token buckets, including the
+        # cache_creation breakdown by TTL. cache_creation_1h=12000 reflects the
+        # 1h cache write the contextualizer requested via cache_control.
+        guard.add.assert_called_once_with(
+            input_tokens=200, cached_tokens=80, output_tokens=15,
+            cache_creation_5min_tokens=0, cache_creation_1h_tokens=12000,
+        )
 
     def test_prompt_template_matches_anthropic_canonical(self):
         # RESEARCH lines 723-730 verbatim
@@ -117,6 +141,8 @@ class TestSituateChunk:
         fake_response.content = [MagicMock(text="ctx")]
         fake_response.usage.input_tokens = 50
         fake_response.usage.cache_read_input_tokens = None  # SDK quirk
+        fake_response.usage.cache_creation_input_tokens = 0
+        fake_response.usage.cache_creation = None
         fake_response.usage.output_tokens = 10
         fake_client.messages.create.return_value = fake_response
         guard = MagicMock(spec=ContextualBudgetGuard)

@@ -40,3 +40,45 @@ class TestContextualBudgetGuard:
         # 100M output tokens × $1.25/M = $125 → way over $15
         with pytest.raises(BudgetExceeded, match="CONTEXTUAL HARD CAP REACHED"):
             g.add(input_tokens=0, cached_tokens=0, output_tokens=100_000_000)
+
+    def test_cache_creation_tokens_tracked_at_correct_prices(self):
+        # 06-08 fix: cost accounting must include cache_creation buckets.
+        # Bug surfaced when ContextualBudgetGuard.cost_usd watched only ~$1-2
+        # while Anthropic dashboard charged $15+ for cache_creation_input_tokens
+        # we never tracked.
+        g = ContextualBudgetGuard()
+        g.add(
+            input_tokens=1_000,
+            cached_tokens=2_000,
+            output_tokens=500,
+            cache_creation_5min_tokens=10_000,
+            cache_creation_1h_tokens=20_000,
+        )
+        expected = (
+            1_000 * 0.25
+            + 10_000 * 0.3125  # 5-min cache write
+            + 20_000 * 0.625   # 1-hour cache write
+            + 2_000 * 0.025
+            + 500 * 1.25
+        ) / 1_000_000
+        assert abs(g.cost_usd - expected) < 1e-9
+
+    def test_cache_hit_rate_diagnostic(self):
+        # cache_hit_rate exposes the % of calls that hit cache (cached_tokens > 0).
+        # Used by the end-of-run summary to flag when caching isn't engaging.
+        g = ContextualBudgetGuard()
+        # 3 cache hits, 2 misses
+        for _ in range(3):
+            g.add(input_tokens=100, cached_tokens=5_000, output_tokens=50)
+        for _ in range(2):
+            g.add(
+                input_tokens=100, cached_tokens=0, output_tokens=50,
+                cache_creation_1h_tokens=5_000,
+            )
+        assert g.calls == 5
+        assert g.cache_hit_calls == 3
+        assert abs(g.cache_hit_rate - 0.6) < 1e-9
+
+    def test_cache_hit_rate_zero_calls(self):
+        g = ContextualBudgetGuard()
+        assert g.cache_hit_rate == 0.0  # no division by zero
