@@ -51,10 +51,10 @@ Requisitos para o release inicial. Cada um mapeia para exatamente uma fase do ro
 
 ### Base de conhecimento / RAG (Fase 6 — RAG ingestão)
 
-- [ ] **RAG-01**: Script `scripts/ingest-knowledge.ts` extrai texto de PDFs (pdf-parse/pdfjs), aplica chunking semântico (target 500 tokens, overlap 80, prioridade `chapter → section → paragraph`) e gera 3–5 tags automáticas por chunk.
+- [ ] **RAG-01**: Script `vision-service/scripts/ingest_knowledge.py` extrai texto de PDFs/DOCX (PyMuPDF + pdfplumber + docx2txt), aplica chunking semântico custom Python (target 500 tokens flex 300–700, overlap 80, prioridade `chapter → section → paragraph`) e prepara metadata para tagging via Claude Code session (D-T1) — o script NÃO gera tags automáticas; vocabulary tagging é etapa pós-ingest D-T1..T5.
 - [ ] **RAG-02**: Embeddings gerados via Voyage AI `voyage-3` em batches ≤ 128, dimensão 1024; insert em massa em `knowledge_chunks` com `source_book`, `source_chapter`, `source_page`, `metadata`.
-- [ ] **RAG-03**: Corpus seed indexado: Jensen *Iridologia Vol. 1* (escola americana, pt) + Battello *Iridologia Clínica* (escola italiana, pt).
-- [ ] **RAG-04**: `lib/rag/search.ts` expõe `retrieveRelevantKnowledge(features)` que monta queries por constituição, por achados em cada setor (`findings.length > 0`) e por sinais globais; busca top-K=5 por query, deduplica e limita o conjunto injetado a 30 chunks (~15k tokens).
+- [ ] **RAG-03**: Corpus seed indexado: 18 PDFs/DOCX do acervo do fundador em `D:\Projetos\Iridologista\livros\` (D-S1) — Jensen, Rayid, escola Italiana (Lo Rito + Birello), escola Brasileira, Espanhola, Andrews-britânica, etc. Manifest comitado em `vision-service/scripts/data/books_manifest.json`.
+- [ ] **RAG-04**: `apps/web/lib/rag/search.ts` expõe server action `retrieveRelevantKnowledge(features, reportSections)` (D-R1) que monta duas famílias de queries (A: features → constituição + setores com findings + sinais globais; B: reportSections × constituição via templates em `section-queries.ts`); busca top-K=10 por query via RPC `match_knowledge_chunks` (HNSW ef_search=100), deduplica por id, aplica reranking voyage-rerank-2.5 (D-N2 graceful fallback) + pesos D-R4 (clinical_data 1.5×, alta_prioridade 1.1×, dimensoes intersect 1.2×), cap final 30 chunks (~15k tokens). Latência p95 ≤ 2s (D-N4 early-warning), p99 ≤ 3s (D-R5 cap).
 
 ### Análise LLM (Fase 7 — Análise LLM)
 
