@@ -1,5 +1,6 @@
+import 'server-only'
 /**
- * `retrieveRelevantKnowledge` — server action exposing the RAG retrieval pipeline.
+ * `retrieveRelevantKnowledge` — server-side RAG retrieval pipeline.
  *
  * Composition (D-R1..R5, D-N2, D-N4):
  *   1. Auth gate (Supabase server-side user check — mirror readings.ts)
@@ -18,7 +19,13 @@
  * any free-text fields. The `pnpm audit:vocabulary` script (DIRS extension to
  * lib/rag/ lands in 06-12) verifies no proibido vocabulary in static strings.
  */
-'use server'
+// 'use server' directive removed (06-13 founder UAT spot-check 500 error):
+// Next.js requires every export from a 'use server' file to be an async function;
+// we export ALTA_PRIORIDADE_BOOKS (a ReadonlySet) which broke that constraint.
+// This module is server-only by construction: it imports 'server-only' (line above)
+// and is invoked from a Route Handler (/api/admin/rag-spot-check) plus internal
+// ingest scripts — never from client components — so the Server Action wrapper
+// the directive provides is unnecessary.
 import { createClient } from '@/lib/supabase/server'
 import { embedTexts } from './embed'
 import { buildFamilyA, buildFamilyB, type IrisFeaturesForRag } from './build-queries'
