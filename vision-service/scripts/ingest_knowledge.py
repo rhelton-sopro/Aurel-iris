@@ -109,23 +109,37 @@ def process_chunks_into_rows(
         yield row
 
 
+# PostgREST encodes .in_() filters as URL query strings. content_hash is 64
+# hex chars; including the comma + percent-encoding, each hash adds ~65-70
+# bytes to the URL. Default PostgREST/nginx URL ceiling is ~8KB effective,
+# so we batch the lookup to stay well clear (100 × 65 = 6.5KB headroom).
+HASH_LOOKUP_BATCH_SIZE = 100
+
+
 def filter_already_indexed(rows: list[dict], client) -> list[dict]:
     """Pre-insert dedup: query DB for existing content_hashes; return only new rows.
 
     Saves embedding cost on re-runs (D-E2 idempotency hardening before the
     Voyage round-trip, complementing the ON CONFLICT DO NOTHING server-side
     guarantee in upsert_chunks).
+
+    Hashes are looked up in batches of HASH_LOOKUP_BATCH_SIZE because PostgREST
+    serializes .in_() into a URL query string; a single book can produce 1000+
+    chunks (Bernard Jensen pdf = 1008) which would overflow the URL ceiling.
     """
     if not rows:
         return []
     hashes = [r["content_hash"] for r in rows]
-    response = (
-        client.table("knowledge_chunks")
-        .select("content_hash")
-        .in_("content_hash", hashes)
-        .execute()
-    )
-    existing = {row["content_hash"] for row in (response.data or [])}
+    existing: set[str] = set()
+    for i in range(0, len(hashes), HASH_LOOKUP_BATCH_SIZE):
+        batch = hashes[i : i + HASH_LOOKUP_BATCH_SIZE]
+        response = (
+            client.table("knowledge_chunks")
+            .select("content_hash")
+            .in_("content_hash", batch)
+            .execute()
+        )
+        existing.update(row["content_hash"] for row in (response.data or []))
     return [r for r in rows if r["content_hash"] not in existing]
 
 

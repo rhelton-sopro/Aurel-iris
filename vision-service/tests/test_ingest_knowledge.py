@@ -286,3 +286,36 @@ class TestArgparse:
         ]
         new_rows = filter_already_indexed(rows, fake_client)
         assert [r["content_hash"] for r in new_rows] == ["h2", "h4"]
+
+    def test_filter_already_indexed_batches_large_hash_lists(self, monkeypatch):
+        """Large hash lists are batched to avoid PostgREST URL overflow.
+
+        Bernard Jensen pdf produces 1008 chunks; a single .in_() call with
+        all hashes would serialize to ~65KB URL and trigger 'URL component
+        query too long' from PostgREST. Hashes must be split into batches
+        of HASH_LOOKUP_BATCH_SIZE per .in_() call.
+        """
+        from scripts.ingest_knowledge import HASH_LOOKUP_BATCH_SIZE, filter_already_indexed
+        _set_env(monkeypatch)
+        # Build 250 fake hashes (forces ≥3 batches with the 100-cap)
+        fake_response = MagicMock()
+        fake_response.data = []  # nothing already indexed
+        fake_client = MagicMock()
+        fake_client.table.return_value.select.return_value.in_.return_value.execute.return_value = (
+            fake_response
+        )
+        rows = [{"content_hash": f"h{i:03d}", "content": "x"} for i in range(250)]
+        new_rows = filter_already_indexed(rows, fake_client)
+        # All 250 returned (none in DB)
+        assert len(new_rows) == 250
+        # .in_() invoked once per batch
+        in_call_count = fake_client.table.return_value.select.return_value.in_.call_count
+        expected_batches = (250 + HASH_LOOKUP_BATCH_SIZE - 1) // HASH_LOOKUP_BATCH_SIZE
+        assert in_call_count == expected_batches, (
+            f"expected {expected_batches} .in_() calls for 250 hashes "
+            f"with batch={HASH_LOOKUP_BATCH_SIZE}, got {in_call_count}"
+        )
+        # Each call's hash list must not exceed the batch cap
+        for call in fake_client.table.return_value.select.return_value.in_.call_args_list:
+            batch_arg = call.args[1]  # .in_("content_hash", batch_arg)
+            assert len(batch_arg) <= HASH_LOOKUP_BATCH_SIZE
