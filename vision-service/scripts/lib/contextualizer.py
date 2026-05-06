@@ -164,13 +164,26 @@ def situate_chunk(
 
     # Per-call diagnostic logging (env-gated to avoid log spam in production runs).
     # Set RAG_INGEST_DEBUG_CACHE=1 to verify cache hit/miss pattern during smoke tests.
+    # Format: [contextualizer] chunk N | VERDICT $cost.XXXX | rolling_total $sum.XXXX (hit_rate%)
     if os.environ.get("RAG_INGEST_DEBUG_CACHE") == "1":
-        verdict = "HIT" if cache_read_tokens > 0 else ("CREATE" if cache_creation_total > 0 else "MISS")
+        verdict = "HIT   " if cache_read_tokens > 0 else ("CREATE" if cache_creation_total > 0 else "MISS  ")
+        # Compute per-call cost using ContextualBudgetGuard's price constants
+        # (single-source-of-truth — if pricing changes, only one place to edit).
+        from .budget import ContextualBudgetGuard as _BG
+        per_call_cost = (
+            input_tokens * _BG.PRICE_INPUT_PER_1M
+            + cache_creation_5min * _BG.PRICE_CACHE_WRITE_5MIN_PER_1M
+            + cache_creation_1h * _BG.PRICE_CACHE_WRITE_1H_PER_1M
+            + cache_read_tokens * _BG.PRICE_CACHE_READ_PER_1M
+            + output_tokens * _BG.PRICE_OUTPUT_PER_1M
+        ) / 1_000_000
+        # guard.calls already incremented by guard.add(); guard.cost_usd reflects total so far.
         print(
-            f"[contextualizer] {verdict} | input={input_tokens} "
-            f"cache_creation={cache_creation_total} (5m={cache_creation_5min}/1h={cache_creation_1h}) "
-            f"cache_read={cache_read_tokens} output={output_tokens}",
+            f"[contextualizer] chunk {guard.calls:>4} | {verdict} ${per_call_cost:.4f} | "
+            f"total ${guard.cost_usd:.4f} (hit_rate={guard.cache_hit_rate:.0%}) | "
+            f"in={input_tokens} cc1h={cache_creation_1h} cc5m={cache_creation_5min} cr={cache_read_tokens} out={output_tokens}",
             file=sys.stderr,
+            flush=True,
         )
 
     # response.content is a list of content blocks; the first is text in canonical Anthropic responses.
