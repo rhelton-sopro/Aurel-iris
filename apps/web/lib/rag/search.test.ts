@@ -17,10 +17,15 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
-// Hoisted mocks — must register BEFORE the import of search.ts.
-const mockGetUser = vi.fn()
-const mockRpc = vi.fn()
-const mockEmbedTexts = vi.fn()
+// Hoisted mock variables — `vi.hoisted` lifts the declarations alongside the
+// `vi.mock` factory calls (which are themselves hoisted to the top of the
+// file). Without this, the factory body would run before the `const mockX`
+// declarations and we'd get "Cannot access X before initialization".
+const { mockGetUser, mockRpc, mockEmbedTexts } = vi.hoisted(() => ({
+  mockGetUser: vi.fn(),
+  mockRpc: vi.fn(),
+  mockEmbedTexts: vi.fn(),
+}))
 
 vi.mock('@/lib/supabase/server', () => ({
   createClient: vi.fn().mockResolvedValue({
