@@ -19,7 +19,7 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
 - [x] **Fase 3: Captura mobile (PWA)** — App instalável com captura via câmera nativa + validação Claude Haiku 4.5 VLM. Concluída 2026-05-03.
 - [x] **Fase 4: Upload desktop** — Dropzone desktop produzindo a mesma estrutura de leitura. Concluída 2026-05-03 (UAT founder + gsd-verifier passed).
 - [ ] **Fase 5: Pipeline de visão (Modal)** — Serviço Modal `analyze_iris` produzindo o JSON canônico de features.
-- [ ] **Fase 6: RAG — Ingestão da base de conhecimento** — Corpus iridológico chunked, embedded e indexado em pgvector.
+- [x] **Fase 6: RAG — Ingestão da base de conhecimento** — Corpus iridológico chunked, embedded e indexado em pgvector. Concluída 2026-05-06 (UAT 5/5 PASS + secure-phase 16/16 threats closed).
 - [ ] **Fase 7: Análise LLM** — Relatório iridológico em pt-BR gerado por Claude Sonnet 4.6 ancorado em features + RAG.
 - [ ] **Fase 8: Pagamento + LGPD** — Stripe BR (BRL+PIX) com trial 14d e termo de consentimento + direitos LGPD.
 - [ ] **Fase 9: Polish + dogfooding + beta** — Onboarding, e-mail transacional, uso semanal real pelo fundador, depois beta com 10–20 terapeutas.
@@ -276,7 +276,7 @@ Fases v1 executam em ordem numérica: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 
 | 3. Captura mobile (PWA) | 8/8* | ✅ Concluída via UAT | 2026-05-03 |
 | 4. Upload desktop | 7/7 | ✅ Concluída via UAT + gsd-verifier | 2026-05-03 |
 | 5. Pipeline de visão (Modal) | 17/17 | Código-completa; aguardando verify-work + founder smoke | — |
-| 6. RAG — Ingestão | 13/14 | Em execução (Wave 0 + Wave 1 + Wave 2 + Wave 3 + Wave 4 quase fechada — 06-01..06-13 ✅; **D-N1 RESOLVED** com 91% coverage + founder UAT 5/5 PASS; só falta 06-14 README runbook autônomo) | — |
+| 6. RAG — Ingestão | 14/14 | ✅ Concluída via UAT (5/5 PASS) + secure-phase (16/16 threats closed) | 2026-05-06 |
 | 7. Análise LLM | 0/TBD | Não iniciada | — |
 | 8. Pagamento + LGPD | 0/TBD | Não iniciada | — |
 | 9. Polish + dogfooding + beta | 0/TBD | Não iniciada | — |
