@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-06T15:30:00.000Z"
+last_updated: "2026-05-06T16:00:00.000Z"
 progress:
   total_phases: 10
   completed_phases: 4
   total_plans: 56
-  completed_plans: 54
-  percent: 96
+  completed_plans: 55
+  percent: 98
 ---
 
 # Estado do projeto
@@ -143,8 +143,8 @@ Nenhum ainda.
 | audit:vocabulary | 8 ocorrências de "diagnóstico" em comentários técnicos da Fase 3 (`app/(auth)/login/page.tsx`, `app/(auth)/signup/page.tsx`, `app/api/capture/validate/route.ts`, `components/capture/CapturePreview.tsx`) — não em strings de UI; pré-existentes ao Plan 04-01 (verificado por stash + audit em tree limpo). Detalhe em `.planning/phases/04-upload-desktop/deferred-items.md`. | Open | 2026-05-03 (Plan 04-01) |
 | heic2any maintenance | heic2any@0.0.4 sem release há ~37 meses (último 2023-03-29). Aprovado pelo desenvolvedor via checkpoint:decision para Plan 04-01; auditar antes do gate da Fase 9 (revisão jurídica healthtech). | Open (aceito) | 2026-05-03 (Plan 04-01) |
 | tsc legacy | 2 erros TS2339 em `lib/capture/quality-scoring.test.ts:47,54` referenciando `WEIGHTS.reflex` (resíduo da pivô VLM Fase 3). Pré-existentes ao Plan 04-02. Não bloqueiam — escopo de cleanup futuro da Fase 3. | Open | 2026-05-03 (Plan 04-02) |
-| RAG D-N1 Contextual Retrieval | Final ingest 06-08 rodou com `--no-contextual` após ~$6 spent em failed Anthropic attempts (URL overflow + Tier 1 50K TPM caps + chunker chapter-detection issues, todos resolvidos pelo fix-chain de 7 commits e5f5535..995d0ea). 2761 chunks indexed sem contextual prefix; D-N1 boost (~+35% recall per Anthropic blog) ausente. **Para reativar:** `DELETE FROM knowledge_chunks WHERE source_type='biblioteca';` + `pnpm rag:ingest` (default mode). Estimativa: 30-90 min wall-clock + ~$2-5 Anthropic Tier 1. **Decisão de gate:** se 06-13 founder UAT spot-check (lacuna setor 7 → top-5 fígado/lacuna) mostra recall insuficiente, reactivar antes de fechar Fase 6; caso contrário, defer to Fase 9 polish. Adam Jackson book stays D-N1-skip even após reactivation (one chapter is 42K tokens, just over 40K Tier 1 cap — solve via Tier 2 upgrade or extending synthetic-chapter to subdivide oversized real chapters). | Open (deferred) | 2026-05-05 (Plan 06-08) |
-| ALTA_PRIORIDADE_BOOKS drift | `apps/web/lib/rag/search.test.ts:280` (W3 drift detection test from 06-11) fails because `books_manifest.json` v0.1.2 has `"dictionary of iridology pdf"` with `alta_prioridade: true` (flipped in 06-08 commit `64d54e5`), mas o hardcoded `ALTA_PRIORIDADE_BOOKS` ReadonlySet em `apps/web/lib/rag/search.ts` ainda mirrors v0.1.1 (7 books, missing the dictionary). Verified pre-existing at baseline `48a2e9ea` (06-08 SUMMARY closing commit) — NOT introduced by 06-12. Two clean resolution paths (one-line edit either way): add `'dictionary of iridology pdf'` to the TS Set, OR drop `alta_prioridade: true` from the manifest entry. Founder editorial decision belongs in 06-13. Detail in `.planning/phases/06-rag-ingestao/deferred-items.md`. | Open | 2026-05-05 (Plan 06-12) |
+| ~~RAG D-N1 Contextual Retrieval~~ | **RESOLVED 2026-05-05 (Plan 06-13).** Reactivated via fix-chain: `8da720b` (cache_creation_input_tokens tracking + 1h TTL `cache_control: {ttl: '1h'}`), `0da1887` (corrected Haiku 4.5 prices — input $0.80, cache write 5m $1.00 / 1h $2.00, cache read $0.08, output $4.00; were 3.2× too low), `bdce870` (content_hash from source text, not contextual prefix — Haiku non-determinism was breaking idempotency), `cf29829` (chunker chapter regex pt/es/it/en/de + synthetic 'Section N' fallback), `d9b2cc9` (migration 0006 dropped `SET LOCAL hnsw.ef_search` from STABLE function — Postgres rejected it). Final corpus 2026-05-05: 2761 chunks across 12 books, 2505 with `[Contexto:]` prefix (91% coverage), $3.59 contextual + $0.11 voyage = $3.70 total at 98% cache hit rate. Adam Jackson 256 chunks legitimately skip D-N1 (one chapter 42K tokens > 40K Tier 1 cap — accepted v1 trade-off). Founder UAT 5/5 PASS. | **Resolved** | 2026-05-05 (Plan 06-13) |
+| ~~ALTA_PRIORIDADE_BOOKS drift~~ | **RESOLVED 2026-05-05 (Plan 06-13).** Synced TS Set in `apps/web/lib/rag/search.ts` to manifest v0.1.2 via commit `2cc85e2` — 5 books (A Iridologia Em Defesa Da Vida, Bernard Jensen Iridology pdf, Iridologia Psicoemocional, What the Eye Reveals, Iridologia Del Profondo) after 06-08 demoted #1 + #8 alta_prioridade=false. W3 drift detection test now passes 11/11. | **Resolved** | 2026-05-05 (Plan 06-13) |
 
 ## Continuidade de sessão
 

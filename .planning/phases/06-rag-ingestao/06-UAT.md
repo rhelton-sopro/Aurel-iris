@@ -1,8 +1,10 @@
 ---
 phase: 06-rag-ingestao
-status: partial
+status: resolved
 started: 2026-05-05
 updated: 2026-05-05
+signed_off_by: Rhelton
+signed_off_date: 2026-05-05
 ---
 
 # Phase 6 — RAG Ingestão — UAT
@@ -15,11 +17,11 @@ updated: 2026-05-05
 
 ## Current Test
 
-Test 5 — Spot-check: lacuna setor 7 → top-5 chunks fígado/lacuna (founder gate, awaiting run via `pnpm rag:spot-check`).
+All 5 tests PASS. Founder UAT signed off 2026-05-05 after `pnpm rag:spot-check` verified all 3 scenarios green.
 
 ---
 
-## Known limitation v1
+## Known limitation v1 (after final D-N1 reactivation)
 
 ⚠ Ingest ships chunks with EMPTY controlled-vocabulary arrays:
 `metadata.dimensoes=[]`, `setores_referenciados=[]`, `sinais_referenciados=[]`,
@@ -28,31 +30,33 @@ Test 5 — Spot-check: lacuna setor 7 → top-5 chunks fígado/lacuna (founder g
 the founder runs the deferred Claude-Code-session tagging exercise (D-T1..T5)
 that populates these fields.
 
-Additionally, the final ingest in 06-08 ran with `--no-contextual` (D-N1
-DEFERRED — see STATE.md "Itens diferidos") so chunks have NO contextual
-sentence prefix. The Anthropic Contextual Retrieval boost (~+35% recall per
-Anthropic blog) is absent. To reactivate D-N1: `DELETE FROM knowledge_chunks
-WHERE source_type='biblioteca';` + `pnpm rag:ingest` (default mode). Estimate:
-30–90 min wall-clock + ~$2–5 Anthropic Tier 1.
+**D-N1 Contextual Retrieval is ACTIVE in the final corpus** (resolved 2026-05-05).
+After an initial deferral due to a budget guard accounting bug + 5-min cache TTL
+expiring under Tier 1 throttling + wrong Haiku 4.5 prices, the fix-chain across
+~10 commits (e5f5535..d9b2cc9) restored D-N1 viability. Founder ran a full
+`pnpm rag:ingest` with `cache_control: { type: 'ephemeral', ttl: '1h' }` and got
+2761 chunks indexed with 91% coverage (2505 chunks have `[Contexto: ...]` prefix;
+256 chunks from "Iridology a Guide to Iris Analysis" Adam Jackson legitimately
+skipped because one chapter exceeds the 40K Tier 1 TPM cap). Cost: $3.59
+contextual + $0.11 voyage = $3.70 total at 98% cache hit rate.
 
 For UAT scope, the spot-check qualitative grade reflects:
-- Cosine retrieval (pgvector HNSW, ef_search=100)
-- **Without** Contextual Retrieval (D-N1 deferred)
+- Cosine retrieval (pgvector HNSW, ef_search=40 default per migration 0006 —
+  the original `SET LOCAL hnsw.ef_search = 100` was rejected by Postgres
+  because SET is forbidden in STABLE functions; if recall proves insufficient
+  later, raise via `ALTER DATABASE postgres SET hnsw.ef_search = 100;`)
+- D-N1 Contextual Retrieval (91% of chunks)
 - Reranking (D-N2 — voyage-rerank-2.5)
-- `clinical_data 1.5×` multiplier — also a no-op in Phase 6 (no chunks with
+- `clinical_data 1.5×` multiplier — no-op in Phase 6 (no chunks with
   `source_type='clinical_data'` populated; Fase 10 forward-compat)
 - `alta_prioridade 1.1×` multiplier — active (manifest D-M1 marks 5 high-priority
   books in v0.1.2)
 - `dimensoes intersect 1.2×` multiplier — **inert** until D-T1 lands
 
-In other words, top-30 ranking in v1 is driven by **retrieval + rerank +
-`source_book` priority**, NOT by domain-tag interactions and NOT by contextual
-prefixes. UAT must be evaluated against this reality.
-
-**Decision gate (06-13 founder gate):** if the spot-check shows recall is
-insufficient (top-5 doesn't return relevant fígado/lacuna chunks for "lacuna
-setor 7"), this is the trigger to reactivate D-N1 re-ingest before closing
-the phase. Otherwise, defer D-N1 to Fase 9 polish.
+In other words, top-30 ranking in v1 is driven by **retrieval + D-N1 contextual +
+rerank + `source_book` priority**, NOT yet by domain-tag interactions
+(`dimensoes`, `setores_referenciados`, etc.). The tagger session is the next
+quality-improvement lever.
 
 ---
 
@@ -64,13 +68,20 @@ the phase. Otherwise, defer D-N1 to Fase 9 polish.
 completes successfully (06-08 founder gate ran with `--no-contextual` after
 ~$6 spent on failed Anthropic attempts).
 
-**Actual:** Final ingest 2026-05-05 produced 2761 chunks across 12 distinct
-source_books with $0.05 Voyage cost and zero contextual prefixes. Fix-chain
-of 7 commits (e5f5535..995d0ea) restored D-N1 viability for future re-ingest.
+**Actual:** Initial ingest 2026-05-05 produced 2761 chunks (no contextual)
+after the first attempt blew $6 on Anthropic with broken cost tracking.
+After 4 additional fixes (8da720b cache_creation tracking + 1h TTL,
+0da1887 corrected Haiku 4.5 prices, d9b2cc9 migration 0006 dropping
+SET LOCAL from STABLE function, plus 06-13 RPC + auth fixes), founder
+ran a final D-N1-active re-ingest: 2761 chunks across 12 books, 2505
+with `[Contexto: ...]` prefix (91% coverage), $3.59 contextual + $0.11
+voyage at 98% cache hit rate.
 
-**Result:** **PASS** (verified by 06-08 SUMMARY)
+**Result:** **PASS** (verified by 06-08 SUMMARY + 06-13 D-N1 reactivation)
 
-**Notes:** D-N1 contextual retrieval deferred per STATE.md "Itens diferidos".
+**Notes:** D-N1 contextual retrieval ACTIVE in final corpus (resolved
+2026-05-05). Adam Jackson's 256 chunks legitimately skip D-N1 because
+one chapter exceeds 40K Tier 1 TPM cap.
 
 ---
 
@@ -102,11 +113,13 @@ Plus: 06-08 final cost report ≤ $5 voyage + ≤ $15 contextual.
 **Actual:**
 - All rows: `vector_dims(embedding) = 1024` (`voyage-3` PINNED in
   vision-service/scripts/lib/embedder.py + apps/web/lib/rag/embed.ts)
-- Voyage cost: $0.05 (well under $5 budget)
-- Contextual cost: $0 (D-N1 deferred); ~$6 spent in failed attempts before
-  pivot to `--no-contextual`
+- Final Voyage cost: $0.11 (well under $5 budget; cumulative across 2 ingests)
+- Final Contextual cost: $3.59 (under $15 hardcap; D-N1 active at 91% coverage,
+  98% cache hit rate, 1h TTL working as designed)
+- Total cost: $3.70 final + ~$6 wasted on initial broken attempts = ~$9.70 over
+  the lifetime of the phase
 
-**Result:** **PASS** (verified by 06-08 SUMMARY; D-N1 deferred is documented gap)
+**Result:** **PASS** (verified by 06-08 SUMMARY + final re-ingest 2026-05-05)
 
 ---
 
@@ -150,36 +163,30 @@ pnpm rag:spot-check
 The Route Handler `apps/web/app/api/admin/rag-spot-check/route.ts` exercises
 3 scenarios and returns JSON with top-5 chunks per scenario.
 
-**Top-5 review (Scenario 1: lacuna setor 7 / fígado):**
-1. [book] [page] — [PASS/WEAK/FAIL]: [why]
-2. [book] [page] — [PASS/WEAK/FAIL]: [why]
-3. [book] [page] — [PASS/WEAK/FAIL]: [why]
-4. [book] [page] — [PASS/WEAK/FAIL]: [why]
-5. [book] [page] — [PASS/WEAK/FAIL]: [why]
+**Top-5 review (Scenario 1: lacuna setor 7 / fígado, retrieved=21):**
+1. Cunha Chagas pt-BR — score 0.596 — **PASS**: biliar constitution
+2. Cunha Chagas pt-BR — score 0.570 — **PASS**: constitution types
+3. Manual Espanhol — score 0.521 — **PASS**: mixed/biliar constitution
+4. Manual Espanhol — score 0.518 — **PASS**: constitutional types
+5. Cunha Chagas pt-BR — score 0.496 — **PASS**: sinais sintomáticos
+All chunks carry `[Contexto: ...]` D-N1 prefix.
 
-**Tally:**
-- **≥3/5 PASS** = Criterion 5 PASS
-- **1–2/5 PASS** = WEAK — flag for D-N1 reactivation or re-tagging session
-- **0/5 PASS** = FAIL — investigate (model mismatch? bad chunks? missing
-  alta_prioridade flags?)
+**Tally:** 5/5 PASS → Criterion 5 **PASS**.
 
-**Top-5 review (Scenario 2: anel de tensão + neurogênica):**
-1. [book] [page] — [PASS/WEAK/FAIL]
-2. [book] [page] — [PASS/WEAK/FAIL]
-3. [book] [page] — [PASS/WEAK/FAIL]
-4. [book] [page] — [PASS/WEAK/FAIL]
-5. [book] [page] — [PASS/WEAK/FAIL]
+**Top-5 review (Scenario 2: anel de tensão + neurogênica, retrieved=30):**
+Top-5 covers psychoemotional dimension + Lo Rito/Birello (Italian school) +
+Jensen + Iridologia Psicoterapêutica (Brazilian psychoemotional reference).
+All recognizably about the requested feature combination. **PASS**.
 
-**Top-5 review (Scenario 3: linfática + biliar — cross-language):**
-1. [book] [page] — [PASS/WEAK/FAIL]
-2. [book] [page] — [PASS/WEAK/FAIL]
-3. [book] [page] — [PASS/WEAK/FAIL]
-4. [book] [page] — [PASS/WEAK/FAIL]
-5. [book] [page] — [PASS/WEAK/FAIL]
+**Top-5 review (Scenario 3: linfática + biliar — cross-language, retrieved=18):**
+Top-5 includes pt-BR + en + es sources — voyage-3 cross-lingual semantic
+matching working as expected. **PASS**.
 
-**Result:** **PENDING** — awaiting founder gate
+**Result:** **PASS** — founder grade 2026-05-05 by Rhelton.
 
-**D-N1 reactivation decision:** `[trigger D-N1 re-ingest / defer to Fase 9]`
+**D-N1 reactivation decision:** N/A — D-N1 already active in the final
+corpus (91% coverage). The deferred entry in STATE.md "Itens diferidos"
+is now resolved.
 
 ---
 
@@ -187,10 +194,9 @@ The Route Handler `apps/web/app/api/admin/rag-spot-check/route.ts` exercises
 
 | Total | Passed | Failed | Pending |
 | ----- | ------ | ------ | ------- |
-| 5     | 4      | 0      | 1       |
+| 5     | 5      | 0      | 0       |
 
-Tests 1–4 are PASS by virtue of prior plan execution (06-08 + 06-11 + 06-13).
-Test 5 is PENDING the founder spot-check sign-off.
+All 5 success criteria PASS as of 2026-05-05. Phase 6 UAT closed.
 
 ---
 
@@ -210,7 +216,8 @@ Test 5 is PENDING the founder spot-check sign-off.
   `c3c38d8`)
 - [x] ALTA_PRIORIDADE_BOOKS in `apps/web/lib/rag/search.ts` synced to manifest
   v0.1.2 (06-13 commit `2cc85e2`); W3 drift detection test green
-- [ ] Founder runs `pnpm rag:spot-check` and signs off Test 5
+- [x] Founder runs `pnpm rag:spot-check` and signs off Test 5 (2026-05-05)
+- [x] D-N1 Contextual Retrieval reactivated and verified working (91% coverage)
 
 ---
 
@@ -220,7 +227,7 @@ Test 5 is PENDING the founder spot-check sign-off.
 
 ---
 
-**UAT signed off:** *pending founder gate*
+**UAT signed off:** **2026-05-05 by Rhelton** — all 5 Success Criteria PASS, retrieval pipeline production-grade with D-N1 active.
 
 ---
 
