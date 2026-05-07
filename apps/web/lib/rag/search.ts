@@ -146,22 +146,35 @@ export async function retrieveRelevantKnowledge(
   // Step 3: embed queries in parallel (D-R5)
   const { embeddings } = await embedTexts({ texts: allQueries, inputType: 'query' })
 
-  // Step 4: pgvector RPC for each query, parallel (D-R5)
+  // Step 4: pgvector RPC for each query, parallel (D-R5).
+  // Serialize embedding as text vector literal '[0.1,0.2,...]' — pgvector
+  // 0.7+ doesn't auto-cast PostgREST JSON arrays to vector(1024), the cast
+  // must happen via text. Symptom of the cast failing was 0 rows returned
+  // for every query in the 06-13 founder UAT spot-check.
   const rpcPromises = embeddings.map((emb) =>
     supabase.rpc('match_knowledge_chunks', {
-      // Supabase JS serializes number[] -> pgvector format; the generator types
-      // this as `string` (vector literal serialized form), but the SDK accepts
-      // arrays at runtime. The cast follows the same pattern in PATTERNS.md §1124.
-      query_embedding: emb as unknown as string,
+      query_embedding: `[${emb.join(',')}]` as unknown as string,
       match_count: TOP_K_PER_QUERY,
       match_threshold: MATCH_THRESHOLD,
     }),
   )
   const responses = await Promise.all(rpcPromises)
 
-  // Step 5: dedup by id, keep best cosine score
+  // Step 5: dedup by id, keep best cosine score. Surface RPC errors visibly —
+  // prior version silently dropped them, masking issues like the vector cast
+  // failure described above.
   const dedupMap = new Map<string, KnowledgeChunkRow>()
-  for (const { data } of responses) {
+  for (let i = 0; i < responses.length; i++) {
+    const { data, error } = responses[i]
+    if (error) {
+      console.error('[rag] match_knowledge_chunks RPC error', {
+        query: allQueries[i],
+        error: error.message,
+        details: 'details' in error ? (error as { details?: unknown }).details : undefined,
+        hint: 'hint' in error ? (error as { hint?: unknown }).hint : undefined,
+      })
+      continue
+    }
     if (!data) continue
     for (const row of data) {
       const chunk = rpcRowToChunk(row)
