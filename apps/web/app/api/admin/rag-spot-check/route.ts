@@ -83,9 +83,15 @@ export async function GET(request: NextRequest) {
   for (const scenario of SCENARIOS) {
     const t0 = Date.now()
     try {
+      // service-role auth: this route is already gated by RAG_SPOT_CHECK_TOKEN
+      // (verified above before reaching this loop). The session-bound supabase
+      // client has no user cookie under curl/fetch invocation, so the default
+      // 'session' auth path would 'Unauthenticated'. Service-role bypasses RLS
+      // — safe here because the token check is the trust boundary.
       const chunks = await retrieveRelevantKnowledge({
         features: scenario.features,
         reportSections: scenario.reportSections,
+        auth: 'service-role',
       })
       const top5 = chunks.slice(0, 5).map((c) => ({
         id: c.id,

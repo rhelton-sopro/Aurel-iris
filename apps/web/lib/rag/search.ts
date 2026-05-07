@@ -40,6 +40,16 @@ const MATCH_THRESHOLD = 0.0 // RPC default — no minimum score floor
 export interface RetrieveArgs {
   features: IrisFeaturesForRag
   reportSections: ReportSection[]
+  /**
+   * Auth strategy. Default `'session'` reads Supabase user from cookie and
+   * rejects anonymous callers — the secure default for user-facing routes.
+   * `'service-role'` bypasses the user check and uses SUPABASE_SERVICE_ROLE_KEY
+   * directly. Reserved for admin endpoints that have already gated access via
+   * a different mechanism (e.g. /api/admin/rag-spot-check checks
+   * RAG_SPOT_CHECK_TOKEN before invoking). Never expose 'service-role' to
+   * routes reachable by end users — it bypasses RLS.
+   */
+  auth?: 'session' | 'service-role'
 }
 
 /**
@@ -101,13 +111,28 @@ function rpcRowToChunk(row: {
 export async function retrieveRelevantKnowledge(
   args: RetrieveArgs,
 ): Promise<KnowledgeChunkRow[]> {
-  const supabase = await createClient()
-  const {
-    data: { user },
-    error: authErr,
-  } = await supabase.auth.getUser()
-  if (!user || authErr) {
-    throw new Error('Unauthenticated')
+  // Auth strategy:
+  //  - 'session' (default): session-bound supabase client + auth.getUser() check.
+  //    Secure default for user-facing routes; rejects anonymous callers.
+  //  - 'service-role': service-role client (no user session). Bypasses RLS.
+  //    Reserved for admin endpoints already gated by a separate mechanism
+  //    (e.g. /api/admin/rag-spot-check checks RAG_SPOT_CHECK_TOKEN before
+  //    calling). The service-role client is necessary for spot-check because
+  //    knowledge_chunks RLS only permits SELECT to authenticated users; with
+  //    no session cookie the session client returns zero rows.
+  let supabase
+  if (args.auth === 'service-role') {
+    const { createServiceClient } = await import('@/lib/supabase/service')
+    supabase = createServiceClient()
+  } else {
+    supabase = await createClient()
+    const {
+      data: { user },
+      error: authErr,
+    } = await supabase.auth.getUser()
+    if (!user || authErr) {
+      throw new Error('Unauthenticated')
+    }
   }
 
   // Step 2: build queries (D-R2 Family A + Family B)

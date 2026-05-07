@@ -34,6 +34,14 @@ vi.mock('@/lib/supabase/server', () => ({
   }),
 }))
 
+// Service-role client mock — used when auth: 'service-role' is passed
+// (06-13 fix: route handlers gated by RAG_SPOT_CHECK_TOKEN bypass user auth)
+vi.mock('@/lib/supabase/service', () => ({
+  createServiceClient: vi.fn(() => ({
+    rpc: mockRpc,
+  })),
+}))
+
 vi.mock('./embed', () => ({
   embedTexts: (args: { texts: string[]; inputType?: string }) => mockEmbedTexts(args),
 }))
@@ -113,11 +121,43 @@ describe('retrieveRelevantKnowledge (RAG-04, D-R1..R5, D-N2)', () => {
     vi.clearAllMocks()
   })
 
-  it('throws when user is unauthenticated', async () => {
+  it('throws when user is unauthenticated (default session auth)', async () => {
     mockGetUser.mockResolvedValue({ data: { user: null }, error: { message: 'no session' } })
     await expect(
       retrieveRelevantKnowledge({ features: makeFeatures(), reportSections: ['constituicao'] }),
     ).rejects.toThrow(/Unauthenticated/)
+  })
+
+  it('bypasses user auth check when auth=service-role (admin endpoint pattern)', async () => {
+    // Simulate the spot-check Route Handler scenario: token already verified
+    // upstream, no user session cookie. service-role auth must skip getUser
+    // and proceed to the RPC. Bug surfaced 2026-05-05 during 06-13 founder UAT
+    // (curl request had no Supabase session → 'Unauthenticated' under default).
+    mockGetUser.mockResolvedValue({ data: { user: null }, error: { message: 'no session' } })
+    mockEmbedTexts.mockResolvedValue({ embeddings: [[0.1, 0.2]], totalTokens: 100 })
+    mockRpc.mockResolvedValue({
+      data: [
+        {
+          id: 'r1', content: 'fígado lacuna setor 7', source_book: 'A Iridologia',
+          source_chapter: null, source_page: 12,
+          metadata: {
+            autor: 'Miryan Cunha Chagas', escola: 'Brasileira', idioma: 'pt', ano: 2012,
+            constituicao_referenciada: [], setores_referenciados: [], sinais_referenciados: [],
+            dimensoes: [], tags_livres: [],
+          },
+          source_type: 'biblioteca',
+          score: 0.91,
+        },
+      ],
+      error: null,
+    })
+    const result = await retrieveRelevantKnowledge({
+      features: makeFeatures(),
+      reportSections: ['constituicao'],
+      auth: 'service-role',
+    })
+    expect(result).toHaveLength(1)
+    expect(mockGetUser).not.toHaveBeenCalled()  // user check skipped
   })
 
   it('returns empty array when no queries built', async () => {
