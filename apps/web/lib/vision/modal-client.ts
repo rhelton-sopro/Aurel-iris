@@ -8,7 +8,10 @@
  */
 import 'server-only'
 
-export const MODAL_ENDPOINT_TIMEOUT_MS = 10_000 // ample for sync spawn return (<1s typical)
+// Was 10s — too aggressive for Modal cold starts (containers spinning up after
+// idle/redeploy can take 20-30s before the FastAPI endpoint returns the spawn
+// call_id). Steady-state warm calls return in <1s. 30s is comfortable margin.
+export const MODAL_ENDPOINT_TIMEOUT_MS = 30_000
 
 export interface ImageUrlEntry {
   eye: 'right' | 'left'
