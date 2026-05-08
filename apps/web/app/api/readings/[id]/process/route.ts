@@ -123,7 +123,16 @@ export async function POST(
     callId = result.callId
   } catch (err) {
     // Rollback to 'failed' so terapeuta sees a failure state and can Reprocessar.
-    const errorMessage = err instanceof ModalTriggerError ? err.message : 'unknown'
+    // Surface the actual error message regardless of error type — the previous
+    // narrow check (`err instanceof ModalTriggerError`) hid timeout/network errors
+    // as 'unknown', making production debugging impossible.
+    const errorMessage =
+      err instanceof Error ? `${err.name}: ${err.message}` : String(err)
+    console.error(
+      `[process/route] Modal trigger error reading=${readingId}:`,
+      errorMessage,
+      err instanceof Error && err.stack ? `\n${err.stack}` : '',
+    )
     await serviceClient
       .from('readings')
       .update({
