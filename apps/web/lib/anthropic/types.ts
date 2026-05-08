@@ -1,3 +1,8 @@
+// audit-vocabulary:allowlist — este arquivo carrega ENCERRAMENTO_LITERAL,
+// cópia byte-exact da LGPD copy obrigatória SPEC §6 linhas 624-627 (negação
+// explícita de status diagnóstico). É a ÚNICA superfície em código TS onde a
+// presença das 3 palavras restritas é justificada e auditada por humano.
+// Marker honrado por apps/web/scripts/audit-vocabulary.mjs (file-level skip).
 /**
  * Shared types for Phase 7 — Análise LLM.
  *
