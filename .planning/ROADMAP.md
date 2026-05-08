@@ -223,7 +223,7 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
   - [x] 07-05-PLAN.md — TDD lib/anthropic/audit.ts (anchor rate sentence-split D-A1 + LGPD vocab regex word-boundary D-A2 + Pitfall 7 W6 parity + AuditMetadata D-A3) *(2026-05-08)*
   - [x] 07-06-PLAN.md — TDD lib/anthropic/diff.ts (diffWords classifier D-U2 threshold 30% + classifyAllSections produzindo edit_diff/zonas_editadas/tipo_edicao) *(2026-05-08)*
 - **Wave 3** *(orchestrator)*:
-  - [ ] 07-07-PLAN.md — lib/anthropic/analyze.ts (carrega prompts + retrieveRelevantKnowledge frozen Fase 6 D-PR2 + Anthropic stream + cost telemetry D-T1) + section-queries.test.ts D-PR2 CI gate
+  - [x] 07-07-PLAN.md — lib/anthropic/analyze.ts (carrega prompts + retrieveRelevantKnowledge frozen Fase 6 D-PR2 + Anthropic stream + cost telemetry D-T1) + section-queries.test.ts D-PR2 CI gate
 - **Wave 4** *(transport)*:
   - [ ] 07-08-PLAN.md — app/api/readings/[id]/analyze/route.ts (POST streaming Web Streams API + 5 auth gates a-e T-7-AUTH/T-7-COST + section-boundary persistence D-S2 + ENCERRAMENTO_LITERAL append server-side D-P3 + audit + regeneration_log; webhook comment refresh)
 - **Wave 5** *(UI surfaces — paralelos)*:
