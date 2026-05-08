@@ -230,7 +230,7 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
   - [x] 07-09-PLAN.md — Surface 1 (UI-SPEC §Surface 1): /leituras/[id]/page.tsx RSC + analise-client.tsx streaming consumer + AnalysisCTA/AnalysisStream/AnalysisHero components + StatusBadge ephemeral 'Gerando…' variant
   - [x] 07-10-PLAN.md — Surface 2 (UI-SPEC §Surface 2): /leituras/[id]/editar/page.tsx RSC + editar-client.tsx + Server Actions saveReportDelivered (D-A2 BLOCK) + markReadingDelivered (defesa profunda) + EditorAccordion 13 + EditorSectionItem react-markdown preview + EditorAuditBanner + DeliverDialog
 - **Wave 6** *(listing extension)*:
-  - [ ] 07-11-PLAN.md — Surface 3 (UI-SPEC §Surface 3): /leituras/page.tsx — coluna Análise com 4 CTAs condicionais (Gerar análise / Ver análise / Continuar editando / Ver entregue)
+  - [x] 07-11-PLAN.md — Surface 3 (UI-SPEC §Surface 3): /leituras/page.tsx — coluna Análise com 4 CTAs condicionais (Gerar análise / Ver análise / Continuar editando / Ver entregue)
 
 **Cross-cutting constraints (truths repeated across multiple plans):**
 - Vocabulário proibido (`diagnóstico|tratamento|cura`) ausente em todos os arquivos novos via `pnpm audit:vocabulary` (DIRS estendido para `lib/anthropic` em 07-02 D-A4); audit.ts constrói regex indireta via concat para evitar self-match — 07-02, 07-05, 07-08, 07-10
