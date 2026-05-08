@@ -154,7 +154,12 @@ def _classify_error_summary(warnings: list[str]) -> str:
     return ERROR_SUMMARY["transient"]
 
 
-@app.function(image=image, gpu="T4", timeout=120)
+@app.function(
+    image=image,
+    gpu="T4",
+    timeout=120,
+    secrets=[modal.Secret.from_name("aurel-iris-vision")],
+)
 def run_pipeline(reading_id: str, image_urls: list[dict]) -> dict:
     """Per-eye orchestration with D-F1 soft degradation.
 
