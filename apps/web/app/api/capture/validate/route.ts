@@ -17,29 +17,33 @@ const MAX_TOKENS = 256
 // se Anthropic ficar pendurado.
 const REQUEST_TIMEOUT_MS = 8000
 
-// Prompt compacto com critérios MUTUAMENTE EXCLUSIVOS (UAT 03 round 12):
-//   - muito_longe é SÓ sobre framing/tamanho — nunca sobre nitidez
+// Prompt compacto com critérios MUTUAMENTE EXCLUSIVOS (UAT 03 round 13 — Phase 7 dogfooding):
+//   - muito_longe baixado de 12% → 8% (round 12 era restritivo demais; rejeitava close-ups
+//     de iPhone reais com íris em ~10%)
+//   - dois_olhos endurecido: exige AMBAS as íris visíveis e identificáveis individualmente
+//     (não basta sobrancelha+cílios sugerirem segundo olho)
+//   - banda 'boa' alargada (8-20%) pra cobrir close handheld real
 //   - borrado é SÓ sobre nitidez — nunca sobre tamanho
-//   - banda 'boa' alargada (12-25%) pra cobrir close típico de iPhone
-//   - 'regular' agora cobre apenas reflexo parcial (não tamanho limítrofe)
+//   - 'regular' cobre apenas reflexo parcial (não tamanho limítrofe)
 const SYSTEM_PROMPT = `Avalie a foto para análise iridológica. Retorne APENAS JSON, sem markdown:
 {"quality":"<ruim|regular|boa|excelente>","reason":"<reason>"}
 
 quality "ruim" (com reason correspondente):
 - sem_olho: sem olho humano na imagem
-- dois_olhos: ambos os olhos visíveis (deve haver apenas um em close)
-- muito_longe: íris ocupa <12% da menor dimensão da imagem. NÃO use este reason por causa de desfoque (use 'borrado'). NÃO use por contexto facial visível ao redor do olho — close-ups legítimos podem mostrar um pouco de bochecha ou sobrancelha; só importa o tamanho relativo da íris.
+- dois_olhos: AMBAS as íris estão claramente visíveis e identificáveis individualmente como duas íris separadas, ocupando regiões distintas da imagem. NÃO use este reason quando houver apenas uma íris e o restante seja sobrancelha, cílios, pálpebra do outro olho parcialmente visível, ou contexto facial. Só dispare 'dois_olhos' quando o terapeuta poderia legitimamente fotografar UMA íris só recortando metade da imagem — ou seja, há literalmente duas íris completas e nítidas.
+- muito_longe: íris ocupa <8% da menor dimensão da imagem. NÃO use este reason por causa de desfoque (use 'borrado'). NÃO use por contexto facial visível ao redor do olho — close-ups legítimos podem mostrar um pouco de bochecha ou sobrancelha; só importa o tamanho relativo da íris. EM CASO DE DÚVIDA entre 8-12%, prefira 'boa' (não rejeite).
 - olho_fechado: pálpebra fechada ou íris coberta
 - reflexo_total: reflexo cobre >70% da área da íris
 - borrado: fibras radiais da íris não são individualmente distinguíveis. TESTE CONCRETO: você consegue contar as fibras radiais como linhas separadas com bordas bem definidas? Se NÃO (fibras parecem fundidas, suaves, difusas, com blur por movimento ou foco), é 'borrado' — mesmo que o blur seja sutil. Nitidez é crítica para análise iridológica. Use SEMPRE este reason quando houver perda de definição, nunca 'muito_longe'.
 
 caso contrário, reason "olho_detectado" e:
 - excelente: íris ≥20% da menor dimensão E fibras radiais nítidas. Specular highlights localizados (pequenos pontos de luz da câmera) são OK e NÃO impedem 'excelente'.
-- boa: íris ≥12% da menor dimensão E fibras radiais visíveis. Reflexo leve disperso é OK.
+- boa: íris ≥8% da menor dimensão E fibras radiais visíveis. Reflexo leve disperso é OK.
 - regular: SOMENTE quando reflexo cobre pelo menos 30% da área da íris (mas <70%) e atrapalha a leitura.
 
-REGRA DE PRECEDÊNCIA (não pule esta verificação):
-ANTES de classificar quality, faça o teste concreto: as fibras radiais individuais têm bordas definidas e são distinguíveis umas das outras? Se você precisa duvidar disso, é 'borrado'. Nitidez tem precedência absoluta sobre tie-breaker de quality.
+REGRAS DE PRECEDÊNCIA (não pule essas verificações):
+1. ANTES de classificar quality, faça o teste concreto: as fibras radiais individuais têm bordas definidas e são distinguíveis umas das outras? Se você precisa duvidar disso, é 'borrado'. Nitidez tem precedência absoluta sobre tie-breaker de quality.
+2. Para 'dois_olhos': se você não consegue apontar com certeza para DUAS íris circulares completas, é uma íris só — use 'olho_detectado' ou 'borrado'/'muito_longe' conforme o caso.
 
 Em caso de dúvida APENAS entre excelente/boa/regular (com nitidez já confirmada), prefira 'boa'. Não rebaixe para 'regular' por reflexo pequeno.`
 
