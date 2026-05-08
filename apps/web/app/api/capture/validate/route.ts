@@ -17,13 +17,13 @@ const MAX_TOKENS = 256
 // se Anthropic ficar pendurado.
 const REQUEST_TIMEOUT_MS = 8000
 
-// Prompt compacto com critérios MUTUAMENTE EXCLUSIVOS (UAT 03 round 13 — Phase 7 dogfooding):
-//   - muito_longe baixado de 12% → 8% (round 12 era restritivo demais; rejeitava close-ups
-//     de iPhone reais com íris em ~10%)
+// Prompt compacto com critérios MUTUAMENTE EXCLUSIVOS (UAT 03 round 14 — Phase 7 dogfooding v2):
+//   - muito_longe baixado de 12% → 8% (round 12 era restritivo demais)
 //   - dois_olhos endurecido: exige AMBAS as íris visíveis e identificáveis individualmente
-//     (não basta sobrancelha+cílios sugerirem segundo olho)
 //   - banda 'boa' alargada (8-20%) pra cobrir close handheld real
-//   - borrado é SÓ sobre nitidez — nunca sobre tamanho
+//   - **borrado é SÓ sobre as fibras da íris — skin/eyelashes/eyebrow blur NÃO conta**
+//     (round 13 ainda confundia o VLM; capturas reais de iPhone com profundidade de campo
+//      rasa têm pele/cílios fora de foco mas íris nítida — isso é boa, não borrado)
 //   - 'regular' cobre apenas reflexo parcial (não tamanho limítrofe)
 const SYSTEM_PROMPT = `Avalie a foto para análise iridológica. Retorne APENAS JSON, sem markdown:
 {"quality":"<ruim|regular|boa|excelente>","reason":"<reason>"}
@@ -34,18 +34,20 @@ quality "ruim" (com reason correspondente):
 - muito_longe: íris ocupa <8% da menor dimensão da imagem. NÃO use este reason por causa de desfoque (use 'borrado'). NÃO use por contexto facial visível ao redor do olho — close-ups legítimos podem mostrar um pouco de bochecha ou sobrancelha; só importa o tamanho relativo da íris. EM CASO DE DÚVIDA entre 8-12%, prefira 'boa' (não rejeite).
 - olho_fechado: pálpebra fechada ou íris coberta
 - reflexo_total: reflexo cobre >70% da área da íris
-- borrado: fibras radiais da íris não são individualmente distinguíveis. TESTE CONCRETO: você consegue contar as fibras radiais como linhas separadas com bordas bem definidas? Se NÃO (fibras parecem fundidas, suaves, difusas, com blur por movimento ou foco), é 'borrado' — mesmo que o blur seja sutil. Nitidez é crítica para análise iridológica. Use SEMPRE este reason quando houver perda de definição, nunca 'muito_longe'.
+- borrado: as **fibras radiais DA ÍRIS** (não da pele, cílios, ou sobrancelha) não são individualmente distinguíveis. TESTE CONCRETO: olhe SOMENTE para a região circular da íris — você consegue contar as fibras radiais como linhas separadas com bordas bem definidas? Se NÃO (fibras da íris parecem fundidas, suaves, difusas, com blur por movimento ou foco), é 'borrado' — mesmo que o blur seja sutil.
+
+ESCOPO RESTRITO PRA ESTE TESTE: Em fotos de iridologia tiradas com close de smartphone, é COMUM e ESPERADO que pele, cílios, sobrancelha, e o branco do olho estejam fora de foco devido à profundidade de campo rasa. ISSO NÃO É 'borrado'. O ÚNICO ponto de avaliação de nitidez é a região circular colorida da íris. Se a íris está nítida com fibras visíveis MAS o resto da imagem está blur, é 'boa' ou 'excelente', nunca 'borrado'.
 
 caso contrário, reason "olho_detectado" e:
-- excelente: íris ≥20% da menor dimensão E fibras radiais nítidas. Specular highlights localizados (pequenos pontos de luz da câmera) são OK e NÃO impedem 'excelente'.
-- boa: íris ≥8% da menor dimensão E fibras radiais visíveis. Reflexo leve disperso é OK.
+- excelente: íris ≥20% da menor dimensão E fibras radiais DA ÍRIS nítidas. Specular highlights localizados (pequenos pontos de luz da câmera) são OK e NÃO impedem 'excelente'. Resto da imagem (pele, cílios) PODE estar fora de foco.
+- boa: íris ≥8% da menor dimensão E fibras radiais DA ÍRIS visíveis (mesmo que não perfeitamente nítidas). Reflexo leve disperso é OK. Resto da imagem PODE estar fora de foco.
 - regular: SOMENTE quando reflexo cobre pelo menos 30% da área da íris (mas <70%) e atrapalha a leitura.
 
 REGRAS DE PRECEDÊNCIA (não pule essas verificações):
-1. ANTES de classificar quality, faça o teste concreto: as fibras radiais individuais têm bordas definidas e são distinguíveis umas das outras? Se você precisa duvidar disso, é 'borrado'. Nitidez tem precedência absoluta sobre tie-breaker de quality.
+1. **ÍRIS é o único alvo de avaliação de nitidez.** Antes de classificar como 'borrado', confirme: o blur está nas fibras da íris ou só na pele/cílios/sobrancelha? Se o blur está fora da íris, é 'boa' ou 'excelente', NUNCA 'borrado'. Profundidade de campo rasa em smartphones produz close-ups onde só a íris está em foco — isso é o IDEAL pra iridologia.
 2. Para 'dois_olhos': se você não consegue apontar com certeza para DUAS íris circulares completas, é uma íris só — use 'olho_detectado' ou 'borrado'/'muito_longe' conforme o caso.
 
-Em caso de dúvida APENAS entre excelente/boa/regular (com nitidez já confirmada), prefira 'boa'. Não rebaixe para 'regular' por reflexo pequeno.`
+Em caso de dúvida APENAS entre excelente/boa/regular (com nitidez DA ÍRIS já confirmada), prefira 'boa'. Não rebaixe para 'regular' por reflexo pequeno.`
 
 interface ValidateRequestBody {
   imageBase64?: unknown
