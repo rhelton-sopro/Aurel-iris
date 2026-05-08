@@ -18,7 +18,7 @@ const PATTERN = /diagnóstico|tratamento|cura/i
 const EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'])
 
 // Diretórios a varrer
-const DIRS = ['app', 'components', 'lib/rag']
+const DIRS = ['app', 'components', 'lib/rag', 'lib/anthropic']
 
 /**
  * Recursively collect all files from a directory.
