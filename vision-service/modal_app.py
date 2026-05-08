@@ -49,10 +49,12 @@ image = (
     modal.Image.debian_slim()
     .apt_install(
         "libgl1",
-        "libglib2.0-0",  # provides libgthread-2.0.so.0 (cv2 runtime dep)
-        "libsm6",
-        "libxext6",
-        "libxrender1",
+        "libglib2.0-0",   # libgthread-2.0.so.0 (cv2 runtime)
+        "libgles2",       # libGLESv2.so.2 (MediaPipe runtime — OpenGL ES)
+        "libegl1",        # libEGL.so.1 (MediaPipe runtime — paired with GLES2)
+        "libsm6",         # X11 session mgmt (cv2)
+        "libxext6",       # X11 ext (cv2)
+        "libxrender1",    # X11 render (cv2)
         "wget",
     )
     .pip_install(
