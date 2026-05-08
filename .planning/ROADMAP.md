@@ -218,7 +218,7 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
   - [x] 07-01-PLAN.md — [BLOCKING] migration 0007 (DROP/ADD ai_report_raw/edited → jsonb canônico + GENERATED columns + IMMUTABLE function jsonb_concat_sections_pt_br + 11 forward-compat columns Fase 10 SAC) + supabase db push --linked + pnpm gen:types + smoke SQL Pitfall 1 ordering *(2026-05-08)*
   - [x] 07-02-PLAN.md — Wave-0 setup: deps install (react-markdown@10 + remark-gfm@4 + diff@9 + shadcn accordion) + literal copy SPEC §6 prompts (system.md + feature-injection.md) + outputFileTracingIncludes (Pitfall 9) + audit:vocabulary DIRS extension D-A4 + 8 Wave-0 test stubs *(2026-05-08)*
 - **Wave 2** *(building blocks server-only — paralelos)*:
-  - [ ] 07-03-PLAN.md — lib/anthropic/{types,client,prompts}.ts (canonical types ReportSectionKey + ENCERRAMENTO_LITERAL D-P3 + Anthropic factory D-T2 + cache_control ephemeral + FS loader prompts.ts + mustache renderInjection)
+  - [x] 07-03-PLAN.md — lib/anthropic/{types,client,prompts}.ts (canonical types ReportSectionKey + ENCERRAMENTO_LITERAL D-P3 + Anthropic factory D-T2 + cache_control ephemeral + FS loader prompts.ts + mustache renderInjection) *(2026-05-08)*
   - [ ] 07-04-PLAN.md — TDD lib/anthropic/parser.ts (section-boundary regex `^### (\d{1,2})\.\s+/gm` + Pitfall 2 defenses: out-of-range / non-monotonic / line-start anchor)
   - [ ] 07-05-PLAN.md — TDD lib/anthropic/audit.ts (anchor rate sentence-split D-A1 + LGPD vocab regex word-boundary D-A2 + Pitfall 7 W6 parity + AuditMetadata D-A3)
   - [ ] 07-06-PLAN.md — TDD lib/anthropic/diff.ts (diffWords classifier D-U2 threshold 30% + classifyAllSections produzindo edit_diff/zonas_editadas/tipo_edicao)
