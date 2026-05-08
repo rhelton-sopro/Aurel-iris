@@ -233,7 +233,7 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
   - [x] 07-11-PLAN.md — Surface 3 (UI-SPEC §Surface 3): /leituras/page.tsx — coluna Análise com 4 CTAs condicionais (Gerar análise / Ver análise / Continuar editando / Ver entregue)
 
 - **Wave 7** *(gap closure — após /gsd-verify-work 7 que produziu VERIFICATION 2026-05-08 com 3/5 truths verified e gaps_found em SC2/SC4/SC5)*:
-  - [ ] 07-12-PLAN.md — Gap closure: 4 guardas server-side em app/actions/analise.ts (CR-05 ENCERRAMENTO_LITERAL overwrite SC4 + CR-04 empty-content gate SC5 + low_anchor_rate gate SC2 + WR-08 terminal-state gate) + flip 4+ it.todo em save-action.test.ts -> >=9 testes GREEN (gap_closure: true)
+  - [x] 07-12-PLAN.md — Gap closure: 4 guardas server-side em app/actions/analise.ts (CR-05 ENCERRAMENTO_LITERAL overwrite SC4 + CR-04 empty-content gate SC5 + low_anchor_rate gate SC2 + WR-08 terminal-state gate) + flip 4+ it.todo em save-action.test.ts -> >=9 testes GREEN (gap_closure: true)
 
 **Cross-cutting constraints (truths repeated across multiple plans):**
 - Vocabulário proibido (`diagnóstico|tratamento|cura`) ausente em todos os arquivos novos via `pnpm audit:vocabulary` (DIRS estendido para `lib/anthropic` em 07-02 D-A4); audit.ts constrói regex indireta via concat para evitar self-match — 07-02, 07-05, 07-08, 07-10
