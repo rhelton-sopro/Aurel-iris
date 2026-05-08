@@ -31,11 +31,12 @@ describe('lib/anthropic/diff — classifyEdit (D-U2)', () => {
     expect(r.type).toBe('adicionado')
   })
 
-  it('mudança ~28% (abaixo do threshold 30%) = "corrigido"', () => {
-    // 10 palavras, 2 substituídas no final → ~27% via tokens diffWords
-    // (palavras + whitespace contam como tokens distintos).
-    const generated = 'um dois três quatro cinco seis sete oito nove dez'
-    const delivered = 'um dois três quatro cinco seis sete oito ZERO ONZE'
+  it('mudança <30% (abaixo do threshold) = "corrigido"', () => {
+    // 14 palavras, 2 substituídas no final → ~25% via diffWords
+    // (added+removed contam separadamente: total = 12 common + 2 rem + 2 add = 16,
+    // changed = 4, 4/16 = 25%).
+    const generated = 'um dois três quatro cinco seis sete oito nove dez onze doze treze quatorze'
+    const delivered = 'um dois três quatro cinco seis sete oito nove dez onze doze ZERO ONZE'
     const r = classifyEdit(generated, delivered)
     expect(r.type).toBe('corrigido')
     expect(r.changed_pct).toBeLessThan(30)
