@@ -1,22 +1,232 @@
-// Wave-0 stub — preenchido em 07-05-PLAN (anchor rate + LGPD vocab).
-// Source: 07-VALIDATION.md line 55, 07-RESEARCH.md line 1080.
+// Phase 7 | Plan 07-05 — audit.ts tests (RED→GREEN cycle).
 //
-// Nota: termos proibidos LGPD-06 NÃO aparecem como substring literal aqui —
-// audit-vocabulary.mjs varre `lib/anthropic` agora (D-A4) e qualquer literal
-// dispararia self-match. As implementações em 07-05 montam regex via concat
-// indireto (Pitfall 7 W6 parity).
-import { describe, it } from 'vitest'
+// Forbidden vocab terms are NEVER inlined as literals in this source — fixtures
+// build them via array-join. Even though `audit-vocabulary.mjs` skips test
+// files (extension match is .ts but the script does scan __tests__/), this
+// pattern keeps the test source defensively clean and mirrors the same
+// indirect-concat technique used in audit.ts itself (Pitfall 7 + W6 parity +
+// audit-vocabulary self-match avoidance).
+import { describe, it, expect } from 'vitest'
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
+import { runAudit, FORBIDDEN_VOCAB_RE, extractForbiddenHits } from '../audit'
+import type { ReportJsonb } from '../types'
+
+// Build forbidden term fixtures via concat so the test source ALSO doesn't
+// embed the 3 restricted literals (defensive — scanner currently skips
+// __tests__ but future-proofing against config drift).
+const TERM_DIAG = ['d', 'i', 'a', 'g', 'n', 'ó', 's', 't', 'i', 'c', 'o'].join('')
+const TERM_TRAT = ['t', 'r', 'a', 't', 'a', 'm', 'e', 'n', 't', 'o'].join('')
+const TERM_CURA = ['c', 'u', 'r', 'a'].join('')
 
 describe('lib/anthropic/audit — anchor rate (D-A1)', () => {
-  it.todo('calcula anchor rate por seção 2-6 via sentence-split em [.!?]+(?=\\s|$)')
-  it.todo('low_anchor_rate=true quando overall < 95%')
-  it.todo('low_anchor_rate=false quando overall >= 95%')
-  it.todo('anchor_rate_pct=100 quando seção é vazia (degenerate)')
+  it('low_anchor_rate=false quando overall = 100%', () => {
+    const report: ReportJsonb = {
+      '2_estrutural_fisica':
+        'Sinal A [ancorado em: features.constitution.primary]. Sinal B [ancorado em: features.sectors[0]].',
+      '3_indicacoes_sistemicas': 'Indicação X [ancorado em: features.global_signs.lymph].',
+      '4_toxemia': 'Carga Y [ancorado em: features.rings.toxic].',
+      '5_psicoemocional': 'Padrão Z [ancorado em: features.collarette.shape].',
+      '6_cargas_temporais': 'Hipótese W [ancorado em: features.sectors[3]].',
+    }
+    const result = runAudit(report)
+    expect(result.low_anchor_rate).toBe(false)
+    expect(result.anchor_rate_pct).toBe(100)
+  })
+
+  it('low_anchor_rate=true quando overall < 95%', () => {
+    const report: ReportJsonb = {
+      '2_estrutural_fisica': 'Sentence one. Sentence two. Sentence three.', // 0/3
+      '3_indicacoes_sistemicas': 'Indicação X [ancorado em: features.X]. Outra sem ancora.', // 1/2
+      '4_toxemia': 'Carga Y [ancorado em: features.Y].',
+      '5_psicoemocional': 'Padrão Z [ancorado em: features.Z].',
+      '6_cargas_temporais': 'Hipótese W [ancorado em: features.W].',
+    }
+    const result = runAudit(report)
+    expect(result.low_anchor_rate).toBe(true)
+    expect(result.anchor_rate_pct).toBeLessThan(95)
+  })
+
+  it('boundary 95% — exactly 95% rate is NOT low (strict <)', () => {
+    // 95 ancoradas / 100 sentences in section 2 plus 4 perfect sections.
+    // Total: 99/104 ≈ 95.2% — NOT < 95.
+    const ancoradas = Array.from({ length: 95 }, () => 'Frase [ancorado em: features.X].').join(' ')
+    const sem = Array.from({ length: 5 }, () => 'Frase sem ancora.').join(' ')
+    const report: ReportJsonb = {
+      '2_estrutural_fisica': ancoradas + ' ' + sem,
+      '3_indicacoes_sistemicas': 'Sentence [ancorado em: features.A].',
+      '4_toxemia': 'Sentence [ancorado em: features.B].',
+      '5_psicoemocional': 'Sentence [ancorado em: features.C].',
+      '6_cargas_temporais': 'Sentence [ancorado em: features.D].',
+    }
+    const result = runAudit(report)
+    expect(result.low_anchor_rate).toBe(false)
+  })
+
+  it('anchor_rate_pct=100 quando seção é vazia (degenerate — no sentences = no failures)', () => {
+    const report: ReportJsonb = {
+      '2_estrutural_fisica': '',
+      '3_indicacoes_sistemicas': 'Sentence [ancorado em: features.A].',
+      '4_toxemia': 'Sentence [ancorado em: features.B].',
+      '5_psicoemocional': 'Sentence [ancorado em: features.C].',
+      '6_cargas_temporais': 'Sentence [ancorado em: features.D].',
+    }
+    const result = runAudit(report)
+    expect(result.anchor_rate_per_section['2']).toBe(100)
+  })
+
+  it('sentence-split via /[.!?]+(?=\\s|$)/ corretamente segmenta pt-BR', () => {
+    const report: ReportJsonb = {
+      '2_estrutural_fisica': 'Foo. Bar! Baz?',
+      '3_indicacoes_sistemicas': 'Sentence [ancorado em: features.A].',
+      '4_toxemia': 'Sentence [ancorado em: features.B].',
+      '5_psicoemocional': 'Sentence [ancorado em: features.C].',
+      '6_cargas_temporais': 'Sentence [ancorado em: features.D].',
+    }
+    const result = runAudit(report)
+    // Section 2 has 3 sentences, 0 ancoradas → 0%
+    expect(result.anchor_rate_per_section['2']).toBe(0)
+  })
+
+  it('regex anchor /\\[ancorado em: features\\.[\\w.\\[\\]]+\\]/ casa caminhos com [], ., _, números', () => {
+    const report: ReportJsonb = {
+      '2_estrutural_fisica':
+        'A [ancorado em: features.sectors[0]]. B [ancorado em: features.global_signs.lymph]. C [ancorado em: features.constitution_primary].',
+      '3_indicacoes_sistemicas': 'X [ancorado em: features.A].',
+      '4_toxemia': 'Y [ancorado em: features.B].',
+      '5_psicoemocional': 'Z [ancorado em: features.C].',
+      '6_cargas_temporais': 'W [ancorado em: features.D].',
+    }
+    const result = runAudit(report)
+    expect(result.anchor_rate_pct).toBe(100)
+  })
 })
 
-describe('lib/anthropic/audit — LGPD forbidden vocab (D-A2 + Pitfall 7)', () => {
-  it.todo('regex word-boundary casa cada um dos 3 termos LGPD-06 proibidos')
-  it.todo('regex NÃO casa "naturocultura" (substring de termo proibido rejeitada por \\b)')
-  it.todo('lista hits por seção+termo+ocorrências em audit_metadata.forbidden_vocab')
-  it.todo('audit_metadata.audited_at é ISO timestamp; auditor_version="v1"')
+describe('lib/anthropic/audit — LGPD forbidden vocab (D-A2 + Pitfall 7 word-boundary parity)', () => {
+  it('regex casa o termo "diagnóstico" (com ó, Unicode flag) — runtime fixture', () => {
+    const sample = `o ${TERM_DIAG} clínico`
+    expect(FORBIDDEN_VOCAB_RE.test(sample)).toBe(true)
+    FORBIDDEN_VOCAB_RE.lastIndex = 0
+  })
+
+  it('regex casa "TRATAMENTO" case-insensitive — runtime fixture uppercase', () => {
+    const sample = `${TERM_TRAT.toUpperCase()} indicado`
+    expect(FORBIDDEN_VOCAB_RE.test(sample)).toBe(true)
+    FORBIDDEN_VOCAB_RE.lastIndex = 0
+  })
+
+  it('regex casa "cura," com pontuação (word-boundary acaba em vírgula)', () => {
+    const sample = `a ${TERM_CURA}, então`
+    expect(FORBIDDEN_VOCAB_RE.test(sample)).toBe(true)
+    FORBIDDEN_VOCAB_RE.lastIndex = 0
+  })
+
+  it('regex NÃO casa "naturocultura" (substring rejeitada por \\b — Pitfall 7)', () => {
+    expect(FORBIDDEN_VOCAB_RE.test('naturocultura')).toBe(false)
+    FORBIDDEN_VOCAB_RE.lastIndex = 0
+  })
+
+  it('regex NÃO casa "curadoria" (substring rejeitada por \\b — Pitfall 7)', () => {
+    expect(FORBIDDEN_VOCAB_RE.test('uma curadoria de textos')).toBe(false)
+    FORBIDDEN_VOCAB_RE.lastIndex = 0
+  })
+
+  it('runAudit lista hits por seção+termo+ocorrências', () => {
+    const report: ReportJsonb = {
+      '5_psicoemocional': `Tem ${TERM_DIAG} aqui. Outro ${TERM_DIAG} ali.`,
+      '6_cargas_temporais': `Sugere ${TERM_TRAT}.`,
+      'encerramento_disclaimer': `Esta leitura iridológica é uma ferramenta de apoio à anamnese terapêutica. Não constitui ${TERM_DIAG} médico.`,
+    }
+    const result = runAudit(report)
+    expect(result.forbidden_vocab.length).toBeGreaterThan(0)
+    const psicoHit = result.forbidden_vocab.find(
+      (h) => h.section === '5_psicoemocional' && h.term === TERM_DIAG,
+    )
+    expect(psicoHit).toBeDefined()
+    expect(psicoHit!.occurrences).toBe(2)
+  })
+
+  it('runAudit forbidden_vocab é [] quando texto é limpo', () => {
+    const report: ReportJsonb = {
+      '2_estrutural_fisica':
+        'Sinal X [ancorado em: features.A]. Sinal Y [ancorado em: features.B].',
+      '3_indicacoes_sistemicas': 'Indicação [ancorado em: features.C].',
+      '4_toxemia': 'Carga [ancorado em: features.D].',
+      '5_psicoemocional': 'Padrão [ancorado em: features.E].',
+      '6_cargas_temporais': 'Hipótese [ancorado em: features.F].',
+    }
+    const result = runAudit(report)
+    expect(result.forbidden_vocab).toEqual([])
+  })
+})
+
+describe('lib/anthropic/audit — AuditMetadata shape (D-A3)', () => {
+  it('audited_at é ISO 8601 timestamp', () => {
+    const result = runAudit({
+      '2_estrutural_fisica': 'Sentence [ancorado em: features.A].',
+    })
+    expect(result.audited_at).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)
+  })
+
+  it('auditor_version="v1"', () => {
+    const result = runAudit({})
+    expect(result.auditor_version).toBe('v1')
+  })
+
+  it('anchor_rate_per_section tem 5 keys (2..6)', () => {
+    const result = runAudit({
+      '2_estrutural_fisica': 'Sentence [ancorado em: features.A].',
+      '3_indicacoes_sistemicas': 'Sentence [ancorado em: features.B].',
+      '4_toxemia': 'Sentence [ancorado em: features.C].',
+      '5_psicoemocional': 'Sentence [ancorado em: features.D].',
+      '6_cargas_temporais': 'Sentence [ancorado em: features.E].',
+    })
+    expect(Object.keys(result.anchor_rate_per_section).sort()).toEqual([
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+    ])
+  })
+})
+
+describe('lib/anthropic/audit — extractForbiddenHits (helper for save-action D-A2)', () => {
+  it('retorna lista vazia para texto limpo', () => {
+    expect(extractForbiddenHits('texto limpo aqui', '5_psicoemocional')).toEqual([])
+  })
+
+  it('retorna 1 hit por termo distinto + occurrences agregadas', () => {
+    const sample = `um ${TERM_DIAG}, outro ${TERM_DIAG}, e ${TERM_CURA}`
+    const hits = extractForbiddenHits(sample, '5_psicoemocional')
+    const diag = hits.find((h) => h.term === TERM_DIAG)
+    const cura = hits.find((h) => h.term === TERM_CURA)
+    expect(diag?.occurrences).toBe(2)
+    expect(cura?.occurrences).toBe(1)
+  })
+})
+
+describe('lib/anthropic/audit — meta-invariante: source file is clean', () => {
+  it('audit.ts source NÃO contém os 3 termos proibidos como substring literal (self-match guard)', () => {
+    const auditSrc = readFileSync(path.resolve(__dirname, '..', 'audit.ts'), 'utf8')
+    // Strip comments first — comments may legitimately mention forbidden terms
+    // for documentation. Strict guard is: NO LITERAL outside of comments.
+    // Conservative implementation: scan the whole source EXCLUDING lines
+    // beginning with `//`, `/*`, ` *`, ` */` (block-comment continuations).
+    const codeLines = auditSrc
+      .split('\n')
+      .filter((line) => {
+        const t = line.trimStart()
+        return !(
+          t.startsWith('//') ||
+          t.startsWith('/*') ||
+          t.startsWith('*') ||
+          t.startsWith('*/')
+        )
+      })
+      .join('\n')
+    expect(codeLines).not.toContain(TERM_DIAG)
+    expect(codeLines).not.toContain(TERM_TRAT)
+    expect(codeLines).not.toContain(TERM_CURA)
+  })
 })
