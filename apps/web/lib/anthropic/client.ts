@@ -43,7 +43,21 @@ export const DEFAULT_SYSTEM_CACHE_CONTROL = { type: 'ephemeral' as const }
 /** Hard ceiling em output tokens por análise (D-S3 timeout aligned). */
 export const MAX_OUTPUT_TOKENS = 16000
 
-/** Anthropic Sonnet 4.6 pricing (USD per 1M tokens) para cost telemetry. */
+/**
+ * Anthropic Sonnet 4.6 pricing (USD per 1M tokens) — bucket de 5min ephemeral.
+ *
+ * Valores verificados em 2026-05-08 contra https://www.anthropic.com/pricing
+ * (público) e refletem prompts ≤ 200K tokens; usar estes valores assume que
+ * `MAX_OUTPUT_TOKENS = 16000` e o system prompt ~1.5K tokens nunca empurram
+ * o request total acima do tier de 200K. `cache_write_per_mtok` é o de
+ * `cache_control: { type: 'ephemeral' }` (5min TTL — o que usamos via
+ * DEFAULT_SYSTEM_CACHE_CONTROL acima); o tier 1h ('extended') custa $6/MTok
+ * mas não é usado neste codebase.
+ *
+ * **Audit**: re-verifique anualmente ou ao trocar `MODEL`. Fonte autoritativa
+ * é a tabela pública da Anthropic; se mudar, atualize aqui + os 2 testes em
+ * `__tests__/client.test.ts` que ancoram os 4 valores.
+ */
 export const PRICING_SONNET_4_6 = {
   input_per_mtok: 3.0,
   output_per_mtok: 15.0,
@@ -51,21 +65,50 @@ export const PRICING_SONNET_4_6 = {
   cache_read_per_mtok: 0.3,
 } as const
 
-/** Compute cost em USD given Anthropic usage object (Pitfall 4 — track all 4 buckets). */
-export function estimateCostUsd(usage: {
-  input_tokens?: number
-  output_tokens?: number
-  cache_creation_input_tokens?: number
-  cache_read_input_tokens?: number
-}): number {
+/**
+ * Anthropic Haiku 4.5 pricing (USD per 1M tokens) — bucket de 5min ephemeral.
+ *
+ * Valores verificados em 2026-05-08 contra https://www.anthropic.com/pricing
+ * (público). Aurel não usa Haiku no path principal de análise (D-T2 fixa
+ * Sonnet 4.6), mas o gate de validação de imagem em
+ * `app/api/capture/validate/route.ts` (Phase 3) e qualquer triagem futura
+ * podem se beneficiar do tier mais barato. Mesma estrutura de 4 buckets +
+ * mesmo padrão multiplicativo da Anthropic (cache_write 5min = 1.25× input,
+ * cache_read = 0.10× input).
+ *
+ * **Audit**: re-verifique junto com `PRICING_SONNET_4_6` (mesma fonte).
+ */
+export const PRICING_HAIKU_4_5 = {
+  input_per_mtok: 1.0,
+  output_per_mtok: 5.0,
+  cache_write_per_mtok: 1.25,
+  cache_read_per_mtok: 0.1,
+} as const
+
+type Pricing = typeof PRICING_SONNET_4_6
+
+/**
+ * Compute cost em USD given Anthropic usage object (Pitfall 4 — track all 4
+ * buckets). Default pricing = Sonnet 4.6 (D-T2). Para chamadas Haiku
+ * (validate-image gate) passe `PRICING_HAIKU_4_5` no segundo argumento.
+ */
+export function estimateCostUsd(
+  usage: {
+    input_tokens?: number
+    output_tokens?: number
+    cache_creation_input_tokens?: number
+    cache_read_input_tokens?: number
+  },
+  pricing: Pricing = PRICING_SONNET_4_6,
+): number {
   const i = (usage.input_tokens ?? 0) / 1_000_000
   const o = (usage.output_tokens ?? 0) / 1_000_000
   const cw = (usage.cache_creation_input_tokens ?? 0) / 1_000_000
   const cr = (usage.cache_read_input_tokens ?? 0) / 1_000_000
   return (
-    i * PRICING_SONNET_4_6.input_per_mtok +
-    o * PRICING_SONNET_4_6.output_per_mtok +
-    cw * PRICING_SONNET_4_6.cache_write_per_mtok +
-    cr * PRICING_SONNET_4_6.cache_read_per_mtok
+    i * pricing.input_per_mtok +
+    o * pricing.output_per_mtok +
+    cw * pricing.cache_write_per_mtok +
+    cr * pricing.cache_read_per_mtok
   )
 }
