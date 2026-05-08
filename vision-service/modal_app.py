@@ -47,7 +47,7 @@ app = modal.App("aurel-iris-vision")
 
 image = (
     modal.Image.debian_slim()
-    .apt_install("libgl1")
+    .apt_install("libgl1", "wget")
     .pip_install(
         "opencv-python-headless==4.13.0.92",
         "mediapipe==0.10.35",
