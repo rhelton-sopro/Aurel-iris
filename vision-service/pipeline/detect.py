@@ -74,8 +74,76 @@ def get_landmarker() -> mp.tasks.vision.FaceLandmarker:
     return FaceLandmarker.create_from_options(options)
 
 
+def _hough_circle_fallback(image: np.ndarray) -> dict:
+    """OpenCV Hough Circle fallback for close-up iris photos.
+
+    Used when MediaPipe FaceLandmarker fails (close-ups too tight to show face
+    context). Detects the iris as a dominant dark circle in the image — works
+    on extreme close-ups where MediaPipe sees no face.
+
+    Args:
+        image: H x W x 3 RGB numpy array (uint8).
+
+    Returns:
+        Same dict shape as MediaPipe path: center / radius / landmarks_raw.
+        landmarks_raw is empty list — downstream segment.py only uses
+        center+radius, so this preserves the contract.
+
+    Raises:
+        ValueError("hough_no_circle_detected") -- caught by orchestrator.
+    """
+    h, w = image.shape[:2]
+    min_dim = min(h, w)
+
+    # Convert RGB → BGR → grayscale (cv2 expects BGR).
+    bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    gray = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
+
+    # Median blur reduces noise without softening edges (better than Gaussian
+    # for Hough — preserves the iris/sclera boundary).
+    blurred = cv2.medianBlur(gray, 5)
+
+    # Hough params tuned for close-up iris photos:
+    #   dp=1.5: accumulator resolution ratio (>=1 = lower res = faster)
+    #   minDist: only one iris expected → set to half image width
+    #   minRadius: íris ocupa pelo menos ~10% da menor dimensão (matches VLM "boa" threshold)
+    #   maxRadius: íris pode ocupar até ~60% (close handheld extreme)
+    #   param1: Canny upper threshold (gradient strength)
+    #   param2: accumulator threshold (lower = mais permissivo, mais false positives)
+    circles = cv2.HoughCircles(
+        blurred,
+        cv2.HOUGH_GRADIENT,
+        dp=1.5,
+        minDist=min_dim // 2,
+        param1=80,
+        param2=30,
+        minRadius=int(min_dim * 0.08),
+        maxRadius=int(min_dim * 0.60),
+    )
+
+    if circles is None or len(circles) == 0:
+        raise ValueError("hough_no_circle_detected")
+
+    # circles shape: (1, N, 3) where each row is (x, y, r). Pick the strongest
+    # (first one — Hough returns sorted by accumulator score).
+    cx, cy, r = circles[0][0]
+
+    return {
+        "center": (float(cx), float(cy)),
+        "radius": float(r),
+        "landmarks_raw": [],  # Hough produces no landmarks — segment.py only uses center+radius
+        "_detector": "hough",  # debug breadcrumb so downstream can log which path was used
+    }
+
+
 def find_iris(image: np.ndarray) -> dict:
-    """Detect iris in a single eye image.
+    """Detect iris in a single eye image — hybrid strategy.
+
+    Tries MediaPipe FaceLandmarker first (works when face context is visible).
+    Falls back to OpenCV Hough Circle on close-up photos where MediaPipe sees
+    no face. Phase 7 dogfooding revealed the capture VLM (Haiku) accepts iris
+    ≥8% of frame, but face_landmarker.task needs face context — close-ups
+    legitimate for iridology fail MediaPipe → Hough catches them.
 
     Args:
         image: H x W x 3 RGB numpy array (uint8). MediaPipe Tasks API expects RGB.
@@ -85,9 +153,11 @@ def find_iris(image: np.ndarray) -> dict:
           center        -- (x, y) in pixel coordinates
           radius        -- float, pixel distance from center to a canonical iris edge landmark
           landmarks_raw -- list of {"x", "y", "z"} normalized coords for all 478 landmarks
+                            (empty list when Hough fallback fired — downstream tolerates this)
+          _detector     -- "mediapipe" | "hough" (debug breadcrumb)
 
     Raises:
-        ValueError("mediapipe_no_face_detected") -- caught by orchestrator (D-F1 soft degradation).
+        ValueError("iris_not_detected") -- BOTH MediaPipe AND Hough failed (caught by orchestrator).
     """
     global _landmarker
     if _landmarker is None:
@@ -97,28 +167,30 @@ def find_iris(image: np.ndarray) -> dict:
     mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=image)
     result = _landmarker.detect(mp_image)
 
-    if not result.face_landmarks:
-        raise ValueError("mediapipe_no_face_detected")
+    # MediaPipe path — full landmarks (preferred when face is visible)
+    if result.face_landmarks:
+        landmarks = result.face_landmarks[0]  # first (only) face
 
-    landmarks = result.face_landmarks[0]  # first (only) face
+        iris_pts = [landmarks[i] for i in LEFT_IRIS + RIGHT_IRIS]
+        cx = sum(p.x for p in iris_pts) / len(iris_pts) * w
+        cy = sum(p.y for p in iris_pts) / len(iris_pts) * h
 
-    # Compute iris center as the mean of both iris-landmark sets. The eye
-    # the image actually represents is communicated by the orchestrator
-    # via the `eye` field of the input descriptor; here we return raw
-    # landmarks so callers can pick LEFT_IRIS / RIGHT_IRIS as needed.
-    iris_pts = [landmarks[i] for i in LEFT_IRIS + RIGHT_IRIS]
-    cx = sum(p.x for p in iris_pts) / len(iris_pts) * w
-    cy = sum(p.y for p in iris_pts) / len(iris_pts) * h
+        edge = landmarks[469]
+        radius = float(((edge.x * w - cx) ** 2 + (edge.y * h - cy) ** 2) ** 0.5)
 
-    # Iris radius from center to a canonical edge landmark (469 -- left side
-    # of LEFT_IRIS pentagon). Used as a starting estimate for Hough fallback.
-    edge = landmarks[469]
-    radius = float(((edge.x * w - cx) ** 2 + (edge.y * h - cy) ** 2) ** 0.5)
+        return {
+            "center": (float(cx), float(cy)),
+            "radius": radius,
+            "landmarks_raw": [
+                {"x": float(p.x), "y": float(p.y), "z": float(p.z)} for p in landmarks
+            ],
+            "_detector": "mediapipe",
+        }
 
-    return {
-        "center": (float(cx), float(cy)),
-        "radius": radius,
-        "landmarks_raw": [
-            {"x": float(p.x), "y": float(p.y), "z": float(p.z)} for p in landmarks
-        ],
-    }
+    # Fallback path — Hough Circle for close-up iris photos
+    print(f"[detect] mediapipe_no_face — falling back to Hough on {w}x{h} image")
+    try:
+        return _hough_circle_fallback(image)
+    except ValueError:
+        # Both detection strategies failed — propagate up to orchestrator soft-degradation
+        raise ValueError("iris_not_detected")

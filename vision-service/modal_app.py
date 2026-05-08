@@ -166,7 +166,12 @@ def _classify_error_summary(warnings: list[str]) -> str:
     No pt-BR literals are inlined here — all strings come from the catalog.
     """
     joined = " ".join(warnings).lower()
-    if "no_face_detected" in joined or "mediapipe_no_face" in joined:
+    if (
+        "no_face_detected" in joined
+        or "mediapipe_no_face" in joined
+        or "iris_not_detected" in joined
+        or "hough_no_circle" in joined
+    ):
         return ERROR_SUMMARY["eyes_not_detected"]
     if "timeout" in joined:
         return ERROR_SUMMARY["timeout"]
