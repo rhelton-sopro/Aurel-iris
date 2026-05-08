@@ -213,7 +213,7 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
   3. Linguagem hipotética é respeitada: nenhuma ocorrência das frases proibidas ("o cliente tem", "diagnostica-se", "está doente de", "trauma confirmado aos X anos", e os termos "diagnóstico", "tratamento", "cura") em 10 relatórios de teste consecutivos sobre features distintas.
   4. Disclaimer literal de encerramento (SPEC §6) aparece sempre, no fim de todo relatório.
   5. Em `/leituras/[id]/editar`, terapeuta ajusta texto e salva — `ai_report_edited` é gravado e `status='edited'`; `ai_report_raw` permanece intacto para auditoria.
-**Plans**: 11 plans em 6 waves
+**Plans**: 12 plans em 7 waves
 - **Wave 1** *(setup paralelo + migration BLOCKING)*:
   - [x] 07-01-PLAN.md — [BLOCKING] migration 0007 (DROP/ADD ai_report_raw/edited → jsonb canônico + GENERATED columns + IMMUTABLE function jsonb_concat_sections_pt_br + 11 forward-compat columns Fase 10 SAC) + supabase db push --linked + pnpm gen:types + smoke SQL Pitfall 1 ordering *(2026-05-08)*
   - [x] 07-02-PLAN.md — Wave-0 setup: deps install (react-markdown@10 + remark-gfm@4 + diff@9 + shadcn accordion) + literal copy SPEC §6 prompts (system.md + feature-injection.md) + outputFileTracingIncludes (Pitfall 9) + audit:vocabulary DIRS extension D-A4 + 8 Wave-0 test stubs *(2026-05-08)*
@@ -231,6 +231,9 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
   - [x] 07-10-PLAN.md — Surface 2 (UI-SPEC §Surface 2): /leituras/[id]/editar/page.tsx RSC + editar-client.tsx + Server Actions saveReportDelivered (D-A2 BLOCK) + markReadingDelivered (defesa profunda) + EditorAccordion 13 + EditorSectionItem react-markdown preview + EditorAuditBanner + DeliverDialog
 - **Wave 6** *(listing extension)*:
   - [x] 07-11-PLAN.md — Surface 3 (UI-SPEC §Surface 3): /leituras/page.tsx — coluna Análise com 4 CTAs condicionais (Gerar análise / Ver análise / Continuar editando / Ver entregue)
+
+- **Wave 7** *(gap closure — após /gsd-verify-work 7 que produziu VERIFICATION 2026-05-08 com 3/5 truths verified e gaps_found em SC2/SC4/SC5)*:
+  - [ ] 07-12-PLAN.md — Gap closure: 4 guardas server-side em app/actions/analise.ts (CR-05 ENCERRAMENTO_LITERAL overwrite SC4 + CR-04 empty-content gate SC5 + low_anchor_rate gate SC2 + WR-08 terminal-state gate) + flip 4+ it.todo em save-action.test.ts -> >=9 testes GREEN (gap_closure: true)
 
 **Cross-cutting constraints (truths repeated across multiple plans):**
 - Vocabulário proibido (`diagnóstico|tratamento|cura`) ausente em todos os arquivos novos via `pnpm audit:vocabulary` (DIRS estendido para `lib/anthropic` em 07-02 D-A4); audit.ts constrói regex indireta via concat para evitar self-match — 07-02, 07-05, 07-08, 07-10
