@@ -35,10 +35,14 @@ Baz.`
   })
 
   it('rejeita number=14 (Pitfall 2 — out of range)', () => {
-    const buf = '### 13. Mensagem\nFim.\n### 14. Bibliografia\nDrift.'
+    // Para isolar o filtro de range (1..13), o buffer precisa primeiro satisfazer
+    // monotonia 1..13 (lastNumber+1) — só então o `### 14.` exercita exclusivamente
+    // o branch `number > 13`. Test 5 cobre monotonia em isolado.
+    const head = Array.from({ length: 13 }, (_, i) => `### ${i + 1}. Seção ${i + 1}\nConteúdo.`).join('\n')
+    const buf = `${head}\n### 14. Bibliografia\nDrift fora do range.`
     const result = findAllBoundaries(buf)
-    expect(result).toHaveLength(1)
-    expect(result[0].number).toBe(13)
+    expect(result).toHaveLength(13)
+    expect(result.map((b) => b.number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13])
   })
 
   it('rejeita boundary não-monotônica crescente (Pitfall 2)', () => {
