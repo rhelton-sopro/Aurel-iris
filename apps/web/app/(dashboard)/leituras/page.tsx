@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import React from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { buttonVariants } from '@/components/ui/button'
 import { LocalDateTime } from '@/components/ui/local-date-time'
@@ -14,6 +15,61 @@ import { cn } from '@/lib/utils'
 import { cleanupStaleEmptyReadingsAction } from '@/app/actions/readings'
 import { StatusBadge, type ReadingStatus } from '@/components/readings/StatusBadge'
 import { ReprocessButton } from '@/components/readings/ReprocessButton'
+
+function renderAnalysisLink(reading: {
+  id: string
+  status: string | null
+  report_generated: unknown
+  is_delivered: boolean | null
+}): React.ReactNode {
+  const hasReport =
+    reading.report_generated != null &&
+    Object.keys(reading.report_generated as Record<string, unknown>).length > 0
+  const isDelivered = reading.is_delivered ?? false
+  const status = reading.status
+
+  if (isDelivered) {
+    return (
+      <Link
+        href={`/leituras/${reading.id}`}
+        className={cn(buttonVariants({ size: 'sm', variant: 'outline' }))}
+      >
+        Ver entregue
+      </Link>
+    )
+  }
+  if (status === 'edited') {
+    return (
+      <Link
+        href={`/leituras/${reading.id}/editar`}
+        className={cn(buttonVariants({ size: 'sm', variant: 'outline' }))}
+      >
+        Continuar editando
+      </Link>
+    )
+  }
+  if (status === 'ready' && hasReport) {
+    return (
+      <Link
+        href={`/leituras/${reading.id}`}
+        className={cn(buttonVariants({ size: 'sm', variant: 'outline' }))}
+      >
+        Ver análise
+      </Link>
+    )
+  }
+  if (status === 'ready' && !hasReport) {
+    return (
+      <Link
+        href={`/leituras/${reading.id}`}
+        className={cn(buttonVariants({ size: 'sm', variant: 'default' }))}
+      >
+        Gerar análise
+      </Link>
+    )
+  }
+  return <span className="text-sm text-muted-foreground">—</span>
+}
 
 /**
  * Página dinâmica: a lista deve refletir leituras criadas neste mesmo request
@@ -35,6 +91,8 @@ export default async function LeiturasPage() {
       status,
       created_at,
       vision_features,
+      report_generated,
+      is_delivered,
       client:clients(full_name),
       reading_images(count)
     `)
@@ -71,6 +129,7 @@ export default async function LeiturasPage() {
               <TableHead>Fotos</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="w-32" />
+              <TableHead>Análise</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -119,6 +178,14 @@ export default async function LeiturasPage() {
                         status={status as ReadingStatus}
                       />
                     )}
+                  </TableCell>
+                  <TableCell>
+                    {renderAnalysisLink({
+                      id: r.id,
+                      status: r.status,
+                      report_generated: r.report_generated,
+                      is_delivered: r.is_delivered ?? null,
+                    })}
                   </TableCell>
                 </TableRow>
               )
