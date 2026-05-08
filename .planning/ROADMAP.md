@@ -213,7 +213,34 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
   3. Linguagem hipotética é respeitada: nenhuma ocorrência das frases proibidas ("o cliente tem", "diagnostica-se", "está doente de", "trauma confirmado aos X anos", e os termos "diagnóstico", "tratamento", "cura") em 10 relatórios de teste consecutivos sobre features distintas.
   4. Disclaimer literal de encerramento (SPEC §6) aparece sempre, no fim de todo relatório.
   5. Em `/leituras/[id]/editar`, terapeuta ajusta texto e salva — `ai_report_edited` é gravado e `status='edited'`; `ai_report_raw` permanece intacto para auditoria.
-**Plans**: TBD
+**Plans**: 11 plans em 6 waves
+- **Wave 1** *(setup paralelo + migration BLOCKING)*:
+  - [ ] 07-01-PLAN.md — [BLOCKING] migration 0007 (DROP/ADD ai_report_raw/edited → jsonb canônico + GENERATED columns + IMMUTABLE function jsonb_concat_sections_pt_br + 11 forward-compat columns Fase 10 SAC) + supabase db push --linked + pnpm gen:types + smoke SQL Pitfall 1 ordering
+  - [ ] 07-02-PLAN.md — Wave-0 setup: deps install (react-markdown@10 + remark-gfm@4 + diff@9 + shadcn accordion) + literal copy SPEC §6 prompts (system.md + feature-injection.md) + outputFileTracingIncludes (Pitfall 9) + audit:vocabulary DIRS extension D-A4 + 6 Wave-0 test stubs
+- **Wave 2** *(building blocks server-only — paralelos)*:
+  - [ ] 07-03-PLAN.md — lib/anthropic/{types,client,prompts}.ts (canonical types ReportSectionKey + ENCERRAMENTO_LITERAL D-P3 + Anthropic factory D-T2 + cache_control ephemeral + FS loader prompts.ts + mustache renderInjection)
+  - [ ] 07-04-PLAN.md — TDD lib/anthropic/parser.ts (section-boundary regex `^### (\d{1,2})\.\s+/gm` + Pitfall 2 defenses: out-of-range / non-monotonic / line-start anchor)
+  - [ ] 07-05-PLAN.md — TDD lib/anthropic/audit.ts (anchor rate sentence-split D-A1 + LGPD vocab regex word-boundary D-A2 + Pitfall 7 W6 parity + AuditMetadata D-A3)
+  - [ ] 07-06-PLAN.md — TDD lib/anthropic/diff.ts (diffWords classifier D-U2 threshold 30% + classifyAllSections produzindo edit_diff/zonas_editadas/tipo_edicao)
+- **Wave 3** *(orchestrator)*:
+  - [ ] 07-07-PLAN.md — lib/anthropic/analyze.ts (carrega prompts + retrieveRelevantKnowledge frozen Fase 6 D-PR2 + Anthropic stream + cost telemetry D-T1) + section-queries.test.ts D-PR2 CI gate
+- **Wave 4** *(transport)*:
+  - [ ] 07-08-PLAN.md — app/api/readings/[id]/analyze/route.ts (POST streaming Web Streams API + 5 auth gates a-e T-7-AUTH/T-7-COST + section-boundary persistence D-S2 + ENCERRAMENTO_LITERAL append server-side D-P3 + audit + regeneration_log; webhook comment refresh)
+- **Wave 5** *(UI surfaces — paralelos)*:
+  - [ ] 07-09-PLAN.md — Surface 1 (UI-SPEC §Surface 1): /leituras/[id]/page.tsx RSC + analise-client.tsx streaming consumer + AnalysisCTA/AnalysisStream/AnalysisHero components + StatusBadge ephemeral 'Gerando…' variant
+  - [ ] 07-10-PLAN.md — Surface 2 (UI-SPEC §Surface 2): /leituras/[id]/editar/page.tsx RSC + editar-client.tsx + Server Actions saveReportDelivered (D-A2 BLOCK) + markReadingDelivered (defesa profunda) + EditorAccordion 13 + EditorSectionItem react-markdown preview + EditorAuditBanner + DeliverDialog
+- **Wave 6** *(listing extension)*:
+  - [ ] 07-11-PLAN.md — Surface 3 (UI-SPEC §Surface 3): /leituras/page.tsx — coluna Análise com 4 CTAs condicionais (Gerar análise / Ver análise / Continuar editando / Ver entregue)
+
+**Cross-cutting constraints (truths repeated across multiple plans):**
+- Vocabulário proibido (`diagnóstico|tratamento|cura`) ausente em todos os arquivos novos via `pnpm audit:vocabulary` (DIRS estendido para `lib/anthropic` em 07-02 D-A4); audit.ts constrói regex indireta via concat para evitar self-match — 07-02, 07-05, 07-08, 07-10
+- D-PR2 frozen contract: REPORT_SECTIONS (lib/anthropic/types.ts) ⊆ keys de SECTION_QUERY_TEMPLATES (lib/rag/section-queries.ts) — CI gate test em 07-07
+- ENCERRAMENTO_LITERAL appendado server-side, não pelo LLM (D-P3 — defesa contra prompt drift) — 07-03 (constante), 07-08 (server append after stream end)
+- Word-boundary regex parity Pitfall 7: `\b(diagnóstico|tratamento|cura)\b/giu` em 07-05 (audit.ts) + 07-10 (saveReportDelivered defense in depth via extractForbiddenHits)
+- Section-boundary parser determinístico (Pitfall 2: out-of-range / non-monotonic / line-start anchor) — 07-04 (parser.ts), 07-08 (Route Handler chama findAllBoundaries no buffer accumulated)
+- 5 auth gates T-7-AUTH (a-e) hard-enforced server-side em 07-08 + tooltip hints client-side em 07-09 (defense in depth, cliente nunca é authority)
+- D-T1 telemetria estruturada SEM PII: apenas UUIDs + counts + latencies + token buckets (cache_creation_input_tokens + cache_read_input_tokens separados Pitfall 4) — 07-03 (estimateCostUsd), 07-07 (analyze.ts), 07-08 (regeneration_log)
+
 **UI hint**: yes
 
 ### Fase 8: Pagamento + LGPD
@@ -277,7 +304,7 @@ Fases v1 executam em ordem numérica: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 
 | 4. Upload desktop | 7/7 | ✅ Concluída via UAT + gsd-verifier | 2026-05-03 |
 | 5. Pipeline de visão (Modal) | 17/17 | Código-completa; aguardando verify-work + founder smoke | — |
 | 6. RAG — Ingestão | 14/14 | ✅ Concluída via UAT (5/5 PASS) + secure-phase (16/16 threats closed) | 2026-05-06 |
-| 7. Análise LLM | 0/TBD | Não iniciada | — |
+| 7. Análise LLM | 0/11 | Plans criados (11 plans, 6 waves) — aguardando execute-phase | — |
 | 8. Pagamento + LGPD | 0/TBD | Não iniciada | — |
 | 9. Polish + dogfooding + beta | 0/TBD | Não iniciada | — |
 | 10. Sistema de Aprendizagem Clínica | 0/TBD | **Backlog (planejada — pós-Fase 9)** | — |
