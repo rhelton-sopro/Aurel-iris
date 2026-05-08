@@ -127,16 +127,22 @@ def _post_webhook(
     # WEBHOOK_BASE_URL is the documented env name (vision-service/.env.example
     # + Modal Secrets per 05-17 smoke). Path is canonical /api/vision/webhook.
     webhook_url = os.environ["WEBHOOK_BASE_URL"].rstrip("/") + "/api/vision/webhook"
-    httpx.post(
-        webhook_url,
-        content=body,
-        headers={
-            "Content-Type": "application/json",
-            "X-Modal-Signature": f"sha256={sig}",
-            "X-Modal-Timestamp": timestamp,
-        },
-        timeout=30,
-    )
+    print(f"[_post_webhook] POST {webhook_url} reading={reading_id} status={status} body_len={len(body)}")
+    try:
+        resp = httpx.post(
+            webhook_url,
+            content=body,
+            headers={
+                "Content-Type": "application/json",
+                "X-Modal-Signature": f"sha256={sig}",
+                "X-Modal-Timestamp": timestamp,
+            },
+            timeout=30,
+        )
+        print(f"[_post_webhook] response status={resp.status_code} body={resp.text[:200]}")
+    except Exception as e:
+        print(f"[_post_webhook] FAILED reading={reading_id}: {type(e).__name__}: {e}")
+        raise
 
 
 def _load_image(url: str):
