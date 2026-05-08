@@ -93,32 +93,51 @@ def _hough_circle_fallback(image: np.ndarray) -> dict:
         ValueError("hough_no_circle_detected") -- caught by orchestrator.
     """
     h, w = image.shape[:2]
-    min_dim = min(h, w)
+
+    # Resize down to max 1024px on long edge before Hough — 4K photos make
+    # Hough Circle accumulator search prohibitively slow (~30s+ per call;
+    # with 6 calls per pipeline run @ 120s function timeout we hit cancel).
+    # Iris detection accuracy is fine at 1024px. Scale coordinates back up
+    # to original image space at the end so segment.py downstream gets
+    # coords matching its full-res input.
+    HOUGH_MAX_DIM = 1024
+    long_edge = max(h, w)
+    if long_edge > HOUGH_MAX_DIM:
+        scale = HOUGH_MAX_DIM / long_edge
+        small_w = int(round(w * scale))
+        small_h = int(round(h * scale))
+        small = cv2.resize(image, (small_w, small_h), interpolation=cv2.INTER_AREA)
+    else:
+        scale = 1.0
+        small = image
+
+    sh, sw = small.shape[:2]
+    small_min_dim = min(sh, sw)
 
     # Convert RGB → BGR → grayscale (cv2 expects BGR).
-    bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    bgr = cv2.cvtColor(small, cv2.COLOR_RGB2BGR)
     gray = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
 
     # Median blur reduces noise without softening edges (better than Gaussian
     # for Hough — preserves the iris/sclera boundary).
     blurred = cv2.medianBlur(gray, 5)
 
-    # Hough params tuned for close-up iris photos:
+    # Hough params tuned for close-up iris photos (running on the SMALL image):
     #   dp=1.5: accumulator resolution ratio (>=1 = lower res = faster)
     #   minDist: only one iris expected → set to half image width
-    #   minRadius: íris ocupa pelo menos ~10% da menor dimensão (matches VLM "boa" threshold)
+    #   minRadius: íris ocupa pelo menos ~8% da menor dimensão
     #   maxRadius: íris pode ocupar até ~60% (close handheld extreme)
-    #   param1: Canny upper threshold (gradient strength)
-    #   param2: accumulator threshold (lower = mais permissivo, mais false positives)
+    #   param1: Canny upper threshold
+    #   param2: accumulator threshold (lower = mais permissivo)
     circles = cv2.HoughCircles(
         blurred,
         cv2.HOUGH_GRADIENT,
         dp=1.5,
-        minDist=min_dim // 2,
+        minDist=small_min_dim // 2,
         param1=80,
         param2=30,
-        minRadius=int(min_dim * 0.08),
-        maxRadius=int(min_dim * 0.60),
+        minRadius=int(small_min_dim * 0.08),
+        maxRadius=int(small_min_dim * 0.60),
     )
 
     if circles is None or len(circles) == 0:
@@ -126,7 +145,14 @@ def _hough_circle_fallback(image: np.ndarray) -> dict:
 
     # circles shape: (1, N, 3) where each row is (x, y, r). Pick the strongest
     # (first one — Hough returns sorted by accumulator score).
-    cx, cy, r = circles[0][0]
+    cx_small, cy_small, r_small = circles[0][0]
+
+    # Scale coordinates back to original image space (segment.py expects the
+    # input image at full resolution; coords must match).
+    cx = cx_small / scale
+    cy = cy_small / scale
+    r = r_small / scale
+    print(f"[detect] hough found circle on resized {sw}x{sh} (scale={scale:.3f}): center=({cx:.0f},{cy:.0f}) r={r:.0f}")
 
     return {
         "center": (float(cx), float(cy)),
