@@ -141,7 +141,10 @@ def _post_webhook(
             },
             timeout=30,
         )
-        print(f"[_post_webhook] response status={resp.status_code} body={resp.text[:200]}")
+        # Defensive: tests may mock httpx.post returning None; production httpx
+        # always returns a Response with .status_code/.text. Only log when present.
+        if resp is not None and hasattr(resp, "status_code"):
+            print(f"[_post_webhook] response status={resp.status_code} body={resp.text[:200]}")
     except Exception as e:
         print(f"[_post_webhook] FAILED reading={reading_id}: {type(e).__name__}: {e}")
         raise
