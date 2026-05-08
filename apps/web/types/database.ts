@@ -187,50 +187,89 @@ export type Database = {
         Row: {
           ai_report_edited: string | null
           ai_report_raw: string | null
+          audit_metadata: Json | null
           capture_method: string | null
           client_id: string
+          clinical_feedback: Json | null
           created_at: string | null
           delivered_at: string | null
+          edit_diff: Json | null
+          exam_notes: string | null
+          feedback_collected_at: string | null
           id: string
           iris_map: string | null
           is_delivered: boolean | null
           processed_at: string | null
+          regeneration_count: number | null
+          regeneration_log: Json | null
+          report_delivered: Json | null
+          report_delivered_at: string | null
+          report_generated: Json | null
+          report_generated_at: string | null
           status: string | null
           therapist_id: string
           therapist_notes: string | null
+          tipo_edicao: string[] | null
           vision_features: Json | null
+          zonas_editadas: Json | null
         }
         Insert: {
           ai_report_edited?: string | null
           ai_report_raw?: string | null
+          audit_metadata?: Json | null
           capture_method?: string | null
           client_id: string
+          clinical_feedback?: Json | null
           created_at?: string | null
           delivered_at?: string | null
+          edit_diff?: Json | null
+          exam_notes?: string | null
+          feedback_collected_at?: string | null
           id?: string
           iris_map?: string | null
           is_delivered?: boolean | null
           processed_at?: string | null
+          regeneration_count?: number | null
+          regeneration_log?: Json | null
+          report_delivered?: Json | null
+          report_delivered_at?: string | null
+          report_generated?: Json | null
+          report_generated_at?: string | null
           status?: string | null
           therapist_id: string
           therapist_notes?: string | null
+          tipo_edicao?: string[] | null
           vision_features?: Json | null
+          zonas_editadas?: Json | null
         }
         Update: {
           ai_report_edited?: string | null
           ai_report_raw?: string | null
+          audit_metadata?: Json | null
           capture_method?: string | null
           client_id?: string
+          clinical_feedback?: Json | null
           created_at?: string | null
           delivered_at?: string | null
+          edit_diff?: Json | null
+          exam_notes?: string | null
+          feedback_collected_at?: string | null
           id?: string
           iris_map?: string | null
           is_delivered?: boolean | null
           processed_at?: string | null
+          regeneration_count?: number | null
+          regeneration_log?: Json | null
+          report_delivered?: Json | null
+          report_delivered_at?: string | null
+          report_generated?: Json | null
+          report_generated_at?: string | null
           status?: string | null
           therapist_id?: string
           therapist_notes?: string | null
+          tipo_edicao?: string[] | null
           vision_features?: Json | null
+          zonas_editadas?: Json | null
         }
         Relationships: [
           {
@@ -292,6 +331,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      jsonb_concat_sections_pt_br: { Args: { input: Json }; Returns: string }
       match_knowledge_chunks: {
         Args: {
           match_count?: number
