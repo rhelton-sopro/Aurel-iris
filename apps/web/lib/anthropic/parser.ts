@@ -1,19 +1,23 @@
 /**
  * Section-boundary parser for incremental LLM streaming persistence.
  *
- * Detects `^### N. ` headings (N=1..13) over an accumulated buffer (NOT delta
- * events — Pitfall 2 mandates buffer-level scan). Defenses:
- *   - Strict regex: `^### (\d{1,2})\.\s+` in multiline mode (line-start anchor)
+ * Detects `^## N. ` or `^### N. ` headings (N=1..13) over an accumulated
+ * buffer (NOT delta events — Pitfall 2 mandates buffer-level scan). Defenses:
+ *   - Regex: `^#{2,3} (\d{1,2})\.\s+` in multiline mode (line-start anchor)
  *   - Number must be in [1, 13] inclusive
  *   - Numbers must be strictly monotonic (`number === lastNumber + 1`)
  *   - Resets `lastIndex` per call (no cross-invocation state leak)
+ *
+ * Heading depth: prompt asks for `### N.` (H3) but Sonnet 4.6 sometimes adds
+ * its own H1 doc title and bumps sections up to H2 (`## N.`). Both are accepted;
+ * `#` (H1) and `####` (H4) still rejected. Surfaced 2026-05-08 dogfooding.
  *
  * Phase 7 | Plan 07-04 | Decisions: D-S2, RESEARCH §Code Examples, Pitfall 2
  */
 import 'server-only'
 import { SECTION_KEY_BY_NUMBER, type NumberedSectionKey } from './types'
 
-const BOUNDARY_RE = /^### (\d{1,2})\.\s+/gm
+const BOUNDARY_RE = /^#{2,3} (\d{1,2})\.\s+/gm
 
 export interface BoundaryMatch {
   /** 1..13 — the section number from the heading. */

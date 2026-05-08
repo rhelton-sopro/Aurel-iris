@@ -86,8 +86,23 @@ Bar.`
     expect(findAllBoundaries(buf)).toHaveLength(1) // second call must produce same result
   })
 
-  it('aceita "## " ou "#### " como NÃO boundary (precisa exatamente 3 hashes)', () => {
-    const buf = '## 1. Não é boundary\n### 1. Constituição\n#### 2. Não é boundary'
+  it('aceita "## " (H2) como boundary — Sonnet 4.6 às vezes adiciona H1 doc title e bump sections para H2', () => {
+    // Real raw observed in dogfooding 2026-05-08: Sonnet emitted `# Doc Title`,
+    // `## Client Subtitle`, then `## 1. Constituição`, `## 2. Estrutural`, etc.
+    // Parser must accept both H2 and H3 to handle both heading depths.
+    const buf = `# Documento
+## Subtítulo de cliente
+## 1. Constituição
+Foo.
+## 2. Estrutural
+Bar.`
+    const result = findAllBoundaries(buf)
+    expect(result).toHaveLength(2)
+    expect(result.map((b) => b.number)).toEqual([1, 2])
+  })
+
+  it('rejeita "# " (H1) e "#### " (H4) — só H2/H3 são aceitos', () => {
+    const buf = '# 1. Não é boundary\n### 1. Constituição\n#### 2. Não é boundary'
     const result = findAllBoundaries(buf)
     expect(result).toHaveLength(1)
     expect(result[0].number).toBe(1)
