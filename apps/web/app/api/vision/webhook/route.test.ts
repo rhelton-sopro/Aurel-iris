@@ -46,6 +46,7 @@ function buildServiceClient({
   const update = vi.fn().mockReturnValue({ eq: eqUpdate1 })
 
   const from = vi.fn().mockImplementation(() => ({ select, update }))
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test mock; structural shape too narrow to type
   return { from, _update: update, _select: select } as any
 }
 
