@@ -78,8 +78,11 @@ export function AnalysisCTA({
       {regenTooltip ? (
         <TooltipProvider>
           <Tooltip>
-            <TooltipTrigger asChild>
-              <span>{regenButton}</span>
+            {/* base-ui Tooltip.Trigger uses `render` prop for custom element (not Radix `asChild`).
+                Span wrapper is needed because regenButton may be disabled — disabled buttons
+                don't fire mouse events, so the trigger must render as a non-button. */}
+            <TooltipTrigger render={<span />}>
+              {regenButton}
             </TooltipTrigger>
             <TooltipContent>{regenTooltip}</TooltipContent>
           </Tooltip>

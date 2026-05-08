@@ -196,7 +196,10 @@ export async function POST(request: Request): Promise<NextResponse> {
   const { error: updateError } = await serviceClient
     .from('readings')
     .update({
-      vision_features: visionFeaturesForWrite,
+      // Cast: Supabase generated `Json` type is recursive and TS can't narrow our
+      // structural shape (Zod-parsed payload + fallback dict) to it. Runtime shape
+      // is JSON-safe (no Date, undefined, function refs).
+      vision_features: visionFeaturesForWrite as never,
       status: parsed.status,
       processed_at: processedAt,
     })

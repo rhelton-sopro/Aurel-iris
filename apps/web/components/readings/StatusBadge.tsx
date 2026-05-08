@@ -86,8 +86,8 @@ export function StatusBadge({
     return (
       <TooltipProvider>
         <Tooltip>
-          <TooltipTrigger asChild>
-            <span>{badge}</span>
+          <TooltipTrigger render={<span />}>
+            {badge}
           </TooltipTrigger>
           <TooltipContent>{errorSummary}</TooltipContent>
         </Tooltip>
