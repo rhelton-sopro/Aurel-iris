@@ -191,6 +191,7 @@ export async function POST(
             regeneration_count: currentCount + 1,
             regeneration_log: [...existingLog, logEntry] as unknown as never,
             audit_metadata: audit as unknown as never,
+            report_raw_text: buffer as unknown as never,
           })
           .eq('id', readingId)
 
@@ -206,11 +207,16 @@ export async function POST(
           err instanceof Error ? err.message : 'unknown',
         )
         try {
-          // Persist partial sections that were already closed mid-stream
-          if (Object.keys(completedSections).length > 0) {
+          // Persist partial sections that were already closed mid-stream +
+          // raw buffer (defensive: lets us debug parser misses post-mortem
+          // even when error aborts the stream before audit/finalize ran).
+          if (Object.keys(completedSections).length > 0 || buffer.length > 0) {
             await supabase
               .from('readings')
-              .update({ report_generated: completedSections })
+              .update({
+                report_generated: completedSections,
+                report_raw_text: buffer as unknown as never,
+              })
               .eq('id', readingId)
           }
           controller.enqueue(
