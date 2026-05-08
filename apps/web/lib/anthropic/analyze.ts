@@ -79,12 +79,34 @@ function concatChunksForKnowledge(chunks: KnowledgeChunkRow[]): string {
 export async function analyzeReading(args: AnalyzeArgs): Promise<AnalyzeResult> {
   const startedAt = Date.now()
 
+  // Normalize pipeline output shape → RAG IrisFeaturesForRag shape.
+  // Pipeline produces { right_eye: { constitution: "linfática", sectors, rings }, left_eye: ... }
+  // RAG expects flat { constitution: { primary: string }, sectors, rings }.
+  // This was the cause of TypeError 'Cannot read properties of undefined (reading primary)'
+  // in Phase 7 dogfooding — the contract mismatch never surfaced in tests because no
+  // integration test ran end-to-end with real pipeline output.
+  const vf = args.visionFeatures as unknown as Record<string, unknown>
+  const eyeSource =
+    (vf.right_eye as Record<string, unknown>) ??
+    (vf.left_eye as Record<string, unknown>) ??
+    {}
+  const constitutionRaw = eyeSource.constitution
+  const constitutionObj =
+    typeof constitutionRaw === 'string'
+      ? { primary: constitutionRaw }
+      : (constitutionRaw as { primary?: string; secondary?: string } | null) ?? { primary: '' }
+  const featuresForRag = {
+    constitution: { primary: constitutionObj.primary ?? '', secondary: constitutionObj.secondary },
+    sectors: (eyeSource.sectors as Array<{ hour: number; findings?: Array<{ type: string }> }>) ?? [],
+    rings: (eyeSource.rings as Record<string, { present: boolean }>) ?? {},
+  }
+
   // 1. Parallel: prompts + RAG (D-PR2 frozen contract — passes REPORT_SECTIONS)
   const [systemPrompt, injectionTemplate, ragChunks] = await Promise.all([
     Promise.resolve(loadSystemPrompt()),
     Promise.resolve(loadInjectionTemplate()),
     retrieveRelevantKnowledge({
-      features: args.visionFeatures,
+      features: featuresForRag as never,
       reportSections: REPORT_SECTIONS,
     }),
   ])
