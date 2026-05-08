@@ -113,10 +113,15 @@ export function runAudit(report: ReportJsonb): AuditMetadata {
   const overallPct =
     totalSentences === 0 ? 100 : Math.round((totalAnchored / totalSentences) * 100)
 
-  // Forbidden vocab scan over ALL keys (not just sections 2-6).
+  // Forbidden vocab scan over LLM-authored sections only.
+  // `encerramento_disclaimer` is server-appended literal text (D-P3) mandated
+  // by SPEC §6 lines 624-627, and the literal contains the word "diagnóstico"
+  // by design ("Não constitui diagnóstico médico…"). Scanning it would always
+  // trip the audit even on a perfect report. Bug surfaced 2026-05-08 dogfooding.
   const forbiddenHits: ForbiddenHit[] = []
   for (const [key, text] of Object.entries(report)) {
     if (typeof text !== 'string') continue
+    if (key === 'encerramento_disclaimer') continue
     forbiddenHits.push(...extractForbiddenHits(text, key))
   }
 

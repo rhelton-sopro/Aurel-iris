@@ -155,6 +155,14 @@ describe('lib/anthropic/audit — LGPD forbidden vocab (D-A2 + Pitfall 7 word-bo
     expect(psicoHit!.occurrences).toBe(2)
   })
 
+  it('runAudit IGNORA encerramento_disclaimer no scan de vocab proibido (server-appended literal contém "diagnóstico" por SPEC)', () => {
+    const report: ReportJsonb = {
+      'encerramento_disclaimer': `Esta leitura iridológica é uma ferramenta de apoio à anamnese terapêutica. Não constitui ${TERM_DIAG} médico nem substitui avaliação clínica profissional.`,
+    }
+    const result = runAudit(report)
+    expect(result.forbidden_vocab).toEqual([])
+  })
+
   it('runAudit forbidden_vocab é [] quando texto é limpo', () => {
     const report: ReportJsonb = {
       '2_estrutural_fisica':
