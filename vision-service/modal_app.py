@@ -66,6 +66,14 @@ image = (
             "face_landmarker/float16/1/face_landmarker.task"
         ),
     )
+    # Mount pipeline package + data dir into container.
+    # Default Modal only ships the entrypoint file (modal_app.py) — without these
+    # mounts, `from pipeline.error_summary import ERROR_SUMMARY` (line 43) and
+    # all line-171+ pipeline imports fail with ModuleNotFoundError. The data dir
+    # is needed because pipeline/iris_maps.py and pipeline/error_summary.py read
+    # `Path(__file__).parent.parent / "data" / "*.json"` at import-time.
+    .add_local_python_source("pipeline")
+    .add_local_dir("data", "/root/data")
 )
 
 
