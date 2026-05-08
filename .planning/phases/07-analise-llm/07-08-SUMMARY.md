@@ -196,3 +196,12 @@ No new security-relevant surface beyond the plan's threat model. The route intro
 ---
 *Phase: 07-analise-llm*
 *Completed: 2026-05-08*
+
+## Self-Check: PASSED
+
+- `apps/web/app/api/readings/[id]/analyze/route.ts` — FOUND
+- `apps/web/app/api/readings/[id]/analyze/__tests__/route.test.ts` — FOUND
+- `.planning/phases/07-analise-llm/07-08-SUMMARY.md` — FOUND
+- Commit `ee66eb9` (test: Wave-0 stub) — FOUND
+- Commit `cae3969` (feat: Route Handler) — FOUND
+- Commit `1c337fa` (docs: SUMMARY) — FOUND
