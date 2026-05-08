@@ -215,7 +215,7 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
   5. Em `/leituras/[id]/editar`, terapeuta ajusta texto e salva — `ai_report_edited` é gravado e `status='edited'`; `ai_report_raw` permanece intacto para auditoria.
 **Plans**: 11 plans em 6 waves
 - **Wave 1** *(setup paralelo + migration BLOCKING)*:
-  - [ ] 07-01-PLAN.md — [BLOCKING] migration 0007 (DROP/ADD ai_report_raw/edited → jsonb canônico + GENERATED columns + IMMUTABLE function jsonb_concat_sections_pt_br + 11 forward-compat columns Fase 10 SAC) + supabase db push --linked + pnpm gen:types + smoke SQL Pitfall 1 ordering
+  - [x] 07-01-PLAN.md — [BLOCKING] migration 0007 (DROP/ADD ai_report_raw/edited → jsonb canônico + GENERATED columns + IMMUTABLE function jsonb_concat_sections_pt_br + 11 forward-compat columns Fase 10 SAC) + supabase db push --linked + pnpm gen:types + smoke SQL Pitfall 1 ordering *(2026-05-08)*
   - [x] 07-02-PLAN.md — Wave-0 setup: deps install (react-markdown@10 + remark-gfm@4 + diff@9 + shadcn accordion) + literal copy SPEC §6 prompts (system.md + feature-injection.md) + outputFileTracingIncludes (Pitfall 9) + audit:vocabulary DIRS extension D-A4 + 8 Wave-0 test stubs *(2026-05-08)*
 - **Wave 2** *(building blocks server-only — paralelos)*:
   - [ ] 07-03-PLAN.md — lib/anthropic/{types,client,prompts}.ts (canonical types ReportSectionKey + ENCERRAMENTO_LITERAL D-P3 + Anthropic factory D-T2 + cache_control ephemeral + FS loader prompts.ts + mustache renderInjection)
