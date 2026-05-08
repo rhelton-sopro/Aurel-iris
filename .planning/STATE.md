@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Phase 7 Wave 3 complete (07-04 + 07-05 + 07-06 ✓) — ready for Wave 4 (07-07 analyze.ts orchestrator)
-last_updated: "2026-05-08T16:30:00.000Z"
+status: "Wave 3 entregou 9 commits atômicos em paralelo via 3 worktrees disjuntos:"
+stopped_at: Phase 7 context gathered
+last_updated: "2026-05-08T16:35:18.744Z"
 progress:
   total_phases: 8
   completed_phases: 5
@@ -28,6 +28,7 @@ Fase: 7 de 10 — RAG retrieval ancorado em features → relatório iridológico
 Plan: Wave 3 fechada — 07-04 ✓ (parser.ts) + 07-05 ✓ (audit.ts) + 07-06 ✓ (diff.ts) entregues em paralelo via 3 worktrees em ~5 min (overlapping). Wave 4 (07-07 analyze.ts orchestrator) desbloqueada.
 Próxima ação: `/clear` então `/gsd-execute-phase 7 --wave 4` para 07-07 (analyze.ts orchestrator: carrega prompts + retrieveRelevantKnowledge Fase 6 + Anthropic streaming + buffer parser + telemetria D-T1; section-queries.test.ts D-PR2 CI gate). Single-plan wave; depois Wave 5 = 07-08 (Route Handler streaming + 5 auth gates), Waves 6-7 = UI surfaces.
 Status: Wave 3 entregou 9 commits atômicos em paralelo via 3 worktrees disjuntos:
+
 - 07-04 parser.ts (3 commits: `73a7904` RED 13 testes + `5073be1` GREEN parser.ts 79 linhas + `d64a1fe` SUMMARY) — `findAllBoundaries` + `closeSections` com Pitfall 2 defenses (out-of-range >13, non-monotonic, line-start anchor `^### N. ` integer-only `\d{1,2}`); `^### 7.5 detalhe` rejeitado pelo `^` multiline; cobertura inclui pseudo-headings inline em corpo. 1 Rule 1 deviation: Test 4 buffer refactored (plan body tinha contradição interna entre range branch e strict-monotonia spec do RESEARCH §Pitfall 2).
 - 07-05 audit.ts (3 commits: `f76c236` RED 16 testes anchor/LGPD/meta-invariante + `a74dbab` GREEN audit.ts 131 linhas + `b3e6950` SUMMARY) — `runAudit(report: ReportJsonb): AuditMetadata` calcula anchor rate via sentence-split `text.split(/[.!?]+(?=\s|$)/u)` (D-A1) sobre seções 2-6 + scaneia FORBIDDEN_VOCAB_RE em TODAS as 14 chaves; threshold low_anchor_rate=true se overall_pct < 95 (D-A1). Exporta 4 símbolos: `runAudit`, `FORBIDDEN_VOCAB_RE` (RegExp **construído via concat indireto** — os 3 termos NUNCA aparecem como literal no source), `extractForbiddenHits`, `ForbiddenHit`. **Pitfall 7 W6 parity provado**: `naturocultura`/`curadoria` substring NÃO match (`\b` boundary suprime); `TERM_DIAG`/uppercase `TERM_TRAT`/`${TERM_CURA},` MATCH (Unicode flag `u` enables accented word-boundary). **Meta-invariante test passes**: audit.ts source code lines (excluindo comments) contêm ZERO literal occurrences dos 3 LGPD-06 termos — provado por runtime test AND external `audit-vocabulary.mjs` script. 2 deviations inline: (a) Rule 1 banner comment reescrito em perífrase pra evitar mencionar "naturocultura"/"curadoria" (ambos contêm `cura` substring); (b) Rule 2 `audit-vocabulary:allowlist` marker added to audit.test.ts (mesmo pattern do 07-03 types.ts) — test file legitimately needs nominal references to forbidden compounds para validar regex contract.
 - 07-06 diff.ts (3 commits: `2292006` RED 13 testes + `eed676d` GREEN diff.ts 192 linhas + `1c0f825` SUMMARY) — `classifyEdit(generated, delivered)` via `diffWords` from `diff@9` retornando `{ type: EditTipo; diff_summary: string; char_delta: number; changed_pct: number }`; threshold 30% (corrigido <30, reescrito ≥30); edges: empty→text=adicionado, text→empty=removido, identical=none. `classifyAllSections(generatedJsonb, deliveredJsonb)` produz D-U2 outputs: `edit_diff` jsonb per-section + `zonas_editadas: string[]` + `tipo_edicao: string[]` deduplicado. Boundary coverage: 25%→corrigido (abaixo), 46%→reescrito (acima), 89%→reescrito (high). Performance benchmark: classifyAllSections sobre 14 sections × ~1000 chars = ~2.4 ms per call. 1 Rule 1 deviation: Test 1 fixture % recalculado de "~28%" para 25% (baseline 14 words com 2 substitutions; plan original "~28%" produzia 33% via diffWords@9 porque added+removed both count no numerador) — classifier code prescribed by plan estava correto as-is, só a expectativa numérica do test fixture precisou de ajuste.
