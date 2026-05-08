@@ -49,6 +49,7 @@ image = (
     modal.Image.debian_slim()
     .apt_install("libgl1", "wget")
     .pip_install(
+        "fastapi[standard]>=0.115",
         "opencv-python-headless==4.13.0.92",
         "mediapipe==0.10.35",
         "numpy>=1.26.0",
