@@ -27,7 +27,8 @@ import { redirect } from 'next/navigation'
 
 import { extractForbiddenHits, runAudit } from '@/lib/anthropic/audit'
 import { classifyAllSections } from '@/lib/anthropic/diff'
-import type { ReportJsonb } from '@/lib/anthropic/types'
+import { ENCERRAMENTO_LITERAL } from '@/lib/anthropic/types'
+import type { AuditMetadata, ReportJsonb } from '@/lib/anthropic/types'
 
 import { readingIdSchema, reportDeliveredSchema } from './analise.schemas'
 
@@ -70,14 +71,16 @@ export async function saveReportDelivered(
   // Load report_generated for diff classification
   const { data: reading, error: readingError } = await supabase
     .from('readings')
-    .select('id, therapist_id, report_generated')
+    .select('id, therapist_id, report_generated, is_delivered')
     .eq('id', readingId)
     .eq('therapist_id', user.id)
     .single()
   if (readingError || !reading) return { error: 'Leitura não encontrada' }
+  if (reading.is_delivered) return { error: 'Leitura já entregue ao cliente — somente leitura.' }
 
   const generated = (reading.report_generated as ReportJsonb | null) ?? {}
   const delivered = bodyParsed.data as ReportJsonb
+  delivered.encerramento_disclaimer = ENCERRAMENTO_LITERAL
   const diffs = classifyAllSections(generated, delivered)
   const audit = runAudit(delivered)
 
@@ -121,14 +124,27 @@ export async function markReadingDelivered(readingId: string): Promise<DeliverRe
   // Defense in depth — re-audit report_delivered before terminal flip
   const { data: reading, error: readingError } = await supabase
     .from('readings')
-    .select('id, therapist_id, report_delivered, is_delivered')
+    .select('id, therapist_id, report_delivered, is_delivered, audit_metadata')
     .eq('id', readingId)
     .eq('therapist_id', user.id)
     .single()
   if (readingError || !reading) return { error: 'Leitura não encontrada' }
   if (reading.is_delivered) return { error: 'Leitura já entregue ao cliente' }
 
-  const delivered = (reading.report_delivered as ReportJsonb | null) ?? {}
+  // Guarda D — CR-04: bloqueia entrega de relatório vazio
+  const delivered = (reading.report_delivered as ReportJsonb | null)
+  if (!delivered || Object.keys(delivered).length === 0) {
+    return { error: 'Salve a edição antes de entregar ao cliente.' }
+  }
+
+  // Guarda C — SC2: fail-closed em audit_metadata ausente/low_anchor_rate
+  const audit = reading.audit_metadata as AuditMetadata | null
+  if (!audit || audit.low_anchor_rate !== false) {
+    if (!audit) {
+      return { error: 'Auditoria de ancoragem ausente ou pendente. Re-salve o relatório para re-rodar a auditoria.' }
+    }
+    return { error: 'Âncora insuficiente — taxa de ancoragem abaixo de 95% nas seções clínicas. Edite e re-salve antes de entregar.' }
+  }
   const allHits = []
   for (const [key, value] of Object.entries(delivered)) {
     if (typeof value !== 'string') continue
