@@ -122,13 +122,16 @@ def _hough_circle_fallback(image: np.ndarray) -> dict:
     # for Hough — preserves the iris/sclera boundary).
     blurred = cv2.medianBlur(gray, 5)
 
-    # Hough params tuned for close-up iris photos (running on the SMALL image):
-    #   dp=1.5: accumulator resolution ratio (>=1 = lower res = faster)
-    #   minDist: only one iris expected → set to half image width
-    #   minRadius: íris ocupa pelo menos ~8% da menor dimensão
-    #   maxRadius: íris pode ocupar até ~60% (close handheld extreme)
-    #   param1: Canny upper threshold
-    #   param2: accumulator threshold (lower = mais permissivo)
+    # Hough params tuned for IRIS specifically (not the whole eyeball/face contour):
+    #   - Real iris in a close-up smartphone photo is typically 12-30% of the
+    #     smaller dimension's RADIUS (= 24-60% of frame width). Anything larger
+    #     is almost always the eyeball outline, eye socket, or face contour.
+    #   - Previous (8-60%) range made Hough's "highest accumulator wins" pick
+    #     the larger contours instead of the iris (their edges are stronger).
+    #   - dp=1.5: accumulator resolution ratio (>=1 = lower res = faster)
+    #   - minDist: only one iris expected → set to half image width
+    #   - param1: Canny upper threshold
+    #   - param2: accumulator threshold (lower = mais permissivo)
     circles = cv2.HoughCircles(
         blurred,
         cv2.HOUGH_GRADIENT,
@@ -136,16 +139,24 @@ def _hough_circle_fallback(image: np.ndarray) -> dict:
         minDist=small_min_dim // 2,
         param1=80,
         param2=30,
-        minRadius=int(small_min_dim * 0.08),
-        maxRadius=int(small_min_dim * 0.60),
+        minRadius=int(small_min_dim * 0.12),
+        maxRadius=int(small_min_dim * 0.30),
     )
 
     if circles is None or len(circles) == 0:
         raise ValueError("hough_no_circle_detected")
 
-    # circles shape: (1, N, 3) where each row is (x, y, r). Pick the strongest
-    # (first one — Hough returns sorted by accumulator score).
-    cx_small, cy_small, r_small = circles[0][0]
+    # Pick the circle CLOSEST to the image center (most likely iris in a
+    # well-framed close-up). Hough's default ordering by accumulator score
+    # picks whatever has the strongest edge — for iris photos that can be
+    # the sclera-eyelid border, not the iris-sclera border. Distance-to-
+    # center is a better proxy for "this is the subject."
+    img_cx, img_cy = sw / 2.0, sh / 2.0
+    best = min(
+        circles[0],
+        key=lambda c: (c[0] - img_cx) ** 2 + (c[1] - img_cy) ** 2,
+    )
+    cx_small, cy_small, r_small = best
 
     # Scale coordinates back to original image space (segment.py expects the
     # input image at full resolution; coords must match).
