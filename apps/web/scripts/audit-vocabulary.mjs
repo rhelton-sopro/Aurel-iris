@@ -21,6 +21,16 @@ const EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'])
 const DIRS = ['app', 'components', 'lib/rag', 'lib/anthropic']
 
 /**
+ * Marker que reconhece um arquivo inteiro como allowlisted.
+ * Mesmo padrão do prompts/system.md (07-02 D-A4 forward-compat); adotado em
+ * lib/anthropic/types.ts a partir de 07-03 para acomodar ENCERRAMENTO_LITERAL
+ * (cópia byte-exact de SPEC §6 — copy obrigatória da LGPD que NEGA status
+ * diagnóstico). O marker é file-level: presente uma vez no topo, all hits no
+ * arquivo são ignorados. Justificativa deve aparecer no comment ao lado.
+ */
+const ALLOWLIST_MARKER = 'audit-vocabulary:allowlist'
+
+/**
  * Recursively collect all files from a directory.
  * @param {string} dir
  * @returns {string[]}
@@ -52,6 +62,9 @@ for (const dir of DIRS) {
   const files = collectFiles(absDir)
   for (const file of files) {
     const content = readFileSync(file, 'utf8')
+    // File-level allowlist: pula o arquivo inteiro se contém o marker
+    // (ex: lib/anthropic/types.ts onde mora ENCERRAMENTO_LITERAL = SPEC §6 literal).
+    if (content.includes(ALLOWLIST_MARKER)) continue
     const lines = content.split('\n')
     for (let i = 0; i < lines.length; i++) {
       if (PATTERN.test(lines[i])) {

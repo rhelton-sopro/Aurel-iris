@@ -1,0 +1,80 @@
+/**
+ * Prompt loader + mustache substitution for Phase 7 LLM analysis.
+ *
+ * Files: `apps/web/prompts/system.md` + `apps/web/prompts/feature-injection.md`.
+ * Ambos são cópias LITERAIS de SPEC.md §6 (D-PR1 frozen contract — sem rewrite).
+ *
+ * Vercel deploy: `next.config.ts` `outputFileTracingIncludes` traceia
+ * `prompts/**\/*` para o bundle do route analyze (Pitfall 9 RESEARCH). Sem
+ * essa config, prod 500s com ENOENT no primeiro request.
+ *
+ * Token count: `loadSystemPrompt()` avisa no module init se system.md estimar
+ * < 2200 tokens (Sonnet 4.6 cache_control threshold 2048 + margem). Abaixo do
+ * threshold, cache_control fica silently disabled e o custo sobe ~10x. O
+ * estimador char/4 é heurística — integration smoke confirma com
+ * `client.messages.countTokens` no caminho real.
+ *
+ * Phase 7 | Plan 07-03 | Decisions: D-PR1, RESEARCH Pitfall 4 + Pitfall 9
+ */
+import 'server-only'
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
+
+let _systemCache: string | null = null
+let _injectionCache: string | null = null
+
+const PROMPTS_DIR = path.join(process.cwd(), 'prompts')
+
+/**
+ * Threshold para emitir warn quando system.md estiver curto demais para que
+ * o cache_control do Anthropic seja ativado (Sonnet 4.6 = 2048 tokens; usamos
+ * 2200 como margem de segurança contra estimativas char/4 imprecisas).
+ */
+const CACHE_CONTROL_TOKEN_MARGIN = 2200
+const CHARS_PER_TOKEN_ESTIMATE = 4
+
+export function loadSystemPrompt(): string {
+  if (_systemCache !== null) return _systemCache
+  const filepath = path.join(PROMPTS_DIR, 'system.md')
+  _systemCache = readFileSync(filepath, 'utf8')
+  // Pitfall 4 — token-count check no first load.
+  // Aproximação: 1 token ≈ 4 chars para pt-BR + estrutura markdown.
+  // Para precisão Anthropic, rodar client.messages.countTokens em deploy-smoke.
+  const estimatedTokens = Math.ceil(_systemCache.length / CHARS_PER_TOKEN_ESTIMATE)
+  if (estimatedTokens < CACHE_CONTROL_TOKEN_MARGIN) {
+    console.warn(
+      `[lib/anthropic/prompts] system.md ~${estimatedTokens} tokens estimados, ` +
+        `abaixo da margem ${CACHE_CONTROL_TOKEN_MARGIN} (Sonnet 4.6 cache_control ` +
+        `threshold = 2048). Prompt caching pode estar silently disabled — custo ~10x. ` +
+        `Pitfall 4 RESEARCH.`,
+    )
+  }
+  return _systemCache
+}
+
+export function loadInjectionTemplate(): string {
+  if (_injectionCache !== null) return _injectionCache
+  const filepath = path.join(PROMPTS_DIR, 'feature-injection.md')
+  _injectionCache = readFileSync(filepath, 'utf8')
+  return _injectionCache
+}
+
+/**
+ * Mustache-style substitution: `{{name}}` → vars[name] || ''.
+ * Chaves ausentes substituem para empty string (não literal `{{name}}`) para
+ * placeholders unrendered não vazarem para o LLM como instruções.
+ *
+ * Regex restritivo `[\w_]+` (alfanumérico/underscore apenas) — defesa contra
+ * T-7-INJECTION (prompt injection via template). Valores das vars vêm de
+ * server-controlled state (vision_features JSON server-validated, RAG chunks
+ * da base de conhecimento Fase 6), nunca user input direto.
+ */
+export function renderInjection(template: string, vars: Record<string, string>): string {
+  return template.replace(/\{\{([\w_]+)\}\}/g, (_, key) => vars[key] ?? '')
+}
+
+/** Reset module cache — TEST ONLY. Production callers MUST NOT call this. */
+export function _resetPromptsCache(): void {
+  _systemCache = null
+  _injectionCache = null
+}
