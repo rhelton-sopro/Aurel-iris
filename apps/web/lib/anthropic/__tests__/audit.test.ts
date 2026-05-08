@@ -1,11 +1,20 @@
+// audit-vocabulary:allowlist — este teste valida em runtime que `audit.ts`
+// rejeita compostos pt-BR contendo termo proibido como substring (e.g.,
+// "naturocultura", "curadoria") via word-boundary regex. Mencionar tais
+// compostos por nome em it() descriptions é parte do contrato de teste —
+// pessoa lendo o test source DEVE ver as palavras testadas. Os 3 termos
+// restritos LGPD-06 também aparecem em comentários explicativos dos casos
+// regex (caps "TRATAMENTO", literal "cura," com pontuação) — necessário
+// para que humanos auditem o que o teste afirma. Marker file-level honrado
+// por apps/web/scripts/audit-vocabulary.mjs (mesmo pattern que types.ts em
+// 07-03 e prompts/system.md em 07-02).
+//
 // Phase 7 | Plan 07-05 — audit.ts tests (RED→GREEN cycle).
 //
-// Forbidden vocab terms are NEVER inlined as literals in this source — fixtures
-// build them via array-join. Even though `audit-vocabulary.mjs` skips test
-// files (extension match is .ts but the script does scan __tests__/), this
-// pattern keeps the test source defensively clean and mirrors the same
-// indirect-concat technique used in audit.ts itself (Pitfall 7 + W6 parity +
-// audit-vocabulary self-match avoidance).
+// Forbidden vocab terms são montados via array-join (TERM_DIAG/TERM_TRAT/
+// TERM_CURA) para que as fixtures runtime carreguem as strings via concat,
+// não via literal — defesa em profundidade alinhada ao audit.ts source
+// (Pitfall 7 + W6 parity).
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
