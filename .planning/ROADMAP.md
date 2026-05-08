@@ -225,7 +225,7 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
 - **Wave 3** *(orchestrator)*:
   - [x] 07-07-PLAN.md — lib/anthropic/analyze.ts (carrega prompts + retrieveRelevantKnowledge frozen Fase 6 D-PR2 + Anthropic stream + cost telemetry D-T1) + section-queries.test.ts D-PR2 CI gate
 - **Wave 4** *(transport)*:
-  - [ ] 07-08-PLAN.md — app/api/readings/[id]/analyze/route.ts (POST streaming Web Streams API + 5 auth gates a-e T-7-AUTH/T-7-COST + section-boundary persistence D-S2 + ENCERRAMENTO_LITERAL append server-side D-P3 + audit + regeneration_log; webhook comment refresh)
+  - [x] 07-08-PLAN.md — app/api/readings/[id]/analyze/route.ts (POST streaming Web Streams API + 5 auth gates a-e T-7-AUTH/T-7-COST + section-boundary persistence D-S2 + ENCERRAMENTO_LITERAL append server-side D-P3 + audit + regeneration_log; webhook comment refresh)
 - **Wave 5** *(UI surfaces — paralelos)*:
   - [ ] 07-09-PLAN.md — Surface 1 (UI-SPEC §Surface 1): /leituras/[id]/page.tsx RSC + analise-client.tsx streaming consumer + AnalysisCTA/AnalysisStream/AnalysisHero components + StatusBadge ephemeral 'Gerando…' variant
   - [ ] 07-10-PLAN.md — Surface 2 (UI-SPEC §Surface 2): /leituras/[id]/editar/page.tsx RSC + editar-client.tsx + Server Actions saveReportDelivered (D-A2 BLOCK) + markReadingDelivered (defesa profunda) + EditorAccordion 13 + EditorSectionItem react-markdown preview + EditorAuditBanner + DeliverDialog
