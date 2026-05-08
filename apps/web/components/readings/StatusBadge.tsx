@@ -15,6 +15,8 @@
  * shadcn are imported as client components but render safely from
  * server component context.
  */
+import { Loader2 } from 'lucide-react'
+
 import { Badge } from '@/components/ui/badge'
 import {
   Tooltip,
@@ -49,13 +51,26 @@ export interface StatusBadgeProps {
   status: ReadingStatus
   isRascunho?: boolean
   errorSummary?: string | null
+  /** Ephemeral 'gerando…' state — client-side only, NOT a persisted enum value (D-P4 + UI-SPEC line 308) */
+  streaming?: boolean
 }
 
 export function StatusBadge({
   status,
   isRascunho = false,
   errorSummary,
+  streaming = false,
 }: StatusBadgeProps) {
+  // Streaming variant short-circuit (client-side ephemeral)
+  if (streaming) {
+    return (
+      <Badge variant="secondary" data-status="streaming" className="gap-1">
+        <Loader2 className="h-3 w-3 animate-spin" aria-hidden />
+        Gerando…
+      </Badge>
+    )
+  }
+
   const { label, variant } = isRascunho
     ? RASCUNHO_COPY
     : STATUS_COPY[status] ?? STATUS_COPY.pending
