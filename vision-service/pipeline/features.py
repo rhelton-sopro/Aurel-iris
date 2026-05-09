@@ -77,7 +77,22 @@ def classify_iris_color(
     """
     # Convert RGB -> LAB
     lab = cv2.cvtColor(masked_image, cv2.COLOR_RGB2LAB)
-    pixels = lab.reshape(-1, 3).astype(np.float32)
+
+    # Filter out mask-zeroed pixels before clustering. `segment.iris_mask`
+    # produces an image where everything outside the iris circle is pure
+    # black (cv2.bitwise_and). In a typical 4K capture the iris occupies
+    # ~2% of the frame, so without this filter the largest k-means cluster
+    # is the mask-black pixels and primary classification collapses to
+    # whichever centroid is closest to LAB (0,128,128) — historically
+    # 'castanho'. Bug surfaced 2026-05-09 dogfooding (green iris classified
+    # as castanho/hematogenea). Real iris pixels never have R=G=B=0.
+    rgb_pixels = masked_image.reshape(-1, 3)
+    iris_pixels_mask = rgb_pixels.sum(axis=1) > 0
+    pixels = lab.reshape(-1, 3).astype(np.float32)[iris_pixels_mask]
+
+    # Edge case: input fully masked (no iris pixels). Return safe default.
+    if pixels.shape[0] < KMEANS_K:
+        return {"primary": "misto", "secondary": None, "central_heterochromia": False}
 
     # Run k-means
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 100, 0.2)
