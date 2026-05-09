@@ -1,6 +1,6 @@
 ---
 created: 2026-05-09
-updated: 2026-05-09 (sessão tarde — ground truth correction + 5 novos itens + reordering por waves)
+updated: 2026-05-09 (sessão noite — Modal B1a verified active; B1b moved into Wave B; B1d added)
 title: Dogfooding iteration 1 — fixes pós-leitura real (08/05/2026)
 area: cross-phase (vision + llm + audit + UX)
 files:
@@ -41,9 +41,13 @@ related_commits:
 ## Status executivo
 
 ### ✅ Resolvido nesta iteração
-- **B1a — mask filter no k-means** (commit `889cc94`). Antes: toda íris classificava como castanho/hematogenea porque cluster maior do k-means era pixels de mask preto. Depois: pixels mask filtrados via `rgb_pixels.sum(axis=1) > 0`. Verificado via 8 testes em `vision-service/tests/test_color_classifier_diagnostic.py` (4 cores sintéticas + Nailli regression guard explícito + 2 probes de matemática + 1 baseline). **Pendente: Modal redeploy + reprocess da Nailli/Rhelton para validar in-vivo.**
+- **B1a — mask filter no k-means** (commit `889cc94`, **Modal-verified 2026-05-09 noite**). Antes: toda íris classificava como castanho/hematogenea porque cluster maior do k-means era pixels de mask preto. Depois: pixels mask filtrados via `rgb_pixels.sum(axis=1) > 0`. Verificado in-vivo em Modal via print canário diagnóstico (3 reprocessos da leitura `71a7bf1d-...`): canário disparou confirmando mask filter ativo (174452/7151808 pixels OD; 65478/7151808 pixels OE — ratio 2.44%/0.92% coerente com íris ocupando ~1-3% de frame 4K). Detalhes em `.planning/CHECKPOINT-2026-05-09-B1a-modal-verification.md`.
 - **C1 — ANCHOR_RE relaxado** (commit `1e58a88`). Aceita capital "Ancorado", backticks em volta do path, prefixo `features.` opcional.
 - **C2 — extractForbiddenHits skip LGPD-aware** (commit `1e58a88`). "não um diagnóstico" / "não substitui tratamento" / "não é diagnóstico" / etc passam com 0 hits via `NEG_CONTEXT_RE` + lookback de 30 chars. Skip propaga ao save-action defense-in-depth.
+
+### 🔍 Descoberto nesta iteração (sessão noite)
+- **B1d — bug estrutural: pupila + sombras de pálpebra contaminam k-means de cor.** Após Modal redeploy de B1a, `iris_color.primary` continuou retornando `castanho` para a íris verde-acinzentada do Rhelton. LAB centers medidos via canário: OD (66, 131, 135), OE (86, 134, 134) — L baixo + a/b quase neutros = padrão de **mistura preto + cor real** (não cor real). Causa raiz: `segment.iris_mask` aplica `cv2.bitwise_and` baseado no círculo externo da íris, mas pupila (círculo interno) e sombras de pálpebra superior/inferior ficam DENTRO desse círculo e sobrevivem. B1a filtra apenas R=G=B=0 exato — pixels da pupila têm valores baixos mas NÃO exatamente zero (compressão JPEG + ruído de sensor), passam o filtro, contaminam o cluster center. **Fix:** mascarar pupila + zona pupilar antes do `classify_iris_color`. Adicionado como B1d em Wave B (junto com P0a + P0b + B1b).
+- **B1b sai da fila imediata.** Calibrar centroides pra enum velho (3 categorias: azul/castanho/verde-mosaico) é trabalho descartável quando Wave B vai (a) expandir o enum via P0a, (b) corrigir input do k-means via B1d. Sequência correta: B1d (input limpo) → P0a/P0b (enum + sectoral) → B1b (calibrar centroides usando enum novo + input limpo via fixtures reais). Tudo bundled em PLAN 07.1-02.
 
 ### 🟡 Em ordem de execução (Waves)
 Detalhe por item nas seções abaixo. Decisões de ordenação registradas em "Decisões registradas".
@@ -51,11 +55,11 @@ Detalhe por item nas seções abaixo. Decisões de ordenação registradas em "D
 | Wave | Itens | Custo aprox | Bloqueia |
 |---|---|---|---|
 | **A** | P0c + A2 + A3 (prompt-only) | ~1hr total, prompt edits | nada |
-| **B** | P0a + P0b bundled (vision schema) | 3-5hrs, schema + Pydantic + TS regen + Modal redeploy | B1b, P1a, B1c |
-| **C** | B1b (recalibrar centroides com fixtures reais) | 1-2hrs após coletar fixtures | P1a |
+| **B** (PLAN 07.1-02) | P0a + P0b + **B1d** + B1b bundled (vision schema + pupil mask + sectoral pigment + centroid recalibration) | 5-7hrs, schema + Pydantic + TS regen + Modal redeploy + reprocess único | P1a, B1c |
+| ~~**C**~~ | ~~B1b standalone~~ — **MOVED to Wave B** | — | — |
 | **D** | P1a (distribuição %) + B1c (threshold lacuna por constituição) | 2-4hrs | nada |
 | **E** | P1b (com attestation checkbox; face-detection é gold-plating) | ~30min checkbox / +6-10hrs auto | nada |
-| **independente** | A1 (16 seções) | grande, paraleliza com B/C/D | nada |
+| **independente** | A1 (16 seções) | grande, paraleliza com B/D | nada |
 | **backlog P3** | B3, B5 | médio prazo | nada |
 | **backlog P4** | B6, B4 | longo prazo / Fase 10+11 | nada |
 
@@ -164,11 +168,45 @@ Detalhe por item nas seções abaixo. Decisões de ordenação registradas em "D
       pigmento amarelo-âmbar bilateralmente. Lista `sectoral_pigments` não-vazia
       em ambos os olhos. Setor exato é validado pelo Rhelton via UAT.
 
----
+### [ ] B1d. Mascarar pupila + zona pupilar antes do classify_iris_color (NOVO — descoberto 2026-05-09 noite)
+- [ ] **Causa raiz documentada em `.planning/CHECKPOINT-2026-05-09-B1a-modal-verification.md`.**
+      Após Modal redeploy do B1a, LAB centers medidos no Rhelton via canário:
+      OD (66, 131, 135), OE (86, 134, 134) — L baixo + a/b quase neutros =
+      pixels da pupila (preta-near-zero) + sombras de pálpebra contaminando
+      o cluster center. B1a só filtra pixels exatamente R=G=B=0; pixels da
+      pupila têm valores baixos mas não exatamente zero (compressão JPEG +
+      ruído de sensor) e passam o filtro.
+- [ ] Implementar mask explícito da pupila em `vision-service/pipeline/features.py`
+      `classify_iris_color`. Caminhos possíveis (decidir no PLAN):
+  - **Opção A (preferida):** consumir pupil_circle de `detect.find_iris` se já
+        está disponível no payload (verificar) e mascarar via `cv2.circle` antes
+        do reshape pra LAB.
+  - **Opção B:** estimar pupila via heurística (centro do iris_circle + raio
+        ~30-40% do raio externo). Menos preciso mas funciona sem mudar contrato
+        do detect.
+  - **Opção C:** filtrar via threshold LAB (rejeitar pixels com L < 30) —
+        rápido mas frágil; íris muito escuras podem perder pixels válidos.
+- [ ] Mascarar **bandas superior/inferior** (zonas tipicamente cobertas por
+      pálpebra). Heurística simples: cortar 15% superior + 10% inferior do
+      círculo da íris. Decisão no PLAN se usa essa heurística OU se confia em
+      eyelid mask explícito do MediaPipe (não disponível hoje porque MediaPipe
+      sempre falha em close-ups — ver "MediaPipe-on-close-ups" abaixo).
+- [ ] Validar via re-run do canário diagnóstico em fixtures reais:
+      pós-B1d, LAB centers devem mover-se de "preto + cor" pra "cor pura".
+      Para Rhelton (verde-acinzentada), esperar L >= 110, a < 130 (greenish),
+      b ~ 140-150 (yellow tinge).
+- [ ] Acceptance: cluster center LAB do Rhelton pós-B1d distancia mais perto de
+      `verde-mosaico` (140, 110, 145) que de `castanho` (90, 145, 160), OU
+      novos centroides recalibrados (B1b) classificam corretamente.
 
-## Wave C — Calibração com fixtures reais
-
-### [ ] B1b. Recalibrar IRIS_COLOR_LAB_CENTROIDS
+### [ ] B1b. Recalibrar IRIS_COLOR_LAB_CENTROIDS (depois de B1d + P0a)
+- [ ] **Por que B1b precisa vir depois de B1d:** calibrar centroides usando LAB
+      contaminado por pupila/sombra mede o ARTEFATO, não a cor real. Centroides
+      calibrados contra contamination ficam inúteis quando a contamination for
+      removida.
+- [ ] **Por que B1b precisa vir depois de P0a:** o enum velho (3 categorias) não
+      contempla mista_biliar/mista_hematogenea/biliar. Calibrar contra enum
+      velho é trabalho descartável quando P0a expande o vocabulário.
 - [ ] Hoje em `vision-service/pipeline/features.py:51-58`:
   ```python
   IRIS_COLOR_LAB_CENTROIDS = {
@@ -177,25 +215,21 @@ Detalhe por item nas seções abaixo. Decisões de ordenação registradas em "D
       "verde-mosaico": (140, 110, 145),
   }
   ```
-- [ ] Centroides nunca foram calibrados contra fotos reais. Mesmo após B1a,
-      íris azul real (LAB ~111, 140, 81) classifica como verde-mosaico
-      porque o "azul" centroide está a 113 unidades vs 76 de verde-mosaico.
-- [ ] Coletar **fixtures reais**:
-  - [ ] Rhelton (mista biliar, conhecido) — já temos as 6 fotos da Nailli
-  - [ ] 1-2 íris azul/cinza claras
-  - [ ] 1-2 íris castanha pura
-  - [ ] 1 íris verde clássica (verde-mosaico)
-- [ ] Para cada, rodar pipeline até `composite_image["segmented_image"]` +
-      mask filter (B1a) + extrair LAB médio do cluster maior pós-filter.
-- [ ] Definir novos centroides como média dos LABs medidos por categoria.
-- [ ] **Decisão pendente:** se Wave B (P0a) introduzir nova categoria
-      `pigment_amarelo` como cor primary OU se pigmento fica só em
-      `sectoral_pigments`. Provavelmente não primary — pigment fica como
-      sectoral_pigments só (P0b). Validar no PLAN.
+  Vai virar Record com 5-6 categorias do enum expandido (P0a).
+- [ ] Coletar **fixtures reais** (mesmas usadas pra validar B1d + P0a/P0b):
+  - [ ] Rhelton (mista biliar com pigmento amarelo-âmbar setorial — ground truth)
+  - [ ] 1-2 íris azul/cinza claras (linfática)
+  - [ ] 1-2 íris castanha pura (hematogenea)
+  - [ ] 1 íris verde clássica (mista biliar sem pigmento dominante)
+- [ ] Para cada, rodar pipeline pós-B1d + extrair LAB médio do cluster maior
+      pós-mask explícito de pupila/pálpebra.
+- [ ] Definir novos centroides como média dos LABs medidos por categoria do
+      enum expandido.
 - [ ] Atualizar testes em `test_color_classifier_diagnostic.py` para usar
-      LABs reais em vez de RGB sintéticos.
+      LABs reais em vez de RGB sintéticos. Manter Nailli/Rhelton como
+      regression guard explícito.
 - [ ] Acceptance: as 4-6 fixtures reais classificam corretamente como
-      sua categoria conhecida.
+      sua categoria conhecida (Rhelton → mista_biliar).
 
 ---
 
@@ -339,7 +373,7 @@ Detalhe por item nas seções abaixo. Decisões de ordenação registradas em "D
 
 ## Validação — critérios da próxima rodada de dogfooding
 
-Após implementar **Wave A** (P0c + A2 + A3) e Wave B (P0a + P0b bundled):
+Após implementar **Wave A** (P0c + A2 + A3) e Wave B (P0a + P0b + B1d + B1b bundled):
 
 1. [ ] Reprocessar fotos do Rhelton (ground truth)
 2. [ ] Validar:
@@ -353,7 +387,7 @@ Após implementar **Wave A** (P0c + A2 + A3) e Wave B (P0a + P0b bundled):
    - Voz dupla bem separada (post-A2)
    - Zero duplicação de encerramento (post-A3)
 
-Após Wave C (B1b) + Wave D (P1a + B1c):
+Após Wave D (P1a + B1c) — Wave C foi absorvida pela Wave B:
 
 3. [ ] Reprocess do Rhelton + 2-3 outras íris conhecidas
 4. [ ] Validar:
@@ -373,6 +407,10 @@ Após Wave C (B1b) + Wave D (P1a + B1c):
 | **P1b com attestation checkbox como path principal** | 2026-05-09 | Face detection automática exige adicionar step "selfie" ao capture flow (rostos não estão na frame das capturas atuais de íris). Custo desproporcional vs ganho. Attestation checkbox resolve funcionalmente em ~30min. Auto detection fica gold-plating opcional para Fase 9. |
 | **A1 paraleliza com Waves B/C/D** | 2026-05-09 | A1 (16 seções) toca apps/web (LLM/parser/UI). Vision waves B/C tocam vision-service. Sem coupling de schema. Pode rodar em árvore separada. Não é prioridade absoluta — entra como "quando Wave B liberar bandwidth". |
 | **C1 + C2 já entregues** | 2026-05-09 | Polish independente, fechou nesta sessão. Commits `1e58a88` + `8db8ead` (PLAN). |
+| **B1b movido pra Wave B (era Wave C standalone)** | 2026-05-09 (noite) | Calibrar centroides pra enum velho (3 categorias) é descartável quando P0a expande pra 5-6 categorias. Sequência correta: B1d (input limpo) → P0a (enum) → B1b (calibrar contra enum novo + input limpo). Bundled em PLAN 07.1-02. |
+| **B1d adicionado (mascarar pupila + sombras)** | 2026-05-09 (noite) | Descoberto via canário diagnóstico em Modal — LAB centers da Rhelton revelam contamination de pupila + pálpebra (L=66-86 + a/b neutros = mistura preto+cor). B1a só filtra R=G=B=0 exato, não pega pixels da pupila com valores baixos. Resolve via mask explícito de pupila + crop superior/inferior antes do reshape pra LAB. Sub-task de Wave B. |
+| **MediaPipe-on-close-ups: aceito como overhead** | 2026-05-09 (noite) | Logs Modal mostram `mediapipe_no_face` em 100% dos calls (esperado — não há rosto na frame de close-up). Hough fallback funciona. Skipar MediaPipe num modo `iris_close_up` é nice-to-have, não bloqueia. Anotado mas não atacar agora. |
+| **Asimetria OD vs OE 2.66× pixels segmentados: investigar pós-B1d** | 2026-05-09 (noite) | Hough r=691 vs r=581 explica 1.42× da diferença; o extra 1.87× vem de `segment.py` (eyelid masking diferente?). Provavelmente evapora quando B1d aplicar mask explícito de pálpebra. Reavaliar pós-Wave B. |
 
 ---
 
