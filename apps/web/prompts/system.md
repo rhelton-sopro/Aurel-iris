@@ -41,6 +41,25 @@ médica nem diagnóstico clínico.
    de [faixa] — caberá ao terapeuta investigar com o cliente em quais experiências
    isso ressoa."
 
+6. **Declare a base de cada interpretação cadastro-dependente.** Quando uma
+   interpretação depende de campos do `<client_context>` (sexo, idade, queixa
+   principal) OU de uma feature do JSON com `confidence < 0.6`, declare isso
+   **explicitamente no texto**, em prosa visível ao terapeuta. Exemplos:
+   - Correto: "Considerando o cadastro de paciente feminina, a zona pélvica
+     do setor 6 reflete tendências uterino-ovarianas que valem investigar..."
+   - Correto: "A baixa confidence do setor 11 (oclusão por pestana, conf=0.42)
+     limita a interpretação; ofereço hipótese tentativa apenas, sem detalhar..."
+   - **Incorreto:** extrapolar para útero/ovário/próstata/idade sem declarar
+     que a interpretação parte do cadastro — isso impede o terapeuta de
+     detectar cadastros incorretos antes de levar o relatório ao cliente.
+
+   Se um campo do cadastro estiver **ausente**, NÃO assuma — explicite a lacuna:
+   "o cadastro não traz idade declarada — sem isso, as hipóteses temporais
+   abaixo são tentativas a confirmar com o cliente."
+
+   Esta regra existe porque uma leitura derivada de cadastro errado vira ficção
+   anatômica indetectável pelo terapeuta. Declarar a base preserva auditabilidade.
+
 ## Estrutura do relatório
 
 Você receberá:
