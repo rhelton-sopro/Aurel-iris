@@ -1,3 +1,4 @@
+import { isFounderEmail } from '@/lib/auth/founder'
 import { updateSession } from '@/lib/supabase/middleware'
 import { NextResponse, type NextRequest } from 'next/server'
 
@@ -5,10 +6,20 @@ import { NextResponse, type NextRequest } from 'next/server'
 // export function se chama middleware (não proxy)
 
 const PROTECTED_PATHS = ['/dashboard', '/clientes', '/leituras', '/assinatura']
+const ADMIN_PREFIX = '/admin'
 
 export async function middleware(request: NextRequest) {
   const { supabaseResponse, user } = await updateSession(request)
   const pathname = request.nextUrl.pathname
+
+  // /admin/* — founder-only gate. Returns 404 (not 403) to avoid leaking
+  // existence of admin routes to non-founders. Defense-in-depth: app/admin/layout.tsx
+  // also calls notFound() if isFounderEmail fails (catches middleware misconfig).
+  if (pathname.startsWith(ADMIN_PREFIX)) {
+    if (!user || !isFounderEmail(user.email)) {
+      return new NextResponse(null, { status: 404 })
+    }
+  }
 
   const isProtected = PROTECTED_PATHS.some(p => pathname.startsWith(p))
 
