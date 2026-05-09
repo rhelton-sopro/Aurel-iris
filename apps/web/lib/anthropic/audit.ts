@@ -28,17 +28,31 @@ import {
   SECTIONS_REQUIRING_ANCHORS,
 } from './types'
 
-// Anchor marker — relaxed 2026-05-09 to accept Sonnet 4.6 output variations
-// surfaced during dogfooding (Nailli reading): `[Ancorado em: \`feature.path\`]`
-// (capital A, backtick-wrapped path, optional `features.` prefix). Original
-// strict form was `/\[ancorado em: features\.[\w.\[\]]+\]/g` which caused
-// anchor_rate_pct=0 in well-anchored reports.
+// Anchor marker — accepts TWO forms Sonnet 4.6 emits in production:
+//
+// 1. FORMAL: `[ancorado em: features.X.Y]` or `[Ancorado em: \`feature.path\`]`.
+//    First broadening (1e58a88, 2026-05-09 morning) handled the C1 dogfooding
+//    case (capital A + backtick-wrapped path + optional `features.` prefix).
+//
+// 2. COMPACT: `[\`feature.path\`]` or `[\`x\`, \`y\`]` or `[\`rings\` — descrição]`.
+//    Second broadening (this commit, 2026-05-09 night) handles the Wave A v2
+//    dogfooding case where Sonnet drifted from the verbose "ancorado em:"
+//    preamble to a compact backticked-path notation across §2-7. Without this,
+//    anchor_rate_pct=0 in reports that ARE well-anchored (just in compact form).
+//
+// Detection heuristic for compact form: a `[...]` block containing at least
+// one backticked identifier with feature-path shape (`identifier` or
+// `identifier.sub` or `identifier.sub[N].sub`). This avoids false positives
+// on `[Markdown link](url)` (no backticks) and `[outro conteúdo]` (no backticks).
+// Trade-off: rare inline-code references like `[\`bash\`]` would false-positive,
+// but iridological prose is unlikely to contain stray inline-code brackets.
+//
+// Flags:
 //   - `i` flag: case-insensitive ('Ancorado', 'ANCORADO', 'ancorado')
 //   - `u` flag: Unicode-correct (matches SENTENCE_SPLIT_RE flag set)
 //   - `g` flag: global (multi-occurrence per sentence)
-//   - `[^\]]+` body: anything inside the brackets except `]` itself
-//                    (handles backticks, dot-paths, array subscripts).
-const ANCHOR_RE = /\[\s*ancorado em\s*:[^\]]+\]/giu
+const ANCHOR_RE =
+  /(?:\[\s*ancorado em\s*:[^\]]+\])|(?:\[[^\]]*`[a-z_]\w*(?:\.[a-z_]\w*|\[\d+\])*`[^\]]*\])/giu
 
 // Forbidden vocab terms — assembled via concat from character arrays so
 // the literal substrings never appear in this source file. See banner above

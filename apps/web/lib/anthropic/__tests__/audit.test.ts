@@ -97,6 +97,71 @@ describe('lib/anthropic/audit — anchor rate (D-A1)', () => {
     expect(result.anchor_rate_pct).toBe(0)
   })
 
+  // C1.b — compact form (no "ancorado em:" preamble). Surfaced 2026-05-09 night
+  // when Sonnet drifted from verbose to compact across §2-7 in Wave A v2 regen.
+  it('C1.b: aceita formato compacto sem preâmbulo — [`left_eye.collarette`]', () => {
+    const report: ReportJsonb = {
+      '2_estrutural_fisica':
+        'Colarete regular em ambos os olhos [`left_eye.collarette`, `right_eye.collarette`]. Pupila circular [`left_eye.pupil`, `right_eye.pupil`].',
+      '3_indicacoes_sistemicas': 'Sistema X [`left_eye.fiber_density.score`].',
+      '4_toxemia': 'Carga [`rings`].',
+      '5_psicoemocional': 'Padrão [`left_eye.sectors[8].findings`].',
+      '6_cargas_temporais': 'Hipótese [`right_eye.sectors[4].findings`].',
+    }
+    const result = runAudit(report)
+    expect(result.anchor_rate_pct).toBe(100)
+  })
+
+  it('C1.b: aceita compacto com array index — [`left_eye.sectors[3].findings`]', () => {
+    const report: ReportJsonb = {
+      '2_estrutural_fisica':
+        'Lacuna no setor 4 [`left_eye.sectors[3].findings` — 2 lacunas grau 1].',
+      '3_indicacoes_sistemicas': '[`left_eye.sectors[7].findings`].',
+      '4_toxemia': '[`right_eye.rings.linfatico`].',
+      '5_psicoemocional': '[`left_eye.sectors[8].findings`].',
+      '6_cargas_temporais': '[`right_eye.sectors[5].findings`].',
+    }
+    const result = runAudit(report)
+    expect(result.anchor_rate_pct).toBe(100)
+  })
+
+  it('C1.b: aceita identifier simples sem ponto — [`rings`]', () => {
+    const report: ReportJsonb = {
+      '2_estrutural_fisica': 'Anéis ausentes [`rings` — todos negativos em ambos os olhos].',
+      '3_indicacoes_sistemicas': 'X [`pupil`].',
+      '4_toxemia': 'Y [`rings`].',
+      '5_psicoemocional': 'Z [`constitution`].',
+      '6_cargas_temporais': 'W [`sectors`].',
+    }
+    const result = runAudit(report)
+    expect(result.anchor_rate_pct).toBe(100)
+  })
+
+  it('C1.b: regression — formato verbose continua casando', () => {
+    const report: ReportJsonb = {
+      '2_estrutural_fisica': 'Sinal X [ancorado em: features.X].',
+      '3_indicacoes_sistemicas': 'Y [Ancorado em: `features.Y`].',
+      '4_toxemia': 'Z [ancorado em: features.Z.W].',
+      '5_psicoemocional': 'W [ANCORADO EM: features.A].',
+      '6_cargas_temporais': 'V [ancorado em: features.B[3].C].',
+    }
+    const result = runAudit(report)
+    expect(result.anchor_rate_pct).toBe(100)
+  })
+
+  it('C1.b: regression — colchete sem backtick continua não casando', () => {
+    const report: ReportJsonb = {
+      '2_estrutural_fisica':
+        'Sem ancora. [Markdown link](http://x). [outro conteúdo aleatório]. [não-é-path].',
+      '3_indicacoes_sistemicas': 'Sem ancora.',
+      '4_toxemia': 'Sem ancora.',
+      '5_psicoemocional': 'Sem ancora.',
+      '6_cargas_temporais': 'Sem ancora.',
+    }
+    const result = runAudit(report)
+    expect(result.anchor_rate_pct).toBe(0)
+  })
+
   it('boundary 95% — exactly 95% rate is NOT low (strict <)', () => {
     // 95 ancoradas / 100 sentences in section 2 plus 4 perfect sections.
     // Total: 99/104 ≈ 95.2% — NOT < 95.
