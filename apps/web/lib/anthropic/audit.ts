@@ -28,7 +28,17 @@ import {
   SECTIONS_REQUIRING_ANCHORS,
 } from './types'
 
-const ANCHOR_RE = /\[ancorado em: features\.[\w.\[\]]+\]/g
+// Anchor marker — relaxed 2026-05-09 to accept Sonnet 4.6 output variations
+// surfaced during dogfooding (Nailli reading): `[Ancorado em: \`feature.path\`]`
+// (capital A, backtick-wrapped path, optional `features.` prefix). Original
+// strict form was `/\[ancorado em: features\.[\w.\[\]]+\]/g` which caused
+// anchor_rate_pct=0 in well-anchored reports.
+//   - `i` flag: case-insensitive ('Ancorado', 'ANCORADO', 'ancorado')
+//   - `u` flag: Unicode-correct (matches SENTENCE_SPLIT_RE flag set)
+//   - `g` flag: global (multi-occurrence per sentence)
+//   - `[^\]]+` body: anything inside the brackets except `]` itself
+//                    (handles backticks, dot-paths, array subscripts).
+const ANCHOR_RE = /\[\s*ancorado em\s*:[^\]]+\]/giu
 
 // Forbidden vocab terms — assembled via concat from character arrays so
 // the literal substrings never appear in this source file. See banner above
@@ -43,6 +53,23 @@ const _F3 = ['c', 'u', 'r', 'a'].join('')
  * `u` (Unicode for accented word-boundary correctness).
  */
 export const FORBIDDEN_VOCAB_RE = new RegExp(`\\b(${_F1}|${_F2}|${_F3})\\b`, 'giu')
+
+/**
+ * LGPD-correct negative-construction patterns. When a forbidden term is
+ * preceded by one of these phrases in the same sentence, the usage is
+ * compliant ("não um diagnóstico médico", "não substitui tratamento", etc)
+ * and must NOT be counted as a hit. Added 2026-05-09 after Nailli dogfooding
+ * surfaced false positives on Sonnet's correct LGPD phrasing.
+ *
+ * Anchored at end-of-string (`$`) so we can slice the preceding window of
+ * each match and test whether it ends in a negative construction. The
+ * accent-tolerant `[ãa]` covers stripped-accent variants Sonnet sometimes
+ * emits ("nao é"). 'é' and 'e' both included for the same reason.
+ */
+const NEG_CONTEXT_RE =
+  /n[ãa]o\s+(um|uma|constitui|é|e|substitui|representa|significa)\s*$/iu
+
+const NEG_LOOKBACK_CHARS = 30
 
 const SENTENCE_SPLIT_RE = /[.!?]+(?=\s|$)/u
 const ANCHOR_THRESHOLD_PCT = 95
@@ -66,6 +93,13 @@ export function extractForbiddenHits(text: string, section: string): ForbiddenHi
   const counts = new Map<string, number>()
   let m: RegExpExecArray | null
   while ((m = regex.exec(text)) !== null) {
+    // Skip matches that follow an LGPD-correct negative construction in the
+    // same phrase (e.g., "não um diagnóstico médico", "não substitui
+    // tratamento"). Window of NEG_LOOKBACK_CHARS covers the longest
+    // recognized phrase ("não substitui ") plus comfortable buffer.
+    const lookbackStart = Math.max(0, m.index - NEG_LOOKBACK_CHARS)
+    const preceding = text.slice(lookbackStart, m.index)
+    if (NEG_CONTEXT_RE.test(preceding)) continue
     const term = m[0]!.toLowerCase()
     counts.set(term, (counts.get(term) ?? 0) + 1)
   }

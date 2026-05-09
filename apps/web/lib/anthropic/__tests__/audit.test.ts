@@ -56,6 +56,47 @@ describe('lib/anthropic/audit — anchor rate (D-A1)', () => {
     expect(result.anchor_rate_pct).toBeLessThan(95)
   })
 
+  // C1 — relaxed ANCHOR_RE accepts Sonnet 4.6 output variations
+  // (dogfooding 2026-05-09).
+  it('C1: aceita capital "Ancorado" (case-insensitive)', () => {
+    const report: ReportJsonb = {
+      '2_estrutural_fisica': 'Sinal A [Ancorado em: features.constitution].',
+      '3_indicacoes_sistemicas': 'Indicação X [ANCORADO EM: features.X].',
+      '4_toxemia': 'Carga Y [ancorado em: features.Y].',
+      '5_psicoemocional': 'Padrão Z [ancorado em: features.Z].',
+      '6_cargas_temporais': 'Hipótese W [ancorado em: features.W].',
+    }
+    const result = runAudit(report)
+    expect(result.anchor_rate_pct).toBe(100)
+  })
+
+  it('C1: aceita conteúdo entre crases — `feature.path`', () => {
+    const report: ReportJsonb = {
+      '2_estrutural_fisica':
+        'Sinal A [Ancorado em: `feature.path`]. Sinal B [Ancorado em: `features.sectors[3].findings`].',
+      '3_indicacoes_sistemicas': 'Indicação X [ancorado em: features.X].',
+      '4_toxemia': 'Carga Y [ancorado em: features.Y].',
+      '5_psicoemocional': 'Padrão Z [ancorado em: features.Z].',
+      '6_cargas_temporais': 'Hipótese W [ancorado em: features.W].',
+    }
+    const result = runAudit(report)
+    expect(result.anchor_rate_pct).toBe(100)
+  })
+
+  it('C1: NÃO casa colchetes não-relacionados (markdown links, outros)', () => {
+    const report: ReportJsonb = {
+      '2_estrutural_fisica':
+        'Sinal sem ancora aqui. Veja [este link](http://x). Outro [conteúdo aleatório].',
+      '3_indicacoes_sistemicas': 'Sem ancora.',
+      '4_toxemia': 'Sem ancora.',
+      '5_psicoemocional': 'Sem ancora.',
+      '6_cargas_temporais': 'Sem ancora.',
+    }
+    const result = runAudit(report)
+    // 0 anchored sentences across all sections — overall_pct = 0
+    expect(result.anchor_rate_pct).toBe(0)
+  })
+
   it('boundary 95% — exactly 95% rate is NOT low (strict <)', () => {
     // 95 ancoradas / 100 sentences in section 2 plus 4 perfect sections.
     // Total: 99/104 ≈ 95.2% — NOT < 95.
@@ -161,6 +202,60 @@ describe('lib/anthropic/audit — LGPD forbidden vocab (D-A2 + Pitfall 7 word-bo
     }
     const result = runAudit(report)
     expect(result.forbidden_vocab).toEqual([])
+  })
+
+  // C2 — extractForbiddenHits skips LGPD-correct negative constructions
+  // (dogfooding 2026-05-09).
+  it('C2: "não é diagnóstico" NÃO conta como hit', () => {
+    const text = `Esta leitura não é ${TERM_DIAG} médico, mas um convite à reflexão.`
+    const hits = extractForbiddenHits(text, '13_mensagem_final')
+    expect(hits).toEqual([])
+  })
+
+  it('C2: "não substitui tratamento" NÃO conta como hit', () => {
+    const text = `Esta análise não substitui ${TERM_TRAT} profissional.`
+    const hits = extractForbiddenHits(text, '13_mensagem_final')
+    expect(hits).toEqual([])
+  })
+
+  it('C2: "não um diagnóstico" NÃO conta como hit (Nailli case)', () => {
+    const text = `Não um ${TERM_DIAG}, mas um convite à reflexão.`
+    const hits = extractForbiddenHits(text, '13_mensagem_final')
+    expect(hits).toEqual([])
+  })
+
+  it('C2: "Não constitui diagnóstico" — case-insensitive', () => {
+    const text = `Não constitui ${TERM_DIAG} médico.`
+    const hits = extractForbiddenHits(text, '13_mensagem_final')
+    expect(hits).toEqual([])
+  })
+
+  it('C2: "não significa cura" — feminine + alt verb', () => {
+    const text = `Esta orientação não significa ${TERM_CURA} definitiva.`
+    const hits = extractForbiddenHits(text, '13_mensagem_final')
+    expect(hits).toEqual([])
+  })
+
+  it('C2 regression: uso afirmativo "diagnóstico precoce" CONTINUA disparando', () => {
+    const text = `Esta zona indica ${TERM_DIAG} precoce de carga renal.`
+    const hits = extractForbiddenHits(text, '5_psicoemocional')
+    expect(hits.length).toBe(1)
+    expect(hits[0]!.term).toBe(TERM_DIAG)
+  })
+
+  it('C2 regression: termo standalone sem "não" antes CONTINUA disparando', () => {
+    const text = `Sugere ${TERM_TRAT} adicional.`
+    const hits = extractForbiddenHits(text, '6_cargas_temporais')
+    expect(hits.length).toBe(1)
+    expect(hits[0]!.term).toBe(TERM_TRAT)
+  })
+
+  it('C2 regression: "não" em outra cláusula NÃO mascara hit subsequente', () => {
+    // Sentence-split would normally separate, but extractForbiddenHits is
+    // sentence-blind. The 30-char lookback window ends well before "não vai".
+    const text = `Esta leitura não vai discutir o assunto. Sugere ${TERM_DIAG} clínico em outra avaliação.`
+    const hits = extractForbiddenHits(text, '5_psicoemocional')
+    expect(hits.length).toBe(1)
   })
 
   it('runAudit forbidden_vocab é [] quando texto é limpo', () => {
