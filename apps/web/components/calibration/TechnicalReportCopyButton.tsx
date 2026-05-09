@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Copy, Check } from 'lucide-react'
+import { Copy, Check, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { safeArray } from '@/lib/utils'
@@ -18,6 +18,24 @@ interface TechnicalReportCopyButtonProps {
   clientName: string | null
   capturedAt: string | null
   features: unknown
+}
+
+interface SignedPhotoEntry {
+  eye: string
+  angle: string
+  url: string
+  filename: string
+}
+
+const EYE_LABEL_LONG: Record<string, string> = {
+  right: 'OD (olho direito)',
+  left: 'OE (olho esquerdo)',
+}
+
+const ANGLE_LABEL_LONG: Record<string, string> = {
+  frontal: 'frontal',
+  lateral: 'lateral',
+  backlight: 'contraluz',
 }
 
 function fmtPctText(value: number | null | undefined): string {
@@ -123,21 +141,100 @@ function eyeBlock(label: 'OD' | 'OE', eye: EyeBlock | null | undefined): string[
   return lines
 }
 
-function buildText(props: TechnicalReportCopyButtonProps): string {
+function fmtCapturedAt(iso: string | null): string | null {
+  if (!iso) return null
+  try {
+    const d = new Date(iso)
+    if (Number.isNaN(d.getTime())) return iso
+    return d.toLocaleString('pt-BR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'America/Sao_Paulo',
+    })
+  } catch {
+    return iso
+  }
+}
+
+function photosBlock(photos: SignedPhotoEntry[]): string[] {
+  if (photos.length === 0) {
+    return ['', 'FOTOS', '  (nenhuma foto registrada)']
+  }
+  const lines: string[] = ['', 'FOTOS (links válidos por 24h)']
+  // Sort canonical: OD first, then OE; within each: frontal | lateral | backlight
+  const order = ['frontal', 'lateral', 'backlight']
+  const sorted = [...photos].sort((a, b) => {
+    if (a.eye !== b.eye) return a.eye === 'right' ? -1 : 1
+    return order.indexOf(a.angle) - order.indexOf(b.angle)
+  })
+  for (const p of sorted) {
+    const eye = EYE_LABEL_LONG[p.eye] ?? p.eye
+    const angle = ANGLE_LABEL_LONG[p.angle] ?? p.angle
+    lines.push(`  ${eye} · ${angle}:`)
+    lines.push(`    ${p.url}`)
+  }
+  return lines
+}
+
+function footerSections(): string[] {
+  return [
+    '',
+    '═════════════════════════════════════════════════════════════',
+    'ANOTAÇÃO HUMANA',
+    '═════════════════════════════════════════════════════════════',
+    '(observação visual do iridologista — cor real, constituição',
+    ' real, achados percebidos, contexto clínico do cliente)',
+    '',
+    '',
+    '═════════════════════════════════════════════════════════════',
+    'DIAGNÓSTICO COMPARATIVO',
+    '═════════════════════════════════════════════════════════════',
+    '(diff entre o output do pipeline acima e a observação humana —',
+    ' falsos positivos, falsos negativos, drift de classificação,',
+    ' hipóteses sobre fonte do erro)',
+    '',
+    '',
+    '═════════════════════════════════════════════════════════════',
+    'AÇÃO DE CALIBRAÇÃO PROPOSTA',
+    '═════════════════════════════════════════════════════════════',
+    '(o que precisa ser feito no código — qual módulo, qual',
+    ' parâmetro, qual fixture; estimar esforço e prioridade)',
+    '',
+  ]
+}
+
+function buildText(
+  props: TechnicalReportCopyButtonProps,
+  photos: SignedPhotoEntry[],
+): string {
   const f = (props.features ?? {}) as VisionFeatures
   const lines: string[] = []
-  lines.push(`LEITURA TÉCNICA — ${props.readingId}`)
-  if (props.clientName) lines.push(`Cliente: ${props.clientName}`)
-  if (props.capturedAt) lines.push(`Capturado: ${props.capturedAt}`)
-  lines.push('')
 
+  // ── Header ────────────────────────────────────────────────────
+  lines.push('═════════════════════════════════════════════════════════════')
+  lines.push(`LEITURA TÉCNICA — ${props.readingId}`)
+  lines.push('═════════════════════════════════════════════════════════════')
+  if (props.clientName) lines.push(`Cliente: ${props.clientName}`)
+  const captured = fmtCapturedAt(props.capturedAt)
+  if (captured) lines.push(`Capturado: ${captured}`)
+
+  // ── Photos ────────────────────────────────────────────────────
+  for (const line of photosBlock(photos)) lines.push(line)
+
+  // ── Constitution ──────────────────────────────────────────────
+  lines.push('')
   lines.push('CONSTITUIÇÃO (consenso)')
   const topConstitution = f.constitution ?? f.right_eye?.constitution ?? f.left_eye?.constitution
   for (const line of constitutionLines('  ', topConstitution)) lines.push(line)
 
+  // ── Per-eye ───────────────────────────────────────────────────
   for (const line of eyeBlock('OD', f.right_eye)) lines.push(line)
   for (const line of eyeBlock('OE', f.left_eye)) lines.push(line)
 
+  // ── Asymmetry ─────────────────────────────────────────────────
   const asymmetry = safeArray<string>(f.asymmetry_notes)
   if (asymmetry.length > 0) {
     lines.push('')
@@ -145,6 +242,7 @@ function buildText(props: TechnicalReportCopyButtonProps): string {
     for (const note of asymmetry) lines.push(`  - ${note}`)
   }
 
+  // ── Processing metadata ───────────────────────────────────────
   if (f.processing_metadata) {
     lines.push('')
     lines.push('PROCESSAMENTO')
@@ -166,35 +264,71 @@ function buildText(props: TechnicalReportCopyButtonProps): string {
     }
   }
 
+  // ── Footer (3 empty sections for human/AI fill) ───────────────
+  for (const line of footerSections()) lines.push(line)
+
   return lines.join('\n')
+}
+
+async function fetchSignedUrls(readingId: string): Promise<SignedPhotoEntry[]> {
+  const resp = await fetch(
+    `/api/admin/calibration/photos/${encodeURIComponent(readingId)}`,
+  )
+  if (!resp.ok) {
+    throw new Error(`Failed to fetch signed URLs (${resp.status})`)
+  }
+  const json = (await resp.json()) as { signedUrls?: SignedPhotoEntry[] }
+  return safeArray<SignedPhotoEntry>(json.signedUrls)
 }
 
 export function TechnicalReportCopyButton(props: TechnicalReportCopyButtonProps) {
   const [copied, setCopied] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   async function handleCopy() {
-    const text = buildText(props)
+    setIsLoading(true)
     try {
+      const photos = await fetchSignedUrls(props.readingId)
+      const text = buildText(props, photos)
       await navigator.clipboard.writeText(text)
       setCopied(true)
-      toast.success('Relatório técnico copiado')
-      window.setTimeout(() => setCopied(false), 2000)
-    } catch {
-      toast.error('Falha ao copiar — tente novamente')
+      toast.success(
+        photos.length > 0
+          ? `Relatório copiado (${photos.length} fotos · TTL 24h)`
+          : 'Relatório copiado (sem fotos)',
+      )
+      window.setTimeout(() => setCopied(false), 3000)
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'erro desconhecido'
+      toast.error(`Falha ao copiar — ${msg}`)
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <Button type="button" variant="outline" size="sm" onClick={handleCopy}>
-      {copied ? (
+    <Button
+      type="button"
+      variant="default"
+      size="default"
+      onClick={handleCopy}
+      disabled={isLoading}
+      aria-busy={isLoading}
+    >
+      {isLoading ? (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Gerando links + montando relatório...
+        </>
+      ) : copied ? (
         <>
           <Check className="mr-2 h-4 w-4" />
-          Copiado
+          Copiado — cole na conversa externa
         </>
       ) : (
         <>
           <Copy className="mr-2 h-4 w-4" />
-          Copiar relatório técnico
+          Copiar relatório técnico (com fotos + template)
         </>
       )}
     </Button>

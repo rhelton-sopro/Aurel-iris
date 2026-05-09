@@ -20,6 +20,22 @@ const EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'])
 // Diretórios a varrer
 const DIRS = ['app', 'components', 'lib/rag', 'lib/anthropic']
 
+// Subpaths excluídos da varredura (founder-only / internal tools — fora do
+// escopo LGPD-06 que se aplica apenas a superfícies user-facing).
+// Cada path é interpretado como prefixo (segmento de caminho) — match via
+// includes() depois de normalizar separadores.
+const EXCLUDE_SUBPATHS = [
+  // Admin tooling (founder-only via middleware /admin/* gate).
+  // "diagnóstico" usado aqui significa "diagnóstico operacional do pipeline
+  // de calibração", não diagnóstico médico. Calibration tooling lives here
+  // and legitimately uses the term as technical vocabulary.
+  '/app/admin/',
+  '/components/calibration/',
+  // Test fixtures for actions in /admin/* may also reference the term as
+  // diagnosis form payload — same justification.
+  '/app/actions/calibration.test.',
+]
+
 /**
  * Marker que reconhece um arquivo inteiro como allowlisted.
  * Mesmo padrão do prompts/system.md (07-02 D-A4 forward-compat); adotado em
@@ -61,6 +77,10 @@ for (const dir of DIRS) {
   const absDir = join(ROOT, dir)
   const files = collectFiles(absDir)
   for (const file of files) {
+    // Path-level exclusion (admin tools, calibration UI — out of LGPD scope).
+    const normalized = file.replace(/\\/g, '/')
+    if (EXCLUDE_SUBPATHS.some(prefix => normalized.includes(prefix))) continue
+
     const content = readFileSync(file, 'utf8')
     // File-level allowlist: pula o arquivo inteiro se contém o marker
     // (ex: lib/anthropic/types.ts onde mora ENCERRAMENTO_LITERAL = SPEC §6 literal).

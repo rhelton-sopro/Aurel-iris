@@ -46,7 +46,21 @@ export type AnnotationFormState = {
   fieldErrors?: Record<string, string[]>
 }
 
-// Convenience type alias — kept here so any consumer that needs the row shape
+// Diagnosis form state — separate from AnnotationFormState because the diagnosis
+// flow has different concerns (free text, no field validation beyond max length).
+export type DiagnosisFormState = {
+  ok?: boolean
+  error?: string
+}
+
+// Hard cap on diagnosis text length. Generous (100KB ≈ ~25k words) because the
+// document may include a full external-AI conversation transcript pasted back.
+export const DIAGNOSIS_MAX_CHARS = 100_000
+
+// Convenience type aliases — kept here so any consumer that needs the row shape
 // without round-tripping through Database['public']['Tables']['...'] can grab it.
 export type CalibrationAnnotationRow =
   Database['public']['Tables']['calibration_annotations']['Row']
+
+export type CalibrationDiagnosisRow =
+  Database['public']['Tables']['calibration_diagnoses']['Row']

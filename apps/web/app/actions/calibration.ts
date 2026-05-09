@@ -1,26 +1,27 @@
 'use server'
 
 /**
- * Server Actions for /admin/calibration ground-truth annotations.
+ * Server Actions for /admin/calibration tooling.
  *
- * - saveAnnotation(prev, formData):
- *     1. Auth + founder gate (defense-in-depth — middleware + layout already enforce)
- *     2. Zod validation
- *     3. UPSERT by reading_id (UNIQUE constraint guarantees one row per reading)
- *     4. revalidatePath
+ * Structured corpus (calibration_annotations, ML use):
+ * - saveAnnotation(prev, formData) — UPSERT structured fields
+ * - markReviewed(readingId) — set reviewed=true
  *
- * - markReviewed(readingId):
- *     1. Auth + founder gate
- *     2. UPDATE reviewed=true, reviewed_at=NOW()
- *     3. revalidatePath
+ * Operational document (calibration_diagnoses, free text from external analysis):
+ * - saveCalibrationDiagnosis(prev, formData) — UPSERT free-text diagnosis
  *
- * Phase 7.1 | Plan 07.1-03 Task 5.
+ * All actions: founder gate via isFounderEmail (defense-in-depth — middleware
+ * + layout already enforce).
+ *
+ * Phase 7.1 | Plan 07.1-03 + iterative-calibration follow-up.
  */
 import { isFounderEmail } from '@/lib/auth/founder'
 import {
   CONSTITUTION_OPTIONS,
+  DIAGNOSIS_MAX_CHARS,
   IRIS_COLOR_OPTIONS,
   type AnnotationFormState,
+  type DiagnosisFormState,
 } from '@/lib/calibration/constants'
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
@@ -113,6 +114,50 @@ export async function markReviewed(
   if (error) return { error: error.message }
 
   revalidatePath(`/admin/calibration/${idParsed.data}`)
+  revalidatePath('/admin/calibration')
+  return { ok: true }
+}
+
+const diagnosisSchema = z.object({
+  reading_id: z.string().uuid(),
+  diagnosis: z.string().max(DIAGNOSIS_MAX_CHARS),
+})
+
+export async function saveCalibrationDiagnosis(
+  _prev: DiagnosisFormState,
+  formData: FormData,
+): Promise<DiagnosisFormState> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user || !isFounderEmail(user.email)) {
+    return { error: 'Forbidden' }
+  }
+
+  const parsed = diagnosisSchema.safeParse({
+    reading_id: formData.get('reading_id'),
+    diagnosis: formData.get('diagnosis') ?? '',
+  })
+
+  if (!parsed.success) {
+    return { error: 'Dados inválidos' }
+  }
+
+  const { error } = await supabase
+    .from('calibration_diagnoses')
+    .upsert(
+      {
+        reading_id: parsed.data.reading_id,
+        diagnosed_by: user.id,
+        diagnosis: parsed.data.diagnosis,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'reading_id' },
+    )
+
+  if (error) return { error: error.message }
+
+  revalidatePath(`/admin/calibration/${parsed.data.reading_id}`)
   revalidatePath('/admin/calibration')
   return { ok: true }
 }

@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { PhotoGrid, type CalibrationPhoto } from '@/components/calibration/PhotoGrid'
 import { FeaturesDisplay } from '@/components/calibration/FeaturesDisplay'
 import { AnnotationForm } from '@/components/calibration/AnnotationForm'
+import { CalibrationDiagnosisForm } from '@/components/calibration/CalibrationDiagnosisForm'
 import { TechnicalReportCopyButton } from '@/components/calibration/TechnicalReportCopyButton'
 import { PhotoDownloadButton } from '@/components/calibration/PhotoDownloadButton'
 
@@ -39,6 +40,13 @@ interface CalibrationAnnotationRow {
   reviewed: boolean
   reviewed_at: string | null
   annotated_at: string
+}
+
+interface CalibrationDiagnosisRow {
+  id: string
+  reading_id: string
+  diagnosis: string
+  updated_at: string
 }
 
 function getClient(client: ReadingDetail['client']): { full_name: string | null; birth_date: string | null } | null {
@@ -96,7 +104,7 @@ export default async function CalibrationDetailPage({
     }
   }
 
-  // 4. Fetch existing annotation if present.
+  // 4. Fetch existing structured annotation (corpus / ML row).
   const { data: annotation } = await supabase
     .from('calibration_annotations')
     .select('*')
@@ -104,6 +112,15 @@ export default async function CalibrationDetailPage({
     .maybeSingle()
 
   const existingAnnotation = annotation as CalibrationAnnotationRow | null
+
+  // 5. Fetch existing free-text diagnosis (operational document row).
+  const { data: diagnosis } = await supabase
+    .from('calibration_diagnoses')
+    .select('*')
+    .eq('reading_id', readingId)
+    .maybeSingle()
+
+  const existingDiagnosis = diagnosis as CalibrationDiagnosisRow | null
 
   const client = getClient(reading.client as ReadingDetail['client'])
 
@@ -131,22 +148,21 @@ export default async function CalibrationDetailPage({
             )}
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          {existingAnnotation?.reviewed ? (
-            <Badge variant="default" className="bg-emerald-600">revisado</Badge>
-          ) : existingAnnotation ? (
-            <Badge variant="secondary">anotado</Badge>
-          ) : (
-            <Badge variant="outline" className="text-muted-foreground">pendente</Badge>
+        <div className="flex flex-wrap items-center gap-2">
+          {existingDiagnosis && (
+            <Badge variant="default" className="bg-blue-600">diagnóstico salvo</Badge>
           )}
-          {existingAnnotation && (
-            <span className="text-xs text-muted-foreground">
-              última edição: <LocalDateTime iso={existingAnnotation.annotated_at} />
-            </span>
+          {existingAnnotation?.reviewed ? (
+            <Badge variant="default" className="bg-emerald-600">corpus revisado</Badge>
+          ) : existingAnnotation ? (
+            <Badge variant="secondary">corpus anotado</Badge>
+          ) : (
+            <Badge variant="outline" className="text-muted-foreground">corpus pendente</Badge>
           )}
         </div>
       </header>
 
+      {/* ── Visual context ─────────────────────────────────────── */}
       <section className="space-y-3">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
           Fotos da íris
@@ -161,10 +177,45 @@ export default async function CalibrationDetailPage({
         <FeaturesDisplay features={reading.vision_features} />
       </section>
 
+      {/* ── Iterative calibration loop (PRIMARY) ───────────────── */}
       <section className="space-y-3 border-t pt-6">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          Ground truth (anotação)
+          Ciclo de calibração iterativo
         </h3>
+        <p className="text-sm text-muted-foreground">
+          Fluxo: copiar relatório técnico → colar em conversa externa →
+          preencher 3 seções (anotação humana / diagnóstico comparativo /
+          ação de calibração) → colar resultado abaixo e salvar.
+        </p>
+        <div className="flex flex-wrap items-start gap-3">
+          <TechnicalReportCopyButton
+            readingId={reading.id}
+            clientName={client?.full_name ?? null}
+            capturedAt={reading.created_at}
+            features={reading.vision_features}
+          />
+          <PhotoDownloadButton readingId={reading.id} />
+        </div>
+      </section>
+
+      <section className="space-y-3">
+        <CalibrationDiagnosisForm
+          readingId={reading.id}
+          existingDiagnosis={existingDiagnosis?.diagnosis ?? null}
+          diagnosisUpdatedAt={existingDiagnosis?.updated_at ?? null}
+        />
+      </section>
+
+      {/* ── Structured corpus (SECONDARY — ML use, not blocking) ── */}
+      <section className="space-y-3 border-t pt-6">
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+          Corpus estruturado (ML — opcional)
+        </h3>
+        <p className="text-sm text-muted-foreground">
+          Campos categóricos para futura recalibração de centróides LAB (Wave B)
+          e dataset de aprendizagem (Phase 10). Preenchimento opcional —
+          o ciclo iterativo acima é o documento operacional principal.
+        </p>
         <AnnotationForm
           readingId={reading.id}
           existingAnnotation={
@@ -182,21 +233,6 @@ export default async function CalibrationDetailPage({
               : null
           }
         />
-      </section>
-
-      <section className="space-y-3 border-t pt-6">
-        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          Ferramentas
-        </h3>
-        <div className="flex flex-wrap items-start gap-3">
-          <TechnicalReportCopyButton
-            readingId={reading.id}
-            clientName={client?.full_name ?? null}
-            capturedAt={reading.created_at}
-            features={reading.vision_features}
-          />
-          <PhotoDownloadButton readingId={reading.id} />
-        </div>
       </section>
     </div>
   )

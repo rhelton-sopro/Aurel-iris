@@ -253,4 +253,119 @@ describe('app/actions/calibration', () => {
       expect(mockUpdate).not.toHaveBeenCalled()
     })
   })
+
+  describe('saveCalibrationDiagnosis', () => {
+    function makeDiagnosisFormData(overrides: Record<string, string> = {}): FormData {
+      const fd = new FormData()
+      fd.set('reading_id', VALID_READING_UUID)
+      fd.set('diagnosis', 'ANOTAÇÃO HUMANA: cor real verde\n\nDIAGNÓSTICO COMPARATIVO: pipeline classificou castanho\n\nAÇÃO DE CALIBRAÇÃO PROPOSTA: recalibrar centroides LAB com fixtures reais')
+      for (const [k, v] of Object.entries(overrides)) fd.set(k, v)
+      return fd
+    }
+
+    it('upserts diagnosis when caller is founder', async () => {
+      mockGetUser.mockResolvedValue({
+        data: { user: { id: VALID_USER_UUID, email: FOUNDER_EMAIL } },
+        error: null,
+      })
+
+      const { saveCalibrationDiagnosis } = await import('./calibration')
+      const result = await saveCalibrationDiagnosis({}, makeDiagnosisFormData())
+
+      expect(result).toEqual({ ok: true })
+      expect(mockFrom).toHaveBeenCalledWith('calibration_diagnoses')
+      expect(mockUpsert).toHaveBeenCalledTimes(1)
+      const [payload, options] = mockUpsert.mock.calls[0]
+      expect(payload.reading_id).toBe(VALID_READING_UUID)
+      expect(payload.diagnosed_by).toBe(VALID_USER_UUID)
+      expect(payload.diagnosis).toContain('AÇÃO DE CALIBRAÇÃO')
+      expect(typeof payload.updated_at).toBe('string')
+      expect(options).toEqual({ onConflict: 'reading_id' })
+    })
+
+    it('rejects non-founder', async () => {
+      mockGetUser.mockResolvedValue({
+        data: { user: { id: VALID_USER_UUID, email: 'attacker@example.com' } },
+        error: null,
+      })
+
+      const { saveCalibrationDiagnosis } = await import('./calibration')
+      const result = await saveCalibrationDiagnosis({}, makeDiagnosisFormData())
+
+      expect(result).toEqual({ error: 'Forbidden' })
+      expect(mockUpsert).not.toHaveBeenCalled()
+    })
+
+    it('rejects when no session', async () => {
+      mockGetUser.mockResolvedValue({ data: { user: null }, error: null })
+
+      const { saveCalibrationDiagnosis } = await import('./calibration')
+      const result = await saveCalibrationDiagnosis({}, makeDiagnosisFormData())
+
+      expect(result).toEqual({ error: 'Forbidden' })
+    })
+
+    it('rejects invalid reading_id uuid', async () => {
+      mockGetUser.mockResolvedValue({
+        data: { user: { id: VALID_USER_UUID, email: FOUNDER_EMAIL } },
+        error: null,
+      })
+
+      const { saveCalibrationDiagnosis } = await import('./calibration')
+      const result = await saveCalibrationDiagnosis(
+        {},
+        makeDiagnosisFormData({ reading_id: 'not-a-uuid' }),
+      )
+
+      expect(result).toEqual({ error: 'Dados inválidos' })
+      expect(mockUpsert).not.toHaveBeenCalled()
+    })
+
+    it('accepts empty diagnosis text', async () => {
+      mockGetUser.mockResolvedValue({
+        data: { user: { id: VALID_USER_UUID, email: FOUNDER_EMAIL } },
+        error: null,
+      })
+
+      const { saveCalibrationDiagnosis } = await import('./calibration')
+      const result = await saveCalibrationDiagnosis(
+        {},
+        makeDiagnosisFormData({ diagnosis: '' }),
+      )
+
+      expect(result).toEqual({ ok: true })
+      const [payload] = mockUpsert.mock.calls[0]
+      expect(payload.diagnosis).toBe('')
+    })
+
+    it('rejects diagnosis exceeding max chars (100KB)', async () => {
+      mockGetUser.mockResolvedValue({
+        data: { user: { id: VALID_USER_UUID, email: FOUNDER_EMAIL } },
+        error: null,
+      })
+
+      const { saveCalibrationDiagnosis } = await import('./calibration')
+      const huge = 'x'.repeat(100_001)
+      const result = await saveCalibrationDiagnosis(
+        {},
+        makeDiagnosisFormData({ diagnosis: huge }),
+      )
+
+      expect(result).toEqual({ error: 'Dados inválidos' })
+      expect(mockUpsert).not.toHaveBeenCalled()
+    })
+
+    it('propagates supabase error message', async () => {
+      mockGetUser.mockResolvedValue({
+        data: { user: { id: VALID_USER_UUID, email: FOUNDER_EMAIL } },
+        error: null,
+      })
+      mockUpsert.mockResolvedValue({ error: { message: 'connection refused' } })
+
+      const { saveCalibrationDiagnosis } = await import('./calibration')
+      const result = await saveCalibrationDiagnosis({}, makeDiagnosisFormData())
+
+      expect(result).toEqual({ error: 'connection refused' })
+    })
+  })
 })
