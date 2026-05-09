@@ -206,6 +206,7 @@ export type Database = {
           report_delivered_at: string | null
           report_generated: Json | null
           report_generated_at: string | null
+          report_raw_text: string | null
           status: string | null
           therapist_id: string
           therapist_notes: string | null
@@ -235,6 +236,7 @@ export type Database = {
           report_delivered_at?: string | null
           report_generated?: Json | null
           report_generated_at?: string | null
+          report_raw_text?: string | null
           status?: string | null
           therapist_id: string
           therapist_notes?: string | null
@@ -264,6 +266,7 @@ export type Database = {
           report_delivered_at?: string | null
           report_generated?: Json | null
           report_generated_at?: string | null
+          report_raw_text?: string | null
           status?: string | null
           therapist_id?: string
           therapist_notes?: string | null
