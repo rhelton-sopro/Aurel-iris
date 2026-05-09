@@ -13,15 +13,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { saveAnnotation, markReviewed } from '@/app/actions/calibration'
 import {
-  saveAnnotation,
-  markReviewed,
-  IRIS_COLOR_OPTIONS,
   CONSTITUTION_OPTIONS,
+  IRIS_COLOR_OPTIONS,
   type AnnotationFormState,
-  type IrisColorOption,
   type ConstitutionOption,
-} from '@/app/actions/calibration'
+  type IrisColorOption,
+} from '@/lib/calibration/constants'
 import { useEffect, useState } from 'react'
 
 const IRIS_COLOR_LABEL: Record<IrisColorOption, string> = {

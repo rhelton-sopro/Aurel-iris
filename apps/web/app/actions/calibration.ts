@@ -17,30 +17,20 @@
  * Phase 7.1 | Plan 07.1-03 Task 5.
  */
 import { isFounderEmail } from '@/lib/auth/founder'
+import {
+  CONSTITUTION_OPTIONS,
+  IRIS_COLOR_OPTIONS,
+  type AnnotationFormState,
+} from '@/lib/calibration/constants'
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 
-export const IRIS_COLOR_OPTIONS = [
-  'azul',
-  'verde',
-  'castanho',
-  'mista_biliar',
-  'mista_hematogenea',
-  'outra',
-] as const
-
-export const CONSTITUTION_OPTIONS = [
-  'linfatica',
-  'biliar',
-  'hematogenea',
-  'mista_biliar',
-  'mista_hematogenea',
-  'neurogenica',
-] as const
-
-export type IrisColorOption = (typeof IRIS_COLOR_OPTIONS)[number]
-export type ConstitutionOption = (typeof CONSTITUTION_OPTIONS)[number]
+// NOTE: Do NOT export non-async values (constants, types) from this file.
+// Files marked 'use server' treat every export as a Server Action (RPC stub).
+// Constants imported by client components from a 'use server' file arrive
+// as opaque references in production builds, breaking .map() / .length / etc.
+// Shared constants live in '@/lib/calibration/constants' instead.
 
 const annotationSchema = z.object({
   reading_id: z.string().uuid(),
@@ -51,12 +41,6 @@ const annotationSchema = z.object({
   findings_missed: z.string().max(4000).default(''),
   notes: z.string().max(4000).default(''),
 })
-
-export type AnnotationFormState = {
-  ok?: boolean
-  error?: string
-  fieldErrors?: Record<string, string[]>
-}
 
 export async function saveAnnotation(
   _prev: AnnotationFormState,
