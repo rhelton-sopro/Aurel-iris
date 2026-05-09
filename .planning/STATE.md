@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: "Wave 3 entregou 9 commits atômicos em paralelo via 3 worktrees disjuntos:"
-stopped_at: Phase 7.1 mid-execution — B1a + C1 + C2 landed; Nailli reprocess pending Modal redeploy
-last_updated: "2026-05-09T22:30:00.000Z"
+status: "07.1-03 admin/calibration page entregue: 7 commits, 25 testes verdes, founder smoke pending"
+stopped_at: Phase 7.1 — 07.1-03 código completo, awaiting founder smoke + calibration sprint
+last_updated: "2026-05-09T23:30:00.000Z"
 progress:
   total_phases: 8
   completed_phases: 6
-  total_plans: 68
-  completed_plans: 67
+  total_plans: 69
+  completed_plans: 68
   percent: 99
 ---
 
@@ -165,13 +165,17 @@ Nenhum ainda.
 
 ## Continuidade de sessão
 
-Última sessão: 2026-05-06 — **Fase 6 fechada formalmente** via `/gsd-secure-phase 6` + `/gsd-verify-work 6`. `06-SECURITY.md` registra 16 ameaças com disposition (14 mitigated em código + 2 accepted documentadas em Accepted Risks Log: T-RAG-10 RPC `match_count` sem cap server-side / T-RAG-16 token compare não-constant-time em endpoint founder-local). UAT 5/5 PASS preexistente (signed-off 2026-05-05 por Rhelton). 5/10 fases concluídas.
+Última sessão: 2026-05-09 noite (continuação) — **PLAN 07.1-03 (admin/calibration page) ENTREGUE**. 7 commits atômicos: migration 0009 + types regen + founder gate (middleware + layout + lib/auth) + list view + detail page + form + actions + tools + API. 25 testes vitest novos verdes (8 founder + 12 actions + 5 API). Working tree limpa modulo STATE.md + SUMMARY pending commit. Ver `.planning/phases/07.1-dogfooding-fixes/07.1-03-admin-calibration-page-SUMMARY.md`.
 
-Stopped at: Phase 7 context gathered
+Stopped at: Phase 7.1 — 07.1-03 código completo, awaiting founder smoke 12-step + decision on next plan.
 
-Resume file: .planning/phases/07-analise-llm/07-CONTEXT.md
+Resume file: .planning/phases/07.1-dogfooding-fixes/07.1-03-admin-calibration-page-SUMMARY.md
 
-Próxima ação: `/clear` então `/gsd-discuss-phase 7` (Análise LLM ancorada em features Fase 5 + retrieveRelevantKnowledge Fase 6).
+Próxima ação sugerida — escolher entre:
+1. **Founder smoke 12-step** em /admin/calibration (acessar, filtrar, anotar Rhelton, verificar copy/download) — pré-requisito pro calibration sprint.
+2. **Calibration sprint** — anotar N=20-30 fixtures (~3-5h) usando a tool entregue. Output alimenta Wave B (PLAN 07.1-02 P0a+P0b+B1d+B1b) + Phase 9 RESP-01..03 + Phase 10 dataset.
+3. **Modal redeploy + Nailli reprocess** (independente) — `cd vision-service && modal deploy modal_app.py` ativa B1a fix em prod; reprocessar Nailli para esperar `verde-mosaico`.
+4. **PLAN 07.1-02 escrita** (Wave B) — pode esboçar agora, mas executar só após calibration sprint coletar dados.
 
 ---
 
