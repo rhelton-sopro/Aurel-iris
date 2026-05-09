@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge'
 import { PhotoGrid, type CalibrationPhoto } from '@/components/calibration/PhotoGrid'
 import { FeaturesDisplay } from '@/components/calibration/FeaturesDisplay'
 import { AnnotationForm } from '@/components/calibration/AnnotationForm'
+import { TechnicalReportCopyButton } from '@/components/calibration/TechnicalReportCopyButton'
+import { PhotoDownloadButton } from '@/components/calibration/PhotoDownloadButton'
 
 const SIGNED_URL_TTL_SECONDS = 600 // 10 minutes — inline display only.
 
@@ -182,14 +184,19 @@ export default async function CalibrationDetailPage({
         />
       </section>
 
-      {/* T6 placeholder — TechnicalReportCopyButton + PhotoDownloadButton */}
       <section className="space-y-3 border-t pt-6">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
           Ferramentas
         </h3>
-        <p className="text-sm text-muted-foreground italic">
-          Botões de copy + download em construção (T6).
-        </p>
+        <div className="flex flex-wrap items-start gap-3">
+          <TechnicalReportCopyButton
+            readingId={reading.id}
+            clientName={client?.full_name ?? null}
+            capturedAt={reading.created_at}
+            features={reading.vision_features}
+          />
+          <PhotoDownloadButton readingId={reading.id} />
+        </div>
       </section>
     </div>
   )
