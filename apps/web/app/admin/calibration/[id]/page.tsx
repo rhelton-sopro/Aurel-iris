@@ -5,6 +5,7 @@ import { LocalDateTime } from '@/components/ui/local-date-time'
 import { Badge } from '@/components/ui/badge'
 import { PhotoGrid, type CalibrationPhoto } from '@/components/calibration/PhotoGrid'
 import { FeaturesDisplay } from '@/components/calibration/FeaturesDisplay'
+import { AnnotationForm } from '@/components/calibration/AnnotationForm'
 
 const SIGNED_URL_TTL_SECONDS = 600 // 10 minutes — inline display only.
 
@@ -158,17 +159,27 @@ export default async function CalibrationDetailPage({
         <FeaturesDisplay features={reading.vision_features} />
       </section>
 
-      {/* T5 placeholder — AnnotationForm + saveAnnotation server action */}
       <section className="space-y-3 border-t pt-6">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
           Ground truth (anotação)
         </h3>
-        <p className="text-sm text-muted-foreground italic">
-          AnnotationForm em construção (T5). Existing annotation:{' '}
-          {existingAnnotation
-            ? `${existingAnnotation.real_iris_color} / ${existingAnnotation.real_constitution}`
-            : 'nenhuma'}
-        </p>
+        <AnnotationForm
+          readingId={reading.id}
+          existingAnnotation={
+            existingAnnotation
+              ? {
+                  reading_id: existingAnnotation.reading_id,
+                  real_iris_color: existingAnnotation.real_iris_color,
+                  real_constitution: existingAnnotation.real_constitution,
+                  findings_correct: existingAnnotation.findings_correct,
+                  findings_invented: existingAnnotation.findings_invented,
+                  findings_missed: existingAnnotation.findings_missed,
+                  notes: existingAnnotation.notes,
+                  reviewed: existingAnnotation.reviewed,
+                }
+              : null
+          }
+        />
       </section>
 
       {/* T6 placeholder — TechnicalReportCopyButton + PhotoDownloadButton */}
