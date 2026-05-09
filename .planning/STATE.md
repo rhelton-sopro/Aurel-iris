@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: "Wave 3 entregou 9 commits atômicos em paralelo via 3 worktrees disjuntos:"
-stopped_at: Phase 7 context gathered
-last_updated: "2026-05-08T19:15:44.662Z"
+stopped_at: Phase 7.1 mid-execution — B1a + C1 + C2 landed; Nailli reprocess pending Modal redeploy
+last_updated: "2026-05-09T22:30:00.000Z"
 progress:
   total_phases: 8
   completed_phases: 6
@@ -26,7 +26,7 @@ Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 
 Fase: 7 de 10 — RAG retrieval ancorado em features → relatório iridológico em pt-BR via Claude Sonnet 4.6 (Análise LLM)
 Plan: Not started
-Próxima ação: `/clear` então `/gsd-execute-phase 7 --wave 4` para 07-07 (analyze.ts orchestrator: carrega prompts + retrieveRelevantKnowledge Fase 6 + Anthropic streaming + buffer parser + telemetria D-T1; section-queries.test.ts D-PR2 CI gate). Single-plan wave; depois Wave 5 = 07-08 (Route Handler streaming + 5 auth gates), Waves 6-7 = UI surfaces.
+Próxima ação: `/clear` então `/gsd-resume-work`. Sessão de 2026-05-09 entregou 8 commits cobrindo (a) FullReportCopyBlock no /editar, (b) descoberta + fix mínimo do bug do classificador de cor (B1a — mask filter no k-means), (c) C1+C2 regex polish em audit.ts, (d) PLAN 07.1-01 + checkpoint detalhado. Pendência crítica: reprocessar Nailli (Modal redeploy + trigger) para validar nova classificação `verde-mosaico` em vez de `castanho`. Veja `.planning/CHECKPOINT-2026-05-09-phase7.1-classifier-bug-and-audit-polish.md` para detalhe completo.
 Status: Wave 3 entregou 9 commits atômicos em paralelo via 3 worktrees disjuntos:
 
 - 07-04 parser.ts (3 commits: `73a7904` RED 13 testes + `5073be1` GREEN parser.ts 79 linhas + `d64a1fe` SUMMARY) — `findAllBoundaries` + `closeSections` com Pitfall 2 defenses (out-of-range >13, non-monotonic, line-start anchor `^### N. ` integer-only `\d{1,2}`); `^### 7.5 detalhe` rejeitado pelo `^` multiline; cobertura inclui pseudo-headings inline em corpo. 1 Rule 1 deviation: Test 4 buffer refactored (plan body tinha contradição interna entre range branch e strict-monotonia spec do RESEARCH §Pitfall 2).
