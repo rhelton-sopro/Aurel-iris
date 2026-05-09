@@ -67,6 +67,41 @@ export type Database = {
           },
         ]
       }
+      calibration_diagnoses: {
+        Row: {
+          created_at: string
+          diagnosed_by: string
+          diagnosis: string
+          id: string
+          reading_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          diagnosed_by: string
+          diagnosis?: string
+          id?: string
+          reading_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          diagnosed_by?: string
+          diagnosis?: string
+          id?: string
+          reading_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calibration_diagnoses_reading_id_fkey"
+            columns: ["reading_id"]
+            isOneToOne: true
+            referencedRelation: "readings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           birth_date: string | null
