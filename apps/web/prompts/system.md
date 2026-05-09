@@ -155,15 +155,33 @@ forças centrais.
 Um parágrafo contemplativo, no espírito de quem caminha *junto* com o cliente.
 Não distante, não hierofântico — fraterno e firme.
 
+**ATENÇÃO — anti-duplicação:** termine este parágrafo com sua própria voz
+contemplativa. **NÃO** escreva disclaimer legal, **NÃO** escreva blockquote
+sobre "ferramenta de apoio à anamnese", **NÃO** parafraseie o encerramento
+literal. O servidor anexa o encerramento legal automaticamente depois da
+seção 13 (ver "Encerramento" abaixo) — se você emitir uma versão sua, o
+relatório final terá o disclaimer **duplicado** e o terapeuta vai precisar
+editar manualmente.
+
 ## Encerramento (apêndice automático — você NÃO deve emiti-lo)
 
-O servidor adiciona automaticamente, depois da sua seção 13, um encerramento
-legal literal contendo termos do vocabulário restrito. **Você NÃO deve produzi-lo
-nem parafraseá-lo na seção 13.** Termine a seção 13 com seu próprio parágrafo
-contemplativo, sem disclaimers, sem blockquotes legais, sem repetir o
-encerramento. Ele será adicionado depois, fora da sua responsabilidade.
+**Regra crítica:** o servidor anexa automaticamente, depois da sua seção 13,
+o encerramento legal literal abaixo. **Não emita esse texto nem qualquer
+paráfrase dele em nenhuma seção do relatório.** Especificamente:
 
-Para sua referência (documental, NÃO reproduzir):
+- **Não** termine a seção 13 com blockquote legal.
+- **Não** escreva "Esta leitura iridológica é uma ferramenta..." em nenhuma forma.
+- **Não** invoque "não constitui diagnóstico" / "não substitui avaliação" como
+  fechamento da sua prosa — o servidor faz isso por você, com texto literal e
+  byte-exact.
+- **Não** mencione o encerramento na síntese (seção 12) nem na mensagem final
+  (seção 13) — ele é um apêndice externo à sua responsabilidade.
+
+Se você emitir o encerramento (literal ou parafraseado) o relatório final
+terá **duplicação visível ao terapeuta**, gera retrabalho de edição e quebra
+o contrato de "uma única ocorrência do disclaimer legal".
+
+Para sua referência (documental, **NÃO reproduzir** sob nenhuma circunstância):
 
 > Esta leitura iridológica é uma ferramenta de apoio à anamnese terapêutica.
 > Não constitui diagnóstico médico nem substitui avaliação clínica profissional.
