@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Copy, Check } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { safeArray } from '@/lib/utils'
 import type {
   VisionFeatures,
   EyeBlock,
@@ -35,8 +36,9 @@ function constitutionLines(prefix: string, c: ConstitutionBlock | null | undefin
   if (c.primary) lines.push(`${prefix}Primary: ${c.primary} (conf=${fmtConfText(c.confidence)})`)
   if (c.secondary) lines.push(`${prefix}Secondary: ${c.secondary}`)
   if (c.distribution) lines.push(`${prefix}Distribution: ${c.distribution}`)
-  if (c.indicators && c.indicators.length > 0) {
-    lines.push(`${prefix}Indicators: ${c.indicators.join(', ')}`)
+  const indicators = safeArray<string>(c.indicators)
+  if (indicators.length > 0) {
+    lines.push(`${prefix}Indicators: ${indicators.join(', ')}`)
   }
   return lines
 }
@@ -57,12 +59,12 @@ function ringsLines(rings: RingsBlock | null | undefined): string[] {
 }
 
 function sectorLines(sectors: SectorBlock[] | null | undefined): string[] {
-  if (!sectors) return []
   const lines: string[] = []
-  for (const s of sectors) {
-    if (!s.findings || s.findings.length === 0) continue
-    lines.push(`    Setor ${s.hour ?? '?'} (${(s.zones ?? []).join(', ')}):`)
-    for (const f of s.findings) {
+  for (const s of safeArray<SectorBlock>(sectors)) {
+    const findings = safeArray<NonNullable<SectorBlock['findings']>[number]>(s.findings)
+    if (findings.length === 0) continue
+    lines.push(`    Setor ${s.hour ?? '?'} (${safeArray<string>(s.zones).join(', ')}):`)
+    for (const f of findings) {
       const parts: string[] = [f.type ?? 'finding']
       if (f.depth) parts.push(f.depth)
       if (f.size_mm != null) parts.push(`${f.size_mm} mm`)
@@ -112,11 +114,10 @@ function eyeBlock(label: 'OD' | 'OE', eye: EyeBlock | null | undefined): string[
     lines.push(...sectors)
   }
   if (eye.image_quality) {
+    const warnings = safeArray<string>(eye.image_quality.warnings)
     lines.push(
       `  Qualidade da imagem: composite ${fmtConfText(eye.image_quality.composite_score)}` +
-        (eye.image_quality.warnings && eye.image_quality.warnings.length > 0
-          ? ` · warnings: ${eye.image_quality.warnings.join(', ')}`
-          : ''),
+        (warnings.length > 0 ? ` · warnings: ${warnings.join(', ')}` : ''),
     )
   }
   return lines
@@ -137,10 +138,11 @@ function buildText(props: TechnicalReportCopyButtonProps): string {
   for (const line of eyeBlock('OD', f.right_eye)) lines.push(line)
   for (const line of eyeBlock('OE', f.left_eye)) lines.push(line)
 
-  if (f.asymmetry_notes && f.asymmetry_notes.length > 0) {
+  const asymmetry = safeArray<string>(f.asymmetry_notes)
+  if (asymmetry.length > 0) {
     lines.push('')
     lines.push('ASSIMETRIA')
-    for (const note of f.asymmetry_notes) lines.push(`  - ${note}`)
+    for (const note of asymmetry) lines.push(`  - ${note}`)
   }
 
   if (f.processing_metadata) {
@@ -155,8 +157,9 @@ function buildText(props: TechnicalReportCopyButtonProps): string {
     if (f.processing_metadata.modal_call_id) {
       lines.push(`  modal_call_id: ${f.processing_metadata.modal_call_id}`)
     }
-    if (f.processing_metadata.warnings && f.processing_metadata.warnings.length > 0) {
-      lines.push(`  warnings: ${f.processing_metadata.warnings.join(', ')}`)
+    const pmWarnings = safeArray<string>(f.processing_metadata.warnings)
+    if (pmWarnings.length > 0) {
+      lines.push(`  warnings: ${pmWarnings.join(', ')}`)
     }
     if (f.processing_metadata.error_summary) {
       lines.push(`  error_summary: ${f.processing_metadata.error_summary}`)

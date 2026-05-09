@@ -1,6 +1,7 @@
 // Pure RSC — renders vision_features as a readable structured report (NOT JSON).
 // Used by /admin/calibration/[id] for ground truth annotation.
 // Source for the type shape: vision-service/pipeline/features.py extract_all().
+import { safeArray } from '@/lib/utils'
 
 interface IrisColorBlock {
   primary?: string | null
@@ -123,9 +124,12 @@ function ConstitutionCard({ data }: { data: ConstitutionBlock | null | undefined
       {data.secondary && <Row label="Secondary" value={data.secondary} />}
       {data.distribution && <Row label="Distribution" value={data.distribution} />}
       <Row label="Confidence" value={fmtConfidence(data.confidence)} />
-      {data.indicators && data.indicators.length > 0 && (
-        <Row label="Indicators" value={data.indicators.join(', ')} />
-      )}
+      {(() => {
+        const indicators = safeArray<string>(data.indicators)
+        return indicators.length > 0 ? (
+          <Row label="Indicators" value={indicators.join(', ')} />
+        ) : null
+      })()}
     </div>
   )
 }
@@ -140,9 +144,10 @@ function EyeCard({ eye, data }: { eye: 'OD' | 'OE'; data: EyeBlock | null | unde
     )
   }
 
-  const sectorsWithFindings = (data.sectors ?? []).filter(
-    s => Array.isArray(s.findings) && s.findings.length > 0
+  const sectorsWithFindings = safeArray<SectorBlock>(data.sectors).filter(
+    s => Array.isArray(s.findings) && s.findings.length > 0,
   )
+  const totalSectors = safeArray<SectorBlock>(data.sectors).length
 
   const ringsActive: { name: string; ring: RingFlag }[] = []
   if (data.rings) {
@@ -211,15 +216,15 @@ function EyeCard({ eye, data }: { eye: 'OD' | 'OE'; data: EyeBlock | null | unde
       {sectorsWithFindings.length > 0 && (
         <div className="space-y-1">
           <p className="text-xs font-medium text-muted-foreground uppercase">
-            Setores com achados ({sectorsWithFindings.length}/{(data.sectors ?? []).length})
+            Setores com achados ({sectorsWithFindings.length}/{totalSectors})
           </p>
           {sectorsWithFindings.map(sector => (
             <div key={sector.hour ?? 'unknown'} className="ml-2 mt-1">
               <p className="font-mono text-xs text-foreground">
-                Setor {sector.hour ?? '?'} ({sector.zones?.join(', ') ?? '—'}):
+                Setor {sector.hour ?? '?'} ({safeArray<string>(sector.zones).join(', ') || '—'}):
               </p>
               <ul className="ml-4 list-disc text-xs">
-                {(sector.findings ?? []).map((f, i) => (
+                {safeArray<SectorFinding>(sector.findings).map((f, i) => (
                   <li key={i}>
                     <span className="font-mono">{f.type ?? 'finding'}</span>
                     {f.depth && ` · ${f.depth}`}
@@ -237,9 +242,12 @@ function EyeCard({ eye, data }: { eye: 'OD' | 'OE'; data: EyeBlock | null | unde
         <div className="space-y-1 pt-2 border-t border-dashed">
           <p className="text-xs font-medium text-muted-foreground uppercase">Qualidade da imagem</p>
           <Row label="Composite score" value={fmtConfidence(data.image_quality.composite_score)} />
-          {data.image_quality.warnings && data.image_quality.warnings.length > 0 && (
-            <Row label="Warnings" value={data.image_quality.warnings.join(', ')} />
-          )}
+          {(() => {
+            const warnings = safeArray<string>(data.image_quality?.warnings)
+            return warnings.length > 0 ? (
+              <Row label="Warnings" value={warnings.join(', ')} />
+            ) : null
+          })()}
         </div>
       )}
     </div>
@@ -273,15 +281,18 @@ export function FeaturesDisplay({ features }: { features: unknown }) {
         </div>
       </Section>
 
-      {f.asymmetry_notes && f.asymmetry_notes.length > 0 && (
-        <Section title="Assimetria">
-          <ul className="list-disc ml-6 space-y-0.5">
-            {f.asymmetry_notes.map(note => (
-              <li key={note} className="font-mono text-xs">{note}</li>
-            ))}
-          </ul>
-        </Section>
-      )}
+      {(() => {
+        const notes = safeArray<string>(f.asymmetry_notes)
+        return notes.length > 0 ? (
+          <Section title="Assimetria">
+            <ul className="list-disc ml-6 space-y-0.5">
+              {notes.map(note => (
+                <li key={note} className="font-mono text-xs">{note}</li>
+              ))}
+            </ul>
+          </Section>
+        ) : null
+      })()}
 
       {f.processing_metadata && (
         <Section title="Processamento">
@@ -294,9 +305,12 @@ export function FeaturesDisplay({ features }: { features: unknown }) {
           {f.processing_metadata.modal_call_id && (
             <Row label="Modal call id" value={f.processing_metadata.modal_call_id} />
           )}
-          {f.processing_metadata.warnings && f.processing_metadata.warnings.length > 0 && (
-            <Row label="Warnings" value={f.processing_metadata.warnings.join(', ')} />
-          )}
+          {(() => {
+            const pmWarnings = safeArray<string>(f.processing_metadata?.warnings)
+            return pmWarnings.length > 0 ? (
+              <Row label="Warnings" value={pmWarnings.join(', ')} />
+            ) : null
+          })()}
           {f.processing_metadata.error_summary && (
             <Row label="Error summary" value={f.processing_metadata.error_summary} />
           )}
