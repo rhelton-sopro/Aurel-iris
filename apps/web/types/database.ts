@@ -14,6 +14,59 @@ export type Database = {
   }
   public: {
     Tables: {
+      calibration_annotations: {
+        Row: {
+          annotated_at: string
+          annotated_by: string
+          findings_correct: string | null
+          findings_invented: string | null
+          findings_missed: string | null
+          id: string
+          notes: string | null
+          reading_id: string
+          real_constitution: string
+          real_iris_color: string
+          reviewed: boolean
+          reviewed_at: string | null
+        }
+        Insert: {
+          annotated_at?: string
+          annotated_by: string
+          findings_correct?: string | null
+          findings_invented?: string | null
+          findings_missed?: string | null
+          id?: string
+          notes?: string | null
+          reading_id: string
+          real_constitution: string
+          real_iris_color: string
+          reviewed?: boolean
+          reviewed_at?: string | null
+        }
+        Update: {
+          annotated_at?: string
+          annotated_by?: string
+          findings_correct?: string | null
+          findings_invented?: string | null
+          findings_missed?: string | null
+          id?: string
+          notes?: string | null
+          reading_id?: string
+          real_constitution?: string
+          real_iris_color?: string
+          reviewed?: boolean
+          reviewed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calibration_annotations_reading_id_fkey"
+            columns: ["reading_id"]
+            isOneToOne: true
+            referencedRelation: "readings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           birth_date: string | null
