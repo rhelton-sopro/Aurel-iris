@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: "07.1-03 admin/calibration page entregue: 7 commits, 25 testes verdes, founder smoke pending"
-stopped_at: Phase 7.1 — 07.1-03 código completo, awaiting founder smoke + calibration sprint
-last_updated: "2026-05-09T23:30:00.000Z"
+status: "07.1-03 + iterative calibration loop entregues: 14 commits, 32 testes verdes, primeiro diagnóstico Nailli persistido"
+stopped_at: Phase 7.1 — calibration tooling 100% operacional; Wave B (PLAN 07.1-02) é a próxima sessão
+last_updated: "2026-05-10T00:30:00.000Z"
 progress:
   total_phases: 8
   completed_phases: 6
@@ -165,17 +165,30 @@ Nenhum ainda.
 
 ## Continuidade de sessão
 
-Última sessão: 2026-05-09 noite (continuação) — **PLAN 07.1-03 (admin/calibration page) ENTREGUE**. 7 commits atômicos: migration 0009 + types regen + founder gate (middleware + layout + lib/auth) + list view + detail page + form + actions + tools + API. 25 testes vitest novos verdes (8 founder + 12 actions + 5 API). Working tree limpa modulo STATE.md + SUMMARY pending commit. Ver `.planning/phases/07.1-dogfooding-fixes/07.1-03-admin-calibration-page-SUMMARY.md`.
+Última sessão: 2026-05-09 noite + supplement (mesma sessão estendida) — **PLAN 07.1-03 ENTREGUE + iterative calibration loop adicionado em cima**. Total 14 commits (7 do PLAN original + 7 supplement), 32 testes vitest verdes, 3 bugs descobertos em produção e corrigidos durante a sessão (safeArray defensivo, 'use server' export hygiene, RLS broken auth.users subquery). Founder smoke confirmado: AnnotationForm + CalibrationDiagnosisForm ambos funcionais em produção; primeiro diagnóstico salvo pra Nailli. Ver `.planning/phases/07.1-dogfooding-fixes/07.1-03-admin-calibration-page-SUMMARY.md` (seção "Post-PLAN supplement").
 
-Stopped at: Phase 7.1 — 07.1-03 código completo, awaiting founder smoke 12-step + decision on next plan.
+Stopped at: Phase 7.1 — tooling de calibração 100% operacional. Próxima sessão começa **PLAN 07.1-02 (Wave B)** com primeira evidência empírica já coletada (Nailli diagnosis row).
 
-Resume file: .planning/phases/07.1-dogfooding-fixes/07.1-03-admin-calibration-page-SUMMARY.md
+Resume file: `.planning/phases/07.1-dogfooding-fixes/07.1-03-admin-calibration-page-SUMMARY.md`
 
-Próxima ação sugerida — escolher entre:
-1. **Founder smoke 12-step** em /admin/calibration (acessar, filtrar, anotar Rhelton, verificar copy/download) — pré-requisito pro calibration sprint.
-2. **Calibration sprint** — anotar N=20-30 fixtures (~3-5h) usando a tool entregue. Output alimenta Wave B (PLAN 07.1-02 P0a+P0b+B1d+B1b) + Phase 9 RESP-01..03 + Phase 10 dataset.
-3. **Modal redeploy + Nailli reprocess** (independente) — `cd vision-service && modal deploy modal_app.py` ativa B1a fix em prod; reprocessar Nailli para esperar `verde-mosaico`.
-4. **PLAN 07.1-02 escrita** (Wave B) — pode esboçar agora, mas executar só após calibration sprint coletar dados.
+**Estado das tabelas:**
+- `calibration_annotations` — 1 row (Nailli, founder smoke confirmação)
+- `calibration_diagnoses` — 1 row (Nailli, primeiro diagnóstico operacional)
+
+**Migrations aplicadas nesta sessão:**
+- 0009 — calibration_annotations (broken RLS — fixed by 0011)
+- 0010 — calibration_diagnoses (broken RLS — fixed by 0011)
+- 0011 — RLS fix: auth.jwt() ->> 'email' em vez de auth.users subquery
+
+**Lessons registradas (anti-patterns importantes):**
+1. Files com `'use server'` SÓ podem exportar async functions. Constants/types em arquivo sibling. Senão crashes prod-only ("g.map is not a function").
+2. NUNCA query `auth.users` de RLS — role `authenticated` não tem SELECT no schema. Use `auth.jwt() ->> 'email'`.
+3. Always `safeArray()` antes de .map/.filter/.join em jsonb fields — TS types otimistas não catch wrong-type runtime drift.
+
+Próxima ação sugerida:
+1. **PLAN 07.1-02 (Wave B)** — abrir SPEC pra P0a + P0b + B1d + B1b. Primeira diagnose persistida (Nailli) é input empírico inicial. Considerar coletar 5-10 diagnoses ANTES de finalizar plan, pra ter pattern.
+2. **Modal redeploy** (independente) — `cd vision-service && modal deploy modal_app.py` ativa B1a fix em prod. Reprocessar Nailli para validar nova classificação.
+3. **Calibration sprint extra** — anotar mais N readings antes do PLAN 07.1-02 (sessão dedicada ~3-5h).
 
 ---
 
