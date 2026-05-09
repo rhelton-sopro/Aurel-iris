@@ -18,7 +18,7 @@ import remarkGfm from 'remark-gfm'
 
 import { EditorSectionItem } from './EditorSectionItem'
 
-const SECTIONS: Array<{ key: string; number: number; title: string }> = [
+export const SECTIONS: ReadonlyArray<{ key: string; number: number; title: string }> = [
   { key: '1_constituicao', number: 1, title: 'Constituição' },
   { key: '2_estrutural_fisica', number: 2, title: 'Estrutural Física' },
   { key: '3_indicacoes_sistemicas', number: 3, title: 'Indicações Sistêmicas' },

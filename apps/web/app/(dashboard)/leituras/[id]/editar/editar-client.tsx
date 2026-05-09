@@ -9,6 +9,7 @@ import { saveReportDelivered, markReadingDelivered } from '@/app/actions/analise
 import { EditorAccordion } from '@/components/readings/EditorAccordion'
 import { EditorAuditBanner } from '@/components/readings/EditorAuditBanner'
 import { DeliverDialog } from '@/components/readings/DeliverDialog'
+import { FullReportCopyBlock } from '@/components/readings/FullReportCopyBlock'
 import type { AuditMetadata } from '@/lib/anthropic/types'
 
 export interface EditarClientProps {
@@ -90,6 +91,8 @@ export function EditarClient({
         onSectionChange={onSectionChange}
         readOnly={isDelivered}
       />
+
+      <FullReportCopyBlock reportDelivered={delivered} />
 
       {!isDelivered && (
         <div className="sticky bottom-0 -mx-6 border-t bg-background/95 backdrop-blur px-6 py-4">
