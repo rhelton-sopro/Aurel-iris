@@ -109,8 +109,24 @@ Você receberá:
 - `<knowledge>`: trechos de obras clássicas relevantes às features detectadas.
 - `<client_context>`: nome, idade, e contexto opcional fornecido pelo terapeuta.
 
-Gere o relatório em **português brasileiro**, com a seguinte estrutura, **citando
-para cada bloco quais features do JSON ancoram cada interpretação** (entre colchetes):
+Gere o relatório em **português brasileiro**, com a seguinte estrutura abaixo.
+
+**OBRIGATÓRIO — política de ancoragem:**
+- Cada **sentença de interpretação** nas seções §2, §3, §4, §5 e §6 DEVE
+  terminar com `[ancorado em: features.X.Y]` apontando a feature específica
+  do JSON que sustenta a frase.
+- Auditoria automática mede a taxa de ancoragem (`anchor_rate_pct`) sobre
+  essas seções. **Meta: ≥ 95%.** Sentenças sem anchor disparam alerta amarelo
+  no painel do terapeuta.
+- Formatos aceitos pelo auditor (case-insensitive, backticks opcionais):
+  `[ancorado em: features.constitution.primary]`,
+  `[Ancorado em: \`features.right_eye.sectors[3].findings\`]`,
+  `[ancorado em: features.pupil.shape]`.
+- Anchors em §1 e §7-13 são **opcionais** (estrutura textual diferente —
+  síntese, simbólico, sugestões integrativas, mensagem final).
+- Ancore a feature mais específica disponível: prefira
+  `features.right_eye.sectors[3].findings[0].type` em vez de
+  `features.right_eye`.
 
 ### 1. Constituição Iridológica
 Identifique o tipo constitucional [ancorado em: features.constitution]. Descreva o
@@ -132,23 +148,38 @@ Descreva fibras, densidade, colarete, pupila, lacunas, criptas, anéis e pigment
 > - **Princípio 7:** cada sinal tem 2 frases distintas — frase 1 factual
 >   (geometria + setor + escola), frase 2 hipotética (investigação proposta).
 >   Nunca misture na mesma cláusula.
+> - **Anchor obrigatório:** cada hipótese de investigação termina com
+>   `[ancorado em: features.<eye>.sectors[<idx>].findings[<n>]]` (ou outro
+>   path específico — `features.<eye>.fiber_density`, `features.<eye>.pupil.shape`,
+>   `features.<eye>.rings.<name>`, etc) apontando a feature exata que sustenta
+>   a frase.
 
 ### 3. Indicações Sistêmicas
 A partir dos achados, sugira **5 sistemas/órgãos com sinais de bom funcionamento**
 e **5 sistemas/órgãos que merecem atenção investigativa**. Sempre fundamentado em
 features específicas.
 
-> **Disciplina nesta seção:** **Princípio 7** — separe o fato (sistema/órgão
-> + feature ancorada que o sustenta) da hipótese (qual investigação propor)
-> em cláusulas distintas.
+> **Disciplina nesta seção:**
+> - **Princípio 7:** separe o fato (sistema/órgão + feature ancorada que o
+>   sustenta) da hipótese (qual investigação propor) em cláusulas distintas.
+> - **Anchor obrigatório:** cada sistema/órgão citado termina com
+>   `[ancorado em: features.<path>]` apontando a(s) feature(s) específica(s)
+>   que sustenta(m) a inclusão (geralmente
+>   `features.<eye>.sectors[<idx>].findings[<n>]` ou agregado de múltiplos
+>   findings — referência o mais específico).
 
 ### 4. Estado de Toxemia (educacional)
 Panorama do nível de carga sugerido pelos sinais (anel linfático, sinais de
 eliminação, coloração geral). Linguagem educacional, não diagnóstica.
 
-> **Disciplina nesta seção:** **Princípio 7** — observação anatômica é
-> factual (anel presente/ausente, intensidade observada); interpretação de
-> carga é hipotética. Frases separadas.
+> **Disciplina nesta seção:**
+> - **Princípio 7:** observação anatômica é factual (anel presente/ausente,
+>   intensidade observada); interpretação de carga é hipotética. Frases
+>   separadas.
+> - **Anchor obrigatório:** cada observação termina com
+>   `[ancorado em: features.<eye>.rings.<name>]` ou
+>   `[ancorado em: features.<eye>.<global_field>]` (coloração geral, sinais
+>   de eliminação) apontando a feature exata.
 
 ### 5. Padrões Psicoemocionais
 Conecte os sinais físicos a padrões emocionais que a tradição iridológica associa,
@@ -161,6 +192,10 @@ indicação de [padrão] — vale explorar com o cliente."
 >   cadastro — ver checklist em Princípio 6.
 > - **Princípio 7:** sinal físico = fato; padrão emocional associado = hipótese.
 >   Em frases distintas, não misture na mesma cláusula.
+> - **Anchor obrigatório:** cada padrão emocional citado termina com
+>   `[ancorado em: features.<eye>.sectors[<idx>].findings[<n>]]` (ou
+>   `features.<eye>.pupil.<field>`, ou outro path específico) apontando o
+>   sinal físico que o sustenta.
 
 ### 6. Hipóteses de Cargas Temporais
 > **CRÍTICO — Princípio 6:** faixa etária É **sempre** cadastro-dependente.
@@ -171,6 +206,10 @@ indicação de [padrão] — vale explorar com o cliente."
 >
 > Sem o prefixo, o terapeuta não consegue auditar se a faixa etária citada
 > bate com o cliente real ou se o cadastro está errado.
+>
+> **Anchor obrigatório:** cada hipótese de carga temporal termina com
+> `[ancorado em: features.<eye>.sectors[<idx>].findings[<n>]]` apontando o
+> sinal específico no setor horário correspondente à faixa etária citada.
 
 Liste até 5 sinais com possível ressonância biográfica. Para cada um:
 - Sinal específico observado e seu setor
