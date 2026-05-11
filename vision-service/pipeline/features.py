@@ -65,12 +65,21 @@ IRIS_COLOR_LAB_CENTROIDS: dict[str, tuple[int, int, int]] = {
 def classify_iris_color(
     masked_image: np.ndarray,
     iris_circle: Optional[tuple[float, float, float]] = None,
+    pupil_circle: Optional[tuple[float, float, float]] = None,
 ) -> dict:
     """Classify iris primary/secondary color via LAB k-means.
 
     Args:
         masked_image: RGB uint8 array of the segmented iris region.
         iris_circle: Optional (cx, cy, r) tuple for central_heterochromia detection.
+        pupil_circle: Optional (cx, cy, r) — exclude pupil disc (r*1.10 margin
+            for anti-aliasing) from k-means BEFORE classification. P0.1 fix
+            (PLAN 07.1-02): without this, pupil pixels arrive as ~RGB (3,3,3)
+            after enhance.clahe (not pure zero, escaping the B1a R+G+B==0
+            filter) and still pull cluster centers toward LAB-black, which
+            lands on the 'castanho' centroid (L=90). Diagnosed 2026-05-09
+            on Nailli reading 71a7bf1d (verde-acinzentado classificada como
+            castanho/hematogenea). Falls back gracefully when None or invalid.
 
     Returns:
         dict with keys: primary, secondary (Optional[str]), central_heterochromia (bool).
@@ -88,6 +97,30 @@ def classify_iris_color(
     # as castanho/hematogenea). Real iris pixels never have R=G=B=0.
     rgb_pixels = masked_image.reshape(-1, 3)
     iris_pixels_mask = rgb_pixels.sum(axis=1) > 0
+
+    # P0.1 (PLAN 07.1-02): also exclude pupil disc if hint provided. The
+    # B1a filter alone is insufficient — pupil pixels post-CLAHE arrive
+    # as quase-preto (RGB ~3,3,3) and still pull k-means toward castanho.
+    # Margin 1.10 handles anti-aliasing at the pupil/iris boundary.
+    if pupil_circle is not None:
+        try:
+            cx_p, cy_p, r_p = (float(v) for v in pupil_circle)
+        except (TypeError, ValueError):
+            cx_p = cy_p = r_p = 0.0
+        # Guard: r must be positive and finite, center must be finite.
+        if (
+            r_p > 0
+            and np.isfinite(cx_p)
+            and np.isfinite(cy_p)
+            and np.isfinite(r_p)
+        ):
+            r_excl = r_p * 1.10
+            H, W = masked_image.shape[:2]
+            yy, xx = np.ogrid[:H, :W]
+            pupil_disc = (xx - cx_p) ** 2 + (yy - cy_p) ** 2 <= r_excl ** 2
+            # Flatten + AND with iris_pixels_mask (skip pupil pixels)
+            iris_pixels_mask = iris_pixels_mask & (~pupil_disc.reshape(-1))
+
     pixels = lab.reshape(-1, 3).astype(np.float32)[iris_pixels_mask]
 
     # Edge case: input fully masked (no iris pixels). Return safe default.
@@ -355,6 +388,7 @@ def extract_all(
     iris_color = classify_iris_color(
         composite_image["segmented_image"],
         iris_circle=composite_image.get("iris_circle"),
+        pupil_circle=composite_image.get("pupil_circle"),
     )
     fiber_density = _compute_fiber_density(enhanced_image)
     constitution = _classify_constitution(iris_color, fiber_density)

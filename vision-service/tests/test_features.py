@@ -261,3 +261,55 @@ def test_compute_asymmetry_uses_dict_subscripts_not_attributes():
             f"compute_asymmetry raised AttributeError — uses attribute access instead "
             f"of dict subscripts (B4 anti-regression): {e}"
         )
+
+
+# ---------------------------------------------------------------------------
+# PLAN 07.1-02 P0.1 — pupil mask in classify_iris_color
+# ---------------------------------------------------------------------------
+
+def test_classify_iris_color_excludes_pupil_pixels():
+    """Synthetic image: 200x200 RGB with central black pupil disc (r=30)
+    + iris annulus painted verde-mosaico (L=140, a=110, b=145 in LAB).
+    Without pupil mask: k-means picks black cluster as primary -> castanho.
+    With pupil mask: clean verde-mosaico -> primary='verde-mosaico' or 'misto'.
+    """
+    H, W = 200, 200
+    cx, cy = W // 2, H // 2
+    r_iris = 80
+    r_pupil = 30
+
+    # Verde-mosaico LAB -> RGB approx (L=140 a=110 b=145 -> ~RGB (102, 130, 80))
+    img = np.zeros((H, W, 3), dtype=np.uint8)
+    yy, xx = np.ogrid[:H, :W]
+    iris_mask = (xx - cx) ** 2 + (yy - cy) ** 2 <= r_iris ** 2
+    pupil_mask = (xx - cx) ** 2 + (yy - cy) ** 2 <= r_pupil ** 2
+
+    img[iris_mask] = [102, 130, 80]    # verde-mosaico fill
+    img[pupil_mask] = [0, 0, 0]        # pupila preta puro
+
+    # Pupil-edge dark ring: pixels near pupil border that are quase-preto but
+    # NOT exactly zero (simula real pós-CLAHE onde pupila chega como cinza
+    # muito escuro, escapando do B1a filter R+G+B==0).
+    pupil_dark_ring = ((xx - cx) ** 2 + (yy - cy) ** 2 > r_pupil ** 2) & \
+                      ((xx - cx) ** 2 + (yy - cy) ** 2 <= (r_pupil + 5) ** 2)
+    img[pupil_dark_ring] = [3, 3, 3]
+
+    # With pupil hint: deve acertar
+    result_with_hint = classify_iris_color(
+        img,
+        iris_circle=(float(cx), float(cy), float(r_iris)),
+        pupil_circle=(float(cx), float(cy), float(r_pupil)),
+    )
+    assert result_with_hint["primary"] in {"verde-mosaico", "misto"}, (
+        f"With pupil hint, primary should be verde-mosaico or misto, got "
+        f"{result_with_hint['primary']}"
+    )
+
+
+def test_classify_iris_color_pupil_hint_optional_no_crash():
+    """Backward compat: pupil_circle=None must not crash (fallback to B1a only)."""
+    img = np.zeros((50, 50, 3), dtype=np.uint8)
+    img[10:40, 10:40] = [102, 130, 80]
+    # No pupil_circle, no iris_circle — should not raise
+    result = classify_iris_color(img)
+    assert result["primary"] in {"azul", "castanho", "verde-mosaico", "misto"}
