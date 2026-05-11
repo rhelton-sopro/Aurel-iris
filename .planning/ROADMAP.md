@@ -288,7 +288,14 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
   6. `/admin/calibration` lista canonical_status badge por foto + botão "Re-canonicalizar" (idempotente) funcional. Founder usa pra inspecionar e re-canonicalizar leituras existentes on-demand.
   7. Regression suite: `apps/web/scripts/probe-haiku-iris-landmarks.mjs` committed (header runbook + remove Nailli hardcoded default) + `landmarks-probe-sonnet-4-6.json` committed como golden fixture + gated integration test `CANONICAL_PROBE=1 vitest run probe-canonical.test.ts` passa contra Nailli e85ea7de com tolerância ±5% center, ±10% radius.
   8. Verification: founder dogfooding ≥3 leituras pós-deploy com canonical ON; visual inspection via /admin/calibration confirma ≥80% canonical_status='ok' em readings novas.
-**Plans**: TBD via `/gsd-plan-phase 07.1.6` (esperado: 4-6 plans cobrindo Wave 0 RED scaffolding + canonicalize endpoint + finalizeReadingAction wiring + schema migration + admin/calibration UI extension + regression suite).
+**Plans**: 7 plans em 4 waves (planejado 2026-05-12 via /gsd-plan-phase 07.1.6).
+- [ ] 07.1.6-01-PLAN.md — Wave 0: schema migration 0012 (additive + [BLOCKING] supabase db push) + SONNET_BBOX_MODEL constant + IrisBbox/CanonicalStatus/CanonicalMetadata types
+- [ ] 07.1.6-02-PLAN.md — Wave 0: sanity.ts pure functions (geometric + cross-angle outlier) + RED→GREEN unit tests (TDD)
+- [ ] 07.1.6-03-PLAN.md — Wave 1: storage-path.ts + sonnet-bbox.ts (Sonnet 4.6 call) + crop.ts (sharp 800×800 lanczos3, SEM rotation) + index.ts orchestrator (6× Promise.all + trust gate + upsert)
+- [ ] 07.1.6-04-PLAN.md — Wave 1: POST /api/capture/canonicalize endpoint (auth gate + ownership + idempotent — chamado por finalize + admin Re-canonicalizar)
+- [ ] 07.1.6-05-PLAN.md — Wave 2: finalizeReadingAction wiring (fire-and-forget canonical fetch before Modal trigger) + process/route.ts resolve canonical_storage_path ?? storage_path
+- [ ] 07.1.6-06-PLAN.md — Wave 2: /admin/calibration canonical_status badge + RecanonicalizeButton client component + photos API canonical_url extension
+- [ ] 07.1.6-07-PLAN.md — Wave 3: .gitignore negation + probe-haiku-iris-landmarks.mjs header runbook + golden fixture committed + probe-canonical.test.ts (CANONICAL_PROBE=1 gated, ±5% center / ±10% radius)
 
 **Cross-cutting constraints:**
 - **Não regressões em readings pre-07.1.6:** existing readings (canonical_storage_path NULL) continuam funcionando via `process/route.ts` resolvendo `storage_path` original. Backward compat é column-NULL fallback.
