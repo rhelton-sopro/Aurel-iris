@@ -28,11 +28,22 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class ConstitutionType(str, Enum):
-    """Canonical Jensen constitution values (informational; not enforced)."""
+    """Canonical Jensen constitution values (informational; not enforced).
+
+    Expanded 2026-05-11 (PLAN 07.1-02 P0.2) to accommodate the Brazilian
+    iridology school + mixed types diagnosed by founder during calibration
+    sprint. Constitution.primary remains `str` (not Enum-enforced) so old
+    payloads validate unchanged.
+    """
 
     LINFATICA = "linfatica"
     HEMATOGENEA = "hematogenea"
     MISTA = "mista"
+    # Added by PLAN 07.1-02:
+    MISTA_BILIAR = "mista_biliar"
+    MISTA_HEMATOGENEA = "mista_hematogenea"
+    BILIAR = "biliar"
+    NEUROGENICA = "neurogenica"
 
 
 class Constitution(BaseModel):

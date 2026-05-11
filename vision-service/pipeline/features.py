@@ -241,46 +241,86 @@ def _compute_fiber_density(enhanced_polar: np.ndarray) -> dict:
     return {"score": score, "interpretation": interpretation}
 
 
-def _classify_constitution(iris_color: dict, fiber_density: dict) -> dict:
-    """Heuristic Jensen constitution classification.
+def _classify_constitution(
+    iris_color: dict,
+    fiber_density: dict,
+    sectoral_pigments: Optional[list[dict]] = None,
+) -> dict:
+    """6-way Jensen constitution heuristic (PLAN 07.1-02 P0.2).
+
+    Heuristic priority (first match wins):
+      1. azul + densa             -> neurogenica
+      2. azul + (esparsa|media)   -> linfatica
+      3. verde-mosaico|misto + amarelo-âmbar superior x≥2 -> mista_biliar (low/med fiber)
+                                                            | biliar (densa)
+      4. castanho + marrom_difuso x≥2 -> mista_hematogenea
+      5. castanho                 -> hematogenea
+      6. fallback                 -> mista
 
     Args:
         iris_color: output of classify_iris_color.
         fiber_density: output of _compute_fiber_density.
+        sectoral_pigments: output of detect_sectoral_pigments (P0.3); None when
+            called without sectoral_pigments support (backward compat).
 
     Returns:
         dict with primary (str), confidence (float), indicators (list[str]).
     """
     primary_color = iris_color.get("primary", "misto")
     interpretation = fiber_density.get("interpretation", "media")
-
+    pigments = sectoral_pigments or []
     indicators: list[str] = []
 
+    # Pigment signals (P0.3 input)
+    superior_hours = {11, 12, 1, 2}
+    amarelo_ambar_superior = [
+        p for p in pigments
+        if p.get("type") == "amarelo_ambar"
+        and p.get("hour") in superior_hours
+        and p.get("intensity") in ("moderado", "denso")
+    ]
+    marrom_difuso_present = [
+        p for p in pigments
+        if p.get("type") == "marrom_difuso" and p.get("intensity") in ("moderado", "denso")
+    ]
+
+    # Branch 1: neurogenica (azul + densa → fibras radiais finas marcadas)
+    if primary_color == "azul" and interpretation == "densa":
+        indicators.append("coloracao_azul_clara")
+        indicators.append("fibras_radiais_finas_marcadas")
+        return {"primary": "neurogenica", "confidence": 0.7, "indicators": indicators}
+
+    # Branch 2: linfatica (azul + esparsa/media/media-densa)
     if primary_color == "azul":
         indicators.append("coloracao_azul_clara")
-        if interpretation in ("esparsa", "media"):
-            constitution = "linfatica"
-            confidence = 0.8 if iris_color.get("secondary") is None else 0.7
-        else:
-            constitution = "mista"
-            confidence = 0.6
-    elif primary_color == "castanho":
+        return {
+            "primary": "linfatica",
+            "confidence": 0.8 if iris_color.get("secondary") is None else 0.7,
+            "indicators": indicators,
+        }
+
+    # Branch 3: biliar / mista_biliar (verde-mosaico|misto + pigmento amarelo)
+    if primary_color in ("verde-mosaico", "misto") and len(amarelo_ambar_superior) >= 2:
+        indicators.append("coloracao_verde_amarelada")
+        indicators.append("pigmento_amarelo_ambar_setorial")
+        if interpretation == "densa":
+            return {"primary": "biliar", "confidence": 0.7, "indicators": indicators}
+        return {"primary": "mista_biliar", "confidence": 0.65, "indicators": indicators}
+
+    # Branch 4: mista_hematogenea (castanho + pigmento marrom difuso x≥2)
+    if primary_color == "castanho" and len(marrom_difuso_present) >= 2:
         indicators.append("coloracao_castanha")
-        constitution = "hematogenea"
-        confidence = 0.7
-    else:
-        indicators.append("coloracao_mista_ou_verde")
-        constitution = "mista"
-        confidence = 0.6
+        indicators.append("pigmento_marrom_difuso")
+        return {"primary": "mista_hematogenea", "confidence": 0.65, "indicators": indicators}
 
-    if interpretation in ("media", "media-densa"):
-        indicators.append("fibras_finas_radiais")
+    # Branch 5: hematogenea pura (castanho sem pigmento difuso)
+    if primary_color == "castanho":
+        indicators.append("coloracao_castanha")
+        return {"primary": "hematogenea", "confidence": 0.8, "indicators": indicators}
 
-    return {
-        "primary": constitution,
-        "confidence": confidence,
-        "indicators": indicators,
-    }
+    # Branch 6: fallback (verde-mosaico|misto sem pigmento ou outras combinações)
+    indicators.append("coloracao_mista_ou_verde")
+    return {"primary": "mista", "confidence": 0.6, "indicators": indicators}
 
 
 def _build_collarette() -> dict:

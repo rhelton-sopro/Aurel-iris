@@ -313,3 +313,82 @@ def test_classify_iris_color_pupil_hint_optional_no_crash():
     # No pupil_circle, no iris_circle — should not raise
     result = classify_iris_color(img)
     assert result["primary"] in {"azul", "castanho", "verde-mosaico", "misto"}
+
+
+# ---------------------------------------------------------------------------
+# PLAN 07.1-02 P0.2 — ConstitutionType enum + 6-way heuristic
+# ---------------------------------------------------------------------------
+
+def test_classify_constitution_mista_biliar_when_yellow_amber_pigment_present():
+    """Verde-mosaico + ≥2 amarelo_ambar moderado pigments in hours 11/12/1/2 → mista_biliar."""
+    from pipeline.features import _classify_constitution
+
+    iris_color = {"primary": "verde-mosaico", "secondary": None, "central_heterochromia": False}
+    fiber_density = {"score": 0.55, "interpretation": "media"}
+    sectoral_pigments = [
+        {"hour": 12, "type": "amarelo_ambar", "intensity": "moderado", "delta_lab": [0, 0, 18]},
+        {"hour": 1, "type": "amarelo_ambar", "intensity": "denso", "delta_lab": [0, 0, 26]},
+    ]
+    result = _classify_constitution(iris_color, fiber_density, sectoral_pigments=sectoral_pigments)
+    assert result["primary"] == "mista_biliar"
+    assert "pigmento_amarelo_ambar_setorial" in result["indicators"]
+    assert result["confidence"] >= 0.65
+
+
+def test_classify_constitution_biliar_pure_no_lymphatic_base():
+    """Verde-mosaico denso + ≥2 amarelo-âmbar superior + alta densidade → biliar."""
+    from pipeline.features import _classify_constitution
+
+    iris_color = {"primary": "verde-mosaico", "secondary": None, "central_heterochromia": False}
+    fiber_density = {"score": 0.90, "interpretation": "densa"}
+    sectoral_pigments = [
+        {"hour": 12, "type": "amarelo_ambar", "intensity": "denso", "delta_lab": [0, 0, 30]},
+        {"hour": 1, "type": "amarelo_ambar", "intensity": "moderado", "delta_lab": [0, 0, 20]},
+    ]
+    result = _classify_constitution(iris_color, fiber_density, sectoral_pigments=sectoral_pigments)
+    assert result["primary"] == "biliar"
+
+
+def test_classify_constitution_hematogenea_pure_unchanged_regression():
+    """Castanho denso + sem pigmento difuso continua hematogenea (não promove para mista_hematogenea)."""
+    from pipeline.features import _classify_constitution
+
+    iris_color = {"primary": "castanho", "secondary": None, "central_heterochromia": False}
+    fiber_density = {"score": 0.85, "interpretation": "densa"}
+    result = _classify_constitution(iris_color, fiber_density, sectoral_pigments=[])
+    assert result["primary"] == "hematogenea"
+
+
+def test_classify_constitution_mista_hematogenea_when_brown_diffuse_pigment():
+    """Castanho + marrom_difuso pigment x≥2 → mista_hematogenea."""
+    from pipeline.features import _classify_constitution
+
+    iris_color = {"primary": "castanho", "secondary": None, "central_heterochromia": False}
+    fiber_density = {"score": 0.6, "interpretation": "media"}
+    sectoral_pigments = [
+        {"hour": 9, "type": "marrom_difuso", "intensity": "moderado", "delta_lab": [-12, 6, 8]},
+        {"hour": 10, "type": "marrom_difuso", "intensity": "moderado", "delta_lab": [-13, 7, 9]},
+    ]
+    result = _classify_constitution(iris_color, fiber_density, sectoral_pigments=sectoral_pigments)
+    assert result["primary"] == "mista_hematogenea"
+
+
+def test_classify_constitution_neurogenica_when_fine_radial_dense():
+    """Azul + densa = neurogenica (fibras radiais finas marcadas)."""
+    from pipeline.features import _classify_constitution
+
+    iris_color = {"primary": "azul", "secondary": None, "central_heterochromia": False}
+    fiber_density = {"score": 0.88, "interpretation": "densa"}
+    result = _classify_constitution(iris_color, fiber_density, sectoral_pigments=[])
+    assert result["primary"] == "neurogenica"
+
+
+def test_classify_constitution_sectoral_pigments_optional_default_none():
+    """Backward compat: chamadas sem sectoral_pigments funcionam (default None)."""
+    from pipeline.features import _classify_constitution
+
+    result = _classify_constitution(
+        {"primary": "azul", "secondary": None, "central_heterochromia": False},
+        {"score": 0.5, "interpretation": "esparsa"},
+    )
+    assert result["primary"] == "linfatica"
