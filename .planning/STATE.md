@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: "Phase 07.1.5 closed B_INFEASIBLE + escalation route DECIDED: 07.1.6 = canonical capture via Sonnet bbox (NOT U-Net). Probe Sonnet 5/6 viável; Haiku probe templated (radius 0.12 fixo); rotation detection morta em ambos VLMs. Capture/validate hardening shipped (commit ed7b7be) — borrado + reflexo_total agora hard-block, muito_longe qualitativo (íris ≤ 1/5 menor dim)."
-stopped_at: "Phase 07.1.5 ABANDONED P2 (founder chose ESCALATE_NEW_PHASE per 2026-05-11). Phase 07.1.6 escopo locked com 8 decisões C-01..C-08 em CHECKPOINT-2026-05-11-phase7.1.5-and-canonical-capture-decision.md. Próxima sessão: `/gsd-discuss-phase 07.1.6` para refinar (confidence threshold + feature flag default + backfill estratégia + bbox regression tooling)."
-last_updated: "2026-05-11T19:00:00.000Z"
+status: "Phase 07.1.6 escopo definitivamente LOCKED (full scope: 1 Sonnet bbox call per foto, 6 calls/reading ~$0.05). Capture protocol revisto shipped (commit f885462 — paciente fixo + flash ativo + câmera tilt sutil). Re-probe Nailli (reading e85ea7de) com novo protocolo: Sonnet 5/6 visualmente OK, fiber detail melhor com flash; geometric convergence melhorou 59% no LEFT (637→343 px) mas continua >50px gate — confirma que shared-bbox-per-eye é inviável, precisa per-photo. Pronto pra /gsd-discuss-phase 07.1.6."
+stopped_at: "Phase 07.1.5 ABANDONED. Phase 07.1.6 = canonical capture via Sonnet bbox per-photo. 8 decisões C-01..C-08 em CHECKPOINT-2026-05-11 + decisão arquitetural definitiva (full scope, não reduzido). Próxima sessão: `/clear` então `/gsd-discuss-phase 07.1.6` para refinar 4 gray areas remanescentes — confidence threshold (right_frontal failed com conf 0.78, gate <0.5 não pega), feature flag default, backfill estratégia (Nailli antiga 71a7bf1d agora em /pre-protocol/ pra audit), bbox regression suite (Nailli nova e85ea7de = primeira golden fixture)."
+last_updated: "2026-05-12T00:00:00.000Z"
 progress:
   total_phases: 11
   completed_phases: 7
