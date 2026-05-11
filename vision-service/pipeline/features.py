@@ -53,7 +53,19 @@ IRIS_COLOR_LABELS: tuple[str, ...] = ("azul", "castanho", "verde-mosaico", "mist
 IRIS_COLOR_LAB_CENTROIDS: dict[str, tuple[int, int, int]] = {
     "azul": (220, 130, 110),
     "castanho": (90, 145, 160),
-    "verde-mosaico": (140, 110, 145),
+    # P0.4 (PLAN 07.1-02, 2026-05-11): recalibrated from Nailli fixture
+    # (reading 71a7bf1d, real_iris_color='mista_biliar' — verde-acinzentado
+    # base + amarelo-âmbar superior). Both eyes (n=2) produced
+    # OD: LAB (149,140,144), OE: LAB (150,142,145); mean (150,141,145)
+    # via apps/web/scripts/recalibrate-centroids.mjs. Intra-cluster variance
+    # (1,1,1) — left/right symmetric. Previous hardcoded value (140,110,145)
+    # had `a` channel pulled to 110 (more green than the real photographic
+    # signal) which made distance to 'castanho' (a=145) artificially
+    # smaller than distance to verde-mosaico for the Nailli iris,
+    # contributing to the castanho/hematogenea misclassification cascade
+    # diagnosed 2026-05-09. Sanity gate L in [50,200]: PASS (L=150).
+    # Re-derive as calibration corpus grows past N=3 per category.
+    "verde-mosaico": (150, 141, 145),
 }
 """Heuristic LAB anchor centroids for color classification.
 'misto' is the fallback when distances to all three are within 10% of each other.
