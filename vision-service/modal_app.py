@@ -207,11 +207,13 @@ def run_pipeline(reading_id: str, image_urls: list[dict]) -> dict:
     call_id = modal.current_function_call_id()
     warnings: list[str] = []
     stages_timing: dict[str, int] = {}
+    detect_diagnostics: dict[str, list[dict]] = {}  # Wave C probe
     jensen = load_jensen_map()
     results: dict = {}
 
     for eye in ("right", "left"):
         eye_images = [u for u in image_urls if u.get("eye") == eye]
+        per_eye_diag: list[dict] = []
         try:
             # Stage 1: detect (per angle)
             t0 = _time.monotonic()
@@ -226,19 +228,44 @@ def run_pipeline(reading_id: str, image_urls: list[dict]) -> dict:
                     detected.append(
                         {"angle": entry["angle"], "image": entry["image"], "detection": det}
                     )
+                    per_eye_diag.append({
+                        "angle": entry["angle"],
+                        "detector": det.get("_detector", "unknown"),
+                        "detect_center": list(det.get("center", [])),
+                        "detect_radius": float(det.get("radius", 0.0)),
+                    })
                 except ValueError as e:
                     warnings.append(f"detect_{eye}_{entry['angle']}_{str(e)}")
+                    per_eye_diag.append({
+                        "angle": entry["angle"],
+                        "detector": "failed",
+                        "error": str(e),
+                    })
             stages_timing[f"detect_{eye}"] = int((_time.monotonic() - t0) * 1000)
+            detect_diagnostics[eye] = per_eye_diag  # bind early; segment loop mutates in place
             if not detected:
                 raise RuntimeError(f"detect_failed_all_angles_{eye}")
 
             # Stage 2: segment (per angle)
             t0 = _time.monotonic()
             segmented = []
+            warn_before_segment = len(warnings)
             for d in detected:
                 seg = segment.iris_mask(d["image"], d["detection"], warnings=warnings)
                 seg["angle"] = d["angle"]
                 segmented.append(seg)
+                iris_c = seg.get("iris_circle")
+                segment_fallback = any(
+                    "hough_segment_failed_fallback_mediapipe" in w
+                    for w in warnings[warn_before_segment:]
+                )
+                for diag in per_eye_diag:
+                    if diag["angle"] == d["angle"] and "segment_iris_circle" not in diag:
+                        diag["segment_iris_circle"] = (
+                            list(iris_c) if iris_c is not None else None
+                        )
+                        diag["segment_hough_fallback"] = segment_fallback
+                        break
             stages_timing[f"segment_{eye}"] = int((_time.monotonic() - t0) * 1000)
 
             # Stage 3: compose
@@ -283,6 +310,7 @@ def run_pipeline(reading_id: str, image_urls: list[dict]) -> dict:
             "stages_timing_ms": stages_timing,
             "warnings": warnings,
             "error_summary": error_summary,
+            "detect_diagnostics": detect_diagnostics,
         }
         failed_features = {
             "right_eye": None,
@@ -309,6 +337,7 @@ def run_pipeline(reading_id: str, image_urls: list[dict]) -> dict:
             "stages_timing_ms": stages_timing,
             "warnings": warnings,
             "error_summary": None,
+            "detect_diagnostics": detect_diagnostics,
         },
     }
     validated = IrisFeatures.model_validate(full_payload)

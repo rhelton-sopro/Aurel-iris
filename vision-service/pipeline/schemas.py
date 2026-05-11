@@ -191,6 +191,7 @@ class ProcessingMetadata(BaseModel):
     stages_timing_ms: dict[str, int] = Field(default_factory=dict)
     warnings: list[str] = Field(default_factory=list)
     error_summary: Optional[str] = None  # populated only when reading is failed; D-E1 catalog
+    detect_diagnostics: dict = Field(default_factory=dict)  # Wave C probe: per-eye per-angle detect+segment circles
 
     model_config = ConfigDict(extra="forbid")
 

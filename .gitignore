@@ -16,6 +16,10 @@ __pycache__/
 .venv/
 .env
 
+# vision-service ML models (downloaded on-demand by probe scripts)
+vision-service/models/*.task
+vision-service/scripts/output/
+
 # environment
 .env.local
 .env*.local
