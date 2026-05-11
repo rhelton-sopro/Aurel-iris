@@ -17,6 +17,8 @@ from typing import Optional
 import cv2
 import numpy as np
 
+from pipeline.masks import color_iris_mask
+
 # Starting values calibrated for ~1024px resized iris images.
 # Source: Literature (Masek 2003, Daugman 2004) + OpenCV Hough docs.
 # These are STARTING POINTS — must be calibrated against founder fixtures (D-X3).
@@ -76,6 +78,15 @@ def iris_mask(
     # --- Hough pre-processing ------------------------------------------------
     # Convert RGB → gray; medianBlur reduces specular highlight noise before Hough.
     gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+
+    # --- Phase 07.1.5 additive defense: same color mask as detect.py ---
+    # Even with a good seed, segment's independent Hough can still pick
+    # eyebrow arcs on full-resolution input. Apply the same shared color
+    # mask (pipeline.masks.color_iris_mask) so the gradient image only
+    # sees iris-candidate pixels.
+    _seg_color_mask = color_iris_mask(image)
+    gray = cv2.bitwise_and(gray, gray, mask=_seg_color_mask)
+
     gray_blur = cv2.medianBlur(gray, 5)
 
     # --- HoughCircles call (RESEARCH Pattern 5) --------------------------------

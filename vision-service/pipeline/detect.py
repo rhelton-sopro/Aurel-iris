@@ -24,6 +24,8 @@ import cv2  # noqa: F401  # imported for side-effect compatibility on some MP bu
 import mediapipe as mp
 import numpy as np
 
+from pipeline.masks import color_iris_mask
+
 LEFT_IRIS = [468, 469, 470, 471, 472]
 RIGHT_IRIS = [473, 474, 475, 476, 477]
 
@@ -118,6 +120,14 @@ def _hough_circle_fallback(image: np.ndarray) -> dict:
     bgr = cv2.cvtColor(small, cv2.COLOR_RGB2BGR)
     gray = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
 
+    # --- Approach B color pre-segmentation (Phase 07.1.5 D-01) ---
+    # Remove eyebrow/eyelid arcs from Hough accumulator search space by
+    # masking out non-iris pixels BEFORE Canny gradient computation.
+    mask = color_iris_mask(small)
+    mask_ratio = float(np.count_nonzero(mask)) / float(mask.size)
+    gray = cv2.bitwise_and(gray, gray, mask=mask)
+    print(f"[detect] color_mask ratio={mask_ratio:.3f}")
+
     # Median blur reduces noise without softening edges (better than Gaussian
     # for Hough — preserves the iris/sclera boundary).
     blurred = cv2.medianBlur(gray, 5)
@@ -169,7 +179,8 @@ def _hough_circle_fallback(image: np.ndarray) -> dict:
         "center": (float(cx), float(cy)),
         "radius": float(r),
         "landmarks_raw": [],  # Hough produces no landmarks — segment.py only uses center+radius
-        "_detector": "hough",  # debug breadcrumb so downstream can log which path was used
+        "_detector": "hough_color_masked",  # Phase 07.1.5 D-01 breadcrumb
+        "_color_mask_ratio": mask_ratio,    # diagnostic — open-dict per D-13
     }
 
 
