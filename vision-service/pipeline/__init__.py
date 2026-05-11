@@ -6,6 +6,14 @@ Order: detect -> segment -> compose -> normalize -> enhance -> features.
 Status: SKELETON ONLY — Phase 1 (Setup). Real implementations land in Phase 5.
 """
 
-from . import compose, detect, enhance, features, normalize, segment
+from . import compose, detect, enhance, features, normalize, sectoral_pigments, segment
 
-__all__ = ["detect", "segment", "compose", "normalize", "enhance", "features"]
+__all__ = [
+    "detect",
+    "segment",
+    "compose",
+    "normalize",
+    "enhance",
+    "features",
+    "sectoral_pigments",
+]

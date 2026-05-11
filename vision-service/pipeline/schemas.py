@@ -85,6 +85,23 @@ class Pupil(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
 
+class SectoralPigment(BaseModel):
+    """Per-sector chromatic pigment marker (PLAN 07.1-02 P0.3).
+
+    Detected by pipeline.sectoral_pigments.detect_sectoral_pigments via
+    LAB delta vs per-image stroma base. Clinically actionable types:
+    amarelo_ambar (hepato-biliary), laranja (digestive/pancreatic),
+    marrom_difuso (chronic hematogenea overlap).
+    """
+
+    hour: int = Field(ge=1, le=12)
+    type: str  # 'amarelo_ambar' | 'laranja' | 'marrom_difuso'
+    intensity: str  # 'leve' | 'moderado' | 'denso'
+    delta_lab: list[float] = Field(min_length=3, max_length=3)
+
+    model_config = ConfigDict(extra="forbid")
+
+
 class Finding(BaseModel):
     type: str  # "lacuna" | "pigmentacao" | "cripta" | future...
     depth: Optional[str] = None
@@ -157,6 +174,7 @@ class EyeFeatures(BaseModel):
     collarette: Collarette
     pupil: Pupil
     sectors: list[Sector] = Field(default_factory=list)
+    sectoral_pigments: list[SectoralPigment] = Field(default_factory=list)
     rings: Rings
     global_signs: GlobalSigns
     image_quality: ImageQuality

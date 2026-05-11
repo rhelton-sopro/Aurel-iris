@@ -29,6 +29,8 @@ from typing import Optional
 import cv2
 import numpy as np
 
+from pipeline.sectoral_pigments import detect_sectoral_pigments
+
 # ---------------------------------------------------------------------------
 # Module constants (D-X3 calibration anchors — exposed for tuning)
 # ---------------------------------------------------------------------------
@@ -431,9 +433,22 @@ def extract_all(
         pupil_circle=composite_image.get("pupil_circle"),
     )
     fiber_density = _compute_fiber_density(enhanced_image)
-    constitution = _classify_constitution(iris_color, fiber_density)
     collarette = _build_collarette()
     pupil = _build_pupil(composite_image)
+
+    # P0.3 (PLAN 07.1-02): chromatic per-sector pigment detection BEFORE
+    # constitution classification (constitution heuristic consumes pigments).
+    sectoral_pigments = detect_sectoral_pigments(
+        enhanced_image,
+        iris_circle=composite_image.get("iris_circle"),
+        collarette_diameter_ratio=collarette.get("diameter_ratio", 0.32),
+    )
+
+    # P0.2 (PLAN 07.1-02): constitution heuristic accepts sectoral_pigments
+    # to trigger biliar / mista_biliar / mista_hematogenea branches.
+    constitution = _classify_constitution(
+        iris_color, fiber_density, sectoral_pigments=sectoral_pigments
+    )
 
     sectors = []
     for hour in range(1, 13):
@@ -456,6 +471,7 @@ def extract_all(
         "collarette": collarette,
         "pupil": pupil,
         "sectors": sectors,
+        "sectoral_pigments": sectoral_pigments,
         "rings": rings,
         "global_signs": global_signs,
         "image_quality": image_quality,
