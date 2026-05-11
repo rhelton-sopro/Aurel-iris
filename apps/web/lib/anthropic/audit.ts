@@ -1,3 +1,13 @@
+// audit-vocabulary:allowlist — este arquivo IMPLEMENTA o detector LGPD
+// (FORBIDDEN_VOCAB_RE + NEG_CONTEXT_RE) e cita os 3 termos restritos em
+// COMENTÁRIOS DE DOCUMENTAÇÃO ao explicar a heurística de skip negativo
+// ("não um diagnóstico médico", "não substitui tratamento", etc — exemplos
+// de construções LGPD-corretas que o regex deliberadamente ignora). O CÓDIGO
+// em si permanece limpo: os termos só aparecem montados via array-join em
+// _F1/_F2/_F3 (Pitfall 7 + W6). Meta-invariante runtime em audit.test.ts
+// (linhas 386-409) faz o gate strip-comments e prova absence-in-code. Marker
+// file-level honra a mesma escapatória usada por types.ts (07-03) e
+// /app/admin/ (07.1-03 calibration tooling — commit 18592c4).
 /**
  * Audit module — anchor rate (D-A1) + LGPD forbidden vocab (D-A2).
  *
@@ -7,9 +17,11 @@
  *
  * SOURCE-CLEANLINESS CONSTRAINT (Pitfall 7 + audit-vocabulary self-match
  * avoidance): the three forbidden vocabulary terms NEVER appear as literal
- * substrings in this source file. They are assembled via array-join into the
- * RegExp constructor. A meta-invariant test in audit.test.ts asserts this
- * cleanliness by reading the source and checking absence outside comments.
+ * substrings in this source file's CODE. They are assembled via array-join
+ * into the RegExp constructor. A meta-invariant test in audit.test.ts asserts
+ * this cleanliness by reading the source and checking absence outside comments.
+ * The allowlist marker above covers legitimate comment mentions in the LGPD
+ * negative-skip documentation (added 2026-05-09 dogfooding C2 fix).
  *
  * Word-boundary parity (Pitfall 7 / W6): word-boundary regex `\b...\b` mirrors
  * the file-scan audit (`audit-vocabulary.mjs` is intentionally substring per
