@@ -21,6 +21,8 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
 - [ ] **Fase 5: Pipeline de visão (Modal)** — Serviço Modal `analyze_iris` produzindo o JSON canônico de features.
 - [x] **Fase 6: RAG — Ingestão da base de conhecimento** — Corpus iridológico chunked, embedded e indexado em pgvector. Concluída 2026-05-06 (UAT 5/5 PASS + secure-phase 16/16 threats closed).
 - [ ] **Fase 7: Análise LLM** — Relatório iridológico em pt-BR gerado por Claude Sonnet 4.6 ancorado em features + RAG.
+- [x] **Fase 7.1 (INSERTED): Dogfooding fixes** — 3 plans entregues 2026-05-09..11: audit regex polish (C1+C2) + vision pipeline calibration (P0.1-P0.4) + admin calibration page. Status: human_needed (24/25 truths; T5 empirical Nailli convergence deferred para 7.2).
+- [ ] **Fase 7.2 (INSERTED): Wave C — corpus expansion + threshold tuning** — Founder annotation sprint (N≥3 fixtures por iris-color category) + re-run `recalibrate-centroids.mjs` + tune `detect_sectoral_pigments` thresholds contra real-photo LAB-delta distributions. Goal: Nailli reprocess converge para `iris_color ∈ {verde-mosaico, misto}` + `constitution ∈ {mista_biliar, biliar, mista}` + `sectoral_pigments` não-vazio (closes 07.1-HUMAN-UAT items 1-3).
 - [ ] **Fase 8: Pagamento + LGPD** — Stripe BR (BRL+PIX) com trial 14d e termo de consentimento + direitos LGPD.
 - [ ] **Fase 9: Polish + dogfooding + beta** — Onboarding, e-mail transacional, uso semanal real pelo fundador, depois beta com 10–20 terapeutas.
 - [ ] **Fase 10: Sistema de Aprendizagem Clínica** *(planejada — backlog de longo prazo, executar depois da Fase 9 fechar)* — Captura de diff entre relatório gerado e entregue → descoberta de heurísticas emergentes + scoring clínico próprio + sugestões pré-preenchidas. Transforma o produto de "software de iridologia" em "sistema proprietário de análise iridológica" intransponível. **Pré-requisito de captura de dados embutido na Fase 7** (relatório_gerado, relatório_entregue, zonas_editadas, tipo_edição). Ver `.planning/phases/10-aprendizagem-clinica/10-CONTEXT.md`.
@@ -245,6 +247,26 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
 - D-T1 telemetria estruturada SEM PII: apenas UUIDs + counts + latencies + token buckets (cache_creation_input_tokens + cache_read_input_tokens separados Pitfall 4) — 07-03 (estimateCostUsd), 07-07 (analyze.ts), 07-08 (regeneration_log)
 
 **UI hint**: yes
+
+### Fase 7.2 (INSERTED): Wave C — corpus expansion + threshold tuning
+**Origem:** Closure de 07.1-HUMAN-UAT (3 items pendentes após `/gsd-execute-phase 07.1` 2026-05-11 verificar `human_needed` com 24/25 truths). Decimal/inserida em vez de aguardar Fase 8 porque desbloqueia uso real (sem Wave C, Nailli continua classificada `castanho/hematogenea/[]` apesar do código P0.1-P0.4 entregue).
+**Goal**: Após corpus de calibração expandido (≥3 fixtures por iris-color category via `/admin/calibration`) + tuning empírico de `detect_sectoral_pigments`, reprocess da Nailli produz `iris_color.primary ∈ {verde-mosaico, misto}` (não `castanho`) + `constitution.primary ∈ {mista_biliar, biliar, mista}` (não `hematogenea`) + `sectoral_pigments` contém ≥1 entry `amarelo_ambar` nos hours 11/12/1/2 com `intensity ≥ moderado`.
+**Depends on**: Fase 7.1 (P0.1-P0.4 código entregue; sectoral_pigments wire ativo no Modal payload). Pode rodar em paralelo com Fase 7 LLM (audit gates ANCHOR_RE + LGPD-aware já corretos via 07.1-01).
+**Requirements**: nenhum formal (backlog Phase 9 RESP-01..03 será confirmado quando empirical convergence validar approach).
+**Success Criteria** (o que deve ser verdade):
+  1. Corpus de calibração tem ≥3 fixtures por categoria (verde/verde-mosaico, azul, castanho, mista_hematogenea) anotadas em `calibration_annotations` com `real_iris_color` + `real_constitution` ground truth.
+  2. `recalibrate-centroids.mjs` re-rodado: propõe centroides para `azul` e `castanho` (hoje hardcoded) + estabiliza `verde-mosaico` sobre N≥6 (3 readings × 2 olhos); intra-cluster variância reportada por categoria.
+  3. `detect_sectoral_pigments` empirically detecta `amarelo_ambar` no setor superior em ≥1 dos fixtures verde-mosaico anotados (Nailli + 2 outras se disponíveis). Thresholds (`DELTA_B_LEVE_MIN/MODERADO_MIN/DENSO_MIN` + `CILIARY_RING_TOP_FRAC/BOTTOM_FRAC`) tunados contra distribuição LAB-delta real observada.
+  4. Após Modal redeploy com thresholds tunados, reprocess da Nailli (reading `71a7bf1d-747f-4de8-9129-13b69197c6a4`) produz vision_features com os 3 critérios da Goal acima — validado via direct query OU founder visual confirmation em `/admin/calibration/[id]`.
+  5. (Stretch) Pipeline rodado em ≥2 fixtures adicionais (não-Nailli) e features visualmente plausíveis (founder qualitative gate).
+**Plans**: TBD via `/gsd-discuss-phase 07.2` (esperado: 1-3 plans cobrindo annotation workflow doc + threshold tuning + recalibrate re-run).
+
+**Cross-cutting constraints:**
+- Founder annotation é **manual** (não automatizável); plans descrevem o workflow + checklist, não delegam o ato de anotar.
+- Threshold tuning é empírico: PR contém LAB-delta distribution evidence por categoria, não apenas mudança de constantes.
+- Modal redeploy é founder gate.
+
+**UI hint**: no (Wave C usa /admin/calibration já entregue em 07.1-03; não cria UI nova).
 
 ### Fase 8: Pagamento + LGPD
 **Mapeamento SPEC:** Fase 7 — Pagamento + LGPD (3–4 dias).

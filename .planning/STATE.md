@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: "Phase 07.1 closed (human_needed) — 3 plans entregues (07.1-01 audit regex polish + 07.1-02 vision pipeline calibration P0.1-P0.4 + 07.1-03 admin calibration page) — 24/25 truths VERIFIED, T5 empirical Nailli convergence DEFERRED para Wave C corpus expansion sprint (acceptance criterion 6)"
-stopped_at: Phase 7.1 verified human_needed — 3 HUMAN-UAT items pendentes (founder annotation N>=3 + threshold tuning + recalibrate re-run). Próximo passo é Wave C ou avançar para Phase 7 análise LLM enquanto founder coleta corpus.
+stopped_at: Phase 7.2 (Wave C) inserida no ROADMAP — corpus expansion + threshold tuning sprint. Próximo passo é /gsd-discuss-phase 07.2 para escopar plans antes da founder annotation sprint começar (alternativa: avançar Phase 7 LLM em paralelo enquanto corpus expande).
 last_updated: "2026-05-11T13:00:00.000Z"
 progress:
   total_phases: 8
@@ -24,9 +24,9 @@ Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 
 ## Posição atual
 
-Fase: 7.1 FECHADA (human_needed) — Wave C corpus-expansion sprint pendente OU avançar para Fase 7 / 8 enquanto founder coleta corpus
-Plan: Phase 07.1 dogfooding-fixes — 3/3 plans entregues (07.1-01, 07.1-02 partial-acceptance, 07.1-03); 24/25 truths VERIFIED
-Próxima ação: `/clear` então decidir entre (a) Wave C — founder annotation sprint via `/admin/calibration` (N>=3 fixtures por categoria) + threshold tuning de sectoral_pigments + recalibrate-centroids re-run, ou (b) `/gsd-discuss-phase 7` para iniciar Fase 7 Análise LLM enquanto corpus expande em paralelo. Wave C é pre-requisito para empirical Nailli convergence (iris_color → verde-mosaico, constitution → mista_biliar) mas NÃO bloqueia Fase 7 LLM começar (Fase 7 já tem audit gates ANCHOR_RE + extractForbiddenHits LGPD-aware funcionais via 07.1-01).
+Fase: 7.2 (Wave C — corpus expansion + threshold tuning) INSERIDA no ROADMAP, aguardando planning
+Plan: Phase 07.2 sem plans ainda (TBD via /gsd-discuss-phase). Phase 07.1 fechada (human_needed; 24/25 truths VERIFIED, 3 HUMAN-UAT items migrados para acceptance criteria da 07.2).
+Próxima ação: `/clear` então `/gsd-discuss-phase 07.2` para escopar plans (esperado 1-3 plans cobrindo annotation workflow doc + threshold tuning + recalibrate re-run). Annotation sprint é founder work manual — plans descrevem o workflow/checklist, não delegam o ato de anotar. Alternativa paralela: `/gsd-discuss-phase 7` para Fase 7 Análise LLM enquanto corpus expande (audit gates ANCHOR_RE + extractForbiddenHits LGPD-aware já corretos via 07.1-01).
 
 **Phase 07.1 execução (2026-05-11):** orquestrador `/gsd-execute-phase 07.1` rodou 2 waves sequenciais sem worktree isolation (single-plan-per-wave; Windows worktree pain memo) — 9 commits novos + REVIEW.md + VERIFICATION.md + HUMAN-UAT.md. Wave A (07.1-01 back-fill: 4abe518 + 3232c13) closou audit-vocabulary allowlist marker + SUMMARY record (work substantivamente shipped em 1e58a88+36ad36c 2026-05-09). Wave B (07.1-02: 140fbf1+6db8b7c+142d06a+3c1362d+a894edb+73c26d1+11d536f) entregou P0.1 pupil mask + P0.2 ConstitutionType 6-way + P0.3 sectoral_pigments.py + P0.4 recalibrate-centroids.mjs + first-pass verde-mosaico apply. Modal deploy succeeded; sectoral_pigments key PRESENT em Nailli payload (T3 wire ativo). Empirical values ainda castanho/hematogenea/[] — acceptance criterion 6 (Wave C corpus expansion) é o explicit planned fallback. Code review: 0 critical / 4 warning / 6 info (WR-01 features.py:539-542 asymmetry bug é pre-existing Phase 5.9 commit 1b9cbb6, NÃO 07.1; WR-04 30-char lookback documentado nas plan failure_modes; WR-02/WR-03 = polish para Wave C).
 Status: Wave 3 entregou 9 commits atômicos em paralelo via 3 worktrees disjuntos:
