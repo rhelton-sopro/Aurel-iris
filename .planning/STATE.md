@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: "Wave 3 entregou 9 commits atômicos em paralelo via 3 worktrees disjuntos:"
-stopped_at: "Phase 7.1 — PLAN 07.1-02 (Wave B) PRONTO PARA EXECUÇÃO. Próxima sessão: `/clear` então `/gsd-execute-phase 07.1` (executor agent roda T1-T4 sequencial em ~7-10h de wall time + waves intermédias). Após execução, founder roda `modal deploy` + reprocess Nailli pra validar ciclo end-to-end."
-last_updated: "2026-05-11T17:35:08.755Z"
+status: "Phase 07.1.5 P1 (Plan 01) executed: verdict B_INFEASIBLE — Approach B HSV color pre-segmentation implemented + 3-cycle probe iteration shows monotonic but insufficient convergence on Nailli (974→496→279 px center spread, gate <=50 px unreached). P2 auto-blocked awaiting founder ESCALATE_C vs ESCALATE_NEW_PHASE."
+stopped_at: "Phase 07.1.5 P2 — AUTO-BLOCKED at Task 0 (founder-strengthened gate per 2026-05-11 directive 'Auto-block C-branch'). Founder must explicitly choose: type literal `ESCALATE_C` token to in-phase absorb Approach C (U-Net), OR default to `ESCALATE_NEW_PHASE` and run `/gsd-insert-phase 07.1.6 --reason 'C escalation'` for fresh phase with own cost ceiling."
+last_updated: "2026-05-11T18:30:00.000Z"
 progress:
   total_phases: 11
   completed_phases: 7
-  total_plans: 73
-  completed_plans: 70
-  percent: 96
+  total_plans: 75
+  completed_plans: 71
+  percent: 94
 ---
 
 # Estado do projeto
@@ -24,9 +24,11 @@ Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 
 ## Posição atual
 
-Fase: 7.1.5 (Detect/segment robustness para close-up iris photos) — CONTEXT.md gathered 2026-05-11, ready for planning. 7.2 segue blocked-on-7.1.5.
-Plan: Phase 07.1.5 sem plans ainda (TBD via /gsd-plan-phase 07.1.5). CONTEXT.md tem 13 decisões locked (approach B→C cascade, verification gate Nailli + 2-3 synthetic fixtures, 2-plan structure com stop-loss em P1).
-Próxima ação: `/clear` então `/gsd-plan-phase 07.1.5`. CONTEXT.md + DISCUSSION-LOG.md + DISCUSSION-NOTES.md pre-carregam o planner com 13 decisões + empirical findings + Modal-side detect_diagnostics baseline. Alternativa paralela: `/gsd-discuss-phase 7` para Fase 7 Análise LLM (disjunto de vision-service).
+Fase: 7.1.5 (Detect/segment robustness para close-up iris photos) — P1 executado 2026-05-11 com verdict **B_INFEASIBLE**; P2 auto-bloqueado em Task 0 aguardando founder decision (ESCALATE_C vs ESCALATE_NEW_PHASE). 7.2 segue blocked-on-7.1.5.
+Plan: 07.1.5-01 COMPLETO (verdict B_INFEASIBLE, 4 commits a67eb1f→f415ac8). 07.1.5-02 AUTO-BLOCKED em Task 0.
+Próxima ação: founder decide entre (a) `ESCALATE_C` em P2 Task 0 — in-phase absorption de Approach C (smp.Unet + MobileNetV3-small + iris_unet.pth checkpoint pre-bake no Modal image; ~5 tasks, 2-3× P2 cost, 200 MB wget), OU (b) default `ESCALATE_NEW_PHASE` — `/gsd-insert-phase 07.1.6 --reason 'C escalation after B_INFEASIBLE'` para fresh phase com cost ceiling próprio. Founder directive explícito (2026-05-11): "Auto-block C-branch. Não quero que ele tome essa decisão sozinho dado o custo e complexidade."
+
+**Phase 07.1.5 P1 execução (2026-05-11):** orquestrador `/gsd-execute-phase 07.1.5` rodou sequential single-plan-wave (no worktree, Windows pain memo). 4 commits atômicos: `a67eb1f` test(Wave 0) RED scaffolding (6 unit tests test_color_iris_mask.py + 3 detect tests incl. BLOCKER-3 MediaPipe non-regression guard com mocked landmarker + conftest synthetic_close_up_eye fixture + probe --dump-detect-table flag), `173c6ea` feat(Wave 1) pipeline/masks.py com public color_iris_mask helper (HSV→inRange S>=30 V>=40→MORPH_CLOSE→MORPH_OPEN) + integração em _hough_circle_fallback (lines 119→123 insertion) + segment.py iris_mask additive defense + return dict `_detector: hough_color_masked` + `_color_mask_ratio` sub-field, `7bfb5b6` tune(Wave 2) 3 cycles de threshold tuning em _COLOR_MASK_* constants, `f415ac8` docs(P1 SUMMARY) BINARY verdict B_INFEASIBLE + 8 sections (threshold trajectory + per-fixture convergence tables + D-05 fixture rationale + visual gate PNGs + test gate evidence + empirical evidence appendix). **Smoking gun:** post-fix segment radii saltaram de 97-191 px (pre-fix) para 411-681 px porque color mask deixa eyeball/sclera como single iris-candidate connected component — Hough trava no eyeball outer arc em vez do iris inner arc. Monotonic improvement observed (RIGHT 974→496→279 px Cycles 1-3) mas gate <=50 px não atingido. pytest 275 passed / 4 skipped / 0 failures / 279 collected (>= 266 floor). BLOCKER-2 input para P2 SC-2 gate: `C:\Users\rhelt\AppData\Local\Temp\nailli_postfix_detect_diagnostics.json` (Cycle 3 final). modal_app.py unchanged (WARN-5 propagation automática via det.get('_detector', 'unknown')). 3 deviations auto-fixed documentadas em SUMMARY (pre-existing test_no_face_raises_value_error bug `mediapipe_no_face_detected`→`iris_not_detected`; CLOSE kernel expanded (3,3)→(5,5) para fechar 6×6 specular hole; D-05 strict status='ready' relaxed para incluir 'pending' — audit-only, Nailli é verdict gate).
 
 **Investigation track durante /gsd-discuss-phase 07.2 (2026-05-11):** founder pediu para confirmar empiricamente se threshold tuning resolveria antes de planejar 07.2. Sequência: (1) flipped Nailli reading status ready→failed para reprocess UI; (2) wrote `vision-service/scripts/probe_pigment_deltas.py` (local Python probe) — rodou pipeline local + dumped LAB-delta 12-setores per olho + salvou enhanced_polar PNG; (3) probe revelou dB máximo ~5 em setores com pigmento amarelo visível (threshold atual 12 = 4× alto demais) MAS visualmente o PNG mostrou ~35% íris + ~65% pálpebra/esclera/pele — pipeline upstream broken; (4) added `processing_metadata.detect_diagnostics: dict` field em ProcessingMetadata schema + per-angle capture em modal_app.run_pipeline; (5) Modal deploy succeeded; (6) reprocess Nailli call_id `fc-01KRBPC40B4D15XGQJPSNMNX6V` returned detect_diagnostics confirmando segment centers right eye span 700 px / left eye span 1497 px entre 3 ângulos da mesma íris; (7) committed infra (commit 8494a4a) + inserted phase 7.1.5 no ROADMAP + criou DISCUSSION-NOTES.md.
 

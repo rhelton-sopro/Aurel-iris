@@ -263,8 +263,8 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
   6. (Stretch) Probe `probe_pigment_deltas.py` rodado pós-fix produz LAB-delta tables onde sectores 11/12/1/2 do right eye Nailli mostram dB elevado consistente (founder visual correlação com pigmento amarelo-âmbar visível).
 **Plans**: 2 plans
 
-- [ ] 07.1.5-01-PLAN.md — Approach B (HSV color pre-segmentation) implementation + local probe + synthetic fixture iteration + stop-loss verdict (B passes OR escalate to C)
-- [ ] 07.1.5-02-PLAN.md — Modal redeploy + Nailli reprocess + detect_diagnostics geometric gate + final verification (with B_INFEASIBLE branch for C research + implementation)
+- [x] 07.1.5-01-PLAN.md — Approach B (HSV color pre-segmentation) implementation + local probe + synthetic fixture iteration + stop-loss verdict — **B_INFEASIBLE** (2026-05-11, commits a67eb1f→f415ac8; SUMMARY documenta monotonic improvement 974→496→279 px em Cycles 1-3 mas gate <=50 px não atingido; Hough lock-on no eyeball outer arc post-mask)
+- [ ] 07.1.5-02-PLAN.md — Modal redeploy + Nailli reprocess + detect_diagnostics geometric gate + final verification (with B_INFEASIBLE branch for C research + implementation) **— AUTO-BLOCKED em Task 0 awaiting founder ESCALATE_C vs ESCALATE_NEW_PHASE decision per 2026-05-11 directive**
 
 **Cross-cutting constraints:**
 - **Não regressões em fotos com face context (MediaPipe success path):** qualquer mudança em `detect.find_iris` ou `segment.iris_mask` deve preservar caminho atual para fotos onde MediaPipe retorna landmarks. Verificação: tests síntéticos com face-context devem continuar GREEN.
