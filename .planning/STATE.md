@@ -4,7 +4,7 @@ milestone: v1.0
 milestone_name: milestone
 status: "07.1-03 + iterative calibration loop entregues: 14 commits, 32 testes verdes, primeiro diagnóstico Nailli persistido"
 stopped_at: Phase 7.1 — calibration tooling 100% operacional; Wave B (PLAN 07.1-02) é a próxima sessão
-last_updated: "2026-05-10T00:30:00.000Z"
+last_updated: "2026-05-11T12:00:00.000Z"
 progress:
   total_phases: 8
   completed_phases: 6
@@ -165,9 +165,20 @@ Nenhum ainda.
 
 ## Continuidade de sessão
 
-Última sessão: 2026-05-09 noite + supplement (mesma sessão estendida) — **PLAN 07.1-03 ENTREGUE + iterative calibration loop adicionado em cima**. Total 14 commits (7 do PLAN original + 7 supplement), 32 testes vitest verdes, 3 bugs descobertos em produção e corrigidos durante a sessão (safeArray defensivo, 'use server' export hygiene, RLS broken auth.users subquery). Founder smoke confirmado: AnnotationForm + CalibrationDiagnosisForm ambos funcionais em produção; primeiro diagnóstico salvo pra Nailli. Ver `.planning/phases/07.1-dogfooding-fixes/07.1-03-admin-calibration-page-SUMMARY.md` (seção "Post-PLAN supplement").
+Última sessão: 2026-05-11 — **Resume-work session: Modal B1a fix deployed + Nailli reprocess confirmou que B1a sozinho não chega + PLAN 07.1-02 (Wave B) escrito**.
+- `modal deploy modal_app.py` em `vision-service/` → endpoint ativo com fix B1a (commit `889cc94` — filter mask-zeroed pixels antes do k-means de iris color).
+- Reading Nailli `71a7bf1d-747f-4de8-9129-13b69197c6a4` reprocessada via flip-to-failed + Reprocessar UI. Resultado pós-B1a: **iris_color.primary ainda `castanho`**, constitution ainda `hematogenea` em ambos os olhos — call_id KRBARC... — confirma diagnóstico salvo de que B1a é necessário mas insuficiente.
+- **PLAN 07.1-02 escrito** (`.planning/phases/07.1-dogfooding-fixes/07.1-02-vision-pipeline-calibration-PLAN.md`) cobrindo 4 P0s bundlados conforme diagnóstico humano (calibration_diagnoses `19ae43a7-bfb1-44ff-9036-014cb7970dc5`):
+  - **T1 (P0.1):** pupil mask em `classify_iris_color` (~1h) — exclui disco pupilar antes do k-means
+  - **T2 (P0.2):** ConstitutionType enum 6-way + heuristic rewrite (~2-3h) — MISTA_BILIAR/MISTA_HEMATOGENEA/BILIAR/NEUROGENICA
+  - **T3 (P0.3):** novo módulo `vision-service/pipeline/sectoral_pigments.py` + EyeFeatures.sectoral_pigments field (~3-4h) — detector cromático por hora-setor (amarelo_ambar/laranja/marrom_difuso via delta LAB)
+  - **T4 (P0.4):** script `apps/web/scripts/recalibrate-centroids.mjs` read-only + first-pass apply usando Nailli como única fixture verde-mosaico (~1-2h) — graceful degradation com N=1
+- Total estimado: 7-10h. Validação end-to-end = reprocess Nailli pós-PLAN espera iris_color verde-mosaico/misto + constitution mista_biliar + sectoral_pigments≥1 amarelo-âmbar superior. Fallback explícito: se P0.4 first-pass não converge, mantém centroide hardcoded + abre Wave C.
+- Adicionado `apps/web/scripts/reprocess-nailli.mjs` como utilitário reusável (requer MODAL_TOKEN_ID/SECRET no .env.local — atualmente vazios localmente; produção usa Vercel env vars).
 
-Stopped at: Phase 7.1 — tooling de calibração 100% operacional. Próxima sessão começa **PLAN 07.1-02 (Wave B)** com primeira evidência empírica já coletada (Nailli diagnosis row).
+Sessão anterior: 2026-05-09 noite + supplement (mesma sessão estendida) — **PLAN 07.1-03 ENTREGUE + iterative calibration loop adicionado em cima**. Total 14 commits (7 do PLAN original + 7 supplement), 32 testes vitest verdes, 3 bugs descobertos em produção e corrigidos durante a sessão (safeArray defensivo, 'use server' export hygiene, RLS broken auth.users subquery). Founder smoke confirmado: AnnotationForm + CalibrationDiagnosisForm ambos funcionais em produção; primeiro diagnóstico salvo pra Nailli. Ver `.planning/phases/07.1-dogfooding-fixes/07.1-03-admin-calibration-page-SUMMARY.md` (seção "Post-PLAN supplement").
+
+Stopped at: Phase 7.1 — PLAN 07.1-02 (Wave B) PRONTO PARA EXECUÇÃO. Próxima sessão: `/clear` então `/gsd-execute-phase 07.1` (executor agent roda T1-T4 sequencial em ~7-10h de wall time + waves intermédias). Após execução, founder roda `modal deploy` + reprocess Nailli pra validar ciclo end-to-end.
 
 Resume file: `.planning/phases/07.1-dogfooding-fixes/07.1-03-admin-calibration-page-SUMMARY.md`
 
@@ -186,9 +197,9 @@ Resume file: `.planning/phases/07.1-dogfooding-fixes/07.1-03-admin-calibration-p
 3. Always `safeArray()` antes de .map/.filter/.join em jsonb fields — TS types otimistas não catch wrong-type runtime drift.
 
 Próxima ação sugerida:
-1. **PLAN 07.1-02 (Wave B)** — abrir SPEC pra P0a + P0b + B1d + B1b. Primeira diagnose persistida (Nailli) é input empírico inicial. Considerar coletar 5-10 diagnoses ANTES de finalizar plan, pra ter pattern.
-2. **Modal redeploy** (independente) — `cd vision-service && modal deploy modal_app.py` ativa B1a fix em prod. Reprocessar Nailli para validar nova classificação.
-3. **Calibration sprint extra** — anotar mais N readings antes do PLAN 07.1-02 (sessão dedicada ~3-5h).
+1. **Executar PLAN 07.1-02** — `/clear` então `/gsd-execute-phase 07.1` ou executor agent inline. Cobre 4 P0s da Wave B (~7-10h).
+2. **Validar end-to-end pós-execução** — Modal redeploy + reprocess Nailli + verificar iris_color/constitution/sectoral_pigments.
+3. **Wave C planning** — após Wave B fechar, PLAN 07.1-03/04 cobre P1.1 (pixels→mm das lacunas), P1.2 (threshold por constituição), P2.1/P2.2 (collarette/density refinements).
 
 ---
 
