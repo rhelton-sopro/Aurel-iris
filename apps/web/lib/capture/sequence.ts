@@ -57,15 +57,23 @@ export const EYE_LABEL: Record<Eye, string> = {
 }
 
 /**
- * Labels visíveis ao usuário. NÃO descrevem ângulos da câmera (ela fica
- * sempre frontal ao olho); descrevem a ROTAÇÃO DO CORPO/CABEÇA do paciente.
- *   - frontal:   rosto voltado para frente
- *   - lateral:   corpo virado ~90° para a direita
- *   - backlight: corpo virado ~90° para a esquerda
+ * Labels visíveis ao usuário. PROTOCOLO REVISTO 2026-05-12: descrevem
+ * INCLINAÇÃO DA CÂMERA (não rotação do paciente). Paciente fica fixo
+ * olhando para um ponto; o terapeuta inclina a câmera levemente.
+ *   - frontal:   câmera frontal direta à íris
+ *   - lateral:   câmera inclinada ~15° para a direita
+ *   - backlight: câmera inclinada ~15° para a esquerda
  *
- * Os identificadores internos ('frontal'/'lateral'/'backlight') ficam pra
- * compatibilidade do schema (path no Storage, coluna `angle` em
- * `reading_images`). Renomear é breaking change.
+ * Razão da revisão: o protocolo antigo (paciente gira ~90°) produzia
+ * íris em posições muito diferentes entre os 3 ângulos da mesma íris,
+ * frustrando detect/segment (Phase 07.1.5 verdict B_INFEASIBLE) e o
+ * gate de convergência geométrica do photometric stereo.
+ *
+ * Os identificadores internos ('frontal'/'lateral'/'backlight') ficam
+ * pra compatibilidade do schema (path no Storage, coluna `angle` em
+ * `reading_images`). Renomear é breaking change. O nome 'backlight'
+ * em particular ficou semanticamente desatualizado mas mantido por
+ * estabilidade do storage_path histórico.
  */
 export const ANGLE_LABEL: Record<Angle, string> = {
   frontal: 'frente',
@@ -107,11 +115,20 @@ export function getSlotProgressLabel(slotIndex: number): string {
 /**
  * Copy de instrução por slot, exibida na AngleInterstitial antes de cada foto.
  *
- * Princípios (conversa com o terapeuta sobre captura iridológica):
- *  - A câmera fica SEMPRE frontal ao olho. Quem gira é o paciente (cabeça/corpo).
- *  - A fonte de luz nunca deve ficar atrás do paciente.
- *  - 'lateral' = paciente vira ~90° para a direita; 'backlight' = ~90° para a
- *    esquerda. Nomes internos preservados pra não quebrar storage_path.
+ * PROTOCOLO REVISTO 2026-05-12 (founder testou empiricamente no iPhone):
+ *  - PACIENTE fica FIXO olhando para um ponto na parede; NÃO gira o corpo.
+ *  - TERAPEUTA muda a posição da CÂMERA entre as 3 fotos da mesma íris:
+ *      frontal   → câmera direta à íris
+ *      lateral   → câmera inclinada ~15° à DIREITA do terapeuta
+ *      backlight → câmera inclinada ~15° à ESQUERDA do terapeuta
+ *  - FLASH ATIVO em todas as fotos (revela fibras radiais; pupila contrai
+ *    naturalmente; reflexo localizado é pequeno e não atrapalha).
+ *
+ * Razão: o protocolo antigo (paciente gira ~90°) deslocava a íris muito
+ * entre as 3 fotos, frustrando convergência geométrica do photometric
+ * stereo (Phase 07.1.5 B_INFEASIBLE). Tilt sutil de câmera mantém a íris
+ * geometricamente próxima entre fotos enquanto varia a iluminação o
+ * suficiente pra photometric stereo funcionar.
  */
 export function getSlotInstructionCopy(
   slot: Slot,
@@ -125,15 +142,15 @@ export function getSlotInstructionCopy(
   switch (slot.angle) {
     case 'frontal':
       angleLabel = 'Frente'
-      subtitle = `Rosto voltado para frente, olho ${eyeUpper} aberto. Luz de frente ou lateral — nunca atrás.`
+      subtitle = `Paciente olhando para um ponto fixo na parede. Câmera FRONTAL direta ao olho ${eyeUpper}, com FLASH ATIVO.`
       break
     case 'lateral':
-      angleLabel = 'Direita'
-      subtitle = 'Vire o corpo ~90° para a direita, mantendo o olho aberto e a câmera frontal ao olho.'
+      angleLabel = 'Câmera à direita'
+      subtitle = 'Paciente continua olhando para o mesmo ponto fixo (não se move). Incline a CÂMERA ~15° para a DIREITA, mantendo o flash ativo.'
       break
     case 'backlight':
-      angleLabel = 'Esquerda'
-      subtitle = 'Vire o corpo ~90° para a esquerda, mantendo o olho aberto e a câmera frontal ao olho.'
+      angleLabel = 'Câmera à esquerda'
+      subtitle = 'Paciente continua olhando para o mesmo ponto fixo (não se move). Incline a CÂMERA ~15° para a ESQUERDA, mantendo o flash ativo.'
       break
   }
 

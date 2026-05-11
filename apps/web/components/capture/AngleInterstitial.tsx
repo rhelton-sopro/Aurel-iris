@@ -20,8 +20,13 @@ interface AngleInterstitialProps {
 
 /**
  * Tela fullscreen exibida antes de cada foto do fluxo de captura nativa.
- * Copy é específica do slot (frente/direita 90°/esquerda 90°), comunicando
- * a rotação do paciente — a câmera fica sempre frontal ao olho.
+ * Copy é específica do slot (frontal/câmera-à-direita/câmera-à-esquerda).
+ *
+ * PROTOCOLO REVISTO 2026-05-12: paciente fica fixo olhando para um ponto;
+ * terapeuta inclina levemente a câmera entre as 3 fotos. FLASH ATIVO em
+ * todas as fotos (revela fibras radiais; reverte política anterior). Ver
+ * comentário em sequence.ts:getSlotInstructionCopy para detalhes do
+ * protocolo e razão da revisão.
  */
 export function AngleInterstitial({ nextSlot, slotIndex, onProceed, mode }: AngleInterstitialProps) {
   const copy = getSlotInstructionCopy(nextSlot, slotIndex, mode)
@@ -46,18 +51,18 @@ export function AngleInterstitial({ nextSlot, slotIndex, onProceed, mode }: Angl
 
         <div
           role="alert"
-          className="w-full bg-destructive/10 border-2 border-destructive rounded-lg px-4 py-3 flex items-start gap-2.5"
+          className="w-full bg-amber-500/10 border-2 border-amber-600 rounded-lg px-4 py-3 flex items-start gap-2.5"
         >
-          <AlertTriangle className="h-6 w-6 mt-0.5 shrink-0 text-destructive" aria-hidden="true" />
+          <AlertTriangle className="h-6 w-6 mt-0.5 shrink-0 text-amber-700" aria-hidden="true" />
           <div className="text-left space-y-1.5">
-            <p className="text-base font-bold text-destructive uppercase tracking-wide">
-              Use a câmera traseira · Nunca utilize o flash
+            <p className="text-base font-bold text-amber-900 uppercase tracking-wide">
+              Ative o flash · Use câmera traseira
             </p>
-            <p className="text-sm text-destructive/90">
-              Não use a câmera frontal (selfie). O flash gera reflexo que cobre a íris e invalida a leitura.
+            <p className="text-sm text-amber-900/90">
+              Toque no ícone do raio (flash) na câmera antes de fotografar — a iluminação direta revela as fibras radiais da íris. Não use câmera frontal (selfie).
             </p>
-            <p className="text-sm text-destructive/90 pt-1 border-t border-destructive/20">
-              Se o exame é da sua íris, peça a alguém para tirar a foto para você.
+            <p className="text-sm text-amber-900/90 pt-1 border-t border-amber-600/30">
+              Se o exame é da sua íris, peça a alguém para fotografar você.
             </p>
           </div>
         </div>

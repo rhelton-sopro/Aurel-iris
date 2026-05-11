@@ -12,6 +12,14 @@ interface AngleIconProps extends React.SVGAttributes<SVGSVGElement> {
  * stroke=currentColor; escalar via Tailwind (className w-12 h-12, w-24 h-24 etc.).
  * NUNCA usar width=/height= inline — usar className apenas (UI-SPEC §AngleIcon).
  * D-11: ícone vetorial SVG do olho com seta indicando o ângulo.
+ *
+ * TODO (Phase 07.1.6 polish): visuals atuais foram desenhados pra protocolo
+ * antigo onde PACIENTE rotacionava o corpo (setas indicavam direção da
+ * rotação). Protocolo revisto 2026-05-12 inverte isso — quem inclina é a
+ * CÂMERA, paciente fica fixo. As setas ainda funcionam visualmente como
+ * "esquerda/direita/frontal" mas a semântica deslocou. Vale redesenhar
+ * pra mostrar câmera tilt (não cabeça girada) num polish posterior.
+ * Não-blocking pra Phase 07.1.6 launch — ícones continuam interpretáveis.
  */
 export function AngleIcon({ eye, angle, className, ...rest }: AngleIconProps) {
   return (

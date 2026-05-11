@@ -137,36 +137,47 @@ describe('getSlotProgressLabel', () => {
 })
 
 describe('getSlotInstructionCopy', () => {
-  it('foto 1 (left/frontal) instrui rosto para frente + olho ESQUERDO', () => {
+  // Protocolo revisto 2026-05-12: paciente fixo, câmera tilt + flash ativo.
+  // Substitui o protocolo antigo (paciente gira ~90°) que produzia íris
+  // geometricamente divergentes entre os 3 ângulos da mesma íris.
+
+  it('foto 1 (left/frontal) instrui paciente fixo + câmera frontal + flash ativo', () => {
     const copy = getSlotInstructionCopy({ eye: 'left', angle: 'frontal' }, 0)
     expect(copy.heading).toContain('Foto 1 de 6')
     expect(copy.heading).toContain('ESQUERDO')
     expect(copy.heading).toContain('Frente')
-    expect(copy.subtitle).toContain('olho ESQUERDO aberto')
-    expect(copy.subtitle).toContain('Luz de frente ou lateral')
+    expect(copy.subtitle).toContain('olho ESQUERDO')
+    expect(copy.subtitle).toContain('FRONTAL')
+    expect(copy.subtitle).toContain('FLASH ATIVO')
+    expect(copy.subtitle).toContain('ponto fixo')
     expect(copy.cta).toBe('Abrir câmera')
   })
 
-  it('foto 2 (left/lateral) instrui virar 90° para a direita', () => {
+  it('foto 2 (left/lateral) instrui inclinar câmera ~15° para a direita, paciente NÃO se move', () => {
     const copy = getSlotInstructionCopy({ eye: 'left', angle: 'lateral' }, 1)
     expect(copy.heading).toContain('Foto 2 de 6')
-    expect(copy.heading).toContain('Direita')
-    expect(copy.subtitle).toContain('~90° para a direita')
-    expect(copy.subtitle).toContain('câmera frontal ao olho')
+    expect(copy.heading).toContain('Câmera à direita')
+    expect(copy.subtitle).toContain('~15° para a DIREITA')
+    expect(copy.subtitle).toContain('CÂMERA')
+    expect(copy.subtitle).toContain('flash ativo')
+    expect(copy.subtitle).toContain('não se move')
   })
 
-  it('foto 3 (left/backlight) instrui virar 90° para a esquerda', () => {
+  it('foto 3 (left/backlight) instrui inclinar câmera ~15° para a esquerda, paciente NÃO se move', () => {
     const copy = getSlotInstructionCopy({ eye: 'left', angle: 'backlight' }, 2)
     expect(copy.heading).toContain('Foto 3 de 6')
-    expect(copy.heading).toContain('Esquerda')
-    expect(copy.subtitle).toContain('~90° para a esquerda')
+    expect(copy.heading).toContain('Câmera à esquerda')
+    expect(copy.subtitle).toContain('~15° para a ESQUERDA')
+    expect(copy.subtitle).toContain('flash ativo')
+    expect(copy.subtitle).toContain('não se move')
   })
 
   it('foto 4 (right/frontal) repete o padrão para olho DIREITO', () => {
     const copy = getSlotInstructionCopy({ eye: 'right', angle: 'frontal' }, 3)
     expect(copy.heading).toContain('Foto 4 de 6')
     expect(copy.heading).toContain('DIREITO')
-    expect(copy.subtitle).toContain('olho DIREITO aberto')
+    expect(copy.subtitle).toContain('olho DIREITO')
+    expect(copy.subtitle).toContain('FLASH ATIVO')
   })
 
   it('cta é "Abrir câmera" em todas as fotos', () => {
@@ -217,7 +228,10 @@ describe('labels', () => {
     expect(EYE_LABEL.left).toBe('esquerdo')
     expect(EYE_LABEL.right).toBe('direito')
   })
-  it('ANGLE_LABEL reflete a ROTAÇÃO DO PACIENTE (não ângulo de câmera)', () => {
+  it('ANGLE_LABEL reflete a INCLINAÇÃO DA CÂMERA (paciente fica fixo) — protocolo revisto 2026-05-12', () => {
+    // Strings preservadas (compat) mas semântica invertida: agora descrevem
+    // direção de tilt da câmera, não rotação do paciente. Ver comentário em
+    // sequence.ts ANGLE_LABEL para detalhes do protocolo.
     expect(ANGLE_LABEL.frontal).toBe('frente')
     expect(ANGLE_LABEL.lateral).toBe('direita')
     expect(ANGLE_LABEL.backlight).toBe('esquerda')
