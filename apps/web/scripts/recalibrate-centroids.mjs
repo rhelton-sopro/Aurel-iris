@@ -58,8 +58,6 @@ const COLOR_TO_CATEGORY = {
   outra: 'unknown',
 }
 
-const SIGNED_URL_TTL_SECONDS = 600
-
 async function fetchAnnotations() {
   const { data, error } = await client
     .from('calibration_annotations')
