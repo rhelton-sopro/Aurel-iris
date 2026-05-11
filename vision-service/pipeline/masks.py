@@ -14,12 +14,12 @@ import numpy as np
 # --- Approach B color pre-segmentation constants (Phase 07.1.5 D-01) -------
 # Starting values — tuned via probe iteration in Wave 2 per RESEARCH Pitfalls 1-4.
 # All thresholds operate on OpenCV HSV scale: H in [0, 179], S/V in [0, 255].
-_COLOR_MASK_S_MIN = 30          # Sclera typically S<15; iris typically S>=30
-_COLOR_MASK_V_MIN = 40          # Drops near-black eyelash/pupil; keeps dark brown iris
+_COLOR_MASK_S_MIN = 80          # Cycle 3: raised from 60 — Cycle 2 mask ratio still ~0.80 (too permissive); Nailli iris has S>=100 in close-ups, skin S~40-70
+_COLOR_MASK_V_MIN = 50          # Cycle 2: raised from 40 — drops more eyelash + skin shadow; iris still survives (V~70+ at 1024 resize)
 _COLOR_MASK_CLOSE_KERNEL = (5, 5)   # Fills specular reflection holes up to ~8 px diameter
 _COLOR_MASK_CLOSE_ITER = 2
-_COLOR_MASK_OPEN_KERNEL = (5, 5)    # Removes thin eyelash strands (~2-4 px wide at 1024px)
-_COLOR_MASK_OPEN_ITER = 1
+_COLOR_MASK_OPEN_KERNEL = (7, 7)    # Cycle 3: enlarged from (5,5) per Pitfall 2 — Cycle 2 eyelash residue caused Hough to pick eyebrow arcs on LEFT
+_COLOR_MASK_OPEN_ITER = 2           # Cycle 3: doubled from 1 — more aggressive cleanup of skin/eyelid residue
 
 
 def color_iris_mask(rgb: np.ndarray) -> np.ndarray:
