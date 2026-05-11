@@ -261,7 +261,10 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
   4. Pytest gate: 266+ tests permanecem GREEN (zero regressões em test_features/test_sectoral_pigments/test_segment); novos tests cobrem o novo path de detect/segment com synthetic close-up fixtures.
   5. Modal deploy concluído + reprocess da Nailli salva detect_diagnostics consistent + (consequência esperada, não requirement) classify_iris_color pode mover de `castanho` para `verde-mosaico/misto` se LAB-mean pós-fix realmente refletir íris stroma — se ainda não converge, 7.2 escopo restaura sentido (corpus + threshold tuning sobre dados agora confiáveis).
   6. (Stretch) Probe `probe_pigment_deltas.py` rodado pós-fix produz LAB-delta tables onde sectores 11/12/1/2 do right eye Nailli mostram dB elevado consistente (founder visual correlação com pigmento amarelo-âmbar visível).
-**Plans**: TBD via `/gsd-discuss-phase 07.1.5` (esperado: 1-2 plans cobrindo research-phase → implementation; research é gate porque escolha entre hipóteses A-F muda o escopo significativamente).
+**Plans**: 2 plans
+
+- [ ] 07.1.5-01-PLAN.md — Approach B (HSV color pre-segmentation) implementation + local probe + synthetic fixture iteration + stop-loss verdict (B passes OR escalate to C)
+- [ ] 07.1.5-02-PLAN.md — Modal redeploy + Nailli reprocess + detect_diagnostics geometric gate + final verification (with B_INFEASIBLE branch for C research + implementation)
 
 **Cross-cutting constraints:**
 - **Não regressões em fotos com face context (MediaPipe success path):** qualquer mudança em `detect.find_iris` ou `segment.iris_mask` deve preservar caminho atual para fotos onde MediaPipe retorna landmarks. Verificação: tests síntéticos com face-context devem continuar GREEN.

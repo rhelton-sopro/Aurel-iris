@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: "Phase 07.1.5 CONTEXT.md gathered 2026-05-11. Approach LOCKED: B (HSV/LAB color pre-seg before Hough) primeiro, C (U-Net CASIA pre-trained) fallback. Verification gate: Nailli + 2-3 synthetic close-up fixtures from existing readings DB. Plan structure: 2 plans (P1 B local probe + iteration with stop-loss; P2 Modal redeploy + Nailli reprocess + verify, OR morphs into C if P1 declared B infeasible). Downstream feature convergence on Nailli explicitly OUT of scope (07.2's job)."
-stopped_at: Phase 7.1.5 contexto fechado. Próximo passo é /gsd-plan-phase 07.1.5 para gerar P1 + P2 plans. CONTEXT.md em .planning/phases/07.1.5-detect-segment-close-up-fix/07.1.5-CONTEXT.md com 13 decisões (D-01..D-13). Alternativa paralela: /gsd-discuss-phase 7 para LLM stack (disjunto de vision-service).
-last_updated: "2026-05-11T19:00:00.000Z"
+status: "Wave 3 entregou 9 commits atômicos em paralelo via 3 worktrees disjuntos:"
+stopped_at: "Phase 7.1 — PLAN 07.1-02 (Wave B) PRONTO PARA EXECUÇÃO. Próxima sessão: `/clear` então `/gsd-execute-phase 07.1` (executor agent roda T1-T4 sequencial em ~7-10h de wall time + waves intermédias). Após execução, founder roda `modal deploy` + reprocess Nailli pra validar ciclo end-to-end."
+last_updated: "2026-05-11T17:35:08.755Z"
 progress:
-  total_phases: 8
-  completed_phases: 6
-  total_plans: 71
+  total_phases: 11
+  completed_phases: 7
+  total_plans: 73
   completed_plans: 70
-  percent: 99
+  percent: 96
 ---
 
 # Estado do projeto
@@ -170,6 +170,7 @@ Nenhum ainda.
 ## Continuidade de sessão
 
 Última sessão: 2026-05-11 — **Resume-work session: Modal B1a fix deployed + Nailli reprocess confirmou que B1a sozinho não chega + PLAN 07.1-02 (Wave B) escrito**.
+
 - `modal deploy modal_app.py` em `vision-service/` → endpoint ativo com fix B1a (commit `889cc94` — filter mask-zeroed pixels antes do k-means de iris color).
 - Reading Nailli `71a7bf1d-747f-4de8-9129-13b69197c6a4` reprocessada via flip-to-failed + Reprocessar UI. Resultado pós-B1a: **iris_color.primary ainda `castanho`**, constitution ainda `hematogenea` em ambos os olhos — call_id KRBARC... — confirma diagnóstico salvo de que B1a é necessário mas insuficiente.
 - **PLAN 07.1-02 escrito** (`.planning/phases/07.1-dogfooding-fixes/07.1-02-vision-pipeline-calibration-PLAN.md`) cobrindo 4 P0s bundlados conforme diagnóstico humano (calibration_diagnoses `19ae43a7-bfb1-44ff-9036-014cb7970dc5`):
@@ -187,20 +188,24 @@ Stopped at: Phase 7.1 — PLAN 07.1-02 (Wave B) PRONTO PARA EXECUÇÃO. Próxima
 Resume file: `.planning/phases/07.1-dogfooding-fixes/07.1-03-admin-calibration-page-SUMMARY.md`
 
 **Estado das tabelas:**
+
 - `calibration_annotations` — 1 row (Nailli, founder smoke confirmação)
 - `calibration_diagnoses` — 1 row (Nailli, primeiro diagnóstico operacional)
 
 **Migrations aplicadas nesta sessão:**
+
 - 0009 — calibration_annotations (broken RLS — fixed by 0011)
 - 0010 — calibration_diagnoses (broken RLS — fixed by 0011)
 - 0011 — RLS fix: auth.jwt() ->> 'email' em vez de auth.users subquery
 
 **Lessons registradas (anti-patterns importantes):**
+
 1. Files com `'use server'` SÓ podem exportar async functions. Constants/types em arquivo sibling. Senão crashes prod-only ("g.map is not a function").
 2. NUNCA query `auth.users` de RLS — role `authenticated` não tem SELECT no schema. Use `auth.jwt() ->> 'email'`.
 3. Always `safeArray()` antes de .map/.filter/.join em jsonb fields — TS types otimistas não catch wrong-type runtime drift.
 
 Próxima ação sugerida:
+
 1. **Executar PLAN 07.1-02** — `/clear` então `/gsd-execute-phase 07.1` ou executor agent inline. Cobre 4 P0s da Wave B (~7-10h).
 2. **Validar end-to-end pós-execução** — Modal redeploy + reprocess Nailli + verificar iris_color/constitution/sectoral_pigments.
 3. **Wave C planning** — após Wave B fechar, PLAN 07.1-03/04 cobre P1.1 (pixels→mm das lacunas), P1.2 (threshold por constituição), P2.1/P2.2 (collarette/density refinements).
