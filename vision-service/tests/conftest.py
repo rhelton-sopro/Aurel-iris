@@ -42,3 +42,41 @@ def iris_images() -> dict:
 def fixtures_dir() -> Path:
     """Filesystem path to tests/fixtures/. Useful for tests that need raw bytes."""
     return FIXTURES_DIR
+
+
+@pytest.fixture(scope="session")
+def synthetic_close_up_eye():
+    """Builder for synthetic close-up iris (no face context) — Phase 07.1.5 WARN-6.
+
+    Single source of truth for synthetic close-up images. Consumed by
+    test_color_iris_mask.py (helper tests) AND test_detect.py (color-masked
+    Hough tests). Returns a builder callable so tests vary iris HSV / size
+    without duplicating cv2.circle construction logic.
+
+    Args of returned _build callable:
+        iris_hsv: HSV tuple for iris fill colour (default brown: 20, 150, 100).
+        bg_hsv:   HSV tuple for sclera background (default ~white: 0, 0, 240).
+        size:     square image size (default 512).
+
+    Returns:
+        Callable returning H x W x 3 uint8 RGB array with a filled iris disk
+        of radius size//4 centred on the image.
+    """
+    import cv2
+    import numpy as np
+
+    def _build(iris_hsv=(20, 150, 100), bg_hsv=(0, 0, 240), size=512):
+        bg = cv2.cvtColor(
+            np.array([[[*bg_hsv]]], dtype=np.uint8), cv2.COLOR_HSV2RGB
+        )[0, 0]
+        img = np.full((size, size, 3), bg, dtype=np.uint8)
+        iris = cv2.cvtColor(
+            np.array([[[*iris_hsv]]], dtype=np.uint8), cv2.COLOR_HSV2RGB
+        )[0, 0]
+        cv2.circle(
+            img, (size // 2, size // 2), size // 4,
+            tuple(int(v) for v in iris), thickness=-1,
+        )
+        return img
+
+    return _build

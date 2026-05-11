@@ -19,9 +19,12 @@ Outputs:
 """
 from __future__ import annotations
 
+import argparse
+import json
 import os
 import sys
 from io import BytesIO
+from itertools import combinations
 from pathlib import Path
 from urllib.request import urlopen
 
@@ -66,7 +69,35 @@ def load_image_from_url(url: str) -> np.ndarray:
 
 
 def main() -> None:
-    reading_id = sys.argv[1] if len(sys.argv) > 1 else NAILLI_READING_ID
+    parser = argparse.ArgumentParser(
+        description="Probe vision pipeline locally (Phase 07.1.5 instrumentation).",
+    )
+    parser.add_argument(
+        "reading_id",
+        nargs="?",
+        default=NAILLI_READING_ID,
+        help=f"reading_id (uuid); defaults to Nailli {NAILLI_READING_ID}",
+    )
+    parser.add_argument(
+        "--dump-detect-table",
+        action="store_true",
+        help=(
+            "Phase 07.1.5 D-08: emit per-eye segment convergence table "
+            "(centers, radii, max spread, CV, PASS/FAIL gates)."
+        ),
+    )
+    parser.add_argument(
+        "--dump-json",
+        type=str,
+        default=None,
+        help=(
+            "Phase 07.1.5 BLOCKER-2 / P2 SC-2 gate: write a JSON snapshot of "
+            "per-eye per-angle segment_center + segment_radius to this path. "
+            "Consumed by P2 Task 3's programmatic SC-2 gate."
+        ),
+    )
+    args = parser.parse_args()
+    reading_id = args.reading_id
 
     load_env_from_apps_web()
     ensure_model()
@@ -129,6 +160,10 @@ def main() -> None:
     )
     print(f"Sectors: {SECTOR_COUNT} (hour 1..12)\n")
 
+    # Phase 07.1.5 BLOCKER-2: accumulate per-eye per-angle segment circles
+    # for the JSON snapshot consumed by P2 Task 3's programmatic SC-2 gate.
+    detect_dump: dict = {}
+
     for eye in ("right", "left"):
         eye_rows = [r for r in rows if r["eye"] == eye]
         if not eye_rows:
@@ -170,6 +205,47 @@ def main() -> None:
         if not segmented:
             print(f"\n--- {eye.upper()} eye: segment failed on all angles; skipping")
             continue
+
+        # Phase 07.1.5 BLOCKER-2: accumulate per-angle segment circles for JSON snapshot
+        eye_dump: dict = {}
+        for seg in segmented:
+            cx, cy, r = seg["iris_circle"]
+            eye_dump[seg["angle"]] = {
+                "segment_center": [float(cx), float(cy)],
+                "segment_radius": float(r),
+            }
+        detect_dump[eye] = eye_dump
+
+        # Phase 07.1.5 D-08 --dump-detect-table: convergence table for P1 SUMMARY
+        if args.dump_detect_table:
+            circles = [seg["iris_circle"] for seg in segmented]
+            centers = np.array([(c[0], c[1]) for c in circles], dtype=np.float64)
+            radii = np.array([c[2] for c in circles], dtype=np.float64)
+            pairs = list(combinations(range(len(circles)), 2))
+            center_dists = [
+                float(np.linalg.norm(centers[i] - centers[j]))
+                for i, j in pairs
+            ]
+            max_center_spread = max(center_dists) if center_dists else 0.0
+            r_mean = float(radii.mean()) if len(radii) else 0.0
+            r_cv = float(radii.std() / r_mean) if r_mean > 0 else float("inf")
+            center_gate_pass = max_center_spread <= 50.0
+            radius_gate_pass = r_cv <= 0.15
+            print(f"\n[probe] === {eye.upper()} segment convergence ===")
+            for seg in segmented:
+                cx, cy, r = seg["iris_circle"]
+                print(
+                    f"[probe]   {seg['angle']:<10} center=({cx:7.1f},{cy:7.1f}) "
+                    f"radius={r:6.1f}"
+                )
+            print(
+                f"[probe]   max center spread:  {max_center_spread:7.1f} px  "
+                f"(gate: <=50 px)  {'PASS' if center_gate_pass else 'FAIL'}"
+            )
+            print(
+                f"[probe]   radius CV:          {r_cv:7.3f}      "
+                f"(gate: <=0.15) {'PASS' if radius_gate_pass else 'FAIL'}"
+            )
 
         composite = compose.photometric_combine(segmented)
         normalized = normalize.daugman_polar(composite)
@@ -224,6 +300,14 @@ def main() -> None:
                 f"    {hour:>4} | {dL:>+7.2f} | {dA:>+7.2f} | {dB:>+7.2f} | "
                 f"{am:>7} | {la:>7} | {ma:>7}"
             )
+
+    # Phase 07.1.5 BLOCKER-2: write JSON snapshot for P2 Task 3 SC-2 gate.
+    if args.dump_json:
+        out_path = Path(args.dump_json)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        with out_path.open("w", encoding="utf-8") as f:
+            json.dump(detect_dump, f, indent=2, sort_keys=True)
+        print(f"\n[probe] wrote detect_diagnostics JSON snapshot -> {out_path}")
 
 
 if __name__ == "__main__":
