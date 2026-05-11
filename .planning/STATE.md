@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: "Phase 07.2 discussion pausada 2026-05-11 após investigation empírica revelar root cause upstream: detect+segment produz polar unwraps geometricamente inconsistentes em close-up iris photos (MediaPipe falha 5/6 → Hough fallback escolhe círculos errados → segment centers de 3 ângulos da mesma íris 599-1497 px distantes). Phase 7.1.5 (detect/segment robustness) INSERTED ANTES de 7.2 — bloqueia 7.2 (corpus + threshold tuning sobre pixel-soup não-íris não converge). Infrastructure deployed: `processing_metadata.detect_diagnostics` field (commit 8494a4a)."
-stopped_at: Phase 7.1.5 inserida no ROADMAP entre 7.1 e 7.2. Próximo passo é /gsd-discuss-phase 07.1.5 — DISCUSSION-NOTES.md já criado em .planning/phases/07.1.5-detect-segment-close-up-fix/ com empirical findings + 6 hipóteses de abordagem (A. Hough priors, B. color-pre-seg, C. U-Net CASIA, D. multi-stage eyeball-first, E. UX zoom-out REJECTED, F. research scope). 07.2 continua em ROADMAP mas blocked-on-07.1.5.
-last_updated: "2026-05-11T18:30:00.000Z"
+status: "Phase 07.1.5 CONTEXT.md gathered 2026-05-11. Approach LOCKED: B (HSV/LAB color pre-seg before Hough) primeiro, C (U-Net CASIA pre-trained) fallback. Verification gate: Nailli + 2-3 synthetic close-up fixtures from existing readings DB. Plan structure: 2 plans (P1 B local probe + iteration with stop-loss; P2 Modal redeploy + Nailli reprocess + verify, OR morphs into C if P1 declared B infeasible). Downstream feature convergence on Nailli explicitly OUT of scope (07.2's job)."
+stopped_at: Phase 7.1.5 contexto fechado. Próximo passo é /gsd-plan-phase 07.1.5 para gerar P1 + P2 plans. CONTEXT.md em .planning/phases/07.1.5-detect-segment-close-up-fix/07.1.5-CONTEXT.md com 13 decisões (D-01..D-13). Alternativa paralela: /gsd-discuss-phase 7 para LLM stack (disjunto de vision-service).
+last_updated: "2026-05-11T19:00:00.000Z"
 progress:
   total_phases: 8
   completed_phases: 6
@@ -24,9 +24,9 @@ Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 
 ## Posição atual
 
-Fase: 7.1.5 (Detect/segment robustness para close-up iris photos) INSERIDA no ROADMAP entre 7.1 e 7.2; 7.2 bloqueado-em-7.1.5.
-Plan: Phase 07.1.5 sem plans ainda (TBD via /gsd-discuss-phase 07.1.5). DISCUSSION-NOTES.md com empirical findings + 6 hipóteses de approach já criado em .planning/phases/07.1.5-detect-segment-close-up-fix/.
-Próxima ação: `/clear` então `/gsd-discuss-phase 07.1.5` (DISCUSSION-NOTES.md vai pre-carregar o contexto empírico para o discuss agent). Alternativa paralela: `/gsd-discuss-phase 7` para Fase 7 Análise LLM enquanto 7.1.5 é planejado (vision-service work é disjunto do LLM stack — audit/RAG/streaming não tocam pipeline visão).
+Fase: 7.1.5 (Detect/segment robustness para close-up iris photos) — CONTEXT.md gathered 2026-05-11, ready for planning. 7.2 segue blocked-on-7.1.5.
+Plan: Phase 07.1.5 sem plans ainda (TBD via /gsd-plan-phase 07.1.5). CONTEXT.md tem 13 decisões locked (approach B→C cascade, verification gate Nailli + 2-3 synthetic fixtures, 2-plan structure com stop-loss em P1).
+Próxima ação: `/clear` então `/gsd-plan-phase 07.1.5`. CONTEXT.md + DISCUSSION-LOG.md + DISCUSSION-NOTES.md pre-carregam o planner com 13 decisões + empirical findings + Modal-side detect_diagnostics baseline. Alternativa paralela: `/gsd-discuss-phase 7` para Fase 7 Análise LLM (disjunto de vision-service).
 
 **Investigation track durante /gsd-discuss-phase 07.2 (2026-05-11):** founder pediu para confirmar empiricamente se threshold tuning resolveria antes de planejar 07.2. Sequência: (1) flipped Nailli reading status ready→failed para reprocess UI; (2) wrote `vision-service/scripts/probe_pigment_deltas.py` (local Python probe) — rodou pipeline local + dumped LAB-delta 12-setores per olho + salvou enhanced_polar PNG; (3) probe revelou dB máximo ~5 em setores com pigmento amarelo visível (threshold atual 12 = 4× alto demais) MAS visualmente o PNG mostrou ~35% íris + ~65% pálpebra/esclera/pele — pipeline upstream broken; (4) added `processing_metadata.detect_diagnostics: dict` field em ProcessingMetadata schema + per-angle capture em modal_app.run_pipeline; (5) Modal deploy succeeded; (6) reprocess Nailli call_id `fc-01KRBPC40B4D15XGQJPSNMNX6V` returned detect_diagnostics confirmando segment centers right eye span 700 px / left eye span 1497 px entre 3 ângulos da mesma íris; (7) committed infra (commit 8494a4a) + inserted phase 7.1.5 no ROADMAP + criou DISCUSSION-NOTES.md.
 
