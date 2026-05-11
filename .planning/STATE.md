@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: "Phase 07.1 closed (human_needed) — 3 plans entregues (07.1-01 audit regex polish + 07.1-02 vision pipeline calibration P0.1-P0.4 + 07.1-03 admin calibration page) — 24/25 truths VERIFIED, T5 empirical Nailli convergence DEFERRED para Wave C corpus expansion sprint (acceptance criterion 6)"
-stopped_at: Phase 7.2 (Wave C) inserida no ROADMAP — corpus expansion + threshold tuning sprint. Próximo passo é /gsd-discuss-phase 07.2 para escopar plans antes da founder annotation sprint começar (alternativa: avançar Phase 7 LLM em paralelo enquanto corpus expande).
-last_updated: "2026-05-11T13:00:00.000Z"
+status: "Phase 07.2 discussion pausada 2026-05-11 após investigation empírica revelar root cause upstream: detect+segment produz polar unwraps geometricamente inconsistentes em close-up iris photos (MediaPipe falha 5/6 → Hough fallback escolhe círculos errados → segment centers de 3 ângulos da mesma íris 599-1497 px distantes). Phase 7.1.5 (detect/segment robustness) INSERTED ANTES de 7.2 — bloqueia 7.2 (corpus + threshold tuning sobre pixel-soup não-íris não converge). Infrastructure deployed: `processing_metadata.detect_diagnostics` field (commit 8494a4a)."
+stopped_at: Phase 7.1.5 inserida no ROADMAP entre 7.1 e 7.2. Próximo passo é /gsd-discuss-phase 07.1.5 — DISCUSSION-NOTES.md já criado em .planning/phases/07.1.5-detect-segment-close-up-fix/ com empirical findings + 6 hipóteses de abordagem (A. Hough priors, B. color-pre-seg, C. U-Net CASIA, D. multi-stage eyeball-first, E. UX zoom-out REJECTED, F. research scope). 07.2 continua em ROADMAP mas blocked-on-07.1.5.
+last_updated: "2026-05-11T18:30:00.000Z"
 progress:
   total_phases: 8
   completed_phases: 6
@@ -24,9 +24,11 @@ Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 
 ## Posição atual
 
-Fase: 7.2 (Wave C — corpus expansion + threshold tuning) INSERIDA no ROADMAP, aguardando planning
-Plan: Phase 07.2 sem plans ainda (TBD via /gsd-discuss-phase). Phase 07.1 fechada (human_needed; 24/25 truths VERIFIED, 3 HUMAN-UAT items migrados para acceptance criteria da 07.2).
-Próxima ação: `/clear` então `/gsd-discuss-phase 07.2` para escopar plans (esperado 1-3 plans cobrindo annotation workflow doc + threshold tuning + recalibrate re-run). Annotation sprint é founder work manual — plans descrevem o workflow/checklist, não delegam o ato de anotar. Alternativa paralela: `/gsd-discuss-phase 7` para Fase 7 Análise LLM enquanto corpus expande (audit gates ANCHOR_RE + extractForbiddenHits LGPD-aware já corretos via 07.1-01).
+Fase: 7.1.5 (Detect/segment robustness para close-up iris photos) INSERIDA no ROADMAP entre 7.1 e 7.2; 7.2 bloqueado-em-7.1.5.
+Plan: Phase 07.1.5 sem plans ainda (TBD via /gsd-discuss-phase 07.1.5). DISCUSSION-NOTES.md com empirical findings + 6 hipóteses de approach já criado em .planning/phases/07.1.5-detect-segment-close-up-fix/.
+Próxima ação: `/clear` então `/gsd-discuss-phase 07.1.5` (DISCUSSION-NOTES.md vai pre-carregar o contexto empírico para o discuss agent). Alternativa paralela: `/gsd-discuss-phase 7` para Fase 7 Análise LLM enquanto 7.1.5 é planejado (vision-service work é disjunto do LLM stack — audit/RAG/streaming não tocam pipeline visão).
+
+**Investigation track durante /gsd-discuss-phase 07.2 (2026-05-11):** founder pediu para confirmar empiricamente se threshold tuning resolveria antes de planejar 07.2. Sequência: (1) flipped Nailli reading status ready→failed para reprocess UI; (2) wrote `vision-service/scripts/probe_pigment_deltas.py` (local Python probe) — rodou pipeline local + dumped LAB-delta 12-setores per olho + salvou enhanced_polar PNG; (3) probe revelou dB máximo ~5 em setores com pigmento amarelo visível (threshold atual 12 = 4× alto demais) MAS visualmente o PNG mostrou ~35% íris + ~65% pálpebra/esclera/pele — pipeline upstream broken; (4) added `processing_metadata.detect_diagnostics: dict` field em ProcessingMetadata schema + per-angle capture em modal_app.run_pipeline; (5) Modal deploy succeeded; (6) reprocess Nailli call_id `fc-01KRBPC40B4D15XGQJPSNMNX6V` returned detect_diagnostics confirmando segment centers right eye span 700 px / left eye span 1497 px entre 3 ângulos da mesma íris; (7) committed infra (commit 8494a4a) + inserted phase 7.1.5 no ROADMAP + criou DISCUSSION-NOTES.md.
 
 **Phase 07.1 execução (2026-05-11):** orquestrador `/gsd-execute-phase 07.1` rodou 2 waves sequenciais sem worktree isolation (single-plan-per-wave; Windows worktree pain memo) — 9 commits novos + REVIEW.md + VERIFICATION.md + HUMAN-UAT.md. Wave A (07.1-01 back-fill: 4abe518 + 3232c13) closou audit-vocabulary allowlist marker + SUMMARY record (work substantivamente shipped em 1e58a88+36ad36c 2026-05-09). Wave B (07.1-02: 140fbf1+6db8b7c+142d06a+3c1362d+a894edb+73c26d1+11d536f) entregou P0.1 pupil mask + P0.2 ConstitutionType 6-way + P0.3 sectoral_pigments.py + P0.4 recalibrate-centroids.mjs + first-pass verde-mosaico apply. Modal deploy succeeded; sectoral_pigments key PRESENT em Nailli payload (T3 wire ativo). Empirical values ainda castanho/hematogenea/[] — acceptance criterion 6 (Wave C corpus expansion) é o explicit planned fallback. Code review: 0 critical / 4 warning / 6 info (WR-01 features.py:539-542 asymmetry bug é pre-existing Phase 5.9 commit 1b9cbb6, NÃO 07.1; WR-04 30-char lookback documentado nas plan failure_modes; WR-02/WR-03 = polish para Wave C).
 Status: Wave 3 entregou 9 commits atômicos em paralelo via 3 worktrees disjuntos:
