@@ -28,12 +28,19 @@ export type ValidationReason =
   | 'olho_fechado'
 
 /** Reasons que BLOQUEIAM o botão Confirmar (sem chance de continuar).
-    UAT 03 round 11: dois_olhos adicionado — captura é por olho individual. */
+    UAT 03 round 11: dois_olhos adicionado — captura é por olho individual.
+    Phase 07.1.6 prep (2026-05-11): borrado + reflexo_total promovidos de
+    soft-warning a hard-block — fotos sem fibras contáveis OU com reflexo
+    cobrindo a íris destroem análise iridológica downstream (parser produz
+    lixo, classifier produz lixo); melhor pedir refazer do que processar
+    pixel-soup. */
 export const BLOCKING_REASONS: readonly string[] = [
   'sem_olho',
   'dois_olhos',
   'olho_fechado',
   'muito_longe',
+  'borrado',
+  'reflexo_total',
 ]
 
 export interface ValidationResult {

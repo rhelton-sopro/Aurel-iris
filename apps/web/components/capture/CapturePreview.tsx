@@ -63,8 +63,8 @@ export function CapturePreview({
       sem_olho: 'Foto não contém um olho — refaça apontando para o olho do paciente',
       dois_olhos: 'Apenas um olho por foto — refaça com close de um único olho',
       muito_longe: 'Rosto/olho muito distante — aproxime a câmera para um close apenas do olho',
-      borrado: 'Foto borrada — refaça com a câmera mais firme',
-      reflexo_total: 'Reflexo cobre a íris inteira — mude o ângulo da luz',
+      borrado: 'Foto borrada — as fibras da íris não estão visíveis. Segure firme e tente novamente.',
+      reflexo_total: 'Reflexo cobre a íris inteira — mude o ângulo ou a iluminação e tente novamente.',
       olho_fechado: 'Olho fechado ou coberto — abra o olho completamente',
     }
     reasons.push(messages[r] ?? `Foto rejeitada: ${r}`)
@@ -76,10 +76,11 @@ export function CapturePreview({
     reasons.push('Reflexo parcial atrapalha a leitura da íris — tente mudar o ângulo da luz')
   }
 
-  // Bloqueio do Confirmar: sem_olho, olho_fechado e muito_longe são rejeições
-  // "duras" — não faz sentido permitir avançar. borrado / reflexo_total são
-  // warnings — usuário pode confirmar e seguir se entender que está
-  // aceitável (decisão clínica do iridologista).
+  // Bloqueio do Confirmar: ver BLOCKING_REASONS em validate-image.ts.
+  // Phase 07.1.6 prep (2026-05-11): borrado + reflexo_total promovidos de
+  // soft-warning a hard-block — fotos sem fibras contáveis OU com reflexo
+  // cobrindo a íris destroem análise iridológica downstream, então faz mais
+  // sentido pedir refazer do que deixar o terapeuta forçar a foto ruim.
   const isBlocked = analysis?.vlmValidation
     ? isBlockingRejection(analysis.vlmValidation)
     : false
@@ -142,8 +143,10 @@ export function CapturePreview({
 
           {/* Dois botões de mesmo tamanho.
               "Refazer" secundário (reabre câmera). "Confirmar" primário (avança).
-              Confirmar é DESABILITADO quando VLM rejeitou com razão dura
-              (sem_olho ou olho_fechado) — não faz sentido aceitar foto sem olho. */}
+              Confirmar é DESABILITADO quando VLM retornou qualquer
+              BLOCKING_REASONS (sem_olho, dois_olhos, olho_fechado, muito_longe,
+              borrado, reflexo_total) — fotos rejeitadas nessas condições não
+              produzem análise iridológica útil, melhor pedir refazer. */}
           <div className="flex gap-2">
             <Button
               onClick={onRedo}

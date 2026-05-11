@@ -129,7 +129,9 @@ describe('CapturePreview', () => {
     expect(screen.getByRole('button', { name: /Confirmar/ })).toBeDisabled()
   })
 
-  it('allows Confirmar when VLM rejects with borrado (soft warning)', () => {
+  it('blocks Confirmar when VLM rejects with borrado (Phase 07.1.6 hard-block)', () => {
+    // Phase 07.1.6 prep: borrado promovido de soft-warning a hard-block.
+    // Fotos sem fibras contáveis destroem análise iridológica downstream.
     const analysis: PostCaptureAnalysis = {
       imageWidth: 3840,
       imageHeight: 2160,
@@ -148,8 +150,8 @@ describe('CapturePreview', () => {
       />
     )
     expect(screen.getByText(/Foto borrada/)).toBeInTheDocument()
-    expect(screen.getByText(/Qualidade abaixo do ideal/)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Confirmar/ })).not.toBeDisabled()
+    expect(screen.getByText(/Foto rejeitada/)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Confirmar/ })).toBeDisabled()
   })
 
   it('allows Confirmar when VLM fallback (network failure)', () => {
