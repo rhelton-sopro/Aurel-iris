@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: "Phase 07.1.6 PLANNED (commit 751a37c). 7 plans em 4 waves criados via /gsd-plan-phase 07.1.6 — Wave 0 (01 schema migration + types + [BLOCKING] supabase db push; 02 sanity.ts pure-function TDD), Wave 1 (03 canonicalize core: storage-path + sonnet-bbox + crop + index.ts orchestrator; 04 POST /api/capture/canonicalize endpoint), Wave 2 (05 finalizeReadingAction wiring + process/route canonical_storage_path resolution; 06 /admin/calibration badge + Re-canonicalizar button), Wave 3 (07 regression suite — probe script committed + golden fixture + CANONICAL_PROBE=1 gated test). Plan-checker verificou 12 dimensions, zero blockers/warnings. Decision coverage: C-01..C-05, C-08, D-01..D-06 (C-06/C-07 pre-shipped). Pronta para execução."
-stopped_at: "Phase 07.1.6 plans prontos. Próxima sessão: `/clear` então `/gsd-execute-phase 07.1.6`. Wave 0 (01 + 02) roda em paralelo — Plan 01 tem checkpoint:human-action [BLOCKING] (founder roda `supabase db push` localmente). Wave 1 (03 + 04) bloqueada até Wave 0 completar. Inputs disponíveis: .planning/phases/07.1.6-canonical-capture-pipeline/07.1.6-{01..07}-PLAN.md + 07.1.6-PATTERNS.md (17 files mapeados) + 07.1.6-CONTEXT.md (decisões C-01..C-08 + D-01..D-06)."
-last_updated: "2026-05-11T23:35:00.000Z"
+status: "Phase 07.1.6 EXECUTING — Wave 0 Plan 01 COMPLETE (cb03ced + 4c0203c + 8161591 + supabase db push applied 2026-05-12 founder confirmed). Schema migration 0012 live (reading_images.canonical_storage_path + readings.canonical_metadata, ambas nullable). SONNET_BBOX_MODEL hardcoded literal type. IrisBbox + CanonicalStatus + CanonicalMetadata exportados. Próximo: Wave 0 Plan 02 (sanity.ts TDD pure-functions) → desbloqueia Plan 03 canonicalize core. 6 plans remaining (02 → 03 → 04 → 05 → 06 → 07)."
+stopped_at: "Plan 01 finalizado (3 code commits + db push applied). Plan 02 (sanity.ts TDD) é next em sequential execution mode — autonomous:true, sem human-action checkpoint."
+last_updated: "2026-05-12T07:43:57.000Z"
 progress:
   total_phases: 11
   completed_phases: 7
@@ -24,9 +24,9 @@ Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 
 ## Posição atual
 
-Fase: 7.1.5 ABANDONED (P1 B_INFEASIBLE; P2 ESCALATE_NEW_PHASE per founder 2026-05-11). 7.1.6 OPEN — CONTEXT.md committed cc30a09 (canonical capture via Sonnet bbox + sharp crop 800×800; 6 decisões D-01..D-06 sobre as 4 gray areas remanescentes do CHECKPOINT). 7.2 continua blocked-on-7.1.6.
-Plan: 07.1.5-01 COMPLETO (B_INFEASIBLE). 07.1.5-02 ABANDONED. 07.1.6 sem plans ainda (TBD via /gsd-plan-phase 07.1.6 — esperado 4-6 plans).
-Próxima ação: `/clear` então `/gsd-plan-phase 07.1.6`. CONTEXT.md em .planning/phases/07.1.6-canonical-capture-pipeline/ tem 8 decisões herdadas (C-01..C-08 de CHECKPOINT-2026-05-11) + 6 novas (D-01 fallback to original; D-02 cross-angle + geometric sanity gate; D-03 sem retry; D-04 ON day 1 com CANONICAL_CAPTURE_ENABLED kill-switch env; D-05 on-demand via /admin/calibration Re-canonicalizar botão; D-06 golden JSON + CANONICAL_PROBE=1 gated integration test). ROADMAP atualizada com 7.1.6 entry (8 success criteria) + 7.2 depends-on flipped to 7.1.6.
+Fase: 7.1.6 EXECUTING (sequential mode em main, no worktrees per founder pref). 7.1.5 ABANDONED. 7.2 continua blocked-on-7.1.6.
+Plan: 07.1.6-01 COMPLETO (cb03ced + 4c0203c + 8161591 + supabase db push applied 2026-05-12 founder confirmed). Schema migration 0012 live. SONNET_BBOX_MODEL hardcoded literal type. IrisBbox + CanonicalStatus + CanonicalMetadata exportados.
+Próxima ação: Plan 02 (sanity.ts TDD pure-functions) → desbloqueia Plan 03 canonicalize core. 6 plans remaining (02 autonomous → 03 autonomous → 04 autonomous → 05 autonomous → 06 autonomous → 07 autonomous). Zero further human-action checkpoints até verify_phase_goal.
 
 **Phase 07.1.6 architectural rationale (2026-05-11):** founder + Claude exploraram alternativa ao U-Net escalation. Probe `apps/web/scripts/probe-haiku-iris-landmarks.mjs` (gitignored output) testou Haiku 4.5 e Sonnet 4.6 como landmark detectors. Haiku templated: radius_pct=0.12 em 5/6 fotos da Nailli, rotation_angle_deg=-8 em 5/6, center_x≈0.58 em 4/6 — VLM bbox detection via Haiku inviável. Sonnet 4.6 melhorou: bbox center varia per-image (5/6 crops visualmente aprovados pelo founder), custo $0.0474 / 6 fotos = ~$0.05/reading. **Smoking gun crítico:** Sonnet também templated rotation_angle_deg=-3.00 em TODAS as 6 fotos — rotation detection via VLM **morta independente do modelo**. Decisão: 07.1.6 faz canonical CROP (Sonnet bbox + sharp crop + resize 800×800) sem rotation correction; terapeuta é responsável pela orientação da câmera. Substitui U-Net escalation (Approach C) que era o default original do 07.1.5 P2 em B_INFEASIBLE branch. U-Net resolveria só detect/segment (sintoma); canonical capture resolve detect/segment + Sonnet Vision downstream economy + corpus standardization (4 ganhos vs 1).
 

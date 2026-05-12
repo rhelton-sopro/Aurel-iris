@@ -289,7 +289,7 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
   7. Regression suite: `apps/web/scripts/probe-haiku-iris-landmarks.mjs` committed (header runbook + remove Nailli hardcoded default) + `landmarks-probe-sonnet-4-6.json` committed como golden fixture + gated integration test `CANONICAL_PROBE=1 vitest run probe-canonical.test.ts` passa contra Nailli e85ea7de com tolerância ±5% center, ±10% radius.
   8. Verification: founder dogfooding ≥3 leituras pós-deploy com canonical ON; visual inspection via /admin/calibration confirma ≥80% canonical_status='ok' em readings novas.
 **Plans**: 7 plans em 4 waves (planejado 2026-05-12 via /gsd-plan-phase 07.1.6).
-- [ ] 07.1.6-01-PLAN.md — Wave 0: schema migration 0012 (additive + [BLOCKING] supabase db push) + SONNET_BBOX_MODEL constant + IrisBbox/CanonicalStatus/CanonicalMetadata types
+- [x] 07.1.6-01-PLAN.md — Wave 0: schema migration 0012 (additive + [BLOCKING] supabase db push) + SONNET_BBOX_MODEL constant + IrisBbox/CanonicalStatus/CanonicalMetadata types ✓ 2026-05-12 (cb03ced, 4c0203c, 8161591 + supabase db push applied)
 - [ ] 07.1.6-02-PLAN.md — Wave 0: sanity.ts pure functions (geometric + cross-angle outlier) + RED→GREEN unit tests (TDD)
 - [ ] 07.1.6-03-PLAN.md — Wave 1: storage-path.ts + sonnet-bbox.ts (Sonnet 4.6 call) + crop.ts (sharp 800×800 lanczos3, SEM rotation) + index.ts orchestrator (6× Promise.all + trust gate + upsert)
 - [ ] 07.1.6-04-PLAN.md — Wave 1: POST /api/capture/canonicalize endpoint (auth gate + ownership + idempotent — chamado por finalize + admin Re-canonicalizar)
