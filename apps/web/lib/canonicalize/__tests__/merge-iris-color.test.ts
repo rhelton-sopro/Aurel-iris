@@ -11,6 +11,7 @@ import { describe, it, expect } from 'vitest'
 import {
   mergeCanonicalIrisColor,
   iridologicalHintForPrimary,
+  iridologicalConstitutionForPrimary,
 } from '../merge-iris-color'
 import type { CanonicalMetadata, IrisColorAggregate } from '@/lib/anthropic/types'
 
@@ -131,5 +132,62 @@ describe('mergeCanonicalIrisColor', () => {
     expect((merged.right_eye as Record<string, unknown>).iris_color).toMatchObject({
       primary: 'castanho',
     })
+  })
+
+  // -------------------------------------------------------------------------
+  // Constitution override (UAT item 1 follow-up, 2026-05-12)
+  // analyze.ts reads vision_features.{eye}.constitution.primary → RAG, NOT
+  // iris_color. So patching iris_color alone wasn't enough — the LLM kept
+  // generating 'hematogênica' reports because Modal's constitution.primary
+  // stayed stale. mergeCanonicalIrisColor now also overrides constitution
+  // when canonical iris_color triggers a confirmed iridological mapping.
+  // -------------------------------------------------------------------------
+
+  it('overrides vision_features.{eye}.constitution when verde_acinzentado primary present', () => {
+    const vf = {
+      right_eye: {
+        iris_color: { primary: 'verde' /* stale */ },
+        constitution: { primary: 'hematogênica' /* stale Modal value — UAT bug */ },
+        fiber_density: { score: 7 },
+      },
+    }
+    const meta: CanonicalMetadata = {
+      ...baseMetadata,
+      iris_color_by_eye: { left: null, right: { ...verdeAcinzentadoLeft } },
+    }
+    const merged = mergeCanonicalIrisColor(vf, meta)
+    const rightEye = merged.right_eye as Record<string, unknown>
+    const constitution = rightEye.constitution as Record<string, unknown>
+    expect(constitution.primary).toBe('biliar')
+    expect(constitution.secondary).toBe('linfática')
+    expect(constitution.source).toBe('canonical_metadata')
+    // Other right_eye fields untouched.
+    expect(rightEye.fiber_density).toEqual({ score: 7 })
+  })
+
+  it('leaves constitution untouched when canonical primary has no mapping', () => {
+    const vf = {
+      right_eye: {
+        constitution: { primary: 'hematogênica' },
+      },
+    }
+    const meta: CanonicalMetadata = {
+      ...baseMetadata,
+      iris_color_by_eye: { left: null, right: castanhoRight },
+    }
+    const merged = mergeCanonicalIrisColor(vf, meta)
+    const constitution = (merged.right_eye as Record<string, unknown>).constitution as Record<string, unknown>
+    // 'castanho' has no founder-confirmed iridological override → Modal's value preserved.
+    expect(constitution.primary).toBe('hematogênica')
+  })
+
+  it('exposes iridologicalConstitutionForPrimary for direct use', () => {
+    expect(iridologicalConstitutionForPrimary('verde_acinzentado')).toEqual({
+      primary: 'biliar',
+      secondary: 'linfática',
+      source: 'canonical_metadata',
+    })
+    expect(iridologicalConstitutionForPrimary('castanho')).toBeNull()
+    expect(iridologicalConstitutionForPrimary(null)).toBeNull()
   })
 })

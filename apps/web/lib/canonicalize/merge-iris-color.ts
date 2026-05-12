@@ -39,6 +39,28 @@ export function iridologicalHintForPrimary(primary: string | null): string | nul
 }
 
 /**
+ * Constitution block override for the gray-tinted vocabulary. When canonical
+ * iris_color triggers a known iridological mapping, replace the Modal-written
+ * vision_features.{eye}.constitution block — Modal's LAB-centroid analysis
+ * produced "hematogênica" for verde_acinzentado readings, which is iridologically
+ * incompatible with gray-tinted iris (UAT item 1 follow-up, 2026-05-12).
+ *
+ * Returned shape matches the existing constitution block consumed by
+ * analyze.ts (featuresForRag.constitution.primary → RAG section-query).
+ *
+ * Same founder-confirmed mapping table as iridologicalHintForPrimary; expand
+ * as more iridological mappings get clinically confirmed.
+ */
+export function iridologicalConstitutionForPrimary(primary: string | null):
+  | { primary: string; secondary: string | null; source: 'canonical_metadata' }
+  | null {
+  if (primary === 'verde_acinzentado') {
+    return { primary: 'biliar', secondary: 'linfática', source: 'canonical_metadata' }
+  }
+  return null
+}
+
+/**
  * Overlay canonical_metadata.iris_color_by_eye onto vision_features.{left_eye,right_eye}.iris_color.
  * Returns a NEW object — input visionFeatures is not mutated. If canonicalMetadata
  * is null/missing or has no iris_color_by_eye, returns visionFeatures unchanged.
@@ -58,16 +80,23 @@ export function mergeCanonicalIrisColor(
 
   if (byEye.left) {
     const leftEye = (base.left_eye as Record<string, unknown> | undefined) ?? {}
+    const constitutionOverride = iridologicalConstitutionForPrimary(byEye.left.primary)
     base.left_eye = {
       ...leftEye,
       iris_color: buildIrisColorBlock(byEye.left),
+      // Override constitution when canonical color maps to a confirmed iridological
+      // category. Modal's vision_features.constitution is unreliable for gray-tinted
+      // iris (UAT item 1 follow-up: verde_acinzentado wrote 'hematogênica').
+      ...(constitutionOverride ? { constitution: constitutionOverride } : {}),
     }
   }
   if (byEye.right) {
     const rightEye = (base.right_eye as Record<string, unknown> | undefined) ?? {}
+    const constitutionOverride = iridologicalConstitutionForPrimary(byEye.right.primary)
     base.right_eye = {
       ...rightEye,
       iris_color: buildIrisColorBlock(byEye.right),
+      ...(constitutionOverride ? { constitution: constitutionOverride } : {}),
     }
   }
   return base
