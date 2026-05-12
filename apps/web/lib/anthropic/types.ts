@@ -133,5 +133,38 @@ export class AnthropicError extends Error {
   }
 }
 
+/** Iris bounding box returned by Sonnet 4.6 for canonical capture (Phase 07.1.6). */
+export interface IrisBbox {
+  /** 0.0-1.0 fraction of image width (post-EXIF-rotation) */
+  center_x_pct: number
+  /** 0.0-1.0 fraction of image height (post-EXIF-rotation) */
+  center_y_pct: number
+  /** fraction of min(W,H); typical valid range [0.05, 0.30] */
+  radius_pct: number
+  /** 0.0-1.0 Sonnet self-reported (informational only — D-02 cross-angle gate does the real work) */
+  confidence: number
+  /** false = Sonnet could not locate an iris in this image */
+  valid: boolean
+}
+
+/**
+ * Per-image canonical pipeline status.
+ * - 'ok'       → canonical_storage_path populated, Modal receives canonical URL
+ * - 'fallback' → bbox failed sanity gate (D-02), Modal receives original URL
+ * - 'disabled' → CANONICAL_CAPTURE_ENABLED=false at finalize time (D-04 kill-switch)
+ */
+export type CanonicalStatus = 'ok' | 'fallback' | 'disabled'
+
+/** Aggregate canonical metadata stored in readings.canonical_metadata (jsonb). */
+export interface CanonicalMetadata {
+  sonnet_input_tokens: number
+  sonnet_output_tokens: number
+  cost_usd: number
+  /** Counts per status — sum should equal 6 for full readings */
+  status_summary: Record<CanonicalStatus, number>
+  /** ISO timestamp when canonicalize finished */
+  canonicalized_at: string
+}
+
 /** Re-export keeps Database type alive — cross-reference for `readings` Row shape. */
 export type _DatabaseImported = Database
