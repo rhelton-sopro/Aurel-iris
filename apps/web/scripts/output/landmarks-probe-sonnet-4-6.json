@@ -1,0 +1,430 @@
+{
+  "reading_id": "e85ea7de-0e5f-4f49-a889-f886e4a05073",
+  "model": "claude-sonnet-4-6",
+  "run_at": "2026-05-11T22:29:20.618Z",
+  "pricing_per_mtok": {
+    "input": 3,
+    "output": 15
+  },
+  "token_totals": {
+    "input_tokens": 10830,
+    "output_tokens": 990,
+    "estimated_cost_usd": 0.04734
+  },
+  "results": [
+    {
+      "image_path": "1e02831f-0631-4059-b7bc-c8a6a62f9548/e85ea7de-0e5f-4f49-a889-f886e4a05073/originais/left_backlight.jpg",
+      "eye": "left",
+      "angle": "backlight",
+      "original_dims": {
+        "width": 3024,
+        "height": 4032
+      },
+      "vlm_dims": {
+        "width": 768,
+        "height": 1024
+      },
+      "haiku_raw_text": "{\n  \"valid\": true,\n  \"iris_bbox\": {\n    \"center_x_pct\": 0.42,\n    \"center_y_pct\": 0.42,\n    \"radius_pct\": 0.13\n  },\n  \"rotation_angle_deg\": -3,\n  \"eye_landmarks\": {\n    \"inner_canthus_x_pct\": 0.22,\n    \"inner_canthus_y_pct\": 0.44,\n    \"outer_canthus_x_pct\": 0.65,\n    \"outer_canthus_y_pct\": 0.41\n  },\n  \"confidence\": 0.78\n}",
+      "haiku_response": {
+        "valid": true,
+        "iris_bbox": {
+          "center_x_pct": 0.42,
+          "center_y_pct": 0.42,
+          "radius_pct": 0.13
+        },
+        "rotation_angle_deg": -3,
+        "eye_landmarks": {
+          "inner_canthus_x_pct": 0.22,
+          "inner_canthus_y_pct": 0.44,
+          "outer_canthus_x_pct": 0.65,
+          "outer_canthus_y_pct": 0.41
+        },
+        "confidence": 0.78
+      },
+      "parse_error": null,
+      "usage": {
+        "input_tokens": 1805,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 173,
+        "service_tier": "standard",
+        "inference_geo": "global"
+      },
+      "duration_ms": 3573,
+      "computed": {
+        "iris_center_px": [
+          1270,
+          1693
+        ],
+        "iris_radius_px": 393,
+        "rotation_applied_deg": -3,
+        "rotated_dims": {
+          "width": 3231,
+          "height": 4185
+        },
+        "rotated_iris_center_px": [
+          1357,
+          1783
+        ],
+        "crop_box": {
+          "left": 866,
+          "top": 1292,
+          "side": 983
+        },
+        "output_size_px": 800
+      },
+      "crop_saved_path": "scripts/output/crops-sonnet-4-6/left_backlight_crop.jpg",
+      "error": null,
+      "model": "claude-sonnet-4-6"
+    },
+    {
+      "image_path": "1e02831f-0631-4059-b7bc-c8a6a62f9548/e85ea7de-0e5f-4f49-a889-f886e4a05073/originais/left_frontal.jpg",
+      "eye": "left",
+      "angle": "frontal",
+      "original_dims": {
+        "width": 3024,
+        "height": 4032
+      },
+      "vlm_dims": {
+        "width": 768,
+        "height": 1024
+      },
+      "haiku_raw_text": "{\n  \"valid\": true,\n  \"iris_bbox\": {\n    \"center_x_pct\": 0.52,\n    \"center_y_pct\": 0.38,\n    \"radius_pct\": 0.13\n  },\n  \"rotation_angle_deg\": -3,\n  \"eye_landmarks\": {\n    \"inner_canthus_x_pct\": 0.28,\n    \"inner_canthus_y_pct\": 0.40,\n    \"outer_canthus_x_pct\": 0.78,\n    \"outer_canthus_y_pct\": 0.36\n  },\n  \"confidence\": 0.82\n}",
+      "haiku_response": {
+        "valid": true,
+        "iris_bbox": {
+          "center_x_pct": 0.52,
+          "center_y_pct": 0.38,
+          "radius_pct": 0.13
+        },
+        "rotation_angle_deg": -3,
+        "eye_landmarks": {
+          "inner_canthus_x_pct": 0.28,
+          "inner_canthus_y_pct": 0.4,
+          "outer_canthus_x_pct": 0.78,
+          "outer_canthus_y_pct": 0.36
+        },
+        "confidence": 0.82
+      },
+      "parse_error": null,
+      "usage": {
+        "input_tokens": 1805,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 173,
+        "service_tier": "standard",
+        "inference_geo": "global"
+      },
+      "duration_ms": 5187,
+      "computed": {
+        "iris_center_px": [
+          1572,
+          1532
+        ],
+        "iris_radius_px": 393,
+        "rotation_applied_deg": -3,
+        "rotated_dims": {
+          "width": 3231,
+          "height": 4185
+        },
+        "rotated_iris_center_px": [
+          1651,
+          1606
+        ],
+        "crop_box": {
+          "left": 1159,
+          "top": 1115,
+          "side": 983
+        },
+        "output_size_px": 800
+      },
+      "crop_saved_path": "scripts/output/crops-sonnet-4-6/left_frontal_crop.jpg",
+      "error": null,
+      "model": "claude-sonnet-4-6"
+    },
+    {
+      "image_path": "1e02831f-0631-4059-b7bc-c8a6a62f9548/e85ea7de-0e5f-4f49-a889-f886e4a05073/originais/left_lateral.jpg",
+      "eye": "left",
+      "angle": "lateral",
+      "original_dims": {
+        "width": 3024,
+        "height": 4032
+      },
+      "vlm_dims": {
+        "width": 768,
+        "height": 1024
+      },
+      "haiku_raw_text": "{\n  \"valid\": true,\n  \"iris_bbox\": {\n    \"center_x_pct\": 0.46,\n    \"center_y_pct\": 0.42,\n    \"radius_pct\": 0.12\n  },\n  \"rotation_angle_deg\": -3,\n  \"eye_landmarks\": {\n    \"inner_canthus_x_pct\": 0.27,\n    \"inner_canthus_y_pct\": 0.45,\n    \"outer_canthus_x_pct\": 0.72,\n    \"outer_canthus_y_pct\": 0.40\n  },\n  \"confidence\": 0.78\n}",
+      "haiku_response": {
+        "valid": true,
+        "iris_bbox": {
+          "center_x_pct": 0.46,
+          "center_y_pct": 0.42,
+          "radius_pct": 0.12
+        },
+        "rotation_angle_deg": -3,
+        "eye_landmarks": {
+          "inner_canthus_x_pct": 0.27,
+          "inner_canthus_y_pct": 0.45,
+          "outer_canthus_x_pct": 0.72,
+          "outer_canthus_y_pct": 0.4
+        },
+        "confidence": 0.78
+      },
+      "parse_error": null,
+      "usage": {
+        "input_tokens": 1805,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 173,
+        "service_tier": "standard",
+        "inference_geo": "global"
+      },
+      "duration_ms": 3482,
+      "computed": {
+        "iris_center_px": [
+          1391,
+          1693
+        ],
+        "iris_radius_px": 363,
+        "rotation_applied_deg": -3,
+        "rotated_dims": {
+          "width": 3231,
+          "height": 4185
+        },
+        "rotated_iris_center_px": [
+          1478,
+          1777
+        ],
+        "crop_box": {
+          "left": 1024,
+          "top": 1323,
+          "side": 907
+        },
+        "output_size_px": 800
+      },
+      "crop_saved_path": "scripts/output/crops-sonnet-4-6/left_lateral_crop.jpg",
+      "error": null,
+      "model": "claude-sonnet-4-6"
+    },
+    {
+      "image_path": "1e02831f-0631-4059-b7bc-c8a6a62f9548/e85ea7de-0e5f-4f49-a889-f886e4a05073/originais/right_backlight.jpg",
+      "eye": "right",
+      "angle": "backlight",
+      "original_dims": {
+        "width": 3024,
+        "height": 4032
+      },
+      "vlm_dims": {
+        "width": 768,
+        "height": 1024
+      },
+      "haiku_raw_text": "{\n  \"valid\": true,\n  \"iris_bbox\": {\n    \"center_x_pct\": 0.52,\n    \"center_y_pct\": 0.42,\n    \"radius_pct\": 0.17\n  },\n  \"rotation_angle_deg\": -3,\n  \"eye_landmarks\": {\n    \"inner_canthus_x_pct\": 0.82,\n    \"inner_canthus_y_pct\": 0.44,\n    \"outer_canthus_x_pct\": 0.18,\n    \"outer_canthus_y_pct\": 0.41\n  },\n  \"confidence\": 0.82\n}",
+      "haiku_response": {
+        "valid": true,
+        "iris_bbox": {
+          "center_x_pct": 0.52,
+          "center_y_pct": 0.42,
+          "radius_pct": 0.17
+        },
+        "rotation_angle_deg": -3,
+        "eye_landmarks": {
+          "inner_canthus_x_pct": 0.82,
+          "inner_canthus_y_pct": 0.44,
+          "outer_canthus_x_pct": 0.18,
+          "outer_canthus_y_pct": 0.41
+        },
+        "confidence": 0.82
+      },
+      "parse_error": null,
+      "usage": {
+        "input_tokens": 1805,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 173,
+        "service_tier": "standard",
+        "inference_geo": "global"
+      },
+      "duration_ms": 2842,
+      "computed": {
+        "iris_center_px": [
+          1572,
+          1693
+        ],
+        "iris_radius_px": 514,
+        "rotation_applied_deg": -3,
+        "rotated_dims": {
+          "width": 3231,
+          "height": 4185
+        },
+        "rotated_iris_center_px": [
+          1659,
+          1767
+        ],
+        "crop_box": {
+          "left": 1017,
+          "top": 1125,
+          "side": 1285
+        },
+        "output_size_px": 800
+      },
+      "crop_saved_path": "scripts/output/crops-sonnet-4-6/right_backlight_crop.jpg",
+      "error": null,
+      "model": "claude-sonnet-4-6"
+    },
+    {
+      "image_path": "1e02831f-0631-4059-b7bc-c8a6a62f9548/e85ea7de-0e5f-4f49-a889-f886e4a05073/originais/right_frontal.jpg",
+      "eye": "right",
+      "angle": "frontal",
+      "original_dims": {
+        "width": 3024,
+        "height": 4032
+      },
+      "vlm_dims": {
+        "width": 768,
+        "height": 1024
+      },
+      "haiku_raw_text": "{\n  \"valid\": true,\n  \"iris_bbox\": {\n    \"center_x_pct\": 0.45,\n    \"center_y_pct\": 0.45,\n    \"radius_pct\": 0.13\n  },\n  \"rotation_angle_deg\": -3,\n  \"eye_landmarks\": {\n    \"inner_canthus_x_pct\": 0.62,\n    \"inner_canthus_y_pct\": 0.48,\n    \"outer_canthus_x_pct\": 0.22,\n    \"outer_canthus_y_pct\": 0.44\n  },\n  \"confidence\": 0.78\n}",
+      "haiku_response": {
+        "valid": true,
+        "iris_bbox": {
+          "center_x_pct": 0.45,
+          "center_y_pct": 0.45,
+          "radius_pct": 0.13
+        },
+        "rotation_angle_deg": -3,
+        "eye_landmarks": {
+          "inner_canthus_x_pct": 0.62,
+          "inner_canthus_y_pct": 0.48,
+          "outer_canthus_x_pct": 0.22,
+          "outer_canthus_y_pct": 0.44
+        },
+        "confidence": 0.78
+      },
+      "parse_error": null,
+      "usage": {
+        "input_tokens": 1805,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 173,
+        "service_tier": "standard",
+        "inference_geo": "global"
+      },
+      "duration_ms": 3315,
+      "computed": {
+        "iris_center_px": [
+          1361,
+          1814
+        ],
+        "iris_radius_px": 393,
+        "rotation_applied_deg": -3,
+        "rotated_dims": {
+          "width": 3231,
+          "height": 4185
+        },
+        "rotated_iris_center_px": [
+          1454,
+          1899
+        ],
+        "crop_box": {
+          "left": 962,
+          "top": 1408,
+          "side": 983
+        },
+        "output_size_px": 800
+      },
+      "crop_saved_path": "scripts/output/crops-sonnet-4-6/right_frontal_crop.jpg",
+      "error": null,
+      "model": "claude-sonnet-4-6"
+    },
+    {
+      "image_path": "1e02831f-0631-4059-b7bc-c8a6a62f9548/e85ea7de-0e5f-4f49-a889-f886e4a05073/originais/right_lateral.jpg",
+      "eye": "right",
+      "angle": "lateral",
+      "original_dims": {
+        "width": 3024,
+        "height": 4032
+      },
+      "vlm_dims": {
+        "width": 768,
+        "height": 1024
+      },
+      "haiku_raw_text": "{\"valid\":true,\"iris_bbox\":{\"center_x_pct\":0.42,\"center_y_pct\":0.45,\"radius_pct\":0.13},\"rotation_angle_deg\":3,\"eye_landmarks\":{\"inner_canthus_x_pct\":0.18,\"inner_canthus_y_pct\":0.48,\"outer_canthus_x_pct\":0.72,\"outer_canthus_y_pct\":0.44},\"confidence\":0.82}",
+      "haiku_response": {
+        "valid": true,
+        "iris_bbox": {
+          "center_x_pct": 0.42,
+          "center_y_pct": 0.45,
+          "radius_pct": 0.13
+        },
+        "rotation_angle_deg": 3,
+        "eye_landmarks": {
+          "inner_canthus_x_pct": 0.18,
+          "inner_canthus_y_pct": 0.48,
+          "outer_canthus_x_pct": 0.72,
+          "outer_canthus_y_pct": 0.44
+        },
+        "confidence": 0.82
+      },
+      "parse_error": null,
+      "usage": {
+        "input_tokens": 1805,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 125,
+        "service_tier": "standard",
+        "inference_geo": "global"
+      },
+      "duration_ms": 2717,
+      "computed": {
+        "iris_center_px": [
+          1270,
+          1814
+        ],
+        "iris_radius_px": 393,
+        "rotation_applied_deg": 3,
+        "rotated_dims": {
+          "width": 3231,
+          "height": 4185
+        },
+        "rotated_iris_center_px": [
+          1384,
+          1879
+        ],
+        "crop_box": {
+          "left": 893,
+          "top": 1387,
+          "side": 983
+        },
+        "output_size_px": 800
+      },
+      "crop_saved_path": "scripts/output/crops-sonnet-4-6/right_lateral_crop.jpg",
+      "error": null,
+      "model": "claude-sonnet-4-6"
+    }
+  ]
+}
