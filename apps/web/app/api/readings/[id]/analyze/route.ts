@@ -28,6 +28,8 @@ import { revalidatePath } from 'next/cache'
 
 import { createClient } from '@/lib/supabase/server'
 import { analyzeReading } from '@/lib/anthropic/analyze'
+import { mergeCanonicalIrisColor } from '@/lib/canonicalize/merge-iris-color'
+import type { CanonicalMetadata } from '@/lib/anthropic/types'
 import type { IrisFeaturesForRag } from '@/lib/rag/build-queries'
 import { findAllBoundaries, closeSections } from '@/lib/anthropic/parser'
 import { runAudit } from '@/lib/anthropic/audit'
@@ -61,7 +63,7 @@ export async function POST(
   const { data: reading, error: readingError } = await supabase
     .from('readings')
     .select(
-      'id, therapist_id, status, vision_features, report_delivered, regeneration_count, regeneration_log, client:clients(full_name, birth_date)',
+      'id, therapist_id, status, vision_features, canonical_metadata, report_delivered, regeneration_count, regeneration_log, client:clients(full_name, birth_date)',
     )
     .eq('id', readingId)
     .maybeSingle()
@@ -106,11 +108,21 @@ export async function POST(
     ? Math.floor((Date.now() - new Date(clientBirth).getTime()) / 31_557_600_000)
     : null
 
+  // Phase 07.1.6 UAT item 2: canonical iris_color is authoritative. Modal's
+  // post-canonicalize callback overwrites vision_features.{eye}.iris_color with
+  // its stale LAB-centroid analysis; merge canonical_metadata.iris_color_by_eye
+  // back in here so the LLM sees the Sonnet-extracted color + iridological hint.
+  // No-op when canonical_metadata is null (pre-07.1.6 readings).
+  const mergedVisionFeatures = mergeCanonicalIrisColor(
+    reading.vision_features as Record<string, unknown> | null,
+    reading.canonical_metadata as unknown as CanonicalMetadata | null,
+  )
+
   // Open the analysis stream
   const analysis = await analyzeReading({
     readingId,
     therapistId: user.id,
-    visionFeatures: reading.vision_features as unknown as IrisFeaturesForRag & Record<string, unknown>,
+    visionFeatures: mergedVisionFeatures as unknown as IrisFeaturesForRag & Record<string, unknown>,
     clientName,
     clientAge,
     therapistNotes: null, // Phase 7 doesn't surface notes; Fase 9 polish may add
