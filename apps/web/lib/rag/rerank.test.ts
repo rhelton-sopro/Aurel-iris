@@ -3,12 +3,12 @@
  *
  * Mocks the `voyageai` npm SDK at module scope via `vi.mock` so the wrapper
  * never makes a real HTTP call. Covers the 7 contracts from 06-11-PLAN:
- *  - reorders top-50 → top-30 candidates correctly via voyage-rerank-2.5 (D-N2)
+ *  - reorders top-50 → top-30 candidates correctly via rerank-2.5 (D-N2)
  *  - falls back to cosine sort on API error (D-N2 graceful — never throws)
  *  - falls back to cosine sort when VOYAGE_API_KEY missing
  *  - returns empty array on empty candidates input (no SDK call)
  *  - respects topK arg (default 30 — D-R3 cap)
- *  - uses RERANK_MODEL from VOYAGE_RERANK_MODEL env var (defaults voyage-rerank-2.5)
+ *  - uses RERANK_MODEL from VOYAGE_RERANK_MODEL env var (defaults rerank-2.5)
  *  - replaces score with relevanceScore from rerank response
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
@@ -58,7 +58,7 @@ describe('rerank.ts (D-N2)', () => {
     vi.unstubAllEnvs()
   })
 
-  it('reorders top-50 → top-30 via voyage-rerank-2.5', async () => {
+  it('reorders top-50 → top-30 via rerank-2.5', async () => {
     const candidates = Array.from({ length: 50 }, (_, i) => makeChunk(i, 0.5))
     mockRerankFn.mockResolvedValue({
       data: [
@@ -108,12 +108,12 @@ describe('rerank.ts (D-N2)', () => {
     expect(result).toHaveLength(30) // default topK
   })
 
-  it('RERANK_MODEL defaults to voyage-rerank-2.5 (env-overridable)', () => {
+  it('RERANK_MODEL defaults to rerank-2.5 (env-overridable)', () => {
     // RERANK_MODEL is captured at module load. With no override env var set in the
     // test runner, the default applies. Override path is verified at runtime by
-    // `process.env.VOYAGE_RERANK_MODEL ?? 'voyage-rerank-2.5'` — no module-reset
+    // `process.env.VOYAGE_RERANK_MODEL ?? 'rerank-2.5'` — no module-reset
     // hack needed in vitest because the default branch is the production path.
-    expect(RERANK_MODEL).toBe('voyage-rerank-2.5')
+    expect(RERANK_MODEL).toBe('rerank-2.5')
   })
 
   it('replaces score with relevanceScore from rerank response', async () => {

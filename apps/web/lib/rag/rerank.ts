@@ -22,11 +22,18 @@ import { VoyageAIClient } from 'voyageai'
 import type { KnowledgeChunkRow } from './types'
 
 /**
- * Rerank model name — env-overridable to allow swapping to `voyage-rerank-2.5-lite`
+ * Rerank model name — env-overridable to allow swapping to `rerank-2.5-lite`
  * (lower cost, slightly lower quality) without code change. RESEARCH lines 137 —
  * lite is the documented fallback de custo.
+ *
+ * 2026-05-12: Voyage API rejected `voyage-rerank-2.5` (legacy name) with HTTP
+ * 400; supported models are `rerank-lite-1 | rerank-2-lite | rerank-2 |
+ * rerank-2.5 | rerank-2.5-lite`. Surfaced in f4408c23 analyze logs
+ * (`[rag.rerank] reranker failed — falling back to cosine sort: ... Model
+ * voyage-rerank-2.5 is not supported`). Default updated to `rerank-2.5`;
+ * VOYAGE_RERANK_MODEL env override preserved.
  */
-export const RERANK_MODEL = process.env.VOYAGE_RERANK_MODEL ?? 'voyage-rerank-2.5'
+export const RERANK_MODEL = process.env.VOYAGE_RERANK_MODEL ?? 'rerank-2.5'
 
 /** D-R3 default cap — caller can override (e.g. 60 to overfetch before applyWeights). */
 const DEFAULT_TOP_K = 30

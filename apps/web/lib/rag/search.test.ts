@@ -50,7 +50,7 @@ vi.mock('./rerank', () => ({
   rerankChunks: vi.fn(async (args: { candidates: unknown[]; topK?: number }) => {
     return args.candidates.slice(0, args.topK ?? 30)
   }),
-  RERANK_MODEL: 'voyage-rerank-2.5',
+  RERANK_MODEL: 'rerank-2.5',
 }))
 
 import { retrieveRelevantKnowledge, ALTA_PRIORIDADE_BOOKS } from './search'
