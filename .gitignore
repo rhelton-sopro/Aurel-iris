@@ -19,6 +19,14 @@ __pycache__/
 # vision-service ML models (downloaded on-demand by probe scripts)
 vision-service/models/*.task
 vision-service/scripts/output/
+apps/web/scripts/output/
+# Phase 07.1.6 D-06: commit only the golden fixture; outros outputs continuam ignored.
+# Note: parent dir é ignored, mas re-incluímos com pattern de file específico — git
+# precisa do parent NÃO-ignored para a negação funcionar, então usamos /* no parent
+# e negate apenas o golden. Crops/ dirs continuam ignored via /* wildcard.
+!apps/web/scripts/output/
+apps/web/scripts/output/*
+!apps/web/scripts/output/landmarks-probe-sonnet-4-6.json
 
 # environment
 .env.local
