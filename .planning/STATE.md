@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: "Phase 07.1.6 EXECUTING — Wave 0 Plan 01 COMPLETE (cb03ced + 4c0203c + 8161591 + supabase db push applied 2026-05-12 founder confirmed). Schema migration 0012 live (reading_images.canonical_storage_path + readings.canonical_metadata, ambas nullable). SONNET_BBOX_MODEL hardcoded literal type. IrisBbox + CanonicalStatus + CanonicalMetadata exportados. Próximo: Wave 0 Plan 02 (sanity.ts TDD pure-functions) → desbloqueia Plan 03 canonicalize core. 6 plans remaining (02 → 03 → 04 → 05 → 06 → 07)."
-stopped_at: "Plan 01 finalizado (3 code commits + db push applied). Plan 02 (sanity.ts TDD) é next em sequential execution mode — autonomous:true, sem human-action checkpoint."
-last_updated: "2026-05-12T07:43:57.000Z"
+status: "Phase 07.1.6 EXECUTING — Wave 0 Plan 02 COMPLETE (f1e183b RED + 3479d11 GREEN; 17/17 vitest pass em 4ms). Plan 01 já entregue (cb03ced + 4c0203c + 8161591 + db push). sanity.ts exporta isGeometricallySane + isCrossAngleOutlier + isCanonicalAccepted como pure functions (no I/O, no async, no env). Thresholds hardcoded D-02 (0.20/0.80 center, 0.05/0.30 radius, 0.08 cross-angle strict>); D-03 sem retry (gate fail → 'fallback'). Próximo: Wave 1 Plan 03 (canonicalize-core index.ts orchestrator com sonnet-bbox.ts + crop.ts + storage-path.ts + per-eye trust gate). 5 plans remaining (03 → 04 → 05 → 06 → 07)."
+stopped_at: "Plan 02 finalizado (RED + GREEN commits + SUMMARY). Plan 03 (canonicalize-core) é next em sequential execution mode — autonomous:true, sem human-action checkpoint."
+last_updated: "2026-05-12T09:15:00.000Z"
 progress:
   total_phases: 11
   completed_phases: 7
   total_plans: 75
-  completed_plans: 71
-  percent: 94
+  completed_plans: 72
+  percent: 96
 ---
 
 # Estado do projeto
@@ -25,8 +25,11 @@ Ver: .planning/PROJECT.md (atualizado em 2026-04-30)
 ## Posição atual
 
 Fase: 7.1.6 EXECUTING (sequential mode em main, no worktrees per founder pref). 7.1.5 ABANDONED. 7.2 continua blocked-on-7.1.6.
-Plan: 07.1.6-01 COMPLETO (cb03ced + 4c0203c + 8161591 + supabase db push applied 2026-05-12 founder confirmed). Schema migration 0012 live. SONNET_BBOX_MODEL hardcoded literal type. IrisBbox + CanonicalStatus + CanonicalMetadata exportados.
-Próxima ação: Plan 02 (sanity.ts TDD pure-functions) → desbloqueia Plan 03 canonicalize core. 6 plans remaining (02 autonomous → 03 autonomous → 04 autonomous → 05 autonomous → 06 autonomous → 07 autonomous). Zero further human-action checkpoints até verify_phase_goal.
+Plan: 07.1.6-02 COMPLETO (f1e183b RED + 3479d11 GREEN). sanity.ts pure-functions live: isGeometricallySane (center ∈ [0.20,0.80] inclusive + radius ∈ [0.05,0.30] inclusive), isCrossAngleOutlier (strict > 0.08 vs median(peers.x|y); false quando peers.length < 2), isCanonicalAccepted (combined gate — 'ok' iff valid+sane+non-outlier; 'fallback' caso contrário). 17/17 vitest pass em 4ms. Plan 01 também COMPLETO (cb03ced + 4c0203c + 8161591 + db push 2026-05-12).
+Próxima ação: Plan 03 (canonicalize-core: storage-path.ts + sonnet-bbox.ts + crop.ts + index.ts orchestrator com 6× Promise.all + per-eye trust gate). 5 plans remaining (03 autonomous → 04 autonomous → 05 autonomous → 06 autonomous → 07 autonomous). Zero further human-action checkpoints até verify_phase_goal.
+
+**Plan 07.1.6-02 execução (2026-05-12 sequential, sem worktree):** TDD RED→GREEN cycle puro em <12 min total. Wave 0 Plan 02 entregou 2 commits atômicos: `f1e183b` RED (apps/web/lib/canonicalize/__tests__/sanity.test.ts +335 linhas — 4 describe blocks × 17 it cases com fixtures empíricas Nailli e85ea7de + boundary cases + invalid bbox + end-to-end 5-ok-1-fallback fixture; vitest fail mode "Failed to resolve import '../sanity'") + `3479d11` GREEN (apps/web/lib/canonicalize/sanity.ts +104 linhas com 3 pure functions + median() private helper; threshold consts hardcoded sem env-override; NO 'server-only' / NO async / NO I/O; imports apenas `IrisBbox + CanonicalStatus` from `@/lib/anthropic/types`). 1 Rule 1 deviation inline-fixed: `boundaryOutlierX` test fixture re-anchored de center_x=0.54 + peers=[0.46,0.46] → center_x=0.58 + peers=[0.50,0.50] porque IEEE 754 drift produzia `Math.abs(0.54-0.46)=0.08000000000000002` (acima do strict threshold 0.08); novo fixture produz `Math.abs(0.58-0.50)=0.07999999999999996` deterministicamente abaixo. Implementação `isCrossAngleOutlier` (strict `>`) inalterada — só o fixture precisou de ajuste para expressar a semântica "delta exatamente 0.08 NÃO é outlier". Verification gates GREEN: `pnpm test:run lib/canonicalize/__tests__/sanity.test.ts` → 17/17 pass (zero todo); `pnpm tsc --noEmit` em apps/web → ZERO novos erros em `lib/canonicalize/` (pre-existing Phase 3/5 dívida em readings.test.ts/ReprocessButton/modal-client/quality-scoring intocada); `pnpm lint` → 9 baseline warnings unchanged, ZERO novos; `pnpm audit:vocabulary` → 8 baseline Phase 3 hits unchanged, ZERO novos de `lib/canonicalize/`. Downstream contract para Plan 03: `import { isCanonicalAccepted } from '@/lib/canonicalize/sanity'` chamado per-image; per-eye peer extraction via `array.filter((_, i) => i !== idx)`. **Accepted limitation declarada em SUMMARY (matching CONTEXT.md §Specifics):** o gate D-02 pode NÃO catch o specific right_frontal Nailli (números consistentes mas bbox visualmente errada); founder /admin Re-canonicalizar (Plan 06) é o escape hatch manual quando isso acontece. SUMMARY.md criado em `.planning/phases/07.1.6-canonical-capture-pipeline/07.1.6-02-SUMMARY.md` com Self-Check: PASSED. ROADMAP.md Phase 7.1.6 row 02 flipada de `[ ]` → `[x] ✓ 2026-05-12`. **Wave 0 100% complete — 2/2 plans entregues; Wave 1 desbloqueada.**
+
 
 **Phase 07.1.6 architectural rationale (2026-05-11):** founder + Claude exploraram alternativa ao U-Net escalation. Probe `apps/web/scripts/probe-haiku-iris-landmarks.mjs` (gitignored output) testou Haiku 4.5 e Sonnet 4.6 como landmark detectors. Haiku templated: radius_pct=0.12 em 5/6 fotos da Nailli, rotation_angle_deg=-8 em 5/6, center_x≈0.58 em 4/6 — VLM bbox detection via Haiku inviável. Sonnet 4.6 melhorou: bbox center varia per-image (5/6 crops visualmente aprovados pelo founder), custo $0.0474 / 6 fotos = ~$0.05/reading. **Smoking gun crítico:** Sonnet também templated rotation_angle_deg=-3.00 em TODAS as 6 fotos — rotation detection via VLM **morta independente do modelo**. Decisão: 07.1.6 faz canonical CROP (Sonnet bbox + sharp crop + resize 800×800) sem rotation correction; terapeuta é responsável pela orientação da câmera. Substitui U-Net escalation (Approach C) que era o default original do 07.1.5 P2 em B_INFEASIBLE branch. U-Net resolveria só detect/segment (sintoma); canonical capture resolve detect/segment + Sonnet Vision downstream economy + corpus standardization (4 ganhos vs 1).
 
