@@ -9,6 +9,7 @@ import { AnnotationForm } from '@/components/calibration/AnnotationForm'
 import { CalibrationDiagnosisForm } from '@/components/calibration/CalibrationDiagnosisForm'
 import { TechnicalReportCopyButton } from '@/components/calibration/TechnicalReportCopyButton'
 import { PhotoDownloadButton } from '@/components/calibration/PhotoDownloadButton'
+import { RecanonicalizeButton } from '@/components/calibration/RecanonicalizeButton'
 
 const SIGNED_URL_TTL_SECONDS = 600 // 10 minutes — inline display only.
 
@@ -19,6 +20,8 @@ interface ReadingDetail {
   created_at: string
   status: string | null
   vision_features: unknown
+  // Phase 07.1.6 — jsonb CanonicalMetadata shape (status_summary + canonicalized_at).
+  canonical_metadata: unknown
   client: { full_name: string | null; birth_date: string | null } | { full_name: string | null; birth_date: string | null }[] | null
 }
 
@@ -66,7 +69,7 @@ export default async function CalibrationDetailPage({
   const { data: reading, error: readingError } = await supabase
     .from('readings')
     .select(
-      'id, created_at, status, vision_features, client:clients(full_name, birth_date)'
+      'id, created_at, status, vision_features, canonical_metadata, client:clients(full_name, birth_date)'
     )
     .eq('id', readingId)
     .maybeSingle()
@@ -124,6 +127,17 @@ export default async function CalibrationDetailPage({
 
   const client = getClient(reading.client as ReadingDetail['client'])
 
+  // Phase 07.1.6 — canonical_metadata jsonb (CanonicalMetadata shape: status_summary + canonicalized_at).
+  // NULL para readings pre-07.1.6 (D-05 backfill on-demand via RecanonicalizeButton) ou pre-finalize.
+  const canonicalMeta = reading.canonical_metadata as {
+    status_summary?: { ok?: number; fallback?: number; disabled?: number }
+    canonicalized_at?: string
+  } | null
+  const okCount = canonicalMeta?.status_summary?.ok ?? 0
+  const fallbackCount = canonicalMeta?.status_summary?.fallback ?? 0
+  const disabledCount = canonicalMeta?.status_summary?.disabled ?? 0
+  const totalCanonical = okCount + fallbackCount + disabledCount
+
   return (
     <div className="space-y-6">
       <div>
@@ -149,6 +163,19 @@ export default async function CalibrationDetailPage({
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          {/* Phase 07.1.6 — canonical_metadata badge (D-05 audit-ability). */}
+          {totalCanonical > 0 ? (
+            <Badge
+              variant={fallbackCount > 0 || disabledCount > 0 ? 'secondary' : 'default'}
+              className={fallbackCount === 0 && disabledCount === 0 ? 'bg-violet-600' : ''}
+            >
+              canonical {okCount}/{totalCanonical}
+            </Badge>
+          ) : (
+            <Badge variant="outline" className="text-muted-foreground">
+              canonical pendente
+            </Badge>
+          )}
           {existingDiagnosis && (
             <Badge variant="default" className="bg-blue-600">diagnóstico salvo</Badge>
           )}
@@ -195,6 +222,7 @@ export default async function CalibrationDetailPage({
             features={reading.vision_features}
           />
           <PhotoDownloadButton readingId={reading.id} />
+          <RecanonicalizeButton readingId={reading.id} />
         </div>
       </section>
 
