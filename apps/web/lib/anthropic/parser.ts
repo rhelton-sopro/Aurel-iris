@@ -30,14 +30,19 @@ import 'server-only'
 import { SECTION_KEY_BY_NUMBER, type NumberedSectionKey } from './types'
 
 // Anatomy:
-//   ^#{2,3}        — line starts with ## or ###
-//   \s+            — at least one space after hashes
+//   ^[ \t]*        — line start with optional indent (defensive — Sonnet rarely indents but seen 1× in dogfooding)
+//   #{2,3}         — 2 or 3 hashes (H2 or H3)
+//   [ \t]+         — at least one space/tab after hashes
 //   §?             — optional section glyph (`§1` vs `1`)
+//   [ \t]*         — optional spaces between § and number
 //   (\d{1,2})      — capture 1-13 (range-checked below)
-//   \s*            — optional spaces between number and separator
-//   [.\-—–]        — separator: period, hyphen, em-dash, or en-dash
-//   \s+            — at least one space after separator
-const BOUNDARY_RE = /^#{2,3}\s+§?(\d{1,2})\s*[.\-—–]\s+/gm
+//   [ \t]*         — optional spaces between number and separator
+//   [\p{Pd}.]      — separator: period OR any Unicode Dash Punctuation
+//                    (\p{Pd} covers em-dash, en-dash, hyphen-minus, figure-dash,
+//                    swung-dash, two-em-dash, etc — robust against character variants)
+//   [ \t]*         — optional trailing space (no-space variants like `1.Title` accepted)
+// u flag required for \p{Pd}; m flag for line-start anchor.
+const BOUNDARY_RE = /^[ \t]*#{2,3}[ \t]+§?[ \t]*(\d{1,2})[ \t]*[\p{Pd}.][ \t]*/gmu
 
 export interface BoundaryMatch {
   /** 1..13 — the section number from the heading. */

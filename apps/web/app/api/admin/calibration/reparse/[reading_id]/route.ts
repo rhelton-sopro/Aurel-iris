@@ -77,6 +77,58 @@ export async function POST(
 
   // 3. Re-parse with current parser (the same one /analyze uses post-stream).
   const boundaries = findAllBoundaries(buffer)
+
+  // 3a. Diagnostic short-circuit: if parser found ZERO boundaries, return a
+  //     forensic dump instead of overwriting report_generated with just the
+  //     encerramento. This is the recovery surface for parser regex drift —
+  //     founder sees exactly what's in the buffer + char codes of any
+  //     heading-like lines without needing SQL access.
+  if (boundaries.length === 0) {
+    const headingCandidates: Array<{
+      line: number
+      preview: string
+      starts_with_hashes: number
+      first_30_char_codes: number[]
+    }> = []
+    const lines = buffer.split('\n')
+    for (let i = 0; i < lines.length && headingCandidates.length < 10; i++) {
+      const line = lines[i]!
+      // Capture anything that LOOKS like a heading candidate — leading whitespace
+      // optional, then 1+ hash, then non-space char. Permissive so we catch
+      // whatever Sonnet emitted regardless of regex shape.
+      if (/^\s*#+\s*\S/.test(line)) {
+        headingCandidates.push({
+          line: i,
+          preview: line.slice(0, 100),
+          starts_with_hashes: (line.match(/^\s*(#+)/) ?? ['', ''])[1]!.length,
+          first_30_char_codes: Array.from(line.slice(0, 30)).map(c => c.codePointAt(0)!),
+        })
+      }
+    }
+    console.error(
+      `[reparse-report] zero boundaries reading=${readingId} buffer_length=${buffer.length} heading_candidates=${headingCandidates.length}`,
+    )
+    return NextResponse.json(
+      {
+        reading_id: readingId,
+        sections_parsed: 0,
+        boundaries_found: 0,
+        buffer_length: buffer.length,
+        diagnostic: {
+          sample_head: buffer.slice(0, 500),
+          sample_head_char_codes: Array.from(buffer.slice(0, 50)).map(c =>
+            c.codePointAt(0)!,
+          ),
+          heading_candidates: headingCandidates,
+          has_crlf: buffer.includes('\r\n'),
+          has_bare_cr: buffer.includes('\r') && !buffer.includes('\r\n'),
+          has_bom: buffer.charCodeAt(0) === 0xfeff,
+        },
+      },
+      { status: 200 },
+    )
+  }
+
   const closedSections = closeSections(boundaries, buffer)
   const completedSections: ReportJsonb = {}
   for (const section of closedSections) {

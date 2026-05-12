@@ -23,6 +23,20 @@ import { Button } from '@/components/ui/button'
  * useState + sonner toast + shadcn Button).
  */
 
+interface ReparseDiagnostic {
+  sample_head: string
+  sample_head_char_codes: number[]
+  heading_candidates: Array<{
+    line: number
+    preview: string
+    starts_with_hashes: number
+    first_30_char_codes: number[]
+  }>
+  has_crlf: boolean
+  has_bare_cr: boolean
+  has_bom: boolean
+}
+
 interface ReparseResponseBody {
   reading_id?: string
   sections_parsed?: number
@@ -30,6 +44,7 @@ interface ReparseResponseBody {
   buffer_length?: number
   boundaries_found?: number
   audit_anchor_rate_pct?: number
+  diagnostic?: ReparseDiagnostic
   error?: string
 }
 
@@ -60,16 +75,22 @@ export function ReparseReportButton({ readingId }: { readingId: string }) {
       const anchor = body.audit_anchor_rate_pct ?? 0
 
       if (boundaries === 0) {
+        // Surface forensic diagnostic in browser console — copy-pasteable for
+        // the parser regex fix. Toast points the founder to F12.
+        console.warn(
+          '[ReparseReportButton] 0 boundaries — diagnostic:',
+          JSON.stringify(body.diagnostic, null, 2),
+        )
         toast.warning(
-          `Re-parse: 0 boundaries no buffer (${buf} chars). Parser ainda não casa — buffer pode ter formato novo.`,
+          `Re-parse: 0 boundaries em ${buf} chars. Abre DevTools (F12) → Console pra ver o diagnóstico (sample + char codes + heading candidates).`,
+          { duration: 12000 },
         )
       } else {
         toast.success(
           `Re-parse: ${sections} seções (${boundaries} boundaries, anchor ${anchor.toFixed(0)}%).`,
         )
+        router.refresh()
       }
-
-      router.refresh()
     } catch (err) {
       const reason = err instanceof Error ? err.message : 'falha de rede'
       console.error('[ReparseReportButton] fetch error', err)
