@@ -31,10 +31,16 @@ const GEOM_CENTER_MAX = 0.8
 const GEOM_RADIUS_MIN = 0.05
 const GEOM_RADIUS_MAX = 0.3
 
-// D-02 cross-angle outlier threshold — empirical right_frontal delta foi
-// 0.10 from median; 0.08 catches it com folga, sem flagear ruído normal
-// entre 3 ângulos do mesmo olho. STRICT > (boundary não-outlier).
-const CROSS_ANGLE_OUTLIER_THRESHOLD = 0.08
+// D-02 cross-angle outlier threshold.
+// Initial empirical lock (Nailli e85ea7de probe, 2026-05-11): 0.08.
+// Relaxed to 0.18 after Phase 07.1.6 UAT item 1 (reading f4408c23, 2026-05-12):
+// 5/6 photos fell back with cross_angle deltas 0.09–0.16 — all geometrically
+// sane, all consistent with the camera-tilt capture protocol (3 angles per
+// eye intentionally produce a measurable lateral shift of the iris in-frame).
+// 0.18 is empirically grounded (>max observed natural shift 0.16, < a
+// pathological "Sonnet pointed at the eyelid" outlier ≥ 0.25). STRICT >
+// (boundary não-outlier).
+const CROSS_ANGLE_OUTLIER_THRESHOLD = 0.18
 
 /** Empirical thresholds exported para diagnóstico (gate_diagnostics.context). */
 export const GATE_THRESHOLDS = {

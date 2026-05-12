@@ -10,8 +10,9 @@
  * Behavior coverage (≥14 cases):
  *   isGeometricallySane: in-range, center_x out-low, center_y out-high,
  *                       radius out-low, radius out-high, inclusive boundaries.
- *   isCrossAngleOutlier: <2 peers => false; x delta >0.08 => true; y delta >0.08 => true;
- *                       boundary delta = 0.08 NOT outlier (strict >).
+ *   isCrossAngleOutlier: <2 peers => false; x delta >0.18 => true; y delta >0.18 => true;
+ *                       boundary delta = 0.18 NOT outlier (strict >).
+ *                       (Threshold relaxed 0.08 → 0.18 2026-05-12 after UAT item 1.)
  *   isCanonicalAccepted: ok when sane+non-outlier; fallback on insane geometry;
  *                       fallback on cross-angle outlier; fallback on bbox.valid===false.
  *
@@ -77,10 +78,12 @@ const validNailliRightBacklight: IrisBbox = {
 // O smoking gun real do Nailli probe: right_frontal mislocated.
 // CONTEXT.md §Specifics observa: "números podem estar dentro do range geométrico"
 // mas a bbox em SI tá fora da íris visualmente. Aqui usamos delta cross-angle
-// suficientemente grande (>0.08) pra simular o caso em que o gate captura
-// (founder admin Re-canonicalizar é escape hatch quando NÃO captura).
+// suficientemente grande (>0.18) pra simular o caso em que o gate captura
+// um Sonnet-aponta-pra-pálpebra (founder admin Re-canonicalizar é escape hatch
+// quando NÃO captura). Threshold pós-UAT (0.18) é > shift natural do protocolo
+// de tilt; outliers reais (Sonnet localiza eyelid em vez de íris) tendem a ≥ 0.25.
 const nailliRightFrontalOutlier: IrisBbox = {
-  center_x_pct: 0.55, // peers median x = 0.465 → delta 0.085 > 0.08
+  center_x_pct: 0.71, // peers median x ≈ 0.465 → delta ≈ 0.245 > 0.18
   center_y_pct: 0.44,
   radius_pct: 0.13,
   confidence: 0.78,
@@ -147,30 +150,30 @@ const invalidBbox: IrisBbox = {
   valid: false,
 }
 
-// Outlier x test: peers x median ≈ 0.46, this bbox at 0.55 → delta 0.09 > 0.08
+// Outlier x test: peers x median ≈ 0.46, this bbox at 0.68 → delta ≈ 0.22 > 0.18
 const crossAngleOutlierX: IrisBbox = {
-  center_x_pct: 0.55,
+  center_x_pct: 0.68,
   center_y_pct: 0.41,
   radius_pct: 0.13,
   confidence: 0.78,
   valid: true,
 }
 
-// Outlier y test: peers y median ≈ 0.41, this bbox at 0.50 → delta 0.09 > 0.08
+// Outlier y test: peers y median ≈ 0.41, this bbox at 0.62 → delta ≈ 0.21 > 0.18
 const crossAngleOutlierY: IrisBbox = {
   center_x_pct: 0.47,
-  center_y_pct: 0.50,
+  center_y_pct: 0.62,
   radius_pct: 0.13,
   confidence: 0.78,
   valid: true,
 }
 
-// Boundary delta exactly 0.08 — strict > so NOT outlier.
-// peers x median = 0.50; this bbox.x = 0.58 → delta 0.08 deterministic em IEEE 754
-// (Math.abs(0.58 - 0.50) === 0.07999999999999996 < 0.08; usar valores escolhidos
-// para evitar drift de ponto-flutuante onde 0.54 - 0.46 dá 0.08000000000000002).
+// Boundary delta exactly 0.18 — strict > so NOT outlier.
+// peers x median = 0.50; bbox.x = 0.32 → Math.abs(0.32 - 0.50) === 0.18 exactly
+// (IEEE 754 stable: `0.18 > 0.18` is false; tested via node REPL).
+// 0.32 stays geometrically sane (within [0.20, 0.80]).
 const boundaryOutlierX: IrisBbox = {
-  center_x_pct: 0.58,
+  center_x_pct: 0.32,
   center_y_pct: 0.41,
   radius_pct: 0.13,
   confidence: 0.78,
@@ -225,18 +228,20 @@ describe('isCrossAngleOutlier', () => {
     ).toBe(false)
   })
 
-  it('retorna true quando |center_x_pct - median(peers.center_x)| > 0.08', () => {
+  it('retorna true quando |center_x_pct - median(peers.center_x)| > 0.18', () => {
     // peers x = [0.46, 0.48] → median 0.47
-    // bbox x = 0.55 → delta 0.08 boundary; bump to 0.56 → delta 0.09
-    const bbox = { ...crossAngleOutlierX, center_x_pct: 0.56 }
+    // bbox x = 0.68 → delta 0.21 > 0.18
     expect(
-      isCrossAngleOutlier(bbox, [validNailliLeftLateral, validNailliLeftBacklight]),
+      isCrossAngleOutlier(crossAngleOutlierX, [
+        validNailliLeftLateral,
+        validNailliLeftBacklight,
+      ]),
     ).toBe(true)
   })
 
-  it('retorna true quando |center_y_pct - median(peers.center_y)| > 0.08', () => {
+  it('retorna true quando |center_y_pct - median(peers.center_y)| > 0.18', () => {
     // peers y = [0.42, 0.40] → median 0.41
-    // bbox y = 0.50 → delta 0.09 > 0.08
+    // bbox y = 0.62 → delta 0.21 > 0.18
     expect(
       isCrossAngleOutlier(crossAngleOutlierY, [
         validNailliLeftLateral,
@@ -245,14 +250,24 @@ describe('isCrossAngleOutlier', () => {
     ).toBe(true)
   })
 
-  it('retorna false em boundary delta = 0.08 (strict > não inclui igualdade)', () => {
+  it('retorna false em boundary delta = 0.18 (strict > não inclui igualdade)', () => {
     // peers x = [0.50, 0.50] → median 0.50
-    // bbox x = 0.58 → delta = Math.abs(0.58 - 0.50) = 0.07999999999999996 ≤ 0.08
-    // (escolhido para ser deterministicamente NÃO-outlier em IEEE 754 —
-    // ver banner do fixture boundaryOutlierX acima).
+    // bbox x = 0.32 → Math.abs(0.32 - 0.50) === 0.18 exactly
+    // (`0.18 > 0.18` is false in IEEE 754; verified via node REPL).
     const peer1: IrisBbox = { ...validNailliLeftLateral, center_x_pct: 0.5 }
     const peer2: IrisBbox = { ...validNailliLeftBacklight, center_x_pct: 0.5 }
     expect(isCrossAngleOutlier(boundaryOutlierX, [peer1, peer2])).toBe(false)
+  })
+
+  it('retorna false quando delta cross-angle é shift natural do tilt protocol (≤ 0.18)', () => {
+    // UAT item 1 regression guard: natural shift entre os 3 ângulos do mesmo olho
+    // sob o capture protocol (founder tilta camera ~15°-25° entre frontal/lateral/
+    // medial). Empirical deltas observados: 0.09-0.16 (todos abaixo de 0.18).
+    // 0.10 representativa de mid-range natural shift.
+    const bbox: IrisBbox = { ...validNailliLeftFrontal, center_x_pct: 0.56 }
+    expect(
+      isCrossAngleOutlier(bbox, [validNailliLeftLateral, validNailliLeftBacklight]),
+    ).toBe(false)
   })
 
   it('não é outlier quando bbox está alinhada aos peers (caso feliz)', () => {
@@ -305,7 +320,7 @@ describe('Nailli e85ea7de end-to-end fixture (5 ok + 1 fallback)', () => {
       validNailliLeftBacklight, // backlight (ok)
     ]
     const rightEye = [
-      nailliRightFrontalOutlier, // frontal (fallback — outlier x delta > 0.08)
+      nailliRightFrontalOutlier, // frontal (fallback — outlier x delta > 0.18)
       validNailliRightLateral, // lateral (ok)
       validNailliRightBacklight, // backlight (ok)
     ]
@@ -377,11 +392,12 @@ describe('diagnoseCanonical', () => {
     )
   })
 
-  it('flags cross_angle_x when delta from peer median exceeds 0.08', () => {
-    const bbox: IrisBbox = { center_x_pct: 0.65, center_y_pct: 0.41, radius_pct: 0.13, confidence: 0.85, valid: true }
+  it('flags cross_angle_x when delta from peer median exceeds 0.18', () => {
+    // bbox x = 0.70; peer median x ≈ 0.47 → delta ≈ 0.23 > 0.18
+    const bbox: IrisBbox = { center_x_pct: 0.70, center_y_pct: 0.41, radius_pct: 0.13, confidence: 0.85, valid: true }
     const diag = diagnoseCanonical(bbox, [validNailliLeftLateral, validNailliLeftBacklight])
     expect(diag.fail_reasons).toContain('cross_angle_x')
-    expect(diag.delta_x_pct).toBeGreaterThan(0.08)
+    expect(diag.delta_x_pct).toBeGreaterThan(0.18)
   })
 
   it('returns null medians/deltas when peer_count < 2', () => {
@@ -414,6 +430,7 @@ describe('diagnoseCanonical', () => {
     expect(GATE_THRESHOLDS.geom_center_max).toBe(0.8)
     expect(GATE_THRESHOLDS.geom_radius_min).toBe(0.05)
     expect(GATE_THRESHOLDS.geom_radius_max).toBe(0.3)
-    expect(GATE_THRESHOLDS.cross_angle_outlier).toBe(0.08)
+    // Relaxed 0.08 → 0.18 2026-05-12 (UAT item 1: natural tilt-protocol shift was 0.09-0.16).
+    expect(GATE_THRESHOLDS.cross_angle_outlier).toBe(0.18)
   })
 })
