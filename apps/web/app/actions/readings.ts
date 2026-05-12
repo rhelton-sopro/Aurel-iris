@@ -124,11 +124,39 @@ export async function finalizeReadingAction(
     return { error: 'reading_id inválido' }
   }
 
-  // D-T1: dispara trigger via internal fetch, forwarding session cookie
-  // para que o auth gate de /api/readings/[id]/process aceite a request.
+  // D-T1+07.1.6: canonical capture ANTES do trigger Modal.
+  // Fire-and-forget per D-01: canonicalize falhar NUNCA bloqueia finalize.
+  // Se a env var CANONICAL_CAPTURE_ENABLED=false, o endpoint canonicalizeReading
+  // retorna early all-disabled — chamada barata, sem custo Anthropic.
   const cookieStore = await cookies()
   const cookieHeader = cookieStore.toString()
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+
+  try {
+    const canonicalRes = await fetch(`${baseUrl}/api/capture/canonicalize`, {
+      method: 'POST',
+      headers: { Cookie: cookieHeader, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ readingId: parsed.data.reading_id }),
+      cache: 'no-store',
+    })
+    if (!canonicalRes.ok) {
+      const detail = await canonicalRes.text().catch(() => '')
+      // D-01: never block finalize for canonicalize failure — process/route.ts
+      // cai em storage_path original por imagem quando canonical_storage_path IS NULL.
+      console.error(
+        `[finalize] canonicalize non-200 reading=${parsed.data.reading_id} status=${canonicalRes.status} body=${detail.slice(0, 200)}`,
+      )
+    }
+  } catch (err) {
+    // D-01: never block finalize for canonicalize failure. Process route caira em storage_path por imagem.
+    const errMessage = err instanceof Error ? err.message : 'unknown'
+    console.error(
+      `[finalize] canonicalize fetch threw reading=${parsed.data.reading_id}: ${errMessage}`,
+    )
+  }
+
+  // D-T1: dispara trigger via internal fetch, forwarding session cookie
+  // para que o auth gate de /api/readings/[id]/process aceite a request.
   const triggerUrl = `${baseUrl}/api/readings/${parsed.data.reading_id}/process`
 
   let triggerStatus: number | null = null
