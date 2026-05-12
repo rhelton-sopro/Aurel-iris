@@ -32,6 +32,17 @@ export const anthropicClient = new Anthropic({ apiKey })
 export const MODEL = process.env.ANTHROPIC_MODEL ?? 'claude-sonnet-4-6'
 
 /**
+ * Model for canonical bbox detection (Phase 07.1.6).
+ * Hardcoded — NOT overridable via env var. Sonnet 4.6 é o único modelo
+ * validado pra per-image iris measurement (C-04: Haiku templates,
+ * Opus overkill, custo trivial $0.05/reading).
+ *
+ * O MODEL exportado acima (claude-sonnet-4-6 default via env) é para
+ * relatórios LLM Phase 7; bbox usa esta constante hardcoded.
+ */
+export const SONNET_BBOX_MODEL = 'claude-sonnet-4-6' as const
+
+/**
  * Default args para o system block em `messages.stream({...})`.
  * `cache_control: { type: 'ephemeral' }` habilita Anthropic-side prompt caching.
  *
