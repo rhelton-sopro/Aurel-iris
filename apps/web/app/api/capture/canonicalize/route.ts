@@ -40,7 +40,9 @@
  */
 import 'server-only'
 import { NextResponse, type NextRequest } from 'next/server'
+import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/service'
 import { canonicalizeReading } from '@/lib/canonicalize'
 
 // Force Node.js runtime — sharp + Anthropic SDK não rodam em Edge.
@@ -48,6 +50,14 @@ export const runtime = 'nodejs'
 
 interface CanonicalizeRequestBody {
   readingId?: unknown
+  /**
+   * Optional Phase 07.1.6 UAT item 2 follow-up: when true and canonicalize
+   * succeeds, the route also resets reading.status to 'pending' and re-fires
+   * the Modal pipeline via /api/readings/{id}/process so Modal consumes the
+   * freshly-uploaded canonical crops (not the stale originals from any prior
+   * Modal run). Used by /admin/calibration Re-canonicalizar button.
+   */
+  reprocessModal?: unknown
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
@@ -65,6 +75,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     )
   }
   const readingId = body.readingId
+  const reprocessModal = body.reprocessModal === true
 
   // 2. Auth gate (user session — RLS-enforced client)
   const supabase = await createClient()
@@ -102,11 +113,65 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   //    revalidatePath é responsabilidade do caller (finalize action ou admin client).
   try {
     const { results, metadata } = await canonicalizeReading(readingId, user.id)
+
+    // Phase 07.1.6 UAT item 2 follow-up: optionally re-fire Modal so it picks up
+    // the freshly-uploaded canonical crops. Without this, /admin/calibration
+    // Re-canonicalizar updates canonical_storage_path but Modal's existing
+    // vision_features stays stale → report uses old Modal output.
+    //
+    // Best-effort: failure here does not roll back canonicalize. The canonical
+    // crops are already persisted; the founder can still manually click
+    // "Reprocessar" if this trigger fails.
+    let modalTriggered = false
+    let modalTriggerError: string | null = null
+    if (reprocessModal) {
+      try {
+        // Step 1: service-role status reset to 'pending'. Process route's gate
+        // accepts {'pending', 'failed'} only; if status is 'ready' / 'delivered'
+        // it would 404. Service-role bypasses RLS — caller already passed auth
+        // + ownership gates above, so this UPDATE is authorized.
+        const service = createServiceClient()
+        const { error: resetError } = await service
+          .from('readings')
+          .update({ status: 'pending' })
+          .eq('id', readingId)
+        if (resetError) {
+          throw new Error(`status reset failed: ${resetError.message}`)
+        }
+
+        // Step 2: internal fetch to process route with cookie forwarded
+        // (mirror of finalizeReadingAction pattern). Process route now sees
+        // canonical_storage_path populated and signs canonical URLs for Modal.
+        const cookieStore = await cookies()
+        const cookieHeader = cookieStore.toString()
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+        const triggerRes = await fetch(`${baseUrl}/api/readings/${readingId}/process`, {
+          method: 'POST',
+          headers: { Cookie: cookieHeader },
+          cache: 'no-store',
+        })
+        if (triggerRes.status === 202) {
+          modalTriggered = true
+        } else {
+          const detail = await triggerRes.text().catch(() => '')
+          throw new Error(`process route returned ${triggerRes.status}: ${detail.slice(0, 200)}`)
+        }
+      } catch (err) {
+        modalTriggerError = err instanceof Error ? err.message : String(err)
+        console.error(
+          `[api/capture/canonicalize] reprocessModal failed reading=${readingId}:`,
+          modalTriggerError,
+        )
+      }
+    }
+
     return NextResponse.json(
       {
         results,
         metadata,
         status_summary: metadata.status_summary,
+        modal_triggered: modalTriggered,
+        ...(modalTriggerError ? { modal_trigger_error: modalTriggerError } : {}),
       },
       { status: 200 },
     )

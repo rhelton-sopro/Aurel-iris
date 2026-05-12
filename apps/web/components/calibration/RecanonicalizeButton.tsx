@@ -38,6 +38,9 @@ interface CanonicalizeResponseBody {
     fallback?: number
     disabled?: number
   }
+  /** Phase 07.1.6 UAT item 2 follow-up: true when canonicalize triggered Modal reprocess. */
+  modal_triggered?: boolean
+  modal_trigger_error?: string
   error?: string
 }
 
@@ -46,10 +49,12 @@ export function RecanonicalizeButton({ readingId }: { readingId: string }) {
   const router = useRouter()
 
   async function handleClick() {
-    // Founder action é costly ($0.05) e idempotente — confirma explícito.
+    // Founder action é costly ($0.05 Sonnet + Modal ~$0.01) e idempotente —
+    // confirma explícito. UAT item 2 follow-up: também re-fire Modal pra
+    // pipeline consumir os canonical crops novos (não os originais stale).
     if (
       !window.confirm(
-        'Re-canonicalizar todas as 6 fotos? Custo Sonnet ~US$ 0,05 e leva ~5s.',
+        'Re-canonicalizar todas as 6 fotos E re-processar com Modal? Custo ~US$ 0,06 e leva ~10s.',
       )
     ) {
       return
@@ -60,7 +65,7 @@ export function RecanonicalizeButton({ readingId }: { readingId: string }) {
       const res = await fetch('/api/capture/canonicalize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ readingId }),
+        body: JSON.stringify({ readingId, reprocessModal: true }),
         cache: 'no-store',
       })
 
@@ -82,13 +87,26 @@ export function RecanonicalizeButton({ readingId }: { readingId: string }) {
       const disabled = body.status_summary?.disabled ?? 0
       const msg = `canonical: ${ok} ok · ${fallback} fallback · ${disabled} disabled`
 
+      // UAT item 2: surface Modal re-trigger status. Without this signal the
+      // founder doesn't know whether vision_features will refresh.
+      const modalSuffix = body.modal_triggered
+        ? ' · Modal reprocess disparado'
+        : body.modal_trigger_error
+          ? ` · Modal NÃO reprocessou (${body.modal_trigger_error.slice(0, 60)})`
+          : ''
+
       if (disabled > 0) {
         // D-04 kill-switch ON em produção: CANONICAL_CAPTURE_ENABLED=false
-        toast.warning(`${msg} (kill-switch ativo)`)
+        toast.warning(`${msg} (kill-switch ativo)${modalSuffix}`)
       } else if (fallback > 0) {
-        toast.warning(msg)
+        toast.warning(msg + modalSuffix)
       } else if (ok > 0) {
-        toast.success(msg)
+        // Even on full success, if Modal trigger failed we need a warning tint.
+        if (body.modal_trigger_error) {
+          toast.warning(msg + modalSuffix)
+        } else {
+          toast.success(msg + modalSuffix)
+        }
       } else {
         toast.warning('Nenhuma foto canonicalizada (ver logs).')
       }
