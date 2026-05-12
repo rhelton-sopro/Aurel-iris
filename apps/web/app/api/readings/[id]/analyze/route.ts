@@ -113,10 +113,40 @@ export async function POST(
   // its stale LAB-centroid analysis; merge canonical_metadata.iris_color_by_eye
   // back in here so the LLM sees the Sonnet-extracted color + iridological hint.
   // No-op when canonical_metadata is null (pre-07.1.6 readings).
+  const rawVisionFeatures = reading.vision_features as Record<string, unknown> | null
+  const rawCanonicalMetadata = reading.canonical_metadata as unknown as CanonicalMetadata | null
   const mergedVisionFeatures = mergeCanonicalIrisColor(
-    reading.vision_features as Record<string, unknown> | null,
-    reading.canonical_metadata as unknown as CanonicalMetadata | null,
+    rawVisionFeatures,
+    rawCanonicalMetadata,
   )
+
+  // Phase 07.1.6 UAT-1 diagnostic logging (2026-05-12).
+  // Surfaces in Vercel logs whether the merge ran, what canonical iris_color
+  // looked like, and which constitution value reached the LLM. Remove this
+  // block when the report-generation pipeline is stable across canonical readings.
+  const diagSnapshot = {
+    readingId,
+    has_canonical_metadata: !!rawCanonicalMetadata,
+    canonical_iris_color_right: rawCanonicalMetadata?.iris_color_by_eye?.right?.primary ?? null,
+    canonical_iris_color_left: rawCanonicalMetadata?.iris_color_by_eye?.left?.primary ?? null,
+    pre_merge_top_constitution:
+      (rawVisionFeatures as { constitution?: { primary?: string } } | null)?.constitution?.primary ?? null,
+    pre_merge_right_eye_constitution:
+      (rawVisionFeatures as { right_eye?: { constitution?: { primary?: string } } } | null)?.right_eye
+        ?.constitution?.primary ?? null,
+    merged_top_constitution:
+      (mergedVisionFeatures as { constitution?: { primary?: string } }).constitution?.primary ?? null,
+    merged_right_eye_constitution:
+      (mergedVisionFeatures as { right_eye?: { constitution?: { primary?: string } } }).right_eye
+        ?.constitution?.primary ?? null,
+    has_right_eye_block: 'right_eye' in (mergedVisionFeatures ?? {}),
+    has_left_eye_block: 'left_eye' in (mergedVisionFeatures ?? {}),
+    has_right_eye_sectors: Array.isArray(
+      (mergedVisionFeatures as { right_eye?: { sectors?: unknown[] } }).right_eye?.sectors,
+    ),
+    vision_features_keys: Object.keys(mergedVisionFeatures ?? {}),
+  }
+  console.log('[analyze/route] merge-diag', JSON.stringify(diagSnapshot))
 
   // Open the analysis stream
   const analysis = await analyzeReading({
@@ -171,8 +201,35 @@ export async function POST(
           completedSections[section.key] = section.content
         }
 
+        // Phase 07.1.6 UAT-1 diagnostic: log stream output state BEFORE appending
+        // encerramento. Reveals empty-report case (LLM produced no section
+        // boundaries; previously this was masked by encerramento_disclaimer
+        // being the only key, making hasReport=true on the page even though
+        // the actual report is missing).
+        const sectionKeysBeforeEncerramento = Object.keys(completedSections)
+        console.log(
+          '[analyze/route] stream-finalize',
+          JSON.stringify({
+            readingId,
+            buffer_length: buffer.length,
+            sections_completed: sectionKeysBeforeEncerramento,
+            boundaries_count: lastBoundaryCount,
+          }),
+        )
+
         // D-P3 server-appended encerramento
         completedSections.encerramento_disclaimer = ENCERRAMENTO_LITERAL
+
+        // If LLM produced zero numbered sections, surface this loudly so the
+        // founder sees a clear "report came back empty" error instead of a
+        // page that looks blank. This is almost always upstream (missing
+        // vision_features eye blocks, Modal didn't run, etc.) — leave the
+        // partial buffer in report_raw_text below for forensic inspection.
+        if (sectionKeysBeforeEncerramento.length === 0) {
+          console.error(
+            `[analyze/route] EMPTY-REPORT reading=${readingId} buffer_head=${buffer.slice(0, 400).replace(/\n/g, ' ⏎ ')}`,
+          )
+        }
 
         // Finalize: usage + audit + regeneration_log
         const finalization = await analysis.finalize()

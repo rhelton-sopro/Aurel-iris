@@ -99,6 +99,23 @@ export function mergeCanonicalIrisColor(
       ...(constitutionOverride ? { constitution: constitutionOverride } : {}),
     }
   }
+
+  // ALSO override TOP-LEVEL vision_features.constitution — the LLM system prompt
+  // anchors to `features.constitution.primary` (system.md:115), not to the
+  // nested eye-level constitution. Without this, my eye-level override is
+  // shadowed and the LLM keeps generating reports based on Modal's stale
+  // top-level value. Prefer right_eye's mapping (analyze.ts eyeSource convention:
+  // right first, left fallback). Only override when at least one eye has a
+  // confirmed iridological mapping; otherwise pass through Modal's top-level
+  // value untouched.
+  const topLevelOverride =
+    (byEye.right && iridologicalConstitutionForPrimary(byEye.right.primary)) ||
+    (byEye.left && iridologicalConstitutionForPrimary(byEye.left.primary)) ||
+    null
+  if (topLevelOverride) {
+    base.constitution = topLevelOverride
+  }
+
   return base
 }
 

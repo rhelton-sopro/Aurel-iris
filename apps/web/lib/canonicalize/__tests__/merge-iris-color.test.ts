@@ -190,4 +190,65 @@ describe('mergeCanonicalIrisColor', () => {
     expect(iridologicalConstitutionForPrimary('castanho')).toBeNull()
     expect(iridologicalConstitutionForPrimary(null)).toBeNull()
   })
+
+  // -------------------------------------------------------------------------
+  // Top-level constitution override (UAT-1 root cause, 2026-05-12)
+  // system.md:115 anchors to `features.constitution.primary` at TOP LEVEL,
+  // not nested under right_eye/left_eye. Eye-level override alone was
+  // shadowed — LLM kept generating hematogênica reports. Now also patches
+  // the top-level field.
+  // -------------------------------------------------------------------------
+
+  it('overrides TOP-LEVEL vision_features.constitution when verde_acinzentado present', () => {
+    const vf = {
+      constitution: { primary: 'hematogênica' /* Modal top-level stale */ },
+      right_eye: { constitution: { primary: 'hematogênica' /* Modal nested stale */ } },
+    }
+    const meta: CanonicalMetadata = {
+      ...baseMetadata,
+      iris_color_by_eye: { left: null, right: verdeAcinzentadoLeft },
+    }
+    const merged = mergeCanonicalIrisColor(vf, meta)
+    const topConstitution = merged.constitution as Record<string, unknown>
+    expect(topConstitution.primary).toBe('biliar')
+    expect(topConstitution.secondary).toBe('linfática')
+    expect(topConstitution.source).toBe('canonical_metadata')
+  })
+
+  it('prefers right_eye mapping over left_eye for top-level override (matches analyze.ts eyeSource pattern)', () => {
+    const vf = { constitution: { primary: 'hematogênica' } }
+    const meta: CanonicalMetadata = {
+      ...baseMetadata,
+      iris_color_by_eye: {
+        left: { ...verdeAcinzentadoLeft, primary: 'verde_acinzentado' },
+        right: { ...verdeAcinzentadoLeft, primary: 'verde_acinzentado' },
+      },
+    }
+    const merged = mergeCanonicalIrisColor(vf, meta)
+    expect((merged.constitution as Record<string, unknown>).primary).toBe('biliar')
+  })
+
+  it('leaves TOP-LEVEL constitution untouched when no eye has a confirmed mapping', () => {
+    const vf = { constitution: { primary: 'hematogênica' /* Modal stale */ } }
+    const meta: CanonicalMetadata = {
+      ...baseMetadata,
+      iris_color_by_eye: { left: castanhoRight, right: castanhoRight },
+    }
+    const merged = mergeCanonicalIrisColor(vf, meta)
+    // No mapping for 'castanho' — Modal's value passes through.
+    expect((merged.constitution as Record<string, unknown>).primary).toBe('hematogênica')
+  })
+
+  it('falls back to left_eye mapping when right_eye has no mapping', () => {
+    const vf = { constitution: { primary: 'hematogênica' } }
+    const meta: CanonicalMetadata = {
+      ...baseMetadata,
+      iris_color_by_eye: {
+        left: { ...verdeAcinzentadoLeft, primary: 'verde_acinzentado' },
+        right: castanhoRight, // no mapping
+      },
+    }
+    const merged = mergeCanonicalIrisColor(vf, meta)
+    expect((merged.constitution as Record<string, unknown>).primary).toBe('biliar')
+  })
 })
