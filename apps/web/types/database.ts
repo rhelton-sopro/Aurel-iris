@@ -230,6 +230,7 @@ export type Database = {
       reading_images: {
         Row: {
           angle: string
+          canonical_storage_path: string | null
           created_at: string | null
           eye: string
           height: number | null
@@ -241,6 +242,7 @@ export type Database = {
         }
         Insert: {
           angle: string
+          canonical_storage_path?: string | null
           created_at?: string | null
           eye: string
           height?: number | null
@@ -252,6 +254,7 @@ export type Database = {
         }
         Update: {
           angle?: string
+          canonical_storage_path?: string | null
           created_at?: string | null
           eye?: string
           height?: number | null
@@ -276,6 +279,7 @@ export type Database = {
           ai_report_edited: string | null
           ai_report_raw: string | null
           audit_metadata: Json | null
+          canonical_metadata: Json | null
           capture_method: string | null
           client_id: string
           clinical_feedback: Json | null
@@ -306,6 +310,7 @@ export type Database = {
           ai_report_edited?: string | null
           ai_report_raw?: string | null
           audit_metadata?: Json | null
+          canonical_metadata?: Json | null
           capture_method?: string | null
           client_id: string
           clinical_feedback?: Json | null
@@ -336,6 +341,7 @@ export type Database = {
           ai_report_edited?: string | null
           ai_report_raw?: string | null
           audit_metadata?: Json | null
+          canonical_metadata?: Json | null
           capture_method?: string | null
           client_id?: string
           clinical_feedback?: Json | null
