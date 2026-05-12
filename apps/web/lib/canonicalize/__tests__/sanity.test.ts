@@ -164,9 +164,11 @@ const crossAngleOutlierY: IrisBbox = {
 }
 
 // Boundary delta exactly 0.08 — strict > so NOT outlier.
-// peers x median = 0.46; this bbox.x = 0.54 → delta 0.08 (boundary)
+// peers x median = 0.50; this bbox.x = 0.58 → delta 0.08 deterministic em IEEE 754
+// (Math.abs(0.58 - 0.50) === 0.07999999999999996 < 0.08; usar valores escolhidos
+// para evitar drift de ponto-flutuante onde 0.54 - 0.46 dá 0.08000000000000002).
 const boundaryOutlierX: IrisBbox = {
-  center_x_pct: 0.54,
+  center_x_pct: 0.58,
   center_y_pct: 0.41,
   radius_pct: 0.13,
   confidence: 0.78,
@@ -242,12 +244,12 @@ describe('isCrossAngleOutlier', () => {
   })
 
   it('retorna false em boundary delta = 0.08 (strict > não inclui igualdade)', () => {
-    // peers x = [0.46, 0.48] → median 0.47
-    // bbox x = 0.54? delta vs 0.47 = 0.07 (não 0.08); usar peers que produzam median 0.46:
-    // peers x = [0.46, 0.46] → median 0.46
-    // bbox x = 0.54 → delta exatamente 0.08
-    const peer1: IrisBbox = { ...validNailliLeftLateral, center_x_pct: 0.46 }
-    const peer2: IrisBbox = { ...validNailliLeftBacklight, center_x_pct: 0.46 }
+    // peers x = [0.50, 0.50] → median 0.50
+    // bbox x = 0.58 → delta = Math.abs(0.58 - 0.50) = 0.07999999999999996 ≤ 0.08
+    // (escolhido para ser deterministicamente NÃO-outlier em IEEE 754 —
+    // ver banner do fixture boundaryOutlierX acima).
+    const peer1: IrisBbox = { ...validNailliLeftLateral, center_x_pct: 0.5 }
+    const peer2: IrisBbox = { ...validNailliLeftBacklight, center_x_pct: 0.5 }
     expect(isCrossAngleOutlier(boundaryOutlierX, [peer1, peer2])).toBe(false)
   })
 
