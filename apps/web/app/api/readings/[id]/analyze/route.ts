@@ -28,6 +28,7 @@ import { revalidatePath } from 'next/cache'
 
 import { createClient } from '@/lib/supabase/server'
 import { analyzeReading } from '@/lib/anthropic/analyze'
+import { isFounderEmail } from '@/lib/auth/founder'
 import { mergeCanonicalIrisColor } from '@/lib/canonicalize/merge-iris-color'
 import type { CanonicalMetadata } from '@/lib/anthropic/types'
 import type { IrisFeaturesForRag } from '@/lib/rag/build-queries'
@@ -92,9 +93,13 @@ export async function POST(
       { status: 409 },
     )
   }
-  // Gate (e): regen cap
+  // Gate (e): regen cap — 3/3 for therapists (D-S4), bypassed for the founder
+  // during calibration iteration. regeneration_count still increments below for
+  // telemetry parity. is_delivered gate above still applies — founder cannot
+  // regenerate a delivered report (business rule, not a friction guard).
   const currentCount = reading.regeneration_count ?? 0
-  if (currentCount >= 3) {
+  const isFounder = isFounderEmail(user.email)
+  if (currentCount >= 3 && !isFounder) {
     return NextResponse.json(
       { error: 'Regeneration limit reached (3/3). Edit manually instead.' },
       { status: 409 },
