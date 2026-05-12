@@ -155,6 +155,36 @@ export interface IrisBbox {
  */
 export type CanonicalStatus = 'ok' | 'fallback' | 'disabled'
 
+/**
+ * Per-photo gate diagnostic stored em canonical_metadata.gate_diagnostics[].
+ * Surfaced for empirical threshold tuning (founder queries Supabase Studio
+ * para entender por que cada foto caiu pra fallback). Structural-only shape;
+ * `GateFailReason` enum vive em lib/canonicalize/sanity (não importado aqui
+ * pra evitar circular dep — typed as string[] no jsonb).
+ */
+export interface CanonicalGateDiagnostic {
+  eye: string
+  angle: string
+  bbox: IrisBbox
+  status: CanonicalStatus
+  /** Empty when status='ok'. Subset of 'invalid' | 'geom_center_x' | 'geom_center_y' | 'geom_radius' | 'cross_angle_x' | 'cross_angle_y'. */
+  fail_reasons: string[]
+  /** Peer set size for cross-angle median (other angles of same eye). */
+  peer_count: number
+  median_x_pct: number | null
+  median_y_pct: number | null
+  delta_x_pct: number | null
+  delta_y_pct: number | null
+  /** Snapshot of thresholds at evaluation time (so post-hoc analysis is grounded). */
+  thresholds: {
+    geom_center_min: number
+    geom_center_max: number
+    geom_radius_min: number
+    geom_radius_max: number
+    cross_angle_outlier: number
+  }
+}
+
 /** Aggregate canonical metadata stored in readings.canonical_metadata (jsonb). */
 export interface CanonicalMetadata {
   sonnet_input_tokens: number
@@ -164,6 +194,12 @@ export interface CanonicalMetadata {
   status_summary: Record<CanonicalStatus, number>
   /** ISO timestamp when canonicalize finished */
   canonicalized_at: string
+  /**
+   * Per-photo diagnostic trail (Phase 07.1.6 UAT — surfaced after item 1
+   * showed 5/6 fallback for the first real reading). Optional para preservar
+   * backward-compat com readings canonicalizadas antes do diagnostic patch.
+   */
+  gate_diagnostics?: CanonicalGateDiagnostic[]
 }
 
 /** Re-export keeps Database type alive — cross-reference for `readings` Row shape. */

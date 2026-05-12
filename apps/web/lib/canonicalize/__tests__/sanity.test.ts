@@ -22,6 +22,8 @@ import {
   isGeometricallySane,
   isCrossAngleOutlier,
   isCanonicalAccepted,
+  diagnoseCanonical,
+  GATE_THRESHOLDS,
 } from '../sanity'
 import type { IrisBbox } from '@/lib/anthropic/types'
 
@@ -333,5 +335,85 @@ describe('Nailli e85ea7de end-to-end fixture (5 ok + 1 fallback)', () => {
       angle: 'frontal',
       status: 'fallback',
     })
+  })
+})
+
+// ---------------------------------------------------------------------------
+// diagnoseCanonical — UAT diagnostic instrumentation (Phase 07.1.6 UAT item 1)
+// Founder reportou 5/6 fallback no primeiro reading real; precisamos saber
+// QUAL gate flagrou cada foto. diagnoseCanonical retorna structured info.
+// Behavioral parity com isCanonicalAccepted (mesmo status); só amplia output.
+// ---------------------------------------------------------------------------
+
+describe('diagnoseCanonical', () => {
+  it('returns status=ok and empty fail_reasons when bbox sane and matches peers', () => {
+    const peers = [validNailliLeftLateral, validNailliLeftBacklight]
+    const diag = diagnoseCanonical(validNailliLeftFrontal, peers)
+    expect(diag.status).toBe('ok')
+    expect(diag.fail_reasons).toEqual([])
+    expect(diag.peer_count).toBe(2)
+    expect(diag.median_x_pct).not.toBeNull()
+    expect(diag.delta_x_pct).not.toBeNull()
+  })
+
+  it('flags geom_center_x when center_x out of [0.20, 0.80]', () => {
+    const bbox: IrisBbox = { center_x_pct: 0.1, center_y_pct: 0.5, radius_pct: 0.15, confidence: 0.9, valid: true }
+    const diag = diagnoseCanonical(bbox, [validNailliLeftLateral, validNailliLeftBacklight])
+    expect(diag.status).toBe('fallback')
+    expect(diag.fail_reasons).toContain('geom_center_x')
+  })
+
+  it('flags geom_radius when radius_pct out of [0.05, 0.30]', () => {
+    const bbox: IrisBbox = { center_x_pct: 0.5, center_y_pct: 0.5, radius_pct: 0.40, confidence: 0.9, valid: true }
+    const diag = diagnoseCanonical(bbox, [validNailliLeftLateral, validNailliLeftBacklight])
+    expect(diag.fail_reasons).toContain('geom_radius')
+  })
+
+  it('flags multiple reasons simultaneously when several axes fail', () => {
+    const bbox: IrisBbox = { center_x_pct: 0.05, center_y_pct: 0.95, radius_pct: 0.40, confidence: 0.9, valid: true }
+    const diag = diagnoseCanonical(bbox, [validNailliLeftLateral, validNailliLeftBacklight])
+    expect(diag.fail_reasons).toEqual(
+      expect.arrayContaining(['geom_center_x', 'geom_center_y', 'geom_radius']),
+    )
+  })
+
+  it('flags cross_angle_x when delta from peer median exceeds 0.08', () => {
+    const bbox: IrisBbox = { center_x_pct: 0.65, center_y_pct: 0.41, radius_pct: 0.13, confidence: 0.85, valid: true }
+    const diag = diagnoseCanonical(bbox, [validNailliLeftLateral, validNailliLeftBacklight])
+    expect(diag.fail_reasons).toContain('cross_angle_x')
+    expect(diag.delta_x_pct).toBeGreaterThan(0.08)
+  })
+
+  it('returns null medians/deltas when peer_count < 2', () => {
+    const diag = diagnoseCanonical(validNailliLeftFrontal, [validNailliLeftLateral])
+    expect(diag.peer_count).toBe(1)
+    expect(diag.median_x_pct).toBeNull()
+    expect(diag.delta_x_pct).toBeNull()
+  })
+
+  it('flags invalid when bbox.valid=false', () => {
+    const invalidBbox: IrisBbox = { ...validNailliLeftFrontal, valid: false }
+    const diag = diagnoseCanonical(invalidBbox, [validNailliLeftLateral, validNailliLeftBacklight])
+    expect(diag.fail_reasons).toContain('invalid')
+    expect(diag.status).toBe('fallback')
+  })
+
+  it('behavioral parity: isCanonicalAccepted returns same status as diagnoseCanonical', () => {
+    const cases: { bbox: IrisBbox; peers: IrisBbox[] }[] = [
+      { bbox: validNailliLeftFrontal, peers: [validNailliLeftLateral, validNailliLeftBacklight] },
+      { bbox: { center_x_pct: 0.1, center_y_pct: 0.5, radius_pct: 0.15, confidence: 0.9, valid: true }, peers: [validNailliLeftLateral, validNailliLeftBacklight] },
+      { bbox: { ...validNailliLeftFrontal, valid: false }, peers: [validNailliLeftLateral, validNailliLeftBacklight] },
+    ]
+    for (const { bbox, peers } of cases) {
+      expect(isCanonicalAccepted(bbox, peers)).toBe(diagnoseCanonical(bbox, peers).status)
+    }
+  })
+
+  it('exports GATE_THRESHOLDS with canonical empirical values', () => {
+    expect(GATE_THRESHOLDS.geom_center_min).toBe(0.2)
+    expect(GATE_THRESHOLDS.geom_center_max).toBe(0.8)
+    expect(GATE_THRESHOLDS.geom_radius_min).toBe(0.05)
+    expect(GATE_THRESHOLDS.geom_radius_max).toBe(0.3)
+    expect(GATE_THRESHOLDS.cross_angle_outlier).toBe(0.08)
   })
 })

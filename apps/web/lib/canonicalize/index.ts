@@ -39,12 +39,13 @@ import sharp from 'sharp'
 import { createServiceClient } from '@/lib/supabase/service'
 import { fetchIrisBbox } from './sonnet-bbox'
 import { cropToCanonical } from './crop'
-import { isCanonicalAccepted } from './sanity'
+import { diagnoseCanonical, GATE_THRESHOLDS, type GateDiagnostic } from './sanity'
 import { buildCanonicalStoragePath } from './storage-path'
 import type {
   IrisBbox,
   CanonicalStatus,
   CanonicalMetadata,
+  CanonicalGateDiagnostic,
 } from '@/lib/anthropic/types'
 import type { Eye } from '@/lib/capture/iris-geometry'
 import type { Angle } from '@/lib/capture/sequence'
@@ -211,6 +212,7 @@ export async function canonicalizeReading(
   // ---------------------------------------------------------------------
   // Step 3: per-image trust gate + (se 'ok') crop + upload + update em paralelo
   // ---------------------------------------------------------------------
+  const gate_diagnostics: CanonicalGateDiagnostic[] = []
   const results: CanonicalizeResult[] = await Promise.all(
     bboxResults.map(async (r): Promise<CanonicalizeResult> => {
       // Pre-gate failures (download/bbox-fetch erro): marca fallback sem retry
@@ -226,10 +228,25 @@ export async function canonicalizeReading(
         }
       }
 
-      // D-02 trust gate (sanity.ts isCanonicalAccepted)
+      // D-02 trust gate — diagnoseCanonical retorna estrutura completa
+      // (status + fail_reasons + peer median + deltas) pra observabilidade.
       const peers = (bboxesByEye[r.eye] ?? []).filter(b => b !== r.bbox)
-      const status = isCanonicalAccepted(r.bbox, peers)
-      if (status !== 'ok') {
+      const diag: GateDiagnostic = diagnoseCanonical(r.bbox, peers)
+      gate_diagnostics.push({
+        eye: r.eye,
+        angle: r.angle,
+        bbox: r.bbox,
+        status: diag.status,
+        fail_reasons: diag.fail_reasons,
+        peer_count: diag.peer_count,
+        median_x_pct: diag.median_x_pct,
+        median_y_pct: diag.median_y_pct,
+        delta_x_pct: diag.delta_x_pct,
+        delta_y_pct: diag.delta_y_pct,
+        thresholds: GATE_THRESHOLDS,
+      })
+
+      if (diag.status !== 'ok') {
         return {
           eye: r.eye,
           angle: r.angle,
@@ -314,6 +331,7 @@ export async function canonicalizeReading(
     cost_usd: totalCost,
     status_summary: summary,
     canonicalized_at: new Date().toISOString(),
+    gate_diagnostics,
   }
 
   // `canonical_metadata` é jsonb (migration 0012). Supabase typegen exporta

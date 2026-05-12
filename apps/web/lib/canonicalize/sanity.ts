@@ -36,6 +36,40 @@ const GEOM_RADIUS_MAX = 0.3
 // entre 3 ângulos do mesmo olho. STRICT > (boundary não-outlier).
 const CROSS_ANGLE_OUTLIER_THRESHOLD = 0.08
 
+/** Empirical thresholds exported para diagnóstico (gate_diagnostics.context). */
+export const GATE_THRESHOLDS = {
+  geom_center_min: GEOM_CENTER_MIN,
+  geom_center_max: GEOM_CENTER_MAX,
+  geom_radius_min: GEOM_RADIUS_MIN,
+  geom_radius_max: GEOM_RADIUS_MAX,
+  cross_angle_outlier: CROSS_ANGLE_OUTLIER_THRESHOLD,
+} as const
+
+/**
+ * Reasons a bbox can fail the gate. Diagnostic enum — each row in
+ * canonical_metadata.gate_diagnostics carries a subset of these.
+ * Empty array (status='ok') means all gates passed.
+ */
+export type GateFailReason =
+  | 'invalid'
+  | 'geom_center_x'
+  | 'geom_center_y'
+  | 'geom_radius'
+  | 'cross_angle_x'
+  | 'cross_angle_y'
+
+export interface GateDiagnostic {
+  status: CanonicalStatus
+  fail_reasons: GateFailReason[]
+  /** Peer set used for cross-angle median (other angles of same eye). */
+  peer_count: number
+  median_x_pct: number | null
+  median_y_pct: number | null
+  /** abs(center_axis - median_axis); null when peer_count < 2 */
+  delta_x_pct: number | null
+  delta_y_pct: number | null
+}
+
 /**
  * Geometric sanity: bbox center deve estar nos centrais 60% do frame
  * E radius_pct dentro de [0.05, 0.30]. Bounds são INCLUSIVE.
@@ -90,10 +124,64 @@ export function isCanonicalAccepted(
   bbox: IrisBbox,
   peers: IrisBbox[],
 ): CanonicalStatus {
-  if (!bbox.valid) return 'fallback'
-  if (!isGeometricallySane(bbox)) return 'fallback'
-  if (isCrossAngleOutlier(bbox, peers)) return 'fallback'
-  return 'ok'
+  return diagnoseCanonical(bbox, peers).status
+}
+
+/**
+ * Same gate as `isCanonicalAccepted`, but returns structured diagnostic info
+ * (fail reasons, peer median, deltas) for observability. Orchestrator writes
+ * this per-photo into `canonical_metadata.gate_diagnostics` so the founder can
+ * query Supabase Studio and tune thresholds empirically without redeploying
+ * to add log lines.
+ *
+ * Behavioral parity with `isCanonicalAccepted`: same boundary semantics
+ * (geometric bounds INCLUSIVE; cross-angle delta STRICT >; peer_count<2
+ * skips cross-angle check). Adding this function does NOT change which
+ * photos pass the gate.
+ */
+export function diagnoseCanonical(
+  bbox: IrisBbox,
+  peers: IrisBbox[],
+): GateDiagnostic {
+  const fail_reasons: GateFailReason[] = []
+
+  if (!bbox.valid) fail_reasons.push('invalid')
+
+  // Geometric gate — evaluate each axis independently so the founder
+  // can see WHICH axis blew it (e.g. center_x out of range but center_y fine).
+  if (bbox.center_x_pct < GEOM_CENTER_MIN || bbox.center_x_pct > GEOM_CENTER_MAX) {
+    fail_reasons.push('geom_center_x')
+  }
+  if (bbox.center_y_pct < GEOM_CENTER_MIN || bbox.center_y_pct > GEOM_CENTER_MAX) {
+    fail_reasons.push('geom_center_y')
+  }
+  if (bbox.radius_pct < GEOM_RADIUS_MIN || bbox.radius_pct > GEOM_RADIUS_MAX) {
+    fail_reasons.push('geom_radius')
+  }
+
+  // Cross-angle gate (peer_count<2 → skipped, same as isCrossAngleOutlier).
+  let median_x_pct: number | null = null
+  let median_y_pct: number | null = null
+  let delta_x_pct: number | null = null
+  let delta_y_pct: number | null = null
+  if (peers.length >= 2) {
+    median_x_pct = median(peers.map(p => p.center_x_pct))
+    median_y_pct = median(peers.map(p => p.center_y_pct))
+    delta_x_pct = Math.abs(bbox.center_x_pct - median_x_pct)
+    delta_y_pct = Math.abs(bbox.center_y_pct - median_y_pct)
+    if (delta_x_pct > CROSS_ANGLE_OUTLIER_THRESHOLD) fail_reasons.push('cross_angle_x')
+    if (delta_y_pct > CROSS_ANGLE_OUTLIER_THRESHOLD) fail_reasons.push('cross_angle_y')
+  }
+
+  return {
+    status: fail_reasons.length === 0 ? 'ok' : 'fallback',
+    fail_reasons,
+    peer_count: peers.length,
+    median_x_pct,
+    median_y_pct,
+    delta_x_pct,
+    delta_y_pct,
+  }
 }
 
 // ---------------------------------------------------------------------------
