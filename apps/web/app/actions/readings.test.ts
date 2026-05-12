@@ -215,7 +215,7 @@ describe('finalizeReadingAction — Phase 5 trigger', () => {
     vi.clearAllMocks()
   })
 
-  it('calls POST /api/readings/<id>/process exactly once with cookie + no-store cache', async () => {
+  it('calls POST /api/readings/<id>/process with cookie + no-store cache (Phase 07.1.6: also POSTs canonicalize first)', async () => {
     const fetchMock = vi.fn(async () => new Response(null, { status: 202 }))
     globalThis.fetch = fetchMock as typeof globalThis.fetch
 
@@ -223,8 +223,26 @@ describe('finalizeReadingAction — Phase 5 trigger', () => {
       /NEXT_REDIRECT:\/leituras/,
     )
 
-    expect(fetchMock).toHaveBeenCalledTimes(1)
-    const [url, init] = fetchMock.mock.calls[0]!
+    // Phase 07.1.6 Plan 05: finalize agora dispara 2 fetches —
+    //   1) POST /api/capture/canonicalize (fire-and-forget, D-01 never blocks)
+    //   2) POST /api/readings/<id>/process (Modal trigger, D-T1)
+    // Validamos ambos os contratos abaixo.
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+
+    // Call 1: canonicalize (fire-and-forget, must come BEFORE Modal trigger)
+    const [canonicalUrl, canonicalInit] = fetchMock.mock.calls[0]!
+    expect(canonicalUrl).toBe('https://aurel-iris.test/api/capture/canonicalize')
+    expect((canonicalInit as RequestInit).method).toBe('POST')
+    const canonicalHeaders = (canonicalInit as RequestInit).headers as Record<string, string>
+    expect(canonicalHeaders.Cookie).toContain('sb-access-token=test-token')
+    expect(canonicalHeaders['Content-Type']).toBe('application/json')
+    expect((canonicalInit as RequestInit).body).toBe(
+      JSON.stringify({ readingId: READING_ID }),
+    )
+    expect((canonicalInit as RequestInit).cache).toBe('no-store')
+
+    // Call 2: Modal trigger (preserved Phase 5 contract)
+    const [url, init] = fetchMock.mock.calls[1]!
     expect(url).toBe(`https://aurel-iris.test/api/readings/${READING_ID}/process`)
     expect((init as RequestInit).method).toBe('POST')
     const headers = (init as RequestInit).headers as Record<string, string>

@@ -68,9 +68,10 @@ export async function POST(
   }
 
   // 3. Fetch the 6 reading_images
+  // Phase 07.1.6: select canonical_storage_path; resolve per-image abaixo (D-01 fallback).
   const { data: images, error: imagesError } = await supabase
     .from('reading_images')
-    .select('eye, angle, storage_path')
+    .select('eye, angle, storage_path, canonical_storage_path')
     .eq('reading_id', readingId)
   if (imagesError || !images || images.length === 0) {
     return NextResponse.json({ error: 'No images for this reading' }, { status: 404 })
@@ -78,7 +79,10 @@ export async function POST(
 
   // 4. Generate signed URLs (TTL=600s per D-T6) — service client avoids RLS path tax
   const serviceClient = createServiceClient()
-  const paths = images.map((img) => img.storage_path)
+  // Phase 07.1.6 D-01: canonical_storage_path se non-NULL, senão storage_path original.
+  // Backward-compat: readings pre-07.1.6 têm canonical_storage_path IS NULL → storage_path.
+  // D-04 disabled: same resolution; canonical_storage_path IS NULL → storage_path.
+  const paths = images.map((img) => img.canonical_storage_path ?? img.storage_path)
   const { data: signedData, error: signedError } = await serviceClient.storage
     .from('iris-captures')
     .createSignedUrls(paths, SIGNED_URL_TTL_SECONDS)
