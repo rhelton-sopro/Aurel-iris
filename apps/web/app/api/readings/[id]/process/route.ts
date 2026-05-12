@@ -83,6 +83,22 @@ export async function POST(
   // Backward-compat: readings pre-07.1.6 têm canonical_storage_path IS NULL → storage_path.
   // D-04 disabled: same resolution; canonical_storage_path IS NULL → storage_path.
   const paths = images.map((img) => img.canonical_storage_path ?? img.storage_path)
+
+  // Phase 07.1.6 UAT-2 diagnostic log: surface which path tier each image got.
+  // 'canonical' = canonical_storage_path used (Modal gets 800×800 crop)
+  // 'original'  = canonical_storage_path IS NULL → fell back to storage_path
+  // If user reports "Modal got originals", this log proves whether canonical
+  // paths were resolved at trigger time or canonical_storage_path was NULL.
+  const pathTiers = images.map((img) => ({
+    eye: img.eye,
+    angle: img.angle,
+    tier: img.canonical_storage_path ? ('canonical' as const) : ('original' as const),
+    path_segment: (img.canonical_storage_path ?? img.storage_path).slice(-60),
+  }))
+  console.log(
+    '[process/route] path-resolution',
+    JSON.stringify({ readingId, tiers: pathTiers }),
+  )
   const { data: signedData, error: signedError } = await serviceClient.storage
     .from('iris-captures')
     .createSignedUrls(paths, SIGNED_URL_TTL_SECONDS)

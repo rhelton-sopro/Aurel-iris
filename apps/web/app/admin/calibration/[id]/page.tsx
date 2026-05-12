@@ -29,6 +29,8 @@ interface ReadingImageRow {
   eye: string
   angle: string
   storage_path: string
+  /** Phase 07.1.6 — canonical 800×800 crop path. NULL when canonicalize hasn't run or fell back. */
+  canonical_storage_path: string | null
 }
 
 interface CalibrationAnnotationRow {
@@ -76,18 +78,23 @@ export default async function CalibrationDetailPage({
 
   if (readingError || !reading) notFound()
 
-  // 2. Fetch reading_images.
+  // 2. Fetch reading_images. Phase 07.1.6: also pull canonical_storage_path so
+  // the inline PhotoGrid renders the 800×800 canonical crop when available
+  // (founder needs to see what Modal actually consumed, not the raw originals).
   const { data: imagesRaw } = await supabase
     .from('reading_images')
-    .select('eye, angle, storage_path')
+    .select('eye, angle, storage_path, canonical_storage_path')
     .eq('reading_id', readingId)
 
   const images = (imagesRaw ?? []) as ReadingImageRow[]
 
   // 3. Generate signed URLs (TTL=600s — inline display).
+  // Phase 07.1.6 UAT item 2: prefer canonical 800×800 crop when available so
+  // the founder inspects the SAME image Modal received, not the raw original.
   let photos: CalibrationPhoto[] = []
   if (images.length > 0) {
-    const paths = images.map(img => img.storage_path)
+    // Resolve per-image path: canonical_storage_path (800×800 crop) if set, else original.
+    const paths = images.map(img => img.canonical_storage_path ?? img.storage_path)
     const { data: signed, error: signedError } = await supabase.storage
       .from('iris-captures')
       .createSignedUrls(paths, SIGNED_URL_TTL_SECONDS)
