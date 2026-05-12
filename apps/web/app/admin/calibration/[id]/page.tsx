@@ -10,6 +10,7 @@ import { CalibrationDiagnosisForm } from '@/components/calibration/CalibrationDi
 import { TechnicalReportCopyButton } from '@/components/calibration/TechnicalReportCopyButton'
 import { PhotoDownloadButton } from '@/components/calibration/PhotoDownloadButton'
 import { RecanonicalizeButton } from '@/components/calibration/RecanonicalizeButton'
+import { ReparseReportButton } from '@/components/calibration/ReparseReportButton'
 
 const SIGNED_URL_TTL_SECONDS = 600 // 10 minutes — inline display only.
 
@@ -230,6 +231,7 @@ export default async function CalibrationDetailPage({
           />
           <PhotoDownloadButton readingId={reading.id} />
           <RecanonicalizeButton readingId={reading.id} />
+          <ReparseReportButton readingId={reading.id} />
         </div>
       </section>
 
