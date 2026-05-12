@@ -1,23 +1,43 @@
 /**
  * Section-boundary parser for incremental LLM streaming persistence.
  *
- * Detects `^## N. ` or `^### N. ` headings (N=1..13) over an accumulated
- * buffer (NOT delta events — Pitfall 2 mandates buffer-level scan). Defenses:
- *   - Regex: `^#{2,3} (\d{1,2})\.\s+` in multiline mode (line-start anchor)
+ * Detects section headings (N=1..13) over an accumulated buffer (NOT delta
+ * events — Pitfall 2 mandates buffer-level scan). Defenses:
+ *   - Regex (multiline): line starts with 2 or 3 hashes, optional `§` glyph,
+ *     digit 1-2 chars, then either `.` or em-dash/en-dash/hyphen separator
  *   - Number must be in [1, 13] inclusive
  *   - Numbers must be strictly monotonic (`number === lastNumber + 1`)
  *   - Resets `lastIndex` per call (no cross-invocation state leak)
  *
- * Heading depth: prompt asks for `### N.` (H3) but Sonnet 4.6 sometimes adds
- * its own H1 doc title and bumps sections up to H2 (`## N.`). Both are accepted;
- * `#` (H1) and `####` (H4) still rejected. Surfaced 2026-05-08 dogfooding.
+ * Accepted heading variants (observed across Sonnet 4.6 dogfooding):
+ *   - `### 1. Constituição Iridológica`     (canonical prompt format)
+ *   - `## 1. Constituição Iridológica`      (Sonnet sometimes bumps H3→H2)
+ *   - `## §1 — Constituição Iridológica`    (Sonnet 4.6 post-2026-05-12;
+ *                                            surfaced after Phase 07.1.6 UAT:
+ *                                            buffer had full 40KB report but
+ *                                            ZERO boundaries matched the
+ *                                            old `.` separator regex →
+ *                                            report_generated stayed empty)
+ *   - `### §1 — ...`, `## 1 — ...`, `### 1 —`, etc. — same shape, any combo
+ *
+ * Rejected: `#` (H1) and `####` (H4) bypass the boundary check. Pitfall 2
+ * defenses still hold for all variants.
  *
  * Phase 7 | Plan 07-04 | Decisions: D-S2, RESEARCH §Code Examples, Pitfall 2
+ * Phase 07.1.6 UAT-1 fix (2026-05-12): regex tolerance for `## §N —` format.
  */
 import 'server-only'
 import { SECTION_KEY_BY_NUMBER, type NumberedSectionKey } from './types'
 
-const BOUNDARY_RE = /^#{2,3} (\d{1,2})\.\s+/gm
+// Anatomy:
+//   ^#{2,3}        — line starts with ## or ###
+//   \s+            — at least one space after hashes
+//   §?             — optional section glyph (`§1` vs `1`)
+//   (\d{1,2})      — capture 1-13 (range-checked below)
+//   \s*            — optional spaces between number and separator
+//   [.\-—–]        — separator: period, hyphen, em-dash, or en-dash
+//   \s+            — at least one space after separator
+const BOUNDARY_RE = /^#{2,3}\s+§?(\d{1,2})\s*[.\-—–]\s+/gm
 
 export interface BoundaryMatch {
   /** 1..13 — the section number from the heading. */

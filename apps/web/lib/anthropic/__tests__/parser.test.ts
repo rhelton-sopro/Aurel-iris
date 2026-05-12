@@ -143,3 +143,81 @@ A mensagem final que vai até o fim do buffer.`
     expect(closeSections([], 'Texto qualquer.')).toEqual([])
   })
 })
+
+// ---------------------------------------------------------------------------
+// Phase 07.1.6 UAT-1 regression (2026-05-12)
+//
+// f4408c23 regenerar análise: buffer_length=40038, sections_completed=[].
+// LLM produced `## §1 — Constituição Iridológica` headers (Sonnet 4.6 drift)
+// but old regex required `.` separator. Zero boundaries matched → empty report.
+// Parser now accepts §-prefixed numbers and em-dash/en-dash/hyphen separators.
+// ---------------------------------------------------------------------------
+
+describe('lib/anthropic/parser — Sonnet 4.6 heading variants (Phase 07.1.6 UAT-1)', () => {
+  it('aceita "## §N — Title" (section glyph + em-dash separator)', () => {
+    const buf = '## §1 — Constituição Iridológica\nA íris revela...'
+    const result = findAllBoundaries(buf)
+    expect(result).toHaveLength(1)
+    expect(result[0]).toMatchObject({ number: 1, key: '1_constituicao' })
+  })
+
+  it('aceita "### §N — Title" (H3 + § + em-dash)', () => {
+    const buf = '### §1 — Constituição\nFoo.'
+    const result = findAllBoundaries(buf)
+    expect(result).toHaveLength(1)
+    expect(result[0].number).toBe(1)
+  })
+
+  it('aceita en-dash e hyphen além de em-dash', () => {
+    const enDashBuf = '## 1 – Title\n'
+    const hyphenBuf = '## 1 - Title\n'
+    expect(findAllBoundaries(enDashBuf)).toHaveLength(1)
+    expect(findAllBoundaries(hyphenBuf)).toHaveLength(1)
+  })
+
+  it('detecta 13 boundaries sequenciais no novo formato', () => {
+    const sections = Array.from({ length: 13 }, (_, i) => `## §${i + 1} — Seção ${i + 1}\nConteúdo.`)
+    const buf = sections.join('\n')
+    const result = findAllBoundaries(buf)
+    expect(result).toHaveLength(13)
+    expect(result.map(b => b.number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13])
+  })
+
+  it('aceita variantes mistas (Sonnet ocasionalmente alterna formato no mesmo report)', () => {
+    const buf = `### 1. Constituição Iridológica
+Foo.
+## §2 — Análise Estrutural
+Bar.
+### 3. Indicações Sistêmicas
+Baz.`
+    const result = findAllBoundaries(buf)
+    expect(result).toHaveLength(3)
+    expect(result.map(b => b.number)).toEqual([1, 2, 3])
+  })
+
+  it('regression: f4408c23 buffer head matches first section', () => {
+    // Reproduces the actual buffer head from f4408c23 Vercel logs that produced
+    // 0 sections under the old regex.
+    const buf =
+      '# Leitura Iridológica Integrativa\n## Nailli GF de Carvalho · 37 anos · Mapa Jensen\n\n---\n\n## §1 — Constituição Iridológica\n\nA íris de Nailli revela uma constituição biliar-linfática mista.'
+    const result = findAllBoundaries(buf)
+    expect(result).toHaveLength(1)
+    expect(result[0]).toMatchObject({ number: 1, key: '1_constituicao' })
+    // startIdx points at the `## §1` line, NOT at `## Nailli` subtitle nor `# Leitura`.
+    expect(buf.slice(result[0].startIdx, result[0].startIdx + 6)).toBe('## §1 ')
+  })
+
+  it('still rejects H1 and H4 (Pitfall 2 boundaries intact)', () => {
+    const h1 = '# 1. Wrong depth\n'
+    const h4 = '#### 1. Wrong depth\n'
+    expect(findAllBoundaries(h1)).toHaveLength(0)
+    expect(findAllBoundaries(h4)).toHaveLength(0)
+  })
+
+  it('still rejects out-of-range numbers with new format', () => {
+    const buf = '## §0 — Prologue\n## §1 — Real first\nFoo.'
+    const result = findAllBoundaries(buf)
+    expect(result).toHaveLength(1)
+    expect(result[0].number).toBe(1)
+  })
+})
