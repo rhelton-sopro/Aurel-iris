@@ -291,7 +291,7 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
 **Plans**: 7 plans em 4 waves (planejado 2026-05-12 via /gsd-plan-phase 07.1.6).
 - [x] 07.1.6-01-PLAN.md — Wave 0: schema migration 0012 (additive + [BLOCKING] supabase db push) + SONNET_BBOX_MODEL constant + IrisBbox/CanonicalStatus/CanonicalMetadata types ✓ 2026-05-12 (cb03ced, 4c0203c, 8161591 + supabase db push applied)
 - [x] 07.1.6-02-PLAN.md — Wave 0: sanity.ts pure functions (geometric + cross-angle outlier) + RED→GREEN unit tests (TDD) ✓ 2026-05-12 (f1e183b RED + 3479d11 GREEN; 17/17 vitest pass; zero new tsc/lint/audit hits)
-- [ ] 07.1.6-03-PLAN.md — Wave 1: storage-path.ts + sonnet-bbox.ts (Sonnet 4.6 call) + crop.ts (sharp 800×800 lanczos3, SEM rotation) + index.ts orchestrator (6× Promise.all + trust gate + upsert)
+- [x] 07.1.6-03-PLAN.md — Wave 1: storage-path.ts + sonnet-bbox.ts (Sonnet 4.6 call) + crop.ts (sharp 800×800 lanczos3, SEM rotation) + index.ts orchestrator (6× Promise.all + trust gate + upsert) ✓ 2026-05-12 (198978b + b28fe83 + d1f7385 + 2a172e3; 4 artifacts em apps/web/lib/canonicalize/ = 662 source linhas + 408 test linhas; 43/43 vitest pass; zero new tsc/lint regressions; C-02/C-03/C-04/C-05/D-01..D-05 honored)
 - [ ] 07.1.6-04-PLAN.md — Wave 1: POST /api/capture/canonicalize endpoint (auth gate + ownership + idempotent — chamado por finalize + admin Re-canonicalizar)
 - [ ] 07.1.6-05-PLAN.md — Wave 2: finalizeReadingAction wiring (fire-and-forget canonical fetch before Modal trigger) + process/route.ts resolve canonical_storage_path ?? storage_path
 - [ ] 07.1.6-06-PLAN.md — Wave 2: /admin/calibration canonical_status badge + RecanonicalizeButton client component + photos API canonical_url extension
