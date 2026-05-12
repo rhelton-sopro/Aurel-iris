@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: "Phase 07.1.6 COMPLETE + UAT APPROVED 2026-05-12. 35+ commits delivered (cb03ced..d43f0d9). 7/7 plans + 4 UAT-driven fix waves shipped (gate diagnostics → threshold relax 0.08→0.18 → iris_color vocab expansion → constitution top-level merge → parser regex permissive → re-parse endpoint → founder regen-bypass → admin canonical viewer + button). Clinical UAT (founder direct inspection of f4408c23 vs 6 source photos): 4/4 HUMAN-UAT items PASSED; 3 calibration findings routed to Phase 7.2 as scope additions (7.2-A prompt findings hierarchy, 7.2-B lacuna chromatic-transition exclusion, 7.2-C cramp ring detector, 7.2-D peripheral pigment clustering). What worked: constitution biliar-linfática mista correct, color verde_acinzentado correct, fiber density correct, all absence-of-signs correct, parser working, 13/13 sections rendered. Phase 7.2 (Wave C corpus + threshold tuning + new detectors) now unblocked AND has expanded scope from clinical findings."
-stopped_at: "Phase 07.1.6 closed + UAT approved. Next session: /gsd-discuss-phase 7.2 — Phase 7.2 scope now includes original Wave C (corpus + thresholds) PLUS 4 calibration items (7.2-A..D) from 07.1.6 clinical UAT. See .planning/phases/07.1.6-canonical-capture-pipeline/07.1.6-UAT-FINDINGS.md for full review."
-last_updated: "2026-05-12T18:30:00.000Z"
+stopped_at: "Phase 07.1.6 closed + UAT approved. Next session: /gsd-discuss-phase 7.2 — Phase 7.2 scope = original Wave C (corpus + thresholds) + 7 calibration items (7.2-A..G): A findings hierarchy in LLM prompt, B lacuna chromatic-transition exclusion, C cramp ring detector (inner reticular), D peripheral pigment clustering (ciliary 8-10 / 2-4), E carúncula laterality validation in canonicalize prompt, F nerve ring sensitivity (ciliary tune), G collarette irregularity classifier (zigue-zague). 7.2-E touches canonicalize-side, others Modal. See 07.1.6-UAT-FINDINGS.md for full review (founder UAT + Gemini cross-validation pass)."
+last_updated: "2026-05-12T19:00:00.000Z"
 progress:
   total_phases: 11
   completed_phases: 7
