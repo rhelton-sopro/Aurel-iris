@@ -164,7 +164,7 @@ const SYSTEM_PROMPT = `Você é um analisador visual de fotos de íris para irid
   },
   "confidence": <0.0-1.0>,
   "iris_color": {
-    "primary": <"castanho"|"azul"|"verde"|"misto"|"cinza"|"avela"|null>,
+    "primary": <"castanho"|"azul"|"verde"|"misto"|"cinza"|"avela"|"acinzentado"|"verde_acinzentado"|"azul_acinzentado"|"castanho_acinzentado"|null>,
     "secondary": <string|null>,
     "dominant_pigments": [<string>, ...],
     "central_heterochromia": <true|false>,
@@ -179,7 +179,19 @@ Definições (importante seguir exatamente):
 - rotation_angle_deg: graus para rotacionar a imagem no sentido HORÁRIO (clockwise) para deixar a linha imaginária entre o canto INTERNO e o canto EXTERNO do olho HORIZONTAL (paralela à borda inferior da imagem). Positivo = sentido horário. Negativo = anti-horário. Ex: se o canto interno está mais ALTO que o externo no momento (cabeça inclinada para a esquerda do paciente / direita do observador), retorne valor POSITIVO (rotacionar CW endireita).
 - inner_canthus = canto INTERNO do olho (lado do nariz). outer_canthus = canto EXTERNO (lado da têmpora).
 - confidence: sua confiança na precisão das coordenadas reportadas (0.0 = chute, 1.0 = certeza absoluta).
-- iris_color.primary: cor predominante da íris em vocabulário iridológico. Escolha UMA: "castanho" (marrom em qualquer tom), "azul" (azul puro), "verde" (verde puro), "misto" (mistura clara de azul/verde/castanho sem dominância), "cinza" (acromático), "avela" (avelã/hazel — castanho-claro com nuance verde). Use null SOMENTE se a foto não permite ver cor (totalmente embaçada, sem foco, foto de pálpebra fechada).
+- iris_color.primary: cor predominante da íris em vocabulário iridológico. Escolha UMA, observando atentamente o tom da MAIOR parte da área visível da íris:
+  - "castanho" (marrom em qualquer tom, sem nuance gray/dust)
+  - "azul" (azul puro, vibrante, sem nuance gray)
+  - "verde" (verde puro, vibrante, sem nuance gray)
+  - "misto" (mistura clara de duas cores SEM dominância gray — ex: castanho central + verde periférico equilibrados)
+  - "cinza" (acromático puro — sem dominância de verde, azul, ou castanho)
+  - "avela" (avelã/hazel — castanho-claro com nuance verde-amarelada)
+  - "acinzentado" (íris fundamentalmente gray-tinted, mas com cor base não identificável claramente — ex: gray puxando levemente pra azul-cinza ou verde-cinza sem dominância)
+  - "verde_acinzentado" (íris verde com nuance cinza VISÍVEL — gray-green, comum em pacientes com predominância biliar-linfática iridológica; distingue-se de "verde" puro pela presença de gray visível no estroma)
+  - "azul_acinzentado" (íris azul com nuance cinza VISÍVEL — blue-gray, comum em constituição linfática iridológica pura)
+  - "castanho_acinzentado" (íris castanha com nuance cinza VISÍVEL — brown-gray)
+  Use null SOMENTE se a foto não permite ver cor (totalmente embaçada, sem foco, foto de pálpebra fechada).
+  HEURÍSTICA: se você está em dúvida entre "verde" e "verde_acinzentado", escolha "verde_acinzentado" sempre que houver QUALQUER componente gray visível — é a categoria iridológica mais informativa. Pure "verde" reserva-se para íris vibrantes sem gray.
 - iris_color.secondary: cor secundária visível se a íris tem segundo tom claro (ex: castanho central + verde periférico → secondary="verde"). Use null se monocromática.
 - iris_color.dominant_pigments: lista de pigmentos visíveis em vocabulário iridológico. Inclua TODOS que você identifica entre: "pigmento_amarelo" (xantofila — manchas amarelas pequenas), "pigmento_marrom" (melanina concentrada — manchas marrom-escuras), "pigmento_alaranjado" (pigmento de coloração laranja, mais raro), "pigmento_psicológico" (manchas pequenas próximas à pupila), "anel_sódico" (anel branco/cinza na periferia). Lista vazia [] se íris uniforme sem pigmentação distintiva.
 - iris_color.central_heterochromia: true se a região central da íris (~1/3 anel ao redor da pupila) tem cor distintamente diferente do anel periférico (ex: castanho central + azul periférico). false se monocromática ou só gradação suave.
