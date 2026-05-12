@@ -148,6 +148,26 @@ export interface IrisBbox {
 }
 
 /**
+ * Per-photo iris color extracted by Sonnet 4.6 in the same canonical bbox call
+ * (zero extra Anthropic cost — same image upload, ~50 additional output tokens).
+ * Phase 07.1.6 UAT item 2 — Sonnet is already looking at the iris for bbox,
+ * so we get color naming at no marginal cost. Aggregated per-eye in the
+ * orchestrator (see `IrisColorBlock` in vision_features schema).
+ */
+export interface IrisColorPerPhoto {
+  /** Iridological category: 'castanho' | 'azul' | 'verde' | 'misto' | 'cinza' | 'avela'. Null = Sonnet couldn't determine. */
+  primary: string | null
+  /** Optional secondary color when iris shows clear two-tone (e.g. brown center + green edge). */
+  secondary: string | null
+  /** Iridological pigment names (e.g. 'pigmento_amarelo', 'pigmento_marrom', 'pigmento_psicológico'). */
+  dominant_pigments: string[]
+  /** True when central iris (around pupil) is distinctly different color from periphery. */
+  central_heterochromia: boolean
+  /** 0.0-1.0 Sonnet self-reported certainty in the color naming. */
+  confidence: number
+}
+
+/**
  * Per-image canonical pipeline status.
  * - 'ok'       → canonical_storage_path populated, Modal receives canonical URL
  * - 'fallback' → bbox failed sanity gate (D-02), Modal receives original URL
@@ -185,6 +205,21 @@ export interface CanonicalGateDiagnostic {
   }
 }
 
+/**
+ * Per-eye aggregated iris color (matches vision_features.{eye}.iris_color
+ * shape consumed by FeaturesDisplay.tsx + analyze.ts report prompt).
+ * `dominant_pigments` is additive vs the legacy Modal shape — readers that
+ * don't know about it just ignore it.
+ */
+export interface IrisColorAggregate {
+  primary: string | null
+  secondary: string | null
+  central_heterochromia: boolean | null
+  dominant_pigments: string[]
+  /** Average Sonnet confidence across the 3 angles aggregated. */
+  confidence: number
+}
+
 /** Aggregate canonical metadata stored in readings.canonical_metadata (jsonb). */
 export interface CanonicalMetadata {
   sonnet_input_tokens: number
@@ -200,6 +235,17 @@ export interface CanonicalMetadata {
    * backward-compat com readings canonicalizadas antes do diagnostic patch.
    */
   gate_diagnostics?: CanonicalGateDiagnostic[]
+  /**
+   * Per-eye iris color extracted by Sonnet in the bbox call (zero extra cost).
+   * Source of truth for iris color (Modal's color analysis is unreliable for
+   * iridological categories). Also mirrored into vision_features.{eye}.iris_color
+   * via an additive UPDATE so the report prompt (analyze.ts) reads it from
+   * the existing slot. Phase 07.1.6 UAT item 2.
+   */
+  iris_color_by_eye?: {
+    left: IrisColorAggregate | null
+    right: IrisColorAggregate | null
+  }
 }
 
 /** Re-export keeps Database type alive — cross-reference for `readings` Row shape. */

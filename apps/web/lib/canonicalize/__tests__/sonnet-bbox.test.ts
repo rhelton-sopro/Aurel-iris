@@ -202,4 +202,107 @@ describe('fetchIrisBbox', () => {
     expect(callArgs.messages[0].content[0].type).toBe('image')
     expect(callArgs.messages[0].content[0].source.media_type).toBe('image/jpeg')
   })
+
+  // -------------------------------------------------------------------------
+  // iris_color extraction (Phase 07.1.6 UAT item 2 — Sonnet returns color in
+  // same bbox call at zero extra cost). Defensive parsing: malformed/missing
+  // iris_color → null (orchestrator skips that photo in aggregation).
+  // -------------------------------------------------------------------------
+
+  it('parses iris_color block when Sonnet returns it', async () => {
+    mockMessagesCreate.mockResolvedValueOnce(
+      mockSonnetResponse(
+        JSON.stringify({
+          valid: true,
+          iris_bbox: { center_x_pct: 0.5, center_y_pct: 0.5, radius_pct: 0.15 },
+          confidence: 0.9,
+          iris_color: {
+            primary: 'castanho',
+            secondary: 'verde',
+            dominant_pigments: ['pigmento_amarelo', 'pigmento_marrom'],
+            central_heterochromia: false,
+            confidence: 0.82,
+          },
+        }),
+      ),
+    )
+    const { fetchIrisBbox } = await import('../sonnet-bbox')
+    const buf = await makeTestJpeg()
+    const result = await fetchIrisBbox(buf)
+    expect(result.iris_color).toEqual({
+      primary: 'castanho',
+      secondary: 'verde',
+      dominant_pigments: ['pigmento_amarelo', 'pigmento_marrom'],
+      central_heterochromia: false,
+      confidence: 0.82,
+    })
+  })
+
+  it('returns iris_color=null when Sonnet omits the field (backward-compat)', async () => {
+    mockMessagesCreate.mockResolvedValueOnce(
+      mockSonnetResponse(
+        JSON.stringify({
+          valid: true,
+          iris_bbox: { center_x_pct: 0.5, center_y_pct: 0.5, radius_pct: 0.15 },
+          confidence: 0.9,
+        }),
+      ),
+    )
+    const { fetchIrisBbox } = await import('../sonnet-bbox')
+    const buf = await makeTestJpeg()
+    const result = await fetchIrisBbox(buf)
+    expect(result.iris_color).toBeNull()
+  })
+
+  it('returns iris_color=null when bbox.valid=false (no measurable color)', async () => {
+    mockMessagesCreate.mockResolvedValueOnce(
+      mockSonnetResponse(
+        JSON.stringify({
+          valid: false,
+          iris_bbox: { center_x_pct: 0.5, center_y_pct: 0.5, radius_pct: 0 },
+          confidence: 0,
+          iris_color: {
+            primary: null,
+            secondary: null,
+            dominant_pigments: [],
+            central_heterochromia: false,
+            confidence: 0,
+          },
+        }),
+      ),
+    )
+    const { fetchIrisBbox } = await import('../sonnet-bbox')
+    const buf = await makeTestJpeg()
+    const result = await fetchIrisBbox(buf)
+    expect(result.iris_color).toBeNull()
+  })
+
+  it('coerces malformed iris_color fields to safe defaults', async () => {
+    mockMessagesCreate.mockResolvedValueOnce(
+      mockSonnetResponse(
+        JSON.stringify({
+          valid: true,
+          iris_bbox: { center_x_pct: 0.5, center_y_pct: 0.5, radius_pct: 0.15 },
+          confidence: 0.9,
+          iris_color: {
+            primary: 'castanho',
+            secondary: 12345, // not a string → null
+            dominant_pigments: 'not_an_array', // wrong shape → []
+            central_heterochromia: 'yes', // not strictly boolean true → false
+            confidence: 'high', // not a number → 0
+          },
+        }),
+      ),
+    )
+    const { fetchIrisBbox } = await import('../sonnet-bbox')
+    const buf = await makeTestJpeg()
+    const result = await fetchIrisBbox(buf)
+    expect(result.iris_color).toEqual({
+      primary: 'castanho',
+      secondary: null,
+      dominant_pigments: [],
+      central_heterochromia: false,
+      confidence: 0,
+    })
+  })
 })

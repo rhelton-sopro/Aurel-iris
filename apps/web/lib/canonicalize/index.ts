@@ -46,6 +46,8 @@ import type {
   CanonicalStatus,
   CanonicalMetadata,
   CanonicalGateDiagnostic,
+  IrisColorPerPhoto,
+  IrisColorAggregate,
 } from '@/lib/anthropic/types'
 import type { Eye } from '@/lib/capture/iris-geometry'
 import type { Angle } from '@/lib/capture/sequence'
@@ -81,6 +83,8 @@ interface PerImageBboxResult {
   angle: Angle
   storage_path: string
   bbox: IrisBbox | null
+  /** Iris color extraído pela mesma Sonnet call (Phase 07.1.6 UAT item 2). null em falha ou pre-prompt-update. */
+  iris_color: IrisColorPerPhoto | null
   /** Buffer já com EXIF baked, reusado pro crop step. null se download falhou. */
   bufferBaked: Buffer | null
   origW: number
@@ -153,6 +157,7 @@ export async function canonicalizeReading(
         angle: img.angle as Angle,
         storage_path: img.storage_path,
         bbox: null,
+        iris_color: null,
         bufferBaked: null,
         origW: 0,
         origH: 0,
@@ -181,8 +186,9 @@ export async function canonicalizeReading(
           throw new Error('sharp metadata missing width/height after EXIF bake')
         }
 
-        const { bbox, usage, cost_usd } = await fetchIrisBbox(baked)
+        const { bbox, iris_color, usage, cost_usd } = await fetchIrisBbox(baked)
         base.bbox = bbox
+        base.iris_color = iris_color
         base.input_tokens = usage.input_tokens
         base.output_tokens = usage.output_tokens
         base.cost_usd = cost_usd
@@ -317,7 +323,21 @@ export async function canonicalizeReading(
   )
 
   // ---------------------------------------------------------------------
-  // Step 4: aggregate usage + costs → persist em readings.canonical_metadata
+  // Step 4: aggregate iris_color per eye (Phase 07.1.6 UAT item 2)
+  // ---------------------------------------------------------------------
+  const colorsLeft = bboxResults
+    .filter(r => r.eye === 'left' && r.iris_color !== null)
+    .map(r => r.iris_color as IrisColorPerPhoto)
+  const colorsRight = bboxResults
+    .filter(r => r.eye === 'right' && r.iris_color !== null)
+    .map(r => r.iris_color as IrisColorPerPhoto)
+  const iris_color_by_eye = {
+    left: aggregateIrisColor(colorsLeft),
+    right: aggregateIrisColor(colorsRight),
+  }
+
+  // ---------------------------------------------------------------------
+  // Step 5: aggregate usage + costs → persist em readings.canonical_metadata
   // ---------------------------------------------------------------------
   const totalInput = bboxResults.reduce((sum, r) => sum + r.input_tokens, 0)
   const totalOutput = bboxResults.reduce((sum, r) => sum + r.output_tokens, 0)
@@ -332,6 +352,7 @@ export async function canonicalizeReading(
     status_summary: summary,
     canonicalized_at: new Date().toISOString(),
     gate_diagnostics,
+    iris_color_by_eye,
   }
 
   // `canonical_metadata` é jsonb (migration 0012). Supabase typegen exporta
@@ -350,5 +371,151 @@ export async function canonicalizeReading(
     )
   }
 
+  // ---------------------------------------------------------------------
+  // Step 6: patch vision_features.{eye}.iris_color (Phase 07.1.6 UAT item 2)
+  //
+  // Sonnet's iris_color is more reliable than Modal's LAB centroid analysis
+  // for iridological category naming. Mirror it into the existing vision_features
+  // slot so the Phase 7 report prompt (analyze.ts) sees it without changes.
+  //
+  // Idempotent additive UPDATE: read-modify-write, replacing ONLY left_eye.iris_color
+  // and right_eye.iris_color. If Modal runs AFTER and overwrites the whole
+  // vision_features row, the next canonicalize call (or admin Re-canonicalizar)
+  // will re-patch. Long-term: have Modal skip iris_color extraction once we
+  // trust the Sonnet path (separate phase).
+  // ---------------------------------------------------------------------
+  if (iris_color_by_eye.left || iris_color_by_eye.right) {
+    await patchVisionFeaturesIrisColor(service, readingId, iris_color_by_eye)
+  }
+
   return { results, metadata }
+}
+
+// ---------------------------------------------------------------------------
+// Iris color aggregation + vision_features patch (Phase 07.1.6 UAT item 2)
+// ---------------------------------------------------------------------------
+
+/**
+ * Aggregate 3 per-photo iris_color records (one per angle of the same eye) into
+ * a single per-eye IrisColorAggregate. Strategy:
+ *   - primary: confidence-weighted vote across non-null primaries; ties broken
+ *     by highest single-photo confidence.
+ *   - secondary: most-common non-null value across photos; null if none.
+ *   - dominant_pigments: union of all per-photo pigment arrays (deduped).
+ *   - central_heterochromia: true if any photo reported true (conservative —
+ *     heterochromia is a stable trait; one good detection is sufficient).
+ *   - confidence: average of per-photo confidences.
+ * Returns null if the input array is empty (e.g. all 3 photos returned bbox
+ * but no iris_color, or all 3 fell back to valid=false).
+ */
+function aggregateIrisColor(colors: IrisColorPerPhoto[]): IrisColorAggregate | null {
+  if (colors.length === 0) return null
+
+  // Weighted vote on primary: sum confidence by category.
+  const primaryScore: Record<string, number> = {}
+  let bestPrimary: string | null = null
+  let bestPrimaryConfidence = -1
+  for (const c of colors) {
+    if (c.primary !== null) {
+      primaryScore[c.primary] = (primaryScore[c.primary] ?? 0) + c.confidence
+      if (c.confidence > bestPrimaryConfidence) {
+        bestPrimaryConfidence = c.confidence
+        bestPrimary = c.primary
+      }
+    }
+  }
+  // Pick highest-scored primary; tie-break to bestPrimary (highest single confidence).
+  let primary: string | null = null
+  let maxScore = -1
+  for (const [cat, score] of Object.entries(primaryScore)) {
+    if (score > maxScore) {
+      maxScore = score
+      primary = cat
+    } else if (score === maxScore && cat === bestPrimary) {
+      primary = cat
+    }
+  }
+
+  // Secondary: most common non-null.
+  const secondaryCount: Record<string, number> = {}
+  for (const c of colors) {
+    if (c.secondary !== null) {
+      secondaryCount[c.secondary] = (secondaryCount[c.secondary] ?? 0) + 1
+    }
+  }
+  let secondary: string | null = null
+  let maxSecondaryCount = 0
+  for (const [sec, count] of Object.entries(secondaryCount)) {
+    if (count > maxSecondaryCount) {
+      maxSecondaryCount = count
+      secondary = sec
+    }
+  }
+
+  // Dominant pigments: union (dedup).
+  const pigmentSet = new Set<string>()
+  for (const c of colors) {
+    for (const p of c.dominant_pigments) pigmentSet.add(p)
+  }
+
+  // Heterochromia: any photo reporting true.
+  const central_heterochromia = colors.some(c => c.central_heterochromia)
+
+  // Average confidence.
+  const confidence = colors.reduce((sum, c) => sum + c.confidence, 0) / colors.length
+
+  return {
+    primary,
+    secondary,
+    central_heterochromia,
+    dominant_pigments: Array.from(pigmentSet),
+    confidence,
+  }
+}
+
+/**
+ * Patch vision_features.{left_eye,right_eye}.iris_color additive UPDATE.
+ * Read-modify-write on the existing vision_features jsonb so Modal's other
+ * outputs (constitution, fiber_density, rings, sectors, etc.) are preserved.
+ * Safe to call even when vision_features is null (creates the structure).
+ *
+ * Non-fatal: failure logs and returns; canonical_metadata.iris_color_by_eye
+ * is the source of truth either way (analyze.ts can fall back to it).
+ */
+async function patchVisionFeaturesIrisColor(
+  service: ReturnType<typeof createServiceClient>,
+  readingId: string,
+  irisColorByEye: { left: IrisColorAggregate | null; right: IrisColorAggregate | null },
+): Promise<void> {
+  const { data: row, error: readError } = await service
+    .from('readings')
+    .select('vision_features')
+    .eq('id', readingId)
+    .single()
+  if (readError) {
+    console.error(`[canonicalize] read vision_features failed: ${readError.message}`)
+    return
+  }
+
+  const existing = (row?.vision_features as Record<string, unknown> | null) ?? {}
+  const leftEye = (existing.left_eye as Record<string, unknown> | undefined) ?? {}
+  const rightEye = (existing.right_eye as Record<string, unknown> | undefined) ?? {}
+
+  const patched = {
+    ...existing,
+    left_eye: irisColorByEye.left
+      ? { ...leftEye, iris_color: irisColorByEye.left }
+      : leftEye,
+    right_eye: irisColorByEye.right
+      ? { ...rightEye, iris_color: irisColorByEye.right }
+      : rightEye,
+  }
+
+  const { error: writeError } = await service
+    .from('readings')
+    .update({ vision_features: patched as unknown as Json })
+    .eq('id', readingId)
+  if (writeError) {
+    console.error(`[canonicalize] patch vision_features iris_color failed: ${writeError.message}`)
+  }
 }
