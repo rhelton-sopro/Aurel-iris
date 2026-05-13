@@ -1,0 +1,46 @@
+{
+  "_meta": {
+    "purpose": "Source-of-truth for Iris Codex forbidden vocabulary lists. Consumed by scripts/audit-vocabulary.mjs (CI) and lib/anthropic/audit-v2.ts (runtime). DO NOT add this file to audit scan dirs — it's the term source, scanning it would self-match.",
+    "phase": "07.4",
+    "plan": "07.4-02",
+    "decisions": "D-VOC1, D-VOC2, D-VOC3"
+  },
+  "iridological_jargon": [
+    "constituição linfática",
+    "constituição hematogênea",
+    "constituição mista",
+    "anel nervoso",
+    "anel de tensão",
+    "linfática rosary",
+    "lacuna grau",
+    "radii solaris",
+    "sodium ring",
+    "senile arc",
+    "escola alemã",
+    "escola Jensen",
+    "Jensen",
+    "Lo Rito",
+    "Battello",
+    "Deck",
+    "Angerer",
+    "Lindemann",
+    "ancorado em",
+    "pipeline detectou",
+    "Modal output"
+  ],
+  "sopro_vocab": [
+    "centelha divina",
+    "atravessar",
+    "vasto",
+    "essência primordial",
+    "sopro da origem",
+    "princípio criador",
+    "mistério",
+    "caminho da alma"
+  ],
+  "lgpd": [
+    "diagnóstico",
+    "tratamento",
+    "cura"
+  ]
+}
