@@ -24,7 +24,9 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
 - [x] **Fase 7.1 (INSERTED): Dogfooding fixes** — 3 plans entregues 2026-05-09..11: audit regex polish (C1+C2) + vision pipeline calibration (P0.1-P0.4) + admin calibration page. Status: human_needed (24/25 truths; T5 empirical Nailli convergence deferred para 7.2).
 - [ ] **Fase 7.1.5 (INSERTED): Detect/segment robustness para close-up iris photos** — Empirical investigation durante `/gsd-discuss-phase 07.2` 2026-05-11 revelou que MediaPipe falha em close-ups (no face context) → Hough fallback escolhe círculos errados → segment centers de 3 ângulos da mesma íris ficam 600-1500 px distantes → compose mistura polar-unwraps de regiões diferentes → features são lixo (`castanho/hematogenea/[]`). Bloqueia 7.2: anotação + threshold tuning sobre pixel-soup não-íris não resolve nada. Goal: detect+segment produz iris circles geometricamente consistentes (centros ≤50 px de variação) entre 3 ângulos do mesmo olho.
 - [ ] **Fase 7.2 (INSERTED): Wave C — corpus expansion + threshold tuning** — Founder annotation sprint (N≥3 fixtures por iris-color category) + re-run `recalibrate-centroids.mjs` + tune `detect_sectoral_pigments` thresholds contra real-photo LAB-delta distributions. Goal: Nailli reprocess converge para `iris_color ∈ {verde-mosaico, misto}` + `constitution ∈ {mista_biliar, biliar, mista}` + `sectoral_pigments` não-vazio (closes 07.1-HUMAN-UAT items 1-3). **BLOQUEADO em 7.1.5** (sem polar unwrap correto, threshold tuning não converge).
-- [ ] **Fase 7.3 (INSERTED): Dual-layer report authorship & rendering** — Founder dogfooding pain (07.1.6 UAT 2026-05-12): relatório precisa de duas camadas em uma única chamada Sonnet — PRIMARY (voz clínica direta, sem citações de autor/escola, sem ancoragem `[features.x]`, sem meta-pipeline; foco órgãos+emoções+traumas) e TECHNICAL (vocabulário iridológico completo, citações Jensen/Lo Rito/Moraga, feature anchors, pipeline refs) renderizado em tab "Ver análise técnica completa". UI: todas 13 seções iniciam colapsadas. §11 affirmations vira toggle per-reading default OFF em `/editar`. §13 fica primary-only sempre. Absorve 7.2-A (findings hierarchy — mesmo arquivo `system.md`). Paralelizável com 7.2 (surface disjunta web/prompt/parser/schema vs Modal/corpus). **HIGH priority — executar antes de 7.2** (dogfooding diário do founder).
+- [~] **Fase 7.3 (INSERTED, ABANDONED 2026-05-13): Dual-layer report authorship** — Escopo original (primary clínico + technical acadêmico na mesma chamada Sonnet + §11 toggle + collapsed default) **descartado durante discuss-phase 2026-05-13** após pivot arquitetural de produto. Founder concluiu que público-alvo V1 (terapeutas integrativos não-iridologistas + clientes finais + curiosos) não consome nomenclatura iridológica formal no padrão. Decisão: **relatório único funcional adaptativo** (sem jargão) + análise iridológica técnica vira **módulo add-on pago** (V1.1). Substituída por Fase 7.4 (nova arquitetura) + Fase 7.5 (mapping engine). 7.2-A migrou pra 7.5.
+- [ ] **Fase 7.4 (INSERTED): Iris Codex — Relatório funcional adaptativo + add-on placeholder** — Pivot arquitetural 2026-05-13: descarta o template fixo de 13 seções e dual-layer. Sonnet 4.6 emite **um único relatório clínico-funcional adaptativo** via structured output JSON: executive_summary + constitutional_pattern + systems_with_tendency[] (priorizado por grade 1-5, sistemas sem achados omitidos) + integrative_axes + bilateral_findings + therapeutic_synthesis + priority_focus + clinical_note. Cada system com tendency tem: nome, grade 1-5 + label + barra visual, clinical_description (prosa funcional sem jargão iridológico), associated_manifestations[], investigation_points[], therapeutic_direction. Vocabulário: linguagem clínica funcional ("sobrecarga hepática", "tendência inflamatória"), **proibido jargão iridológico no padrão** (constituição linfática, anel nervoso, hN codes) + **proibido Sopro da Origem vocab** (centelha divina, atravessar) + diagnóstico médico. Botão "Análise Iridológica Aprofundada (1 crédito)" como placeholder UI (DB schema via nova tabela `reading_addons` extensível pra família V1.1+). Streaming progressivo + zod/pydantic validation + retry com prompt corretivo. Mapping placeholder/manual em 7.4; Fase 7.5 endurece. **Rebrand "Aurel → Iris Codex"** (PROJECT.md + UI copy + voice rules). **HIGH priority — executar antes de 7.2**.
+- [ ] **Fase 7.5 (INSERTED): Iris Codex — Tendency mapping engine (sinais → tendências)** — Camada de mapeamento entre `vision_features` (output do pipeline Modal Fase 5) e o input estruturado pro prompt-mestre da Fase 7.4. **IP central do Iris Codex**: regras de combinação de achados iridológicos + RAG multi-escola (Jensen, Lo Rito, Battello, Deck, Lindemann) que produzem `tendencies[]` com `{ system_id, grade 1-5, contributing_signs[], confidence, school_attribution[] }`. Absorve **7.2-A** (findings hierarchy by visual prominence — inerente à função do mapping engine, já que priority ordering é o que ele decide). Substitui placeholder/manual mapping de 7.4 quando lands. Threshold tuning empírico baseado em corpus Wave C de 7.2. Pode rodar em paralelo com 7.4 (7.4 ships placeholder; 7.5 swap-in incremental).
 - [ ] **Fase 8: Pagamento + LGPD** — Stripe BR (BRL+PIX) com trial 14d e termo de consentimento + direitos LGPD.
 - [ ] **Fase 9: Polish + dogfooding + beta** — Onboarding, e-mail transacional, uso semanal real pelo fundador, depois beta com 10–20 terapeutas.
 - [ ] **Fase 10: Sistema de Aprendizagem Clínica** *(planejada — backlog de longo prazo, executar depois da Fase 9 fechar)* — Captura de diff entre relatório gerado e entregue → descoberta de heurísticas emergentes + scoring clínico próprio + sugestões pré-preenchidas. Transforma o produto de "software de iridologia" em "sistema proprietário de análise iridológica" intransponível. **Pré-requisito de captura de dados embutido na Fase 7** (relatório_gerado, relatório_entregue, zonas_editadas, tipo_edição). Ver `.planning/phases/10-aprendizagem-clinica/10-CONTEXT.md`.
@@ -329,7 +331,7 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
 **UI hint**: no (Wave C usa /admin/calibration já entregue em 07.1-03; não cria UI nova).
 
 **Scope additions from 07.1.6 clinical UAT (2026-05-12, founder direct inspection of f4408c23):**
-- **7.2-A → MIGRATED TO Fase 7.3 (2026-05-13)**: findings-hierarchy clause no LLM system prompt foi movida pra 7.3 porque a reescrita dual-layer (primary/technical) edita o mesmo arquivo `apps/web/prompts/system.md`. Consolidar em um pass de prompt-eng evita merge conflicts e dois passes de cross-validation Gemini.
+- **7.2-A → MIGRATED TO Fase 7.5 (2026-05-13, re-routed)**: findings-hierarchy clause foi originalmente migrada pra 7.3 (dual-layer rewrite). Após pivot arquitetural 2026-05-13 (7.3 ABANDONED, nova arquitetura em 7.4 + 7.5), findings hierarchy passa a ser **inerente à função do mapping engine (7.5)** — quem decide grade 1-5 por sistema com priority ordering é a engine, não o prompt. Sonnet em 7.4 só renderiza systems_with_tendency[] já priorizado.
 - **7.2-B** Tune Modal lacuna size measurement to exclude chromatic transition zones from extent calculation. Founder UAT: thyroid lacuna at hour-4 reported 11-27mm bilateral when direct visual shows smaller signals; Modal counts chromatic transition zone as part of extent. Scope: `vision-service/pipeline/segment.py` (or equivalent).
 - **7.2-C** Add **cramp ring detector** to Modal pipeline — concentric ring artifact in inner reticular zone (functional digestive tension signal). Founder UAT confirmed signal visible in photos, absent from vision_features. Scope: new Modal detector via radial intensity profile + curvature analysis. Thresholds derived from same Wave C fixture corpus.
 - **7.2-D** Add **peripheral pigment clustering detector** to Modal pipeline — sectoral pigment density at ciliary zone (hours 8-10 and 2-4), discrete clusters NOT full tofus. Founder UAT confirmed bilateral signal visible, absent from `sectoral_pigments`. Scope: new Modal detector. Same fixture corpus.
@@ -339,11 +341,135 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
 - **7.2-F** Tune Modal **nerve tension ring detector sensitivity** — currently emitting `nerve_rings: false` when visible cramp rings exist in the ciliary zone. False-negative threshold issue. Distinct from 7.2-C (cramp ring in inner reticular zone): 7.2-F is the ciliary-zone variant. Scope: Modal `vision-service/pipeline/` ring detector — lower the activation threshold or add ciliary-zone branch. Thresholds empirical from Wave C corpus.
 - **7.2-G** Add Modal **collarette irregularity detector** (zigue-zague vs regular shape) — currently emitting `collarette.shape: 'regular'` when zigue-zague is visible. False-negative shape classification. Scope: Modal `vision-service/pipeline/` collarette analysis — add irregularity metric (e.g. radial-distance variance from circular fit, or curvature inflection count). Output `collarette.irregularity ∈ {regular, leve_zigue, zigue_zague, severo}`. Empirical thresholds from Wave C corpus.
 
-Item from Gemini list (LLM findings-hierarchy by visual prominence) was the same concern as 7.2-A — **migrated together to Fase 7.3** (see entry below; both edits land on `apps/web/prompts/system.md`).
+Item from Gemini list (LLM findings-hierarchy by visual prominence) was the same concern as 7.2-A — **migrated to Fase 7.5 mapping engine** (priority ordering é função inerente da engine; ver entry abaixo).
 
 See `.planning/phases/07.1.6-canonical-capture-pipeline/07.1.6-UAT-FINDINGS.md` for the full clinical review + Gemini cross-validation pass.
 
-### Fase 7.3 (INSERTED): Dual-layer report authorship & rendering
+### Fase 7.3 (INSERTED, ABANDONED 2026-05-13): Dual-layer report authorship & rendering — SUPERSEDED by 7.4 + 7.5
+**Status:** ABANDONED durante `/gsd-discuss-phase 7.3` em 2026-05-13. Zero plans escritos; zero código mexido. ROADMAP entry preservado como audit trail da decisão de pivot.
+
+**Original scope (descartado):** dual-layer report (primary clínico + technical acadêmico na mesma chamada Sonnet), tabs "Ver análise técnica completa", 13 seções colapsadas por default, §11 affirmations toggle per-reading. Mantinha 13-section structure intacta (Phase 10 telemetry preservation).
+
+**Por que descartada:** durante discuss-phase founder reposicionou o produto. Análise:
+- Público-alvo V1 (terapeutas integrativos NÃO-iridologistas + clientes finais + curiosos) **não consome nomenclatura iridológica formal** (constituição linfática, anel nervoso, sinais Jensen com hN codes) no relatório padrão.
+- Estrutura fixa de 13 seções é template — não adapta ao caso clínico real. Sistemas sem achados relevantes aparecem como "sem alterações" ruidoso.
+- Analista iridológico técnico **vira valor pago opcional** (módulo add-on por crédito), não default. Justifica preço premium + monetização modular.
+- Brand "Iris Codex" separa positionamento científico-clínico de outras linhas espirituais ("Sopro da Origem" excluído do vocabulário).
+
+**O que substitui:**
+- **Fase 7.4** — Iris Codex relatório funcional adaptativo (single layer + add-on placeholder)
+- **Fase 7.5** — Tendency mapping engine (sinais → tendências, IP central)
+
+**Migrações de scope:**
+- 7.2-A (findings hierarchy) que estava em 7.3 → re-routed pra **7.5** (mapping engine é dono natural de priority ordering)
+- §11 affirmations toggle → drop de V1; placeholder no campo `advanced_analysis.affirmations` do future add-on "Mensagem para cliente final" (V1.1)
+- §13 mensagem final → absorvido pelo `clinical_note` no novo schema
+- Collapsed-default behavior → não-aplicável (novo render não é accordion de seções fixas)
+
+See `.planning/phases/07.4-iris-codex-report/07.4-CONTEXT.md` for the new architecture decisions.
+
+### Fase 7.4 (INSERTED): Iris Codex — Relatório funcional adaptativo + add-on placeholder
+**Origem:** Pivot arquitetural durante `/gsd-discuss-phase 7.3` em 2026-05-13. Founder reposicionou produto V1 para terapeutas integrativos não-iridologistas + clientes finais + curiosos como público-alvo principal. Análise iridológica formal vira módulo add-on pago (V1.1). 7.3 (dual-layer original) substituída por esta entrega + 7.5 mapping engine.
+**Goal**: Sonnet 4.6 emite um **único relatório clínico-funcional adaptativo** por leitura via structured output JSON (não mais markdown freeform de 13 seções). Schema `report_v2`:
+```json
+{
+  "report_version": "2.0",
+  "executive_summary": "...",
+  "constitutional_pattern": { "description": "...", "key_traits": [...] },
+  "systems_with_tendency": [
+    {
+      "system_id": "linfatico", "system_name": "Sistema Linfático",
+      "tendency_grade": 4, "tendency_label": "alta",
+      "clinical_description": "prosa funcional sem jargão iridológico",
+      "associated_manifestations": ["sinusite recorrente", "edema vespertino", ...],
+      "investigation_points": ["...", "...", "..."],
+      "therapeutic_direction": "prosa curta acionável"
+    }
+  ],
+  "integrative_axes": [ { "axis_name": "Fígado-Linfa-Mucosa", "status": "ativo", "description": "..." } ],
+  "bilateral_findings": { "asymmetry_present": true, "description": "..." },
+  "therapeutic_synthesis": "...",
+  "priority_focus": ["...", "...", "..."],
+  "clinical_note": "...",
+  "advanced_analysis": { "available": true, "generated": false, "credit_cost": 1 }
+}
+```
+Sistemas sem achados relevantes são OMITIDOS do array (não preenchidos com "sem alterações" — relatório adaptativo). Cada `systems_with_tendency[]` entry tem barra visual de grade 1-5 + bullets de manifestações + bullets de pontos investigativos. **Vocabulário:** linguagem clínica funcional ("sobrecarga hepática", "tendência inflamatória", "sistema nervoso simpático ativado"); **proibido** jargão iridológico no padrão (constituição linfática, anel nervoso, hN codes, sinais Jensen formais) + **proibido Sopro da Origem vocab** ("centelha divina", "atravessar", "vasto", etc.) + **proibido diagnóstico médico** (sempre "tendência a", "sugere", "considere investigar"). UI: render adaptativo (não accordion fixo) — header summary + cards priorizados por grade + axes + bilateral + síntese + nota. **Botão "Análise Iridológica Aprofundada — 1 crédito"** como placeholder UI; persistência via nova tabela `reading_addons` (extensível pra família V1.1+: relatório cliente, plano terapêutico, longitudinal, mapa nutricional, recomendações de exames). Implementação completa do add-on fica pra V1.1.
+**Depends on**: Fase 7.1.6 (canonical capture confiável) + Fase 5 Modal pipeline (vision_features). NÃO depende de Fase 7.5 mapping (ship com hand-crafted heuristic mapping placeholder; 7.5 swap-in depois). **Pode rodar em paralelo com 7.2 e 7.5** — surface disjunta. **Substitui Fase 7.3 (ABANDONED)**.
+**Requirements**: nenhum formal novo; refina entrega de relatório. Backlog Phase 9 RESP-01..03 continua válido.
+**Success Criteria** (o que deve ser verdade):
+  1. Migration `0013_iris_codex_report` adiciona colunas: `readings.report_v2 jsonb`, `readings.report_v2_delivered jsonb`, `readings.report_version text DEFAULT '2.0'` (legacy readings recebem backfill `report_version='1.0'`), e cria tabela `reading_addons (id uuid PK, reading_id uuid FK, addon_type text, generated_content jsonb, generated_at timestamptz, credit_cost int, model_version text)`. Drop da GENERATED column `ai_report_raw` + função `jsonb_concat_sections_pt_br()` (obsoletos).
+  2. **Prompt-mestre reescrito do zero** em `apps/web/prompts/system.md` (D-PR1 frozen contract SUSPENDED — SPEC.md §6 obsoleto pro V1 atual): novo prompt instrui Sonnet a (a) receber tendências estruturadas + RAG chunks, (b) gerar JSON conforme schema `report_v2`, (c) omitir sistemas sem achados, (d) usar vocabulário clínico funcional, (e) evitar jargão iridológico + Sopro vocab + linguagem diagnóstica.
+  3. **Structured output mode**: Sonnet chamado com response_format JSON schema (Anthropic JSON mode). Server faz **zod validation** pós-stream; se falhar, retry com prompt corretivo carregando o JSON inválido + error message (max 2 retries; 3ª falha → save raw + flag para founder review).
+  4. **Streaming progressivo**: stream events parsed incrementalmente; UI renderiza sections conforme cada `systems_with_tendency[]` entry completa (não esperar JSON inteiro fechar). Preservar UX-feedback similar ao atual.
+  5. **EditorAccordion → adaptive renderer**: novo componente `ReportAdaptiveView` renderiza schema dinamicamente; cada section block é editável via inline editor com diff tracking similar ao Phase 7 D-U2 mas keyed por `system_id` em vez de section_number.
+  6. **Audit-vocabulary script estendido**: novos patterns proibidos no `apps/web/scripts/audit-vocabulary.mjs` — (a) jargão iridológico formal (lista a ser confirmada na plan-phase: ~15-20 termos), (b) Sopro da Origem vocab (lista a ser confirmada: ~10 termos), (c) mantém os existentes ("diagnóstico", "tratamento", "cura" word-boundary).
+  7. **Rebrand "Aurel → Iris Codex"**: atualiza PROJECT.md, UI copy (landing, headers, emails), nome no manifest PWA, e voice rules no prompt-mestre. Sopro da Origem fica documentado como brand separada (não mais relacionada).
+  8. **Add-on placeholder UI**: botão "Análise Iridológica Aprofundada — 1 crédito" visível em `/leituras/[id]` (após report gerado) abre modal com "Em breve (V1.1)". Tabela `reading_addons` criada vazia (zero rows em V1).
+  9. **Existing 25 readings legacy**: backfill SQL `UPDATE readings SET report_version='1.0' WHERE report_generated IS NOT NULL`. Não reanalisar; legacy continua visível via path legacy renderer (manter EditorAccordion atual como fallback pra `report_version='1.0'`).
+  10. **Founder UAT**: reprocess Nailli (sucessor de `f4408c23`) com nova arquitetura + ler relatório → reporta "yes, isso lê como relatório clínico funcional, não como artigo de iridologia" OU route to refinement.
+
+**Cross-cutting constraints:**
+- **Phase 10 telemetry contract**: o contrato original (13 seções fixas + `zonas_editadas` per key) está **quebrado** pelo novo schema variável. **Defer:** Phase 10 redesigna o telemetry quando for planejada (não bloqueia 7.4). 7.4 adiciona `report_v2_edit_diff jsonb` shape `{ system_id: { delta_type, char_delta, ... } }` como ponto de partida; Phase 10 reusa ou redesigna.
+- **Mapping placeholder em 7.4**: hand-crafted heuristic em `apps/web/lib/anthropic/tendency-mapping-placeholder.ts` traduz `vision_features` em `tendencies[]` minimal (1-2 regras simples por sistema). Marker comment `TODO 7.5` no arquivo. Founder dogfooding suficiente com placeholder enquanto 7.5 não lands.
+- **§11 affirmations**: drop de V1; placeholder no schema `advanced_analysis.affirmations` field stub pra future add-on "Mensagem para cliente final" (V1.1).
+- **§13 mensagem final**: absorvido por `clinical_note` no novo schema (disclaimer protetor + nota clínica).
+- **Sopro da Origem vocab**: lista exata de termos proibidos a confirmar com founder na plan-phase. Sopro permanece brand separado fora deste codebase.
+- **Single LLM call** (não 2): structured output é uma chamada com schema JSON. Cost ≤105% do baseline atual ($0.024/reading) target.
+
+**UI hint**: yes (rewrite total do report viewer + adaptive renderer + add-on placeholder button + editar adaptado).
+
+**Migrated from 7.3 (ABANDONED):**
+- Originally housed §11 toggle, collapsed-default, dual-layer. Todos descartados na pivot arquitetural — ver entry 7.3 ABANDONED acima.
+
+See `.planning/phases/07.4-iris-codex-report/07.4-CONTEXT.md` for the full decision capture from `/gsd-discuss-phase 7.3` (renamed 7.4).
+
+### Fase 7.5 (INSERTED): Iris Codex — Tendency mapping engine (sinais → tendências)
+**Origem:** Pivot arquitetural 2026-05-13. User flagou que "qual combinação de achados iridológicos gera qual tendência funcional e em qual grau" é **o coração do IP do Iris Codex**. Merece camada/fase dedicada com rules + RAG multi-escola + validation + threshold tuning. Separada de 7.4 pra que 7.4 ship com placeholder primeiro e dogfooding rode em paralelo; 7.5 swap-in incremental.
+**Goal**: Implementar camada de mapeamento entre `vision_features` (output do pipeline Modal Fase 5) e `tendencies[]` (input pro prompt-mestre da Fase 7.4). Output shape:
+```json
+[
+  {
+    "system_id": "linfatico",
+    "system_name": "Sistema Linfático",
+    "grade": 4,
+    "label": "alta",
+    "contributing_signs": [
+      { "feature_path": "vision_features.left.rosary_lymphatic", "value": true, "weight": 0.4 },
+      { "feature_path": "vision_features.right.rosary_lymphatic", "value": true, "weight": 0.4 },
+      { "feature_path": "vision_features.left.iris_color.primary", "value": "azul", "weight": 0.2 }
+    ],
+    "confidence": 0.85,
+    "school_attribution": ["jensen", "deck_angerer"]
+  }
+]
+```
+Arquitetura proposta (decisões finais em `/gsd-discuss-phase 7.5`):
+- **Camada de regras** em `apps/web/lib/tendency-engine/`: rules.ts (mapping declarativo feature→system+weight), aggregator.ts (combina weights por system → grade 1-5), confidence.ts (deriva confidence do agreement entre signs).
+- **RAG multi-escola** em `apps/web/lib/tendency-engine/rag-attribution.ts`: chama `retrieveRelevantKnowledge` para anexar `school_attribution[]` (Jensen, Lo Rito, Battello, Deck/Angerer, Lindemann).
+- **Findings hierarchy** (migrated 7.2-A): visual prominence drives weight scheme — "dense pigmented halo + heterocromia" tem weight maior que "sectoral lacunas grau 1" no mesmo sistema. Concrete weights documented em rules.ts.
+- **Threshold tuning** empírico baseado no corpus Wave C (Fase 7.2). Convergence gate: Nailli + 2-3 fixtures reais classificam consistentemente.
+**Depends on**: Fase 5 Modal pipeline (vision_features) + Fase 6 RAG (school attribution) + Fase 7.4 (consume contract — 7.4 deve estar shipping com placeholder pra 7.5 ter target a substituir) + Fase 7.2 corpus (Wave C fixtures para threshold tuning empírico).
+**Requirements**: nenhum formal novo; é IP layer.
+**Success Criteria** (o que deve ser verdade):
+  1. `apps/web/lib/tendency-engine/` module com rules.ts + aggregator.ts + confidence.ts + rag-attribution.ts (+ unit tests).
+  2. Rules cobrem **mínimo 8 sistemas funcionais** (linfático, hepático/biliar, renal, digestivo, nervoso autônomo, cardiovascular, endócrino, imune) com pelo menos 3 contributing_signs por sistema mapped do schema `vision_features`.
+  3. RAG attribution funciona: cada `tendency` retorna `school_attribution[]` não-vazio (pelo menos 1 escola atribuída via RAG chunk match).
+  4. **Findings hierarchy applied** (7.2-A): weights documentados em rules.ts com comentário cross-ref aos founder-confirmed examples (dense pigmented halo > sectoral lacunas).
+  5. **Convergence gate empírico**: Nailli (sucessor de `f4408c23`) + 2-3 fixtures reais (Wave C corpus de Fase 7.2) classificam consistentemente — `tendencies[]` output estável entre re-runs com mesmo input + grade 1-5 alinhado com founder UAT clinical.
+  6. **Swap-in incremental**: 7.4 placeholder em `tendency-mapping-placeholder.ts` é substituído por chamada à engine real sem alterar contrato consumido pelo prompt-mestre. Migration zero-downtime.
+  7. Confidence scoring funcional: `confidence ≥ 0.7` quando ≥3 signs concordam; `< 0.5` quando signs conflitam (founder UAT validate behavior).
+
+**Cross-cutting constraints:**
+- **IP central — care e validation**: rules.ts é versionado em git com extensive review; mudanças exigem founder approval + regression tests contra Wave C corpus.
+- **Mapping é determinístico** (não LLM): rules + weighted sum + threshold ladder. RAG é só pra attribution metadata, não pra decision.
+- **Bloquear escalation pra ML/LLM-based mapping**: founder explicitly preferiu rules-based pra V1 (auditável, reproduzível, sem hallucination). ML/LLM mapping fica como Phase 10 (Sistema de Aprendizagem Clínica) se aprendizagem emergir.
+
+**UI hint**: no (engine interno; debug surface via `/admin/calibration` que já existe).
+
+See `.planning/phases/07.5-tendency-mapping-engine/07.5-CONTEXT.md` (a criar via `/gsd-discuss-phase 7.5`) para decisões de implementação.
+
+### Fase 8: Pagamento + LGPD
 **Origem:** Closure do 07.1.6 UAT clínico (founder + Gemini cross-validation pass 2026-05-12) revelou três pain points de dogfooding diário: (1) report abre com 3 seções expandidas e 10 colapsadas — founder quer todas colapsadas para inspecionar uma de cada vez sem scroll noise; (2) prompt atual mistura voz clínica direta com vocabulário acadêmico (citações Jensen/Lo Rito/Moraga, "ancorado em features.x", "the pipeline detected", "according to the German school") — terapeutas leitores precisam camada clínica limpa primeiro; (3) §11 affirmations entrega texto motivacional como bloco obrigatório do report, mas só faz sentido quando terapeuta vai usar com cliente (default off, opt-in por leitura). Migrado de 7.2-A (findings hierarchy) porque três itens reescrevem o mesmo arquivo (`apps/web/prompts/system.md`) — um pass de prompt-eng, não dois.
 **Goal**: Cada leitura produz DUAS camadas de relatório em uma única chamada Sonnet 4.6 (cost-neutral): (A) **PRIMARY layer** — voz clínica direta de iridologista sênior pra colega terapeuta, foco em órgãos com predisposição + emoções/padrões psicológicos + traumas potenciais sugeridos por topografia, hedge só quando genuinamente incerto, **ZERO citações de autor/escola**, **ZERO ancoragem `[ancorado em features.x]`**, **ZERO meta-pipeline** ("the pipeline detected"); (B) **TECHNICAL layer** — vocabulário iridológico completo, citações Jensen/Lo Rito/Moraga, feature anchors, pipeline output refs, renderizado em tab "Ver análise técnica completa" abaixo do primary. UI: todas 13 seções colapsadas por default. §11 affirmations vira toggle per-reading (`readings.affirmations_enabled` default false; toggle em `/leituras/[id]/editar`). §13 Mensagem Final sempre no primary layer (founder vai refinar tom depois separadamente). **Absorve 7.2-A** (findings-hierarchy por visual prominence — incorporado ao prompt rewrite do primary layer).
 **Depends on**: Fase 7.1.6 (canonical capture entrega `vision_features` confiáveis — sem isso o primary layer seria honesto-mas-errado). Fase 7 LLM (pipeline existente é base — esta fase reescreve o prompt e adiciona parser layer-split, não troca o LLM). NÃO depende de 7.2 (corpus/threshold é vision-side; 7.3 é authorship/rendering). **Pode rodar em paralelo com 7.2** — surface disjunta (web/prompt/parser/schema vs Modal/Python).
