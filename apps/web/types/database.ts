@@ -227,6 +227,50 @@ export type Database = {
         }
         Relationships: []
       }
+      reading_addons: {
+        Row: {
+          addon_type: string
+          created_at: string
+          credit_cost: number
+          generated_at: string | null
+          generated_content: Json | null
+          id: string
+          model_version: string | null
+          reading_id: string
+          therapist_id: string
+        }
+        Insert: {
+          addon_type: string
+          created_at?: string
+          credit_cost?: number
+          generated_at?: string | null
+          generated_content?: Json | null
+          id?: string
+          model_version?: string | null
+          reading_id: string
+          therapist_id: string
+        }
+        Update: {
+          addon_type?: string
+          created_at?: string
+          credit_cost?: number
+          generated_at?: string | null
+          generated_content?: Json | null
+          id?: string
+          model_version?: string | null
+          reading_id?: string
+          therapist_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reading_addons_reading_id_fkey"
+            columns: ["reading_id"]
+            isOneToOne: false
+            referencedRelation: "readings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reading_images: {
         Row: {
           angle: string
@@ -276,8 +320,6 @@ export type Database = {
       }
       readings: {
         Row: {
-          ai_report_edited: string | null
-          ai_report_raw: string | null
           audit_metadata: Json | null
           canonical_metadata: Json | null
           capture_method: string | null
@@ -299,6 +341,12 @@ export type Database = {
           report_generated: Json | null
           report_generated_at: string | null
           report_raw_text: string | null
+          report_v2: Json | null
+          report_v2_delivered: Json | null
+          report_v2_delivered_at: string | null
+          report_v2_edit_diff: Json | null
+          report_v2_generated_at: string | null
+          report_version: string
           status: string | null
           therapist_id: string
           therapist_notes: string | null
@@ -307,8 +355,6 @@ export type Database = {
           zonas_editadas: Json | null
         }
         Insert: {
-          ai_report_edited?: string | null
-          ai_report_raw?: string | null
           audit_metadata?: Json | null
           canonical_metadata?: Json | null
           capture_method?: string | null
@@ -330,6 +376,12 @@ export type Database = {
           report_generated?: Json | null
           report_generated_at?: string | null
           report_raw_text?: string | null
+          report_v2?: Json | null
+          report_v2_delivered?: Json | null
+          report_v2_delivered_at?: string | null
+          report_v2_edit_diff?: Json | null
+          report_v2_generated_at?: string | null
+          report_version?: string
           status?: string | null
           therapist_id: string
           therapist_notes?: string | null
@@ -338,8 +390,6 @@ export type Database = {
           zonas_editadas?: Json | null
         }
         Update: {
-          ai_report_edited?: string | null
-          ai_report_raw?: string | null
           audit_metadata?: Json | null
           canonical_metadata?: Json | null
           capture_method?: string | null
@@ -361,6 +411,12 @@ export type Database = {
           report_generated?: Json | null
           report_generated_at?: string | null
           report_raw_text?: string | null
+          report_v2?: Json | null
+          report_v2_delivered?: Json | null
+          report_v2_delivered_at?: string | null
+          report_v2_edit_diff?: Json | null
+          report_v2_generated_at?: string | null
+          report_version?: string
           status?: string | null
           therapist_id?: string
           therapist_notes?: string | null
@@ -428,7 +484,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      jsonb_concat_sections_pt_br: { Args: { input: Json }; Returns: string }
       match_knowledge_chunks: {
         Args: {
           match_count?: number
