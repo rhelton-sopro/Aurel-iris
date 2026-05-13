@@ -1,0 +1,26 @@
+{
+  "report_version": "2.0",
+  "executive_summary": "A leitura desta cliente não evidencia tendências sistêmicas relevantes no momento; predominância de sinais constitucionais equilibrados.",
+  "constitutional_pattern": {
+    "description": "Padrão constitucional equilibrado sem sinais de sobrecarga predominante.",
+    "key_traits": ["equilíbrio responsivo", "boa hidratação aparente"]
+  },
+  "systems_with_tendency": [],
+  "integrative_axes": [],
+  "bilateral_findings": {
+    "asymmetry_present": false,
+    "description": null
+  },
+  "therapeutic_synthesis": "Síntese: manter rotina atual de cuidados; reavaliar em próxima leitura.",
+  "priority_focus": [
+    "Manter padrão de hidratação atual",
+    "Observar mudanças de rotina alimentar",
+    "Reavaliar em 6 meses"
+  ],
+  "clinical_note": "Este relatório é ferramenta de apoio à anamnese terapêutica integrativa; não substitui avaliação médica.",
+  "advanced_analysis": {
+    "available": true,
+    "generated": false,
+    "credit_cost": 1
+  }
+}

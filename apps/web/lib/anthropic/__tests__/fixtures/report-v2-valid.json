@@ -1,0 +1,53 @@
+{
+  "report_version": "2.0",
+  "executive_summary": "A leitura desta cliente evidencia tendência inflamatória sistêmica com componente linfático e hepático predominante.",
+  "constitutional_pattern": {
+    "description": "Padrão constitucional misto com predominância de sinais de sobrecarga metabólica.",
+    "key_traits": ["responsividade reativa", "sensibilidade alimentar", "tendência à retenção"]
+  },
+  "systems_with_tendency": [
+    {
+      "system_id": "linfatico",
+      "system_name": "Sistema linfático",
+      "tendency_grade": 4,
+      "tendency_label": "alta",
+      "clinical_description": "Sinais sugerem drenagem linfática comprometida com tendência inflamatória sistêmica.",
+      "associated_manifestations": ["sinusite recorrente", "edema vespertino"],
+      "investigation_points": ["histórico de infecções de via aérea superior", "qualidade da hidratação"],
+      "therapeutic_direction": "Considere protocolos de drenagem linfática e suporte imune funcional."
+    },
+    {
+      "system_id": "hepatico_biliar",
+      "system_name": "Sistema hepático-biliar",
+      "tendency_grade": 3,
+      "tendency_label": "moderada",
+      "clinical_description": "Tendência a sobrecarga hepática com reflexos digestivos.",
+      "associated_manifestations": ["intolerância a gorduras"],
+      "investigation_points": ["padrão alimentar", "uso de medicamentos"],
+      "therapeutic_direction": "Sugere-se trabalho de detoxificação suave e suporte ao metabolismo hepático."
+    }
+  ],
+  "integrative_axes": [
+    {
+      "axis_name": "Fígado-Linfa-Mucosa",
+      "status": "ativo",
+      "description": "Eixo expressando sobrecarga combinada — atenção integrativa indicada."
+    }
+  ],
+  "bilateral_findings": {
+    "asymmetry_present": true,
+    "description": "Lado direito mais expressivo na ocupação dos sinais linfáticos."
+  },
+  "therapeutic_synthesis": "Síntese: priorizar suporte linfático e hepático com hidratação adequada.",
+  "priority_focus": [
+    "Avaliar padrão de hidratação e ingestão de fibras",
+    "Investigar histórico de infecções de via aérea superior",
+    "Considerar protocolo de detoxificação suave"
+  ],
+  "clinical_note": "Este relatório é ferramenta de apoio à anamnese terapêutica integrativa; não substitui avaliação médica.",
+  "advanced_analysis": {
+    "available": true,
+    "generated": false,
+    "credit_cost": 1
+  }
+}
