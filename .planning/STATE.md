@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: "2026-05-13: MAJOR PIVOT durante /gsd-discuss-phase 7.3 — escopo original (dual-layer report + §11 toggle + collapsed default) ABANDONED após founder reposicionar o produto V1. Público-alvo passa a ser terapeutas integrativos não-iridologistas + clientes finais + curiosos; nomenclatura iridológica formal sai do relatório padrão e vira ADD-ON PAGO (1 crédito, V1.1). 6 decisões locked: (1) 7.3 ABANDONED, criadas 7.4 + 7.5; (2) 7.4 = Iris Codex report adaptive (single layer JSON structured output + reading_addons table); 7.5 = tendency mapping engine (sinais→tendências rules + RAG multi-escola, IP central); (3) 7.4 ship com mapping placeholder, 7.5 swap-in incremental; (4) Iris Codex = rebrand do produto (PROJECT.md update + UI copy + Sopro da Origem vocab proibido); (5) §11 affirmations → placeholder no add-on V1.1; (6) 7.2-A findings hierarchy migrated TO 7.5 (priority é função inerente da engine). ROADMAP atualizada: 7.3 ABANDONED entry + 7.4 + 7.5 inseridas. 7.4-CONTEXT.md completo com schema report_v2 + D-SCH/PR/VAL/UI/VOC/BR/ADD/TEL/LEG decisions. Prior context: Phase 07.1.6 COMPLETE + UAT APPROVED 2026-05-12 — 35+ commits + security audit 36/36 threats closed."
-stopped_at: "Phase 7.3 ABANDONED + Phase 7.4 (Iris Codex report adaptive) + Phase 7.5 (mapping engine) inserted. 7.4-CONTEXT.md written. Next session: /clear then /gsd-plan-phase 7.4 — esperado: 4-7 plans cobrindo (a) migration 0013a/b/c (schema additions + drop GENERATED column + reading_addons table), (b) prompt-mestre reescrito + tendency-mapping-placeholder, (c) Anthropic JSON mode + zod validation + retry path, (d) ReportAdaptiveView + AdvancedAnalysisCTA UI + legacy renderer routing, (e) audit-vocabulary extension (jargão iridológico + Sopro vocab patterns), (f) rebrand Aurel→Iris Codex (grep + replace + PROJECT.md), (g) UAT founder Nailli reprocess. 7.5 fica blocked atrás de 7.4 PLAN ou roda em paralelo (separate /gsd-discuss-phase 7.5 quando founder priorizar). 7.2 (Wave C corpus) continua queued atrás de 7.4. Resume command: /gsd-plan-phase 7.4"
-last_updated: "2026-05-13T12:00:00.000Z"
+status: "2026-05-13: Phase 7.4 EXECUTION STARTED via /gsd-execute-phase 7.4. Wave 0 (Plan 07.4-00) COMPLETE — reportV2Schema (zod 4) + SYSTEM_IDS (12) + TENDENCY_LABELS (5) + AXIS_STATUSES + REPORT_V2_TOP_LEVEL_KEYS + TendencyEngine interface + 3 JSON fixtures + 15 test files (1 GREEN report-schema 9/9 pass; 14 RED with expect.fail markers). 3 commits: 4dd441d (schema+types), ff802d9 (tests+fixtures), 1211ea9 (SUMMARY). pnpm tsc --noEmit zero new errors in new files; vitest report-schema GREEN. Next: Wave 1 (Plan 07.4-01) DB migration HIL — needs founder approval for supabase db push. Prior pivot context preserved: 7.3 ABANDONED + 7.4 (Iris Codex adaptive) + 7.5 (mapping engine) inserted; 6 decisions locked; 7.4-CONTEXT.md schema report_v2 + D-SCH/PR/VAL/UI/VOC/BR/ADD/TEL/LEG. Phase 07.1.6 COMPLETE + UAT APPROVED 2026-05-12."
+stopped_at: "Phase 7.4 Wave 0 complete (Plan 00 TDD scaffold). Wave 1 next = Plan 07.4-01 DB migration (autonomous:false — HIL gate for supabase db push). Remaining: 10 plans across 6 waves (01, [02,03,04] parallel, 05, [06,07] parallel, 07b, 08, 09 HIL). Resume: /gsd-execute-phase 7.4 (orchestrator auto-detects 1 plan complete, picks up at Plan 01)."
+last_updated: "2026-05-13T18:05:00.000Z"
 progress:
   total_phases: 13
   completed_phases: 7
-  total_plans: 75
-  completed_plans: 75
-  percent: 100
+  total_plans: 86
+  completed_plans: 76
+  percent: 88
 ---
 
 # Estado do projeto
