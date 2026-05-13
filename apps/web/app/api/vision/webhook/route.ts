@@ -14,8 +14,8 @@
  *   - PRIMARY barrier: status guard — only `status='processing'` accepts the UPDATE.
  *     Late retries from Modal find `status='ready'` or `'failed'` and no-op.
  *     Phase 7 edits move status to `'edited'` and write to `report_delivered`
- *     jsonb (the legacy `ai_report_edited` text view is now a GENERATED column
- *     reconstructed from report_delivered — see migration 0007).
+ *     jsonb directly (Phase 7.4 migration 0014 dropped the legacy
+ *     `ai_report_edited` GENERATED text column; consumers read jsonb).
  *   - DEFENSE-IN-DEPTH: warn-log on stored modal_call_id mismatch (D-T5) but
  *     proceed — status guard is primary. This avoids brittleness if the
  *     trigger route's placeholder/replacement sequence (D-T5) is ever
