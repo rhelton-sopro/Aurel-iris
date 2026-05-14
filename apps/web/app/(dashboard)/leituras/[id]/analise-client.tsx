@@ -3,13 +3,15 @@
  *
  * Composes:
  *   - <AnalysisCTA> (button group A/C with disabled-tooltips D-S4)
- *   - <AnalysisStream> (legacy markdown sections — currently 13, Plan 11
- *     extends parser to 14)
+ *   - <AnalysisStream> (Iris Codex V1 markdown sections — 14, Plan 07.4-11
+ *     extended the server parser to §1..§14, Plan 07.4-12 wires the UI counter)
  *
  * Stream consumption: fetch POST /api/readings/[id]/analyze, getReader().read()
  * loop, count progress via the `^### N. ` boundary regex on the accumulated
- * buffer. On stream end, router.refresh() so RSC reads the persisted
- * report_generated.
+ * buffer. The regex `\d{1,2}` is intentionally generic — it accepts §1..§14
+ * (and would even tolerate §15+ if the prompt drifts; server parser is the
+ * strict source of truth). AnalysisStream clamps the displayed count to 14.
+ * On stream end, router.refresh() so RSC reads the persisted report_generated.
  *
  * UI-SPEC §State Machine line 222: 'gerando…' is purely client-side ephemeral
  * — DO NOT add a new persisted ReadingStatus.
@@ -17,6 +19,8 @@
  * Phase 7 (07-09-PLAN) — legacy. Phase 7.4 Plan 10 (Direction Correction):
  * removed the V2 8-block AdaptiveAnalysisStream switch + V2_KEYS_ORDERED
  * detector. All readings stream via the legacy markdown path.
+ * Phase 7.4 Plan 12: docstring updated to reflect 14-section reality (no code
+ * change required — boundary detector already uses generic `\d{1,2}`).
  */
 'use client'
 
