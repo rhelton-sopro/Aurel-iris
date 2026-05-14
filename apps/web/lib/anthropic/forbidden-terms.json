@@ -2,8 +2,8 @@
   "_meta": {
     "purpose": "Source-of-truth for Iris Codex forbidden vocabulary lists. Consumed by scripts/audit-vocabulary.mjs (CI) and lib/anthropic/audit-v2.ts (runtime). DO NOT add this file to audit scan dirs — it's the term source, scanning it would self-match.",
     "phase": "07.4",
-    "plan": "07.4-02",
-    "decisions": "D-VOC1, D-VOC2, D-VOC3"
+    "plan": "07.4-02, 07.4-09",
+    "decisions": "D-VOC1, D-VOC2, D-VOC3, D-BR2"
   },
   "iridological_jargon": [
     "constituição linfática",
@@ -42,5 +42,9 @@
     "diagnóstico",
     "tratamento",
     "cura"
+  ],
+  "aurel_brand": [
+    "Aurel Iris",
+    "Aurel"
   ]
 }

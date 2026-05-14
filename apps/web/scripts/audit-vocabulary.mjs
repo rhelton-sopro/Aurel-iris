@@ -2,11 +2,13 @@
 /**
  * audit-vocabulary.mjs — CI gate scanning apps/web source files for forbidden vocabulary.
  *
- * Phase 7.4 extension (D-VOC1, D-VOC2):
- *   3 pattern sets sourced from lib/anthropic/forbidden-terms.json:
+ * Phase 7.4 extension (D-VOC1, D-VOC2, D-BR2):
+ *   4 pattern sets sourced from lib/anthropic/forbidden-terms.json:
  *     - iridological_jargon (D-VOC1 set 1) — proibido no relatório padrão Iris Codex
  *     - sopro_vocab (D-VOC1 set 2) — proibido absoluto em Iris Codex copy
  *     - lgpd (D-VOC1 set 3, existing) — diagnóstico|tratamento|cura
+ *     - aurel_brand (D-BR2, Plan 07.4-09) — Aurel Iris|Aurel — catches future
+ *       regressions of the abandoned brand name in user-visible surfaces.
  *
  * EXCLUDE_SUBPATHS preserved from existing Phase 6 pattern + forbidden-terms.json
  * (term source — scanning would self-match) + __tests__/fixtures.
@@ -21,7 +23,7 @@
  *
  * Exit 0 = OK (zero matches across all pattern sets). Exit 1 = FAIL.
  *
- * Phase 7.4 | Plan 07.4-02 | Decisões: D-VOC1, D-VOC2
+ * Phase 7.4 | Plan 07.4-02, 07.4-09 | Decisões: D-VOC1, D-VOC2, D-BR2
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, extname, dirname } from 'node:path'
@@ -54,6 +56,7 @@ const PATTERNS = {
   iridological_jargon: buildSet(terms.iridological_jargon),
   sopro_vocab: buildSet(terms.sopro_vocab),
   lgpd: buildSet(terms.lgpd),
+  aurel_brand: buildSet(terms.aurel_brand), // D-BR2, Plan 07.4-09
 }
 
 // ---------------------------------------------------------------------------
