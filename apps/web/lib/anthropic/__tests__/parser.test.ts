@@ -1,6 +1,9 @@
 // Phase 7 | Plan 07-04 — section-boundary parser tests.
 // Phase 7.4 Plan 11 — Direction Correction DC-1/DC-3: range extended 1..13 -> 1..14;
 //   section keys remapped from legacy 13 to new 14 (Iris Codex V1 markdown structure).
+// Phase 7.4 Plan 17 — UAT-3: §2.5 decimal heading inserted (15 sections); BoundaryMatch
+//   field renamed `number: number` → `headingNumber: string`; monotonicity now
+//   array-index based (not numeric `lastNumber + 1`).
 import { describe, it, expect } from 'vitest'
 import { findAllBoundaries, closeSections } from '../parser'
 
@@ -9,7 +12,7 @@ describe('lib/anthropic/parser — findAllBoundaries (D-S2 + Pitfall 2)', () => 
     const buf = '### 1. Constituição\nFoo bar baz.'
     const result = findAllBoundaries(buf)
     expect(result).toHaveLength(1)
-    expect(result[0]).toMatchObject({ number: 1, key: '1_constituicao_temperamento' })
+    expect(result[0]).toMatchObject({ headingNumber: '1', key: '1_constituicao_temperamento' })
     expect(result[0].startIdx).toBe(0)
   })
 
@@ -21,11 +24,33 @@ Bar.
 ### 3. Linha do Tempo Emocional
 Baz.`
     const result = findAllBoundaries(buf)
-    expect(result).toHaveLength(3)
-    expect(result.map((b) => b.number)).toEqual([1, 2, 3])
+    // §2.5 is OPTIONAL in the canonical sequence — buffer without §2.5 still
+    // matches §1 → §2 → §3 (array-index monotonicity allows skipping intervening
+    // headings as long as no out-of-order heading appears between them).
+    // Wait — actually the array-index check requires `idx === lastIndex + 1`,
+    // meaning §3 (idx 3) cannot follow §2 (idx 1) without §2.5 (idx 2).
+    // So this buffer (without §2.5) matches §1 (idx 0) + §2 (idx 1), then §3
+    // gets rejected because idx 3 !== idx 1 + 1.
+    expect(result).toHaveLength(2)
+    expect(result.map((b) => b.headingNumber)).toEqual(['1', '2'])
+  })
+
+  it('detecta 4 boundaries 1, 2, 2.5, 3 (Plan 17 happy path com §2.5)', () => {
+    const buf = `### 1. Constituição e Temperamento
+Foo.
+### 2. Mapa Orgânico
+Bar.
+## §2.5 — Sistemas em Bom Funcionamento
+Boa funcionalidade.
+### 3. Linha do Tempo Emocional
+Baz.`
+    const result = findAllBoundaries(buf)
+    expect(result).toHaveLength(4)
+    expect(result.map((b) => b.headingNumber)).toEqual(['1', '2', '2.5', '3'])
     expect(result.map((b) => b.key)).toEqual([
       '1_constituicao_temperamento',
       '2_mapa_organico',
+      '2_5_sistemas_funcionando_bem',
       '3_linha_tempo_emocional',
     ])
   })
@@ -34,42 +59,55 @@ Baz.`
     const buf = '### 0. Prólogo\n### 1. Constituição\nFoo.'
     const result = findAllBoundaries(buf)
     expect(result).toHaveLength(1)
-    expect(result[0].number).toBe(1)
+    expect(result[0].headingNumber).toBe('1')
   })
 
-  it('rejeita number=15 (Pitfall 2 — out of range, new max is 14)', () => {
-    // Para isolar o filtro de range (1..14), o buffer precisa primeiro satisfazer
-    // monotonia 1..14 (lastNumber+1) — só então o `### 15.` exercita exclusivamente
-    // o branch `number > 14`. Test 5 cobre monotonia em isolado.
-    const head = Array.from({ length: 14 }, (_, i) => `### ${i + 1}. Seção ${i + 1}\nConteúdo.`).join('\n')
+  it('rejeita number=15 (Pitfall 2 — out of range; max is 14 even with §2.5)', () => {
+    // To isolate the membership filter, the buffer must first satisfy the array-
+    // index monotonicity 1..14 (with §2.5 inserted) — only then `### 15.`
+    // exercises exclusively the `idx === -1` branch (15 not in headings array).
+    const headings = ['1', '2', '2.5', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14']
+    const head = headings.map((n) => `### ${n}. Seção ${n}\nConteúdo.`).join('\n')
     const buf = `${head}\n### 15. Bibliografia\nDrift fora do range.`
     const result = findAllBoundaries(buf)
-    expect(result).toHaveLength(14)
-    expect(result.map((b) => b.number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14])
+    expect(result).toHaveLength(15)
+    expect(result.map((b) => b.headingNumber)).toEqual(headings)
   })
 
-  it('aceita number=14 (Plan 11 — new max is 14, was 13)', () => {
-    const head = Array.from({ length: 13 }, (_, i) => `### ${i + 1}. Seção ${i + 1}\nConteúdo.`).join('\n')
+  it('aceita number=14 (Plan 11 — was max 13; Plan 17 — sequência 1..14 with §2.5)', () => {
+    const headings = ['1', '2', '2.5', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13']
+    const head = headings.map((n) => `### ${n}. Seção ${n}\nConteúdo.`).join('\n')
     const buf = `${head}\n### 14. Mensagem para o Cliente\nFecho caloroso.`
     const result = findAllBoundaries(buf)
-    expect(result).toHaveLength(14)
-    expect(result.map((b) => b.number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14])
-    expect(result[13].key).toBe('14_mensagem_cliente')
+    expect(result).toHaveLength(15)
+    expect(result.map((b) => b.headingNumber)).toEqual([...headings, '14'])
+    expect(result[14].key).toBe('14_mensagem_cliente')
   })
 
   it('rejeita boundary não-monotônica crescente (Pitfall 2)', () => {
-    // After 1, sees 5 (not 2). 5 is rejected because lastNumber + 1 = 2, mismatch.
-    // Then 2 satisfies lastNumber + 1 = 2.
+    // After 1 (idx 0), sees 5 (idx 5). 5 is rejected because lastIndex + 1 = 1, mismatch.
+    // Then 2 (idx 1) satisfies lastIndex + 1 = 1.
     const buf = '### 1. Constituição\nFoo.\n### 5. Salto\nDrift.\n### 2. Mapa\nReal.'
     const result = findAllBoundaries(buf)
     expect(result).toHaveLength(2)
-    expect(result.map((b) => b.number)).toEqual([1, 2])
+    expect(result.map((b) => b.headingNumber)).toEqual(['1', '2'])
+  })
+
+  it('rejeita §3 quando precede §2.5 (Plan 17 — array-index monotonicity skipa misordered)', () => {
+    // §1 (idx 0) ✓ → §2 (idx 1) ✓ → §3 (idx 3) ✗ rejected (idx 3 !== 1+1=2)
+    // → §2.5 (idx 2) ✓ accepted (idx 2 === 1+1=2). Parser recovers from
+    // misordering by skipping the out-of-order heading and accepting the next
+    // valid sequential one.
+    const buf = `## §1 — A
+## §2 — B
+## §3 — C (out of order — §2.5 should come first)
+## §2.5 — D`
+    const result = findAllBoundaries(buf)
+    expect(result).toHaveLength(3)
+    expect(result.map((b) => b.headingNumber)).toEqual(['1', '2', '2.5'])
   })
 
   it('ignora pseudo-heading inline em corpo (Pitfall 2 — false positive)', () => {
-    // `### 7.5 Detalhe` (decimal) is rejected because regex requires `\d{1,2}\.`
-    // followed by `\s+` AND only matches at LINE START in /m mode.
-    // `Tabela 4. exemplo` is rejected because no `### ` prefix.
     const buf = `### 1. Constituição
 Veja a Tabela 4. de exemplo na página 7.
 Inline ### 7.5 Detalhe técnico (não é boundary).
@@ -77,14 +115,15 @@ Inline ### 7.5 Detalhe técnico (não é boundary).
 Bar.`
     const result = findAllBoundaries(buf)
     expect(result).toHaveLength(2)
-    expect(result.map((b) => b.number)).toEqual([1, 2])
+    expect(result.map((b) => b.headingNumber)).toEqual(['1', '2'])
   })
 
-  it('aceita 14 boundaries 1..14 sequenciais (happy path full report)', () => {
-    const buf = Array.from({ length: 14 }, (_, i) => `### ${i + 1}. Seção ${i + 1}\nConteúdo.`).join('\n')
+  it('aceita 15 boundaries 1, 2, 2.5, 3..14 sequenciais (Plan 17 happy path full report)', () => {
+    const headings = ['1', '2', '2.5', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14']
+    const buf = headings.map((n) => `### ${n}. Seção ${n}\nConteúdo.`).join('\n')
     const result = findAllBoundaries(buf)
-    expect(result).toHaveLength(14)
-    expect(result.map((b) => b.number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14])
+    expect(result).toHaveLength(15)
+    expect(result.map((b) => b.headingNumber)).toEqual(headings)
   })
 
   it('retorna lista vazia para buffer sem boundaries', () => {
@@ -99,9 +138,6 @@ Bar.`
   })
 
   it('aceita "## " (H2) como boundary — Sonnet 4.6 às vezes adiciona H1 doc title e bump sections para H2', () => {
-    // Real raw observed in dogfooding 2026-05-08: Sonnet emitted `# Doc Title`,
-    // `## Client Subtitle`, then `## 1. Constituição`, `## 2. Estrutural`, etc.
-    // Parser must accept both H2 and H3 to handle both heading depths.
     const buf = `# Documento
 ## Subtítulo de cliente
 ## 1. Constituição
@@ -110,14 +146,14 @@ Foo.
 Bar.`
     const result = findAllBoundaries(buf)
     expect(result).toHaveLength(2)
-    expect(result.map((b) => b.number)).toEqual([1, 2])
+    expect(result.map((b) => b.headingNumber)).toEqual(['1', '2'])
   })
 
   it('rejeita "# " (H1) e "#### " (H4) — só H2/H3 são aceitos', () => {
     const buf = '# 1. Não é boundary\n### 1. Constituição\n#### 2. Não é boundary'
     const result = findAllBoundaries(buf)
     expect(result).toHaveLength(1)
-    expect(result[0].number).toBe(1)
+    expect(result[0].headingNumber).toBe('1')
   })
 })
 
@@ -143,10 +179,10 @@ Foo.
 ### 14. Mensagem para o Cliente
 A mensagem final que vai até o fim do buffer.`
     const boundaries = findAllBoundaries(buf)
-    // Note: this won't have all 14 boundaries because monotonia violou.
+    // Note: this won't have all 15 boundaries because monotonia violou.
     // closeSections só processa o que findAllBoundaries devolveu.
     expect(boundaries).toHaveLength(1)
-    expect(boundaries[0].number).toBe(1)
+    expect(boundaries[0].headingNumber).toBe('1')
     const closed = closeSections(boundaries, buf)
     expect(closed[0].content).toContain('A mensagem final que vai até o fim do buffer.')
   })
@@ -170,14 +206,27 @@ describe('lib/anthropic/parser — Sonnet 4.6 heading variants (Phase 07.1.6 UAT
     const buf = '## §1 — Constituição e Temperamento\nA íris revela...'
     const result = findAllBoundaries(buf)
     expect(result).toHaveLength(1)
-    expect(result[0]).toMatchObject({ number: 1, key: '1_constituicao_temperamento' })
+    expect(result[0]).toMatchObject({ headingNumber: '1', key: '1_constituicao_temperamento' })
   })
 
   it('aceita "### §N — Title" (H3 + § + em-dash)', () => {
     const buf = '### §1 — Constituição e Temperamento\nFoo.'
     const result = findAllBoundaries(buf)
     expect(result).toHaveLength(1)
-    expect(result[0].number).toBe(1)
+    expect(result[0].headingNumber).toBe('1')
+  })
+
+  it('aceita "## §2.5 — Title" (Plan 17 — decimal heading)', () => {
+    const buf = `## §1 — Constituição
+Foo.
+## §2 — Mapa Orgânico
+Bar.
+## §2.5 — Sistemas em Bom Funcionamento
+Boa funcionalidade.`
+    const result = findAllBoundaries(buf)
+    expect(result).toHaveLength(3)
+    expect(result.map((b) => b.headingNumber)).toEqual(['1', '2', '2.5'])
+    expect(result[2].key).toBe('2_5_sistemas_funcionando_bem')
   })
 
   it('aceita en-dash e hyphen além de em-dash', () => {
@@ -187,14 +236,16 @@ describe('lib/anthropic/parser — Sonnet 4.6 heading variants (Phase 07.1.6 UAT
     expect(findAllBoundaries(hyphenBuf)).toHaveLength(1)
   })
 
-  it('Plan 11: detecta 14 boundaries sequenciais no formato §N — Title', () => {
-    const sections = Array.from({ length: 14 }, (_, i) => `## §${i + 1} — Seção ${i + 1}\nConteúdo.`)
+  it('Plan 17: detecta 15 boundaries sequenciais no formato §N — Title (com §2.5)', () => {
+    const headings = ['1', '2', '2.5', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14']
+    const sections = headings.map((n) => `## §${n} — Seção ${n}\nConteúdo.`)
     const buf = sections.join('\n')
     const result = findAllBoundaries(buf)
-    expect(result).toHaveLength(14)
-    expect(result.map((b) => b.number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14])
+    expect(result).toHaveLength(15)
+    expect(result.map((b) => b.headingNumber)).toEqual(headings)
     expect(result[0].key).toBe('1_constituicao_temperamento')
-    expect(result[13].key).toBe('14_mensagem_cliente')
+    expect(result[2].key).toBe('2_5_sistemas_funcionando_bem')
+    expect(result[14].key).toBe('14_mensagem_cliente')
   })
 
   it('aceita variantes mistas (Sonnet ocasionalmente alterna formato no mesmo report)', () => {
@@ -202,22 +253,21 @@ describe('lib/anthropic/parser — Sonnet 4.6 heading variants (Phase 07.1.6 UAT
 Foo.
 ## §2 — Mapa Orgânico
 Bar.
+## §2.5 — Sistemas em Bom Funcionamento
+Recursos.
 ### 3. Linha do Tempo Emocional
 Baz.`
     const result = findAllBoundaries(buf)
-    expect(result).toHaveLength(3)
-    expect(result.map(b => b.number)).toEqual([1, 2, 3])
+    expect(result).toHaveLength(4)
+    expect(result.map((b) => b.headingNumber)).toEqual(['1', '2', '2.5', '3'])
   })
 
   it('regression: f4408c23 buffer head matches first section', () => {
-    // Reproduces the actual buffer head from f4408c23 Vercel logs that produced
-    // 0 sections under the old regex.
     const buf =
-      '# Leitura Iridológica Integrativa\n## Nailli GF de Carvalho · 37 anos · Mapa Jensen\n\n---\n\n## §1 — Constituição e Temperamento\n\nA íris de Nailli revela uma constituição funcional mista.'
+      '# Leitura Iridológica Integrativa\n## Nailli GF de Carvalho · 37 anos\n\n---\n\n## §1 — Constituição e Temperamento\n\nA íris de Nailli revela uma constituição funcional mista.'
     const result = findAllBoundaries(buf)
     expect(result).toHaveLength(1)
-    expect(result[0]).toMatchObject({ number: 1, key: '1_constituicao_temperamento' })
-    // startIdx points at the `## §1` line, NOT at `## Nailli` subtitle nor `# Leitura`.
+    expect(result[0]).toMatchObject({ headingNumber: '1', key: '1_constituicao_temperamento' })
     expect(buf.slice(result[0].startIdx, result[0].startIdx + 6)).toBe('## §1 ')
   })
 
@@ -232,6 +282,6 @@ Baz.`
     const buf = '## §0 — Prologue\n## §1 — Real first\nFoo.'
     const result = findAllBoundaries(buf)
     expect(result).toHaveLength(1)
-    expect(result[0].number).toBe(1)
+    expect(result[0].headingNumber).toBe('1')
   })
 })

@@ -42,23 +42,28 @@ if (!readingId) {
   process.exit(1)
 }
 
-// Mirror of apps/web/lib/anthropic/types.ts SECTION_KEY_BY_NUMBER
+// Mirror of apps/web/lib/anthropic/types.ts SECTION_KEY_BY_NUMBER + NUMBERED_SECTION_HEADINGS
 // Plan 11 (Direction Correction DC-1) — remapped to 14 sections.
+// Plan 17 (UAT-3) — '2.5' decimal heading inserted (15 sections).
+const NUMBERED_SECTION_HEADINGS = [
+  '1', '2', '2.5', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14',
+]
 const SECTION_KEY_BY_NUMBER = {
-  1: '1_constituicao_temperamento',
-  2: '2_mapa_organico',
-  3: '3_linha_tempo_emocional',
-  4: '4_padroes_emocionais_ativos',
-  5: '5_eixo_psicossomatico',
-  6: '6_herancas_transgeracionais',
-  7: '7_carencias_funcionais',
-  8: '8_estado_mental_nervoso',
-  9: '9_recursos_forcas',
-  10: '10_dimensao_arquetipica',
-  11: '11_sugestoes_integrativas',
-  12: '12_roteiro_anamnese',
-  13: '13_sintese_integrativa',
-  14: '14_mensagem_cliente',
+  '1': '1_constituicao_temperamento',
+  '2': '2_mapa_organico',
+  '2.5': '2_5_sistemas_funcionando_bem',
+  '3': '3_linha_tempo_emocional',
+  '4': '4_padroes_emocionais_ativos',
+  '5': '5_eixo_psicossomatico',
+  '6': '6_herancas_transgeracionais',
+  '7': '7_carencias_funcionais',
+  '8': '8_estado_mental_nervoso',
+  '9': '9_recursos_forcas',
+  '10': '10_dimensao_arquetipica',
+  '11': '11_sugestoes_integrativas',
+  '12': '12_roteiro_anamnese',
+  '13': '13_sintese_integrativa',
+  '14': '14_mensagem_cliente',
 }
 
 const ENCERRAMENTO_LITERAL = `Esta leitura iridológica é uma ferramenta de apoio à anamnese terapêutica.
@@ -67,17 +72,19 @@ Os achados aqui descritos são hipóteses a serem investigadas pelo terapeuta
 em conjunto com o cliente, à luz de sua história de vida e contexto integral.`
 
 // Mirror of apps/web/lib/anthropic/parser.ts findAllBoundaries + closeSections
+// Plan 17: extended to accept §2.5 decimal heading + array-index monotonicity.
 function findAllBoundaries(buffer) {
-  const re = /^#{2,3} (\d{1,2})\.\s+/gm
+  const re = /^[ \t]*#{2,3}[ \t]+§?[ \t]*(\d{1,2}(?:\.\d)?)[ \t]*[\p{Pd}.][ \t]*/gmu
   const matches = []
   let m
-  let lastNumber = 0
+  let lastIndex = -1
   while ((m = re.exec(buffer)) !== null) {
-    const number = parseInt(m[1], 10)
-    if (number < 1 || number > 14) continue
-    if (number !== lastNumber + 1) continue
-    lastNumber = number
-    matches.push({ number, key: SECTION_KEY_BY_NUMBER[number], startIdx: m.index })
+    const headingStr = m[1]
+    const idx = NUMBERED_SECTION_HEADINGS.indexOf(headingStr)
+    if (idx === -1) continue
+    if (idx !== lastIndex + 1) continue
+    lastIndex = idx
+    matches.push({ headingNumber: headingStr, key: SECTION_KEY_BY_NUMBER[headingStr], startIdx: m.index })
   }
   return matches
 }
@@ -178,7 +185,7 @@ console.log(`Raw text: ${raw.length} chars`)
 console.log(`regeneration_count: ${data.regeneration_count} (NOT changed by reparse)`)
 
 const boundaries = findAllBoundaries(raw)
-console.log(`Boundaries found: ${boundaries.length} → numbers ${boundaries.map((b) => b.number).join(', ')}`)
+console.log(`Boundaries found: ${boundaries.length} → numbers ${boundaries.map((b) => b.headingNumber).join(', ')}`)
 
 if (boundaries.length === 0) {
   console.error('Parser found 0 boundaries — heading format still mismatches. Inspect first ~1KB of raw:')

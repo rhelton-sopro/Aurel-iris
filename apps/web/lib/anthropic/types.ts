@@ -6,26 +6,26 @@
 /**
  * Shared types for Phase 7 — Análise LLM.
  *
- * Canonical shapes (Phase 7.4 Plan 11 — Direction Correction DC-1..DC-6):
- *   - ReportSectionKey: 15-key union (14 numbered + encerramento_disclaimer)
+ * Canonical shapes (Phase 7.4 Plan 17 — UAT-3 restructure §2.5 + 15 sections):
+ *   - ReportSectionKey: 16-key union (15 numbered including '2_5_...' + encerramento_disclaimer)
  *   - ReportJsonb: Partial<Record<ReportSectionKey, string>> — incremental persistence (D-S2)
  *   - AuditMetadata: D-A3 shape (anchor rate + forbidden vocab + timestamps)
  *   - EditTipo: D-U2 classifier output
  *   - RegenerationLogEntry: D-S4 telemetry per regeneration
  *   - ENCERRAMENTO_LITERAL: SPEC §6 disclaimer literal — server-appended (D-P3)
- *   - REPORT_SECTIONS: D-PR2 RAG-slug array — remapped for the 14-section structure
+ *   - REPORT_SECTIONS: D-PR2 RAG-slug array — remapped for the 15-section structure
+ *   - NUMBERED_SECTION_HEADINGS: ordered string heading numbers for parser monotonicity
  *
- * Plan 11 (Direction Correction) rewrites the section keys from the legacy 13
- * (`1_constituicao` .. `13_mensagem_final`) to the new 14 markdown sections of
- * the Iris Codex V1 prompt (`1_constituicao_temperamento` .. `14_mensagem_cliente`).
- * The 8-block JSON path (Plans 02/03/04/06/07) is gone (Plan 10). Legacy 1.0
- * readings continue to render via EditorAccordion (which Plan 12 will rebuild
- * for the 14-section structure).
+ * Plan 11 (Direction Correction) remapped 13→14 sections; Plan 17 (UAT-3
+ * restructure) extended to 15 by inserting §2.5 — Sistemas em Bom Funcionamento
+ * between §2 — Mapa Orgânico and §3 — Linha do Tempo Emocional. Decimal
+ * heading numbers (only '2.5' currently) require string-keyed lookup + ordered
+ * array monotonicity instead of numeric `lastNumber + 1`.
  *
  * LGPD: este arquivo declara apenas estrutura. Sem vocabulário proibido em
  * código — `pnpm audit:vocabulary` cobre `lib/anthropic/` desde 07-02 (D-A4).
  *
- * Phase 7 | Plan 07.4-11 | Decisions: DC-1, DC-2, DC-3, DC-4, DC-6
+ * Phase 7 | Plan 07.4-17 | Decisions: DC-1, DC-3 + UAT-3 §2.5 insertion
  */
 import type { Database } from '@/types/database'
 import type { ReportSection } from '@/lib/rag/types'
@@ -33,6 +33,7 @@ import type { ReportSection } from '@/lib/rag/types'
 export type ReportSectionKey =
   | '1_constituicao_temperamento'
   | '2_mapa_organico'
+  | '2_5_sistemas_funcionando_bem'
   | '3_linha_tempo_emocional'
   | '4_padroes_emocionais_ativos'
   | '5_eixo_psicossomatico'
@@ -47,25 +48,58 @@ export type ReportSectionKey =
   | '14_mensagem_cliente'
   | 'encerramento_disclaimer'
 
-/** Numeric-prefixed keys only (1..14). Used by section-boundary parser. */
+/** Numeric-prefixed keys only (1..14 plus '2.5'). Used by section-boundary parser. */
 export type NumberedSectionKey = Exclude<ReportSectionKey, 'encerramento_disclaimer'>
 
-/** Map number 1..14 to canonical section key (boundary parser uses this). */
-export const SECTION_KEY_BY_NUMBER: Record<number, NumberedSectionKey> = {
-  1: '1_constituicao_temperamento',
-  2: '2_mapa_organico',
-  3: '3_linha_tempo_emocional',
-  4: '4_padroes_emocionais_ativos',
-  5: '5_eixo_psicossomatico',
-  6: '6_herancas_transgeracionais',
-  7: '7_carencias_funcionais',
-  8: '8_estado_mental_nervoso',
-  9: '9_recursos_forcas',
-  10: '10_dimensao_arquetipica',
-  11: '11_sugestoes_integrativas',
-  12: '12_roteiro_anamnese',
-  13: '13_sintese_integrativa',
-  14: '14_mensagem_cliente',
+/**
+ * Ordered heading-number strings for the 15 numbered sections, in canonical
+ * emission order. Source of truth for parser monotonicity (`indexOf(headingStr)`
+ * must equal `lastIndex + 1`) and for UI counters (length = 15).
+ *
+ * Plan 17 (UAT-3): inserted '2.5' between '2' and '3' for §2.5 — Sistemas em
+ * Bom Funcionamento.
+ */
+export const NUMBERED_SECTION_HEADINGS = [
+  '1',
+  '2',
+  '2.5',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+  '10',
+  '11',
+  '12',
+  '13',
+  '14',
+] as const
+
+export type NumberedSectionHeading = (typeof NUMBERED_SECTION_HEADINGS)[number]
+
+/**
+ * Map heading-number string ('1', '2', '2.5', '3', ..., '14') to canonical
+ * section key. Plan 17 (UAT-3): re-keyed from numeric to string so '2.5'
+ * round-trips through the parser without lossy numeric conversion.
+ */
+export const SECTION_KEY_BY_NUMBER: Record<NumberedSectionHeading, NumberedSectionKey> = {
+  '1': '1_constituicao_temperamento',
+  '2': '2_mapa_organico',
+  '2.5': '2_5_sistemas_funcionando_bem',
+  '3': '3_linha_tempo_emocional',
+  '4': '4_padroes_emocionais_ativos',
+  '5': '5_eixo_psicossomatico',
+  '6': '6_herancas_transgeracionais',
+  '7': '7_carencias_funcionais',
+  '8': '8_estado_mental_nervoso',
+  '9': '9_recursos_forcas',
+  '10': '10_dimensao_arquetipica',
+  '11': '11_sugestoes_integrativas',
+  '12': '12_roteiro_anamnese',
+  '13': '13_sintese_integrativa',
+  '14': '14_mensagem_cliente',
 }
 
 export type ReportJsonb = Partial<Record<ReportSectionKey, string>>

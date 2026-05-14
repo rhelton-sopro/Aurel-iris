@@ -2,9 +2,11 @@ import { z } from 'zod'
 
 // Phase 7.4 Plan 11 (Direction Correction DC-1) — section keys remapped from
 // 13-section legacy to 14-section Iris Codex V1 markdown structure.
+// Phase 7.4 Plan 17 (UAT-3) — '2_5_sistemas_funcionando_bem' inserted (15 sections).
 const REPORT_KEYS = [
   '1_constituicao_temperamento',
   '2_mapa_organico',
+  '2_5_sistemas_funcionando_bem',
   '3_linha_tempo_emocional',
   '4_padroes_emocionais_ativos',
   '5_eixo_psicossomatico',

@@ -132,17 +132,19 @@ export interface SectionDiffs {
 }
 
 /**
- * Lista canônica das 15 chaves processadas (14 numeradas + encerramento).
+ * Lista canônica das 16 chaves processadas (15 numeradas + encerramento).
  * Chaves fora desta lista são IGNORADAS (defesa contra Sonnet emitir chaves
  * espúrias). Sincronizada com types.ts ReportSectionKey union — adicionar
  * chave aqui requer edit coordenado em types.ts + parser.
  *
  * Plan 11 (Direction Correction DC-1) — keys remapped from 13-section legacy
  * to 14-section Iris Codex V1 structure.
+ * Plan 17 (UAT-3) — '2_5_sistemas_funcionando_bem' inserted between §2 and §3.
  */
 const ALL_REPORT_KEYS: ReportSectionKey[] = [
   '1_constituicao_temperamento',
   '2_mapa_organico',
+  '2_5_sistemas_funcionando_bem',
   '3_linha_tempo_emocional',
   '4_padroes_emocionais_ativos',
   '5_eixo_psicossomatico',
