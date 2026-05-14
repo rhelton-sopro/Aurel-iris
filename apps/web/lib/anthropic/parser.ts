@@ -1,11 +1,11 @@
 /**
  * Section-boundary parser for incremental LLM streaming persistence.
  *
- * Detects section headings (N=1..13) over an accumulated buffer (NOT delta
+ * Detects section headings (N=1..14) over an accumulated buffer (NOT delta
  * events — Pitfall 2 mandates buffer-level scan). Defenses:
  *   - Regex (multiline): line starts with 2 or 3 hashes, optional `§` glyph,
  *     digit 1-2 chars, then either `.` or em-dash/en-dash/hyphen separator
- *   - Number must be in [1, 13] inclusive
+ *   - Number must be in [1, 14] inclusive
  *   - Numbers must be strictly monotonic (`number === lastNumber + 1`)
  *   - Resets `lastIndex` per call (no cross-invocation state leak)
  *
@@ -25,6 +25,8 @@
  *
  * Phase 7 | Plan 07-04 | Decisions: D-S2, RESEARCH §Code Examples, Pitfall 2
  * Phase 07.1.6 UAT-1 fix (2026-05-12): regex tolerance for `## §N —` format.
+ * Phase 7.4 Plan 11 (Direction Correction DC-1/DC-3): range extended 13 → 14
+ * to match the new Iris Codex V1 14-section markdown structure.
  */
 import 'server-only'
 import { SECTION_KEY_BY_NUMBER, type NumberedSectionKey } from './types'
@@ -35,7 +37,7 @@ import { SECTION_KEY_BY_NUMBER, type NumberedSectionKey } from './types'
 //   [ \t]+         — at least one space/tab after hashes
 //   §?             — optional section glyph (`§1` vs `1`)
 //   [ \t]*         — optional spaces between § and number
-//   (\d{1,2})      — capture 1-13 (range-checked below)
+//   (\d{1,2})      — capture 1-14 (range-checked below)
 //   [ \t]*         — optional spaces between number and separator
 //   [\p{Pd}.]      — separator: period OR any Unicode Dash Punctuation
 //                    (\p{Pd} covers em-dash, en-dash, hyphen-minus, figure-dash,
@@ -45,9 +47,9 @@ import { SECTION_KEY_BY_NUMBER, type NumberedSectionKey } from './types'
 const BOUNDARY_RE = /^[ \t]*#{2,3}[ \t]+§?[ \t]*(\d{1,2})[ \t]*[\p{Pd}.][ \t]*/gmu
 
 export interface BoundaryMatch {
-  /** 1..13 — the section number from the heading. */
+  /** 1..14 — the section number from the heading. */
   number: number
-  /** Canonical jsonb key for the section, e.g. '5_psicoemocional'. */
+  /** Canonical jsonb key for the section, e.g. '5_eixo_psicossomatico'. */
   key: NumberedSectionKey
   /** Index in buffer where '### ' begins (just after \n or buffer start). */
   startIdx: number
@@ -67,7 +69,7 @@ export function findAllBoundaries(buffer: string): BoundaryMatch[] {
   let lastNumber = 0
   while ((m = BOUNDARY_RE.exec(buffer)) !== null) {
     const number = parseInt(m[1]!, 10)
-    if (number < 1 || number > 13) continue
+    if (number < 1 || number > 14) continue
     if (number !== lastNumber + 1) continue
     lastNumber = number
     const matchEnd = m.index + m[0].length
