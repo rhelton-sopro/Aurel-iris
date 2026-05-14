@@ -5,7 +5,7 @@
  * Phase 7.4 | Plan 07.4-06 | Decisões: D-UI4
  */
 import { Badge } from '@/components/ui/badge'
-import type { TendencyLabel } from '@/lib/anthropic/report-schema'
+import type { TendencyLabel } from '@/lib/anthropic/report-schema-shared'
 
 export interface GradeBadgeProps {
   grade: 1 | 2 | 3 | 4 | 5

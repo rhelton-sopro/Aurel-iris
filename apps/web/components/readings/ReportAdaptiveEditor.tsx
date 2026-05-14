@@ -47,7 +47,7 @@ import { Textarea } from '@/components/ui/textarea'
 
 import { saveReportV2Delivered, deliverReportV2 } from '@/app/actions/analise'
 import { safeArray } from '@/lib/utils'
-import type { ReportV2 } from '@/lib/anthropic/report-schema'
+import type { ReportV2 } from '@/lib/anthropic/report-schema-shared'
 import type { AuditV2Result } from '@/lib/anthropic/types-v2'
 
 import { AdvancedAnalysisCTA } from './AdvancedAnalysisCTA'

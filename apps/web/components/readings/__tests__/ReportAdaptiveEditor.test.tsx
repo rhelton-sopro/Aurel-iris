@@ -26,7 +26,7 @@ import {
   deliverReportV2,
 } from '@/app/actions/analise'
 import { toast } from 'sonner'
-import type { ReportV2 } from '@/lib/anthropic/report-schema'
+import type { ReportV2 } from '@/lib/anthropic/report-schema-shared'
 import { ReportAdaptiveEditor } from '../ReportAdaptiveEditor'
 
 const READING_ID = 'r-123'

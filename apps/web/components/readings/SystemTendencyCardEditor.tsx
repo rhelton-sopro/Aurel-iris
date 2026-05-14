@@ -44,7 +44,7 @@ import {
   TENDENCY_LABELS,
   type SystemTendency,
   type TendencyLabel,
-} from '@/lib/anthropic/report-schema'
+} from '@/lib/anthropic/report-schema-shared'
 
 const GRADE_TO_LABEL: Record<1 | 2 | 3 | 4 | 5, TendencyLabel> = {
   1: 'leve',

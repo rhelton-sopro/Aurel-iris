@@ -18,7 +18,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { safeArray } from '@/lib/utils'
 import { GradeBadge } from './GradeBadge'
 import { GradeBar } from './GradeBar'
-import type { SystemTendency } from '@/lib/anthropic/report-schema'
+import type { SystemTendency } from '@/lib/anthropic/report-schema-shared'
 
 export interface SystemTendencyCardProps {
   system: SystemTendency

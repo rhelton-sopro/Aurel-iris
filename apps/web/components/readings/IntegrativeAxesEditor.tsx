@@ -31,7 +31,7 @@ import { safeArray } from '@/lib/utils'
 
 import { BlockEditPane } from './BlockEditPane'
 import { IntegrativeAxisItem } from './IntegrativeAxisItem'
-import type { ReportV2, AxisStatus } from '@/lib/anthropic/report-schema'
+import type { ReportV2, AxisStatus } from '@/lib/anthropic/report-schema-shared'
 
 type Axis = ReportV2['integrative_axes'][number]
 

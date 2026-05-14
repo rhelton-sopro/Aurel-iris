@@ -12,7 +12,7 @@
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Badge } from '@/components/ui/badge'
-import type { AxisStatus } from '@/lib/anthropic/report-schema'
+import type { AxisStatus } from '@/lib/anthropic/report-schema-shared'
 
 const STATUS_LABEL: Record<AxisStatus, string> = {
   ativo: 'Ativo',

@@ -11,7 +11,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { SystemTendencyCardEditor } from '../SystemTendencyCardEditor'
-import type { SystemTendency } from '@/lib/anthropic/report-schema'
+import type { SystemTendency } from '@/lib/anthropic/report-schema-shared'
 
 const mockSystem: SystemTendency = {
   system_id: 'linfatico',

@@ -19,7 +19,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 
 import { BlockEditPane } from './BlockEditPane'
-import type { ReportV2 } from '@/lib/anthropic/report-schema'
+import type { ReportV2 } from '@/lib/anthropic/report-schema-shared'
 
 type BilateralFindings = ReportV2['bilateral_findings']
 

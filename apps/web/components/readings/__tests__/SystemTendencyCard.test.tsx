@@ -6,7 +6,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { SystemTendencyCard } from '../SystemTendencyCard'
-import type { SystemTendency } from '@/lib/anthropic/report-schema'
+import type { SystemTendency } from '@/lib/anthropic/report-schema-shared'
 
 const baseSystem: SystemTendency = {
   system_id: 'linfatico',

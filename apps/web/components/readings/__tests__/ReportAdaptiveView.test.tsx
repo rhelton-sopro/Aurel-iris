@@ -9,7 +9,7 @@ import { render, screen } from '@testing-library/react'
 import { ReportAdaptiveView } from '../ReportAdaptiveView'
 import validFixture from '@/lib/anthropic/__tests__/fixtures/report-v2-valid.json'
 import emptyFixture from '@/lib/anthropic/__tests__/fixtures/report-v2-empty-systems.json'
-import type { ReportV2 } from '@/lib/anthropic/report-schema'
+import type { ReportV2 } from '@/lib/anthropic/report-schema-shared'
 
 const validReport = validFixture as unknown as ReportV2
 const emptyReport = emptyFixture as unknown as ReportV2
