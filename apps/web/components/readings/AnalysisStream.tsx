@@ -4,16 +4,18 @@
  * AnalysisStream — streaming progress UI (UI-SPEC §Surface 1 State B + §Streaming Visual Cue).
  *
  * Inputs:
- *   - sectionsReceived: number 0..13 (best-effort count from client buffer)
+ *   - sectionsReceived: number 0..14 (best-effort count from client buffer)
  *   - error: optional error message to render fallback
  *
  * Renders:
- *   - aria-live="polite" region announcing "{N}/13 seções"
+ *   - aria-live="polite" region announcing "{N}/14 seções"
  *   - shadcn Progress bar
- *   - 13-row checklist (Check icon for received, Skeleton for pending)
+ *   - 14-row checklist (Check icon for received, Skeleton for pending)
  *   - Hint text reassuring refresh is safe (D-S2)
  *
- * Phase 7 | Plan 07-09 | UI-SPEC lines 196-208, 300-318
+ * Phase 7 | Plan 07-09 → 07.4-12 (Direction Correction DC-1: 13→14 sections,
+ * §14 Mensagem para o Cliente as warm-voice client-delivered closer)
+ * UI-SPEC lines 196-208, 300-318
  */
 import { Loader2, Check } from 'lucide-react'
 
@@ -22,19 +24,20 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 const SECTION_TITLES = [
-  'Constituição',
-  'Estrutural Física',
-  'Indicações Sistêmicas',
-  'Toxemia',
-  'Psicoemocional',
-  'Cargas Temporais',
-  'Carências Nutricionais',
-  'Simbólico Espiritual',
-  'Cuidados Integrativos',
-  'Potenciais e Forças',
-  'Afirmações de Integração',
+  'Constituição e Temperamento',
+  'Mapa Orgânico',
+  'Linha do Tempo Emocional',
+  'Padrões Emocionais Ativos',
+  'Eixo Psicossomático',
+  'Heranças Transgeracionais',
+  'Carências Funcionais',
+  'Estado Mental e Nervoso',
+  'Recursos e Forças',
+  'Dimensão Arquetípica',
+  'Sugestões Integrativas',
+  'Roteiro de Anamnese',
   'Síntese Integrativa',
-  'Mensagem Final',
+  'Mensagem para o Cliente',
 ]
 
 export interface AnalysisStreamProps {
@@ -43,8 +46,8 @@ export interface AnalysisStreamProps {
 }
 
 export function AnalysisStream({ sectionsReceived, error }: AnalysisStreamProps) {
-  const safe = Math.min(13, Math.max(0, sectionsReceived))
-  const pct = Math.round((safe / 13) * 100)
+  const safe = Math.min(14, Math.max(0, sectionsReceived))
+  const pct = Math.round((safe / 14) * 100)
 
   return (
     <Card className="max-w-3xl">
@@ -52,7 +55,7 @@ export function AnalysisStream({ sectionsReceived, error }: AnalysisStreamProps)
         <CardTitle className="flex items-center gap-2 text-xl">
           <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
           <span>
-            Gerando relatório… {safe}/13 seções
+            Gerando relatório… {safe}/14 seções
           </span>
         </CardTitle>
         <p className="text-sm text-muted-foreground">
