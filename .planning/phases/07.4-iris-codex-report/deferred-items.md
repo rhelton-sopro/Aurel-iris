@@ -72,3 +72,19 @@ Discovered during Plan execution but out of scope for the current plan. Track he
 - **Pre-existing:** Plan 07.4-02 baseline tracked via "Plan 02 delta-test framework" (per Plan 07.4-09 prompt constraints). Plan 09's `aurel_brand` category itself returns **0 hits** — clean.
 - **Suggested fix:** dedicated cleanup pass to either fix or `audit-vocabulary:allowlist`-mark each remaining hit. Some are legit (RAG school names ARE meant to reference Jensen/Lo Rito; banner copy MUST quote forbidden vocab to warn user) → those need allowlist markers or per-category exceptions.
 - **Scope:** out of Plan 07.4-09 (rebrand sweep). Phase 7.4 close-out polish.
+
+## Discovered during Plan 07.4-14 (UAT-2 fixes)
+
+### D-DEF-14-01 — Cronorichio + biographical map chunks may be absent from current RAG corpus
+
+- **Discovered:** 2026-05-14 during Plan 07.4-14 implementation (§3 retrieval wiring for UAT-2 fix).
+- **Concern:** Plan 14 adds 4 new RAG queries under the `biografia_temporal` concern for §3 generation:
+  - `cronorichio Lo Rito cronologia iridológica`
+  - `mapa biográfico iridológico {constitution.primary}`
+  - `Jensen biographical mapping iris ages`
+  - `mapa biográfico brasileiro setores idade`
+- **Risk:** If the current Phase 6 corpus (2761 chunks across 12 books) does NOT contain Lo Rito's Cronorichio book, Jensen biographical-mapping chapters, or the Brazilian biographical iris-map literature, these retrievals will return low-relevance chunks. The §3 generation will fall back to Sonnet's pre-training knowledge of biographical iris mapping, which may be thin.
+- **How to detect:** after Plan 14 lands and the founder regenerates a reading, inspect the RAG retrieval logs (or run a manual `pnpm scripts/rag-probe.mjs` if available) for the `biografia_temporal` queries. If the top-k chunks have low cosine similarity OR don't actually reference Cronorichio/biographical mapping, the corpus is the bottleneck.
+- **Fix (Phase 7.2 Wave C scope — "item 7.2-H new" per founder UAT-2 spec):** ingest Lo Rito's Cronorichio (Italian-language book), the relevant Jensen biographical chapters, and the Brazilian biographical iris-map literature. Cost: each book ~$0.30 contextual ingest per Phase 6 baseline. Total ~$1 + author-permissions handling.
+- **Workaround until corpus expands:** the §3 prompt instructions (Plan 14 system.md rewrite) tell Sonnet to SKIP unanchored markers ("better 3 anchored than 6 generic"). So if RAG returns thin biographical chunks, §3 will be shorter rather than fabricated — failure mode is acceptable.
+- **Scope:** out of Plan 07.4-14 (prompt + UI iteration). New item for Phase 7.2 corpus expansion roadmap.
