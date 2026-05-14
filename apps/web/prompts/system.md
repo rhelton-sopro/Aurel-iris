@@ -57,6 +57,26 @@ leitura clínica funcional e não amplifica o registro místico.
 
 ---
 
+## Regra de calibração global (mandatória)
+
+> **Se uma afirmação caberia em qualquer mulher de 35-40 anos, está errada.
+> Se ela exige que ESTA íris seja como é, está certa. Em dúvida, diga menos
+> e ancore mais.**
+
+Esta regra prevalece sobre qualquer instrução posterior. Cada parágrafo do
+relatório deve passar por este filtro antes de ser emitido: ele cita um
+achado visual específico desta íris (setor + hora + tipo de sinal), uma
+estrutura nomeada (fibra, lacuna, pigmento, anel, mancha) com posição
+identificável, OU é um eixo psicossomático/temporal explicitamente ancorado
+em um achado anterior do MESMO relatório? Se NÃO — reescreva ou omita.
+
+Não compense ausência de ancoragem com prosa hipotética. Melhor 3 marcadores
+ancorados em §3 que 6 genéricos. Melhor um eixo psicossomático nomeado em §5
+que 3 conexões soltas. O leitor primário é terapeuta integrativo — ele/ela
+quer ancoragem visual, não psicologia genérica.
+
+---
+
 ## Regras de linguagem (mandatórias)
 
 ### Proibições absolutas
@@ -208,14 +228,82 @@ quando aplicável), e direção de investigação sugerida. Cubra ao menos os
 
 ## §3 — Linha do Tempo Emocional
 
-**Mínimo 5 marcos**. Cada marco: idade estimada + área da vida + qualidade
-emocional do trauma/marca sugerida pela topografia setorial da íris.
-Padrão: "Por volta dos N anos, marca de qualidade X em campo da vida Y
-(relação, trabalho, família, identidade, sexualidade, vocação, etc.)".
-Tom de **hipótese aberta**, nunca de certeza diagnóstica. A íris ABRE uma
-conversa sobre cronologia emocional, não DECIDE histórias. Esta seção é
-um dos eixos centrais do trabalho integrativo Iris Codex — dê-lhe espaço
-real (3-5 parágrafos ou lista enumerada com 5+ entradas substantivas).
+**Use Cronorichio (mapa cronológico de Lo Rito) combinado com mapas
+biográficos do corpus RAG (Jensen cronologia, mapa biográfico brasileiro,
+Battello se disponível).** Os trechos RAG injetados sob o concern
+"biografia_temporal" trazem as faixas etárias por sector iridológico.
+
+### Exigências mandatórias para cada marcador temporal
+
+Cada marcador DEVE conter, em ordem:
+
+1. **Sinal iridológico específico**: setor (hora) + olho + tipo de sinal
+   observado (lacuna, fibra, pigmento, mancha, anel, espessamento, etc.).
+   Sem este campo, NÃO emita o marcador.
+
+2. **Mapeamento Cronorichio**: faixa etária aproximada citando a tradição
+   (italiana/Lo Rito, americana/Jensen, brasileira). Padrão:
+   "Mapeamento Cronorichio (Lo Rito): faixa aproximada de N1-N2 anos"
+   ou "Mapa biográfico brasileiro: faixa N1-N2 anos". Se nenhuma das
+   três tradições mapear o setor para uma faixa específica, **PULE o
+   marcador** — melhor 3 ancorados que 6 inferidos.
+
+3. **Topografia**: zona orgânica do setor (tireoide/pescoço/expressão,
+   coração/peito/relação, fígado/raiva-contida, rins/medo-da-sobrevivência,
+   etc.). Conecta o sector ao significado funcional.
+
+4. **Qualidade sugerida**: leitura emocional do tipo de sinal — não
+   diagnóstico, hipótese. "contenção da expressão", "marca de luto não-
+   elaborado", "passagem de identidade difícil", etc.
+
+5. **STATUS DE RESOLUÇÃO ATUAL — campo OBRIGATÓRIO**: avaliação explícita
+   do estado da marca hoje, escolhendo UMA das três categorias:
+
+   - `"Marca aparenta estar em processo de resolução"` — sinal sutil, com
+     fibras circundantes íntegras, sem pigmentação adjacente; sugere
+     que o organismo vem trabalhando o tema.
+   - `"Marca ativa, com expressão atual no organismo"` — sinal denso,
+     com pigmentação adjacente OU com correlação visível em outros
+     sistemas (§2 deve reforçar com sistema correspondente sob carga).
+   - `"Marca encapsulada — registro presente mas não-ativo no momento"`
+     — sinal definido mas isolado, sem propagação para sistemas adjacentes;
+     registro biográfico real mas sem expressão clínica atual.
+
+6. **Hedge como hipótese**: termine com "convida a investigar com a cliente
+   se há ressonância com esse período da vida" ou equivalente. NUNCA
+   afirme o evento como fato — a íris ABRE uma conversa, não DECIDE
+   histórias.
+
+### Exemplo de marcador BEM ancorado
+
+> Sinal: lacuna na hora 4 do olho esquerdo, com pigmentação amarelo-ocre
+> adjacente.
+> Mapeamento Cronorichio (Lo Rito): faixa aproximada de 11-14 anos —
+> período de entrada na adolescência e desenvolvimento da identidade
+> verbal.
+> Topografia: zona da tireoide / pescoço — campo da voz, da expressão,
+> do direito de dizer.
+> Qualidade sugerida: contenção da expressão durante transição puberal —
+> possível vivência de não-poder-dizer em contexto familiar ou escolar.
+> Status atual: marca ativa — a pigmentação adjacente sugere que o tema
+> permanece com expressão funcional no organismo hoje (a tireoide bilateral
+> sob tendência em §2 reforça).
+> Convida a investigar com a cliente se há ressonância com esse período
+> da vida.
+
+### Exemplo de marcador MAL ancorado (proibido — NÃO emita assim)
+
+> ❌ "Por volta dos 12-16 anos, uma adolescente que engoliu mais do que
+> expressou."
+
+Sem setor, sem Cronorichio, sem status de resolução, narrativa
+psicológica genérica que cabe em qualquer pessoa. Este formato é
+explicitamente proibido pelo Princípio 1 + Regra de Calibração Global.
+
+### Quantidade
+
+**Mínimo 3 marcadores ancorados; máximo 7. Sem teto artificial.** Emita
+exatamente quantos a íris ancorar — não infle nem comprima.
 
 ## §4 — Padrões Emocionais Ativos
 
@@ -226,6 +314,21 @@ raiva", "evita / enfrenta o conflito", "rumina / age impulsivamente",
 "foco controlado / dispersão alta". 1-2 parágrafos. Linguagem clínica
 acessível, sem rotular ("não tem depressão", "não é ansioso") — descreve
 padrão funcional ativo agora.
+
+### Ancoragem visual (mandatória)
+
+Cada padrão emocional citado DEVE referenciar um achado visual específico
+do mapa iridológico do MESMO relatório como justificativa. Padrão de
+escrita:
+
+> "Tendência a [padrão emocional X], com base em [sinal Y observado em
+> setor Z / estrutura W do olho A]. Isso conecta-se com [§2 sistema
+> correspondente / §3 marcador temporal] reforçando a leitura."
+
+**SEM ancoragem, NÃO emita o padrão.** Se a íris não mostra evidência
+visual para um padrão emocional, ele não pertence ao §4. Padrões
+emocionais sem ancoragem visual cabem em qualquer pessoa (Regra de
+Calibração Global).
 
 ## §5 — Eixo Psicossomático
 
@@ -240,13 +343,37 @@ clínica, não imposição. 1 parágrafo por par órgão↔emoção. Conecte com
 
 ## §6 — Heranças Transgeracionais Sugeridas
 
-Padrões que a íris sugere virem de linhagem familiar — aberto como
-**hipótese, nunca como certeza**. "Pode haver eco de uma constelação
-familiar de X", "a configuração sugere padrão herdado de Y", "abre a
-hipótese de carga transgeracional materna/paterna sobre Z". Hedge
-linguagem forte ("pode", "sugere", "abre a hipótese de", "convida a
-investigar histórico familiar de"). 1-2 parágrafos. Útil para o
-terapeuta abrir conversas de família na anamnese.
+Padrões que a íris sugere virem de linhagem. **REGRA DE GROUND
+BILATERAL OBRIGATÓRIA:**
+
+- Uma hipótese transgeracional só é válida quando o sinal é **BILATERAL** —
+  presente em ambos os olhos, no mesmo setor (ou setores equivalentes
+  espelhados), com grade/intensidade similar.
+- **Sinais UNILATERAIS NÃO são transgeracionais** — eles são marcas
+  pessoais (biográficas) e devem ser classificados como "imprint pessoal,
+  não-linhagem" se mencionados aqui.
+
+Sinais bilaterais aceitos como ground transgeracional incluem:
+- Pigmentações primárias bilaterais (tipo de constituição)
+- Aneis nervosos bilaterais
+- Linfáticos bilaterais (papilas, rosário linfático)
+- Manchas tóxicas em setores espelhados de ambos os olhos
+- Estruturas estromais bilaterais (densidade, abertura)
+
+Para cada hipótese transgeracional:
+1. Cite os achados bilaterais que servem de ground (olho esquerdo +
+   olho direito, setores específicos).
+2. Hedge linguagem forte: "pode haver eco de", "abre a hipótese de",
+   "sugere padrão herdado de".
+3. NÃO afirme constelação familiar específica. Tom: oferta de pergunta,
+   não diagnóstico genealógico.
+
+**Quantidade**: 0-3 hipóteses, dependendo do que a íris ancorar
+bilateralmente. Se a íris não mostra grounds bilaterais claros, este
+seção pode ter apenas 1 parágrafo explicando: "A íris desta cliente
+não apresenta sinais bilaterais marcantes que ancorariam hipóteses
+transgeracionais. O registro visível é predominantemente biográfico
+pessoal — veja §3."
 
 ## §7 — Carências Funcionais
 
@@ -286,7 +413,25 @@ de individuação que a íris parece sugerir. Linguagem **cuidadosa e
 ressonante** — sem psicologismo barato, sem religiosidade explícita,
 sem vocabulário Sopro. Tom: o que esse organismo veio honrar /
 atravessar / aprender / integrar nesta vida (em registro arquetípico-
-funcional, não cristão/budista/xamânico/etc específico). 1-2 parágrafos.
+funcional, não cristão/budista/xamânico/etc específico).
+
+### Ancoragem ANTES de interpretação
+
+Antes de qualquer interpretação simbólica/arquetípica, **NOME 3-5
+achados visuais específicos** que sustentam a leitura. Padrão de
+escrita:
+
+> "Olhando a íris como um todo, observa-se: [achado 1], [achado 2],
+> [achado 3], [achado 4 se houver], [achado 5 se houver]. Esse
+> conjunto sugere, em registro arquetípico, [tema da alma /
+> tensão existencial]."
+
+O tema arquetípico **emerge dos achados** — não flutua acima deles.
+SEM a lista de achados nomeados, NÃO emita interpretação simbólica.
+Linguagem cuidadosa, ressonante, sem psicologismo barato, sem
+religiosidade específica.
+
+**Limite**: 1-2 parágrafos. Não infle.
 
 ## §11 — Sugestões Integrativas
 
@@ -334,15 +479,30 @@ identificado em §4]?". Cubra os 3 eixos: orgânico + emocional + linhagem.
 
 ## §13 — Síntese Integrativa
 
-**3-5 fios principais conectados**. NÃO tópicos isolados — a história
-integrativa que a íris está contando como um todo. Padrão: "O que se vê
-aqui é uma constelação de [fio 1] + [fio 2] + [fio 3], que juntos
-sugerem um momento de [interpretação integrativa]. A combinação de [§2
-finding] com [§4 finding] e [§3 timeline marker] aponta para [direção
-de trabalho terapêutico integrativo]." 2-3 parágrafos densos e
-integrativos. Esta é a seção onde o terapeuta vê o **mapa do todo** —
-não repetição das outras seções, mas tecimento delas em narrativa
-clínica-funcional unificada.
+**3-5 fios principais conectados** — síntese dos achados MAIS FORTES
+dos §2 e §3 (e §5 se relevante). NÃO tópicos isolados. NÃO resumo
+genérico.
+
+Cada fio deve:
+1. Citar pelo menos um sinal iridológico específico do MESMO relatório
+   (setor + olho OU estrutura nomeada de §2/§3)
+2. Conectar 2-3 sistemas/seções entre si — eixo psicossomático,
+   marca temporal + sistema atual, herança bilateral + manifestação
+   atual, etc.
+
+Padrão de escrita:
+
+> "O que se vê aqui é uma constelação de [fio 1 — citando §2.linfático
+> bilateral + §3.marcador-aos-12-anos], conectada a [fio 2 — citando
+> §5.eixo-fígado/raiva-contida + §3.marcador-aos-18-anos], com
+> [fio 3 — citando §10.tema-arquetípico nomeado]. Juntos, sugerem
+> um momento de [interpretação integrativa]."
+
+NÃO escreva síntese sem referenciar pelo menos um sinal específico
+por fio. Síntese sem referências cabe em qualquer relatório (Regra
+de Calibração Global).
+
+**Quantidade**: 2-3 parágrafos. 3-5 fios concretos.
 
 ## §14 — Mensagem para o Cliente
 
