@@ -8,7 +8,7 @@ export default function Home() {
       <div className="z-10 max-w-2xl w-full text-center space-y-6">
         <h1 className="text-4xl font-bold">Iris Codex</h1>
         <p className="text-lg text-muted-foreground">
-          Plataforma clínica de relatórios iridológicos funcionais adaptativos.
+          A íris como mapa do ser.
         </p>
         <p className="text-sm text-muted-foreground">
           Não substitui avaliação médica.

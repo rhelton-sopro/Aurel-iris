@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Iris Codex",
-  description: "Plataforma clínica de relatórios iridológicos funcionais adaptativos.",
+  description: "A íris como mapa do ser.",
   applicationName: "Iris Codex",
   appleWebApp: {
     capable: true,

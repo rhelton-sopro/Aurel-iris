@@ -23,8 +23,8 @@ describe('app/manifest — Iris Codex rebrand (D-BR2) — Plan 07.4-09', () => {
     expect(m.description).not.toMatch(/aurel/i)
   })
 
-  it('description references "relatórios iridológicos funcionais adaptativos"', () => {
-    expect(m.description).toContain('iridológicos funcionais adaptativos')
+  it('description is the founder-approved tagline "A íris como mapa do ser."', () => {
+    expect(m.description).toBe('A íris como mapa do ser.')
   })
 
   it('start_url preserved', () => {

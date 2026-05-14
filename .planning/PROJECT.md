@@ -2,18 +2,19 @@
 
 ## O que é isto
 
-Iris Codex é uma plataforma clínica de relatórios iridológicos funcionais
-adaptativos para terapeutas integrativos, clientes finais e curiosos, com
-pipeline em duas camadas: visão computacional dedicada extrai *features*
-objetivas da íris a partir de fotos capturadas via PWA mobile ou upload
-desktop, e um LLM (Claude Sonnet 4.6) interpreta essas features em **linguagem
-clínico-funcional** ancorado em uma base de conhecimento iridológica indexada
-por RAG. Sistemas sem achados relevantes são omitidos do output (relatório
-adaptativo, não template fixo). Análise iridológica formal com nomenclatura
-técnica (Jensen, Lo Rito, Deck/Angerer, Lindemann) entra como **módulo add-on
-pago** ("Análise Iridológica Aprofundada", 1 crédito, V1.1+). O usuário
-primário do produto é o terapeuta — pacientes/clientes finais não têm conta
-no V1.
+> **A íris como mapa do ser.**
+
+Iris Codex é uma plataforma para terapeutas integrativos, clientes finais e
+curiosos, com pipeline em duas camadas: visão computacional dedicada extrai
+*features* objetivas da íris a partir de fotos capturadas via PWA mobile ou
+upload desktop, e um LLM (Claude Sonnet 4.6) interpreta essas features em
+**linguagem clínico-funcional** ancorado em uma base de conhecimento
+iridológica indexada por RAG. Sistemas sem achados relevantes são omitidos
+do output (relatório adaptativo, não template fixo). Análise iridológica
+formal com nomenclatura técnica (Jensen, Lo Rito, Deck/Angerer, Lindemann)
+entra como **módulo add-on pago** ("Análise Iridológica Aprofundada", 1
+crédito, V1.1+). O usuário primário do produto é o terapeuta —
+pacientes/clientes finais não têm conta no V1.
 
 **Separação de marcas (D-BR1, Phase 7.4):**
 - **Iris Codex** — científico-clínico, este produto.

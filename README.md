@@ -1,6 +1,8 @@
 # Iris Codex
 
-Plataforma clínica de relatórios iridológicos funcionais adaptativos para terapeutas integrativos, clientes finais e curiosos.
+> A íris como mapa do ser.
+
+Plataforma para terapeutas integrativos, clientes finais e curiosos.
 
 > Ferramenta de apoio à anamnese terapêutica integrativa, não substitui avaliação médica.
 

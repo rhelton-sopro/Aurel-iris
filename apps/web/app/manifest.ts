@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'Iris Codex',
     short_name: 'Iris Codex',
-    description: 'Plataforma clínica de relatórios iridológicos funcionais adaptativos.',
+    description: 'A íris como mapa do ser.',
     start_url: '/dashboard',
     display: 'standalone',
     orientation: 'portrait',
