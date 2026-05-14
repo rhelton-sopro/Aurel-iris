@@ -95,7 +95,7 @@ export function ReportReadView({
               key={key}
               data-section-key={key}
               data-section-heading={headingStr}
-              className="font-serif"
+              className="font-serif print:break-inside-avoid"
             >
               <h2
                 className={`${headingMargin} mb-4 text-2xl font-bold tracking-tight`}
