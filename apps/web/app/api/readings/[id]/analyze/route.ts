@@ -28,8 +28,6 @@ import { revalidatePath } from 'next/cache'
 
 import { createClient } from '@/lib/supabase/server'
 import { analyzeReading } from '@/lib/anthropic/analyze'
-import { analyzeReadingV2, ZodValidationFailedError } from '@/lib/anthropic/analyze-v2'
-import { detectCompletedKeys } from '@/lib/anthropic/stream-parser-v2'
 import { isFounderEmail } from '@/lib/auth/founder'
 import { mergeCanonicalIrisColor } from '@/lib/canonicalize/merge-iris-color'
 import type { CanonicalMetadata } from '@/lib/anthropic/types'
@@ -37,13 +35,11 @@ import type { IrisFeaturesForRag } from '@/lib/rag/build-queries'
 import { findAllBoundaries, closeSections } from '@/lib/anthropic/parser'
 import { runAudit } from '@/lib/anthropic/audit'
 import { MODEL } from '@/lib/anthropic/client'
-import { REPORT_SECTIONS } from '@/lib/anthropic/types'
 import {
   ENCERRAMENTO_LITERAL,
   type ReportJsonb,
   type RegenerationLogEntry,
 } from '@/lib/anthropic/types'
-import { mapVisionFeaturesToTendencies } from '@/lib/tendency-engine'
 
 export const runtime = 'nodejs'
 export const maxDuration = 300
@@ -68,7 +64,7 @@ export async function POST(
   const { data: reading, error: readingError } = await supabase
     .from('readings')
     .select(
-      'id, therapist_id, status, vision_features, canonical_metadata, report_delivered, report_v2, report_v2_delivered, report_version, regeneration_count, regeneration_log, therapist_notes, client:clients(full_name, birth_date)',
+      'id, therapist_id, status, vision_features, canonical_metadata, report_delivered, regeneration_count, regeneration_log, therapist_notes, client:clients(full_name, birth_date)',
     )
     .eq('id', readingId)
     .maybeSingle()
@@ -90,13 +86,8 @@ export async function POST(
       { status: 409 },
     )
   }
-  // Gate (d): not yet delivered. For V2 readings, check `report_v2_delivered`;
-  // for legacy `'1.0'` readings, retain the original `report_delivered` check.
-  const alreadyDelivered =
-    reading.report_version === '2.0'
-      ? reading.report_v2_delivered != null
-      : reading.report_delivered != null
-  if (alreadyDelivered) {
+  // Gate (d): not yet delivered.
+  if (reading.report_delivered != null) {
     return NextResponse.json(
       { error: 'Reading already delivered. Cannot regenerate.' },
       { status: 409 },
@@ -114,183 +105,6 @@ export async function POST(
       { status: 409 },
     )
   }
-
-  // === Phase 7.4 V2 branch ===
-  // Phase 7.4 | Plan 07.4-05 | Decisões: D-VAL1, D-VAL2, D-VAL3, D-UI3
-  //
-  // Branch on report_version. Legacy '1.0' (or null) falls through to the
-  // existing Phase 7 path below. New '2.0' readings get the Iris Codex pipeline:
-  //   tendency-engine → RAG → analyzeReadingV2 → stream text deltas + finalize +
-  //   ZodValidationFailedError catch + canonical persist ONCE after finalize.
-  //
-  // Persistence model (V1): canonical report_v2 jsonb writes ONCE on stream
-  // completion. detectCompletedKeys is used only for progress signaling. Mid-stream
-  // disconnect = NO persisted state; caller retries. Per-key checkpoint persistence
-  // is a V1.1 polish item.
-  if (reading.report_version === '2.0') {
-    // Normalize vision_features shape — same fallback pattern as Phase 7 analyze.ts
-    const vf = reading.vision_features as Record<string, unknown> | null
-    if (!vf) {
-      return NextResponse.json({ error: 'vision_features ausente' }, { status: 422 })
-    }
-    const eyeSource =
-      (vf.right_eye as Record<string, unknown>) ??
-      (vf.left_eye as Record<string, unknown>) ??
-      {}
-    const constitutionRaw = eyeSource.constitution
-    const constitutionObj =
-      typeof constitutionRaw === 'string'
-        ? { primary: constitutionRaw }
-        : ((constitutionRaw as { primary?: string; secondary?: string } | null) ?? {
-            primary: '',
-          })
-    const featuresForRag: IrisFeaturesForRag = {
-      constitution: {
-        primary: constitutionObj.primary ?? '',
-        secondary: constitutionObj.secondary,
-      },
-      sectors:
-        (eyeSource.sectors as Array<{
-          hour: number
-          findings: Array<{ type: string }>
-        }>) ?? [],
-      rings:
-        (eyeSource.rings as Record<string, { present: boolean }>) ?? {},
-    }
-
-    // 1. Map vision features → tendencies (D-PR2, D-PR3)
-    const tendencies = mapVisionFeaturesToTendencies(featuresForRag)
-
-    // 2. RAG knowledge retrieval — reuses Fase 6 contract
-    const { retrieveRelevantKnowledge } = await import('@/lib/rag/search')
-    const knowledgeChunks = await retrieveRelevantKnowledge({
-      features: featuresForRag,
-      reportSections: REPORT_SECTIONS,
-    })
-
-    // 3. Compute client context for prompt
-    const v2ClientName =
-      (reading.client as { full_name?: string } | null)?.full_name ?? ''
-    const v2ClientBirth =
-      (reading.client as { birth_date?: string } | null)?.birth_date ?? null
-    const v2ClientAge = v2ClientBirth
-      ? Math.floor((Date.now() - new Date(v2ClientBirth).getTime()) / 31_557_600_000)
-      : null
-
-    // 4. Open V2 stream
-    const analysisV2 = await analyzeReadingV2({
-      readingId,
-      therapistId: user.id,
-      clientName: v2ClientName,
-      clientAge: v2ClientAge,
-      clientSex: null, // Phase 7 didn't expose sex; can be enriched in a future plan
-      therapistNotes: reading.therapist_notes ?? null,
-      tendencies,
-      knowledgeChunks,
-      signal: request.signal,
-    })
-
-    const v2Encoder = new TextEncoder()
-    let v2Buffer = ''
-    let v2LastCompletedCount = 0
-
-    const v2ResponseStream = new ReadableStream({
-      async start(controller) {
-        try {
-          for await (const text of analysisV2.stream) {
-            v2Buffer += text
-            controller.enqueue(v2Encoder.encode(text))
-
-            // Client-progress signaling only — NO mid-stream DB writes.
-            // Canonical persistence happens ONCE after finalize() below.
-            const completed = detectCompletedKeys(v2Buffer)
-            if (completed.length > v2LastCompletedCount) {
-              v2LastCompletedCount = completed.length
-            }
-          }
-
-          // 5. Finalize: zod validation + retry path (inside analyze-v2)
-          const result = await analysisV2.finalize()
-
-          // 6. Persist final state ONCE — full report_v2 + audit_metadata + timestamps.
-          //    Single DB write for the generation flow. Mid-stream disconnect → no
-          //    persisted state; caller retries by re-invoking the route handler.
-          await supabase
-            .from('readings')
-            .update({
-              report_v2: result.report as never,
-              report_v2_generated_at: new Date().toISOString(),
-              audit_metadata: result.audit as never,
-              status: 'ready', // editor flips to 'edited' on first save
-              regeneration_count:
-                (reading.regeneration_count ?? 0) + (reading.report_v2 ? 1 : 0),
-            })
-            .eq('id', readingId)
-
-          revalidatePath(`/leituras/${readingId}`)
-          revalidatePath(`/leituras/${readingId}/editar`)
-          revalidatePath('/leituras')
-
-          controller.close()
-        } catch (err) {
-          if (err instanceof ZodValidationFailedError) {
-            // D-VAL2 3rd-fail path: save raw + flag, do NOT block reading.
-            // RESEARCH §V8 LGPD: redact client_name from raw before persist.
-            const lgpdClientName =
-              (reading.client as { full_name?: string } | null)?.full_name ?? ''
-            const sanitizedRaw = lgpdClientName
-              ? err.rawOutput.split(lgpdClientName).join('[CLIENT_NAME_REDACTED]')
-              : err.rawOutput
-
-            await supabase
-              .from('readings')
-              .update({
-                audit_metadata: {
-                  json_validation_failed: true,
-                  invalid_json_output: sanitizedRaw.slice(0, 50000), // cap to avoid jsonb bloat
-                  retry_count: err.attempts,
-                  zod_error_summary: err.zodError.issues.slice(0, 10).map((i) => ({
-                    path: i.path.join('.'),
-                    message: i.message,
-                  })),
-                } as never,
-                report_v2_generated_at: new Date().toISOString(),
-                status: 'ready',
-              })
-              .eq('id', readingId)
-
-            controller.enqueue(
-              v2Encoder.encode('\n\n[ERRO_GERACAO: founder review needed]'),
-            )
-            controller.close()
-            return
-          }
-
-          // Unknown error — close stream, do not corrupt DB
-          const message = err instanceof Error ? err.message : 'unknown'
-          console.error('[analyze-v2] stream error reading=' + readingId + ' err=', message)
-          try {
-            controller.error(err)
-          } catch {
-            /* already closed */
-          }
-        }
-      },
-
-      async cancel() {
-        console.info('[analyze-v2] stream cancelled by caller reading=' + readingId)
-      },
-    })
-
-    return new Response(v2ResponseStream, {
-      headers: {
-        'Content-Type': 'text/plain; charset=utf-8',
-        'Cache-Control': 'no-cache, no-transform',
-        'X-Content-Type-Options': 'nosniff',
-      },
-    })
-  }
-  // ----- end V2 branch — legacy '1.0' path continues below -----
 
   // Compute client age for prompt injection
   const clientName = (reading.client as { full_name?: string } | null)?.full_name ?? 'Cliente'

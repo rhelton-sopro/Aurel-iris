@@ -18,7 +18,30 @@ import { AlertTriangle } from 'lucide-react'
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { safeArray } from '@/lib/utils'
-import type { AuditV2Hit, AuditV2Result } from '@/lib/anthropic/types-v2'
+
+/**
+ * Audit hit + result shapes (inlined Plan 10 — Direction Correction).
+ *
+ * Source of truth was `@/lib/anthropic/types-v2` (deleted with the 8-block
+ * pipeline). VocabularyAuditBanner is retained as a runtime audit-display
+ * surface (DC-10); Plan 11/12 will revisit the audit pipeline for the
+ * 14-section markdown direction and may re-centralize these types.
+ */
+export interface AuditV2Hit {
+  /** Dot-path identifier (e.g., 'executive_summary' or 'systems.linfatico.field'). */
+  field: string
+  term: string
+  count: number
+}
+
+export interface AuditV2Result {
+  iridological_jargon: AuditV2Hit[]
+  sopro_vocab: AuditV2Hit[]
+  forbidden_vocab: AuditV2Hit[]
+  json_validation_passed: boolean
+  retry_count: number
+  audited_at: string // ISO timestamp
+}
 
 function uniqTerms(hits: AuditV2Hit[]): string {
   return Array.from(new Set(hits.map((h) => h.term))).join(', ')

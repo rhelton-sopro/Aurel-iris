@@ -6,8 +6,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { VocabularyAuditBanner } from '../VocabularyAuditBanner'
-import type { AuditV2Result } from '@/lib/anthropic/types-v2'
+import { VocabularyAuditBanner, type AuditV2Result } from '../VocabularyAuditBanner'
 
 function buildAudit(partial: Partial<AuditV2Result> = {}): AuditV2Result {
   return {

@@ -7,12 +7,11 @@
  *   B — streaming (client-driven, ephemeral): handled by analise-client.tsx
  *   C — generated (report_generated populated): show "Editar análise" + regen
  *
- * Phase 7.4 (07.4-08-PLAN): D-UI3 + D-LEG2 — RSC router by `report_version`.
- *   - V2 path (report_version='2.0' + report_v2 populated): render
- *     <ReportAdaptiveView> below the hero with AdvancedAnalysisCTA in footerSlot.
- *   - Legacy path (report_version='1.0' or missing report_v2): existing
- *     AnalysisHero + AnaliseClient block stays exactly as it was (zero regression
- *     for 25 existing readings backfilled with report_version='1.0').
+ * Phase 7.4 Plan 10 (Direction Correction — see 07.4-CONTEXT.md DC-1..DC-10):
+ *   The 8-block JSON v2 surface (ReportAdaptiveView + AdvancedAnalysisCTA
+ *   footerSlot + report_version routing) has been removed. All readings render
+ *   via the legacy AnalysisHero + AnaliseClient + EditorAccordion path until
+ *   Plan 12 rebuilds the v2 surface around 14 markdown sections.
  *
  * Auth + RLS via createClient() session-bound. Therapist must own the reading
  * to see it (RLS enforces; route returns 404 via `notFound()` if missing).
@@ -24,9 +23,6 @@ import { createClient } from '@/lib/supabase/server'
 import { LocalDateTime } from '@/components/ui/local-date-time'
 import { StatusBadge } from '@/components/readings/StatusBadge'
 import { AnalysisHero } from '@/components/readings/AnalysisHero'
-import { ReportAdaptiveView } from '@/components/readings/ReportAdaptiveView'
-import { AdvancedAnalysisCTA } from '@/components/readings/AdvancedAnalysisCTA'
-import type { ReportV2 } from '@/lib/anthropic/report-schema'
 import { AnaliseClient } from './analise-client'
 
 export const dynamic = 'force-dynamic'
@@ -42,7 +38,7 @@ export default async function LeituraDetailPage({
   const { data: reading, error } = await supabase
     .from('readings')
     .select(
-      'id, status, created_at, report_generated, report_delivered, audit_metadata, regeneration_count, is_delivered, delivered_at, vision_features, report_v2, report_v2_delivered, report_version, client:clients(full_name, birth_date)',
+      'id, status, created_at, report_generated, report_delivered, audit_metadata, regeneration_count, is_delivered, delivered_at, vision_features, client:clients(full_name, birth_date)',
     )
     .eq('id', readingId)
     .maybeSingle()
@@ -55,14 +51,6 @@ export default async function LeituraDetailPage({
   const regenerationCount = reading.regeneration_count ?? 0
   const isDelivered = reading.is_delivered ?? false
   const status = reading.status ?? 'pending'
-
-  // V2 routing (D-UI3): branch render by report_version.
-  const reportV2 = reading.report_v2 as ReportV2 | null
-  const reportV2Delivered = reading.report_v2_delivered as ReportV2 | null
-  const reportVersion = (reading.report_version ?? '1.0') as '1.0' | '2.0'
-  const isV2 = reportVersion === '2.0' || reportV2 != null
-  const hasReportV2 =
-    isV2 && reportV2 != null && Object.keys(reportV2).length > 0
 
   return (
     <div className="space-y-6 px-6 py-8">
@@ -87,13 +75,10 @@ export default async function LeituraDetailPage({
       </div>
 
       {/* The hero card decides which State (A/B/C) to render based on
-          server-side data + delegates streaming-state UI to analise-client.
-          UNCHANGED for legacy 1.0 path — D-LEG2 zero regression. The V2 path
-          ALSO uses the same hero for empty/streaming states; the adaptive
-          report body renders below the hero when report_v2 is populated. */}
+          server-side data + delegates streaming-state UI to analise-client. */}
       <AnalysisHero
         readingId={readingId}
-        hasReport={isV2 ? hasReportV2 : hasReport}
+        hasReport={hasReport}
         status={status as never}
         regenerationCount={regenerationCount}
         isDelivered={isDelivered}
@@ -103,28 +88,14 @@ export default async function LeituraDetailPage({
         }
         auditMetadata={reading.audit_metadata as never}
       >
-        {/* Client island for streaming state machine + fetch.
-            reportVersion drives the streaming UI switch in analise-client.tsx
-            (V2 → AdaptiveAnalysisStream; legacy → AnalysisStream). */}
+        {/* Client island for streaming state machine + fetch. */}
         <AnaliseClient
           readingId={readingId}
-          hasInitialReport={isV2 ? hasReportV2 : hasReport}
+          hasInitialReport={hasReport}
           regenerationCount={regenerationCount}
           isDelivered={isDelivered}
-          reportVersion={reportVersion}
         />
       </AnalysisHero>
-
-      {/* V2 path (D-UI3): adaptive report body below the hero. Prefers the
-          delivered jsonb if present, falls back to generated. Legacy 1.0
-          readings skip this entire branch — the editar route renders their
-          report via EditorAccordion (unchanged). */}
-      {isV2 && hasReportV2 && (
-        <ReportAdaptiveView
-          report={(reportV2Delivered ?? reportV2) as ReportV2}
-          footerSlot={<AdvancedAnalysisCTA />}
-        />
-      )}
     </div>
   )
 }
