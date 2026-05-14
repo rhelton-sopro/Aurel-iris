@@ -45,3 +45,16 @@ class ResizeObserverMock {
   disconnect() {}
 }
 globalThis.ResizeObserver = ResizeObserverMock as unknown as typeof ResizeObserver
+
+// jsdom não implementa PointerEvent — base-ui Checkbox/Select onClick handlers
+// invocam `new PointerEvent('click', {...})` em jsdom (sem isso o handler
+// lança ReferenceError silenciosamente e os onCheckedChange/onValueChange
+// callbacks nunca disparam). Fallback para MouseEvent que tem o subset
+// necessário (pointerType, pointerId default undefined).
+if (typeof globalThis.PointerEvent === 'undefined') {
+  // Cast: MouseEvent satisfies the subset of PointerEvent that base-ui touches
+  // in jsdom (type + button + currentTarget). pointerType, pressure, tangentialPressure
+  // are read-only undefined on MouseEvent which is acceptable for click semantics.
+  globalThis.PointerEvent =
+    globalThis.MouseEvent as unknown as typeof PointerEvent
+}
