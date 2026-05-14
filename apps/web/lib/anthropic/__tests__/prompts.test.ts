@@ -13,7 +13,7 @@ beforeEach(() => {
   _resetPromptsCache()
 })
 
-describe('lib/anthropic/prompts — file content (Plan 11 — 14-section Iris Codex V1)', () => {
+describe('lib/anthropic/prompts — file content (Plan 16 — 15-section Iris Codex V1)', () => {
   it('system.md contém o marker allowlist do audit na linha 1', () => {
     const sys = loadSystemPrompt()
     const firstLine = sys.split('\n')[0]
@@ -24,18 +24,36 @@ describe('lib/anthropic/prompts — file content (Plan 11 — 14-section Iris Co
     expect(loadSystemPrompt()).toContain('Iris Codex')
   })
 
-  it('system.md contém os 14 headings "## §N — Title" (1..14)', () => {
+  it('system.md contém os 15 headings "## §N — Title" (1, 2, 2.5, 3..14)', () => {
     const sys = loadSystemPrompt()
-    for (let n = 1; n <= 14; n++) {
-      expect(sys).toMatch(new RegExp(`## §${n} —`))
+    const expectedNumbers = [
+      '1',
+      '2',
+      '2.5',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
+      '10',
+      '11',
+      '12',
+      '13',
+      '14',
+    ]
+    for (const n of expectedNumbers) {
+      expect(sys).toContain(`## §${n} —`)
     }
   })
 
-  it('system.md contém os 14 titles canônicos da Direction Correction DC-1', () => {
+  it('system.md contém os 15 titles canônicos (Plan 16 — §2.5 inserted between §2 and §3)', () => {
     const sys = loadSystemPrompt()
     const expectedTitles = [
       'Constituição e Temperamento',
       'Mapa Orgânico',
+      'Sistemas em Bom Funcionamento',
       'Linha do Tempo Emocional',
       'Padrões Emocionais Ativos',
       'Eixo Psicossomático',
@@ -62,8 +80,8 @@ describe('lib/anthropic/prompts — file content (Plan 11 — 14-section Iris Co
     expect(sys).not.toContain('systems_with_tendency')
     expect(sys).not.toContain('tendency_grade')
     expect(sys).not.toContain('bilateral_findings')
-    // Positive assertion: the prompt instructs markdown output
-    expect(sys).toMatch(/14 seções markdown/i)
+    // Positive assertion: the prompt instructs markdown output (15 seções)
+    expect(sys).toMatch(/15 seções markdown/i)
   })
 
   it('feature-injection.md contém placeholders mustache canônicos', () => {
@@ -140,6 +158,86 @@ describe('lib/anthropic/prompts — renderInjection mustache substitution', () =
   it('preserva texto sem placeholders', () => {
     const out = renderInjection('Sem placeholders aqui.', {})
     expect(out).toBe('Sem placeholders aqui.')
+  })
+})
+
+describe('lib/anthropic/prompts — Plan 16 absolute rules + structural restructures', () => {
+  it('contém o bloco "Regras absolutas (mandatórias)" com as 7 regras nomeadas', () => {
+    const sys = loadSystemPrompt()
+    expect(sys).toContain('## Regras absolutas (mandatórias)')
+    expect(sys).toContain('Regra 1 — Nunca cite autores')
+    expect(sys).toContain('Regra 2 — Nunca cite escolas')
+    expect(sys).toContain('Regra 3 — Nenhuma referência a setores')
+    expect(sys).toContain('Regra 4 — §3 Linha do Tempo: APENAS 4 campos clínicos')
+    expect(sys).toContain('Regra 5 — §10 Arquetípica abre simbolicamente')
+    expect(sys).toContain('Regra 6 — §13 Síntese: apenas temas humanos')
+    expect(sys).toContain('Regra 7 — §1 Polimento')
+  })
+
+  it('Regra 1 lista os autores que nunca devem aparecer (allowlisted file)', () => {
+    const sys = loadSystemPrompt()
+    // The rule block names the authors so Sonnet knows what NOT to say.
+    // Allowlist marker on line 1 keeps audit-vocabulary.mjs happy.
+    expect(sys).toMatch(/Jensen[\s\S]*Lo Rito[\s\S]*Battello[\s\S]*Moraga/)
+  })
+
+  it('Regra 2 lista as escolas/tradições que nunca devem aparecer', () => {
+    const sys = loadSystemPrompt()
+    expect(sys).toMatch(/escola alemã[\s\S]*italiana[\s\S]*americana/)
+    expect(sys).toContain('medicina tradicional chinesa')
+    expect(sys).toContain('Cronorichio')
+  })
+
+  it('§3 instructions include the 4 mandatory field labels', () => {
+    const sys = loadSystemPrompt()
+    expect(sys).toContain('**Período de vida:**')
+    expect(sys).toContain('**O que pode ter acontecido:**')
+    expect(sys).toContain('**Tipo de bloqueio/trauma:**')
+    expect(sys).toContain('**Status atual:**')
+  })
+
+  it('§3 instructions include the 3 verbatim Status atual phrases', () => {
+    const sys = loadSystemPrompt()
+    expect(sys).toContain('Resolvido — marca cicatrizada, sem expressão atual')
+    expect(sys).toContain('Em processo — organismo trabalhando ativamente esse campo')
+    expect(sys).toContain('A resolver — marca ativa, pede atenção terapêutica')
+  })
+
+  it('§3 instructions include the INTERNAL vs VISIBLE separation language', () => {
+    const sys = loadSystemPrompt()
+    expect(sys).toMatch(/INTERNAL[\s\S]*VISIBLE/)
+    expect(sys).toMatch(/skip-rather-than-fabricate/i)
+  })
+
+  it('§2.5 — Sistemas em Bom Funcionamento section exists with anchoring criteria', () => {
+    const sys = loadSystemPrompt()
+    expect(sys).toContain('## §2.5 — Sistemas em Bom Funcionamento')
+    expect(sys).toMatch(/Ausência de marcas no setor esperado/)
+    expect(sys).toMatch(/Zonas claras\/íntegras/)
+    expect(sys).toMatch(/Marcadores estruturais positivos/)
+    expect(sys).toMatch(/5 sistemas/)
+  })
+
+  it('§10 instructions enforce symbolic opening (not anatomical)', () => {
+    const sys = loadSystemPrompt()
+    expect(sys).toContain('§10 ABRE com a leitura arquetípica')
+    expect(sys).toMatch(/NÃO abra com inventário anatômico/)
+  })
+
+  it('§13 instructions enforce no-sector-no-hour-no-eye prohibition', () => {
+    const sys = loadSystemPrompt()
+    expect(sys).toContain('§13 NÃO tem referência a setor')
+    expect(sys).toMatch(/sem coordenadas/)
+  })
+
+  it('§1 polimento table includes the 3 mappings', () => {
+    const sys = loadSystemPrompt()
+    expect(sys).toContain('densidade fibrilar alta')
+    expect(sys).toContain('fibras compactas e densas')
+    expect(sys).toContain('colarete regular')
+    expect(sys).toContain('anel interno regular e bem posicionado')
+    expect(sys).toContain('hepatobiliar')
+    expect(sys).toContain('do fígado e vesícula')
   })
 })
 
