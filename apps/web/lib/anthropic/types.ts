@@ -80,6 +80,30 @@ export const NUMBERED_SECTION_HEADINGS = [
 export type NumberedSectionHeading = (typeof NUMBERED_SECTION_HEADINGS)[number]
 
 /**
+ * Display title for each numbered section, keyed by heading-number string.
+ * Single source of truth — consumed by AnalysisStream (streaming progress UI),
+ * EditorAccordion (editor surface), and ReportReadView (reading-mode flowing
+ * document). Plan 18 extracted this from the previous 3-place duplication.
+ */
+export const SECTION_TITLE_BY_NUMBER: Record<NumberedSectionHeading, string> = {
+  '1': 'Constituição e Temperamento',
+  '2': 'Mapa Orgânico',
+  '2.5': 'Sistemas em Bom Funcionamento',
+  '3': 'Linha do Tempo Emocional',
+  '4': 'Padrões Emocionais Ativos',
+  '5': 'Eixo Psicossomático',
+  '6': 'Heranças Transgeracionais',
+  '7': 'Carências Funcionais',
+  '8': 'Estado Mental e Nervoso',
+  '9': 'Recursos e Forças',
+  '10': 'Dimensão Arquetípica',
+  '11': 'Sugestões Integrativas',
+  '12': 'Roteiro de Anamnese',
+  '13': 'Síntese Integrativa',
+  '14': 'Mensagem para o Cliente',
+}
+
+/**
  * Map heading-number string ('1', '2', '2.5', '3', ..., '14') to canonical
  * section key. Plan 17 (UAT-3): re-keyed from numeric to string so '2.5'
  * round-trips through the parser without lossy numeric conversion.
