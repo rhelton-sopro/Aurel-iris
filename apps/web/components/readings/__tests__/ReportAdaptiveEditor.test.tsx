@@ -302,8 +302,22 @@ describe('components/readings/ReportAdaptiveEditor (D-UI2, FLAG-5) — Plan 07.4
     expect(screen.getByText(/diagnóstico/)).toBeInTheDocument()
   })
 
-  it('exposes Editar toggles for the 5 simple-text editable blocks (Plan 07b adds 3 more)', () => {
-    const report = buildReport()
+  it('exposes Editar toggles for all 8 editable blocks (5 simple-text + 3 structured via Plan 07b sub-editors)', () => {
+    const report = buildReport({
+      // Need at least one system so the per-system editar toggle renders.
+      systems_with_tendency: [
+        {
+          system_id: 'linfatico',
+          system_name: 'Sistema linfático',
+          tendency_grade: 3,
+          tendency_label: 'moderada',
+          clinical_description: 'desc',
+          associated_manifestations: ['m1'],
+          investigation_points: ['p1'],
+          therapeutic_direction: 'plan',
+        },
+      ],
+    })
     render(
       <ReportAdaptiveEditor
         readingId={READING_ID}
@@ -313,9 +327,8 @@ describe('components/readings/ReportAdaptiveEditor (D-UI2, FLAG-5) — Plan 07.4
         isDelivered={false}
       />,
     )
-    expect(
-      screen.getByTestId('editar-executive_summary'),
-    ).toBeInTheDocument()
+    // 5 simple-text editors (Plan 07.4-07)
+    expect(screen.getByTestId('editar-executive_summary')).toBeInTheDocument()
     expect(
       screen.getByTestId('editar-constitutional_pattern'),
     ).toBeInTheDocument()
@@ -324,17 +337,13 @@ describe('components/readings/ReportAdaptiveEditor (D-UI2, FLAG-5) — Plan 07.4
     ).toBeInTheDocument()
     expect(screen.getByTestId('editar-priority_focus')).toBeInTheDocument()
     expect(screen.getByTestId('editar-clinical_note')).toBeInTheDocument()
-    // The 3 structured blocks (systems / axes / bilateral) intentionally
-    // have no editor in Plan 07.4-07 — Plan 07b adds them. Assert absence.
-    expect(
-      screen.queryByTestId('editar-systems_with_tendency'),
-    ).not.toBeInTheDocument()
-    expect(
-      screen.queryByTestId('editar-integrative_axes'),
-    ).not.toBeInTheDocument()
-    expect(
-      screen.queryByTestId('editar-bilateral_findings'),
-    ).not.toBeInTheDocument()
+    // 3 structured editors (Plan 07.4-07b sub-editors mounted here):
+    //   - systems_with_tendency uses per-system editar toggles keyed by system_id
+    //   - integrative_axes uses a single editar-integrative_axes toggle
+    //   - bilateral_findings uses editar-bilateral_findings (FLAG-5 always renders)
+    expect(screen.getByTestId('editar-system-linfatico')).toBeInTheDocument()
+    expect(screen.getByTestId('editar-integrative_axes')).toBeInTheDocument()
+    expect(screen.getByTestId('editar-bilateral_findings')).toBeInTheDocument()
   })
 
   it('priority_focus editor exposes 3 inputs and round-trips edits', () => {

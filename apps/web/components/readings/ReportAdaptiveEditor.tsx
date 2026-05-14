@@ -16,24 +16,24 @@
  *  - `AdvancedAnalysisCTA` rendered above the sticky footer for visual
  *    consistency with the read-only view.
  *
- * Scope (Plan 07.4-07):
- *  - 5 simple-text block editors live inline here: executive_summary,
- *    constitutional_pattern (description + key_traits), therapeutic_synthesis,
- *    priority_focus (3 inputs), clinical_note.
- *  - The 3 structured block editors (systems_with_tendency,
- *    integrative_axes, bilateral_findings) are delivered by Plan 07b which
- *    extends this file by mounting sub-editor components inside the same
- *    BlockEditPane toggle pattern. Until then those 3 blocks render in
- *    VIEW mode only (read-only Card content) so the user can still see
- *    the data but cannot edit it.
+ * All 8 block editors live in this file. 5 simple-text editors are inline
+ * (executive_summary, constitutional_pattern, therapeutic_synthesis,
+ * priority_focus, clinical_note). 3 array/object editors are delegated to
+ * sub-components (Plan 07.4-07b):
+ *  - SystemTendencyCardEditor — per-system_id card with 6 fields; one editor
+ *    per system, independent expanded state via `expandedSystemId`.
+ *  - IntegrativeAxesEditor — add/remove axes + per-axis form; full array
+ *    replacement on save (diff classifier records top-level 'integrative_axes').
+ *  - BilateralFindingsEditor — Checkbox + Textarea; always renders the form
+ *    regardless of asymmetry_present (UI-SPEC FLAG-5).
  *
- * FLAG-5 (UI-SPEC line 273): bilateral_findings form renders unconditionally
- * in the editor regardless of asymmetry_present. That toggle is implemented
- * by Plan 07b's BilateralFindingsEditor sub-editor. In Plan 07's interim
- * view-mode rendering, we still always show the card so the user knows the
- * block exists.
+ * Per-system save path: parent owns the systems_with_tendency[] draft array,
+ * sub-editor edits one system at a time, parent merges by system_id then
+ * dispatches the FULL array to saveReportV2Delivered. Server-side
+ * classifyAllSystemsV2 (Plan 07.4-03) computes per-system_id diff against
+ * the current report_v2 (D-SCH3).
  *
- * Phase 7.4 | Plan 07.4-07 | Decisões: D-UI2, D-VOC3, D-VAL3
+ * Phase 7.4 | Plan 07.4-07 + 07.4-07b | Decisões: D-UI2, D-VOC3, D-VAL3, D-UI1, D-UI4, D-SCH3
  */
 import { useMemo, useState, useTransition } from 'react'
 import { Pencil } from 'lucide-react'
@@ -43,7 +43,6 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Separator } from '@/components/ui/separator'
 import { Textarea } from '@/components/ui/textarea'
 
 import { saveReportV2Delivered, deliverReportV2 } from '@/app/actions/analise'
@@ -52,12 +51,12 @@ import type { ReportV2 } from '@/lib/anthropic/report-schema'
 import type { AuditV2Result } from '@/lib/anthropic/types-v2'
 
 import { AdvancedAnalysisCTA } from './AdvancedAnalysisCTA'
-import { BilateralFindingsCard } from './BilateralFindingsCard'
+import { BilateralFindingsEditor } from './BilateralFindingsEditor'
 import { BlockEditPane } from './BlockEditPane'
 import { DeliverDialog } from './DeliverDialog'
-import { IntegrativeAxisItem } from './IntegrativeAxisItem'
+import { IntegrativeAxesEditor } from './IntegrativeAxesEditor'
 import { KeyTraitChipGroup } from './KeyTraitChipGroup'
-import { SystemTendencyCard } from './SystemTendencyCard'
+import { SystemTendencyCardEditor } from './SystemTendencyCardEditor'
 import { VocabularyAuditBanner } from './VocabularyAuditBanner'
 
 type EditableKey =
@@ -66,6 +65,13 @@ type EditableKey =
   | 'therapeutic_synthesis'
   | 'priority_focus'
   | 'clinical_note'
+  // Plan 07.4-07b extends this union for the 2 top-level structured editors.
+  // systems_with_tendency is NOT here — per-system expansion uses the
+  // independent `expandedSystemId` state below (multiple systems can never be
+  // open simultaneously, but the systems block is conceptually always "live"
+  // because each card has its own Editar toggle).
+  | 'integrative_axes'
+  | 'bilateral_findings'
 
 const ALL_KEYS: ReadonlyArray<keyof ReportV2> = [
   'executive_summary',
@@ -102,6 +108,11 @@ export function ReportAdaptiveEditor({
   )
   const [draft, setDraft] = useState<ReportV2>(initial)
   const [expandedKey, setExpandedKey] = useState<EditableKey | null>(null)
+  // Per-system edit mode (Plan 07.4-07b): tracks which system_id (if any) is
+  // currently expanded for editing. Independent from expandedKey because the
+  // user opens systems by clicking the per-card Editar button — no top-level
+  // toggle for the systems_with_tendency block.
+  const [expandedSystemId, setExpandedSystemId] = useState<string | null>(null)
   const [pending, startTransition] = useTransition()
   const [deliverDialogOpen, setDeliverDialogOpen] = useState(false)
 
@@ -333,18 +344,11 @@ export function ReportAdaptiveEditor({
       </Card>
 
       {/*
-        3. Sistemas com tendência, 4. Eixos integrativos, 5. Achados bilaterais —
-        SUB-EDITOR MOUNT POINTS for Plan 07b.
-
-        Plan 07b will extend this file by replacing the read-only renderings
-        below with edit-mode wrappers powered by:
-          - SystemTendencyCardEditor (mounts inside BlockEditPane per system_id)
-          - IntegrativeAxesEditor (mounts inside BlockEditPane for the array)
-          - BilateralFindingsEditor (mounts inside BlockEditPane, always-render
-            regardless of asymmetry_present — FLAG-5)
-
-        Plan 07.4-07 (current) renders these blocks in VIEW mode so the user can
-        still see the data while the structured editors are pending.
+        3. Sistemas com tendência — Plan 07.4-07b sub-editor mount.
+        One SystemTendencyCardEditor per system; per-system_id expanded state
+        via expandedSystemId. Save dispatches the FULL systems_with_tendency
+        array — server-side classifyAllSystemsV2 (D-SCH3) computes per-system_id
+        diff against current report_v2.
       */}
       {draftSystems.length > 0 && (
         <div className="space-y-4">
@@ -352,36 +356,112 @@ export function ReportAdaptiveEditor({
           <div className="space-y-6">
             {[...draftSystems]
               .sort((a, b) => b.tendency_grade - a.tendency_grade)
-              .map((sys) => (
-                <SystemTendencyCard key={sys.system_id} system={sys} />
-              ))}
+              .map((sys) => {
+                const initialSys =
+                  safeArray<ReportV2['systems_with_tendency'][number]>(
+                    initial.systems_with_tendency,
+                  ).find((s) => s.system_id === sys.system_id) ?? sys
+                return (
+                  <SystemTendencyCardEditor
+                    key={sys.system_id}
+                    system={sys}
+                    initialSystem={initialSys}
+                    saving={pending}
+                    expanded={expandedSystemId === sys.system_id}
+                    onExpand={() => setExpandedSystemId(sys.system_id)}
+                    onCancel={() => {
+                      // Revert this single system to initial; preserve other
+                      // systems' in-flight edits in draft.
+                      const nextSystems = safeArray<
+                        ReportV2['systems_with_tendency'][number]
+                      >(draft.systems_with_tendency).map((s) =>
+                        s.system_id === sys.system_id ? initialSys : s,
+                      )
+                      setDraft({
+                        ...draft,
+                        systems_with_tendency: nextSystems,
+                      })
+                      setExpandedSystemId(null)
+                    }}
+                    onSave={() => {
+                      // Save the FULL systems_with_tendency array. Server-side
+                      // diff classifier (classifyAllSystemsV2, Plan 07.4-03)
+                      // records the per-system_id delta — keyed by system_id
+                      // per D-SCH3.
+                      startTransition(async () => {
+                        const result = await saveReportV2Delivered(readingId, {
+                          systems_with_tendency: draft.systems_with_tendency,
+                        })
+                        if (result.error) {
+                          toast.error(result.error)
+                          return
+                        }
+                        toast.success(
+                          'Sistema salvo. Você pode continuar revisando.',
+                        )
+                        setExpandedSystemId(null)
+                      })
+                    }}
+                    onChange={(nextSys) => {
+                      const nextSystems = safeArray<
+                        ReportV2['systems_with_tendency'][number]
+                      >(draft.systems_with_tendency).map((s) =>
+                        s.system_id === sys.system_id ? nextSys : s,
+                      )
+                      setDraft({
+                        ...draft,
+                        systems_with_tendency: nextSystems,
+                      })
+                    }}
+                  />
+                )
+              })}
           </div>
         </div>
       )}
 
-      {draftAxes.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-xl">Eixos integrativos</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {draftAxes.map((axis, idx) => (
-              <div key={`${axis.axis_name}-${idx}`}>
-                <IntegrativeAxisItem
-                  axisName={axis.axis_name}
-                  status={axis.status}
-                  description={axis.description}
-                />
-                {idx < draftAxes.length - 1 && <Separator className="mt-4" />}
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      )}
+      {/* 4. Eixos integrativos — Plan 07.4-07b sub-editor mount. */}
+      <IntegrativeAxesEditor
+        axes={draftAxes}
+        initialAxes={safeArray<ReportV2['integrative_axes'][number]>(
+          initial.integrative_axes,
+        )}
+        saving={pending}
+        expanded={expandedKey === 'integrative_axes'}
+        onExpand={() => setExpandedKey('integrative_axes')}
+        onCancel={() => {
+          setDraft({
+            ...draft,
+            integrative_axes: initial.integrative_axes,
+          })
+          setExpandedKey(null)
+        }}
+        onSave={() => handleSaveBlock('integrative_axes')}
+        onChange={(nextAxes) =>
+          setDraft({ ...draft, integrative_axes: nextAxes })
+        }
+      />
 
-      <BilateralFindingsCard
-        asymmetryPresent={draft.bilateral_findings?.asymmetry_present ?? false}
-        description={draft.bilateral_findings?.description ?? null}
+      {/* 5. Achados bilaterais — Plan 07.4-07b sub-editor mount; FLAG-5
+          ensures the Card + form render unconditionally even when
+          asymmetry_present=false. */}
+      <BilateralFindingsEditor
+        bilateral={draft.bilateral_findings}
+        initialBilateral={initial.bilateral_findings}
+        saving={pending}
+        expanded={expandedKey === 'bilateral_findings'}
+        onExpand={() => setExpandedKey('bilateral_findings')}
+        onCancel={() => {
+          setDraft({
+            ...draft,
+            bilateral_findings: initial.bilateral_findings,
+          })
+          setExpandedKey(null)
+        }}
+        onSave={() => handleSaveBlock('bilateral_findings')}
+        onChange={(nextBilateral) =>
+          setDraft({ ...draft, bilateral_findings: nextBilateral })
+        }
       />
 
       {/* 6. Síntese terapêutica */}
