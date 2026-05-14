@@ -5,8 +5,15 @@
  * UI-SPEC §Surface 2 lines 226-260.
  *
  * Plan 11 (Direction Correction DC-1) — section keys + titles remapped from
- * 13-section legacy to 14-section Iris Codex V1 structure. Visual redesign
- * (warm voice §14, §11 toggle, etc.) deferred to Plan 12.
+ * 13-section legacy to 14-section Iris Codex V1 structure.
+ *
+ * Plan 12 (Direction Correction DC-6) — §14 Mensagem para o Cliente gets a
+ * subtle warm-tone distinguishing treatment (amber background + 'Voz do
+ * terapeuta' caption) to signal it's the warm-voice client-delivered closer
+ * vs the clinical-functional voice of §1..§13. Founder iterates visually
+ * after UAT (Plan 13). §11 Afirmações optional toggle (DC-5) deferred to a
+ * post-UAT plan — it lives OUTSIDE the §1..§14 numbered sequence per the
+ * compromise locked in Plan 11.
  *
  * Note: accordion.tsx wraps @base-ui/react/accordion, which uses `multiple` prop
  * (not Radix `type="multiple"`), and `defaultValue` accepts an array of item values.
@@ -62,14 +69,31 @@ export function EditorAccordion({
         const generated = reportGenerated[s.key] ?? ''
         const delivered = reportDelivered[s.key] ?? generated
         const isEdited = delivered !== generated
+        // DC-6 — §14 Mensagem para o Cliente is the warm-voice client-delivered
+        // closer. Subtle amber tint + 'Voz do terapeuta' caption signal the
+        // tonal shift from clinical-functional (§1..§13) to first-person
+        // brand-warm. Founder will iterate visually after UAT (Plan 13).
+        const isClientMessage = s.key === '14_mensagem_cliente'
         return (
-          <AccordionItem key={s.key} value={s.key}>
+          <AccordionItem
+            key={s.key}
+            value={s.key}
+            data-section-tone={isClientMessage ? 'warm' : 'clinical'}
+            className={isClientMessage ? 'bg-amber-50/30' : undefined}
+          >
             <AccordionTrigger className="text-xl font-semibold">
-              <span className="flex items-center gap-2">
-                {s.number}. {s.title}
-                {isEdited && (
-                  <span className="text-sm font-normal text-muted-foreground">· editado</span>
+              <span className="flex flex-col items-start gap-0.5">
+                {isClientMessage && (
+                  <span className="text-xs font-normal text-muted-foreground">
+                    Voz do terapeuta · Para entrega ao cliente
+                  </span>
                 )}
+                <span className="flex items-center gap-2">
+                  {s.number}. {s.title}
+                  {isEdited && (
+                    <span className="text-sm font-normal text-muted-foreground">· editado</span>
+                  )}
+                </span>
               </span>
             </AccordionTrigger>
             <AccordionContent>

@@ -5,7 +5,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { EditorAccordion } from '../EditorAccordion'
 
-describe('components/readings/EditorAccordion (D-U1 + UI-SPEC §Surface 2; Plan 11 — 14 sections)', () => {
+describe('components/readings/EditorAccordion (D-U1 + UI-SPEC §Surface 2; Plan 11 — 14 sections; Plan 12 — §14 warm-voice distinction)', () => {
   it('renderiza 14 sections + 15ª encerramento read-only', () => {
     const generated = {
       '1_constituicao_temperamento': 'Texto 1',
@@ -23,6 +23,34 @@ describe('components/readings/EditorAccordion (D-U1 + UI-SPEC §Surface 2; Plan 
     expect(screen.getByText(/1\. Constituição e Temperamento/)).toBeDefined()
     expect(screen.getByText(/14\. Mensagem para o Cliente/)).toBeDefined()
     expect(screen.getByText(/Encerramento \(texto literal — não editável\)/)).toBeDefined()
+  })
+
+  it('§14 Mensagem para o Cliente tem distinção visual warm-voice (DC-6)', () => {
+    const generated: Record<string, string> = {
+      '1_constituicao_temperamento': 'Texto 1',
+      '14_mensagem_cliente': 'Mensagem calorosa.',
+    }
+    const { container } = render(
+      <EditorAccordion
+        reportGenerated={generated}
+        reportDelivered={generated}
+        onSectionChange={vi.fn()}
+      />,
+    )
+    // Warm-tone caption rendered ABOVE the §14 trigger label
+    expect(
+      screen.getByText(/Voz do terapeuta · Para entrega ao cliente/),
+    ).toBeDefined()
+    // The §14 AccordionItem carries the distinguishing data-attribute + class
+    const warmItem = container.querySelector('[data-section-tone="warm"]')
+    expect(warmItem).not.toBeNull()
+    expect(warmItem?.className).toContain('bg-amber-50/30')
+    // Sanity: §1 stays on the clinical tone (not warm)
+    const clinicalItems = container.querySelectorAll('[data-section-tone="clinical"]')
+    expect(clinicalItems.length).toBeGreaterThan(0)
+    clinicalItems.forEach((el) => {
+      expect(el.className).not.toContain('bg-amber-50/30')
+    })
   })
 
   it('mostra "editado" indicator quando deliveredValue !== generatedValue', () => {
