@@ -14,15 +14,18 @@ import { Label } from '@/components/ui/label'
 
 // Strip the leading `## §N — Title` (or `### N. Title` legacy form) heading
 // line + trailing blank lines, so the rendered body doesn't duplicate the
-// accordion-trigger title. Handles both Phase 7.4 14-section (`## §N — `) and
-// legacy 13-section (`### N. `) shapes via the same regex shape as parser.ts
-// BOUNDARY_RE. The `u` flag is mandatory for `\p{Pd}` (Unicode Dash Punctuation).
-// Plan 07.4-14 — UAT-2 fix: founder reported `##` markers visible in preview.
-const STRIP_LEADING_HEADING_RE = /^[ \t]*#{2,3}[ \t]+§?[ \t]*\d{1,2}[ \t]*[\p{Pd}.][^\n]*\n+/u
+// accordion-trigger title. Handles all heading shapes via the same regex
+// shape as parser.ts BOUNDARY_RE: 14-section (`## §N — `), legacy 13-section
+// (`### N. `), AND new §2.5 decimal (`## §2.5 — `). The `u` flag is mandatory
+// for `\p{Pd}` (Unicode Dash Punctuation).
+// Plan 07.4-14 — UAT-2 fix; Plan 07.4-17 — extend `\d{1,2}` → `\d{1,2}(?:\.\d)?`
+// to strip §2.5 heading line from preview.
+const STRIP_LEADING_HEADING_RE = /^[ \t]*#{2,3}[ \t]+§?[ \t]*\d{1,2}(?:\.\d)?[ \t]*[\p{Pd}.][^\n]*\n+/u
 
 export interface EditorSectionItemProps {
   sectionKey: string
-  number: number
+  /** String form preserves '2.5' literal (Plan 17). Used display-only. */
+  number: string
   title: string
   generatedValue: string
   deliveredValue: string

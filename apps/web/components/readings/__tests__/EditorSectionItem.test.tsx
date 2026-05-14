@@ -11,7 +11,7 @@ describe('components/readings/EditorSectionItem (UI-SPEC §Surface 2 Editor)', (
     render(
       <EditorSectionItem
         sectionKey="1_constituicao"
-        number={1}
+        number="1"
         title="Constituição"
         generatedValue="Original"
         deliveredValue="Original"
@@ -27,7 +27,7 @@ describe('components/readings/EditorSectionItem (UI-SPEC §Surface 2 Editor)', (
     render(
       <EditorSectionItem
         sectionKey="1_constituicao"
-        number={1}
+        number="1"
         title="Constituição"
         generatedValue=""
         deliveredValue="abcde"
@@ -41,7 +41,7 @@ describe('components/readings/EditorSectionItem (UI-SPEC §Surface 2 Editor)', (
     const { rerender } = render(
       <EditorSectionItem
         sectionKey="1_constituicao"
-        number={1}
+        number="1"
         title="Constituição"
         generatedValue="A"
         deliveredValue="A"
@@ -52,7 +52,7 @@ describe('components/readings/EditorSectionItem (UI-SPEC §Surface 2 Editor)', (
     rerender(
       <EditorSectionItem
         sectionKey="1_constituicao"
-        number={1}
+        number="1"
         title="Constituição"
         generatedValue="A"
         deliveredValue="B"
@@ -66,7 +66,7 @@ describe('components/readings/EditorSectionItem (UI-SPEC §Surface 2 Editor)', (
     render(
       <EditorSectionItem
         sectionKey="1_constituicao"
-        number={1}
+        number="1"
         title="Constituição"
         generatedValue=""
         deliveredValue="**negrito**"
@@ -83,7 +83,7 @@ describe('components/readings/EditorSectionItem (UI-SPEC §Surface 2 Editor)', (
     const { container } = render(
       <EditorSectionItem
         sectionKey="1_constituicao"
-        number={1}
+        number="1"
         title="Constituição"
         generatedValue="A"
         deliveredValue="A"
@@ -102,7 +102,7 @@ describe('components/readings/EditorSectionItem (UI-SPEC §Surface 2 Editor)', (
     const { container } = render(
       <EditorSectionItem
         sectionKey="1_constituicao_temperamento"
-        number={1}
+        number="1"
         title="Constituição e Temperamento"
         generatedValue=""
         deliveredValue={deliveredValue}
@@ -125,12 +125,36 @@ describe('components/readings/EditorSectionItem (UI-SPEC §Surface 2 Editor)', (
     expect(textarea.value).toContain('## §1 — Constituição e Temperamento')
   })
 
+  it('Plan 17: preview body strip also handles new §2.5 decimal heading shape', () => {
+    const deliveredValue =
+      '## §2.5 — Sistemas em Bom Funcionamento\n\nO digestivo está em boas condições.'
+    const { container } = render(
+      <EditorSectionItem
+        sectionKey="2_5_sistemas_funcionando_bem"
+        number="2.5"
+        title="Sistemas em Bom Funcionamento"
+        generatedValue=""
+        deliveredValue={deliveredValue}
+        onChange={vi.fn()}
+      />,
+    )
+    const prose = container.querySelector('.prose')
+    const proseText = prose?.textContent ?? ''
+    expect(proseText).toContain('O digestivo está em boas condições.')
+    // Heading line stripped — no `## §2.5` literal in preview
+    expect(proseText).not.toContain('## §2.5')
+    expect(proseText).not.toContain('Sistemas em Bom Funcionamento')
+    // Source still has the raw heading
+    const textarea = container.querySelector('textarea') as HTMLTextAreaElement
+    expect(textarea.value).toContain('## §2.5 — Sistemas em Bom Funcionamento')
+  })
+
   it('Plan 14 UAT-2 fix: preview body strip also handles legacy 13-section `### N. ` heading shape', () => {
     const deliveredValue = '### 1. Constituição linfática\n\nBody content here.'
     const { container } = render(
       <EditorSectionItem
         sectionKey="1_constituicao"
-        number={1}
+        number="1"
         title="Constituição"
         generatedValue=""
         deliveredValue={deliveredValue}

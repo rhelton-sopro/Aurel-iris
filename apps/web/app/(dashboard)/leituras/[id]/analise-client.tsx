@@ -31,7 +31,10 @@ import { toast } from 'sonner'
 import { AnalysisCTA } from '@/components/readings/AnalysisCTA'
 import { AnalysisStream } from '@/components/readings/AnalysisStream'
 
-const BOUNDARY_RE = /^### \d{1,2}\.\s+/gm
+// Plan 17: extended to mirror parser.ts BOUNDARY_RE — accepts H2/H3, optional
+// §, decimal `.5` for §2.5, em-dash/en-dash/hyphen separators. Best-effort UI
+// counter; server parser is authoritative for persistence.
+const BOUNDARY_RE = /^[ \t]*#{2,3}[ \t]+§?[ \t]*\d{1,2}(?:\.\d)?[ \t]*[\p{Pd}.][ \t]*/gmu
 
 export interface AnaliseClientProps {
   readingId: string

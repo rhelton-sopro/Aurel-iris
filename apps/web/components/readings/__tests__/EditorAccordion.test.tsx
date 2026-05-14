@@ -5,11 +5,12 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { EditorAccordion } from '../EditorAccordion'
 
-describe('components/readings/EditorAccordion (D-U1 + UI-SPEC §Surface 2; Plan 11 — 14 sections; Plan 12 — §14 warm-voice distinction; Plan 14 — §N — Title format + all-collapsed default + body strip)', () => {
-  it('renderiza 14 sections + 15ª encerramento read-only with §N — Title format', () => {
+describe('components/readings/EditorAccordion (D-U1 + UI-SPEC §Surface 2; Plan 11 — 14 sections; Plan 12 — §14 warm-voice distinction; Plan 14 — §N — Title format + all-collapsed default + body strip; Plan 17 — §2.5 inserted, 15 sections)', () => {
+  it('renderiza 15 sections + 16ª encerramento read-only with §N — Title format including §2.5', () => {
     const generated = {
       '1_constituicao_temperamento': 'Texto 1',
       '2_mapa_organico': 'Texto 2',
+      '2_5_sistemas_funcionando_bem': 'Texto 2.5',
       'encerramento_disclaimer': '> Disclaimer literal.',
     }
     render(
@@ -20,18 +21,21 @@ describe('components/readings/EditorAccordion (D-U1 + UI-SPEC §Surface 2; Plan 
       />,
     )
     // Triggers are always rendered regardless of open/closed state.
-    // Plan 14 UAT-2 fix: title format is now `§N — Title` (em-dash + § glyph),
-    // matching the markdown heading shape `## §N — Title`.
+    // Plan 14 UAT-2 fix: title format is `§N — Title` (em-dash + § glyph).
+    // Plan 17: §2.5 — Sistemas em Bom Funcionamento inserted between §2 and §3.
     expect(screen.getByText(/§1 — Constituição e Temperamento/)).toBeDefined()
+    expect(screen.getByText(/§2 — Mapa Orgânico/)).toBeDefined()
+    expect(screen.getByText(/§2\.5 — Sistemas em Bom Funcionamento/)).toBeDefined()
     expect(screen.getByText(/§14 — Mensagem para o Cliente/)).toBeDefined()
     expect(screen.getByText(/Encerramento \(texto literal — não editável\)/)).toBeDefined()
   })
 
-  it('Plan 14 UAT-2 fix: all 14 sections are COLLAPSED by default (no Textareas visible)', () => {
+  it('Plan 17: all 15 sections are COLLAPSED by default (no Textareas visible)', () => {
     const generated: Record<string, string> = {}
     for (let n = 1; n <= 14; n++) {
       generated[`${n}_section`] = `Conteúdo §${n}`
     }
+    generated['2_5_sistemas_funcionando_bem'] = 'Conteúdo §2.5'
     const { container } = render(
       <EditorAccordion
         reportGenerated={generated}
