@@ -42,6 +42,12 @@ const SECTION_THEMES: Record<ReportSection, string[]> = {
   constituicao: ['constitucional', 'fisica'],
   mensagem_final: ['constitucional'],
   nutricao_carencias: ['fisica', 'constitucional'],
+  // Plan 07.4-14 (UAT-2): §3 Linha do Tempo Emocional retrieval. Maps to
+  // psicossomatica (biographical marks live at the body/psyche interface)
+  // and comportamental (life-phase developmental themes). Constitutional
+  // dimension intentionally omitted — biographical iris-mapping is read
+  // against the constitutional substrate, not as a constitutional finding.
+  biografia_temporal: ['psicossomatica', 'comportamental'],
 }
 
 /**

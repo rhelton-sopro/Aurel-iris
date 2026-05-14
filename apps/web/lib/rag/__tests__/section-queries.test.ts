@@ -24,12 +24,24 @@ describe('D-PR2 frozen contract: REPORT_SECTIONS ⊆ SECTION_QUERY_TEMPLATES', (
     expect(missing).toEqual([])
   })
 
-  it('REPORT_SECTIONS tem exatamente 7 slugs (Fase 6 D-R2B contract)', () => {
-    expect(REPORT_SECTIONS.length).toBe(7)
+  it('REPORT_SECTIONS tem exatamente 8 slugs (Phase 7.4 Plan 14 — biografia_temporal added for §3 UAT-2 fix)', () => {
+    expect(REPORT_SECTIONS.length).toBe(8)
   })
 
-  it('SECTION_QUERY_TEMPLATES tem >= 7 keys (pode adicionar mais sem quebrar)', () => {
-    expect(Object.keys(SECTION_QUERY_TEMPLATES).length).toBeGreaterThanOrEqual(7)
+  it('SECTION_QUERY_TEMPLATES tem >= 8 keys (pode adicionar mais sem quebrar)', () => {
+    expect(Object.keys(SECTION_QUERY_TEMPLATES).length).toBeGreaterThanOrEqual(8)
+  })
+
+  it('Plan 07.4-14: biografia_temporal concern emits 4 biographical-mapping queries for §3', () => {
+    const dummyFeatures = { constitution: { primary: 'linfática' } }
+    const queries = SECTION_QUERY_TEMPLATES.biografia_temporal(dummyFeatures)
+    expect(queries.length).toBe(4)
+    expect(queries.some((q) => q.toLowerCase().includes('cronorichio'))).toBe(true)
+    expect(queries.some((q) => q.toLowerCase().includes('lo rito'))).toBe(true)
+    expect(queries.some((q) => q.toLowerCase().includes('jensen biographical'))).toBe(true)
+    expect(queries.some((q) => q.toLowerCase().includes('brasileiro'))).toBe(true)
+    // constitution.primary is injected into the constitution-anchored query
+    expect(queries.some((q) => q.includes('linfática'))).toBe(true)
   })
 
   it('cada template em SECTION_QUERY_TEMPLATES retorna array com >= 1 query string', () => {

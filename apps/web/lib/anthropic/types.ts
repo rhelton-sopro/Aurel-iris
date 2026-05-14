@@ -134,6 +134,14 @@ export const REPORT_SECTIONS: ReportSection[] = [
   'mental_cognitivo',
   'nutricao_carencias',
   'mensagem_final',
+  // Plan 07.4-14 (UAT-2): adds Cronorichio + biographical iris-map retrieval
+  // for §3 Linha do Tempo Emocional. Founder UAT-2 reported §3 producing
+  // Forer/Barnum-style generic age-range narratives; this concern injects
+  // biographical-mapping chunks (Lo Rito Cronorichio, Jensen biographical,
+  // Brazilian biographical map) so the LLM has scaffolding to anchor age
+  // markers per sector. See lib/rag/section-queries.ts SECTION_QUERY_TEMPLATES
+  // for the 4 queries; deferred-items D-DEF-14-01 tracks the corpus gap risk.
+  'biografia_temporal',
 ]
 
 /**

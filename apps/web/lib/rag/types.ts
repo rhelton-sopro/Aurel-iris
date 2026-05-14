@@ -20,6 +20,7 @@ export type ReportSection =
   | 'mensagem_final'
   | 'mental_cognitivo'
   | 'nutricao_carencias'
+  | 'biografia_temporal' // Plan 07.4-14 (UAT-2): Cronorichio + biographical map retrieval for §3 Linha do Tempo Emocional
 
 export interface KnowledgeChunkMetadata {
   autor: string

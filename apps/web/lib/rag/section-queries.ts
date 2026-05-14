@@ -48,4 +48,16 @@ export const SECTION_QUERY_TEMPLATES: Record<
     `${f.constitution.primary} carências nutricionais associadas`,
     `${f.constitution.primary} deficiências de minerais e oligoelementos`,
   ],
+  // Plan 07.4-14 (UAT-2): retrieval for §3 Linha do Tempo Emocional. Pulls
+  // Cronorichio (Lo Rito Italian biographical map), constitution-anchored
+  // biographical iris-map references, Jensen biographical chapters, and
+  // Brazilian biographical map literature. See deferred-items D-DEF-14-01 —
+  // current Phase 6 corpus may not yet contain Lo Rito's Cronorichio book
+  // (Phase 7.2 Wave C corpus expansion).
+  biografia_temporal: (f) => [
+    `cronorichio Lo Rito cronologia iridológica`,
+    `mapa biográfico iridológico ${f.constitution.primary}`,
+    `Jensen biographical mapping iris ages`,
+    `mapa biográfico brasileiro setores idade`,
+  ],
 }
