@@ -22,7 +22,7 @@ beforeEach(() => {
 })
 
 describe('components/readings/ReadingModeActions (Plan 7.4-18 — UAT-3 reading-mode top buttons)', () => {
-  it('renders 3 action buttons when not delivered', () => {
+  it('renders 4 action buttons when not delivered (Plan 19: includes Exportar PDF)', () => {
     render(
       <ReadingModeActions
         readingId="reading-123"
@@ -31,9 +31,23 @@ describe('components/readings/ReadingModeActions (Plan 7.4-18 — UAT-3 reading-
         deliveredAt={null}
       />,
     )
+    expect(screen.getByTestId('reading-mode-export-pdf')).toBeDefined()
     expect(screen.getByTestId('reading-mode-edit')).toBeDefined()
     expect(screen.getByTestId('reading-mode-deliver')).toBeDefined()
     expect(screen.getByTestId('reading-mode-regenerate')).toBeDefined()
+  })
+
+  it('Plan 19: ExportPdfButton link href = /leituras/[id]/print', () => {
+    render(
+      <ReadingModeActions
+        readingId="reading-xyz"
+        regenerationCount={0}
+        isDelivered={false}
+        deliveredAt={null}
+      />,
+    )
+    const pdf = screen.getByTestId('reading-mode-export-pdf')
+    expect(pdf.getAttribute('href')).toBe('/leituras/reading-xyz/print')
   })
 
   it('Editar análise links to /leituras/[id]/editar', () => {
@@ -75,7 +89,7 @@ describe('components/readings/ReadingModeActions (Plan 7.4-18 — UAT-3 reading-
     expect(regen.getAttribute('aria-label')).toContain('3/3')
   })
 
-  it('isDelivered=true hides all action buttons and shows status text', () => {
+  it('isDelivered=true hides edit/deliver/regenerate but KEEPS Exportar PDF visible (Plan 19)', () => {
     render(
       <ReadingModeActions
         readingId="reading-123"
@@ -84,6 +98,9 @@ describe('components/readings/ReadingModeActions (Plan 7.4-18 — UAT-3 reading-
         deliveredAt="2026-05-14T15:00:00.000Z"
       />,
     )
+    // Plan 19: PDF stays visible — re-export of delivered reading is allowed
+    expect(screen.getByTestId('reading-mode-export-pdf')).toBeDefined()
+    // The 3 state-modifying buttons are hidden
     expect(screen.queryByTestId('reading-mode-edit')).toBeNull()
     expect(screen.queryByTestId('reading-mode-deliver')).toBeNull()
     expect(screen.queryByTestId('reading-mode-regenerate')).toBeNull()

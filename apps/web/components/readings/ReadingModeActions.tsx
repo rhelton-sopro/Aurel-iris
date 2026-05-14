@@ -36,6 +36,7 @@ import {
 import { LocalDateTime } from '@/components/ui/local-date-time'
 import { cn } from '@/lib/utils'
 import { DeliverDialog } from './DeliverDialog'
+import { ExportPdfButton } from './ExportPdfButton'
 import { markReadingDelivered } from '@/app/actions/analise'
 
 export interface ReadingModeActionsProps {
@@ -57,19 +58,25 @@ export function ReadingModeActions({
   const [regenPending, startRegenTransition] = useTransition()
 
   if (isDelivered) {
+    // Plan 19: ExportPdfButton stays visible — therapist can re-export a
+    // delivered reading at any time (PDF doesn't modify state).
+    // Editar/Regenerar/Entregar are hidden because they DO modify state.
     return (
-      <p
-        className="text-sm text-muted-foreground"
-        data-testid="reading-mode-delivered-status"
-      >
-        Entregue ao cliente
-        {deliveredAt && (
-          <>
-            {' '}
-            em <LocalDateTime iso={deliveredAt} />
-          </>
-        )}
-      </p>
+      <>
+        <ExportPdfButton readingId={readingId} />
+        <p
+          className="text-sm text-muted-foreground"
+          data-testid="reading-mode-delivered-status"
+        >
+          Entregue ao cliente
+          {deliveredAt && (
+            <>
+              {' '}
+              em <LocalDateTime iso={deliveredAt} />
+            </>
+          )}
+        </p>
+      </>
     )
   }
 
@@ -142,6 +149,8 @@ export function ReadingModeActions({
 
   return (
     <>
+      <ExportPdfButton readingId={readingId} />
+
       <Link
         href={`/leituras/${readingId}/editar`}
         className={cn(buttonVariants({ variant: 'outline' }), 'gap-2')}
