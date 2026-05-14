@@ -4,7 +4,7 @@ Discovered during Plan execution but out of scope for the current plan. Track he
 
 ## Discovered during Plan 07.4-09 (rebrand sweep)
 
-### D-DEF-09-01 — `pnpm build` fails due to `'server-only'` import on client-component boundary
+### D-DEF-09-01 — `pnpm build` fails due to `'server-only'` import on client-component boundary — **RESOLVED 2026-05-13 in commit `536d0c4`**
 
 - **Discovered:** 2026-05-13 during Plan 07.4-09 Task 3 regression sweep.
 - **Symptom:** `pnpm build` exits 1 with:
@@ -20,11 +20,11 @@ Discovered during Plan execution but out of scope for the current plan. Track he
 - **Root cause:** `lib/anthropic/report-schema.ts` has `import 'server-only'` at line 1 (Plan 07.4-00 / commit `4dd441d`), but Plan 07.4-07 (`c28292c` — `SystemTendencyCardEditor.tsx`) added a client-component import path that pulls in the schema. Next.js correctly refuses to bundle a `server-only` module into the client.
 - **Pre-existing:** verified at commit `b1a3eb6` (immediately before Plan 09 started). The build was already failing — Plan 09 rebrand inherits it, does NOT introduce it.
 - **Memory note:** mirrors [feedback_use_server_export_hygiene.md](file:./feedback_use_server_export_hygiene.md) — same pattern class. Server-side directives + client component imports = build break.
-- **Suggested fix (next plan):** split `report-schema.ts` into two siblings:
-  - `report-schema.ts` (no `'server-only'`) — zod schemas + type exports (consumed by client editor components)
-  - `report-schema.server.ts` (with `'server-only'`) — anything the schema imports that's truly server-side (Anthropic SDK adapters, etc.)
-  Then update `SystemTendencyCardEditor.tsx` + `ReportAdaptiveEditor.tsx` imports.
-- **Scope:** out of Plan 07.4-09 (rebrand sweep). Pre-existing architectural debt from Plan 07.4-07. Should be addressed in a Plan 07.4-10 hotfix or a Phase 7.4 close-out polish pass before any deploy.
+- **Resolution (commit `536d0c4`, 2026-05-13):** split `report-schema.ts` into two siblings:
+  - `report-schema-shared.ts` (no `'server-only'`) — const arrays (SYSTEM_IDS, TENDENCY_LABELS, AXIS_STATUSES, REPORT_V2_TOP_LEVEL_KEYS) + plain TS interfaces (ReportV2, SystemTendency, IntegrativeAxis) that mirror the zod-inferred shape exactly.
+  - `report-schema.ts` (keeps `'server-only'`) — zod schema only; imports from + re-exports the shared symbols for backwards compat. Compile-time contract assertions guard zod-vs-interface drift.
+  - 12 client surfaces (8 components + 4 tests) re-pointed to `report-schema-shared`.
+- **Verification:** `pnpm build` exits 0; `pnpm tsc --noEmit` clean; 97/97 component tests GREEN; `pnpm lint` 0 errors / 9 baseline warnings (unchanged).
 
 ### D-DEF-09-02 — `lib/anthropic/__tests__/prompts.test.ts` expects legacy 13-section system.md
 
