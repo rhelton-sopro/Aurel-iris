@@ -5,13 +5,20 @@
  * Renders one of 3 states based on persisted readings state:
  *   A — empty (report_generated IS NULL): show "Gerar análise" CTA
  *   B — streaming (client-driven, ephemeral): handled by analise-client.tsx
- *   C — generated (report_generated populated): show "Editar análise" + regen
+ *   C — generated (report_generated populated): NEW Plan 18 — render
+ *       ReportReadView (continuous flowing serif text) with ReadingModeActions
+ *       top buttons (Editar análise + Entregar ao cliente + Regenerar análise).
  *
  * Phase 7.4 Plan 10 (Direction Correction — see 07.4-CONTEXT.md DC-1..DC-10):
  *   The 8-block JSON v2 surface (ReportAdaptiveView + AdvancedAnalysisCTA
  *   footerSlot + report_version routing) has been removed. All readings render
  *   via the legacy AnalysisHero + AnaliseClient + EditorAccordion path until
- *   Plan 12 rebuilds the v2 surface around 14 markdown sections.
+ *   Plan 12 rebuilt the v2 surface around 14 markdown sections.
+ *
+ * Phase 7.4 Plan 18 (UAT-3 UX flip): State C is now the new ReportReadView
+ * reading-mode surface (continuous flowing serif text — NOT accordion). The
+ * accordion lives exclusively on /leituras/[id]/editar for granular per-section
+ * edits. Plan 19 will add Exportar PDF as a 4th top-button.
  *
  * Auth + RLS via createClient() session-bound. Therapist must own the reading
  * to see it (RLS enforces; route returns 404 via `notFound()` if missing).
@@ -23,6 +30,8 @@ import { createClient } from '@/lib/supabase/server'
 import { LocalDateTime } from '@/components/ui/local-date-time'
 import { StatusBadge } from '@/components/readings/StatusBadge'
 import { AnalysisHero } from '@/components/readings/AnalysisHero'
+import { ReportReadView } from '@/components/readings/ReportReadView'
+import { ReadingModeActions } from '@/components/readings/ReadingModeActions'
 import { AnaliseClient } from './analise-client'
 
 export const dynamic = 'force-dynamic'
@@ -47,11 +56,50 @@ export default async function LeituraDetailPage({
 
   const clientName = (reading.client as { full_name?: string } | null)?.full_name ?? 'Cliente'
   const reportGenerated = reading.report_generated as Record<string, string> | null
+  const reportDelivered = reading.report_delivered as Record<string, string> | null
   const hasReport = reportGenerated != null && Object.keys(reportGenerated).length > 0
   const regenerationCount = reading.regeneration_count ?? 0
   const isDelivered = reading.is_delivered ?? false
   const status = reading.status ?? 'pending'
+  const isReadingMode = (status === 'ready' || status === 'edited') && hasReport
+  const reportToShow = (reportDelivered ?? reportGenerated) as Record<string, string>
+  const reportGeneratedAt =
+    (reading as { report_generated_at?: string }).report_generated_at ?? null
 
+  // ---- READING MODE (Plan 18 default) ----
+  // Continuous flowing serif document with top action buttons.
+  if (isReadingMode) {
+    return (
+      <div className="space-y-6 px-6 py-8">
+        <div className="flex items-center justify-between">
+          <Link
+            href="/leituras"
+            className="text-sm text-muted-foreground hover:underline"
+          >
+            ← Voltar para leituras
+          </Link>
+          <StatusBadge status={status as never} />
+        </div>
+
+        <ReportReadView
+          sections={reportToShow}
+          clientName={clientName}
+          readingDate={reportGeneratedAt ?? reading.created_at}
+          topActionsSlot={
+            <ReadingModeActions
+              readingId={readingId}
+              regenerationCount={regenerationCount}
+              isDelivered={isDelivered}
+              deliveredAt={reading.delivered_at}
+            />
+          }
+        />
+      </div>
+    )
+  }
+
+  // ---- WAITING / EMPTY / STREAMING (State A or State B) ----
+  // Preserved AnalysisHero + AnaliseClient path.
   return (
     <div className="space-y-6 px-6 py-8">
       <div className="flex items-center justify-between">
@@ -74,8 +122,6 @@ export default async function LeituraDetailPage({
         <StatusBadge status={status as never} />
       </div>
 
-      {/* The hero card decides which State (A/B/C) to render based on
-          server-side data + delegates streaming-state UI to analise-client. */}
       <AnalysisHero
         readingId={readingId}
         hasReport={hasReport}
@@ -83,12 +129,9 @@ export default async function LeituraDetailPage({
         regenerationCount={regenerationCount}
         isDelivered={isDelivered}
         deliveredAt={reading.delivered_at}
-        reportGeneratedAt={
-          (reading as { report_generated_at?: string }).report_generated_at ?? null
-        }
+        reportGeneratedAt={reportGeneratedAt}
         auditMetadata={reading.audit_metadata as never}
       >
-        {/* Client island for streaming state machine + fetch. */}
         <AnaliseClient
           readingId={readingId}
           hasInitialReport={hasReport}
