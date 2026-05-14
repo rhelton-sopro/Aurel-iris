@@ -28,6 +28,12 @@ export interface AnaliseClientProps {
   hasInitialReport: boolean
   regenerationCount: number
   isDelivered: boolean
+  /**
+   * Phase 7.4 Plan 07.4-08: prop accepted in Task 1 (optional) so the page route
+   * can pass `reading.report_version` without breaking tsc; Task 3 wires the
+   * actual V2 streaming switch (AdaptiveAnalysisStream) using this value.
+   */
+  reportVersion?: '1.0' | '2.0'
 }
 
 export function AnaliseClient({
@@ -35,6 +41,7 @@ export function AnaliseClient({
   hasInitialReport,
   regenerationCount,
   isDelivered,
+  // reportVersion intentionally not destructured here — Task 3 uses it.
 }: AnaliseClientProps) {
   const router = useRouter()
   const [streaming, setStreaming] = useState(false)
