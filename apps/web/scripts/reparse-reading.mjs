@@ -43,20 +43,22 @@ if (!readingId) {
 }
 
 // Mirror of apps/web/lib/anthropic/types.ts SECTION_KEY_BY_NUMBER
+// Plan 11 (Direction Correction DC-1) — remapped to 14 sections.
 const SECTION_KEY_BY_NUMBER = {
-  1: '1_constituicao',
-  2: '2_estrutural_fisica',
-  3: '3_indicacoes_sistemicas',
-  4: '4_toxemia',
-  5: '5_psicoemocional',
-  6: '6_cargas_temporais',
-  7: '7_carencias_nutricionais',
-  8: '8_simbolico_espiritual',
-  9: '9_cuidados_integrativos',
-  10: '10_potenciais_forcas',
-  11: '11_afirmacoes_integracao',
-  12: '12_sintese_integrativa',
-  13: '13_mensagem_final',
+  1: '1_constituicao_temperamento',
+  2: '2_mapa_organico',
+  3: '3_linha_tempo_emocional',
+  4: '4_padroes_emocionais_ativos',
+  5: '5_eixo_psicossomatico',
+  6: '6_herancas_transgeracionais',
+  7: '7_carencias_funcionais',
+  8: '8_estado_mental_nervoso',
+  9: '9_recursos_forcas',
+  10: '10_dimensao_arquetipica',
+  11: '11_sugestoes_integrativas',
+  12: '12_roteiro_anamnese',
+  13: '13_sintese_integrativa',
+  14: '14_mensagem_cliente',
 }
 
 const ENCERRAMENTO_LITERAL = `Esta leitura iridológica é uma ferramenta de apoio à anamnese terapêutica.
@@ -72,7 +74,7 @@ function findAllBoundaries(buffer) {
   let lastNumber = 0
   while ((m = re.exec(buffer)) !== null) {
     const number = parseInt(m[1], 10)
-    if (number < 1 || number > 13) continue
+    if (number < 1 || number > 14) continue
     if (number !== lastNumber + 1) continue
     lastNumber = number
     matches.push({ number, key: SECTION_KEY_BY_NUMBER[number], startIdx: m.index })
@@ -91,12 +93,17 @@ function closeSections(boundaries, buffer) {
 // against the freshly parsed sections so audit_metadata is not stale).
 const ANCHOR_RE = /\[ancorado em: features\.[\w.\[\]]+\]/g
 const SENTENCE_SPLIT_RE = /[.!?]+(?=\s|$)/u
+// Plan 11 — remapped from 13-section legacy. Anchor-rate still computed by the
+// script for legacy 1.0 readings being reparsed; lib/anthropic/audit.ts is the
+// runtime source-of-truth (which hard-codes anchor_rate_pct=100 in the new
+// direction; this script keeps the legacy scan for backward-compat with already-
+// generated 1.0 markdown that may contain `[ancorado em features.x]` markers).
 const SECTIONS_REQUIRING_ANCHORS = [
-  '2_estrutural_fisica',
-  '3_indicacoes_sistemicas',
-  '4_toxemia',
-  '5_psicoemocional',
-  '6_cargas_temporais',
+  '2_mapa_organico',
+  '3_linha_tempo_emocional',
+  '4_padroes_emocionais_ativos',
+  '5_eixo_psicossomatico',
+  '6_herancas_transgeracionais',
 ]
 const _F1 = ['d', 'i', 'a', 'g', 'n', 'ó', 's', 't', 'i', 'c', 'o'].join('')
 const _F2 = ['t', 'r', 'a', 't', 'a', 'm', 'e', 'n', 't', 'o'].join('')

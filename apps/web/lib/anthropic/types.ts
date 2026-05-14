@@ -6,57 +6,66 @@
 /**
  * Shared types for Phase 7 — Análise LLM.
  *
- * Canonical shapes:
- *   - ReportSectionKey: 14-key union (13 numbered + encerramento_disclaimer)
+ * Canonical shapes (Phase 7.4 Plan 11 — Direction Correction DC-1..DC-6):
+ *   - ReportSectionKey: 15-key union (14 numbered + encerramento_disclaimer)
  *   - ReportJsonb: Partial<Record<ReportSectionKey, string>> — incremental persistence (D-S2)
  *   - AuditMetadata: D-A3 shape (anchor rate + forbidden vocab + timestamps)
  *   - EditTipo: D-U2 classifier output
  *   - RegenerationLogEntry: D-S4 telemetry per regeneration
  *   - ENCERRAMENTO_LITERAL: SPEC §6 disclaimer literal — server-appended (D-P3)
- *   - REPORT_SECTIONS: D-PR2 frozen contract — 7 RAG slugs analyze.ts passes
+ *   - REPORT_SECTIONS: D-PR2 RAG-slug array — remapped for the 14-section structure
+ *
+ * Plan 11 (Direction Correction) rewrites the section keys from the legacy 13
+ * (`1_constituicao` .. `13_mensagem_final`) to the new 14 markdown sections of
+ * the Iris Codex V1 prompt (`1_constituicao_temperamento` .. `14_mensagem_cliente`).
+ * The 8-block JSON path (Plans 02/03/04/06/07) is gone (Plan 10). Legacy 1.0
+ * readings continue to render via EditorAccordion (which Plan 12 will rebuild
+ * for the 14-section structure).
  *
  * LGPD: este arquivo declara apenas estrutura. Sem vocabulário proibido em
  * código — `pnpm audit:vocabulary` cobre `lib/anthropic/` desde 07-02 (D-A4).
  *
- * Phase 7 | Plan 07-03
+ * Phase 7 | Plan 07.4-11 | Decisions: DC-1, DC-2, DC-3, DC-4, DC-6
  */
 import type { Database } from '@/types/database'
 import type { ReportSection } from '@/lib/rag/types'
 
 export type ReportSectionKey =
-  | '1_constituicao'
-  | '2_estrutural_fisica'
-  | '3_indicacoes_sistemicas'
-  | '4_toxemia'
-  | '5_psicoemocional'
-  | '6_cargas_temporais'
-  | '7_carencias_nutricionais'
-  | '8_simbolico_espiritual'
-  | '9_cuidados_integrativos'
-  | '10_potenciais_forcas'
-  | '11_afirmacoes_integracao'
-  | '12_sintese_integrativa'
-  | '13_mensagem_final'
+  | '1_constituicao_temperamento'
+  | '2_mapa_organico'
+  | '3_linha_tempo_emocional'
+  | '4_padroes_emocionais_ativos'
+  | '5_eixo_psicossomatico'
+  | '6_herancas_transgeracionais'
+  | '7_carencias_funcionais'
+  | '8_estado_mental_nervoso'
+  | '9_recursos_forcas'
+  | '10_dimensao_arquetipica'
+  | '11_sugestoes_integrativas'
+  | '12_roteiro_anamnese'
+  | '13_sintese_integrativa'
+  | '14_mensagem_cliente'
   | 'encerramento_disclaimer'
 
-/** Numeric-prefixed keys only (1..13). Used by section-boundary parser. */
+/** Numeric-prefixed keys only (1..14). Used by section-boundary parser. */
 export type NumberedSectionKey = Exclude<ReportSectionKey, 'encerramento_disclaimer'>
 
-/** Map number 1..13 to canonical section key (boundary parser uses this). */
+/** Map number 1..14 to canonical section key (boundary parser uses this). */
 export const SECTION_KEY_BY_NUMBER: Record<number, NumberedSectionKey> = {
-  1: '1_constituicao',
-  2: '2_estrutural_fisica',
-  3: '3_indicacoes_sistemicas',
-  4: '4_toxemia',
-  5: '5_psicoemocional',
-  6: '6_cargas_temporais',
-  7: '7_carencias_nutricionais',
-  8: '8_simbolico_espiritual',
-  9: '9_cuidados_integrativos',
-  10: '10_potenciais_forcas',
-  11: '11_afirmacoes_integracao',
-  12: '12_sintese_integrativa',
-  13: '13_mensagem_final',
+  1: '1_constituicao_temperamento',
+  2: '2_mapa_organico',
+  3: '3_linha_tempo_emocional',
+  4: '4_padroes_emocionais_ativos',
+  5: '5_eixo_psicossomatico',
+  6: '6_herancas_transgeracionais',
+  7: '7_carencias_funcionais',
+  8: '8_estado_mental_nervoso',
+  9: '9_recursos_forcas',
+  10: '10_dimensao_arquetipica',
+  11: '11_sugestoes_integrativas',
+  12: '12_roteiro_anamnese',
+  13: '13_sintese_integrativa',
+  14: '14_mensagem_cliente',
 }
 
 export type ReportJsonb = Partial<Record<ReportSectionKey, string>>
@@ -86,21 +95,36 @@ export interface RegenerationLogEntry {
 }
 
 /**
- * Sections requiring [ancorado em: features.X] citations (D-A1).
- * Anchor rate audit runs over these 5 keys only.
+ * Sections that originally required `[ancorado em: features.X]` citations (D-A1
+ * from Phase 7 original). Plan 11 (Direction Correction DC-4) removes the
+ * inline-anchor requirement from the new prompt — the new 14-section direction
+ * banned `[ancorado em features.x]` markers from the primary surface. This
+ * constant is retained as a structural placeholder so downstream consumers
+ * (audit.ts) keep their iteration shape, but `runAudit` now hard-codes
+ * `low_anchor_rate=false` + `anchor_rate_pct=100` deterministically for the
+ * new keys (no markers to count). Forbidden-vocab scan continues full force.
+ *
+ * Mapping rationale: sections 2-6 in the new numbering are the "physical body
+ * + emotional axes" group that originally carried anchored clinical findings.
  */
 export const SECTIONS_REQUIRING_ANCHORS: ReportSectionKey[] = [
-  '2_estrutural_fisica',
-  '3_indicacoes_sistemicas',
-  '4_toxemia',
-  '5_psicoemocional',
-  '6_cargas_temporais',
+  '2_mapa_organico',
+  '3_linha_tempo_emocional',
+  '4_padroes_emocionais_ativos',
+  '5_eixo_psicossomatico',
+  '6_herancas_transgeracionais',
 ]
 
 /**
- * D-PR2 frozen contract — analyze.ts passes EXACTLY this array to
- * retrieveRelevantKnowledge. Mudanças aqui forçam edit coordenado em
- * `lib/rag/section-queries.ts` (CI gate test em 07-07 garante sincronia).
+ * D-PR2 RAG-slug contract — analyze.ts passes this array to
+ * retrieveRelevantKnowledge. Plan 11 remaps the 13→14 section structure to the
+ * canonical RAG slugs in `lib/rag/types.ts`. Slugs that no longer correspond
+ * to a numbered section (anamnese, síntese, mensagem ao cliente) are omitted
+ * from the RAG fetch — those sections derive from sections 1-10 and the
+ * brand voice rules, not from external chunks.
+ *
+ * Mudanças aqui forçam edit coordenado em `lib/rag/section-queries.ts` (CI
+ * gate test em 07-07 garante sincronia).
  */
 export const REPORT_SECTIONS: ReportSection[] = [
   'constituicao',

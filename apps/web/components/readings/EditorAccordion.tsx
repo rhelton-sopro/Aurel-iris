@@ -1,8 +1,12 @@
 'use client'
 
 /**
- * EditorAccordion — 13 collapsible editable sections + 14th read-only encerramento.
+ * EditorAccordion — 14 collapsible editable sections + 15th read-only encerramento.
  * UI-SPEC §Surface 2 lines 226-260.
+ *
+ * Plan 11 (Direction Correction DC-1) — section keys + titles remapped from
+ * 13-section legacy to 14-section Iris Codex V1 structure. Visual redesign
+ * (warm voice §14, §11 toggle, etc.) deferred to Plan 12.
  *
  * Note: accordion.tsx wraps @base-ui/react/accordion, which uses `multiple` prop
  * (not Radix `type="multiple"`), and `defaultValue` accepts an array of item values.
@@ -19,19 +23,20 @@ import remarkGfm from 'remark-gfm'
 import { EditorSectionItem } from './EditorSectionItem'
 
 export const SECTIONS: ReadonlyArray<{ key: string; number: number; title: string }> = [
-  { key: '1_constituicao', number: 1, title: 'Constituição' },
-  { key: '2_estrutural_fisica', number: 2, title: 'Estrutural Física' },
-  { key: '3_indicacoes_sistemicas', number: 3, title: 'Indicações Sistêmicas' },
-  { key: '4_toxemia', number: 4, title: 'Toxemia' },
-  { key: '5_psicoemocional', number: 5, title: 'Psicoemocional' },
-  { key: '6_cargas_temporais', number: 6, title: 'Cargas Temporais' },
-  { key: '7_carencias_nutricionais', number: 7, title: 'Carências Nutricionais' },
-  { key: '8_simbolico_espiritual', number: 8, title: 'Simbólico Espiritual' },
-  { key: '9_cuidados_integrativos', number: 9, title: 'Cuidados Integrativos' },
-  { key: '10_potenciais_forcas', number: 10, title: 'Potenciais e Forças' },
-  { key: '11_afirmacoes_integracao', number: 11, title: 'Afirmações de Integração' },
-  { key: '12_sintese_integrativa', number: 12, title: 'Síntese Integrativa' },
-  { key: '13_mensagem_final', number: 13, title: 'Mensagem Final' },
+  { key: '1_constituicao_temperamento', number: 1, title: 'Constituição e Temperamento' },
+  { key: '2_mapa_organico', number: 2, title: 'Mapa Orgânico' },
+  { key: '3_linha_tempo_emocional', number: 3, title: 'Linha do Tempo Emocional' },
+  { key: '4_padroes_emocionais_ativos', number: 4, title: 'Padrões Emocionais Ativos' },
+  { key: '5_eixo_psicossomatico', number: 5, title: 'Eixo Psicossomático' },
+  { key: '6_herancas_transgeracionais', number: 6, title: 'Heranças Transgeracionais' },
+  { key: '7_carencias_funcionais', number: 7, title: 'Carências Funcionais' },
+  { key: '8_estado_mental_nervoso', number: 8, title: 'Estado Mental e Nervoso' },
+  { key: '9_recursos_forcas', number: 9, title: 'Recursos e Forças' },
+  { key: '10_dimensao_arquetipica', number: 10, title: 'Dimensão Arquetípica' },
+  { key: '11_sugestoes_integrativas', number: 11, title: 'Sugestões Integrativas' },
+  { key: '12_roteiro_anamnese', number: 12, title: 'Roteiro de Anamnese' },
+  { key: '13_sintese_integrativa', number: 13, title: 'Síntese Integrativa' },
+  { key: '14_mensagem_cliente', number: 14, title: 'Mensagem para o Cliente' },
 ]
 
 export interface EditorAccordionProps {
@@ -50,7 +55,7 @@ export function EditorAccordion({
   return (
     <Accordion
       multiple
-      defaultValue={['1_constituicao', '2_estrutural_fisica', '3_indicacoes_sistemicas']}
+      defaultValue={['1_constituicao_temperamento', '2_mapa_organico', '3_linha_tempo_emocional']}
       className="w-full"
     >
       {SECTIONS.map((s) => {

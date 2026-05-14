@@ -1,19 +1,22 @@
 import { z } from 'zod'
 
+// Phase 7.4 Plan 11 (Direction Correction DC-1) — section keys remapped from
+// 13-section legacy to 14-section Iris Codex V1 markdown structure.
 const REPORT_KEYS = [
-  '1_constituicao',
-  '2_estrutural_fisica',
-  '3_indicacoes_sistemicas',
-  '4_toxemia',
-  '5_psicoemocional',
-  '6_cargas_temporais',
-  '7_carencias_nutricionais',
-  '8_simbolico_espiritual',
-  '9_cuidados_integrativos',
-  '10_potenciais_forcas',
-  '11_afirmacoes_integracao',
-  '12_sintese_integrativa',
-  '13_mensagem_final',
+  '1_constituicao_temperamento',
+  '2_mapa_organico',
+  '3_linha_tempo_emocional',
+  '4_padroes_emocionais_ativos',
+  '5_eixo_psicossomatico',
+  '6_herancas_transgeracionais',
+  '7_carencias_funcionais',
+  '8_estado_mental_nervoso',
+  '9_recursos_forcas',
+  '10_dimensao_arquetipica',
+  '11_sugestoes_integrativas',
+  '12_roteiro_anamnese',
+  '13_sintese_integrativa',
+  '14_mensagem_cliente',
   'encerramento_disclaimer',
 ] as const
 
