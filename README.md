@@ -1,8 +1,10 @@
-# Aurel Iris
+# Iris Codex
 
-SaaS de leitura iridológica assistida por IA para terapeutas integrativos.
+Plataforma clínica de relatórios iridológicos funcionais adaptativos para terapeutas integrativos, clientes finais e curiosos.
 
 > Ferramenta de apoio à anamnese terapêutica integrativa, não substitui avaliação médica.
+
+(Substitui referências anteriores a "Aurel" / "Aurel Iris" — rebrand aplicado em Phase 7.4, decisão D-BR1.)
 
 ## Estrutura do monorepo
 

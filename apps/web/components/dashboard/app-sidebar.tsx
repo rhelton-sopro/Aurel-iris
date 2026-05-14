@@ -24,7 +24,7 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader className="px-4 py-3 pt-[calc(0.75rem+env(safe-area-inset-top))] border-b">
-        <span className="font-semibold text-lg">Aurel Iris</span>
+        <span className="font-semibold text-lg">Iris Codex</span>
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>

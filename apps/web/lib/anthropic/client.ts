@@ -80,7 +80,7 @@ export const PRICING_SONNET_4_6 = {
  * Anthropic Haiku 4.5 pricing (USD per 1M tokens) — bucket de 5min ephemeral.
  *
  * Valores verificados em 2026-05-08 contra https://www.anthropic.com/pricing
- * (público). Aurel não usa Haiku no path principal de análise (D-T2 fixa
+ * (público). Iris Codex não usa Haiku no path principal de análise (D-T2 fixa
  * Sonnet 4.6), mas o gate de validação de imagem em
  * `app/api/capture/validate/route.ts` (Phase 3) e qualquer triagem futura
  * podem se beneficiar do tier mais barato. Mesma estrutura de 4 buckets +

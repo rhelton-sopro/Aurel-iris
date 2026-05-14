@@ -105,7 +105,7 @@ function LoginForm() {
     <Card>
       <CardHeader>
         <CardTitle className="text-2xl">Entrar</CardTitle>
-        <CardDescription>Acesse sua conta Aurel Iris</CardDescription>
+        <CardDescription>Acesse sua conta Iris Codex</CardDescription>
       </CardHeader>
       <CardContent>
         {formError && (

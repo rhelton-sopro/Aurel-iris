@@ -208,7 +208,7 @@ const ORIGINAL_FETCH = globalThis.fetch
 
 describe('finalizeReadingAction — Phase 5 trigger', () => {
   beforeEach(() => {
-    process.env.NEXT_PUBLIC_SITE_URL = 'https://aurel-iris.test'
+    process.env.NEXT_PUBLIC_SITE_URL = 'https://iris-codex.test'
   })
   afterEach(() => {
     globalThis.fetch = ORIGINAL_FETCH
@@ -231,7 +231,7 @@ describe('finalizeReadingAction — Phase 5 trigger', () => {
 
     // Call 1: canonicalize (fire-and-forget, must come BEFORE Modal trigger)
     const [canonicalUrl, canonicalInit] = fetchMock.mock.calls[0]!
-    expect(canonicalUrl).toBe('https://aurel-iris.test/api/capture/canonicalize')
+    expect(canonicalUrl).toBe('https://iris-codex.test/api/capture/canonicalize')
     expect((canonicalInit as RequestInit).method).toBe('POST')
     const canonicalHeaders = (canonicalInit as RequestInit).headers as Record<string, string>
     expect(canonicalHeaders.Cookie).toContain('sb-access-token=test-token')
@@ -243,7 +243,7 @@ describe('finalizeReadingAction — Phase 5 trigger', () => {
 
     // Call 2: Modal trigger (preserved Phase 5 contract)
     const [url, init] = fetchMock.mock.calls[1]!
-    expect(url).toBe(`https://aurel-iris.test/api/readings/${READING_ID}/process`)
+    expect(url).toBe(`https://iris-codex.test/api/readings/${READING_ID}/process`)
     expect((init as RequestInit).method).toBe('POST')
     const headers = (init as RequestInit).headers as Record<string, string>
     expect(headers.Cookie).toContain('sb-access-token=test-token')

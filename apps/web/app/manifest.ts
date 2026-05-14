@@ -2,9 +2,9 @@ import type { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Aurel Iris',
-    short_name: 'Aurel Iris',
-    description: 'Ferramenta de apoio à anamnese terapêutica integrativa.',
+    name: 'Iris Codex',
+    short_name: 'Iris Codex',
+    description: 'Plataforma clínica de relatórios iridológicos funcionais adaptativos.',
     start_url: '/dashboard',
     display: 'standalone',
     orientation: 'portrait',

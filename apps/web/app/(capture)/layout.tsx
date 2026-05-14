@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import type { Metadata, Viewport } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Captura de leitura | Aurel Iris',
+  title: 'Captura de leitura | Iris Codex',
 }
 
 export const viewport: Viewport = {

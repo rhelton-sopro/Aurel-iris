@@ -104,7 +104,7 @@ export default function SignupPage() {
     <Card>
       <CardHeader>
         <CardTitle className="text-2xl">Criar conta</CardTitle>
-        <CardDescription>Aurel Iris — apoio à anamnese terapêutica</CardDescription>
+        <CardDescription>Iris Codex — relatórios iridológicos funcionais adaptativos</CardDescription>
       </CardHeader>
       <CardContent>
         {formError && (

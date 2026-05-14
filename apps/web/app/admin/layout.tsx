@@ -22,7 +22,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
       <header className="border-b bg-card">
         <div className="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
           <h1 className="text-sm font-medium text-muted-foreground">
-            ADMIN · Aurel Iris
+            ADMIN · Iris Codex
           </h1>
           <span className="text-xs text-muted-foreground">{user.email}</span>
         </div>

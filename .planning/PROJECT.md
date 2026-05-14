@@ -1,13 +1,28 @@
-# Aurel Iris
+# Iris Codex
 
 ## O que é isto
 
-Aurel Iris é um SaaS de leitura iridológica assistida por IA para terapeutas
-integrativos, com pipeline em duas camadas: visão computacional dedicada
-extrai *features* objetivas da íris a partir de fotos capturadas via PWA mobile
-ou upload desktop, e um LLM (Claude Sonnet 4.6) interpreta essas features
-ancorado em uma base de conhecimento iridológica indexada por RAG. O usuário do
-produto é o terapeuta — pacientes/clientes finais não têm conta.
+Iris Codex é uma plataforma clínica de relatórios iridológicos funcionais
+adaptativos para terapeutas integrativos, clientes finais e curiosos, com
+pipeline em duas camadas: visão computacional dedicada extrai *features*
+objetivas da íris a partir de fotos capturadas via PWA mobile ou upload
+desktop, e um LLM (Claude Sonnet 4.6) interpreta essas features em **linguagem
+clínico-funcional** ancorado em uma base de conhecimento iridológica indexada
+por RAG. Sistemas sem achados relevantes são omitidos do output (relatório
+adaptativo, não template fixo). Análise iridológica formal com nomenclatura
+técnica (Jensen, Lo Rito, Deck/Angerer, Lindemann) entra como **módulo add-on
+pago** ("Análise Iridológica Aprofundada", 1 crédito, V1.1+). O usuário
+primário do produto é o terapeuta — pacientes/clientes finais não têm conta
+no V1.
+
+**Separação de marcas (D-BR1, Phase 7.4):**
+- **Iris Codex** — científico-clínico, este produto.
+- **Sopro da Origem** — linha espiritual da fundadora, brand separada, fora
+  deste codebase. Vocabulário Sopro (centelha divina, atravessar, vasto,
+  essência primordial) NÃO aparece em Iris Codex.
+
+(Substitui referências anteriores a "Aurel" / "Aurel Iris" — rebrand aplicado
+em Phase 7.4, decisões D-BR1/2/3.)
 
 ## Valor central
 
@@ -21,7 +36,7 @@ polida, billing, onboarding) é tração; isto é o coração.
 
 **Estágio 1 (gate primário):** durante 4 semanas consecutivas, o fundador
 realiza ≥3 leituras/semana em clientes reais, entrega o relatório gerado pelo
-Aurel Iris (com edições do terapeuta) ao cliente como parte oficial da
+Iris Codex (com edições do terapeuta) ao cliente como parte oficial da
 anamnese, e ao fim das 4 semanas responde afirmativamente a: *"Eu pagaria
 R$ 189/mês por essa ferramenta se não fosse meu produto?"* Dogfooding em
 ambiente de anamnese real, com entrega oficial e teste de disposição a pagar,
