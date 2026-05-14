@@ -62,7 +62,7 @@ export function EditorAccordion({
   return (
     <Accordion
       multiple
-      defaultValue={['1_constituicao_temperamento', '2_mapa_organico', '3_linha_tempo_emocional']}
+      defaultValue={[]}
       className="w-full"
     >
       {SECTIONS.map((s) => {
@@ -89,7 +89,7 @@ export function EditorAccordion({
                   </span>
                 )}
                 <span className="flex items-center gap-2">
-                  {s.number}. {s.title}
+                  §{s.number} — {s.title}
                   {isEdited && (
                     <span className="text-sm font-normal text-muted-foreground">· editado</span>
                   )}

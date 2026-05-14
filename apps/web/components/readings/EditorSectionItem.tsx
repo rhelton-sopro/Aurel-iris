@@ -12,6 +12,14 @@ import remarkGfm from 'remark-gfm'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 
+// Strip the leading `## §N — Title` (or `### N. Title` legacy form) heading
+// line + trailing blank lines, so the rendered body doesn't duplicate the
+// accordion-trigger title. Handles both Phase 7.4 14-section (`## §N — `) and
+// legacy 13-section (`### N. `) shapes via the same regex shape as parser.ts
+// BOUNDARY_RE. The `u` flag is mandatory for `\p{Pd}` (Unicode Dash Punctuation).
+// Plan 07.4-14 — UAT-2 fix: founder reported `##` markers visible in preview.
+const STRIP_LEADING_HEADING_RE = /^[ \t]*#{2,3}[ \t]+§?[ \t]*\d{1,2}[ \t]*[\p{Pd}.][^\n]*\n+/u
+
 export interface EditorSectionItemProps {
   sectionKey: string
   number: number
@@ -55,7 +63,9 @@ export function EditorSectionItem({
       <div className="space-y-2">
         <Label className="text-sm">Pré-visualização</Label>
         <div className="prose prose-sm prose-neutral max-w-none rounded-md border bg-muted/30 p-3">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{deliveredValue}</ReactMarkdown>
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {deliveredValue.replace(STRIP_LEADING_HEADING_RE, '')}
+          </ReactMarkdown>
         </div>
       </div>
     </div>
