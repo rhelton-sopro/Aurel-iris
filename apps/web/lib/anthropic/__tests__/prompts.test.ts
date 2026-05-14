@@ -13,16 +13,57 @@ beforeEach(() => {
   _resetPromptsCache()
 })
 
-describe('lib/anthropic/prompts — file content', () => {
-  it('system.md contém "Princípios de operação"', () => {
-    expect(loadSystemPrompt()).toContain('Princípios de operação')
+describe('lib/anthropic/prompts — file content (Plan 11 — 14-section Iris Codex V1)', () => {
+  it('system.md contém o marker allowlist do audit na linha 1', () => {
+    const sys = loadSystemPrompt()
+    const firstLine = sys.split('\n')[0]
+    expect(firstLine).toBe('<!-- audit-vocabulary:allowlist -->')
   })
 
-  it('system.md contém os 13 headings "### N. " (1..13)', () => {
+  it('system.md identifica-se como "Iris Codex" (DC-1 brand)', () => {
+    expect(loadSystemPrompt()).toContain('Iris Codex')
+  })
+
+  it('system.md contém os 14 headings "## §N — Title" (1..14)', () => {
     const sys = loadSystemPrompt()
-    for (let n = 1; n <= 13; n++) {
-      expect(sys).toMatch(new RegExp(`### ${n}\\. `))
+    for (let n = 1; n <= 14; n++) {
+      expect(sys).toMatch(new RegExp(`## §${n} —`))
     }
+  })
+
+  it('system.md contém os 14 titles canônicos da Direction Correction DC-1', () => {
+    const sys = loadSystemPrompt()
+    const expectedTitles = [
+      'Constituição e Temperamento',
+      'Mapa Orgânico',
+      'Linha do Tempo Emocional',
+      'Padrões Emocionais Ativos',
+      'Eixo Psicossomático',
+      'Heranças Transgeracionais',
+      'Carências Funcionais',
+      'Estado Mental e Nervoso',
+      'Recursos e Forças',
+      'Dimensão Arquetípica',
+      'Sugestões Integrativas',
+      'Roteiro de Anamnese',
+      'Síntese Integrativa',
+      'Mensagem para o Cliente',
+    ]
+    for (const title of expectedTitles) {
+      expect(sys).toContain(title)
+    }
+  })
+
+  it('system.md NÃO instrui JSON output (Plan 11 supersedes 8-block JSON)', () => {
+    const sys = loadSystemPrompt()
+    // The new prompt explicitly says "Não emita JSON" in the format section —
+    // verify by asserting absence of the legacy 8-block enum/schema instructions.
+    expect(sys).not.toContain('"report_version": "2.0"')
+    expect(sys).not.toContain('systems_with_tendency')
+    expect(sys).not.toContain('tendency_grade')
+    expect(sys).not.toContain('bilateral_findings')
+    // Positive assertion: the prompt instructs markdown output
+    expect(sys).toMatch(/14 seções markdown/i)
   })
 
   it('feature-injection.md contém placeholders mustache canônicos', () => {

@@ -73,41 +73,41 @@ describe('lib/anthropic/diff — classifyEdit (D-U2)', () => {
   })
 })
 
-describe('lib/anthropic/diff — classifyAllSections (D-U2 outputs)', () => {
+describe('lib/anthropic/diff — classifyAllSections (D-U2 outputs; Plan 11 — 14 sections)', () => {
   it('produz edit_diff jsonb + zonas_editadas + tipo_edicao para 3 keys mistos', () => {
     const generated: ReportJsonb = {
-      '1_constituicao': 'Original constituição.',
-      '2_estrutural_fisica': 'Original estrutural.',
-      '3_indicacoes_sistemicas': 'Original sistêmicas.',
+      '1_constituicao_temperamento': 'Original constituição.',
+      '2_mapa_organico': 'Original mapa orgânico.',
+      '3_linha_tempo_emocional': 'Original linha tempo.',
     }
     const delivered: ReportJsonb = {
-      '1_constituicao': 'Original constituição.', // none
-      '2_estrutural_fisica': 'Modificação completa diferente texto outro novo.', // reescrito
-      '3_indicacoes_sistemicas': '', // removido
+      '1_constituicao_temperamento': 'Original constituição.', // none
+      '2_mapa_organico': 'Modificação completa diferente texto outro novo.', // reescrito
+      '3_linha_tempo_emocional': '', // removido
     }
     const r = classifyAllSections(generated, delivered)
-    expect(r.edit_diff['1_constituicao']?.type).toBe('none')
-    expect(r.edit_diff['2_estrutural_fisica']?.type).toBe('reescrito')
-    expect(r.edit_diff['3_indicacoes_sistemicas']?.type).toBe('removido')
-    expect(r.zonas_editadas).toContain('2_estrutural_fisica')
-    expect(r.zonas_editadas).toContain('3_indicacoes_sistemicas')
-    expect(r.zonas_editadas).not.toContain('1_constituicao')
+    expect(r.edit_diff['1_constituicao_temperamento']?.type).toBe('none')
+    expect(r.edit_diff['2_mapa_organico']?.type).toBe('reescrito')
+    expect(r.edit_diff['3_linha_tempo_emocional']?.type).toBe('removido')
+    expect(r.zonas_editadas).toContain('2_mapa_organico')
+    expect(r.zonas_editadas).toContain('3_linha_tempo_emocional')
+    expect(r.zonas_editadas).not.toContain('1_constituicao_temperamento')
     expect(r.tipo_edicao.sort()).toEqual(['removido', 'reescrito'].sort())
   })
 
   it('chave ausente em generated mas presente em delivered = "adicionado"', () => {
     const generated: ReportJsonb = {}
-    const delivered: ReportJsonb = { '5_psicoemocional': 'Texto novo aqui.' }
+    const delivered: ReportJsonb = { '5_eixo_psicossomatico': 'Texto novo aqui.' }
     const r = classifyAllSections(generated, delivered)
-    expect(r.edit_diff['5_psicoemocional']?.type).toBe('adicionado')
-    expect(r.zonas_editadas).toEqual(['5_psicoemocional'])
+    expect(r.edit_diff['5_eixo_psicossomatico']?.type).toBe('adicionado')
+    expect(r.zonas_editadas).toEqual(['5_eixo_psicossomatico'])
     expect(r.tipo_edicao).toEqual(['adicionado'])
   })
 
   it('tudo idêntico = zonas_editadas vazio + tipo_edicao vazio', () => {
     const report: ReportJsonb = {
-      '1_constituicao': 'Mesmo texto.',
-      '2_estrutural_fisica': 'Mesmo texto 2.',
+      '1_constituicao_temperamento': 'Mesmo texto.',
+      '2_mapa_organico': 'Mesmo texto 2.',
     }
     const r = classifyAllSections(report, report)
     expect(r.zonas_editadas).toEqual([])

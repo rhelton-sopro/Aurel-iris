@@ -5,11 +5,11 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { EditorAccordion } from '../EditorAccordion'
 
-describe('components/readings/EditorAccordion (D-U1 + UI-SPEC §Surface 2)', () => {
-  it('renderiza 13 sections + 14ª encerramento read-only', () => {
+describe('components/readings/EditorAccordion (D-U1 + UI-SPEC §Surface 2; Plan 11 — 14 sections)', () => {
+  it('renderiza 14 sections + 15ª encerramento read-only', () => {
     const generated = {
-      '1_constituicao': 'Texto 1',
-      '2_estrutural_fisica': 'Texto 2',
+      '1_constituicao_temperamento': 'Texto 1',
+      '2_mapa_organico': 'Texto 2',
       'encerramento_disclaimer': '> Disclaimer literal.',
     }
     render(
@@ -20,14 +20,14 @@ describe('components/readings/EditorAccordion (D-U1 + UI-SPEC §Surface 2)', () 
       />,
     )
     // Triggers are always rendered regardless of open/closed state
-    expect(screen.getByText(/1\. Constituição/)).toBeDefined()
-    expect(screen.getByText(/13\. Mensagem Final/)).toBeDefined()
+    expect(screen.getByText(/1\. Constituição e Temperamento/)).toBeDefined()
+    expect(screen.getByText(/14\. Mensagem para o Cliente/)).toBeDefined()
     expect(screen.getByText(/Encerramento \(texto literal — não editável\)/)).toBeDefined()
   })
 
   it('mostra "editado" indicator quando deliveredValue !== generatedValue', () => {
-    const generated = { '1_constituicao': 'Original' }
-    const delivered = { '1_constituicao': 'Modificado' }
+    const generated = { '1_constituicao_temperamento': 'Original' }
+    const delivered = { '1_constituicao_temperamento': 'Modificado' }
     render(
       <EditorAccordion
         reportGenerated={generated}
@@ -71,7 +71,7 @@ describe('components/readings/EditorAccordion (D-U1 + UI-SPEC §Surface 2)', () 
   })
 
   it('readOnly prop desabilita todos os Textareas renderizados', () => {
-    const generated = { '1_constituicao': 'Texto', '5_psicoemocional': 'Outro' }
+    const generated = { '1_constituicao_temperamento': 'Texto', '5_eixo_psicossomatico': 'Outro' }
     const { container } = render(
       <EditorAccordion
         reportGenerated={generated}

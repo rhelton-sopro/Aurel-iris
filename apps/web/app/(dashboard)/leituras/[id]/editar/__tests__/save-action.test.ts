@@ -69,7 +69,7 @@ const VALID_AUDIT_META = {
 }
 
 const VALID_REPORT_DELIVERED = {
-  '1_constituicao': 'Texto válido da seção',
+  '1_constituicao_temperamento': 'Texto válido da seção',
 }
 
 // ---------------------------------------------------------------------------
@@ -138,14 +138,14 @@ describe('saveReportDelivered (D-A2 + WR-08 + CR-05)', () => {
       reading: {
         id: VALID_READING_UUID,
         therapist_id: 'user-1',
-        report_generated: { '1_constituicao': 'texto gerado' },
+        report_generated: { '1_constituicao_temperamento': 'texto gerado' },
         is_delivered: false,
       },
     })
     vi.mocked(createClient).mockResolvedValueOnce(supabaseMock as never)
 
     const result = await saveReportDelivered(VALID_READING_UUID, {
-      '1_constituicao': 'texto editado',
+      '1_constituicao_temperamento': 'texto editado',
       encerramento_disclaimer: 'TENTATIVA DE BYPASS',
     })
 
@@ -160,7 +160,7 @@ describe('saveReportDelivered (D-A2 + WR-08 + CR-05)', () => {
 
   it('BLOCK save com vocab proibido (D-A2 — regression após patch)', async () => {
     vi.mocked(extractForbiddenHits).mockReturnValueOnce([
-      { term: 'diagnóstico', section: '1_constituicao', occurrences: 1 },
+      { term: 'diagnóstico', section: '1_constituicao_temperamento', occurrences: 1 },
     ])
 
     const supabaseMock = createMockSupabase({
@@ -174,7 +174,7 @@ describe('saveReportDelivered (D-A2 + WR-08 + CR-05)', () => {
     vi.mocked(createClient).mockResolvedValueOnce(supabaseMock as never)
 
     const result = await saveReportDelivered(VALID_READING_UUID, {
-      '1_constituicao': 'texto com diagnóstico',
+      '1_constituicao_temperamento': 'texto com diagnóstico',
     })
 
     expect(result.error).toContain('diagnóstico')
@@ -238,7 +238,7 @@ describe('markReadingDelivered (CR-04 + SC2 + WR-08-existing)', () => {
         audit_metadata: {
           low_anchor_rate: true,
           anchor_rate_pct: 87,
-          anchor_rate_per_section: { '2_estrutural_fisica': 0.8 },
+          anchor_rate_per_section: { '2_mapa_organico': 0.8 },
           forbidden_vocab: [],
           audited_at: '2026-05-08T15:00:00Z',
           auditor_version: 'v1',

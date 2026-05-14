@@ -154,24 +154,77 @@ function countAnchoredSentences(text: string): { total: number; anchored: number
  * Run anchor-rate + forbidden-vocab audit on a complete or partial
  * `report_generated` jsonb. Re-runnable on the same input (deterministic
  * except for `audited_at` timestamp).
+ *
+ * Phase 7.4 Plan 11 (Direction Correction DC-4) — the new 14-section Iris
+ * Codex V1 prompt bans inline `[ancorado em features.x]` markers from the
+ * primary surface. With nothing to scan for, anchor-rate becomes deterministic
+ * across the new keys (no markers present == 0 of 0 sentences anchored == 100%
+ * by the empty-section convention). However, LEGACY 1.0 markdown reports
+ * generated under the Phase 7 D-A1 contract DO contain inline anchor markers,
+ * so the legacy scan path is preserved when the report jsonb contains any old
+ * 13-section key. For new 14-section keys, anchor-rate is deterministically
+ * passing (low_anchor_rate=false, anchor_rate_pct=100, per-section=100).
+ *
+ * Forbidden-vocab scan continues full force in both directions.
  */
 export function runAudit(report: ReportJsonb): AuditMetadata {
+  // Detect whether this is a legacy 1.0 markdown report (has any of the old
+  // 13-section keys) or a new 14-section report (DC-1). Mixed reports default
+  // to legacy treatment for safety (anchor-rate scan applies).
+  const LEGACY_KEYS = [
+    '1_constituicao',
+    '2_estrutural_fisica',
+    '3_indicacoes_sistemicas',
+    '4_toxemia',
+    '5_psicoemocional',
+    '6_cargas_temporais',
+    '7_carencias_nutricionais',
+    '8_simbolico_espiritual',
+    '9_cuidados_integrativos',
+    '10_potenciais_forcas',
+    '11_afirmacoes_integracao',
+    '12_sintese_integrativa',
+    '13_mensagem_final',
+  ]
+  const reportKeys = Object.keys(report)
+  const isLegacyShape = reportKeys.some((k) => LEGACY_KEYS.includes(k))
+
   const anchorPerSection: Record<string, number> = {}
-  let totalSentences = 0
-  let totalAnchored = 0
+  let overallPct = 100
 
-  for (const key of SECTIONS_REQUIRING_ANCHORS) {
-    const text = (report[key] ?? '') as string
-    const { total, anchored } = countAnchoredSentences(text)
-    const sectionNumber = key.split('_')[0]!
-    anchorPerSection[sectionNumber] =
-      total === 0 ? 100 : Math.round((anchored / total) * 100)
-    totalSentences += total
-    totalAnchored += anchored
+  if (isLegacyShape) {
+    // Legacy 1.0 path — preserved for already-generated reports that contain
+    // inline `[ancorado em features.x]` markers per the original D-A1 contract.
+    let totalSentences = 0
+    let totalAnchored = 0
+    const LEGACY_ANCHOR_SECTIONS = [
+      '2_estrutural_fisica',
+      '3_indicacoes_sistemicas',
+      '4_toxemia',
+      '5_psicoemocional',
+      '6_cargas_temporais',
+    ] as const
+    for (const key of LEGACY_ANCHOR_SECTIONS) {
+      const text = ((report as Record<string, unknown>)[key] ?? '') as string
+      const { total, anchored } = countAnchoredSentences(text)
+      const sectionNumber = key.split('_')[0]!
+      anchorPerSection[sectionNumber] =
+        total === 0 ? 100 : Math.round((anchored / total) * 100)
+      totalSentences += total
+      totalAnchored += anchored
+    }
+    overallPct =
+      totalSentences === 0 ? 100 : Math.round((totalAnchored / totalSentences) * 100)
+  } else {
+    // New 14-section path (Plan 11) — no inline anchor markers required by the
+    // prompt; the audit gate becomes a no-op for anchor-rate. Per-section
+    // values map to the new numbering (sections 2..6) for shape compatibility
+    // with the AuditBanner UI which iterates over the keys.
+    for (const key of SECTIONS_REQUIRING_ANCHORS) {
+      const sectionNumber = key.split('_')[0]!
+      anchorPerSection[sectionNumber] = 100
+    }
   }
-
-  const overallPct =
-    totalSentences === 0 ? 100 : Math.round((totalAnchored / totalSentences) * 100)
 
   // Forbidden vocab scan over LLM-authored sections only.
   // `encerramento_disclaimer` is server-appended literal text (D-P3) mandated
