@@ -47,6 +47,22 @@ Discovered during Plan execution but out of scope for the current plan. Track he
 - **Memory note:** `quality-scoring.test.ts` failures captured in MEMORY (Phase 3 debt). The other three are similar test-fixture typing drift (mocked `fetch` returning `[]` tuples that TS sees as empty-tuple type; `RequestInit` cast warnings).
 - **Scope:** out of Plan 07.4-09. Phase 3 / Phase 5 test maintenance pass.
 
+### D-DEF-09-05 — Legacy 1.0 regenerate path broken by shared system.md rewrite
+
+- **Discovered:** 2026-05-13 during SC-10 UAT walkthrough — founder regenerated an existing `report_version='1.0'` reading and got an empty report.
+- **Symptom:** legacy markdown parser produces `completedSections = {}`. Log fires:
+  ```
+  [analyze/route] stream-finalize {"sections_completed":[],"boundaries_count":0,...}
+  [analyze/route] EMPTY-REPORT reading=<id> buffer_head=<JSON output from Sonnet>
+  ```
+- **Root cause:** Both `apps/web/lib/anthropic/analyze.ts` (legacy 1.0 path) and `apps/web/lib/anthropic/analyze-v2.ts` (new 2.0 path) call `loadSystemPrompt()` from `lib/anthropic/prompts.ts`, which reads `apps/web/prompts/system.md`. Plan 07.4-02 (commit `9efcbdb`) replaced `system.md` wholesale with the Iris Codex V1 prompt that instructs Sonnet to emit JSON (D-VAL3 path b, fixed top-level key order). Legacy 1.0 readings hit the legacy branch correctly (route.ts line 130 `if (reading.report_version === '2.0')` is false), but `analyze.ts` then feeds Sonnet the new JSON-emitting prompt, Sonnet returns JSON, and the legacy `findAllBoundaries()` markdown parser can't match `## §N` headings → empty sections.
+- **Impact:** All 25 existing `report_version='1.0'` readings are now un-regeneratable. They render in read-only `EditorAccordion` correctly (no regression on the view path), but the "regenerar análise" button produces empty output. Phase 7.4 intent was that 1.0 readings stay read-only (D-LEG2), so this may be acceptable depending on whether founder wants to keep the regen escape-hatch for legacy.
+- **Suggested fix (next plan):** either
+  - **(a) preserve legacy prompt routing:** restore the pre-Plan-02 `system.md` from `git show 9efcbdb~1:apps/web/prompts/system.md` as `apps/web/prompts/system-v1.md`; split `loadSystemPrompt()` into `loadSystemPromptV1()` + `loadSystemPromptV2()`; route `analyze.ts` → v1, `analyze-v2.ts` → v2. ~30-45 min.
+  - **(b) disable legacy regen:** add a route gate `if (reading.report_version === '1.0') return 409 "Legacy readings are read-only — create a new reading to use Iris Codex v2."`. ~10 min. Aligns with D-LEG2 intent.
+- **Workaround for UAT:** founder verifies SC-10 on a freshly created `report_version='2.0'` reading (column default for new rows) via the capture flow — this is Option A from the 2026-05-13 UAT triage.
+- **Scope:** out of Plan 07.4-09 (rebrand sweep). Discovered during UAT, not introduced by Plan 09. Cross-plan regression from Plan 02's `system.md` rewrite that didn't account for the shared `loadSystemPrompt()` consumer.
+
 ### D-DEF-09-04 — Pre-existing audit-vocabulary baseline (38 hits across 3 categories)
 
 - **Symptom:** `node scripts/audit-vocabulary.mjs` exits 1 with 38 hits:
