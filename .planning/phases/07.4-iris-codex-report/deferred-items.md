@@ -26,7 +26,7 @@ Discovered during Plan execution but out of scope for the current plan. Track he
   - 12 client surfaces (8 components + 4 tests) re-pointed to `report-schema-shared`.
 - **Verification:** `pnpm build` exits 0; `pnpm tsc --noEmit` clean; 97/97 component tests GREEN; `pnpm lint` 0 errors / 9 baseline warnings (unchanged).
 
-### D-DEF-09-02 — `lib/anthropic/__tests__/prompts.test.ts` expects legacy 13-section system.md
+### D-DEF-09-02 — `lib/anthropic/__tests__/prompts.test.ts` expects legacy 13-section system.md — **RESOLVED 2026-05-14 by Plan 07.4-11**
 
 - **Discovered:** 2026-05-13 during Plan 07.4-09 Task 3 regression sweep.
 - **Symptom:** `pnpm test:run` fails 1 test:
@@ -36,8 +36,7 @@ Discovered during Plan execution but out of scope for the current plan. Track he
   ```
 - **Root cause:** the test was authored in Phase 7 (`42b7bfe`/`71033b4`) and asserts the **old 13-section markdown structure** of `apps/web/prompts/system.md`. Plan 07.4-02 (`9efcbdb`) rewrote system.md as the Iris Codex V1 adaptive prompt — no longer 13 numbered headings; it now uses checklists + principles + JSON schema. The legacy test is stale.
 - **Pre-existing:** debt from Plan 07.4-02 prompt rewrite. Not introduced by Plan 07.4-09 rebrand.
-- **Suggested fix (next plan):** rewrite or delete `prompts.test.ts` — it should assert against the NEW prompt structure (e.g., presence of `Princípio 1..7`, JSON schema reference, `audit-vocabulary:allowlist` marker, the Iris Codex identity statement).
-- **Scope:** out of Plan 07.4-09 (rebrand sweep). Plan 07.4-02 polish.
+- **Resolution (Plan 07.4-11, commit `7726776`):** prompts.test.ts assertion updated from "13 headings `### N. `" to "14 headings `## §N — `" matching the Direction Correction DC-1 14-section markdown structure. New assertions added for: line-1 allowlist marker, all 14 canonical Plan-11 titles, and absence of 8-block JSON output instructions. Test now GREEN.
 
 ### D-DEF-09-03 — Pre-existing tsc errors in 4 test files
 
@@ -47,7 +46,7 @@ Discovered during Plan execution but out of scope for the current plan. Track he
 - **Memory note:** `quality-scoring.test.ts` failures captured in MEMORY (Phase 3 debt). The other three are similar test-fixture typing drift (mocked `fetch` returning `[]` tuples that TS sees as empty-tuple type; `RequestInit` cast warnings).
 - **Scope:** out of Plan 07.4-09. Phase 3 / Phase 5 test maintenance pass.
 
-### D-DEF-09-05 — Legacy 1.0 regenerate path broken by shared system.md rewrite
+### D-DEF-09-05 — Legacy 1.0 regenerate path broken by shared system.md rewrite — **RESOLVED 2026-05-14 by Plan 07.4-11**
 
 - **Discovered:** 2026-05-13 during SC-10 UAT walkthrough — founder regenerated an existing `report_version='1.0'` reading and got an empty report.
 - **Symptom:** legacy markdown parser produces `completedSections = {}`. Log fires:
@@ -62,6 +61,7 @@ Discovered during Plan execution but out of scope for the current plan. Track he
   - **(b) disable legacy regen:** add a route gate `if (reading.report_version === '1.0') return 409 "Legacy readings are read-only — create a new reading to use Iris Codex v2."`. ~10 min. Aligns with D-LEG2 intent.
 - **Workaround for UAT:** founder verifies SC-10 on a freshly created `report_version='2.0'` reading (column default for new rows) via the capture flow — this is Option A from the 2026-05-13 UAT triage.
 - **Scope:** out of Plan 07.4-09 (rebrand sweep). Discovered during UAT, not introduced by Plan 09. Cross-plan regression from Plan 02's `system.md` rewrite that didn't account for the shared `loadSystemPrompt()` consumer.
+- **Resolution (Plan 07.4-11, commits `22b0b1a` + `a6533e4` + `2b97b4f` + `7726776`):** the Direction Correction consolidates the LLM pipeline into a single path. Plan 11 rewrites `system.md` to emit `## §N — Title` markdown headings (the format the legacy `findAllBoundaries` parser detects), extends the parser range from 1..13 to 1..14, and remaps `ReportSectionKey` to the new 14-section structure. Both legacy 1.0 readings and new 2.0 readings now go through the SAME `analyze.ts` path with the SAME prompt — `loadSystemPrompt()` returns a markdown-emitting prompt the legacy parser can read. Regen for any reading now produces 14 sections.
 
 ### D-DEF-09-04 — Pre-existing audit-vocabulary baseline (38 hits across 3 categories)
 
