@@ -84,8 +84,10 @@ function sectorLines(sectors: SectorBlock[] | null | undefined): string[] {
     lines.push(`    Setor ${s.hour ?? '?'} (${safeArray<string>(s.zones).join(', ')}):`)
     for (const f of findings) {
       const parts: string[] = [f.type ?? 'finding']
+      if (f.color) parts.push(f.color)
       if (f.depth) parts.push(f.depth)
       if (f.size_mm != null) parts.push(`${f.size_mm} mm`)
+      if (f.extension) parts.push(f.extension)
       if (f.intensity) parts.push(`intensidade ${f.intensity}`)
       lines.push(`      - ${parts.join(' · ')}`)
     }

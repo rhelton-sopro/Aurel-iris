@@ -103,6 +103,21 @@ class SectoralPigment(BaseModel):
 
 
 class Finding(BaseModel):
+    """Per-sector clinical finding.
+
+    iter-6 FIX 13/14 (additive, no structural change — fields already existed):
+      - type="lacuna"      : dark stromal cavitation. `depth` is now an
+        OBJECTIVE grade "grau_1".."grau_4" (FIX 14 — was hardcoded "grau_1");
+        `size_mm` is the FIX-12 physical estimate (≤ 4 mm sanity gate).
+      - type="pigmentacao" : chromatic pigment marker surfaced from
+        sectoral_pigments INTO the sector so every findings consumer sees it
+        (the dark-blob detector is blind to amber/yellow). `color` =
+        amarelo_ambar|laranja|marrom_difuso; `extension` =
+        leve|moderado|denso; `depth`/`size_mm` = None.
+    A pigment finding is clinically NOT a lacuna and must never be described
+    as one (system.md enforces this for the LLM).
+    """
+
     type: str  # "lacuna" | "pigmentacao" | "cripta" | future...
     depth: Optional[str] = None
     size_mm: Optional[float] = Field(default=None, ge=0.0)

@@ -304,7 +304,7 @@ def run_pipeline(reading_id: str, image_urls: list[dict]) -> dict:
     if results.get("right_eye") is None and results.get("left_eye") is None:
         error_summary = _classify_error_summary(warnings)
         processing_metadata = {
-            "model_version": "pipeline_0.1.0",
+            "model_version": "pipeline_0.2.0",
             "processing_time_ms": int((_time.monotonic() - t_start) * 1000),
             "modal_call_id": call_id,
             "stages_timing_ms": stages_timing,
@@ -331,7 +331,7 @@ def run_pipeline(reading_id: str, image_urls: list[dict]) -> dict:
         "left_eye": results.get("left_eye"),
         "asymmetry_notes": asymmetry,
         "processing_metadata": {
-            "model_version": "pipeline_0.1.0",
+            "model_version": "pipeline_0.2.0",
             "processing_time_ms": int((_time.monotonic() - t_start) * 1000),
             "modal_call_id": call_id,
             "stages_timing_ms": stages_timing,

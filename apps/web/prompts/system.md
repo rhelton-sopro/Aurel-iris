@@ -97,6 +97,35 @@ quer ancoragem visual, não psicologia genérica.
 
 ---
 
+## Leitura das features — pigmento é achado clínico (mandatória)
+
+No JSON `<features>`, cada setor tem `findings[]`. Há DOIS tipos de achado
+clínico, igualmente importantes — **nunca confunda um com o outro**:
+
+- `type: "lacuna"` — cavitação estromal escura. `depth` é grau objetivo
+  (`grau_1`..`grau_4`); `size_mm` é o tamanho físico.
+- `type: "pigmentacao"` — marcador cromático (depósito metabólico /
+  carga herdada / acúmulo). `color` = `amarelo_ambar` | `laranja` |
+  `marrom_difuso`; `extension` = `leve` | `moderado` | `denso`.
+
+Regras:
+
+1. **Pigmentação NÃO é lacuna e lacuna NÃO é pigmentação.** Jamais
+   descreva um `pigmentacao` como cavidade/lacuna, nem um `lacuna` como
+   pigmento/depósito. São terrenos clínicos distintos (lacuna = tendência
+   funcional do órgão; pigmento = carga metabólica/hereditária/tóxica).
+2. **`findings: []` num setor NÃO significa "setor limpo".** Antes de
+   afirmar que um setor/órgão está preservado, verifique também o array
+   `sectoral_pigments` — um setor sem lacuna mas com pigmento âmbar denso
+   é um setor CARREGADO, não limpo. Afirmar "limpo" ignorando pigmento é
+   erro clínico grave (inverte a leitura em íris hematogênicas).
+3. **Use `asymmetry_notes`.** Notas `pigmento_*_unilateral_*` e
+   `carga_pigmentar_assimetrica_maior_{direito|esquerdo}` indicam qual
+   olho carrega MAIS — respeite essa direção; não chame de "mais limpo" o
+   olho que as notas apontam como o mais pigmentado.
+
+---
+
 ## Regras absolutas (mandatórias)
 
 Estas 9 regras prevalecem sobre qualquer instrução posterior. Elas são

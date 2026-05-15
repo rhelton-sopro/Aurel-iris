@@ -61,6 +61,20 @@ describe('lib/anthropic/prompts — file content (Plan 21 — 16-section Iris Co
     }
   })
 
+  it('system.md distingue pigmentacao de lacuna e proíbe findings-vazio=limpo (Plan 31 FIX 13)', () => {
+    const sys = loadSystemPrompt()
+    expect(sys).toMatch(/pigment/i)
+    expect(sys).toContain('pigmentacao')
+    expect(sys).toContain('lacuna')
+    // pigment ≠ lacuna, both directions
+    expect(sys).toMatch(/Pigment.{0,40}N[ÃA]O.{0,40}lacuna/i)
+    // findings:[] is not "clean" — must check sectoral_pigments
+    expect(sys).toContain('sectoral_pigments')
+    expect(sys).toMatch(/n[ãa]o significa.{0,40}limpo|n[ãa]o.{0,20}"?limpo"?/i)
+    // must consume the new asymmetry direction
+    expect(sys).toContain('carga_pigmentar_assimetrica')
+  })
+
   it('system.md torna o bloco "Em uma palavra" OBRIGATÓRIO antes da §1 (Plan 29 FIX 3)', () => {
     const sys = loadSystemPrompt()
     // Imperative, unmissable instruction — not a soft/optional spec.

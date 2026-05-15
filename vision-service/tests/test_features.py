@@ -477,3 +477,108 @@ def test_no_finding_exceeds_sanity_gate_regression():
     for s in range(12):
         for f in _detect_findings_in_sector(img, s, iris_radius_px=320.0, warnings=[]):
             assert f["size_mm"] <= MAX_PLAUSIBLE_FINDING_MM
+
+
+# ---------------------------------------------------------------------------
+# iter-6 FIX 14 — objective lacuna grading (was hardcoded "grau_1")
+# ---------------------------------------------------------------------------
+
+def test_grade_lacuna_varies_by_contrast():
+    """Depth grade tracks interior-vs-annulus contrast (not all grau_1)."""
+    from pipeline.features import _grade_lacuna
+
+    H = 96
+    # bright stroma background, one dark square component (label 1)
+    gray = np.full((40, 40), 200, dtype=np.uint8)
+    labels = np.zeros((40, 40), dtype=np.int32)
+    gray[18:23, 18:23] = 150       # mild dip vs 200 → low contrast
+    labels[18:23, 18:23] = 1
+    g_mild = _grade_lacuna(gray, labels, 1, size_mm=0.5, polar_height=H)
+
+    gray2 = np.full((40, 40), 200, dtype=np.uint8)
+    labels2 = np.zeros((40, 40), dtype=np.int32)
+    gray2[15:26, 15:26] = 5        # near-black vs 200 → contrast > 0.8
+    labels2[15:26, 15:26] = 1
+    g_deep = _grade_lacuna(gray2, labels2, 1, size_mm=0.5, polar_height=H)
+
+    assert g_mild == "grau_1"
+    assert g_deep == "grau_4"
+    # large diameter alone bumps grade even at modest contrast
+    assert _grade_lacuna(gray, labels, 1, size_mm=2.5, polar_height=H) == "grau_3"
+    # empty annulus → safe fallback, never crashes
+    solid = np.ones((5, 5), dtype=np.int32)
+    assert _grade_lacuna(np.zeros((5, 5), np.uint8), solid, 1, 0.5, H) == "grau_1"
+
+
+# ---------------------------------------------------------------------------
+# iter-6 FIX 13 — pigment surfaced into sectors[].findings
+# ---------------------------------------------------------------------------
+
+def test_pigment_merged_into_sector_findings(monkeypatch):
+    """sectoral_pigments for hour H must appear as a type='pigmentacao'
+    finding in sectors[H-1].findings, and still validate Pydantic."""
+    import pipeline.features as feat
+
+    monkeypatch.setattr(
+        feat,
+        "detect_sectoral_pigments",
+        lambda *a, **k: [
+            {"hour": 7, "type": "amarelo_ambar", "intensity": "denso",
+             "delta_lab": [0.0, 1.0, 22.0]},
+        ],
+    )
+    enhanced = _make_synthetic_enhanced()
+    composite = _make_synthetic_composite()
+    jensen_map = load_jensen_map()
+    result = extract_all(enhanced, composite, jensen_map, "right")
+
+    sec7 = result["sectors"][6]
+    pig = [f for f in sec7["findings"] if f["type"] == "pigmentacao"]
+    assert len(pig) == 1
+    assert pig[0]["color"] == "amarelo_ambar"
+    assert pig[0]["extension"] == "denso"
+    assert pig[0]["depth"] is None and pig[0]["size_mm"] is None
+    # FIX 13 is additive — must still satisfy the frozen Pydantic contract.
+    EyeFeatures.model_validate(result)
+    assert any(p["hour"] == 7 for p in result["sectoral_pigments"])  # array kept too
+
+
+# ---------------------------------------------------------------------------
+# iter-6 FIX 13 ROOT CAUSE — compute_asymmetry now weighs pigment
+# (the Nailli OD/OE inversion: pigmented eye must NOT read as cleaner)
+# ---------------------------------------------------------------------------
+
+def _eye(sectoral_pigments):
+    sectors = [{"hour": h, "zones": [], "findings": []} for h in range(1, 13)]
+    return {
+        "iris_color": {"primary": "castanho"},
+        "fiber_density": {"score": 0.5, "interpretation": "media"},
+        "sectors": sectors,
+        "sectoral_pigments": sectoral_pigments,
+    }
+
+
+def test_compute_asymmetry_weighs_sectoral_pigments():
+    from pipeline.features import compute_asymmetry
+
+    right = _eye([
+        {"hour": 7, "type": "amarelo_ambar", "intensity": "denso", "delta_lab": [0, 1, 22]},
+        {"hour": 4, "type": "amarelo_ambar", "intensity": "moderado", "delta_lab": [0, 1, 18]},
+    ])
+    left = _eye([])  # less pigmented eye
+    notes = compute_asymmetry({"right_eye": right, "left_eye": left})
+    assert "pigmento_amarelo_ambar_unilateral_setor_7_direito" in notes
+    assert "pigmento_amarelo_ambar_unilateral_setor_4_direito" in notes
+    # the load note prevents the heavier eye reading as the cleaner one
+    assert "carga_pigmentar_assimetrica_maior_direito" in notes
+
+
+def test_compute_asymmetry_pigment_symmetric_no_note():
+    from pipeline.features import compute_asymmetry
+
+    same = lambda: [
+        {"hour": 7, "type": "amarelo_ambar", "intensity": "leve", "delta_lab": [0, 1, 13]},
+    ]
+    notes = compute_asymmetry({"right_eye": _eye(same()), "left_eye": _eye(same())})
+    assert not any(n.startswith("pigmento_") for n in notes)
+    assert not any(n.startswith("carga_pigmentar_") for n in notes)

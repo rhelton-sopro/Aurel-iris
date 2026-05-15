@@ -229,6 +229,59 @@ def _polar_area_to_mm(area_px: float, polar_height: int) -> float:
     return equiv_diam_polar_px * (IRIS_DIAMETER_MM / 2.0) / float(polar_height)
 
 
+def _grade_lacuna(
+    gray: np.ndarray,
+    labels: np.ndarray,
+    comp_idx: int,
+    size_mm: float,
+    polar_height: int,
+) -> str:
+    """iter-6 FIX 14 — objective lacuna depth grade (was hardcoded "grau_1").
+
+    `depth contrast` = how much darker the lacuna interior is vs a ~2 mm
+    annulus of surrounding stroma, normalised:
+        contrast = (annulus_mean - interior_mean) / annulus_mean   (0..1)
+    Grade combines contrast with the physical diameter (`size_mm`, already in
+    mm from FIX 12). Brief thresholds:
+        grau_1 leve       : contrast < 0.30 and diameter < 1 mm
+        grau_2 moderada   : contrast 0.30–0.60 or diameter 1–2 mm
+        grau_3 acentuada  : contrast > 0.60 or diameter > 2 mm
+        grau_4 profunda   : near-black interior (contrast > 0.80) — complete
+                            fibre discontinuity
+    Falls back to grau_1 if the annulus is empty (cannot measure contrast).
+    """
+    comp = labels == comp_idx
+    interior = gray[comp]
+    if interior.size == 0:
+        return "grau_1"
+    interior_mean = float(interior.mean())
+
+    # ~2 mm annulus: polar px per mm ≈ H / (IRIS_DIAMETER_MM/2) (inverse of
+    # _polar_area_to_mm's radial scale). Bounded so a tiny sector slice
+    # cannot produce a degenerate kernel.
+    px_per_mm = max(1.0, polar_height / (IRIS_DIAMETER_MM / 2.0))
+    k = int(np.clip(round(2.0 * px_per_mm), 1, 25))
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * k + 1, 2 * k + 1))
+    dilated = cv2.dilate(comp.astype(np.uint8), kernel) > 0
+    ring = dilated & ~comp
+    ring_vals = gray[ring]
+    if ring_vals.size == 0:
+        return "grau_1"
+    annulus_mean = float(ring_vals.mean())
+    if annulus_mean <= 0:
+        return "grau_1"
+
+    contrast = float(np.clip((annulus_mean - interior_mean) / annulus_mean, 0.0, 1.0))
+
+    if contrast > 0.80:
+        return "grau_4"
+    if contrast > 0.60 or size_mm > 2.0:
+        return "grau_3"
+    if contrast >= 0.30 or size_mm >= 1.0:
+        return "grau_2"
+    return "grau_1"
+
+
 def _detect_findings_in_sector(
     enhanced_polar: np.ndarray,
     sector_idx: int,
@@ -291,7 +344,9 @@ def _detect_findings_in_sector(
     gray = cv2.cvtColor(sector_slice, cv2.COLOR_RGB2GRAY)
     mask = (gray < LACUNA_DARK_THRESHOLD).astype(np.uint8)
 
-    num, _, stats, _ = cv2.connectedComponentsWithStats(mask, connectivity=8)
+    # iter-6 FIX 14: keep the label map so each component can be graded by
+    # depth contrast vs its surrounding stroma (was: `_` discarded labels).
+    num, labels, stats, _ = cv2.connectedComponentsWithStats(mask, connectivity=8)
 
     findings: list[dict] = []
     dropped_oversize = 0
@@ -310,7 +365,7 @@ def _detect_findings_in_sector(
             continue
         findings.append({
             "type": "lacuna",
-            "depth": "grau_1",
+            "depth": _grade_lacuna(gray, labels, i, size_mm, H),
             "size_mm": round(size_mm, 3),
         })
     if dropped_oversize > 0 and warnings is not None:
@@ -564,6 +619,19 @@ def extract_all(
         except (TypeError, ValueError, IndexError):
             _iris_radius_px = None
 
+    # iter-6 FIX 13: pigment is a first-class clinical finding, not just a
+    # separate top-level array. The dark-blob detector (gray<60) never sees
+    # amber/yellow pigment, so a pigmented-but-not-cavitated sector used to
+    # report findings=[] and read as "clean" — this inverted the clinical
+    # picture on hematogenic irises (the Nailli OD/OE inversion). Surface the
+    # already-computed sectoral_pigments INTO sectors[].findings as
+    # type="pigmentacao" so every findings consumer (LLM prompt, RAG, UI,
+    # asymmetry) sees it. `Finding` already has type/color/extension fields —
+    # no schema change. Schema authority: pipeline.schemas.Finding.
+    pigments_by_hour: dict[int, list[dict]] = {}
+    for _p in sectoral_pigments:
+        pigments_by_hour.setdefault(int(_p["hour"]), []).append(_p)
+
     sectors = []
     for hour in range(1, 13):
         zones = list(jensen_map[eye][str(hour)])
@@ -573,6 +641,14 @@ def extract_all(
             iris_radius_px=_iris_radius_px,
             warnings=warnings,
         )
+        for _p in pigments_by_hour.get(hour, []):
+            findings.append({
+                "type": "pigmentacao",
+                "color": _p["type"],            # amarelo_ambar | laranja | marrom_difuso
+                "extension": _p["intensity"],   # leve | moderado | denso
+                "depth": None,
+                "size_mm": None,
+            })
         sectors.append({
             "hour": hour,
             "zones": zones,
@@ -657,5 +733,36 @@ def compute_asymmetry(results: dict) -> list[str]:
         and abs(right_score - left_score) > 0.2
     ):
         notes.append("densidade_fibras_assimetrica")
+
+    # iter-6 FIX 13 ROOT CAUSE: pigment asymmetry was never computed, so a
+    # heavily amber-pigmented eye (clinically the MORE loaded one) read as the
+    # "cleaner" eye because only dark lacunae fed asymmetry — this is exactly
+    # the Nailli OD/OE inversion. sectoral_pigments is typed + carries
+    # intensity, so weigh it here. dict subscripts only (B4).
+    _intensity_rank = {"leve": 1, "moderado": 2, "denso": 3}
+    right_pig = right.get("sectoral_pigments", []) or []
+    left_pig = left.get("sectoral_pigments", []) or []
+
+    def _by_hour_type(pigs: list) -> dict:
+        m: dict = {}
+        for p in pigs:
+            m[(int(p["hour"]), p["type"])] = _intensity_rank.get(p.get("intensity"), 1)
+        return m
+
+    r_map = _by_hour_type(right_pig)
+    l_map = _by_hour_type(left_pig)
+    for (hour, ptype) in sorted(set(r_map) | set(l_map)):
+        if (hour, ptype) in r_map and (hour, ptype) not in l_map:
+            notes.append(f"pigmento_{ptype}_unilateral_setor_{hour}_direito")
+        elif (hour, ptype) in l_map and (hour, ptype) not in r_map:
+            notes.append(f"pigmento_{ptype}_unilateral_setor_{hour}_esquerdo")
+
+    # Total pigment load per eye — the single note that prevents reading the
+    # more-pigmented eye as the cleaner one.
+    r_load = sum(r_map.values())
+    l_load = sum(l_map.values())
+    if abs(r_load - l_load) >= 2:
+        heavier = "direito" if r_load > l_load else "esquerdo"
+        notes.append(f"carga_pigmentar_assimetrica_maior_{heavier}")
 
     return notes

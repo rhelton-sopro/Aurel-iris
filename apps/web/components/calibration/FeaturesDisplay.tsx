@@ -52,6 +52,10 @@ interface SectorFinding {
   depth?: string | null
   size_mm?: number | null
   intensity?: string | null
+  // iter-6 FIX 13: pigment findings carry color (amarelo_ambar|laranja|
+  // marrom_difuso) + extension (leve|moderado|denso).
+  color?: string | null
+  extension?: string | null
   [key: string]: unknown
 }
 
@@ -227,8 +231,10 @@ function EyeCard({ eye, data }: { eye: 'OD' | 'OE'; data: EyeBlock | null | unde
                 {safeArray<SectorFinding>(sector.findings).map((f, i) => (
                   <li key={i}>
                     <span className="font-mono">{f.type ?? 'finding'}</span>
+                    {f.color && ` · ${f.color}`}
                     {f.depth && ` · ${f.depth}`}
                     {f.size_mm != null && ` · ${f.size_mm} mm`}
+                    {f.extension && ` · ${f.extension}`}
                     {f.intensity && ` · intensidade ${f.intensity}`}
                   </li>
                 ))}
