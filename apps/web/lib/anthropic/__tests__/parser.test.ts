@@ -62,26 +62,37 @@ Baz.`
     expect(result[0].headingNumber).toBe('1')
   })
 
-  it('rejeita number=15 (Pitfall 2 — out of range; max is 14 even with §2.5)', () => {
-    // To isolate the membership filter, the buffer must first satisfy the array-
-    // index monotonicity 1..14 (with §2.5 inserted) — only then `### 15.`
-    // exercises exclusively the `idx === -1` branch (15 not in headings array).
+  it('rejeita number=15 (Plan 22 — sequência pula de 14 para 16; 15 NÃO está no array)', () => {
+    // To isolate the membership filter, buffer first satisfies 1..14 + §2.5.
+    // Then `### 15.` exercises exclusively the `idx === -1` branch.
+    // Plan 22: 15 was already invalid (max was 14); now array contains '16' but
+    // STILL not '15' — the sequence skips 15 by founder explicit choice.
     const headings = ['1', '2', '2.5', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14']
     const head = headings.map((n) => `### ${n}. Seção ${n}\nConteúdo.`).join('\n')
-    const buf = `${head}\n### 15. Bibliografia\nDrift fora do range.`
+    const buf = `${head}\n### 15. Bibliografia\nDrift — 15 não existe no array.`
     const result = findAllBoundaries(buf)
     expect(result).toHaveLength(15)
     expect(result.map((b) => b.headingNumber)).toEqual(headings)
   })
 
-  it('aceita number=14 (Plan 11 — was max 13; Plan 17 — sequência 1..14 with §2.5)', () => {
+  it('rejeita number=17 (out of range; max is 16 com pula 15)', () => {
+    const headings = ['1', '2', '2.5', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '16']
+    const head = headings.map((n) => `### ${n}. Seção ${n}\nConteúdo.`).join('\n')
+    const buf = `${head}\n### 17. Apêndice\nDrift fora do range.`
+    const result = findAllBoundaries(buf)
+    expect(result).toHaveLength(16)
+    expect(result.map((b) => b.headingNumber)).toEqual(headings)
+  })
+
+  it('aceita number=14 + 16 (Plan 22 — sequência 1, 2, 2.5, 3..14, 16)', () => {
     const headings = ['1', '2', '2.5', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13']
     const head = headings.map((n) => `### ${n}. Seção ${n}\nConteúdo.`).join('\n')
-    const buf = `${head}\n### 14. Mensagem para o Cliente\nFecho caloroso.`
+    const buf = `${head}\n### 14. Mensagem para o Cliente\nFecho caloroso.\n### 16. Síntese Rápida\nResumo.`
     const result = findAllBoundaries(buf)
-    expect(result).toHaveLength(15)
-    expect(result.map((b) => b.headingNumber)).toEqual([...headings, '14'])
+    expect(result).toHaveLength(16)
+    expect(result.map((b) => b.headingNumber)).toEqual([...headings, '14', '16'])
     expect(result[14].key).toBe('14_mensagem_cliente')
+    expect(result[15].key).toBe('16_sintese_rapida')
   })
 
   it('rejeita boundary não-monotônica crescente (Pitfall 2)', () => {
@@ -118,11 +129,11 @@ Bar.`
     expect(result.map((b) => b.headingNumber)).toEqual(['1', '2'])
   })
 
-  it('aceita 15 boundaries 1, 2, 2.5, 3..14 sequenciais (Plan 17 happy path full report)', () => {
-    const headings = ['1', '2', '2.5', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14']
+  it('aceita 16 boundaries 1, 2, 2.5, 3..14, 16 sequenciais (Plan 22 happy path full report)', () => {
+    const headings = ['1', '2', '2.5', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '16']
     const buf = headings.map((n) => `### ${n}. Seção ${n}\nConteúdo.`).join('\n')
     const result = findAllBoundaries(buf)
-    expect(result).toHaveLength(15)
+    expect(result).toHaveLength(16)
     expect(result.map((b) => b.headingNumber)).toEqual(headings)
   })
 
@@ -236,7 +247,9 @@ Boa funcionalidade.`
     expect(findAllBoundaries(hyphenBuf)).toHaveLength(1)
   })
 
-  it('Plan 17: detecta 15 boundaries sequenciais no formato §N — Title (com §2.5)', () => {
+  it('Plan 17 backward-compat: detecta 15 boundaries sequenciais no formato legacy §N — Title (com §2.5, sem §16)', () => {
+    // Plan 16 prompt emitted §-prefixed format. Reports generated under Plan
+    // 16 still parse correctly via the optional `§?` + `[\\p{Pd}.]` regex.
     const headings = ['1', '2', '2.5', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14']
     const sections = headings.map((n) => `## §${n} — Seção ${n}\nConteúdo.`)
     const buf = sections.join('\n')
@@ -246,6 +259,17 @@ Boa funcionalidade.`
     expect(result[0].key).toBe('1_constituicao_temperamento')
     expect(result[2].key).toBe('2_5_sistemas_funcionando_bem')
     expect(result[14].key).toBe('14_mensagem_cliente')
+  })
+
+  it('Plan 22: detecta 16 boundaries sequenciais no formato `## N. Title` (sem §, com §16)', () => {
+    const headings = ['1', '2', '2.5', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '16']
+    const sections = headings.map((n) => `## ${n}. Seção ${n}\nConteúdo.`)
+    const buf = sections.join('\n')
+    const result = findAllBoundaries(buf)
+    expect(result).toHaveLength(16)
+    expect(result.map((b) => b.headingNumber)).toEqual(headings)
+    expect(result[2].key).toBe('2_5_sistemas_funcionando_bem')
+    expect(result[15].key).toBe('16_sintese_rapida')
   })
 
   it('aceita variantes mistas (Sonnet ocasionalmente alterna formato no mesmo report)', () => {

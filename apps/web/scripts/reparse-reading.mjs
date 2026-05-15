@@ -46,7 +46,7 @@ if (!readingId) {
 // Plan 11 (Direction Correction DC-1) — remapped to 14 sections.
 // Plan 17 (UAT-3) — '2.5' decimal heading inserted (15 sections).
 const NUMBERED_SECTION_HEADINGS = [
-  '1', '2', '2.5', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14',
+  '1', '2', '2.5', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '16',
 ]
 const SECTION_KEY_BY_NUMBER = {
   '1': '1_constituicao_temperamento',
@@ -64,6 +64,7 @@ const SECTION_KEY_BY_NUMBER = {
   '12': '12_roteiro_anamnese',
   '13': '13_sintese_integrativa',
   '14': '14_mensagem_cliente',
+  '16': '16_sintese_rapida',
 }
 
 const ENCERRAMENTO_LITERAL = `Esta leitura iridológica é uma ferramenta de apoio à anamnese terapêutica.

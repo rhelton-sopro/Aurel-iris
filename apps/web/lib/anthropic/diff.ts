@@ -157,6 +157,7 @@ const ALL_REPORT_KEYS: ReportSectionKey[] = [
   '12_roteiro_anamnese',
   '13_sintese_integrativa',
   '14_mensagem_cliente',
+  '16_sintese_rapida',
   'encerramento_disclaimer',
 ]
 

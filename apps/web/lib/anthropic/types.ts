@@ -46,18 +46,22 @@ export type ReportSectionKey =
   | '12_roteiro_anamnese'
   | '13_sintese_integrativa'
   | '14_mensagem_cliente'
+  | '16_sintese_rapida'
   | 'encerramento_disclaimer'
 
-/** Numeric-prefixed keys only (1..14 plus '2.5'). Used by section-boundary parser. */
+/** Numeric-prefixed keys only (1..14 plus '2.5' plus '16'). Used by section-boundary parser. */
 export type NumberedSectionKey = Exclude<ReportSectionKey, 'encerramento_disclaimer'>
 
 /**
- * Ordered heading-number strings for the 15 numbered sections, in canonical
+ * Ordered heading-number strings for the 16 numbered sections, in canonical
  * emission order. Source of truth for parser monotonicity (`indexOf(headingStr)`
- * must equal `lastIndex + 1`) and for UI counters (length = 15).
+ * must equal `lastIndex + 1`) and for UI counters (length = 16).
  *
  * Plan 17 (UAT-3): inserted '2.5' between '2' and '3' for §2.5 — Sistemas em
  * Bom Funcionamento.
+ * Plan 22 (UAT-4): appended '16' for §16 — Síntese Rápida; sequence skips
+ * '15' per founder explicit numbering choice (visible heading "16. Síntese
+ * Rápida", not "15. Síntese Rápida"). Counter shows {n}/16.
  */
 export const NUMBERED_SECTION_HEADINGS = [
   '1',
@@ -75,6 +79,7 @@ export const NUMBERED_SECTION_HEADINGS = [
   '12',
   '13',
   '14',
+  '16',
 ] as const
 
 export type NumberedSectionHeading = (typeof NUMBERED_SECTION_HEADINGS)[number]
@@ -101,6 +106,7 @@ export const SECTION_TITLE_BY_NUMBER: Record<NumberedSectionHeading, string> = {
   '12': 'Roteiro de Anamnese',
   '13': 'Síntese Integrativa',
   '14': 'Mensagem para o Cliente',
+  '16': 'Síntese Rápida',
 }
 
 /**
@@ -124,6 +130,7 @@ export const SECTION_KEY_BY_NUMBER: Record<NumberedSectionHeading, NumberedSecti
   '12': '12_roteiro_anamnese',
   '13': '13_sintese_integrativa',
   '14': '14_mensagem_cliente',
+  '16': '16_sintese_rapida',
 }
 
 export type ReportJsonb = Partial<Record<ReportSectionKey, string>>
