@@ -31,6 +31,7 @@
  * Phase 7.4 | Plan 07.4-18 + 07.4-22 | Decisions: DC-1, DC-3, DC-6 + UAT-4
  */
 import ReactMarkdown from 'react-markdown'
+import type { Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import type { ReactNode } from 'react'
 
@@ -47,6 +48,45 @@ import {
 // above. Handles decimal `.5` for §2.5 (Plan 17). Optional `§?` keeps backward
 // compat with reports generated under Plan 16's prompt.
 const STRIP_LEADING_HEADING_RE = /^[ \t]*#{2,3}[ \t]+§?[ \t]*\d{1,2}(?:\.\d)?[ \t]*[\p{Pd}.][^\n]*\n+/u
+
+// This project has NO @tailwindcss/typography plugin (Tailwind v4, globals.css
+// imports only "tailwindcss"). So `prose` / `prose-p:*` classes emit ZERO CSS,
+// and Tailwind's preflight resets <p> margin to 0 — markdown paragraphs render
+// flush with no separation. Every ReactMarkdown surface must therefore style
+// its elements explicitly via `components`; relying on `prose` is a silent
+// no-op (this was the UAT-5b "spacing not applied" root cause).
+type MarkdownVariant = 'body' | 'card' | 'footer'
+
+function markdownComponents(variant: MarkdownVariant): Components {
+  const p =
+    variant === 'body'
+      ? 'mb-6 leading-relaxed'
+      : variant === 'card'
+        ? 'mb-3 text-sm leading-relaxed'
+        : 'mb-3 leading-relaxed'
+  const listGap = variant === 'body' ? 'mb-6 space-y-2 pl-6' : 'mb-3 space-y-1 pl-5'
+  return {
+    p: ({ children }) => <p className={p}>{children}</p>,
+    ul: ({ children }) => <ul className={`list-disc ${listGap}`}>{children}</ul>,
+    ol: ({ children }) => <ol className={`list-decimal ${listGap}`}>{children}</ol>,
+    li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+    strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+    em: ({ children }) => <em className="italic">{children}</em>,
+    h3: ({ children }) => (
+      <h3 className="mb-3 mt-8 text-lg font-semibold">{children}</h3>
+    ),
+    blockquote: ({ children }) => (
+      <blockquote className="my-6 border-l-4 border-muted-foreground/30 pl-4 italic">
+        {children}
+      </blockquote>
+    ),
+    a: ({ children, href }) => (
+      <a href={href} className="underline underline-offset-2">
+        {children}
+      </a>
+    ),
+  }
+}
 
 // §16 subsection split — each block starts with `### ` (markdown h3) followed
 // by a label that includes an emoji + name. Match the block heading line and
@@ -160,8 +200,11 @@ export function ReportReadView({
                       <h3 className="mb-2 font-serif text-lg font-semibold">
                         {block.label}
                       </h3>
-                      <div className="prose prose-sm prose-neutral max-w-none font-serif leading-relaxed prose-p:mb-4 prose-p:mt-0 prose-li:my-1">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      <div className="font-serif leading-relaxed [&>*:last-child]:mb-0">
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          components={markdownComponents('card')}
+                        >
                           {block.body}
                         </ReactMarkdown>
                       </div>
@@ -169,8 +212,16 @@ export function ReportReadView({
                   ))}
                 </div>
               ) : (
-                <div className="prose prose-neutral max-w-none font-serif leading-relaxed prose-p:mb-6 prose-p:mt-0 prose-li:my-1.5">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{body}</ReactMarkdown>
+                <div
+                  data-testid="section-markdown"
+                  className="font-serif leading-relaxed [&>*:last-child]:mb-0"
+                >
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={markdownComponents('body')}
+                  >
+                    {body}
+                  </ReactMarkdown>
                 </div>
               )}
             </section>
@@ -183,8 +234,13 @@ export function ReportReadView({
           data-testid="report-read-view-footer"
           className="my-8 border-l-4 border-muted-foreground/30 pl-4 italic text-muted-foreground"
         >
-          <div className="prose prose-sm prose-neutral max-w-none font-serif">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{encerramento}</ReactMarkdown>
+          <div className="font-serif text-sm leading-relaxed [&>*:last-child]:mb-0">
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={markdownComponents('footer')}
+            >
+              {encerramento}
+            </ReactMarkdown>
           </div>
         </footer>
       )}

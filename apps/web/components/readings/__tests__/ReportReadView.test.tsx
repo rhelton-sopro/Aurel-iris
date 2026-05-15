@@ -138,10 +138,10 @@ describe('components/readings/ReportReadView (Plan 7.4-18 — UAT-3 reading-mode
     expect(h2s.length).toBe(1)
     expect(h2s[0]?.textContent).toBe('1. Constituição e Temperamento')
     // Body prose does not contain the duplicate `## 1` literal
-    const proseBlock = container.querySelector('.prose')
+    const proseBlock = container.querySelector('[data-testid="section-markdown"]')
     expect(proseBlock?.textContent).not.toContain('## 1')
     expect(proseBlock?.textContent).not.toContain('## §1')
-    // No duplicated h2 inside .prose
+    // No duplicated h2 inside the markdown body
     expect(proseBlock?.querySelector('h2')).toBeNull()
   })
 
@@ -159,7 +159,7 @@ describe('components/readings/ReportReadView (Plan 7.4-18 — UAT-3 reading-mode
       />,
     )
     expect(screen.getByText('Legacy body content.')).toBeDefined()
-    const proseBlock = container.querySelector('.prose')
+    const proseBlock = container.querySelector('[data-testid="section-markdown"]')
     expect(proseBlock?.textContent).not.toContain('## §1')
   })
 
@@ -282,7 +282,7 @@ describe('components/readings/ReportReadView (Plan 7.4-18 — UAT-3 reading-mode
     // No grid testid present
     expect(screen.queryByTestId('report-read-view-sintese-grid')).toBeNull()
     // Body still rendered as default prose
-    const prose = container.querySelector('.prose')
+    const prose = container.querySelector('[data-testid="section-markdown"]')
     expect(prose?.textContent).toContain('Sonnet broke the structure')
   })
 })
