@@ -147,12 +147,14 @@ export async function GET(
   bodyForm.append('files', blob(footerHtml), 'footer.html')
   bodyForm.append('paperWidth', '8.27')
   bodyForm.append('paperHeight', '11.69')
-  // marginTop reserves the header band: ~24px logo + rule + ~28px breathing
-  // below it (CHANGE 1 + 3). marginBottom reserves the slim footer band.
-  bodyForm.append('marginTop', '0.66')
-  bodyForm.append('marginBottom', '0.42')
-  bodyForm.append('marginLeft', '0')
-  bodyForm.append('marginRight', '0')
+  // iter-5 FIX 2 — more breathing. marginTop reserves the header band +
+  // generous gap below its rule; marginBottom keeps content well clear of
+  // the footer; L/R 0.7in is the content column (internal CSS padding is now
+  // ~0 so insets don't double). Cover render keeps all margins 0 (bleed).
+  bodyForm.append('marginTop', '0.85')
+  bodyForm.append('marginBottom', '0.7')
+  bodyForm.append('marginLeft', '0.7')
+  bodyForm.append('marginRight', '0.7')
   bodyForm.append('printBackground', 'true')
   bodyForm.append('scale', '1.0')
   // CHANGE 4 — Chromium emits a clickable PDF bookmark tree from the heading

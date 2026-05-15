@@ -117,6 +117,28 @@ export const SECTION_TITLE_BY_NUMBER: Record<NumberedSectionHeading, string> = {
 }
 
 /**
+ * Display title for a section, with the §14 personalization (Plan 7.4-28
+ * iter-5 FIX 1): the "Mensagem para o Cliente" letter is rendered as
+ * "Para {first name}" so it reads as addressed to this specific person.
+ * The internal key + the LLM-emitted `## 14. Mensagem para o Cliente`
+ * heading are UNCHANGED (the parser maps by number, not title) — this is a
+ * render-time override only. Empty/blank clientName → canonical title.
+ *
+ * Used by every surface that shows a §14 heading or TOC entry (PDF heading +
+ * Índice, web ReportReadView heading + Índice) so they stay consistent.
+ */
+export function sectionDisplayTitle(
+  headingStr: NumberedSectionHeading,
+  clientName?: string | null,
+): string {
+  if (headingStr === '14') {
+    const first = (clientName ?? '').trim().split(/\s+/)[0] ?? ''
+    if (first.length > 0) return `Para ${first}`
+  }
+  return SECTION_TITLE_BY_NUMBER[headingStr]
+}
+
+/**
  * Map heading-number string ('1'..'15') to canonical section key.
  * Plan 27: strictly sequential; §15 = Síntese Rápida (was §16).
  */

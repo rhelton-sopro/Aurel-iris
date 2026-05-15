@@ -816,6 +816,12 @@ padrões humanos, não tour iridológico.
 
 ## 14. Mensagem para o Cliente
 
+> Emita o cabeçalho EXATAMENTE como `## 14. Mensagem para o Cliente` (o
+> parser mapeia por número, não por título). O título EXIBIDO no PDF e na
+> web é personalizado para "Para {primeiro nome do cliente}" em tempo de
+> renderização — você não precisa fazer nada além de emitir o cabeçalho
+> canônico acima.
+
 Texto curto em **primeira pessoa**, entregue pelo terapeuta como fecho
 de sessão. **Voz calorosa, brasileira, acolhedora**, não clinicamente
 distante. Não comece com "Caro paciente" ou "Prezado(a)". Tom: terapeuta

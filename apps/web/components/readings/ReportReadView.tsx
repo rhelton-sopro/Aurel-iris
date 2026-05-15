@@ -33,7 +33,7 @@ import { LocalDateTime } from '@/components/ui/local-date-time'
 import {
   NUMBERED_SECTION_HEADINGS,
   SECTION_KEY_BY_NUMBER,
-  SECTION_TITLE_BY_NUMBER,
+  sectionDisplayTitle,
 } from '@/lib/anthropic/types'
 import {
   REPORT_COLORS,
@@ -140,9 +140,16 @@ export function ReportReadView({
 
   return (
     <article
+      lang="pt-BR"
       data-testid="report-read-view"
       className="mx-auto max-w-prose space-y-6"
-      style={{ ...SERIF, color: C.ink }}
+      style={{
+        ...SERIF,
+        color: C.ink,
+        hyphens: 'auto',
+        overflowWrap: 'break-word',
+        wordBreak: 'normal',
+      }}
     >
       <header className="space-y-4 pb-6" style={{ borderBottom: `1.5px solid ${C.teal}` }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -218,7 +225,7 @@ export function ReportReadView({
               <span className="w-6 text-sm" style={{ color: C.teal }}>
                 {h}
               </span>
-              <span className="text-sm">{SECTION_TITLE_BY_NUMBER[h]}</span>
+              <span className="text-sm">{sectionDisplayTitle(h, clientName)}</span>
             </a>
           ))}
         </nav>
@@ -230,8 +237,8 @@ export function ReportReadView({
           const raw = sections[key]
           if (!raw || raw.trim().length === 0) return null
           const body = raw.replace(STRIP_LEADING_HEADING_RE, '')
-          const title = SECTION_TITLE_BY_NUMBER[headingStr]
-          const headingMargin = idx === 0 ? 'mt-6' : 'mt-12'
+          const title = sectionDisplayTitle(headingStr, clientName)
+          const headingMargin = idx === 0 ? 'mt-6' : 'mt-14'
           const isLetter = headingStr === '14'
           const isSinteseRapida = headingStr === '15'
           const parsedBlocks = isSinteseRapida ? parseSubsections(body) : []

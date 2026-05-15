@@ -35,7 +35,7 @@ import remarkGfm from 'remark-gfm'
 import {
   NUMBERED_SECTION_HEADINGS,
   SECTION_KEY_BY_NUMBER,
-  SECTION_TITLE_BY_NUMBER,
+  sectionDisplayTitle,
 } from '@/lib/anthropic/types'
 import {
   REPORT_COLORS,
@@ -103,6 +103,13 @@ const PRINT_CSS = `
     color: var(--ink);
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+    /* iter-5 FIX 2 — never split words mid-syllable ("racionalizadaou");
+       hyphenate naturally (lang="pt-BR" on <html>), break only very long
+       unbreakable runs. */
+    word-break: normal;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    -webkit-hyphens: auto;
   }
 
   /* ---- Cover (its own PDF — full bleed, pure white, no header) ---- */
@@ -160,9 +167,11 @@ const PRINT_CSS = `
   }
 
   /* ---- Índice ---- */
+  /* Real @page margins (route: 0.7in L/R, 0.85 top, 0.7 bottom) own the
+     frame now — internal CSS padding is minimal so insets don't double. */
   .toc {
     background: var(--white);
-    padding: 8mm 60px 28mm;
+    padding: 0 0 8px;
     break-after: page;
     page-break-after: always;
   }
@@ -196,13 +205,13 @@ const PRINT_CSS = `
   /* ---- "Em uma palavra" page ---- */
   .essence-page {
     background: var(--white);
-    min-height: 232mm;
+    min-height: 215mm;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 8mm 26mm 28mm;
+    padding: 0 0 8px;
     break-after: page;
     page-break-after: always;
   }
@@ -234,7 +243,7 @@ const PRINT_CSS = `
   }
 
   /* ---- Content pages ---- */
-  .content { padding: 0 18mm 14mm; background: var(--white); }
+  .content { padding: 0; background: var(--white); }
   section.report-section { break-inside: auto; }
   h2.sec-title {
     font-family: ${REPORT_FONTS.serif};
@@ -242,7 +251,7 @@ const PRINT_CSS = `
     font-weight: 700;
     color: var(--ink);
     line-height: 1.25;
-    margin: 48px 0 0;
+    margin: 56px 0 0;
     break-after: avoid;
     page-break-after: avoid;
   }
@@ -414,7 +423,7 @@ export async function renderBodyHtml(
         {present.map((h) => (
           <div className="toc-row" key={h}>
             <span className="toc-num">{h}</span>
-            <span className="toc-name">{SECTION_TITLE_BY_NUMBER[h]}</span>
+            <span className="toc-name">{sectionDisplayTitle(h, clientName)}</span>
             <span className="toc-leader" />
           </div>
         ))}
@@ -443,7 +452,7 @@ export async function renderBodyHtml(
           const raw = sections[key]
           if (!raw || raw.trim().length === 0) return null
           const body = raw.replace(STRIP_LEADING_HEADING_RE, '')
-          const title = SECTION_TITLE_BY_NUMBER[headingStr]
+          const title = sectionDisplayTitle(headingStr, clientName)
           const isSintese = headingStr === '15'
           const isLetter = headingStr === '14'
           const subs = isSintese ? parseSubsections(body) : []
@@ -525,7 +534,7 @@ export function renderHeaderHtml(clientName: string): string {
     `html,body{margin:0;padding:0;width:100%;background:transparent;` +
     `font-family:${REPORT_FONTS.serif};}` +
     `.hd{width:100%;display:flex;align-items:center;justify-content:space-between;` +
-    `gap:16px;padding:0 16mm 10px;border-bottom:1px solid ${C.teal};}` +
+    `gap:16px;padding:0 0.7in 10px;border-bottom:1px solid ${C.teal};}` +
     `.hd img{height:24px;width:auto;display:block;}` +
     `.hd .meta{color:${C.mist};font-size:9pt;white-space:nowrap;}` +
     `.hd .meta .pageNumber,.hd .meta .totalPages{color:${C.mist};}` +
@@ -550,7 +559,7 @@ export function renderFooterHtml(clientName: string, disclaimerLine: string): st
     `html,body{margin:0;padding:0;width:100%;background:transparent;}` +
     `.bar{width:100%;border-top:1px solid ${C.teal};` +
     `font-family:${REPORT_FONTS.serif};color:${C.mist};font-size:8pt;` +
-    `padding:8px 16mm 12px;display:flex;align-items:center;justify-content:space-between;gap:14px;}` +
+    `padding:8px 0.7in 12px;display:flex;align-items:center;justify-content:space-between;gap:14px;}` +
     `.brand{color:${C.teal};letter-spacing:0.22em;text-transform:uppercase;font-size:7pt;white-space:nowrap;}` +
     `.disc{flex:1;text-align:center;overflow:hidden;}` +
     `</style></head><body><div class="bar">` +

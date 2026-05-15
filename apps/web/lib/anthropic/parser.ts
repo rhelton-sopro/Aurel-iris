@@ -88,31 +88,38 @@ export function findAllBoundaries(buffer: string): BoundaryMatch[] {
   return matches
 }
 
-// "Em uma palavra" essence block (Plan 7.4-28 CHANGE 5). The LLM emits, ONCE,
-// before §1: a heading line containing "em uma palavra" (tolerant of #/##/###
-// or **bold**), then the phrase. Captured until the first markdown heading
-// (the §1 boundary or any `##`) or end of buffer. Not a numbered boundary —
-// findAllBoundaries never sees it; closeSections drops pre-§1 content anyway,
-// so this dedicated extractor is the only path that surfaces the phrase.
-// No `m` flag: `^` is buffer-start (essence is the first content the LLM
-// emits) and the `\s*$` terminator must mean end-of-buffer, not end-of-line
-// (an `m` flag would let the capture stop at the first line break of a
-// multi-line blockquote phrase).
-const ESSENCE_RE =
-  /^\s*(?:#{1,4}[ \t]+|\*{1,2})?\s*em uma palavra[:*_ \t]*\r?\n+([\s\S]*?)(?=\r?\n[ \t]*#{1,4}[ \t]|\s*$)/iu
+// "Em uma palavra" essence marker (Plan 7.4-28 CHANGE 5; hardened iter-5
+// FIX 3). The LLM emits, ONCE, before §1: a line containing "em uma palavra"
+// (any heading depth #..####, **bold**, any case, optional separator), then
+// the phrase — same line (`## Em uma palavra: …` / `— …`) OR following lines.
+//
+// Robustness (iter-5): the search is RESTRICTED to the pre-§1 region (text
+// before the first numbered boundary). This (a) lets a stray preamble exist
+// before the marker without breaking extraction — the #1 suspected miss
+// cause was the old `^`-anchored regex dying on any LLM preamble — and
+// (b) makes a false match inside a section body impossible. The marker is
+// line-anchored (`^|\n`) so it won't fire on prose like "…em uma palavra:".
+const ESSENCE_MARKER_RE =
+  /(?:^|\n)[ \t]*(?:#{1,4}[ \t]+)?\*{0,2}[ \t]*em uma palavra[ \t]*\*{0,2}[ \t]*(?:[:—–-][ \t]*)?/iu
 
 /**
  * Extract the "essence phrase" from the raw stream buffer (Plan 7.4-28
- * CHANGE 5). Returns a single cleaned line (markdown emphasis / blockquote /
- * wrapping quotes stripped, whitespace collapsed) or null when the LLM did
- * not emit the block. Length-capped defensively (the prompt asks 15-25 words).
+ * CHANGE 5, hardened iter-5 FIX 3). Searches only the pre-§1 region, finds
+ * the "em uma palavra" marker, and returns everything after it as one
+ * cleaned line (markdown heading/emphasis/blockquote + wrapping quotes
+ * stripped, whitespace collapsed). null when the marker is absent.
+ * Length-capped defensively (the prompt asks for 15-25 words).
  */
 export function extractEssencePhrase(buffer: string): string | null {
-  const m = ESSENCE_RE.exec(buffer)
-  if (!m || !m[1]) return null
-  const cleaned = m[1]
+  const boundaries = findAllBoundaries(buffer)
+  const region =
+    boundaries.length > 0 ? buffer.slice(0, boundaries[0]!.startIdx) : buffer
+  const m = ESSENCE_MARKER_RE.exec(region)
+  if (!m) return null
+  const cleaned = region
+    .slice(m.index + m[0].length)
     .replace(/^[ \t]*>[ \t]?/gm, '') // blockquote markers
-    .replace(/[*_`]/g, '') // inline emphasis
+    .replace(/[*_`#]/g, '') // markdown emphasis / stray heading hashes
     .replace(/\s+/g, ' ')
     .trim()
     .replace(/^["'“”‘’«»]+|["'“”‘’«»]+$/g, '') // wrapping quotes

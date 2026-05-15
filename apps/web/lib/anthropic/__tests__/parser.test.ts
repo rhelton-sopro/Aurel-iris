@@ -304,4 +304,28 @@ describe('lib/anthropic/parser — extractEssencePhrase (Plan 28 CHANGE 5)', () 
     expect(b).toHaveLength(2)
     expect(b[0].headingNumber).toBe('1')
   })
+
+  // iter-5 FIX 3 — hardened: survive an LLM preamble before the marker,
+  // same-line phrase, and ALL-CAPS heading.
+  it('survives a preamble before the marker (pre-§1 region search)', () => {
+    const buf =
+      '# Leitura Iridológica\n\n## Em uma palavra\nFrase essência aqui.\n\n## 1. Constituição\nCorpo.'
+    expect(extractEssencePhrase(buf)).toBe('Frase essência aqui.')
+  })
+
+  it('extracts a same-line phrase after an em-dash separator', () => {
+    const buf = '## Em uma palavra — A frase na mesma linha.\n\n## 1. X\nCorpo.'
+    expect(extractEssencePhrase(buf)).toBe('A frase na mesma linha.')
+  })
+
+  it('tolerates an ALL-CAPS heading', () => {
+    const buf = '## EM UMA PALAVRA\nFrase em caixa alta de cabeçalho.\n## 1. X\nY'
+    expect(extractEssencePhrase(buf)).toBe('Frase em caixa alta de cabeçalho.')
+  })
+
+  it('does not false-match prose "em uma palavra:" inside §1 body', () => {
+    const buf =
+      '## 1. Constituição\nResumindo em uma palavra: equilíbrio.\n\n## 2. Mapa\nB'
+    expect(extractEssencePhrase(buf)).toBeNull()
+  })
 })
