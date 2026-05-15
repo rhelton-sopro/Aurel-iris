@@ -3,14 +3,14 @@
  *
  * Composes:
  *   - <AnalysisCTA> (button group A/C with disabled-tooltips D-S4)
- *   - <AnalysisStream> (Iris Codex V1 markdown sections — 14, Plan 07.4-11
- *     extended the server parser to §1..§14, Plan 07.4-12 wires the UI counter)
+ *   - <AnalysisStream> (Iris Codex markdown sections — 15 strictly sequential
+ *     §1..§15; server parser in parser.ts is the strict source of truth)
  *
  * Stream consumption: fetch POST /api/readings/[id]/analyze, getReader().read()
  * loop, count progress via the `^### N. ` boundary regex on the accumulated
- * buffer. The regex `\d{1,2}` is intentionally generic — it accepts §1..§14
- * (and would even tolerate §15+ if the prompt drifts; server parser is the
- * strict source of truth). AnalysisStream clamps the displayed count to 14.
+ * buffer. The regex `\d{1,2}` is intentionally generic — it accepts §1..§15
+ * (server parser enforces membership + monotonicity). AnalysisStream derives
+ * the total from NUMBERED_SECTION_HEADINGS.length.
  * On stream end, router.refresh() so RSC reads the persisted report_generated.
  *
  * UI-SPEC §State Machine line 222: 'gerando…' is purely client-side ephemeral
@@ -31,9 +31,9 @@ import { toast } from 'sonner'
 import { AnalysisCTA } from '@/components/readings/AnalysisCTA'
 import { AnalysisStream } from '@/components/readings/AnalysisStream'
 
-// Plan 17: extended to mirror parser.ts BOUNDARY_RE — accepts H2/H3, optional
-// §, decimal `.5` for §2.5, em-dash/en-dash/hyphen separators. Best-effort UI
-// counter; server parser is authoritative for persistence.
+// Mirrors parser.ts BOUNDARY_RE — accepts H2/H3, optional §, em-dash/en-dash/
+// hyphen separators (decimal tail tolerated only for legacy buffers; Plan 27
+// is 1..15 sequential). Best-effort UI counter; server parser is authoritative.
 const BOUNDARY_RE = /^[ \t]*#{2,3}[ \t]+§?[ \t]*\d{1,2}(?:\.\d)?[ \t]*[\p{Pd}.][ \t]*/gmu
 
 export interface AnaliseClientProps {

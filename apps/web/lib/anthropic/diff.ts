@@ -137,14 +137,12 @@ export interface SectionDiffs {
  * espúrias). Sincronizada com types.ts ReportSectionKey union — adicionar
  * chave aqui requer edit coordenado em types.ts + parser.
  *
- * Plan 11 (Direction Correction DC-1) — keys remapped from 13-section legacy
- * to 14-section Iris Codex V1 structure.
- * Plan 17 (UAT-3) — '2_5_sistemas_funcionando_bem' inserted between §2 and §3.
+ * Plan 27 (UAT-iter-3) — §2.5 colapsada em §2; Síntese §16 → §15.
+ * Sequência estritamente 1..15 + encerramento.
  */
 const ALL_REPORT_KEYS: ReportSectionKey[] = [
   '1_constituicao_temperamento',
   '2_mapa_organico',
-  '2_5_sistemas_funcionando_bem',
   '3_linha_tempo_emocional',
   '4_padroes_emocionais_ativos',
   '5_eixo_psicossomatico',
@@ -157,7 +155,7 @@ const ALL_REPORT_KEYS: ReportSectionKey[] = [
   '12_roteiro_anamnese',
   '13_sintese_integrativa',
   '14_mensagem_cliente',
-  '16_sintese_rapida',
+  '15_sintese_rapida',
   'encerramento_disclaimer',
 ]
 

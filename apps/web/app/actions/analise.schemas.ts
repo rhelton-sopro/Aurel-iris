@@ -1,12 +1,11 @@
 import { z } from 'zod'
 
-// Phase 7.4 Plan 11 (Direction Correction DC-1) — section keys remapped from
-// 13-section legacy to 14-section Iris Codex V1 markdown structure.
-// Phase 7.4 Plan 17 (UAT-3) — '2_5_sistemas_funcionando_bem' inserted (15 sections).
+// Phase 7.4 Plan 27 (UAT-iter-3) — §2.5 collapsed into §2; Síntese Rápida
+// renumbered §16 → §15. Strictly sequential 1..15 + encerramento.
+// Keep in sync with types.ts ReportSectionKey.
 const REPORT_KEYS = [
   '1_constituicao_temperamento',
   '2_mapa_organico',
-  '2_5_sistemas_funcionando_bem',
   '3_linha_tempo_emocional',
   '4_padroes_emocionais_ativos',
   '5_eixo_psicossomatico',
@@ -19,7 +18,7 @@ const REPORT_KEYS = [
   '12_roteiro_anamnese',
   '13_sintese_integrativa',
   '14_mensagem_cliente',
-  '16_sintese_rapida',
+  '15_sintese_rapida',
   'encerramento_disclaimer',
 ] as const
 

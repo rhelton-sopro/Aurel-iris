@@ -6,12 +6,12 @@ import { render, screen } from '@testing-library/react'
 import { EditorAccordion } from '../EditorAccordion'
 
 describe('components/readings/EditorAccordion (D-U1 + UI-SPEC §Surface 2; Plan 11 — 14 sections; Plan 12 — §14 warm-voice distinction; Plan 14 — §N — Title format + all-collapsed default + body strip; Plan 17 — §2.5 inserted; Plan 22 — § symbol removed + §16 Síntese Rápida added, 16 sections)', () => {
-  it('renderiza 16 sections + 17ª encerramento read-only with `N. Title` format including §2.5 and §16', () => {
+  it('renderiza 15 sections 1..15 + encerramento read-only com formato `N. Title` (Plan 27)', () => {
     const generated = {
       '1_constituicao_temperamento': 'Texto 1',
       '2_mapa_organico': 'Texto 2',
-      '2_5_sistemas_funcionando_bem': 'Texto 2.5',
-      '16_sintese_rapida': 'Texto 16',
+      '14_mensagem_cliente': 'Texto 14',
+      '15_sintese_rapida': 'Texto 15',
       'encerramento_disclaimer': '> Disclaimer literal.',
     }
     render(
@@ -21,18 +21,16 @@ describe('components/readings/EditorAccordion (D-U1 + UI-SPEC §Surface 2; Plan 
         onSectionChange={vi.fn()}
       />,
     )
-    // Plan 22 (UAT-4): § symbol REMOVED — heading format is now `N. Title`
-    // (period after number, no glyph, no em-dash).
     expect(screen.getByText(/^1\. Constituição e Temperamento/)).toBeDefined()
     expect(screen.getByText(/^2\. Mapa Orgânico/)).toBeDefined()
-    expect(screen.getByText(/^2\.5\. Sistemas em Bom Funcionamento/)).toBeDefined()
     expect(screen.getByText(/^14\. Mensagem para o Cliente/)).toBeDefined()
-    // Plan 22: §16 Síntese Rápida (skip 15)
-    expect(screen.getByText(/^16\. Síntese Rápida/)).toBeDefined()
+    // Plan 27: Síntese Rápida = §15 (no §2.5, no §16)
+    expect(screen.getByText(/^15\. Síntese Rápida/)).toBeDefined()
+    expect(screen.queryByText(/Sistemas em Bom Funcionamento/)).toBeNull()
     expect(screen.getByText(/Encerramento \(texto literal — não editável\)/)).toBeDefined()
   })
 
-  it('Plan 22: all 16 sections are COLLAPSED by default (no Textareas visible)', () => {
+  it('Plan 27: all 15 sections are COLLAPSED by default (no Textareas visible)', () => {
     const generated: Record<string, string> = {}
     for (let n = 1; n <= 14; n++) {
       generated[`${n}_section`] = `Conteúdo §${n}`

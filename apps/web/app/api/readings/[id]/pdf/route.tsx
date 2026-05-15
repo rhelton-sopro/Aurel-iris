@@ -125,15 +125,15 @@ export async function GET(
     new Blob([footerHtml], { type: 'text/html' }),
     'footer.html',
   )
-  // A4 in inches. Top/left/right margin = 0 so the black cover bleeds to the
+  // A4 in inches. Top/left/right margin = 0 so the ivory cover bleeds to the
   // paper edge (page whitespace is CSS padding in PRINT_CSS, not page margin).
-  // Only the bottom 0.6in is reserved — Gotenberg renders footer.html there
-  // on every page (ivory plinth). printBackground is essential (black cover,
-  // §16 card fills, teal rules).
+  // Only the bottom 0.45in is reserved — Gotenberg renders the (transparent,
+  // Plan 27) footer.html there on every page. printBackground is essential
+  // (ivory cover, §15 card tints, teal rules).
   form.append('paperWidth', '8.27')
   form.append('paperHeight', '11.69')
   form.append('marginTop', '0')
-  form.append('marginBottom', '0.6')
+  form.append('marginBottom', '0.45')
   form.append('marginLeft', '0')
   form.append('marginRight', '0')
   form.append('printBackground', 'true')

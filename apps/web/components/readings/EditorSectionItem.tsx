@@ -15,16 +15,15 @@ import { Label } from '@/components/ui/label'
 // Strip the leading `## §N — Title` (or `### N. Title` legacy form) heading
 // line + trailing blank lines, so the rendered body doesn't duplicate the
 // accordion-trigger title. Handles all heading shapes via the same regex
-// shape as parser.ts BOUNDARY_RE: 14-section (`## §N — `), legacy 13-section
-// (`### N. `), AND new §2.5 decimal (`## §2.5 — `). The `u` flag is mandatory
-// for `\p{Pd}` (Unicode Dash Punctuation).
-// Plan 07.4-14 — UAT-2 fix; Plan 07.4-17 — extend `\d{1,2}` → `\d{1,2}(?:\.\d)?`
-// to strip §2.5 heading line from preview.
+// shape as parser.ts BOUNDARY_RE: `## §N — `, legacy `### N. `, any combo for
+// §1..§15. The optional `(?:\.\d)?` is retained only to still strip legacy
+// decimal headings from pre-Plan-27 buffers; the prompt no longer emits them.
+// The `u` flag is mandatory for `\p{Pd}` (Unicode Dash Punctuation).
 const STRIP_LEADING_HEADING_RE = /^[ \t]*#{2,3}[ \t]+§?[ \t]*\d{1,2}(?:\.\d)?[ \t]*[\p{Pd}.][^\n]*\n+/u
 
 export interface EditorSectionItemProps {
   sectionKey: string
-  /** String form preserves '2.5' literal (Plan 17). Used display-only. */
+  /** Heading number string ('1'..'15'). Display-only. */
   number: string
   title: string
   generatedValue: string

@@ -1,8 +1,9 @@
 /**
  * @vitest-environment jsdom
  *
- * Guards the Gotenberg input — the HTML string this builds IS the PDF (Plan
- * 7.4-26). A live Gotenberg isn't needed to catch template regressions.
+ * Guards the Gotenberg input — the HTML string this builds IS the PDF.
+ * Plan 27: 15 sequential sections, ivory cover, single-line heading, TOC,
+ * §2 two-subsection, §15 tinted cards, transparent footer.
  */
 import { describe, it, expect, beforeAll } from 'vitest'
 
@@ -15,10 +16,12 @@ import {
 const SECTIONS = {
   '1_constituicao_temperamento':
     '## 1. Constituição e Temperamento\n\nFibras compactas e densas.\n\nSegundo parágrafo de respiro.',
+  '2_mapa_organico':
+    '## 2. Mapa Orgânico\n\nVisão completa do organismo.\n\n### Sistemas que requerem atenção\n\nFígado sob carga.\n\n### Sistemas em bom funcionamento\n\nDigestivo preservado.',
   '14_mensagem_cliente':
     '## 14. Mensagem para o Cliente\n\nQuerida Nailli, este é o seu momento.',
-  '16_sintese_rapida':
-    '## 16. Síntese Rápida\n\n### 🔴 Fragilidades\n\n- Sistema linfático sob carga\n\n### 🟢 Forças\n\n- Vitalidade preservada',
+  '15_sintese_rapida':
+    '## 15. Síntese Rápida\n\n### 🔴 Fragilidades\n\n- Sistema linfático sob carga\n\n### 🟢 Forças\n\n- Vitalidade preservada',
   encerramento_disclaimer:
     '> Este relatório é ferramenta de apoio à anamnese terapêutica integrativa.',
 }
@@ -39,21 +42,41 @@ describe('renderReportPrintHtml', () => {
     expect(html).toContain('</html>')
   })
 
-  it('renders a full-bleed cover with the inlined logo + client name', () => {
+  it('renders the ivory cover with the inlined light logo + client name', () => {
     expect(html).toContain('class="cover"')
-    expect(html).toContain('class="cover-glow"')
+    expect(html).toContain('class="cover-logo"')
     expect(html).toContain('src="data:image/png;base64,')
-    expect(html).toContain('A íris como mapa do ser')
+    expect(html).toContain('A íris como mapa do ser.')
+    expect(html).toContain('class="cover-divider"')
+    expect(html).toContain('Leitura Iridológica Clínico-Funcional')
     expect(html).toContain('class="cover-name">Nailli Test')
+    expect(html).toContain('class="cover-wordmark">Iris Codex')
+    // Plan 27 removed the black cover + radial glow.
+    expect(html).not.toContain('class="cover-glow"')
   })
 
-  it('renders section eyebrow + title + teal rule (no inline `N.` prefix)', () => {
-    expect(html).toContain('Seção 1')
+  it('renders an Índice (TOC) page listing the present sections', () => {
+    expect(html).toContain('class="toc"')
+    expect(html).toContain('Índice')
+    expect(html).toContain('class="toc-leader"')
+    expect(html).toContain('class="toc-name">Constituição e Temperamento')
+    expect(html).toContain('class="toc-name">Síntese Rápida')
+  })
+
+  it('renders single-line heading "N — Title" + teal rule (no "Seção" eyebrow)', () => {
+    expect(html).toContain('class="sec-title"')
+    expect(html).toContain('class="sec-num">1')
+    expect(html).toContain('class="sec-dash"> — ')
     expect(html).toContain('Constituição e Temperamento')
     expect(html).toContain('class="sec-rule"')
-    expect(html).toContain('Fibras compactas e densas.')
-    // The "1. " numeric prefix is now the eyebrow, not glued to the title.
-    expect(html).not.toContain('>1. Constituição e Temperamento<')
+    expect(html).not.toContain('Seção 1')
+  })
+
+  it('renders §2 with both markdown subsections', () => {
+    expect(html).toContain('Sistemas que requerem atenção')
+    expect(html).toContain('Sistemas em bom funcionamento')
+    expect(html).toContain('Fígado sob carga.')
+    expect(html).toContain('Digestivo preservado.')
   })
 
   it('renders §14 Mensagem as a letter, not a plain section body', () => {
@@ -62,13 +85,15 @@ describe('renderReportPrintHtml', () => {
     expect(html).toContain('este é o seu momento')
   })
 
-  it('renders §16 as a card grid with per-card accent borders', () => {
+  it('renders §15 as tinted cards with per-card accent + tint', () => {
     expect(html).toContain('sintese-grid')
     expect(html).toContain('sintese-card')
     expect(html).toContain('🔴 Fragilidades')
     expect(html).toContain('🟢 Forças')
-    // First card accent = teal-dark from SINTESE_ACCENTS[0].
-    expect(html.toLowerCase()).toContain('border-left-color:#1e6b61')
+    // First card (Fragilidades) accent #C0392B + bg #FBF4F3 from SINTESE_CARD[0].
+    const lc = html.toLowerCase()
+    expect(lc).toContain('border-left-color:#c0392b')
+    expect(lc).toContain('background-color:#fbf4f3')
   })
 
   it('renders the disclaimer block when present', () => {
@@ -78,16 +103,19 @@ describe('renderReportPrintHtml', () => {
 
   it('strips the duplicate leading `## N.` heading from the body', () => {
     expect(html).not.toContain('## 1. Constituição')
+    expect(html).not.toContain('## 15. Síntese')
   })
 })
 
 describe('renderFooterHtml', () => {
-  it('is a complete doc with Chromium pageNumber/totalPages hooks + escaped name', () => {
+  it('is a complete transparent doc with pageNumber/totalPages + escaped name', () => {
     const footer = renderFooterHtml('A & B <x>', 'Linha de aviso.')
     expect(footer.startsWith('<!DOCTYPE html>')).toBe(true)
-    expect(footer).toContain('class="pageNumber"')
+    expect(footer).toContain('class="cur pageNumber"')
     expect(footer).toContain('class="totalPages"')
     expect(footer).toContain('A &amp; B &lt;x&gt;')
+    // Plan 27 removed the ivory plinth — footer background is transparent.
+    expect(footer).toContain('background:transparent')
   })
 })
 

@@ -5,7 +5,7 @@ import { describe, it, expect } from 'vitest'
 import { render, screen, within } from '@testing-library/react'
 import { ReportReadView } from '../ReportReadView'
 
-const SINTESE_RAPIDA_BODY = `## 16. Síntese Rápida
+const SINTESE_RAPIDA_BODY = `## 15. Síntese Rápida
 
 ### 🔴 Fragilidades
 
@@ -43,10 +43,10 @@ Aptidão natural para escuta clínica e cuidado integrativo. Talento
 para sustentar processos longos. Capacidade de reconhecer padrões
 sutis em outros.`
 
-const FULL_16_SECTIONS = {
+const FULL_15_SECTIONS = {
   '1_constituicao_temperamento': '## 1. Constituição e Temperamento\n\nFibras compactas e densas.',
-  '2_mapa_organico': '## 2. Mapa Orgânico\n\nFígado sob carga.',
-  '2_5_sistemas_funcionando_bem': '## 2.5. Sistemas em Bom Funcionamento\n\nDigestivo preservado.',
+  '2_mapa_organico':
+    '## 2. Mapa Orgânico\n\nVisão completa do organismo.\n\n### Sistemas que requerem atenção\n\nFígado sob carga.\n\n### Sistemas em bom funcionamento\n\nDigestivo preservado.',
   '3_linha_tempo_emocional': '## 3. Linha do Tempo Emocional\n\n**Marcador 1 — Infância (0-4 anos)**\n\n- Período de vida: vinculação primária\n- O que pode ter acontecido: questões de acolhimento\n- Tipo de bloqueio/trauma: contenção afetiva\n- Status atual: Em processo — organismo trabalhando ativamente esse campo',
   '4_padroes_emocionais_ativos': '## 4. Padrões Emocionais Ativos\n\nTendência à contenção.',
   '5_eixo_psicossomatico': '## 5. Eixo Psicossomático\n\nFígado ↔ raiva contida.',
@@ -59,7 +59,7 @@ const FULL_16_SECTIONS = {
   '12_roteiro_anamnese': '## 12. Roteiro de Anamnese\n\n1. Como tem sido seu sono?',
   '13_sintese_integrativa': '## 13. Síntese Integrativa\n\nUm fio que percorre o relatório é a relação entre carga hepática e padrões de raiva contida.',
   '14_mensagem_cliente': '## 14. Mensagem para o Cliente\n\nO que a íris me trouxe sobre você hoje é a presença de uma força quieta.',
-  '16_sintese_rapida': SINTESE_RAPIDA_BODY,
+  '15_sintese_rapida': SINTESE_RAPIDA_BODY,
   'encerramento_disclaimer':
     '> Esta leitura iridológica é uma ferramenta de apoio à anamnese terapêutica.',
 }
@@ -68,7 +68,7 @@ describe('components/readings/ReportReadView (Plan 7.4-18 — UAT-3 reading-mode
   it('renders header with client name + reading date', () => {
     render(
       <ReportReadView
-        sections={FULL_16_SECTIONS}
+        sections={FULL_15_SECTIONS}
         clientName="Nailli GF de Carvalho"
         readingDate="2026-05-14T15:00:00.000Z"
       />,
@@ -77,26 +77,22 @@ describe('components/readings/ReportReadView (Plan 7.4-18 — UAT-3 reading-mode
     expect(screen.getByText(/Leitura realizada em/)).toBeDefined()
   })
 
-  it('renders 16 sections in order including §2.5 between §2 and §3 plus §16 last', () => {
+  it('renders 15 sequential sections 1..15 (Plan 27 — §2.5 merged into §2, Síntese = §15)', () => {
     const { container } = render(
       <ReportReadView
-        sections={FULL_16_SECTIONS}
+        sections={FULL_15_SECTIONS}
         clientName="Cliente Teste"
         readingDate="2026-05-14T15:00:00.000Z"
       />,
     )
     const headings = container.querySelectorAll('h2')
-    expect(headings.length).toBe(16)
-    // Verify order: 1 → 2 → 2.5 → 3 → ... → 14 → 16 (skip 15 per Plan 22)
-    const expectedOrder = ['1', '2', '2.5', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '16']
+    expect(headings.length).toBe(15)
+    const expectedOrder = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15']
     expectedOrder.forEach((n, idx) => {
-      // Plan 22: heading format is `N. Title` (no §, no em-dash, period after number)
       expect(headings[idx]?.textContent).toContain(`${n}.`)
     })
-    // §2.5 specifically — Plan 22 format `N. Title`
-    expect(headings[2]?.textContent).toBe('2.5. Sistemas em Bom Funcionamento')
-    // §16 last
-    expect(headings[15]?.textContent).toBe('16. Síntese Rápida')
+    expect(headings[1]?.textContent).toBe('2. Mapa Orgânico')
+    expect(headings[14]?.textContent).toBe('15. Síntese Rápida')
   })
 
   it('skips empty sections (defensive — sections may have fewer than 15 keys)', () => {
@@ -166,7 +162,7 @@ describe('components/readings/ReportReadView (Plan 7.4-18 — UAT-3 reading-mode
   it('renders encerramento_disclaimer footer when present', () => {
     render(
       <ReportReadView
-        sections={FULL_16_SECTIONS}
+        sections={FULL_15_SECTIONS}
         clientName="Client"
         readingDate={null}
       />,
@@ -177,7 +173,7 @@ describe('components/readings/ReportReadView (Plan 7.4-18 — UAT-3 reading-mode
   })
 
   it('omits encerramento footer when absent in jsonb', () => {
-    const noEncerramento = { ...FULL_16_SECTIONS }
+    const noEncerramento = { ...FULL_15_SECTIONS }
     delete (noEncerramento as Record<string, string>)['encerramento_disclaimer']
     render(
       <ReportReadView
@@ -192,7 +188,7 @@ describe('components/readings/ReportReadView (Plan 7.4-18 — UAT-3 reading-mode
   it('renders topActionsSlot above main body when provided', () => {
     const { container } = render(
       <ReportReadView
-        sections={FULL_16_SECTIONS}
+        sections={FULL_15_SECTIONS}
         clientName="Client"
         readingDate={null}
         topActionsSlot={<button data-testid="custom-action">Custom Action</button>}
@@ -209,7 +205,7 @@ describe('components/readings/ReportReadView (Plan 7.4-18 — UAT-3 reading-mode
   it('does NOT render an accordion (continuous flowing text only)', () => {
     const { container } = render(
       <ReportReadView
-        sections={FULL_16_SECTIONS}
+        sections={FULL_15_SECTIONS}
         clientName="Client"
         readingDate={null}
       />,
@@ -224,10 +220,10 @@ describe('components/readings/ReportReadView (Plan 7.4-18 — UAT-3 reading-mode
     })
   })
 
-  it('section number 2.5 renders losslessly as "2.5" not "3" or "2"', () => {
+  it('§15 Síntese Rápida heading renders as "15. Síntese Rápida"', () => {
     const sections = {
-      '2_5_sistemas_funcionando_bem':
-        '## 2.5. Sistemas em Bom Funcionamento\n\nDigestivo preservado.',
+      '15_sintese_rapida':
+        '## 15. Síntese Rápida\n\nSem subseções aqui — prosa simples.',
     }
     render(
       <ReportReadView
@@ -237,17 +233,15 @@ describe('components/readings/ReportReadView (Plan 7.4-18 — UAT-3 reading-mode
       />,
     )
     const h2 = screen.getByRole('heading', { level: 2 })
-    // Plan 22 (UAT-4): no §, period after number
-    expect(h2.textContent).toBe('2.5. Sistemas em Bom Funcionamento')
-    // Verify body content present
+    expect(h2.textContent).toBe('15. Síntese Rápida')
     const article = screen.getByTestId('report-read-view')
-    expect(within(article).getByText('Digestivo preservado.')).toBeDefined()
+    expect(within(article).getByText('Sem subseções aqui — prosa simples.')).toBeDefined()
   })
 
-  it('Plan 22: §16 Síntese Rápida renders as 6-card grid (parses ### subsections)', () => {
+  it('§15 Síntese Rápida renders as 6-card grid (parses ### subsections)', () => {
     render(
       <ReportReadView
-        sections={FULL_16_SECTIONS}
+        sections={FULL_15_SECTIONS}
         clientName="Client"
         readingDate={null}
       />,
@@ -267,10 +261,10 @@ describe('components/readings/ReportReadView (Plan 7.4-18 — UAT-3 reading-mode
     expect(labels[5]).toBe('🌱 Aptidões')
   })
 
-  it('Plan 22: §16 grid hides if subsections cannot be parsed (fallback to default prose)', () => {
+  it('§15 grid hides if subsections cannot be parsed (fallback to default prose)', () => {
     const sections = {
-      '16_sintese_rapida':
-        '## 16. Síntese Rápida\n\nSonnet broke the structure — body has no ### subsections.',
+      '15_sintese_rapida':
+        '## 15. Síntese Rápida\n\nSonnet broke the structure — body has no ### subsections.',
     }
     const { container } = render(
       <ReportReadView

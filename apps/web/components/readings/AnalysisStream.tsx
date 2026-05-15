@@ -13,8 +13,8 @@
  *   - 15-row checklist (Check icon for received, Skeleton for pending)
  *   - Hint text reassuring refresh is safe (D-S2)
  *
- * Phase 7 | Plan 07-09 → 07.4-12 → 07.4-17 (UAT-3: §2.5 — Sistemas em Bom
- * Funcionamento inserted between §2 and §3 → 15 sections total)
+ * Phase 7 | Plan 07-09 → 07.4-12 → 07.4-27 (§2.5 collapsed into §2; 15
+ * strictly sequential sections, Síntese Rápida = §15)
  * UI-SPEC lines 196-208, 300-318
  */
 import { Loader2, Check } from 'lucide-react'
@@ -22,28 +22,18 @@ import { Loader2, Check } from 'lucide-react'
 import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { NUMBERED_SECTION_HEADINGS } from '@/lib/anthropic/types'
+import {
+  NUMBERED_SECTION_HEADINGS,
+  SECTION_TITLE_BY_NUMBER,
+} from '@/lib/anthropic/types'
 
-const TOTAL_SECTIONS = NUMBERED_SECTION_HEADINGS.length // 16 (Plan 22 — added §16)
+const TOTAL_SECTIONS = NUMBERED_SECTION_HEADINGS.length // 15 (Plan 27 — 1..15 sequential)
 
-const SECTION_TITLES: readonly string[] = [
-  'Constituição e Temperamento',
-  'Mapa Orgânico',
-  'Sistemas em Bom Funcionamento',
-  'Linha do Tempo Emocional',
-  'Padrões Emocionais Ativos',
-  'Eixo Psicossomático',
-  'Heranças Transgeracionais',
-  'Carências Funcionais',
-  'Estado Mental e Nervoso',
-  'Recursos e Forças',
-  'Dimensão Arquetípica',
-  'Sugestões Integrativas',
-  'Roteiro de Anamnese',
-  'Síntese Integrativa',
-  'Mensagem para o Cliente',
-  'Síntese Rápida',
-]
+// Derived from the single source of truth (Plan 27 — kills the prior
+// inline-array drift; was a Plan 18 follow-up debt item).
+const SECTION_TITLES: readonly string[] = NUMBERED_SECTION_HEADINGS.map(
+  (h) => SECTION_TITLE_BY_NUMBER[h],
+)
 
 export interface AnalysisStreamProps {
   sectionsReceived: number

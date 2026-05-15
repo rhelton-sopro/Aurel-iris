@@ -6,21 +6,21 @@
 /**
  * Shared types for Phase 7 — Análise LLM.
  *
- * Canonical shapes (Phase 7.4 Plan 17 — UAT-3 restructure §2.5 + 15 sections):
- *   - ReportSectionKey: 16-key union (15 numbered including '2_5_...' + encerramento_disclaimer)
+ * Canonical shapes (Phase 7.4 Plan 27 — 15 sequential sections, no fractions):
+ *   - ReportSectionKey: 16-key union (15 numbered '1'..'15' + encerramento_disclaimer)
  *   - ReportJsonb: Partial<Record<ReportSectionKey, string>> — incremental persistence (D-S2)
  *   - AuditMetadata: D-A3 shape (anchor rate + forbidden vocab + timestamps)
  *   - EditTipo: D-U2 classifier output
  *   - RegenerationLogEntry: D-S4 telemetry per regeneration
  *   - ENCERRAMENTO_LITERAL: SPEC §6 disclaimer literal — server-appended (D-P3)
- *   - REPORT_SECTIONS: D-PR2 RAG-slug array — remapped for the 15-section structure
+ *   - REPORT_SECTIONS: D-PR2 RAG-slug array (slug-keyed — unaffected by renumber)
  *   - NUMBERED_SECTION_HEADINGS: ordered string heading numbers for parser monotonicity
  *
- * Plan 11 (Direction Correction) remapped 13→14 sections; Plan 17 (UAT-3
- * restructure) extended to 15 by inserting §2.5 — Sistemas em Bom Funcionamento
- * between §2 — Mapa Orgânico and §3 — Linha do Tempo Emocional. Decimal
- * heading numbers (only '2.5' currently) require string-keyed lookup + ordered
- * array monotonicity instead of numeric `lastNumber + 1`.
+ * Plan 11 remapped 13→14; Plan 17 (UAT-3) inserted §2.5 for a 16-numbered
+ * structure with a §15 gap. Plan 27 (UAT-iter-3) COLLAPSES §2.5 into §2 as
+ * its second subsection (same conceptual organ-map category) and renumbers to
+ * 15 strictly sequential sections — Síntese Rápida moves §16 → §15. No
+ * decimal/gap headings remain; monotonicity is still ordered-array-index based.
  *
  * LGPD: este arquivo declara apenas estrutura. Sem vocabulário proibido em
  * código — `pnpm audit:vocabulary` cobre `lib/anthropic/` desde 07-02 (D-A4).
@@ -33,7 +33,6 @@ import type { ReportSection } from '@/lib/rag/types'
 export type ReportSectionKey =
   | '1_constituicao_temperamento'
   | '2_mapa_organico'
-  | '2_5_sistemas_funcionando_bem'
   | '3_linha_tempo_emocional'
   | '4_padroes_emocionais_ativos'
   | '5_eixo_psicossomatico'
@@ -46,27 +45,24 @@ export type ReportSectionKey =
   | '12_roteiro_anamnese'
   | '13_sintese_integrativa'
   | '14_mensagem_cliente'
-  | '16_sintese_rapida'
+  | '15_sintese_rapida'
   | 'encerramento_disclaimer'
 
-/** Numeric-prefixed keys only (1..14 plus '2.5' plus '16'). Used by section-boundary parser. */
+/** Numeric-prefixed keys only ('1'..'15'). Used by section-boundary parser. */
 export type NumberedSectionKey = Exclude<ReportSectionKey, 'encerramento_disclaimer'>
 
 /**
- * Ordered heading-number strings for the 16 numbered sections, in canonical
+ * Ordered heading-number strings for the 15 numbered sections, in canonical
  * emission order. Source of truth for parser monotonicity (`indexOf(headingStr)`
- * must equal `lastIndex + 1`) and for UI counters (length = 16).
+ * must equal `lastIndex + 1`) and for UI counters (length = 15).
  *
- * Plan 17 (UAT-3): inserted '2.5' between '2' and '3' for §2.5 — Sistemas em
- * Bom Funcionamento.
- * Plan 22 (UAT-4): appended '16' for §16 — Síntese Rápida; sequence skips
- * '15' per founder explicit numbering choice (visible heading "16. Síntese
- * Rápida", not "15. Síntese Rápida"). Counter shows {n}/16.
+ * Plan 27 (UAT-iter-3): §2.5 collapsed into §2 (subsection B); Síntese Rápida
+ * renumbered §16 → §15. Strictly sequential 1..15 — no fractions, no gaps.
+ * Counter shows {n}/15.
  */
 export const NUMBERED_SECTION_HEADINGS = [
   '1',
   '2',
-  '2.5',
   '3',
   '4',
   '5',
@@ -79,7 +75,7 @@ export const NUMBERED_SECTION_HEADINGS = [
   '12',
   '13',
   '14',
-  '16',
+  '15',
 ] as const
 
 export type NumberedSectionHeading = (typeof NUMBERED_SECTION_HEADINGS)[number]
@@ -93,7 +89,6 @@ export type NumberedSectionHeading = (typeof NUMBERED_SECTION_HEADINGS)[number]
 export const SECTION_TITLE_BY_NUMBER: Record<NumberedSectionHeading, string> = {
   '1': 'Constituição e Temperamento',
   '2': 'Mapa Orgânico',
-  '2.5': 'Sistemas em Bom Funcionamento',
   '3': 'Linha do Tempo Emocional',
   '4': 'Padrões Emocionais Ativos',
   '5': 'Eixo Psicossomático',
@@ -106,18 +101,16 @@ export const SECTION_TITLE_BY_NUMBER: Record<NumberedSectionHeading, string> = {
   '12': 'Roteiro de Anamnese',
   '13': 'Síntese Integrativa',
   '14': 'Mensagem para o Cliente',
-  '16': 'Síntese Rápida',
+  '15': 'Síntese Rápida',
 }
 
 /**
- * Map heading-number string ('1', '2', '2.5', '3', ..., '14') to canonical
- * section key. Plan 17 (UAT-3): re-keyed from numeric to string so '2.5'
- * round-trips through the parser without lossy numeric conversion.
+ * Map heading-number string ('1'..'15') to canonical section key.
+ * Plan 27: strictly sequential; §15 = Síntese Rápida (was §16).
  */
 export const SECTION_KEY_BY_NUMBER: Record<NumberedSectionHeading, NumberedSectionKey> = {
   '1': '1_constituicao_temperamento',
   '2': '2_mapa_organico',
-  '2.5': '2_5_sistemas_funcionando_bem',
   '3': '3_linha_tempo_emocional',
   '4': '4_padroes_emocionais_ativos',
   '5': '5_eixo_psicossomatico',
@@ -130,7 +123,7 @@ export const SECTION_KEY_BY_NUMBER: Record<NumberedSectionHeading, NumberedSecti
   '12': '12_roteiro_anamnese',
   '13': '13_sintese_integrativa',
   '14': '14_mensagem_cliente',
-  '16': '16_sintese_rapida',
+  '15': '15_sintese_rapida',
 }
 
 export type ReportJsonb = Partial<Record<ReportSectionKey, string>>

@@ -1,8 +1,9 @@
 /**
  * ReportReadView — continuous flowing reading surface (Plan 7.4-18 — UAT-3
- * UX flip; Plan 7.4-22 — § removal in headings + §16 card-grid rendering).
+ * UX flip; Plan 7.4-27 — §2.5 collapsed into §2, 15 sequential sections,
+ * Síntese Rápida is now §15 with the card-grid rendering).
  *
- * Renders the 16-section Iris Codex report as a single professionally
+ * Renders the 15-section Iris Codex report as a single professionally
  * formatted document — NOT an accordion. The accordion lives only on the
  * /editar route for granular per-section edits. This component is the default
  * view on /leituras/[id] when the report is ready/edited.
@@ -10,15 +11,14 @@
  * Composition (top → bottom):
  *   1. Header — client name (h1, font-serif) + reading date (muted small)
  *   2. Optional topActionsSlot row — right-aligned button group passed by parent
- *   3. Main body — 16 sections rendered in NUMBERED_SECTION_HEADINGS order:
+ *   3. Main body — 15 sections rendered in NUMBERED_SECTION_HEADINGS order:
  *        - h2 styled as `{N}. {Title}` (font-serif text-2xl bold)
- *          [Plan 22 (UAT-4): § symbol removed from heading display]
  *        - body via ReactMarkdown + remarkGfm in prose font-serif leading-relaxed
  *        - leading `## N. Title` (or legacy `## §N — Title`) heading line
  *          stripped from body to avoid duplication with the styled h2 above
  *        - empty/missing sections are skipped (defensive — sections may have
- *          fewer than 16 keys mid-stream or for legacy 1.0 readings)
- *        - §16 Síntese Rápida gets SPECIAL CARD-GRID rendering: body parsed
+ *          fewer than 15 keys mid-stream or for legacy readings)
+ *        - §15 Síntese Rápida gets SPECIAL CARD-GRID rendering: body parsed
  *          into 6 emoji-labeled subsections, displayed as 2-column grid
  *          (1-col on mobile)
  *   4. Footer — encerramento_disclaimer rendered as italic muted blockquote
@@ -45,8 +45,8 @@ import {
 // Mirrors EditorSectionItem STRIP_LEADING_HEADING_RE + parser.ts BOUNDARY_RE.
 // Strips a leading `## N. Title` (or legacy `## §N — Title`) heading line +
 // trailing blank lines so the rendered body doesn't duplicate the styled h2
-// above. Handles decimal `.5` for §2.5 (Plan 17). Optional `§?` keeps backward
-// compat with reports generated under Plan 16's prompt.
+// above. Decimal `.N` still tolerated for legacy buffers (no longer emitted —
+// Plan 27 is 1..15 sequential). Optional `§?` keeps legacy-format compat.
 const STRIP_LEADING_HEADING_RE = /^[ \t]*#{2,3}[ \t]+§?[ \t]*\d{1,2}(?:\.\d)?[ \t]*[\p{Pd}.][^\n]*\n+/u
 
 // This project has NO @tailwindcss/typography plugin (Tailwind v4, globals.css
@@ -88,10 +88,10 @@ function markdownComponents(variant: MarkdownVariant): Components {
   }
 }
 
-// §16 subsection split — each block starts with `### ` (markdown h3) followed
+// §15 subsection split — each block starts with `### ` (markdown h3) followed
 // by a label that includes an emoji + name. Match the block heading line and
 // capture the full block until the next `### ` (or end of body).
-// Plan 22 (UAT-4): §16 Síntese Rápida is a 6-block card grid.
+// §15 Síntese Rápida is a 6-block card grid (Plan 27 renumber, was §16).
 const SUBSECTION_SPLIT_RE = /^###\s+(.+)$/gm
 
 interface ParsedSubsection {
@@ -102,7 +102,7 @@ interface ParsedSubsection {
 }
 
 /**
- * Parse §16 body markdown into ordered subsections. Splits on `### ` headings;
+ * Parse §15 body markdown into ordered subsections. Splits on `### ` headings;
  * the first block (before any heading) is discarded as preamble. Returns
  * empty array if no `### ` headings detected (caller falls back to default
  * prose render).
@@ -171,7 +171,7 @@ export function ReportReadView({
           const body = raw.replace(STRIP_LEADING_HEADING_RE, '')
           const title = SECTION_TITLE_BY_NUMBER[headingStr]
           const headingMargin = idx === 0 ? 'mt-8' : 'mt-12'
-          const isSinteseRapida = headingStr === '16'
+          const isSinteseRapida = headingStr === '15'
           const parsedBlocks = isSinteseRapida ? parseSubsections(body) : []
           return (
             <section

@@ -24,38 +24,24 @@ describe('lib/anthropic/prompts — file content (Plan 21 — 16-section Iris Co
     expect(loadSystemPrompt()).toContain('Iris Codex')
   })
 
-  it('system.md contém os 16 headings "## N. Title" (1, 2, 2.5, 3..14, 16; skip 15)', () => {
+  it('system.md contém os 15 headings "## N. Title" (1..15 sequencial)', () => {
     const sys = loadSystemPrompt()
     const expectedNumbers = [
-      '1',
-      '2',
-      '2.5',
-      '3',
-      '4',
-      '5',
-      '6',
-      '7',
-      '8',
-      '9',
-      '10',
-      '11',
-      '12',
-      '13',
-      '14',
-      '16',
+      '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15',
     ]
     for (const n of expectedNumbers) {
-      // Plan 21: §-less heading format `## N. Title` (period separator, no glyph)
       expect(sys).toContain(`## ${n}.`)
     }
+    // Plan 27: §2.5 collapsed into §2 — no decimal heading remains.
+    expect(sys).not.toContain('## 2.5.')
+    expect(sys).not.toContain('## 16.')
   })
 
-  it('system.md contém os 16 titles canônicos (Plan 21 — §16 Síntese Rápida added)', () => {
+  it('system.md contém os 15 titles canônicos (Plan 27 — Síntese Rápida = §15)', () => {
     const sys = loadSystemPrompt()
     const expectedTitles = [
       'Constituição e Temperamento',
       'Mapa Orgânico',
-      'Sistemas em Bom Funcionamento',
       'Linha do Tempo Emocional',
       'Padrões Emocionais Ativos',
       'Eixo Psicossomático',
@@ -83,8 +69,8 @@ describe('lib/anthropic/prompts — file content (Plan 21 — 16-section Iris Co
     expect(sys).not.toContain('systems_with_tendency')
     expect(sys).not.toContain('tendency_grade')
     expect(sys).not.toContain('bilateral_findings')
-    // Positive assertion: the prompt instructs markdown output (16 seções)
-    expect(sys).toMatch(/16 seções markdown/i)
+    // Positive assertion: the prompt instructs markdown output (15 seções)
+    expect(sys).toMatch(/15 seções markdown/i)
   })
 
   it('feature-injection.md contém placeholders mustache canônicos', () => {
@@ -212,10 +198,12 @@ describe('lib/anthropic/prompts — Plan 16 absolute rules + structural restruct
     expect(sys).toMatch(/skip-rather-than-fabricate/i)
   })
 
-  it('§2.5 — Sistemas em Bom Funcionamento section exists with anchoring criteria', () => {
+  it('§2 contém as duas subseções (atenção + bom funcionamento) com critérios de ancoragem', () => {
     const sys = loadSystemPrompt()
-    // Plan 21: heading format changed `## §N — Title` → `## N. Title`
-    expect(sys).toContain('## 2.5. Sistemas em Bom Funcionamento')
+    // Plan 27: §2.5 collapsed into §2 as a `### ` subsection.
+    expect(sys).toContain('## 2. Mapa Orgânico')
+    expect(sys).toContain('### Sistemas que requerem atenção')
+    expect(sys).toContain('### Sistemas em bom funcionamento')
     expect(sys).toMatch(/Ausência de marcas no setor esperado/)
     expect(sys).toMatch(/Zonas claras\/íntegras/)
     expect(sys).toMatch(/Marcadores estruturais positivos/)
@@ -268,9 +256,9 @@ describe('lib/anthropic/prompts — Plan 21 UAT-4 fixes (§ removal + §1 breath
     expect(sys).toMatch(/1\.\s+Você notou/)
   })
 
-  it('§16 Síntese Rápida section exists with 6 mandatory subsections', () => {
+  it('§15 Síntese Rápida section exists with 6 mandatory subsections', () => {
     const sys = loadSystemPrompt()
-    expect(sys).toContain('## 16. Síntese Rápida')
+    expect(sys).toContain('## 15. Síntese Rápida')
     expect(sys).toContain('### 🔴 Fragilidades')
     expect(sys).toContain('### 🟢 Forças')
     expect(sys).toContain('### 💛 Emoções a Cuidar')
@@ -288,14 +276,16 @@ describe('lib/anthropic/prompts — Plan 21 UAT-4 fixes (§ removal + §1 breath
     const sys = loadSystemPrompt()
     // Positive: at least one canonical example uses period-separator format
     expect(sys).toContain('## 1. Constituição e Temperamento')
-    expect(sys).toContain('## 16. Síntese Rápida')
+    expect(sys).toContain('## 15. Síntese Rápida')
     // Negative-rule instruction acknowledges the old format is abandoned
     expect(sys).toContain('NÃO emita `## §N — Título`')
   })
 
-  it('Lembretes finais explicitly says "skip 15"', () => {
+  it('Format de saída instrui sequência estrita 1..15 (sem fração, sem pulo)', () => {
     const sys = loadSystemPrompt()
-    expect(sys).toMatch(/skip 15|pula de 14 para 16/i)
+    expect(sys).toMatch(/15 seções markdown/i)
+    expect(sys).toMatch(/estritamente sequencial|estrita 1\.\.15|sem fração/i)
+    expect(sys).not.toMatch(/skip 15|pula de 14 para 16/i)
   })
 })
 
