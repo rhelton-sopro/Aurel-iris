@@ -125,13 +125,17 @@ export async function GET(
     new Blob([footerHtml], { type: 'text/html' }),
     'footer.html',
   )
-  // A4 in inches; reserve bottom margin for the running footer.
+  // A4 in inches. Top/left/right margin = 0 so the black cover bleeds to the
+  // paper edge (page whitespace is CSS padding in PRINT_CSS, not page margin).
+  // Only the bottom 0.6in is reserved — Gotenberg renders footer.html there
+  // on every page (ivory plinth). printBackground is essential (black cover,
+  // §16 card fills, teal rules).
   form.append('paperWidth', '8.27')
   form.append('paperHeight', '11.69')
-  form.append('marginTop', '0.55')
-  form.append('marginBottom', '0.7')
-  form.append('marginLeft', '0.6')
-  form.append('marginRight', '0.6')
+  form.append('marginTop', '0')
+  form.append('marginBottom', '0.6')
+  form.append('marginLeft', '0')
+  form.append('marginRight', '0')
   form.append('printBackground', 'true')
   form.append('scale', '1.0')
 

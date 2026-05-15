@@ -15,6 +15,8 @@ import {
 const SECTIONS = {
   '1_constituicao_temperamento':
     '## 1. Constituição e Temperamento\n\nFibras compactas e densas.\n\nSegundo parágrafo de respiro.',
+  '14_mensagem_cliente':
+    '## 14. Mensagem para o Cliente\n\nQuerida Nailli, este é o seu momento.',
   '16_sintese_rapida':
     '## 16. Síntese Rápida\n\n### 🔴 Fragilidades\n\n- Sistema linfático sob carga\n\n### 🟢 Forças\n\n- Vitalidade preservada',
   encerramento_disclaimer:
@@ -37,18 +39,36 @@ describe('renderReportPrintHtml', () => {
     expect(html).toContain('</html>')
   })
 
-  it('renders brand header + client name + styled section title', () => {
-    expect(html).toContain('Iris Codex')
-    expect(html).toContain('Nailli Test')
-    expect(html).toContain('1. Constituição e Temperamento')
-    expect(html).toContain('Fibras compactas e densas.')
+  it('renders a full-bleed cover with the inlined logo + client name', () => {
+    expect(html).toContain('class="cover"')
+    expect(html).toContain('class="cover-glow"')
+    expect(html).toContain('src="data:image/png;base64,')
+    expect(html).toContain('A íris como mapa do ser')
+    expect(html).toContain('class="cover-name">Nailli Test')
   })
 
-  it('renders §16 as a CSS grid of subsection cards (Chromium supports grid)', () => {
+  it('renders section eyebrow + title + teal rule (no inline `N.` prefix)', () => {
+    expect(html).toContain('Seção 1')
+    expect(html).toContain('Constituição e Temperamento')
+    expect(html).toContain('class="sec-rule"')
+    expect(html).toContain('Fibras compactas e densas.')
+    // The "1. " numeric prefix is now the eyebrow, not glued to the title.
+    expect(html).not.toContain('>1. Constituição e Temperamento<')
+  })
+
+  it('renders §14 Mensagem as a letter, not a plain section body', () => {
+    expect(html).toContain('report-section letter')
+    expect(html).toContain('class="letter-body"')
+    expect(html).toContain('este é o seu momento')
+  })
+
+  it('renders §16 as a card grid with per-card accent borders', () => {
     expect(html).toContain('sintese-grid')
     expect(html).toContain('sintese-card')
     expect(html).toContain('🔴 Fragilidades')
     expect(html).toContain('🟢 Forças')
+    // First card accent = teal-dark from SINTESE_ACCENTS[0].
+    expect(html.toLowerCase()).toContain('border-left-color:#1e6b61')
   })
 
   it('renders the disclaimer block when present', () => {
