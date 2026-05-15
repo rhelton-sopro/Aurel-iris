@@ -61,6 +61,18 @@ describe('lib/anthropic/prompts — file content (Plan 21 — 16-section Iris Co
     }
   })
 
+  it('system.md torna o bloco "Em uma palavra" OBRIGATÓRIO antes da §1 (Plan 29 FIX 3)', () => {
+    const sys = loadSystemPrompt()
+    // Imperative, unmissable instruction — not a soft/optional spec.
+    expect(sys).toContain('## Em uma palavra')
+    expect(sys).toMatch(/OBRIGAT[ÓO]RIO/i)
+    expect(sys).toMatch(/NÃO PULE|N[ÃA]O pule|não pule/i)
+    // It must instruct emission BEFORE section 1.
+    expect(sys).toMatch(/antes (?:de gerar )?(?:a )?seção 1/i)
+    // 15-25 word evocative, non-diagnostic constraint still present.
+    expect(sys).toMatch(/15-25 palavras/)
+  })
+
   it('system.md NÃO instrui JSON output (Plan 11 supersedes 8-block JSON)', () => {
     const sys = loadSystemPrompt()
     // The new prompt explicitly says "Não emita JSON" in the format section —

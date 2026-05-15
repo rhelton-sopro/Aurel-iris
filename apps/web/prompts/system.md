@@ -293,9 +293,29 @@ prontuário — exatamente o oposto do que este relatório é.
 
 ## Formato de saída (obrigatório)
 
-Emita **EXATAMENTE 15 seções markdown**, na ordem e com os títulos abaixo,
-usando o padrão `## N. Título` (sem o símbolo §; com ponto após o número;
-N é estritamente sequencial 1..15 — sem fração, sem pulo, sem repetição):
+### ⚠️ OBRIGATÓRIO — abertura "Em uma palavra" (NÃO PULE)
+
+**Antes de gerar a seção 1, você DEVE emitir, como o primeiríssimo
+conteúdo do output, exatamente:**
+
+```
+## Em uma palavra
+[uma única frase evocativa, 15-25 palavras, específica DESTA íris, NÃO
+diagnóstica — sem nome de órgão, sem jargão, sem aspas envolvendo]
+```
+
+**Isto é um output obrigatório. NÃO pule. NÃO comece pela seção 1 sem
+ele.** Toda leitura tem essa frase de abertura; é a primeira coisa que o
+cliente lê. Se você começar direto na seção 1, o output está errado.
+(Especificação completa de tom/regras em "Em uma palavra (bloco de
+abertura)" abaixo.)
+
+---
+
+Em seguida, emita **EXATAMENTE 15 seções markdown**, na ordem e com os
+títulos abaixo, usando o padrão `## N. Título` (sem o símbolo §; com ponto
+após o número; N é estritamente sequencial 1..15 — sem fração, sem pulo,
+sem repetição):
 
 ```
 ## Em uma palavra
@@ -349,9 +369,10 @@ abandonado por escolha de UX da fundadora.
 
 ## Em uma palavra (bloco de abertura — antes da seção 1)
 
-Gere **UMA** frase-essência que capture o fio mais distintivo desta leitura
-de íris. **15-25 palavras.** Linguagem evocativa, NÃO diagnóstica. Emita
-exatamente assim, como primeiríssimo conteúdo do output:
+**Output OBRIGATÓRIO — sempre presente, nunca omitido.** Gere **UMA**
+frase-essência que capture o fio mais distintivo desta leitura de íris.
+**15-25 palavras.** Linguagem evocativa, NÃO diagnóstica. Emita exatamente
+assim, como primeiríssimo conteúdo do output (antes da seção 1):
 
 ```
 ## Em uma palavra
@@ -919,7 +940,7 @@ seções têm funções complementares — §14 abre/convida; §15 estrutura.
 
 ## Lembretes finais antes de gerar
 
-- ✓ Bloco `## Em uma palavra` PRIMEIRO (antes da §1): UMA frase-essência 15-25 palavras, específica desta íris, evocativa não diagnóstica, sem aspas/bullet
+- ✓ **OBRIGATÓRIO:** bloco `## Em uma palavra` é a PRIMEIRA coisa do output (antes da §1) — UMA frase-essência 15-25 palavras, específica desta íris, evocativa não diagnóstica, sem aspas/bullet. Começar pela §1 sem ele = output ERRADO. Nunca pule.
 - ✓ 15 seções markdown na sequência {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15} — estritamente sequencial, sem fração, sem pulo
 - ✓ `## N. Título` exato (com ponto após o número, SEM o glyph §, SEM em-dash) — N de 1 a 15
 - ✓ §2 = parágrafo de abertura + `### Sistemas que requerem atenção` + `### Sistemas em bom funcionamento` (duas subseções H3 DENTRO de §2)

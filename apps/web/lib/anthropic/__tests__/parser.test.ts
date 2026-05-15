@@ -328,4 +328,34 @@ describe('lib/anthropic/parser — extractEssencePhrase (Plan 28 CHANGE 5)', () 
       '## 1. Constituição\nResumindo em uma palavra: equilíbrio.\n\n## 2. Mapa\nB'
     expect(extractEssencePhrase(buf)).toBeNull()
   })
+
+  // Plan 29 FIX 3 — realistic full-stream fixture: mandatory block first,
+  // then §1..§15. The essence phrase must surface intact.
+  it('extracts the essence from a realistic full-report stream', () => {
+    const buf = [
+      '## Em uma palavra',
+      'Um corpo que aprendeu a se proteger contendo, e que agora começa a perguntar o que aconteceria se confiasse.',
+      '',
+      '## 1. Constituição e Temperamento',
+      'Fibras compactas e densas, padrão linfático-reativo.',
+      '',
+      '## 2. Mapa Orgânico',
+      'Visão completa do organismo.',
+      '',
+      '## 14. Mensagem para o Cliente',
+      'Querida, este é o seu momento.',
+      '',
+      '## 15. Síntese Rápida',
+      '### 🔴 Fragilidades',
+      '- Sistema linfático sob carga',
+    ].join('\n')
+    expect(extractEssencePhrase(buf)).toBe(
+      'Um corpo que aprendeu a se proteger contendo, e que agora começa a perguntar o que aconteceria se confiasse.',
+    )
+    // And it must NOT have polluted §1's content.
+    const closed = closeSections(findAllBoundaries(buf), buf)
+    const sec1 = closed.find((c) => c.key === '1_constituicao_temperamento')
+    expect(sec1?.content).not.toContain('Em uma palavra')
+    expect(sec1?.content).toContain('Fibras compactas')
+  })
 })

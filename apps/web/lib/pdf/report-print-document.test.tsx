@@ -157,6 +157,16 @@ describe('renderHeaderHtml', () => {
     expect(header).toContain('border-bottom:1px solid #3D9B8C')
     expect(header).toContain('background:transparent')
   })
+
+  it('FIX 4 — label is "p. {pageNumber} / {totalPages}" (cover excluded by split-merge)', () => {
+    // Chromium fills .pageNumber/.totalPages within the BODY render only —
+    // the cover is a separate PDF merged in front, so it is excluded from
+    // the count (Índice = p.1, disclaimer = p.N/N, total = body pages).
+    const header = renderHeaderHtml('Nailli')
+    expect(header).toMatch(
+      /p\.\s*<span class="pageNumber"><\/span>\s*\/\s*<span class="totalPages"><\/span>/,
+    )
+  })
 })
 
 describe('renderFooterHtml', () => {
