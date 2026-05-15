@@ -3,34 +3,64 @@
  *
  * Server-side PDF rendering for the Iris Codex 16-section report.
  *
- * Plan 7.4-23 (UAT-4 fix #3): replaces Plan 19 Print CSS approach with a
- * direct file download. Founder approved @react-pdf/renderer install during
- * UAT-4. Browser receives Content-Type: application/pdf with
- * Content-Disposition: attachment; filename, triggering a save dialog.
+ * Plan 7.4-26 (UAT-5 PDF rebuild): @react-pdf/renderer (Plan 23) failed 3 UAT
+ * rounds — the decisive fix is architectural, not another patch. This route
+ * now renders the report as real HTML/CSS (lib/pdf/report-print-document) and
+ * delegates PDF conversion to a Gotenberg (headless Chromium) service running
+ * on Render — the binary that Vercel serverless can't host runs where it can,
+ * and Vercel's role shrinks to a single fetch(). Full CSS3: §16 grid, brand
+ * colors, emoji, future logo/icons/images. Still a direct file download — one
+ * button, no browser interaction (NOT window.print()).
  *
- * Auth gates:
- *   a) Session present (auth.getUser via createClient)
- *   b) reading owned by therapist (RLS enforces; .maybeSingle() → 404)
+ * Env contract (set in Vercel project settings):
+ *   - GOTENBERG_URL          required, e.g. https://iris-gotenberg.onrender.com
+ *   - GOTENBERG_BASIC_AUTH   optional "user:pass" (if the Gotenberg service has
+ *                            --api-enable-basic-auth — recommended so it's not
+ *                            an open HTML→PDF proxy)
+ *
+ * Auth gates (unchanged):
+ *   a) Session present (RLS via createClient)
+ *   b) reading owned by therapist (RLS + .maybeSingle() → 404)
  *   c) reading has a report (status ready/edited + report_generated populated)
  *
- * Source jsonb: reportDelivered ?? reportGenerated (delivered version
- * preferred — therapist's edits are what the client should receive).
+ * Source jsonb: reportDelivered ?? reportGenerated (delivered preferred —
+ * the therapist's edits are what the client should receive).
  *
  * Threat model:
- *   - T-PDF-01 unauthorized download → mitigated by RLS + .maybeSingle()→404
+ *   - T-PDF-01 unauthorized download → RLS + .maybeSingle()→404
  *   - T-PDF-02 PII in PDF metadata → accept (therapist owns this data)
- *   - T-PDF-03 large reports timeout → accept (~16 sections, small render)
+ *   - T-PDF-03 PII egress to renderer → Gotenberg is self-hosted on Render
+ *     (the founder's own infra), not a third-party SaaS; lock it with basic
+ *     auth + a non-guessable URL
+ *   - T-PDF-04 render timeout → 45s AbortController inside maxDuration 60
  *
- * Phase 7.4 | Plan 07.4-23 | Supersedes: Plan 19 Print CSS PDF
+ * Phase 7.4 | Plan 07.4-26 | Supersedes: Plan 23 @react-pdf/renderer
  */
 import { NextResponse, type NextRequest } from 'next/server'
-import { renderToBuffer } from '@react-pdf/renderer'
 
 import { createClient } from '@/lib/supabase/server'
-import { ReportDocument, buildPdfFilename } from '@/lib/pdf/report-document'
+import {
+  renderReportPrintHtml,
+  renderFooterHtml,
+  buildPdfFilename,
+} from '@/lib/pdf/report-print-document'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
+
+const RENDER_TIMEOUT_MS = 45_000
+
+/** First sentence of the disclaimer, condensed for the per-page running footer. */
+function disclaimerFooterLine(sections: Record<string, string>): string {
+  const raw = sections['encerramento_disclaimer'] ?? ''
+  const flat = raw
+    .replace(/[#>*_`]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+  if (!flat) return 'Relatório de apoio à anamnese terapêutica integrativa.'
+  const firstSentence = flat.split(/(?<=[.!?])\s/)[0] ?? flat
+  return firstSentence.length > 160 ? `${firstSentence.slice(0, 157)}…` : firstSentence
+}
 
 export async function GET(
   _request: NextRequest,
@@ -57,10 +87,7 @@ export async function GET(
   const status = reading.status ?? 'pending'
 
   if (!((status === 'ready' || status === 'edited') && hasReport)) {
-    return NextResponse.json(
-      { error: 'Report not ready' },
-      { status: 409 },
-    )
+    return NextResponse.json({ error: 'Report not ready' }, { status: 409 })
   }
 
   const reportToShow = (reportDelivered ?? reportGenerated) as Record<string, string>
@@ -70,18 +97,73 @@ export async function GET(
     (reading as { report_generated_at?: string }).report_generated_at ?? null
   const readingDate = reportGeneratedAt ?? reading.created_at
 
+  const gotenbergUrl = process.env.GOTENBERG_URL
+  if (!gotenbergUrl) {
+    console.error('[api/readings/[id]/pdf] GOTENBERG_URL is not configured')
+    return NextResponse.json(
+      { error: 'PDF service not configured (GOTENBERG_URL missing)' },
+      { status: 503 },
+    )
+  }
+
+  const indexHtml = await renderReportPrintHtml({
+    sections: reportToShow,
+    clientName,
+    readingDate,
+  })
+  const footerHtml = renderFooterHtml(clientName, disclaimerFooterLine(reportToShow))
   const filename = buildPdfFilename(clientName, readingDate)
 
+  const form = new FormData()
+  form.append(
+    'files',
+    new Blob([indexHtml], { type: 'text/html' }),
+    'index.html',
+  )
+  form.append(
+    'files',
+    new Blob([footerHtml], { type: 'text/html' }),
+    'footer.html',
+  )
+  // A4 in inches; reserve bottom margin for the running footer.
+  form.append('paperWidth', '8.27')
+  form.append('paperHeight', '11.69')
+  form.append('marginTop', '0.55')
+  form.append('marginBottom', '0.7')
+  form.append('marginLeft', '0.6')
+  form.append('marginRight', '0.6')
+  form.append('printBackground', 'true')
+  form.append('scale', '1.0')
+
+  const headers: Record<string, string> = {}
+  const basicAuth = process.env.GOTENBERG_BASIC_AUTH
+  if (basicAuth) {
+    headers.Authorization = `Basic ${Buffer.from(basicAuth).toString('base64')}`
+  }
+
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), RENDER_TIMEOUT_MS)
   try {
-    const pdfBuffer = await renderToBuffer(
-      <ReportDocument
-        sections={reportToShow}
-        clientName={clientName}
-        readingDate={readingDate}
-      />,
+    const res = await fetch(
+      `${gotenbergUrl.replace(/\/$/, '')}/forms/chromium/convert/html`,
+      { method: 'POST', body: form, headers, signal: controller.signal },
     )
 
-    return new Response(pdfBuffer as unknown as BodyInit, {
+    if (!res.ok) {
+      const detail = await res.text().catch(() => '')
+      console.error('[api/readings/[id]/pdf] gotenberg error', {
+        readingId,
+        status: res.status,
+        detail: detail.slice(0, 500),
+      })
+      return NextResponse.json(
+        { error: `PDF render failed (gotenberg ${res.status})` },
+        { status: 502 },
+      )
+    }
+
+    const pdf = await res.arrayBuffer()
+    return new Response(pdf, {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
@@ -90,11 +172,14 @@ export async function GET(
       },
     })
   } catch (err) {
-    const msg = err instanceof Error ? err.message : 'unknown'
-    console.error('[api/readings/[id]/pdf] render error', { readingId, msg })
+    const aborted = err instanceof Error && err.name === 'AbortError'
+    const msg = aborted ? `timeout after ${RENDER_TIMEOUT_MS}ms` : err instanceof Error ? err.message : 'unknown'
+    console.error('[api/readings/[id]/pdf] gotenberg request failed', { readingId, msg })
     return NextResponse.json(
-      { error: `PDF render failed: ${msg}` },
-      { status: 500 },
+      { error: aborted ? 'PDF render timed out' : 'PDF service unreachable' },
+      { status: 502 },
     )
+  } finally {
+    clearTimeout(timeout)
   }
 }

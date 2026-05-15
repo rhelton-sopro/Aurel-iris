@@ -1,0 +1,36 @@
+# Render Blueprint — Gotenberg PDF service for Iris Codex (Plan 7.4-26).
+#
+# This stands up the headless-Chromium PDF renderer that Vercel serverless
+# can't host. The Next.js route /api/readings/[id]/pdf POSTs report HTML to
+# this service and streams the PDF back as a download.
+#
+# Apply via Render → "New +" → "Blueprint" → point at this repo. After deploy:
+#   1. Copy the service URL (e.g. https://iris-gotenberg.onrender.com)
+#   2. Set it + the basic-auth creds as Vercel env vars (see below), redeploy.
+#
+# Manual dashboard alternative (more reliable for a one-off — recommended):
+#   New Web Service → Deploy an existing image → docker.io/gotenberg/gotenberg:8
+#   Start command:  gotenberg --api-port 3000 --api-enable-basic-auth
+#   Health check path: /health   ·   Instance: Starter ($7, always-on)
+#   Env: GOTENBERG_API_BASIC_AUTH_USERNAME / _PASSWORD (pick a strong pair)
+#
+# Vercel env vars the route expects (Project Settings → Environment Variables):
+#   GOTENBERG_URL         = https://<your-render-service>.onrender.com
+#   GOTENBERG_BASIC_AUTH  = <username>:<password>   (same pair as below)
+
+services:
+  - type: web
+    name: iris-gotenberg
+    runtime: image
+    image:
+      url: docker.io/gotenberg/gotenberg:8
+    plan: starter # always-on (free tier was removed; Starter has no cold spin-down)
+    region: oregon
+    healthCheckPath: /health
+    # Enable basic auth so this isn't an open HTML→PDF proxy on the internet.
+    dockerCommand: gotenberg --api-port 3000 --api-enable-basic-auth
+    envVars:
+      - key: GOTENBERG_API_BASIC_AUTH_USERNAME
+        sync: false # set in the Render dashboard; do not commit
+      - key: GOTENBERG_API_BASIC_AUTH_PASSWORD
+        sync: false # set in the Render dashboard; do not commit

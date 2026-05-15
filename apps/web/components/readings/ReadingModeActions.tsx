@@ -10,7 +10,7 @@
  *   2. Entregar ao cliente — DeliverDialog → markReadingDelivered server action
  *   3. Regenerar análise — POST /api/readings/[id]/analyze + router.refresh
  *
- * Plan 19 will add a 4th button: Exportar PDF (server-side @react-pdf/renderer).
+ * 4th button: Exportar PDF (server-side via Gotenberg/Chromium — Plan 26).
  *
  * Hidden states:
  *   - isDelivered=true → ALL action buttons hidden; only a small status text

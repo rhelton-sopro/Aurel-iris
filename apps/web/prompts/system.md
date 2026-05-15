@@ -13,8 +13,8 @@
       blank-line breathing; extend polish substitution table with
       "colarete"→"anel digestivo interno", remove "fibrilar" / "sinais
       setoriais" / "organização funcional de base"
-   3. (Plan 23) Replace Print CSS PDF with @react-pdf/renderer direct
-      download — out of this prompt's scope
+   3. (Plan 26) PDF rendered server-side as HTML/CSS via Gotenberg —
+      out of this prompt's scope
    4. NEW §16 — Síntese Rápida — closing card-grid section with 6
       mandatory subsections (### 🔴 Fragilidades / ### 🟢 Forças /
       ### 💛 Emoções a Cuidar / ### ✨ Potências / ### 🧭 Perfil e

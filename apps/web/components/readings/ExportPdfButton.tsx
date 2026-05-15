@@ -1,11 +1,12 @@
 'use client'
 
 /**
- * ExportPdfButton — direct PDF download via @react-pdf/renderer (Plan 7.4-23).
+ * ExportPdfButton — direct PDF download (Plan 7.4-26: Gotenberg/Chromium).
  *
- * Founder approved @react-pdf/renderer install during UAT-4 — replaces
- * Plan 19's Print CSS approach (which opened browser print dialog) with a
- * direct file download.
+ * Engine-agnostic: this button only GETs /api/readings/[id]/pdf and downloads
+ * the returned blob. The route's renderer changed across plans (Print CSS →
+ * @react-pdf → Gotenberg) without touching this component. Still a direct file
+ * download — no browser print dialog.
  *
  * Click flow:
  *   1. fetch GET /api/readings/[id]/pdf
