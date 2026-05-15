@@ -153,20 +153,24 @@ const styles = StyleSheet.create({
   },
   paragraph: {
     marginBottom: 12,
+    maxWidth: '100%',
   },
   list: {
     marginBottom: 12,
     marginLeft: 12,
+    maxWidth: '100%',
   },
   listItem: {
     flexDirection: 'row',
     marginBottom: 4,
+    maxWidth: '100%',
   },
   listBullet: {
     width: 14,
   },
   listText: {
     flex: 1,
+    maxWidth: '100%',
   },
   blockquote: {
     marginVertical: 12,
@@ -196,6 +200,7 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
     borderRadius: 4,
     padding: 8,
+    maxWidth: '100%',
   },
   sinteseCardLabel: {
     fontFamily: 'Times-Bold',
@@ -227,19 +232,50 @@ function stripInlineFormatting(text: string): string {
 // line box. Mirrors the founder's sanitizeValue(v): |v| > 1e10 → exponential.
 const HUGE_NUMERIC_RUN_RE = /(?<![\w.])\d{15,}(?:\.\d+)?(?![\w.])/g
 
+// ROOT CAUSE of `unsupported number: 1.92e+21` (UAT-5b): the PDF uses
+// Times-Roman, a PDF Standard-14 AFM font. AFM fonts carry a width table for
+// WinAnsi codepoints only. ANY codepoint outside that table (emoji, pictographs,
+// variation selectors, ZWJ) has NO advance width → @react-pdf/textkit's line
+// layout produces a degenerate (astronomically large, deterministic) box and
+// throws. The §16 Síntese Rápida labels (🔴 🟢 💛 ✨ 🧭 🌱 — a FIXED set, hence
+// the EXACT same error number every render) are the primary offender; Sonnet
+// may also emit stray pictographs elsewhere. The web view is unaffected (system
+// emoji fonts). Times-Roman could never render these glyphs anyway, so stripping
+// is strictly an improvement, not a loss. This is independent of — and the
+// actual fix behind — the earlier digit/hyphenation hardening.
+const NON_RENDERABLE_RE =
+  /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{1F1E6}-\u{1F1FF}\u{FE00}-\u{FE0F}\u{200D}\u{20E3}\u{2190}-\u{21FF}\u{2300}-\u{23FF}]/gu
+
 function sanitizeNumber(v: number): string {
   return Number.isFinite(v) && Math.abs(v) > 1e10 ? v.toExponential(2) : String(v)
 }
 
-function sanitizeText(text: string): string {
-  return text.replace(HUGE_NUMERIC_RUN_RE, (run) => {
+// TEMPORARY diagnostic (Plan 24 round 2 — UAT-5b). Logs once per call when a
+// non-renderable codepoint is found, so the deployed server logs name exactly
+// what leaked even if a future codepoint slips past NON_RENDERABLE_RE. Remove
+// after UAT-5c confirms the PDF renders (founder cleanup follow-up).
+function sanitizeText(text: string, where = 'pdf-text'): string {
+  let out = text
+  const nonRenderable = out.match(NON_RENDERABLE_RE)
+  if (nonRenderable && nonRenderable.length > 0) {
+    console.warn(
+      `[pdf.sanitize] stripped ${nonRenderable.length} non-renderable codepoint(s) @ ${where}:`,
+      Array.from(new Set(nonRenderable)).map((c) => `U+${c.codePointAt(0)!.toString(16).toUpperCase()}`).join(' '),
+    )
+  }
+  out = out.replace(NON_RENDERABLE_RE, '')
+  out = out.replace(HUGE_NUMERIC_RUN_RE, (run) => {
     const n = Number(run)
     return Number.isFinite(n) && Math.abs(n) > 1e10 ? sanitizeNumber(n) : run
   })
+  // Collapse whitespace orphaned by stripped glyphs (e.g. "🔴 Fragilidades"
+  // → " Fragilidades" → "Fragilidades"). Safe: renderInlineText collapses
+  // \s+ anyway, and §16 labels are single-line.
+  return out.replace(/[ \t]{2,}/g, ' ').trim()
 }
 
-function renderInlineText(text: string): string {
-  return sanitizeText(stripInlineFormatting(text)).replace(/\s+/g, ' ').trim()
+function renderInlineText(text: string, where = 'pdf-text'): string {
+  return sanitizeText(stripInlineFormatting(text), where).replace(/\s+/g, ' ').trim()
 }
 
 function isBulletList(block: string): boolean {
@@ -277,7 +313,7 @@ function parseSinteseSubsections(body: string): ParsedSubsection[] {
   }))
 }
 
-function renderMarkdownBlocks(body: string): ReactNode[] {
+function renderMarkdownBlocks(body: string, where = 'pdf-body'): ReactNode[] {
   const blocks = body.split(/\n{2,}/).map((b) => b.trim()).filter(Boolean)
   return blocks.map((block, idx) => {
     if (isBulletList(block)) {
@@ -287,7 +323,7 @@ function renderMarkdownBlocks(body: string): ReactNode[] {
           {items.map((item, i) => (
             <View key={i} style={styles.listItem}>
               <Text style={styles.listBullet}>{`• `}</Text>
-              <Text style={styles.listText}>{renderInlineText(item)}</Text>
+              <Text style={styles.listText}>{renderInlineText(item, `${where} ul`)}</Text>
             </View>
           ))}
         </View>
@@ -300,7 +336,7 @@ function renderMarkdownBlocks(body: string): ReactNode[] {
           {items.map((item, i) => (
             <View key={i} style={styles.listItem}>
               <Text style={styles.listBullet}>{`${i + 1}. `}</Text>
-              <Text style={styles.listText}>{renderInlineText(item)}</Text>
+              <Text style={styles.listText}>{renderInlineText(item, `${where} ol`)}</Text>
             </View>
           ))}
         </View>
@@ -313,7 +349,7 @@ function renderMarkdownBlocks(body: string): ReactNode[] {
         .join(' ')
       return (
         <View key={idx} style={styles.blockquote}>
-          <Text>{renderInlineText(text)}</Text>
+          <Text>{renderInlineText(text, `${where} quote`)}</Text>
         </View>
       )
     }
@@ -321,7 +357,7 @@ function renderMarkdownBlocks(body: string): ReactNode[] {
     const paraText = block.replace(/\n/g, ' ')
     return (
       <Text key={idx} style={styles.paragraph}>
-        {renderInlineText(paraText)}
+        {renderInlineText(paraText, `${where} p`)}
       </Text>
     )
   })
@@ -357,7 +393,7 @@ export function ReportDocument({
   clientName,
   readingDate,
 }: ReportDocumentProps): ReactElement {
-  const safeClientName = sanitizeText(clientName)
+  const safeClientName = sanitizeText(clientName, 'clientName')
   const encerramento = sections['encerramento_disclaimer'] ?? ''
   const footerText = sanitizeText(
     encerramento
@@ -365,6 +401,7 @@ export function ReportDocument({
       .map((line) => line.replace(/^>\s?/, '').trim())
       .filter(Boolean)
       .join(' '),
+    'footer',
   )
 
   return (
@@ -416,14 +453,14 @@ export function ReportDocument({
                   {subsections.map((sub, sIdx) => (
                     <View key={sIdx} style={styles.sinteseCard} wrap={false}>
                       <View style={styles.sinteseCardInner}>
-                        <Text style={styles.sinteseCardLabel}>{sanitizeText(sub.label)}</Text>
-                        {renderMarkdownBlocks(sub.body)}
+                        <Text style={styles.sinteseCardLabel}>{sanitizeText(sub.label, `§16 ${sub.label.slice(0, 24)}`)}</Text>
+                        {renderMarkdownBlocks(sub.body, `§16/${sIdx}`)}
                       </View>
                     </View>
                   ))}
                 </View>
               ) : (
-                renderMarkdownBlocks(body)
+                renderMarkdownBlocks(body, `§${headingStr}`)
               )}
             </View>
           )
