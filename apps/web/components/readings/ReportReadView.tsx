@@ -160,7 +160,7 @@ export function ReportReadView({
                       <h3 className="mb-2 font-serif text-lg font-semibold">
                         {block.label}
                       </h3>
-                      <div className="prose prose-sm prose-neutral max-w-none font-serif leading-relaxed prose-p:my-2 prose-li:my-0.5">
+                      <div className="prose prose-sm prose-neutral max-w-none font-serif leading-relaxed prose-p:mb-4 prose-p:mt-0 prose-li:my-1">
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>
                           {block.body}
                         </ReactMarkdown>
@@ -169,7 +169,7 @@ export function ReportReadView({
                   ))}
                 </div>
               ) : (
-                <div className="prose prose-neutral max-w-none font-serif leading-relaxed prose-p:my-3 prose-li:my-1">
+                <div className="prose prose-neutral max-w-none font-serif leading-relaxed prose-p:mb-6 prose-p:mt-0 prose-li:my-1.5">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{body}</ReactMarkdown>
                 </div>
               )}

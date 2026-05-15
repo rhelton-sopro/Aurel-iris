@@ -38,8 +38,23 @@ import {
 
 // Ensure @react-pdf doesn't try to load Times via network/disk in serverless
 // environments — Times-Roman is the default built-in serif font and works
-// without registration. Explicit no-op here for clarity.
-Font.registerHyphenationCallback((word) => [word])
+// without registration.
+//
+// The callback also chunks any token longer than MAX_UNBREAKABLE_TOKEN. With
+// the previous `(word) => [word]` no token could ever break, so a single
+// pathologically long unbreakable run (e.g. a huge raw number the LLM leaks
+// into prose) would overflow @react-pdf's Yoga layout and crash with
+// `Got unsupported number: 1.92e+21`. Chunking guarantees a break opportunity
+// for any over-long run while leaving normal words untouched.
+const MAX_UNBREAKABLE_TOKEN = 32
+Font.registerHyphenationCallback((word) => {
+  if (word.length <= MAX_UNBREAKABLE_TOKEN) return [word]
+  const chunks: string[] = []
+  for (let i = 0; i < word.length; i += MAX_UNBREAKABLE_TOKEN) {
+    chunks.push(word.slice(i, i + MAX_UNBREAKABLE_TOKEN))
+  }
+  return chunks
+})
 
 // =============================================================================
 // Styles
@@ -127,7 +142,7 @@ const styles = StyleSheet.create({
   sectionHeading: {
     fontFamily: 'Times-Bold',
     fontSize: 16,
-    marginTop: 24,
+    marginTop: 20,
     marginBottom: 8,
   },
   sectionHeadingFirst: {
@@ -137,10 +152,10 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   paragraph: {
-    marginBottom: 8,
+    marginBottom: 12,
   },
   list: {
-    marginBottom: 8,
+    marginBottom: 12,
     marginLeft: 12,
   },
   listItem: {
@@ -154,7 +169,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   blockquote: {
-    marginVertical: 8,
+    marginVertical: 12,
     paddingLeft: 12,
     borderLeftWidth: 2,
     borderLeftColor: COLORS.border,
@@ -205,8 +220,26 @@ function stripInlineFormatting(text: string): string {
     .replace(/`([^`\n]+)`/g, '$1')
 }
 
+// A standalone run of 15+ digits (optionally with a decimal tail) — far beyond
+// any figure that legitimately belongs in a clinical-functional report. If one
+// leaks into the prose, react-pdf measures it as a single unbreakable token;
+// compact it to scientific shorthand so it reads sanely AND can't dominate the
+// line box. Mirrors the founder's sanitizeValue(v): |v| > 1e10 → exponential.
+const HUGE_NUMERIC_RUN_RE = /(?<![\w.])\d{15,}(?:\.\d+)?(?![\w.])/g
+
+function sanitizeNumber(v: number): string {
+  return Number.isFinite(v) && Math.abs(v) > 1e10 ? v.toExponential(2) : String(v)
+}
+
+function sanitizeText(text: string): string {
+  return text.replace(HUGE_NUMERIC_RUN_RE, (run) => {
+    const n = Number(run)
+    return Number.isFinite(n) && Math.abs(n) > 1e10 ? sanitizeNumber(n) : run
+  })
+}
+
 function renderInlineText(text: string): string {
-  return stripInlineFormatting(text).replace(/\s+/g, ' ').trim()
+  return sanitizeText(stripInlineFormatting(text)).replace(/\s+/g, ' ').trim()
 }
 
 function isBulletList(block: string): boolean {
@@ -324,16 +357,19 @@ export function ReportDocument({
   clientName,
   readingDate,
 }: ReportDocumentProps): ReactElement {
+  const safeClientName = sanitizeText(clientName)
   const encerramento = sections['encerramento_disclaimer'] ?? ''
-  const footerText = encerramento
-    .split('\n')
-    .map((line) => line.replace(/^>\s?/, '').trim())
-    .filter(Boolean)
-    .join(' ')
+  const footerText = sanitizeText(
+    encerramento
+      .split('\n')
+      .map((line) => line.replace(/^>\s?/, '').trim())
+      .filter(Boolean)
+      .join(' '),
+  )
 
   return (
     <Document
-      title={`Iris Codex — Leitura de ${clientName}`}
+      title={`Iris Codex — Leitura de ${safeClientName}`}
       author="Iris Codex"
       subject="Leitura iridológica clínico-funcional"
       creator="Iris Codex"
@@ -344,7 +380,7 @@ export function ReportDocument({
           pageNumber > 1 ? (
             <>
               <Text style={styles.pageHeaderBrand}>Iris Codex</Text>
-              <Text>{clientName}</Text>
+              <Text>{safeClientName}</Text>
             </>
           ) : null
         )} />
@@ -353,7 +389,7 @@ export function ReportDocument({
         <View style={styles.documentHeader}>
           <Text style={styles.brandMark}>Iris Codex</Text>
           <Text style={styles.brandTagline}>A íris como mapa do ser.</Text>
-          <Text style={styles.clientName}>{clientName}</Text>
+          <Text style={styles.clientName}>{safeClientName}</Text>
           {readingDate && (
             <Text style={styles.readingDate}>
               Leitura realizada em {formatDate(readingDate)}
@@ -380,7 +416,7 @@ export function ReportDocument({
                   {subsections.map((sub, sIdx) => (
                     <View key={sIdx} style={styles.sinteseCard} wrap={false}>
                       <View style={styles.sinteseCardInner}>
-                        <Text style={styles.sinteseCardLabel}>{sub.label}</Text>
+                        <Text style={styles.sinteseCardLabel}>{sanitizeText(sub.label)}</Text>
                         {renderMarkdownBlocks(sub.body)}
                       </View>
                     </View>
