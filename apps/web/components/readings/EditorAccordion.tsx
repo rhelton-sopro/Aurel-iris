@@ -42,6 +42,7 @@ export const SECTIONS: ReadonlyArray<{ key: string; number: string; title: strin
   { key: '12_roteiro_anamnese', number: '12', title: 'Roteiro de Anamnese' },
   { key: '13_sintese_integrativa', number: '13', title: 'Síntese Integrativa' },
   { key: '14_mensagem_cliente', number: '14', title: 'Mensagem para o Cliente' },
+  { key: '16_sintese_rapida', number: '16', title: 'Síntese Rápida' },
 ]
 
 export interface EditorAccordionProps {
@@ -87,7 +88,7 @@ export function EditorAccordion({
                   </span>
                 )}
                 <span className="flex items-center gap-2">
-                  §{s.number} — {s.title}
+                  {s.number}. {s.title}
                   {isEdited && (
                     <span className="text-sm font-normal text-muted-foreground">· editado</span>
                   )}

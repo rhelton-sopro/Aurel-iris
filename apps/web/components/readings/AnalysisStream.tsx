@@ -24,7 +24,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { NUMBERED_SECTION_HEADINGS } from '@/lib/anthropic/types'
 
-const TOTAL_SECTIONS = NUMBERED_SECTION_HEADINGS.length // 15
+const TOTAL_SECTIONS = NUMBERED_SECTION_HEADINGS.length // 16 (Plan 22 — added §16)
 
 const SECTION_TITLES: readonly string[] = [
   'Constituição e Temperamento',
@@ -42,6 +42,7 @@ const SECTION_TITLES: readonly string[] = [
   'Roteiro de Anamnese',
   'Síntese Integrativa',
   'Mensagem para o Cliente',
+  'Síntese Rápida',
 ]
 
 export interface AnalysisStreamProps {
