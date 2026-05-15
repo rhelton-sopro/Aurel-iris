@@ -37,7 +37,7 @@ describe('components/readings/ReadingModeActions (Plan 7.4-18 — UAT-3 reading-
     expect(screen.getByTestId('reading-mode-regenerate')).toBeDefined()
   })
 
-  it('Plan 19: ExportPdfButton link href = /leituras/[id]/print', () => {
+  it('Plan 23: ExportPdfButton renders as Button (no href — direct fetch + blob download)', () => {
     render(
       <ReadingModeActions
         readingId="reading-xyz"
@@ -47,7 +47,12 @@ describe('components/readings/ReadingModeActions (Plan 7.4-18 — UAT-3 reading-
       />,
     )
     const pdf = screen.getByTestId('reading-mode-export-pdf')
-    expect(pdf.getAttribute('href')).toBe('/leituras/reading-xyz/print')
+    // Plan 23 (UAT-4 fix #3): ExportPdfButton was a Link to /print under
+    // Plan 19; now it's a Button with onClick → fetch /api/readings/[id]/pdf
+    // → blob download. No href anymore.
+    expect(pdf.tagName.toLowerCase()).toBe('button')
+    expect(pdf.getAttribute('href')).toBeNull()
+    expect(pdf.textContent).toContain('Exportar PDF')
   })
 
   it('Editar análise links to /leituras/[id]/editar', () => {
