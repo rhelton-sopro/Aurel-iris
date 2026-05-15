@@ -32,6 +32,17 @@ HOUGH_DEFAULTS: dict = {
     "maxRadius": 200, # ~20% of 1024px
 }
 
+# Phase 7.4 iter-6a FIX 11 — ROOT CAUSE of "hough_segment_failed_fallback_
+# mediapipe" on 6/6 photos: HOUGH_DEFAULTS minRadius/maxRadius (80–200 px) are
+# explicitly calibrated for ~1024px-resized iris images (see comment above),
+# but iris_mask() ran HoughCircles on the FULL-RESOLUTION capture (no resize),
+# unlike detect.py which resizes to 1024 first. On a 4K photo the true iris
+# radius is far larger than 200 px, so HoughCircles returns None every time →
+# the D-F1 fallback (seed circle) fires on every image and segmentation never
+# refines the boundary. Fix: resize to ≤1024 before Hough (mirroring detect.py),
+# then scale the detected circle back to full-resolution coordinates.
+HOUGH_MAX_DIM = 1024
+
 
 def iris_mask(
     image: np.ndarray,
@@ -87,7 +98,23 @@ def iris_mask(
     _seg_color_mask = color_iris_mask(image)
     gray = cv2.bitwise_and(gray, gray, mask=_seg_color_mask)
 
-    gray_blur = cv2.medianBlur(gray, 5)
+    # --- FIX 11: resize to ≤1024 BEFORE Hough so HOUGH_DEFAULTS (calibrated
+    # for ~1024px) actually match the iris radius. detect.py already does
+    # this; iris_mask() did not, which is why Hough failed on every full-res
+    # capture. Coordinates are scaled back to full resolution afterwards.
+    long_edge = max(h, w)
+    if long_edge > HOUGH_MAX_DIM:
+        hough_scale = HOUGH_MAX_DIM / float(long_edge)
+        small = cv2.resize(
+            gray,
+            (int(round(w * hough_scale)), int(round(h * hough_scale))),
+            interpolation=cv2.INTER_AREA,
+        )
+    else:
+        hough_scale = 1.0
+        small = gray
+
+    gray_blur = cv2.medianBlur(small, 5)
 
     # --- HoughCircles call (RESEARCH Pattern 5) --------------------------------
     circles = cv2.HoughCircles(
@@ -101,9 +128,15 @@ def iris_mask(
         cx, cy, r = float(cx_seed), float(cy_seed), float(r_seed)
         if warnings is not None:
             warnings.append("hough_segment_failed_fallback_mediapipe")
+        print(
+            f"[segment] hough_no_circle img={w}x{h} scale={hough_scale:.3f} "
+            f"params={HOUGH_DEFAULTS} → fallback to seed "
+            f"({cx_seed:.0f},{cy_seed:.0f},r={r_seed:.0f})"
+        )
     else:
-        # circles shape: (1, N, 3) — extract candidate array (N, 3).
-        cands = circles[0]  # shape (N, 3): [[cx, cy, r], ...]
+        # circles shape: (1, N, 3) — extract candidate array (N, 3), scaled
+        # back to full-resolution coordinates.
+        cands = circles[0].astype(np.float64) / hough_scale  # (N, 3) full-res
 
         # Pitfall 7 guard: pick the circle closest to the MediaPipe seed, NOT circles[0][0].
         dists = np.sqrt(
@@ -111,6 +144,10 @@ def iris_mask(
         )
         best = int(np.argmin(dists))
         cx, cy, r = float(cands[best, 0]), float(cands[best, 1]), float(cands[best, 2])
+        print(
+            f"[segment] hough_ok img={w}x{h} scale={hough_scale:.3f} "
+            f"candidates={len(cands)} chosen=({cx:.0f},{cy:.0f},r={r:.0f})"
+        )
 
     # --- Build binary mask ---------------------------------------------------
     mask_u8 = np.zeros((h, w), dtype=np.uint8)

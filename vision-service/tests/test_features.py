@@ -392,3 +392,88 @@ def test_classify_constitution_sectoral_pigments_optional_default_none():
         {"score": 0.5, "interpretation": "esparsa"},
     )
     assert result["primary"] == "linfatica"
+
+
+# ---------------------------------------------------------------------------
+# iter-6a FIX 12 — real px→mm conversion + >4 mm sanity DROP gate
+# ---------------------------------------------------------------------------
+
+def _polar_with_dark_block(h, w, sector_idx, block_h, block_w):
+    """Mid-gray polar RGB with a black rectangle inside one sector's columns."""
+    img = np.full((h, w, 3), 128, dtype=np.uint8)
+    col_start = sector_idx * (w // 12)
+    img[0:block_h, col_start:col_start + block_w] = 0  # black → gray<60 → mask
+    return img
+
+
+def test_polar_area_to_mm_formula_and_cancels_iris_radius():
+    """size_mm ≈ 2·√(area/π)·6/H — physically plausible, never area/100."""
+    from pipeline.features import _polar_area_to_mm
+
+    # Old broken behavior would have been area/100 = 16.0 for area=1600.
+    mm = _polar_area_to_mm(1600.0, polar_height=64)
+    # 2*sqrt(1600/pi)=45.13; *6/64 = 4.23
+    assert 4.0 < mm < 4.5
+    assert mm != 16.0  # not the old area/100 sentinel
+    # Larger polar resolution → smaller mm (more rows per radius).
+    assert _polar_area_to_mm(1600.0, 256) < _polar_area_to_mm(1600.0, 64)
+    assert _polar_area_to_mm(100.0, 0) == float("inf")
+
+
+def test_detect_findings_drops_oversize_misseg_region():
+    """A huge dark region (>4 mm equiv) is DROPPED, never emitted to the LLM."""
+    from pipeline.features import _detect_findings_in_sector
+
+    img = _polar_with_dark_block(64, 360, sector_idx=0, block_h=64, block_w=30)
+    warns: list[str] = []
+    out = _detect_findings_in_sector(
+        img, 0, iris_radius_px=300.0, warnings=warns
+    )
+    assert out == []
+    assert any(w.startswith("findings_dropped_oversize_") for w in warns)
+
+
+def test_detect_findings_keeps_plausible_with_real_mm():
+    """A small blob is kept with a physically plausible size_mm (≤ 4, not area/100)."""
+    from pipeline.features import _detect_findings_in_sector, MAX_PLAUSIBLE_FINDING_MM
+
+    img = _polar_with_dark_block(64, 360, sector_idx=0, block_h=20, block_w=20)
+    out = _detect_findings_in_sector(img, 0, iris_radius_px=300.0, warnings=[])
+    assert len(out) == 1
+    f = out[0]
+    assert f["type"] == "lacuna"
+    assert 0.0 < f["size_mm"] <= MAX_PLAUSIBLE_FINDING_MM
+    # 400 px would have been "4.0 mm" under the old area/100; now it's ~2 mm.
+    assert f["size_mm"] < 3.0
+
+
+def test_detect_findings_dropped_when_no_iris_scale():
+    """Missing/invalid iris radius → drop findings + warn (no fabricated size)."""
+    from pipeline.features import _detect_findings_in_sector
+
+    img = _polar_with_dark_block(64, 360, sector_idx=0, block_h=20, block_w=20)
+    warns: list[str] = []
+    assert _detect_findings_in_sector(img, 0, iris_radius_px=None, warnings=warns) == []
+    assert any(w.startswith("findings_dropped_no_iris_scale_") for w in warns)
+    warns2: list[str] = []
+    assert _detect_findings_in_sector(img, 0, iris_radius_px=0.0, warnings=warns2) == []
+    assert any(w.startswith("findings_dropped_no_iris_scale_") for w in warns2)
+
+
+def test_no_finding_exceeds_sanity_gate_regression():
+    """iter-6a gate: across a full noisy + blocky polar image, NO emitted
+    finding may exceed MAX_PLAUSIBLE_FINDING_MM (the impossible 13–16 mm
+    Nailli values can never recur)."""
+    from pipeline.features import _detect_findings_in_sector, MAX_PLAUSIBLE_FINDING_MM
+
+    rng = np.random.default_rng(7)
+    img = np.full((96, 480, 3), 128, dtype=np.uint8)
+    # scatter dark blocks of varied sizes across several sectors
+    for s in range(12):
+        cs = s * (480 // 12)
+        bh = int(rng.integers(5, 90))
+        bw = int(rng.integers(3, 38))
+        img[0:bh, cs:cs + bw] = 0
+    for s in range(12):
+        for f in _detect_findings_in_sector(img, s, iris_radius_px=320.0, warnings=[]):
+            assert f["size_mm"] <= MAX_PLAUSIBLE_FINDING_MM

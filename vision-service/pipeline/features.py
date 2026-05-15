@@ -44,6 +44,19 @@ LACUNA_DARK_THRESHOLD: int = 60
 LACUNA_MIN_AREA: int = 30
 """Minimum connected-component area (pixels) to qualify as a lacuna."""
 
+IRIS_DIAMETER_MM: float = 12.0
+"""Anatomical human iris diameter (classic iridology reference scale).
+iter-6a FIX 12: the px→mm conversion never existed — `_detect_findings_in_
+sector` returned `size_mm = area_px / 100`, so a 1653-px blob reported
+"16.53 mm" (larger than the whole 12 mm iris). Real conversion derives the
+scale from the iris geometry instead."""
+
+MAX_PLAUSIBLE_FINDING_MM: float = 4.0
+"""iter-6a FIX 12 hard sanity gate. The largest physiologically plausible
+discrete iridological structure (major lacuna / large pigment spot) is
+~3 mm; >4 mm is almost always a mis-segmented whole region; >12 mm is
+physically impossible. Policy: log + DROP (never pass to the LLM)."""
+
 FIBER_DENSITY_BANDS: tuple[float, float, float] = (0.4, 0.65, 0.85)
 """Score boundaries for esparsa | media | media-densa | densa buckets."""
 
@@ -193,20 +206,84 @@ def classify_iris_color(
 # Private helpers
 # ---------------------------------------------------------------------------
 
+def _polar_area_to_mm(area_px: float, polar_height: int) -> float:
+    """iter-6a FIX 12 — convert a connected-component area (polar pixels) to an
+    approximate physical diameter in mm.
+
+    Model (documented V1 approximation): the polar-unwrapped image's H rows
+    span the iris RADIUS, so 1 polar row ≈ iris_radius_px / H cartesian px.
+    A blob's equivalent diameter is 2·√(area/π) polar px. Mapping through the
+    radial scale and the iris≈12 mm reference, the iris_radius_px term
+    cancels analytically, leaving a stable estimate that depends only on the
+    polar radial resolution:
+
+        size_mm ≈ 2·√(area/π) · (IRIS_DIAMETER_MM / 2) / H
+
+    The radial (not angular) scale is used deliberately — it is the
+    conservative axis; the angular scale is what produced the absurd 13–16 mm
+    values in the Nailli reading.
+    """
+    if polar_height <= 0:
+        return float("inf")
+    equiv_diam_polar_px = 2.0 * float(np.sqrt(area_px / np.pi))
+    return equiv_diam_polar_px * (IRIS_DIAMETER_MM / 2.0) / float(polar_height)
+
+
 def _detect_findings_in_sector(
     enhanced_polar: np.ndarray,
     sector_idx: int,
+    *,
+    iris_radius_px: Optional[float] = None,
+    warnings: Optional[list[str]] = None,
 ) -> list[dict]:
     """Detect lacunas in a single sector of the polar-unwrapped iris image.
+
+    iter-6a FIX 12: real px→mm conversion + hard sanity gate. A finding whose
+    estimated diameter exceeds MAX_PLAUSIBLE_FINDING_MM (4 mm) is logged and
+    DROPPED — it is a mis-segmented region, not a discrete structure, and
+    must never reach the LLM. When the upstream iris circle is missing/invalid
+    the segmentation itself is untrustworthy, so findings are dropped rather
+    than emitted with a fabricated size (returning a silent default is the
+    worst possible behavior — it gaslights every downstream consumer).
 
     Args:
         enhanced_polar: RGB uint8 polar image (H x W x 3).
         sector_idx: 0-based sector index (0..11).
+        iris_radius_px: segmented iris radius (px). Validity signal — when
+            falsy/non-finite the sector's findings are dropped.
+        warnings: optional orchestrator sink; one summary token is appended
+            per sector when findings are dropped.
 
     Returns:
         List of finding dicts (may be empty).
     """
     H, W = enhanced_polar.shape[:2]
+
+    # Drop-when-no-scale: an absent/invalid iris circle means segmentation
+    # failed; emitting findings with a guessed size is worse than emitting none.
+    if not (
+        iris_radius_px is not None
+        and np.isfinite(iris_radius_px)
+        and iris_radius_px > 0
+    ):
+        col_start = sector_idx * (W // 12)
+        col_end = (sector_idx + 1) * (W // 12)
+        sector_slice = enhanced_polar[:, col_start:col_end]
+        gray = cv2.cvtColor(sector_slice, cv2.COLOR_RGB2GRAY)
+        mask = (gray < LACUNA_DARK_THRESHOLD).astype(np.uint8)
+        num, _, stats, _ = cv2.connectedComponentsWithStats(mask, connectivity=8)
+        candidate = sum(
+            1 for i in range(1, num) if int(stats[i, cv2.CC_STAT_AREA]) >= LACUNA_MIN_AREA
+        )
+        if candidate > 0:
+            print(
+                f"[features] sector {sector_idx + 1}: dropped {candidate} finding(s) "
+                f"— no valid iris scale (iris_radius_px={iris_radius_px})"
+            )
+            if warnings is not None:
+                warnings.append(f"findings_dropped_no_iris_scale_sector_{sector_idx + 1}")
+        return []
+
     col_start = sector_idx * (W // 12)
     col_end = (sector_idx + 1) * (W // 12)
     sector_slice = enhanced_polar[:, col_start:col_end]
@@ -217,14 +294,29 @@ def _detect_findings_in_sector(
     num, _, stats, _ = cv2.connectedComponentsWithStats(mask, connectivity=8)
 
     findings: list[dict] = []
+    dropped_oversize = 0
     for i in range(1, num):  # skip label 0 (background)
         area = int(stats[i, cv2.CC_STAT_AREA])
-        if area >= LACUNA_MIN_AREA:
-            findings.append({
-                "type": "lacuna",
-                "depth": "grau_1",
-                "size_mm": float(area / 100.0),
-            })
+        if area < LACUNA_MIN_AREA:
+            continue
+        size_mm = _polar_area_to_mm(area, H)
+        if size_mm > MAX_PLAUSIBLE_FINDING_MM:
+            dropped_oversize += 1
+            print(
+                f"[features] sector {sector_idx + 1}: DROP finding "
+                f"area={area}px size_mm={size_mm:.2f} > {MAX_PLAUSIBLE_FINDING_MM}mm "
+                f"(mis-segmented region, not a discrete structure)"
+            )
+            continue
+        findings.append({
+            "type": "lacuna",
+            "depth": "grau_1",
+            "size_mm": round(size_mm, 3),
+        })
+    if dropped_oversize > 0 and warnings is not None:
+        warnings.append(
+            f"findings_dropped_oversize_{dropped_oversize}_sector_{sector_idx + 1}"
+        )
     return findings
 
 
@@ -462,10 +554,25 @@ def extract_all(
         iris_color, fiber_density, sectoral_pigments=sectoral_pigments
     )
 
+    # iter-6a FIX 12: thread the segmented iris radius so findings get a real
+    # mm scale + the >4 mm sanity drop. iris_circle is (cx, cy, r) or None.
+    _iris_circle = composite_image.get("iris_circle")
+    _iris_radius_px: Optional[float] = None
+    if _iris_circle is not None:
+        try:
+            _iris_radius_px = float(_iris_circle[2])
+        except (TypeError, ValueError, IndexError):
+            _iris_radius_px = None
+
     sectors = []
     for hour in range(1, 13):
         zones = list(jensen_map[eye][str(hour)])
-        findings = _detect_findings_in_sector(enhanced_image, hour - 1)
+        findings = _detect_findings_in_sector(
+            enhanced_image,
+            hour - 1,
+            iris_radius_px=_iris_radius_px,
+            warnings=warnings,
+        )
         sectors.append({
             "hour": hour,
             "zones": zones,
