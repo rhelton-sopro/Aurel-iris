@@ -46,10 +46,22 @@ export type ReportSectionKey =
   | '13_sintese_integrativa'
   | '14_mensagem_cliente'
   | '15_sintese_rapida'
+  | 'essence_phrase'
   | 'encerramento_disclaimer'
 
 /** Numeric-prefixed keys only ('1'..'15'). Used by section-boundary parser. */
-export type NumberedSectionKey = Exclude<ReportSectionKey, 'encerramento_disclaimer'>
+export type NumberedSectionKey = Exclude<
+  ReportSectionKey,
+  'encerramento_disclaimer' | 'essence_phrase'
+>
+
+/**
+ * Marker heading the LLM emits ONCE, before §1, carrying the "essence phrase"
+ * (Plan 7.4-28 CHANGE 5 — the "Em uma palavra" page). It is intentionally NOT
+ * a numbered boundary (no digit), so `findAllBoundaries` ignores it and
+ * monotonicity is unaffected; `extractEssencePhrase` pulls it separately.
+ */
+export const ESSENCE_PHRASE_HEADING = 'Em uma palavra'
 
 /**
  * Ordered heading-number strings for the 15 numbered sections, in canonical

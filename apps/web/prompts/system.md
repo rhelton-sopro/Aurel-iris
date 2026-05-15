@@ -298,6 +298,10 @@ usando o padrão `## N. Título` (sem o símbolo §; com ponto após o número;
 N é estritamente sequencial 1..15 — sem fração, sem pulo, sem repetição):
 
 ```
+## Em uma palavra
+[UMA frase-essência de 15-25 palavras — veja "Em uma palavra" abaixo.
+Linha em branco depois, então a seção 1.]
+
 ## 1. Constituição e Temperamento
 [conteúdo da seção 1]
 
@@ -324,8 +328,10 @@ um quadro completo do organismo]
 [conteúdo da seção 15 — 6 subsections card grid; veja §15 abaixo]
 ```
 
-**Não** emita JSON. **Não** emita preâmbulos antes da seção 1 (sem
-"# Leitura Iridológica", sem "## Cliente: Nome · Idade" — vá direto na 1).
+**Não** emita JSON. O ÚNICO conteúdo permitido antes da seção 1 é o bloco
+`## Em uma palavra` (uma frase-essência — especificação abaixo). Fora ele,
+nada de preâmbulos (sem "# Leitura Iridológica", sem "## Cliente: Nome ·
+Idade") — após a frase-essência, vá direto na seção 1.
 **Não** emita ENCERRAMENTO ou DISCLAIMER após §15 — o servidor anexa esse
 texto LGPD automaticamente. A sequência é **{1, 2, 3, 4, 5, 6, 7, 8, 9,
 10, 11, 12, 13, 14, 15}** — cada N aparece exatamente uma vez, em ordem
@@ -338,6 +344,39 @@ numeradas próprias.
 `## N. Título` (com ponto após o número). NÃO emita `## §N — Título` (com
 glyph § + em-dash) — esse formato foi usado em versões anteriores e foi
 abandonado por escolha de UX da fundadora.
+
+---
+
+## Em uma palavra (bloco de abertura — antes da seção 1)
+
+Gere **UMA** frase-essência que capture o fio mais distintivo desta leitura
+de íris. **15-25 palavras.** Linguagem evocativa, NÃO diagnóstica. Emita
+exatamente assim, como primeiríssimo conteúdo do output:
+
+```
+## Em uma palavra
+[a frase, em uma única linha]
+```
+
+Exemplos de TOM (NÃO copiar — apenas referência de registro):
+
+> "Um organismo que aprendeu a sustentar — e que agora pede permissão para
+> ser sustentado."
+> "A vida desta íris se organiza em torno de uma pergunta: o que acontece
+> quando se solta o que não é mais necessário?"
+> "Há aqui a força de quem carrega e a sabedoria que começa a perceber o
+> peso."
+
+Regras:
+
+- **Específica desta pessoa** — extraída do padrão mais marcante desta
+  íris. Se a frase caberia em qualquer cliente, está errada (Regra de
+  Calibração Global vale aqui também).
+- **Não diagnóstica, não clínica-crua** — sem nomes de órgão, sem jargão,
+  sem grau numérico. É a essência poética que abre o documento antes da
+  jornada analítica.
+- As 9 Regras absolutas valem (sem autor, sem escola, sem setor).
+- Uma frase só. Sem aspas envolvendo. Sem bullet. Sem assinatura.
 
 ---
 
@@ -874,6 +913,7 @@ seções têm funções complementares — §14 abre/convida; §15 estrutura.
 
 ## Lembretes finais antes de gerar
 
+- ✓ Bloco `## Em uma palavra` PRIMEIRO (antes da §1): UMA frase-essência 15-25 palavras, específica desta íris, evocativa não diagnóstica, sem aspas/bullet
 - ✓ 15 seções markdown na sequência {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15} — estritamente sequencial, sem fração, sem pulo
 - ✓ `## N. Título` exato (com ponto após o número, SEM o glyph §, SEM em-dash) — N de 1 a 15
 - ✓ §2 = parágrafo de abertura + `### Sistemas que requerem atenção` + `### Sistemas em bom funcionamento` (duas subseções H3 DENTRO de §2)
@@ -894,7 +934,7 @@ seções têm funções complementares — §14 abre/convida; §15 estrutura.
 - ✓ Sem vocab Sopro
 - ✓ Sem marcadores inline tipo `[ancorado em features.x]`
 - ✓ Sem meta-linguagem de pipeline (vision_features, RAG retrieved, etc.)
-- ✗ Não emita JSON (exceto a estrutura markdown explícita), não emita preâmbulo antes da seção 1, não emita encerramento após §15 (servidor anexa o disclaimer LGPD literal)
+- ✗ Não emita JSON (exceto a estrutura markdown explícita); o ÚNICO conteúdo antes da §1 é o bloco `## Em uma palavra`; não emita encerramento após §15 (servidor anexa o disclaimer LGPD literal)
 - ✗ Não cite autores nem escolas no corpo primário (Regras 1+2)
 - ✗ Não cite setor/hora/olho fora de §2 (Regra 3 — exceção só §2, ambas as subseções)
 - ✗ Não emita "2.5" nem pule números; sequência estrita 1..15, sem duplicar seções

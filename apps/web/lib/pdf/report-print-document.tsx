@@ -1,27 +1,32 @@
 /**
- * ReportPrintDocument — server-rendered HTML for the Iris Codex report,
- * converted to PDF by Gotenberg (headless Chromium) on Render.
+ * Iris Codex report → PDF (Gotenberg / headless Chromium on Render).
  *
- * Plan 7.4-26 introduced the HTML/CSS→Gotenberg architecture; Plan 7.4-27
- * (iter-3) is the major restructure + polish:
- *   - 15 strictly-sequential sections (§2.5 collapsed into §2; Síntese §16→§15)
- *   - LIGHT cover (ivory + light-bg logo)
- *   - single-line heading "N — Title" + teal rule (no "SEÇÃO" eyebrow)
- *   - Índice (TOC) page after the cover
- *   - footer without the cream plinth (transparent + teal hairline)
- *   - §2 renders an opening paragraph + two `###` subsections (the LLM emits
- *     "Sistemas que requerem atenção" / "Sistemas em bom funcionamento")
- *   - §15 Síntese Rápida = premium tinted dashboard cards
+ * Plan 7.4-28 (UAT iter-4) — SPLIT architecture:
+ *   The cover must stay full-bleed with NO running header, while every other
+ *   page carries a horizontal-logo header. Chromium print headers apply to
+ *   ALL pages with no per-page skip, so the route renders TWO PDFs and merges:
+ *     1. COVER  — renderCoverHtml  → its own PDF, zero margins, no header/footer
+ *     2. BODY   — renderBodyHtml   → Índice + "Em uma palavra" + §1..§15 +
+ *                disclaimer, with the Gotenberg header.html (horizontal logo +
+ *                client + p.N/total) and a slim footer band
+ *   The two are concatenated via Gotenberg /forms/pdfengines/merge. Page
+ *   numbers in the header therefore count BODY pages — "p. 1" is the Índice
+ *   (the cover is page 1 of the final doc but excluded from the count, which
+ *   reads correctly as "first content page").
  *
- * Layout model: Gotenberg margins top/L/R = 0 (cover bleeds), bottom ≈ 0.45in
- * for the per-page footer band. react-markdown renders bodies; all styling is
- * PRINT_CSS (our own document — no `prose` dependency).
+ * iter-4 changes implemented here:
+ *   1. Horizontal-logo running header on every internal page (renderHeaderHtml)
+ *   2. Cover background pure white (#FFFFFF)
+ *   3. Breathing room — header band reserves ~28px below its teal rule; section
+ *      gap 48px; first section on the first content page starts flush
+ *   4. TOC keeps dotted leaders + a navigation footnote; clickable bookmark
+ *      tree comes from Gotenberg generateDocumentOutline (set in the route)
+ *   5. "Em uma palavra" page between Índice and §1 (essence_phrase)
  *
- * TOC limitation: Chromium/Gotenberg cannot resolve "section → page N" at
- * render time (no CSS target-counter; that needs Prince or a 2-pass). The
- * Índice therefore lists number + title + dotted leader WITHOUT page numbers.
+ * Design tokens (colors / fonts / §15 palette) are shared with the web
+ * reading view via lib/design/report-tokens — the two surfaces must match.
  *
- * Phase 7.4 | Plan 07.4-27 | Engine: Gotenberg/Chromium on Render
+ * Phase 7.4 | Plan 07.4-28 | Engine: Gotenberg/Chromium on Render
  */
 import 'server-only'
 import ReactMarkdown from 'react-markdown'
@@ -32,23 +37,20 @@ import {
   SECTION_KEY_BY_NUMBER,
   SECTION_TITLE_BY_NUMBER,
 } from '@/lib/anthropic/types'
-import { IRIS_CODEX_LOGO_LIGHT_DATA_URI } from './logo-assets'
+import {
+  REPORT_COLORS,
+  REPORT_FONTS,
+  SINTESE_CARD_PALETTE,
+} from '@/lib/design/report-tokens'
+import {
+  IRIS_CODEX_LOGO_LIGHT_DATA_URI,
+  IRIS_CODEX_LOGO_HORIZONTAL_DATA_URI,
+} from './logo-assets'
 
 const STRIP_LEADING_HEADING_RE =
   /^[ \t]*#{2,3}[ \t]+§?[ \t]*\d{1,2}(?:\.\d)?[ \t]*[\p{Pd}.][^\n]*\n+/u
 
 const SUBSECTION_SPLIT_RE = /^###\s+(.+)$/gm
-
-// §15 card accent + 4%-tint background, in subsection order
-// (Fragilidades / Forças / Emoções a Cuidar / Potências / Perfil / Aptidões).
-const SINTESE_CARD = [
-  { accent: '#C0392B', bg: '#FBF4F3' },
-  { accent: '#3D9B8C', bg: '#F2F8F6' },
-  { accent: '#C8920A', bg: '#FBF6E8' },
-  { accent: '#5BBFB0', bg: '#EFF8F5' },
-  { accent: '#1E6B61', bg: '#EEF3F1' },
-  { accent: '#555555', bg: '#F4F4F2' },
-]
 
 interface ParsedSubsection {
   label: string
@@ -82,33 +84,38 @@ function formatDate(iso: string | null): string {
   }
 }
 
+function htmlEscape(s: string): string {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+
+const C = REPORT_COLORS
+
 const PRINT_CSS = `
   :root {
-    --teal:#3D9B8C; --teal-light:#5BBFB0; --teal-dark:#1E6B61;
-    --ivory:#F2EDE4; --mist:#7A7A7A; --ink:#1E1E1E; --white:#FFFFFF;
+    --teal:${C.teal}; --teal-light:${C.tealLight}; --teal-dark:${C.tealDark};
+    --ivory:${C.ivory}; --mist:${C.mist}; --ink:${C.ink}; --white:${C.white};
+    --card-border:${C.cardBorder};
   }
   *, *::before, *::after { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; background: var(--white); }
   body {
-    font-family: Georgia, "Times New Roman", "Liberation Serif", serif;
+    font-family: ${REPORT_FONTS.serif};
     color: var(--ink);
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
 
-  /* ---- Cover (page 1, full bleed, ivory) ---- */
+  /* ---- Cover (its own PDF — full bleed, pure white, no header) ---- */
   .cover {
     position: relative;
-    height: 280mm;
-    background: var(--ivory);
+    height: 297mm;
+    background: var(--white);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
     padding: 0 28mm;
-    break-after: page;
-    page-break-after: always;
   }
   .cover-logo { width: 220px; height: auto; display: block; margin: 0 auto 30px; }
   .cover-tagline {
@@ -152,10 +159,10 @@ const PRINT_CSS = `
     text-transform: uppercase;
   }
 
-  /* ---- Índice (page 2) ---- */
+  /* ---- Índice ---- */
   .toc {
     background: var(--white);
-    padding: 28mm 60px;
+    padding: 8mm 60px 28mm;
     break-after: page;
     page-break-after: always;
   }
@@ -175,12 +182,62 @@ const PRINT_CSS = `
   .toc-num { width: 32px; color: var(--teal); font-size: 11pt; }
   .toc-name { color: var(--ink); font-size: 12pt; }
   .toc-leader { flex: 1; border-bottom: 1px dotted #C0C0C0; margin: 0 8px 4px; }
+  .toc-foot {
+    margin-top: 34px;
+    padding-top: 14px;
+    border-top: 1px solid #E4E4E4;
+    font-size: 9pt;
+    font-style: italic;
+    color: var(--mist);
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  /* ---- "Em uma palavra" page ---- */
+  .essence-page {
+    background: var(--white);
+    min-height: 232mm;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 8mm 26mm 28mm;
+    break-after: page;
+    page-break-after: always;
+  }
+  .essence-label {
+    color: var(--teal);
+    font-size: 9pt;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    margin: 0;
+  }
+  .essence-phrase {
+    font-style: italic;
+    font-size: 22pt;
+    color: var(--ink);
+    line-height: 1.5;
+    max-width: 480px;
+    margin: 32px auto 0;
+  }
+  .essence-divider {
+    width: 80px; height: 0;
+    border-top: 1px solid var(--teal);
+    margin: 40px auto 0;
+  }
+  .essence-foot {
+    color: var(--mist);
+    font-style: italic;
+    font-size: 10pt;
+    margin: 20px 0 0;
+  }
 
   /* ---- Content pages ---- */
   .content { padding: 0 18mm 14mm; background: var(--white); }
   section.report-section { break-inside: auto; }
   h2.sec-title {
-    font-family: Georgia, serif;
+    font-family: ${REPORT_FONTS.serif};
     font-size: 22pt;
     font-weight: 700;
     color: var(--ink);
@@ -189,7 +246,7 @@ const PRINT_CSS = `
     break-after: avoid;
     page-break-after: avoid;
   }
-  section.report-section:first-of-type h2.sec-title { margin-top: 24px; }
+  section.report-section:first-of-type h2.sec-title { margin-top: 0; }
   h2.sec-title .sec-num { color: var(--teal); }
   h2.sec-title .sec-dash { font-weight: 400; }
   .sec-rule {
@@ -199,14 +256,13 @@ const PRINT_CSS = `
     margin: 10px 0 20px;
   }
 
-  .section-body { font-size: 11pt; line-height: 1.9; color: #2A2A2A; }
+  .section-body { font-size: 11pt; line-height: 1.9; color: ${C.body}; }
   .section-body p { margin: 0 0 16px; }
   .section-body p:last-child { margin-bottom: 0; }
   .section-body ul, .section-body ol { margin: 0 0 16px; padding-left: 22px; }
   .section-body li { margin: 0 0 9px; }
   .section-body strong { font-weight: 700; color: var(--ink); }
   .section-body em { font-style: italic; }
-  /* §2 (and any) subsection subtitles emitted as markdown ### */
   .section-body h3 {
     font-size: 13pt;
     font-weight: 700;
@@ -214,7 +270,6 @@ const PRINT_CSS = `
     color: var(--teal);
     margin: 20px 0 12px;
   }
-  /* Pull quote — strongest statements (markdown blockquotes). */
   .section-body blockquote {
     margin: 22px 0;
     padding: 2px 0 2px 22px;
@@ -249,7 +304,7 @@ const PRINT_CSS = `
     margin-top: 4px;
   }
   .sintese-card {
-    border: 1px solid #E8E0D4;
+    border: 1px solid var(--card-border);
     border-left-width: 4px;
     border-radius: 10px;
     padding: 22px;
@@ -265,7 +320,7 @@ const PRINT_CSS = `
     margin: 0 0 10px;
     padding-bottom: 10px;
   }
-  .sintese-card .sintese-body { font-size: 10.5pt; line-height: 1.7; color: #2A2A2A; }
+  .sintese-card .sintese-body { font-size: 10.5pt; line-height: 1.7; color: ${C.body}; }
   .sintese-card .sintese-body p { margin: 0 0 8px; }
   .sintese-card .sintese-body p:last-child { margin-bottom: 0; }
   .sintese-card .sintese-body ul,
@@ -304,166 +359,206 @@ export interface ReportPrintDocumentProps {
   readingDate: string | null
 }
 
-function ReportPrintDocument({
-  sections,
-  clientName,
-  readingDate,
-}: ReportPrintDocumentProps) {
-  const encerramento = sections['encerramento_disclaimer']
-  const present = NUMBERED_SECTION_HEADINGS.filter((h) => {
-    const raw = sections[SECTION_KEY_BY_NUMBER[h]]
-    return raw && raw.trim().length > 0
-  })
+function htmlDoc(title: string, bodyInner: string): string {
   return (
-    <html lang="pt-BR">
-      {/* Standalone Gotenberg doc — a real <head> is required, not next/head. */}
-      {/* eslint-disable-next-line @next/next/no-head-element */}
-      <head>
-        <meta charSet="utf-8" />
-        <title>{`Iris Codex — Leitura de ${clientName}`}</title>
-        <style dangerouslySetInnerHTML={{ __html: PRINT_CSS }} />
-      </head>
-      <body>
-        {/* Cover */}
-        <div className="cover">
-          {/* Standalone Gotenberg doc — next/image would inject the Next runtime. */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            className="cover-logo"
-            src={IRIS_CODEX_LOGO_LIGHT_DATA_URI}
-            alt="Iris Codex"
-          />
-          <div className="cover-tagline">A íris como mapa do ser.</div>
-          <div className="cover-divider" />
-          <div className="cover-label">Leitura Iridológica Clínico-Funcional</div>
-          <div className="cover-name">{clientName}</div>
-          {readingDate && <div className="cover-date">{formatDate(readingDate)}</div>}
-          <div className="cover-wordmark">Iris Codex</div>
-        </div>
-
-        {/* Índice */}
-        <div className="toc">
-          <div className="toc-title">Índice</div>
-          <div className="toc-rule" />
-          {present.map((h) => (
-            <div className="toc-row" key={h}>
-              <span className="toc-num">{h}</span>
-              <span className="toc-name">{SECTION_TITLE_BY_NUMBER[h]}</span>
-              <span className="toc-leader" />
-            </div>
-          ))}
-        </div>
-
-        {/* Sections */}
-        <div className="content">
-          {NUMBERED_SECTION_HEADINGS.map((headingStr) => {
-            const key = SECTION_KEY_BY_NUMBER[headingStr]
-            const raw = sections[key]
-            if (!raw || raw.trim().length === 0) return null
-            const body = raw.replace(STRIP_LEADING_HEADING_RE, '')
-            const title = SECTION_TITLE_BY_NUMBER[headingStr]
-            const isSintese = headingStr === '15'
-            const isLetter = headingStr === '14'
-            const subs = isSintese ? parseSubsections(body) : []
-            return (
-              <section
-                className={`report-section${isLetter ? ' letter' : ''}`}
-                key={key}
-              >
-                <h2 className="sec-title">
-                  <span className="sec-num">{headingStr}</span>
-                  <span className="sec-dash"> — </span>
-                  {title}
-                </h2>
-                <hr className="sec-rule" />
-                {isSintese && subs.length > 0 ? (
-                  <div className="sintese-grid">
-                    {subs.map((sub, i) => {
-                      const c = SINTESE_CARD[i % SINTESE_CARD.length]!
-                      return (
-                        <div
-                          className="sintese-card"
-                          key={`${sub.label}-${i}`}
-                          style={{ backgroundColor: c.bg, borderLeftColor: c.accent }}
-                        >
-                          <h3
-                            style={{
-                              color: c.accent,
-                              borderBottom: `1px solid ${c.accent}4D`,
-                            }}
-                          >
-                            {sub.label}
-                          </h3>
-                          <div className="sintese-body">
-                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                              {sub.body}
-                            </ReactMarkdown>
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                ) : isLetter ? (
-                  <div className="letter-body">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{body}</ReactMarkdown>
-                  </div>
-                ) : (
-                  <div className="section-body">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{body}</ReactMarkdown>
-                  </div>
-                )}
-              </section>
-            )
-          })}
-
-          {encerramento && encerramento.trim().length > 0 && (
-            <div className="disclaimer">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{encerramento}</ReactMarkdown>
-            </div>
-          )}
-        </div>
-      </body>
-    </html>
+    `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8">` +
+    `<title>${htmlEscape(title)}</title>` +
+    `<style>${PRINT_CSS}</style></head><body>${bodyInner}</body></html>`
   )
 }
 
 /**
- * Full standalone HTML document string for Gotenberg's `index.html`.
- * `react-dom/server` is dynamically imported — Next.js App Router hard-bans
- * the static import (assumes client-bundling).
+ * COVER — its own standalone PDF (the route renders it with zero margins and
+ * NO header/footer so it bleeds and carries no running header).
  */
-export async function renderReportPrintHtml(
-  props: ReportPrintDocumentProps,
-): Promise<string> {
-  const { renderToStaticMarkup } = await import('react-dom/server')
-  return `<!DOCTYPE html>${renderToStaticMarkup(<ReportPrintDocument {...props} />)}`
+export function renderCoverHtml(props: ReportPrintDocumentProps): string {
+  const { clientName, readingDate } = props
+  const date = readingDate ? formatDate(readingDate) : ''
+  const cover =
+    `<div class="cover">` +
+    `<img class="cover-logo" src="${IRIS_CODEX_LOGO_LIGHT_DATA_URI}" alt="Iris Codex">` +
+    `<div class="cover-tagline">A íris como mapa do ser.</div>` +
+    `<div class="cover-divider"></div>` +
+    `<div class="cover-label">Leitura Iridológica Clínico-Funcional</div>` +
+    `<div class="cover-name">${htmlEscape(clientName)}</div>` +
+    (date ? `<div class="cover-date">${htmlEscape(date)}</div>` : '') +
+    `<div class="cover-wordmark">Iris Codex</div>` +
+    `</div>`
+  return htmlDoc(`Iris Codex — Leitura de ${clientName}`, cover)
 }
 
 /**
- * Gotenberg `footer.html` — a COMPLETE html doc rendered in the reserved
- * bottom band on every page (Chromium injects `.pageNumber`/`.totalPages`).
- * No background plinth (Plan 27): transparent, a single teal hairline on top.
+ * BODY — Índice + "Em uma palavra" + §1..§15 + disclaimer. Rendered with the
+ * Gotenberg header.html / footer.html bands (page numbers count these pages).
+ * `react-dom/server` is dynamically imported — Next App Router hard-bans the
+ * static import (assumes client bundling).
+ */
+export async function renderBodyHtml(
+  props: ReportPrintDocumentProps,
+): Promise<string> {
+  const { renderToStaticMarkup } = await import('react-dom/server')
+  const { sections, clientName } = props
+  const encerramento = sections['encerramento_disclaimer']
+  const essence = sections['essence_phrase']?.trim()
+  const present = NUMBERED_SECTION_HEADINGS.filter((h) => {
+    const raw = sections[SECTION_KEY_BY_NUMBER[h]]
+    return raw && raw.trim().length > 0
+  })
+
+  const inner = renderToStaticMarkup(
+    <>
+      {/* Índice */}
+      <div className="toc">
+        <div className="toc-title">Índice</div>
+        <div className="toc-rule" />
+        {present.map((h) => (
+          <div className="toc-row" key={h}>
+            <span className="toc-num">{h}</span>
+            <span className="toc-name">{SECTION_TITLE_BY_NUMBER[h]}</span>
+            <span className="toc-leader" />
+          </div>
+        ))}
+        <div className="toc-foot">
+          Use o painel de marcadores/índice do seu leitor de PDF, ou a busca
+          (Ctrl+F / ⌘F), para navegar entre as seções.
+        </div>
+      </div>
+
+      {/* Em uma palavra */}
+      {essence && (
+        <div className="essence-page">
+          <p className="essence-label">Em uma palavra</p>
+          <p className="essence-phrase">{essence}</p>
+          <div className="essence-divider" />
+          <p className="essence-foot">
+            Esta é a essência que atravessa este relatório.
+          </p>
+        </div>
+      )}
+
+      {/* Sections */}
+      <div className="content">
+        {NUMBERED_SECTION_HEADINGS.map((headingStr) => {
+          const key = SECTION_KEY_BY_NUMBER[headingStr]
+          const raw = sections[key]
+          if (!raw || raw.trim().length === 0) return null
+          const body = raw.replace(STRIP_LEADING_HEADING_RE, '')
+          const title = SECTION_TITLE_BY_NUMBER[headingStr]
+          const isSintese = headingStr === '15'
+          const isLetter = headingStr === '14'
+          const subs = isSintese ? parseSubsections(body) : []
+          return (
+            <section
+              className={`report-section${isLetter ? ' letter' : ''}`}
+              key={key}
+            >
+              <h2 className="sec-title">
+                <span className="sec-num">{headingStr}</span>
+                <span className="sec-dash"> — </span>
+                {title}
+              </h2>
+              <hr className="sec-rule" />
+              {isSintese && subs.length > 0 ? (
+                <div className="sintese-grid">
+                  {subs.map((sub, i) => {
+                    const c = SINTESE_CARD_PALETTE[i % SINTESE_CARD_PALETTE.length]!
+                    return (
+                      <div
+                        className="sintese-card"
+                        key={`${sub.label}-${i}`}
+                        style={{ backgroundColor: c.bg, borderLeftColor: c.accent }}
+                      >
+                        <h3
+                          style={{
+                            color: c.accent,
+                            borderBottom: `1px solid ${c.accent}4D`,
+                          }}
+                        >
+                          {sub.label}
+                        </h3>
+                        <div className="sintese-body">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {sub.body}
+                          </ReactMarkdown>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              ) : isLetter ? (
+                <div className="letter-body">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{body}</ReactMarkdown>
+                </div>
+              ) : (
+                <div className="section-body">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{body}</ReactMarkdown>
+                </div>
+              )}
+            </section>
+          )
+        })}
+
+        {encerramento && encerramento.trim().length > 0 && (
+          <div className="disclaimer">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{encerramento}</ReactMarkdown>
+          </div>
+        )}
+      </div>
+    </>,
+  )
+
+  return htmlDoc(`Iris Codex — Leitura de ${clientName}`, inner)
+}
+
+/**
+ * Gotenberg `header.html` — a COMPLETE doc rendered in the reserved top band
+ * on every BODY page (Plan 7.4-28 CHANGE 1). Horizontal logo (inlined base64
+ * — Chromium header docs cannot read public/) on the left; client name +
+ * `p. N / total` on the right; teal rule under it. The band height (route
+ * marginTop) is taller than this content so ~28px of breathing sits below the
+ * rule before the body starts (CHANGE 3).
+ */
+export function renderHeaderHtml(clientName: string): string {
+  return (
+    `<!DOCTYPE html><html><head><meta charset="utf-8"><style>` +
+    `*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;}` +
+    `html,body{margin:0;padding:0;width:100%;background:transparent;` +
+    `font-family:${REPORT_FONTS.serif};}` +
+    `.hd{width:100%;display:flex;align-items:center;justify-content:space-between;` +
+    `gap:16px;padding:0 16mm 10px;border-bottom:1px solid ${C.teal};}` +
+    `.hd img{height:24px;width:auto;display:block;}` +
+    `.hd .meta{color:${C.mist};font-size:9pt;white-space:nowrap;}` +
+    `.hd .meta .pageNumber,.hd .meta .totalPages{color:${C.mist};}` +
+    `</style></head><body><div class="hd">` +
+    `<img src="${IRIS_CODEX_LOGO_HORIZONTAL_DATA_URI}" alt="Iris Codex">` +
+    `<span class="meta">${htmlEscape(clientName)} — p. ` +
+    `<span class="pageNumber"></span> / <span class="totalPages"></span></span>` +
+    `</div></body></html>`
+  )
+}
+
+/**
+ * Gotenberg `footer.html` — slim transparent band on every BODY page. The
+ * teal hairline + brand + condensed LGPD reassurance ride here; the page
+ * number now lives in the header (Plan 7.4-28), so the footer no longer
+ * prints it.
  */
 export function renderFooterHtml(clientName: string, disclaimerLine: string): string {
-  const safe = (s: string) =>
-    s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
-    *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-    html,body{margin:0;padding:0;width:100%;background:transparent;}
-    .bar{
-      width:100%;border-top:1px solid #3D9B8C;
-      font-family:Georgia,"Times New Roman",serif;color:#7A7A7A;font-size:8pt;
-      padding:8px 16mm 12px;display:flex;align-items:center;justify-content:space-between;gap:14px;
-    }
-    .brand{color:#3D9B8C;letter-spacing:0.22em;text-transform:uppercase;font-size:7pt;white-space:nowrap;}
-    .disc{flex:1;text-align:center;overflow:hidden;}
-    .pg{white-space:nowrap;}
-    .pg .cur{color:#3D9B8C;}
-  </style></head><body><div class="bar">
-    <span class="brand">Iris Codex</span>
-    <span class="disc">${safe(clientName)} — ${safe(disclaimerLine)}</span>
-    <span class="pg">p. <span class="cur pageNumber"></span> / <span class="totalPages"></span></span>
-  </div></body></html>`
+  return (
+    `<!DOCTYPE html><html><head><meta charset="utf-8"><style>` +
+    `*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact;}` +
+    `html,body{margin:0;padding:0;width:100%;background:transparent;}` +
+    `.bar{width:100%;border-top:1px solid ${C.teal};` +
+    `font-family:${REPORT_FONTS.serif};color:${C.mist};font-size:8pt;` +
+    `padding:8px 16mm 12px;display:flex;align-items:center;justify-content:space-between;gap:14px;}` +
+    `.brand{color:${C.teal};letter-spacing:0.22em;text-transform:uppercase;font-size:7pt;white-space:nowrap;}` +
+    `.disc{flex:1;text-align:center;overflow:hidden;}` +
+    `</style></head><body><div class="bar">` +
+    `<span class="brand">Iris Codex</span>` +
+    `<span class="disc">${htmlEscape(clientName)} — ${htmlEscape(disclaimerLine)}</span>` +
+    `<span class="brand">&nbsp;</span>` +
+    `</div></body></html>`
+  )
 }
 
 export function buildPdfFilename(clientName: string, readingDate: string | null): string {

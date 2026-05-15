@@ -89,10 +89,11 @@ describe('components/readings/ReportReadView (Plan 7.4-18 — UAT-3 reading-mode
     expect(headings.length).toBe(15)
     const expectedOrder = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15']
     expectedOrder.forEach((n, idx) => {
-      expect(headings[idx]?.textContent).toContain(`${n}.`)
+      expect(headings[idx]?.textContent).toContain(`${n} —`)
     })
-    expect(headings[1]?.textContent).toBe('2. Mapa Orgânico')
-    expect(headings[14]?.textContent).toBe('15. Síntese Rápida')
+    // Plan 7.4-28: PDF-parity heading format `N — Title` (teal num + em-dash).
+    expect(headings[1]?.textContent).toBe('2 — Mapa Orgânico')
+    expect(headings[14]?.textContent).toBe('15 — Síntese Rápida')
   })
 
   it('skips empty sections (defensive — sections may have fewer than 15 keys)', () => {
@@ -109,9 +110,9 @@ describe('components/readings/ReportReadView (Plan 7.4-18 — UAT-3 reading-mode
     )
     const headings = container.querySelectorAll('h2')
     expect(headings.length).toBe(2)
-    // Plan 22: heading format `N. Title` (no §)
-    expect(headings[0]?.textContent).toContain('1.')
-    expect(headings[1]?.textContent).toContain('5.')
+    // Plan 7.4-28: heading format `N — Title`
+    expect(headings[0]?.textContent).toContain('1 —')
+    expect(headings[1]?.textContent).toContain('5 —')
   })
 
   it('strips leading `## N. Title` (and legacy `## §N — Title`) heading from rendered body', () => {
@@ -132,7 +133,7 @@ describe('components/readings/ReportReadView (Plan 7.4-18 — UAT-3 reading-mode
     // The h2 heading is rendered with Plan 22 format
     const h2s = container.querySelectorAll('h2')
     expect(h2s.length).toBe(1)
-    expect(h2s[0]?.textContent).toBe('1. Constituição e Temperamento')
+    expect(h2s[0]?.textContent).toBe('1 — Constituição e Temperamento')
     // Body prose does not contain the duplicate `## 1` literal
     const proseBlock = container.querySelector('[data-testid="section-markdown"]')
     expect(proseBlock?.textContent).not.toContain('## 1')
@@ -233,7 +234,7 @@ describe('components/readings/ReportReadView (Plan 7.4-18 — UAT-3 reading-mode
       />,
     )
     const h2 = screen.getByRole('heading', { level: 2 })
-    expect(h2.textContent).toBe('15. Síntese Rápida')
+    expect(h2.textContent).toBe('15 — Síntese Rápida')
     const article = screen.getByTestId('report-read-view')
     expect(within(article).getByText('Sem subseções aqui — prosa simples.')).toBeDefined()
   })

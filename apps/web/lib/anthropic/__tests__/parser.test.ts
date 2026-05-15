@@ -3,7 +3,7 @@
 //   The canonical sequence is now strictly sequential 1..15 (no fractions,
 //   no gaps). Monotonicity is array-index based via NUMBERED_SECTION_HEADINGS.
 import { describe, it, expect } from 'vitest'
-import { findAllBoundaries, closeSections } from '../parser'
+import { findAllBoundaries, closeSections, extractEssencePhrase } from '../parser'
 
 const ALL_15 = [
   '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15',
@@ -265,5 +265,43 @@ Qux.`
     const result = findAllBoundaries(buf)
     expect(result).toHaveLength(1)
     expect(result[0].headingNumber).toBe('1')
+  })
+})
+
+describe('lib/anthropic/parser — extractEssencePhrase (Plan 28 CHANGE 5)', () => {
+  it('extracts the phrase from a leading "## Em uma palavra" block', () => {
+    const buf =
+      '## Em uma palavra\nUm organismo que aprendeu a sustentar — e que agora pede permissão para ser sustentado.\n\n## 1. Constituição e Temperamento\nCorpo.'
+    expect(extractEssencePhrase(buf)).toBe(
+      'Um organismo que aprendeu a sustentar — e que agora pede permissão para ser sustentado.',
+    )
+  })
+
+  it('strips blockquote, emphasis and wrapping quotes; collapses whitespace', () => {
+    const buf =
+      '### Em uma palavra\n> *"Há aqui a força de quem carrega\n> e a sabedoria que começa a perceber o peso."*\n\n## 1. X\nY'
+    expect(extractEssencePhrase(buf)).toBe(
+      'Há aqui a força de quem carrega e a sabedoria que começa a perceber o peso.',
+    )
+  })
+
+  it('tolerates a colon and **bold** marker form', () => {
+    const buf = '**Em uma palavra:**\nA vida desta íris se organiza em torno de uma pergunta.\n## 1. X\nY'
+    expect(extractEssencePhrase(buf)).toBe(
+      'A vida desta íris se organiza em torno de uma pergunta.',
+    )
+  })
+
+  it('returns null when the block is absent (page is skipped)', () => {
+    const buf = '## 1. Constituição e Temperamento\nCorpo sem essência.'
+    expect(extractEssencePhrase(buf)).toBeNull()
+  })
+
+  it('is NOT picked up as a numbered boundary (monotonicity intact)', () => {
+    const buf =
+      '## Em uma palavra\nFrase.\n\n## 1. Constituição\nA\n\n## 2. Mapa\nB'
+    const b = findAllBoundaries(buf)
+    expect(b).toHaveLength(2)
+    expect(b[0].headingNumber).toBe('1')
   })
 })

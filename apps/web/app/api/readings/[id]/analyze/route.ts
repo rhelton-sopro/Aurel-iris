@@ -32,7 +32,11 @@ import { isFounderEmail } from '@/lib/auth/founder'
 import { mergeCanonicalIrisColor } from '@/lib/canonicalize/merge-iris-color'
 import type { CanonicalMetadata } from '@/lib/anthropic/types'
 import type { IrisFeaturesForRag } from '@/lib/rag/build-queries'
-import { findAllBoundaries, closeSections } from '@/lib/anthropic/parser'
+import {
+  findAllBoundaries,
+  closeSections,
+  extractEssencePhrase,
+} from '@/lib/anthropic/parser'
 import { runAudit } from '@/lib/anthropic/audit'
 import { MODEL } from '@/lib/anthropic/client'
 import {
@@ -222,6 +226,12 @@ export async function POST(
           }),
         )
 
+        // Plan 7.4-28 CHANGE 5 — pull the "Em uma palavra" essence phrase the
+        // LLM emits before §1. Not a numbered boundary, so closeSections never
+        // captured it; extract from the raw buffer. Absent = page is skipped.
+        const essence = extractEssencePhrase(buffer)
+        if (essence) completedSections.essence_phrase = essence
+
         // D-P3 server-appended encerramento
         completedSections.encerramento_disclaimer = ENCERRAMENTO_LITERAL
 
@@ -285,6 +295,8 @@ export async function POST(
           // raw buffer (defensive: lets us debug parser misses post-mortem
           // even when error aborts the stream before audit/finalize ran).
           if (Object.keys(completedSections).length > 0 || buffer.length > 0) {
+            const partialEssence = extractEssencePhrase(buffer)
+            if (partialEssence) completedSections.essence_phrase = partialEssence
             await supabase
               .from('readings')
               .update({

@@ -132,13 +132,14 @@ export interface SectionDiffs {
 }
 
 /**
- * Lista canônica das 16 chaves processadas (15 numeradas + encerramento).
- * Chaves fora desta lista são IGNORADAS (defesa contra Sonnet emitir chaves
- * espúrias). Sincronizada com types.ts ReportSectionKey union — adicionar
- * chave aqui requer edit coordenado em types.ts + parser.
+ * Lista canônica das 17 chaves processadas (15 numeradas + essence_phrase +
+ * encerramento). Chaves fora desta lista são IGNORADAS (defesa contra Sonnet
+ * emitir chaves espúrias). Sincronizada com types.ts ReportSectionKey union —
+ * adicionar chave aqui requer edit coordenado em types.ts + parser.
  *
  * Plan 27 (UAT-iter-3) — §2.5 colapsada em §2; Síntese §16 → §15.
- * Sequência estritamente 1..15 + encerramento.
+ * Plan 28 (UAT-iter-4) — + essence_phrase ("Em uma palavra"), não-numerada.
+ * Sequência estritamente 1..15 + essence_phrase + encerramento.
  */
 const ALL_REPORT_KEYS: ReportSectionKey[] = [
   '1_constituicao_temperamento',
@@ -156,6 +157,7 @@ const ALL_REPORT_KEYS: ReportSectionKey[] = [
   '13_sintese_integrativa',
   '14_mensagem_cliente',
   '15_sintese_rapida',
+  'essence_phrase',
   'encerramento_disclaimer',
 ]
 

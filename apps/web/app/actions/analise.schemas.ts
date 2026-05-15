@@ -2,7 +2,8 @@ import { z } from 'zod'
 
 // Phase 7.4 Plan 27 (UAT-iter-3) — §2.5 collapsed into §2; Síntese Rápida
 // renumbered §16 → §15. Strictly sequential 1..15 + encerramento.
-// Keep in sync with types.ts ReportSectionKey.
+// Plan 28 (UAT-iter-4) — adds non-numbered `essence_phrase` ("Em uma
+// palavra" page). Keep in sync with types.ts ReportSectionKey.
 const REPORT_KEYS = [
   '1_constituicao_temperamento',
   '2_mapa_organico',
@@ -19,6 +20,7 @@ const REPORT_KEYS = [
   '13_sintese_integrativa',
   '14_mensagem_cliente',
   '15_sintese_rapida',
+  'essence_phrase',
   'encerramento_disclaimer',
 ] as const
 

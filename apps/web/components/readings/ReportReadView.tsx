@@ -1,34 +1,28 @@
 /**
- * ReportReadView — continuous flowing reading surface (Plan 7.4-18 — UAT-3
- * UX flip; Plan 7.4-27 — §2.5 collapsed into §2, 15 sequential sections,
- * Síntese Rápida is now §15 with the card-grid rendering).
+ * ReportReadView — the therapist's reading surface for the Iris Codex report.
  *
- * Renders the 15-section Iris Codex report as a single professionally
- * formatted document — NOT an accordion. The accordion lives only on the
- * /editar route for granular per-section edits. This component is the default
- * view on /leituras/[id] when the report is ready/edited.
+ * Plan 7.4-28 (UAT iter-4, CHANGE 6): the web view now mirrors the PDF's
+ * editorial design language so the therapist sees the same premium document
+ * they will export. Shared tokens (lib/design/report-tokens) drive both
+ * surfaces. Web-specific: white continuous scroll (no cover/per-page footer),
+ * anchor-link Índice, action buttons on top.
  *
  * Composition (top → bottom):
- *   1. Header — client name (h1, font-serif) + reading date (muted small)
- *   2. Optional topActionsSlot row — right-aligned button group passed by parent
- *   3. Main body — 15 sections rendered in NUMBERED_SECTION_HEADINGS order:
- *        - h2 styled as `{N}. {Title}` (font-serif text-2xl bold)
- *        - body via ReactMarkdown + remarkGfm in prose font-serif leading-relaxed
- *        - leading `## N. Title` (or legacy `## §N — Title`) heading line
- *          stripped from body to avoid duplication with the styled h2 above
- *        - empty/missing sections are skipped (defensive — sections may have
- *          fewer than 15 keys mid-stream or for legacy readings)
- *        - §15 Síntese Rápida gets SPECIAL CARD-GRID rendering: body parsed
- *          into 6 emoji-labeled subsections, displayed as 2-column grid
- *          (1-col on mobile)
- *   4. Footer — encerramento_disclaimer rendered as italic muted blockquote
- *      (omitted if absent in jsonb)
+ *   1. Header — horizontal logo + client name (h1) + reading date, teal rule
+ *   2. topActionsSlot — right-aligned button group (Exportar PDF / Editar / …)
+ *   3. "Em uma palavra" — essence_phrase as a distinct centered block
+ *   4. Índice — anchor links to each present section (clickable, scrolls)
+ *   5. Sections — `{N} — {Title}` (teal num) + teal rule + markdown body;
+ *        §14 = letter treatment; §15 = tinted card grid (shared palette)
+ *   6. Footer — encerramento_disclaimer as italic muted note
  *
- * RSC by default — no 'use client'. ReactMarkdown is RSC-safe; no client state
- * needed. The action buttons live in ReadingModeActions (separate 'use client'
- * island passed via topActionsSlot).
+ * RSC by default — no 'use client'. ReactMarkdown is RSC-safe. The action
+ * buttons are a separate 'use client' island passed via topActionsSlot.
  *
- * Phase 7.4 | Plan 07.4-18 + 07.4-22 | Decisions: DC-1, DC-3, DC-6 + UAT-4
+ * This project has NO @tailwindcss/typography plugin, so `prose` is inert —
+ * every ReactMarkdown surface MUST style its elements via `components`.
+ *
+ * Phase 7.4 | Plan 07.4-28 | Decisions: DC-1, DC-3, DC-6 + UAT iter-4
  */
 import ReactMarkdown from 'react-markdown'
 import type { Components } from 'react-markdown'
@@ -41,20 +35,17 @@ import {
   SECTION_KEY_BY_NUMBER,
   SECTION_TITLE_BY_NUMBER,
 } from '@/lib/anthropic/types'
+import {
+  REPORT_COLORS,
+  REPORT_FONTS,
+  SINTESE_CARD_PALETTE,
+} from '@/lib/design/report-tokens'
 
-// Mirrors EditorSectionItem STRIP_LEADING_HEADING_RE + parser.ts BOUNDARY_RE.
-// Strips a leading `## N. Title` (or legacy `## §N — Title`) heading line +
-// trailing blank lines so the rendered body doesn't duplicate the styled h2
-// above. Decimal `.N` still tolerated for legacy buffers (no longer emitted —
-// Plan 27 is 1..15 sequential). Optional `§?` keeps legacy-format compat.
 const STRIP_LEADING_HEADING_RE = /^[ \t]*#{2,3}[ \t]+§?[ \t]*\d{1,2}(?:\.\d)?[ \t]*[\p{Pd}.][^\n]*\n+/u
 
-// This project has NO @tailwindcss/typography plugin (Tailwind v4, globals.css
-// imports only "tailwindcss"). So `prose` / `prose-p:*` classes emit ZERO CSS,
-// and Tailwind's preflight resets <p> margin to 0 — markdown paragraphs render
-// flush with no separation. Every ReactMarkdown surface must therefore style
-// its elements explicitly via `components`; relying on `prose` is a silent
-// no-op (this was the UAT-5b "spacing not applied" root cause).
+const SERIF = { fontFamily: REPORT_FONTS.serif }
+const C = REPORT_COLORS
+
 type MarkdownVariant = 'body' | 'card' | 'footer'
 
 function markdownComponents(variant: MarkdownVariant): Components {
@@ -70,46 +61,48 @@ function markdownComponents(variant: MarkdownVariant): Components {
     ul: ({ children }) => <ul className={`list-disc ${listGap}`}>{children}</ul>,
     ol: ({ children }) => <ol className={`list-decimal ${listGap}`}>{children}</ol>,
     li: ({ children }) => <li className="leading-relaxed">{children}</li>,
-    strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+    strong: ({ children }) => (
+      <strong className="font-semibold" style={{ color: C.ink }}>
+        {children}
+      </strong>
+    ),
     em: ({ children }) => <em className="italic">{children}</em>,
     h3: ({ children }) => (
-      <h3 className="mb-3 mt-8 text-lg font-semibold">{children}</h3>
+      <h3 className="mb-3 mt-8 text-lg font-semibold italic" style={{ color: C.teal }}>
+        {children}
+      </h3>
     ),
     blockquote: ({ children }) => (
-      <blockquote className="my-6 border-l-4 border-muted-foreground/30 pl-4 italic">
+      <blockquote
+        className="my-6 border-l-2 pl-5 italic"
+        style={{ borderColor: C.teal, color: C.tealDark }}
+      >
         {children}
       </blockquote>
     ),
     a: ({ children, href }) => (
-      <a href={href} className="underline underline-offset-2">
+      <a href={href} className="underline underline-offset-2" style={{ color: C.teal }}>
         {children}
       </a>
     ),
   }
 }
 
-// §15 subsection split — each block starts with `### ` (markdown h3) followed
-// by a label that includes an emoji + name. Match the block heading line and
-// capture the full block until the next `### ` (or end of body).
-// §15 Síntese Rápida is a 6-block card grid (Plan 27 renumber, was §16).
 const SUBSECTION_SPLIT_RE = /^###\s+(.+)$/gm
 
 interface ParsedSubsection {
   /** Heading label including emoji, e.g. '🔴 Fragilidades'. */
   label: string
-  /** Markdown body content of the subsection (between this heading and next, trimmed). */
+  /** Markdown body content of the subsection (trimmed). */
   body: string
 }
 
 /**
- * Parse §15 body markdown into ordered subsections. Splits on `### ` headings;
- * the first block (before any heading) is discarded as preamble. Returns
- * empty array if no `### ` headings detected (caller falls back to default
- * prose render).
+ * Parse §15 body markdown into ordered subsections. Splits on `### ` headings.
+ * Returns [] if none detected (caller falls back to default prose render).
  */
 export function parseSubsections(body: string): ParsedSubsection[] {
   const headings: Array<{ label: string; startIdx: number; matchEnd: number }> = []
-  // Reset lastIndex defensively — global regex is module-scoped.
   SUBSECTION_SPLIT_RE.lastIndex = 0
   let m: RegExpExecArray | null
   while ((m = SUBSECTION_SPLIT_RE.exec(body)) !== null) {
@@ -118,8 +111,7 @@ export function parseSubsections(body: string): ParsedSubsection[] {
   if (headings.length === 0) return []
   return headings.map((h, i) => {
     const nextStart = headings[i + 1]?.startIdx ?? body.length
-    const content = body.slice(h.matchEnd, nextStart).trim()
-    return { label: h.label, body: content }
+    return { label: h.label, body: body.slice(h.matchEnd, nextStart).trim() }
   })
 }
 
@@ -140,27 +132,96 @@ export function ReportReadView({
   topActionsSlot,
 }: ReportReadViewProps) {
   const encerramento = sections['encerramento_disclaimer']
+  const essence = sections['essence_phrase']?.trim()
+  const present = NUMBERED_SECTION_HEADINGS.filter((h) => {
+    const raw = sections[SECTION_KEY_BY_NUMBER[h]]
+    return raw && raw.trim().length > 0
+  })
 
   return (
     <article
       data-testid="report-read-view"
       className="mx-auto max-w-prose space-y-6"
+      style={{ ...SERIF, color: C.ink }}
     >
-      <header className="space-y-2 border-b pb-6">
-        <h1 className="font-serif text-3xl font-bold tracking-tight">
-          {clientName}
-        </h1>
-        {readingDate && (
-          <p className="text-sm text-muted-foreground">
-            Leitura realizada em <LocalDateTime iso={readingDate} />
-          </p>
-        )}
+      <header className="space-y-4 pb-6" style={{ borderBottom: `1.5px solid ${C.teal}` }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/logo/iris_codex_horizontal.png"
+          alt="Iris Codex"
+          className="h-7 w-auto"
+        />
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight" style={SERIF}>
+            {clientName}
+          </h1>
+          {readingDate && (
+            <p className="text-sm" style={{ color: C.mist }}>
+              Leitura realizada em <LocalDateTime iso={readingDate} />
+            </p>
+          )}
+        </div>
       </header>
 
       {topActionsSlot && (
         <div className="flex flex-wrap items-center justify-end gap-2">
           {topActionsSlot}
         </div>
+      )}
+
+      {essence && (
+        <section
+          data-testid="report-read-view-essence"
+          className="flex flex-col items-center px-6 py-10 text-center"
+        >
+          <p
+            className="text-xs uppercase"
+            style={{ color: C.teal, letterSpacing: '0.25em' }}
+          >
+            Em uma palavra
+          </p>
+          <p
+            className="mt-6 max-w-md text-2xl italic"
+            style={{ ...SERIF, color: C.ink, lineHeight: 1.5 }}
+          >
+            {essence}
+          </p>
+          <div
+            className="mt-8"
+            style={{ width: 80, borderTop: `1px solid ${C.teal}` }}
+          />
+          <p className="mt-5 text-sm italic" style={{ color: C.mist }}>
+            Esta é a essência que atravessa este relatório.
+          </p>
+        </section>
+      )}
+
+      {present.length > 1 && (
+        <nav
+          data-testid="report-read-view-toc"
+          aria-label="Índice"
+          className="space-y-1 py-2"
+        >
+          <p
+            className="mb-3 text-xs uppercase"
+            style={{ color: C.teal, letterSpacing: '0.25em' }}
+          >
+            Índice
+          </p>
+          {present.map((h) => (
+            <a
+              key={h}
+              href={`#sec-${h}`}
+              className="flex items-baseline gap-3 py-0.5 no-underline"
+              style={{ color: C.ink }}
+            >
+              <span className="w-6 text-sm" style={{ color: C.teal }}>
+                {h}
+              </span>
+              <span className="text-sm">{SECTION_TITLE_BY_NUMBER[h]}</span>
+            </a>
+          ))}
+        </nav>
       )}
 
       <div className="space-y-2">
@@ -170,51 +231,91 @@ export function ReportReadView({
           if (!raw || raw.trim().length === 0) return null
           const body = raw.replace(STRIP_LEADING_HEADING_RE, '')
           const title = SECTION_TITLE_BY_NUMBER[headingStr]
-          const headingMargin = idx === 0 ? 'mt-8' : 'mt-12'
+          const headingMargin = idx === 0 ? 'mt-6' : 'mt-12'
+          const isLetter = headingStr === '14'
           const isSinteseRapida = headingStr === '15'
           const parsedBlocks = isSinteseRapida ? parseSubsections(body) : []
           return (
             <section
               key={key}
+              id={`sec-${headingStr}`}
               data-section-key={key}
               data-section-heading={headingStr}
-              className="font-serif print:break-inside-avoid"
+              className="scroll-mt-6 print:break-inside-avoid"
+              style={SERIF}
             >
               <h2
-                className={`${headingMargin} mb-4 text-2xl font-bold tracking-tight`}
+                className={`${headingMargin} text-2xl font-bold tracking-tight`}
+                style={SERIF}
               >
-                {headingStr}. {title}
+                <span style={{ color: C.teal }}>{headingStr}</span>
+                <span className="font-normal">{' — '}</span>
+                {title}
               </h2>
+              <hr
+                className="mb-5 mt-3"
+                style={{ border: 0, borderTop: `1.5px solid ${C.teal}` }}
+              />
 
               {isSinteseRapida && parsedBlocks.length > 0 ? (
                 <div
                   data-testid="report-read-view-sintese-grid"
                   className="grid grid-cols-1 gap-4 md:grid-cols-2"
                 >
-                  {parsedBlocks.map((block, blockIdx) => (
-                    <div
-                      key={`${block.label}-${blockIdx}`}
-                      data-testid={`sintese-block-${blockIdx}`}
-                      className="rounded-md border bg-muted/30 p-4 print:break-inside-avoid"
-                    >
-                      <h3 className="mb-2 font-serif text-lg font-semibold">
-                        {block.label}
-                      </h3>
-                      <div className="font-serif leading-relaxed [&>*:last-child]:mb-0">
-                        <ReactMarkdown
-                          remarkPlugins={[remarkGfm]}
-                          components={markdownComponents('card')}
+                  {parsedBlocks.map((block, blockIdx) => {
+                    const c =
+                      SINTESE_CARD_PALETTE[blockIdx % SINTESE_CARD_PALETTE.length]!
+                    return (
+                      <div
+                        key={`${block.label}-${blockIdx}`}
+                        data-testid={`sintese-block-${blockIdx}`}
+                        className="rounded-lg border p-5 print:break-inside-avoid"
+                        style={{
+                          backgroundColor: c.bg,
+                          borderColor: C.cardBorder,
+                          borderLeft: `4px solid ${c.accent}`,
+                        }}
+                      >
+                        <h3
+                          className="mb-3 pb-2 text-xs font-bold uppercase"
+                          style={{
+                            color: c.accent,
+                            letterSpacing: '0.18em',
+                            borderBottom: `1px solid ${c.accent}4D`,
+                          }}
                         >
-                          {block.body}
-                        </ReactMarkdown>
+                          {block.label}
+                        </h3>
+                        <div
+                          className="leading-relaxed [&>*:last-child]:mb-0"
+                          style={SERIF}
+                        >
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            components={markdownComponents('card')}
+                          >
+                            {block.body}
+                          </ReactMarkdown>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               ) : (
                 <div
                   data-testid="section-markdown"
-                  className="font-serif leading-relaxed [&>*:last-child]:mb-0"
+                  className="leading-relaxed [&>*:last-child]:mb-0"
+                  style={
+                    isLetter
+                      ? {
+                          ...SERIF,
+                          backgroundColor: C.ivory,
+                          borderLeft: `3px solid ${C.teal}`,
+                          padding: '24px 28px',
+                          color: '#2A2420',
+                        }
+                      : SERIF
+                  }
                 >
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
@@ -232,9 +333,10 @@ export function ReportReadView({
       {encerramento && encerramento.trim().length > 0 && (
         <footer
           data-testid="report-read-view-footer"
-          className="my-8 border-l-4 border-muted-foreground/30 pl-4 italic text-muted-foreground"
+          className="my-8 border-l-2 pl-5 text-sm italic"
+          style={{ borderColor: C.teal, color: C.mist }}
         >
-          <div className="font-serif text-sm leading-relaxed [&>*:last-child]:mb-0">
+          <div className="leading-relaxed [&>*:last-child]:mb-0" style={SERIF}>
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={markdownComponents('footer')}

@@ -88,6 +88,39 @@ export function findAllBoundaries(buffer: string): BoundaryMatch[] {
   return matches
 }
 
+// "Em uma palavra" essence block (Plan 7.4-28 CHANGE 5). The LLM emits, ONCE,
+// before §1: a heading line containing "em uma palavra" (tolerant of #/##/###
+// or **bold**), then the phrase. Captured until the first markdown heading
+// (the §1 boundary or any `##`) or end of buffer. Not a numbered boundary —
+// findAllBoundaries never sees it; closeSections drops pre-§1 content anyway,
+// so this dedicated extractor is the only path that surfaces the phrase.
+// No `m` flag: `^` is buffer-start (essence is the first content the LLM
+// emits) and the `\s*$` terminator must mean end-of-buffer, not end-of-line
+// (an `m` flag would let the capture stop at the first line break of a
+// multi-line blockquote phrase).
+const ESSENCE_RE =
+  /^\s*(?:#{1,4}[ \t]+|\*{1,2})?\s*em uma palavra[:*_ \t]*\r?\n+([\s\S]*?)(?=\r?\n[ \t]*#{1,4}[ \t]|\s*$)/iu
+
+/**
+ * Extract the "essence phrase" from the raw stream buffer (Plan 7.4-28
+ * CHANGE 5). Returns a single cleaned line (markdown emphasis / blockquote /
+ * wrapping quotes stripped, whitespace collapsed) or null when the LLM did
+ * not emit the block. Length-capped defensively (the prompt asks 15-25 words).
+ */
+export function extractEssencePhrase(buffer: string): string | null {
+  const m = ESSENCE_RE.exec(buffer)
+  if (!m || !m[1]) return null
+  const cleaned = m[1]
+    .replace(/^[ \t]*>[ \t]?/gm, '') // blockquote markers
+    .replace(/[*_`]/g, '') // inline emphasis
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/^["'“”‘’«»]+|["'“”‘’«»]+$/g, '') // wrapping quotes
+    .trim()
+  if (cleaned.length === 0) return null
+  return cleaned.length > 400 ? `${cleaned.slice(0, 399)}…` : cleaned
+}
+
 export interface ClosedSection {
   key: NumberedSectionKey
   /** Content sliced from `boundary.startIdx` to next boundary's `startIdx`
