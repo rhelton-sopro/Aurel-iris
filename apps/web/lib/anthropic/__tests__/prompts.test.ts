@@ -13,7 +13,7 @@ beforeEach(() => {
   _resetPromptsCache()
 })
 
-describe('lib/anthropic/prompts — file content (Plan 16 — 15-section Iris Codex V1)', () => {
+describe('lib/anthropic/prompts — file content (Plan 21 — 16-section Iris Codex V1, no § symbol)', () => {
   it('system.md contém o marker allowlist do audit na linha 1', () => {
     const sys = loadSystemPrompt()
     const firstLine = sys.split('\n')[0]
@@ -24,7 +24,7 @@ describe('lib/anthropic/prompts — file content (Plan 16 — 15-section Iris Co
     expect(loadSystemPrompt()).toContain('Iris Codex')
   })
 
-  it('system.md contém os 15 headings "## §N — Title" (1, 2, 2.5, 3..14)', () => {
+  it('system.md contém os 16 headings "## N. Title" (1, 2, 2.5, 3..14, 16; skip 15)', () => {
     const sys = loadSystemPrompt()
     const expectedNumbers = [
       '1',
@@ -42,13 +42,15 @@ describe('lib/anthropic/prompts — file content (Plan 16 — 15-section Iris Co
       '12',
       '13',
       '14',
+      '16',
     ]
     for (const n of expectedNumbers) {
-      expect(sys).toContain(`## §${n} —`)
+      // Plan 21: §-less heading format `## N. Title` (period separator, no glyph)
+      expect(sys).toContain(`## ${n}.`)
     }
   })
 
-  it('system.md contém os 15 titles canônicos (Plan 16 — §2.5 inserted between §2 and §3)', () => {
+  it('system.md contém os 16 titles canônicos (Plan 21 — §16 Síntese Rápida added)', () => {
     const sys = loadSystemPrompt()
     const expectedTitles = [
       'Constituição e Temperamento',
@@ -66,6 +68,7 @@ describe('lib/anthropic/prompts — file content (Plan 16 — 15-section Iris Co
       'Roteiro de Anamnese',
       'Síntese Integrativa',
       'Mensagem para o Cliente',
+      'Síntese Rápida',
     ]
     for (const title of expectedTitles) {
       expect(sys).toContain(title)
@@ -80,8 +83,8 @@ describe('lib/anthropic/prompts — file content (Plan 16 — 15-section Iris Co
     expect(sys).not.toContain('systems_with_tendency')
     expect(sys).not.toContain('tendency_grade')
     expect(sys).not.toContain('bilateral_findings')
-    // Positive assertion: the prompt instructs markdown output (15 seções)
-    expect(sys).toMatch(/15 seções markdown/i)
+    // Positive assertion: the prompt instructs markdown output (16 seções)
+    expect(sys).toMatch(/16 seções markdown/i)
   })
 
   it('feature-injection.md contém placeholders mustache canônicos', () => {
@@ -211,7 +214,8 @@ describe('lib/anthropic/prompts — Plan 16 absolute rules + structural restruct
 
   it('§2.5 — Sistemas em Bom Funcionamento section exists with anchoring criteria', () => {
     const sys = loadSystemPrompt()
-    expect(sys).toContain('## §2.5 — Sistemas em Bom Funcionamento')
+    // Plan 21: heading format changed `## §N — Title` → `## N. Title`
+    expect(sys).toContain('## 2.5. Sistemas em Bom Funcionamento')
     expect(sys).toMatch(/Ausência de marcas no setor esperado/)
     expect(sys).toMatch(/Zonas claras\/íntegras/)
     expect(sys).toMatch(/Marcadores estruturais positivos/)
@@ -238,6 +242,60 @@ describe('lib/anthropic/prompts — Plan 16 absolute rules + structural restruct
     expect(sys).toContain('anel interno regular e bem posicionado')
     expect(sys).toContain('hepatobiliar')
     expect(sys).toContain('do fígado e vesícula')
+  })
+})
+
+describe('lib/anthropic/prompts — Plan 21 UAT-4 fixes (§ removal + §1 breathing + §12 numbered + §16 Síntese Rápida)', () => {
+  it('§1 instrução de parágrafos curtos (3-5 frases) com respiração', () => {
+    const sys = loadSystemPrompt()
+    expect(sys).toContain('parágrafos CURTOS')
+    expect(sys).toContain('3-5 frases')
+    expect(sys).toMatch(/respiração visual|linha em branco/i)
+  })
+
+  it('§1 polimento table extended with Plan 21 mappings', () => {
+    const sys = loadSystemPrompt()
+    expect(sys).toContain('anel digestivo interno')
+    expect(sys).toContain('fibrilar (qualquer uso)')
+    expect(sys).toContain('sinais setoriais')
+    expect(sys).toContain('organização funcional de base')
+  })
+
+  it('§12 explicit numbered markdown list instruction', () => {
+    const sys = loadSystemPrompt()
+    expect(sys).toContain('lista numerada markdown')
+    // The example block in §12 should show numbered list format
+    expect(sys).toMatch(/1\.\s+Você notou/)
+  })
+
+  it('§16 Síntese Rápida section exists with 6 mandatory subsections', () => {
+    const sys = loadSystemPrompt()
+    expect(sys).toContain('## 16. Síntese Rápida')
+    expect(sys).toContain('### 🔴 Fragilidades')
+    expect(sys).toContain('### 🟢 Forças')
+    expect(sys).toContain('### 💛 Emoções a Cuidar')
+    expect(sys).toContain('### ✨ Potências')
+    expect(sys).toContain('### 🧭 Perfil e Temperamento')
+    expect(sys).toContain('### 🌱 Aptidões')
+  })
+
+  it('§16 instructions include "Específico desta íris" rule', () => {
+    const sys = loadSystemPrompt()
+    expect(sys).toContain('Específico desta íris')
+  })
+
+  it('Format de saída instructs `## N. Title` (NOT `## §N — Title`)', () => {
+    const sys = loadSystemPrompt()
+    // Positive: at least one canonical example uses period-separator format
+    expect(sys).toContain('## 1. Constituição e Temperamento')
+    expect(sys).toContain('## 16. Síntese Rápida')
+    // Negative-rule instruction acknowledges the old format is abandoned
+    expect(sys).toContain('NÃO emita `## §N — Título`')
+  })
+
+  it('Lembretes finais explicitly says "skip 15"', () => {
+    const sys = loadSystemPrompt()
+    expect(sys).toMatch(/skip 15|pula de 14 para 16/i)
   })
 })
 
