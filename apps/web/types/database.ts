@@ -351,7 +351,11 @@ export type Database = {
           therapist_id: string
           therapist_notes: string | null
           tipo_edicao: string[] | null
+          report_generated_sam: Json | null
+          report_generated_sam_at: string | null
+          sam_run_metadata: Json | null
           vision_features: Json | null
+          vision_features_sam: Json | null
           zonas_editadas: Json | null
         }
         Insert: {
@@ -386,7 +390,11 @@ export type Database = {
           therapist_id: string
           therapist_notes?: string | null
           tipo_edicao?: string[] | null
+          report_generated_sam?: Json | null
+          report_generated_sam_at?: string | null
+          sam_run_metadata?: Json | null
           vision_features?: Json | null
+          vision_features_sam?: Json | null
           zonas_editadas?: Json | null
         }
         Update: {
@@ -421,7 +429,11 @@ export type Database = {
           therapist_id?: string
           therapist_notes?: string | null
           tipo_edicao?: string[] | null
+          report_generated_sam?: Json | null
+          report_generated_sam_at?: string | null
+          sam_run_metadata?: Json | null
           vision_features?: Json | null
+          vision_features_sam?: Json | null
           zonas_editadas?: Json | null
         }
         Relationships: [

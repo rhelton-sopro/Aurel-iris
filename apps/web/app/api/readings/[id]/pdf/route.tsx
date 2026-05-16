@@ -68,10 +68,16 @@ function disclaimerFooterLine(sections: Record<string, string>): string {
 }
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ): Promise<Response> {
   const { id: readingId } = await params
+
+  // Phase 7.4 SAM harness: ?variant=sam renders the parallel SAM report
+  // (report_generated_sam) through the SAME Gotenberg path — marginal cost,
+  // no code duplication. Default (absent/any other value) = production report.
+  const variant = request.nextUrl.searchParams.get('variant')
+  const isSam = variant === 'sam'
 
   const supabase = await createClient()
   const { data: reading, error } = await supabase
@@ -88,14 +94,39 @@ export async function GET(
 
   const reportGenerated = reading.report_generated as Record<string, string> | null
   const reportDelivered = reading.report_delivered as Record<string, string> | null
-  const hasReport = reportGenerated != null && Object.keys(reportGenerated).length > 0
-  const status = reading.status ?? 'pending'
 
-  if (!((status === 'ready' || status === 'edited') && hasReport)) {
-    return NextResponse.json({ error: 'Report not ready' }, { status: 409 })
+  let reportToShow: Record<string, string>
+  if (isSam) {
+    // SAM column fetched ONLY here — the default production select above never
+    // references report_generated_sam, so this route is byte-identical to its
+    // pre-SAM behaviour on the normal path and safe to deploy before the
+    // migration (no production-breakage ordering coupling).
+    const { data: samRow } = await supabase
+      .from('readings')
+      .select('report_generated_sam')
+      .eq('id', readingId)
+      .maybeSingle()
+    const reportSam =
+      (samRow as { report_generated_sam?: Record<string, string> | null } | null)
+        ?.report_generated_sam ?? null
+    // SAM report existence is its own gate (independent of production status —
+    // a SAM run can exist for a reading in any production state).
+    if (reportSam == null || Object.keys(reportSam).length === 0) {
+      return NextResponse.json(
+        { error: 'SAM report not generated for this reading' },
+        { status: 409 },
+      )
+    }
+    reportToShow = reportSam
+  } else {
+    const hasReport =
+      reportGenerated != null && Object.keys(reportGenerated).length > 0
+    const status = reading.status ?? 'pending'
+    if (!((status === 'ready' || status === 'edited') && hasReport)) {
+      return NextResponse.json({ error: 'Report not ready' }, { status: 409 })
+    }
+    reportToShow = (reportDelivered ?? reportGenerated) as Record<string, string>
   }
-
-  const reportToShow = (reportDelivered ?? reportGenerated) as Record<string, string>
   const clientName =
     (reading.client as { full_name?: string } | null)?.full_name ?? 'Cliente'
   const reportGeneratedAt =
@@ -116,7 +147,9 @@ export async function GET(
   const bodyHtml = await renderBodyHtml(props)
   const headerHtml = renderHeaderHtml(clientName)
   const footerHtml = renderFooterHtml(clientName, disclaimerFooterLine(reportToShow))
-  const filename = buildPdfFilename(clientName, readingDate)
+  const filename = isSam
+    ? buildPdfFilename(clientName, readingDate).replace(/\.pdf$/i, '-SAM.pdf')
+    : buildPdfFilename(clientName, readingDate)
 
   const base = gotenbergUrl.replace(/\/$/, '')
   const headers: Record<string, string> = {}

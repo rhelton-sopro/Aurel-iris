@@ -29,6 +29,10 @@ import { Button } from '@/components/ui/button'
 
 export interface ExportPdfButtonProps {
   readingId: string
+  /** Phase 7.4 SAM harness: 'sam' appends ?variant=sam (parallel report). */
+  variant?: 'sam'
+  /** Optional override for the button label (defaults to "Exportar PDF"). */
+  label?: string
 }
 
 function parseFilenameFromHeader(headerValue: string | null): string | null {
@@ -50,16 +54,21 @@ function triggerDownload(blob: Blob, filename: string): void {
   setTimeout(() => URL.revokeObjectURL(url), 500)
 }
 
-export function ExportPdfButton({ readingId }: ExportPdfButtonProps) {
+export function ExportPdfButton({ readingId, variant, label }: ExportPdfButtonProps) {
   const [pending, startTransition] = useTransition()
   const [localPending, setLocalPending] = useState(false)
   const isPending = pending || localPending
+  const isSam = variant === 'sam'
+  const pdfUrl = isSam
+    ? `/api/readings/${readingId}/pdf?variant=sam`
+    : `/api/readings/${readingId}/pdf`
+  const idleLabel = label ?? 'Exportar PDF'
 
   function onClick() {
     setLocalPending(true)
     startTransition(async () => {
       try {
-        const res = await fetch(`/api/readings/${readingId}/pdf`, { method: 'GET' })
+        const res = await fetch(pdfUrl, { method: 'GET' })
         if (!res.ok) {
           const detail = await res.text().catch(() => '')
           const msg = detail.slice(0, 200) || `HTTP ${res.status}`
@@ -69,7 +78,7 @@ export function ExportPdfButton({ readingId }: ExportPdfButtonProps) {
         const blob = await res.blob()
         const filename =
           parseFilenameFromHeader(res.headers.get('Content-Disposition')) ??
-          `leitura-${readingId}.pdf`
+          `leitura-${readingId}${isSam ? '-SAM' : ''}.pdf`
         triggerDownload(blob, filename)
         toast.success('PDF baixado.')
       } catch (err) {
@@ -88,14 +97,14 @@ export function ExportPdfButton({ readingId }: ExportPdfButtonProps) {
       onClick={onClick}
       disabled={isPending}
       className="gap-2"
-      data-testid="reading-mode-export-pdf"
+      data-testid={isSam ? 'reading-mode-export-pdf-sam' : 'reading-mode-export-pdf'}
     >
       {isPending ? (
         <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
       ) : (
         <Download className="h-4 w-4" aria-hidden />
       )}
-      {isPending ? 'Gerando PDF…' : 'Exportar PDF'}
+      {isPending ? 'Gerando PDF…' : idleLabel}
     </Button>
   )
 }

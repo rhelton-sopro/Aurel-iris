@@ -45,7 +45,14 @@ from pipeline.error_summary import ERROR_SUMMARY
 
 app = modal.App("aurel-iris-vision")
 
-image = (
+# Shared build base — ALL build steps (apt/pip/run_commands), NO add_local_*.
+# Modal requires add_local_* to be the LAST steps in an image (otherwise it
+# must rebuild on every local-file change). Both `image` (production) and
+# `sam_image` (Phase 7.4 harness) derive from this base and append the SAME
+# add_local_* calls LAST. Production's resulting build-step chain is
+# byte-identical to before this refactor → identical Modal image → the
+# analyze-iris-endpoint / run_pipeline behaviour is unchanged.
+_base_image = (
     modal.Image.debian_slim()
     .apt_install(
         "libgl1",
@@ -75,12 +82,46 @@ image = (
             "face_landmarker/float16/1/face_landmarker.task"
         ),
     )
-    # Mount pipeline package + data dir into container.
-    # Default Modal only ships the entrypoint file (modal_app.py) — without these
-    # mounts, `from pipeline.error_summary import ERROR_SUMMARY` (line 43) and
-    # all line-171+ pipeline imports fail with ModuleNotFoundError. The data dir
-    # is needed because pipeline/iris_maps.py and pipeline/error_summary.py read
-    # `Path(__file__).parent.parent / "data" / "*.json"` at import-time.
+)
+
+# Mount pipeline package + data dir into container — MUST be the last steps.
+# Default Modal only ships the entrypoint file (modal_app.py) — without these
+# mounts, `from pipeline.error_summary import ERROR_SUMMARY` (line 43) and
+# all line-171+ pipeline imports fail with ModuleNotFoundError. The data dir
+# is needed because pipeline/iris_maps.py and pipeline/error_summary.py read
+# `Path(__file__).parent.parent / "data" / "*.json"` at import-time.
+#
+# PRODUCTION: identical build-step sequence as before the SAM refactor
+# (_base_image == old debian_slim().apt().pip().run(), then the same two
+# add_local_* calls) — same image, no behaviour change.
+image = (
+    _base_image
+    .add_local_python_source("pipeline")
+    .add_local_dir("data", "/root/data")
+)
+
+# Phase 7.4 SAM comparison harness — heavier image used ONLY by the parallel
+# SAM functions so production run_pipeline keeps its lean image. SAM2 is
+# Apache-2.0. ALL build steps (sam pip + checkpoint wget) come from
+# _base_image and run BEFORE the add_local_* calls (Modal's required order);
+# the hydra config ships inside the pip-installed sam2 package.
+sam_image = (
+    _base_image
+    # `git` is required to pip-install sam2 from its GitHub repo. Added on
+    # the SAM image ONLY (not _base_image) so production stays untouched.
+    .apt_install("git")
+    .pip_install(
+        "torch",
+        "torchvision",
+        "git+https://github.com/facebookresearch/sam2.git",
+    )
+    .run_commands(
+        (
+            "wget -q -O /models/sam2.1_hiera_small.pt "
+            "https://dl.fbaipublicfiles.com/segment_anything_2/092824/"
+            "sam2.1_hiera_small.pt"
+        ),
+    )
     .add_local_python_source("pipeline")
     .add_local_dir("data", "/root/data")
 )
@@ -357,7 +398,159 @@ def analyze_iris_endpoint(payload: dict) -> dict:
     return {"call_id": call.object_id}
 
 
+# ---------------------------------------------------------------------------
+# Phase 7.4 — PARALLEL SAM BRANCH (comparison harness)
+#
+# Mirrors run_pipeline EXACTLY except the geometry stage: detect+segment
+# (MediaPipe→Hough) is replaced by a single SAM2 call per angle. compose →
+# normalize → enhance → features.extract_all run byte-identical, so any
+# difference in the report is attributable to segmentation alone — the whole
+# point of the experiment.
+#
+# Isolation from production: this path NEVER posts to the production webhook
+# and NEVER writes vision_features. The endpoint is SYNCHRONOUS (.remote()) —
+# it returns the validated payload to the caller (the founder-gated Next.js
+# admin endpoint), which persists it to the dedicated *_sam columns.
+# ---------------------------------------------------------------------------
+
+SAM_MODEL_VERSION = "pipeline_sam_0.1.0"
+
+
+@app.function(
+    image=sam_image,
+    gpu="T4",
+    timeout=300,
+    secrets=[modal.Secret.from_name("aurel-iris-vision")],
+)
+def run_pipeline_sam(reading_id: str, image_urls: list[dict]) -> dict:
+    """SAM-segmentation variant of run_pipeline. Returns the validated
+    FeaturesPayload dict (model_dump) synchronously. Per-eye soft
+    degradation identical to production (D-F1)."""
+    import time as _time
+
+    from pipeline import compose, enhance, features, normalize, segment_sam
+    from pipeline.iris_maps import load_jensen_map
+    from pipeline.schemas import IrisFeatures
+
+    t_start = _time.monotonic()
+    call_id = modal.current_function_call_id()
+    warnings: list[str] = []
+    stages_timing: dict[str, int] = {}
+    seg_diagnostics: dict[str, list[dict]] = {}
+    jensen = load_jensen_map()
+    results: dict = {}
+
+    for eye in ("right", "left"):
+        eye_images = [u for u in image_urls if u.get("eye") == eye]
+        per_eye_diag: list[dict] = []
+        try:
+            t0 = _time.monotonic()
+            loaded = [
+                {"angle": u.get("angle"), "image": _load_image(u["url"])}
+                for u in eye_images
+            ]
+            segmented = []
+            for entry in loaded:
+                try:
+                    seg = segment_sam.iris_mask_sam(entry["image"], warnings=warnings)
+                    seg["angle"] = entry["angle"]
+                    segmented.append(seg)
+                    ic = seg.get("iris_circle")
+                    pc = seg.get("pupil_circle")
+                    per_eye_diag.append({
+                        "angle": entry["angle"],
+                        "detector": "sam2",
+                        "iris_circle": list(ic) if ic is not None else None,
+                        "pupil_circle": list(pc) if pc is not None else None,
+                    })
+                except ValueError as e:
+                    warnings.append(f"sam_{eye}_{entry.get('angle')}_{str(e)}")
+                    per_eye_diag.append({
+                        "angle": entry.get("angle"),
+                        "detector": "failed",
+                        "error": str(e),
+                    })
+            stages_timing[f"segment_{eye}"] = int((_time.monotonic() - t0) * 1000)
+            seg_diagnostics[eye] = per_eye_diag
+            if not segmented:
+                raise RuntimeError(f"sam_segment_failed_all_angles_{eye}")
+
+            t0 = _time.monotonic()
+            composite = compose.photometric_combine(segmented)
+            stages_timing[f"compose_{eye}"] = int((_time.monotonic() - t0) * 1000)
+
+            t0 = _time.monotonic()
+            normalized = normalize.daugman_polar(composite)
+            stages_timing[f"normalize_{eye}"] = int((_time.monotonic() - t0) * 1000)
+
+            t0 = _time.monotonic()
+            enhanced = enhance.clahe(normalized)
+            stages_timing[f"enhance_{eye}"] = int((_time.monotonic() - t0) * 1000)
+
+            t0 = _time.monotonic()
+            eye_block = features.extract_all(
+                enhanced, composite, jensen, eye, warnings=warnings
+            )
+            stages_timing[f"features_{eye}"] = int((_time.monotonic() - t0) * 1000)
+
+            results[f"{eye}_eye"] = eye_block
+        except Exception as exc:
+            warnings.append(
+                f"sam_pipeline_failed_{eye}_{type(exc).__name__}_{str(exc)[:80]}"
+            )
+            results[f"{eye}_eye"] = None
+
+    processing_metadata = {
+        "model_version": SAM_MODEL_VERSION,
+        "processing_time_ms": int((_time.monotonic() - t_start) * 1000),
+        "modal_call_id": call_id,
+        "stages_timing_ms": stages_timing,
+        "warnings": warnings,
+        "error_summary": (
+            None
+            if (results.get("right_eye") or results.get("left_eye"))
+            else _classify_error_summary(warnings)
+        ),
+        "segment_diagnostics": seg_diagnostics,
+        "variant": "sam",
+    }
+
+    if results.get("right_eye") is None and results.get("left_eye") is None:
+        return {
+            "right_eye": None,
+            "left_eye": None,
+            "asymmetry_notes": [],
+            "processing_metadata": processing_metadata,
+        }
+
+    asymmetry = features.compute_asymmetry(results)
+    full_payload = {
+        "right_eye": results.get("right_eye"),
+        "left_eye": results.get("left_eye"),
+        "asymmetry_notes": asymmetry,
+        "processing_metadata": processing_metadata,
+    }
+    validated = IrisFeatures.model_validate(full_payload)
+    return validated.model_dump()
+
+
+@app.function(image=image)
+@modal.fastapi_endpoint(method="POST")
+def analyze_iris_sam_endpoint(payload: dict) -> dict:
+    """SYNCHRONOUS SAM endpoint (Phase 7.4 harness). Blocks on .remote()
+    and returns the validated SAM features inline — the founder-gated
+    Next.js admin route persists it to readings.vision_features_sam.
+    NOT spawned, NOT webhooked: zero production surface."""
+    reading_id = payload["reading_id"]
+    image_urls = payload["image_urls"]
+    features_payload = run_pipeline_sam.remote(reading_id, image_urls)
+    return {"vision_features_sam": features_payload}
+
+
 if __name__ == "__main__":
     # Local sanity — `python modal_app.py` confirms imports and image definition parse.
     print(f"Modal app: {app.name}")
-    print("Functions registered: run_pipeline, analyze_iris_endpoint")
+    print(
+        "Functions registered: run_pipeline, analyze_iris_endpoint, "
+        "run_pipeline_sam, analyze_iris_sam_endpoint"
+    )
