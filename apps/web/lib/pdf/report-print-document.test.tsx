@@ -3,7 +3,7 @@
  *
  * Guards the Gotenberg input — the HTML this builds IS the PDF.
  * Plan 7.4-28 (UAT iter-4): split render (cover / body), horizontal-logo
- * header, white cover, "Em uma palavra" essence page, TOC nav footnote.
+ * header, white cover, "Em poucas palavras" essence page, TOC nav footnote.
  */
 import { describe, it, expect, beforeAll } from 'vitest'
 
@@ -88,9 +88,9 @@ describe('renderBodyHtml', () => {
     expect(html).toContain('Ctrl+F')
   })
 
-  it('renders the "Em uma palavra" essence page when present', () => {
+  it('renders the "Em poucas palavras" essence page when present', () => {
     expect(html).toContain('class="essence-page"')
-    expect(html).toContain('class="essence-label">Em uma palavra')
+    expect(html).toContain('class="essence-label">Em poucas palavras')
     expect(html).toContain('aprendeu a sustentar')
     expect(html).toContain('class="essence-divider"')
     expect(html).toContain('essência que atravessa este relatório')

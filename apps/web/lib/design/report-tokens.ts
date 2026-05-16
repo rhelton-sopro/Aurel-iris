@@ -59,7 +59,7 @@ export const REPORT_LAYOUT = {
   sectionGapPx: 48,
   /** Section title size. */
   sectionTitlePt: 22,
-  /** "Em uma palavra" essence phrase size. */
+  /** "Em poucas palavras" essence phrase size. */
   essencePt: 22,
 } as const
 

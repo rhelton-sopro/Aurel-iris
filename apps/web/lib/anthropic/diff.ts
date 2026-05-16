@@ -138,7 +138,7 @@ export interface SectionDiffs {
  * adicionar chave aqui requer edit coordenado em types.ts + parser.
  *
  * Plan 27 (UAT-iter-3) — §2.5 colapsada em §2; Síntese §16 → §15.
- * Plan 28 (UAT-iter-4) — + essence_phrase ("Em uma palavra"), não-numerada.
+ * Plan 28 (UAT-iter-4) — + essence_phrase ("Em poucas palavras"), não-numerada.
  * Sequência estritamente 1..15 + essence_phrase + encerramento.
  */
 const ALL_REPORT_KEYS: ReportSectionKey[] = [

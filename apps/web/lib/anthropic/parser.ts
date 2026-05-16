@@ -88,19 +88,25 @@ export function findAllBoundaries(buffer: string): BoundaryMatch[] {
   return matches
 }
 
-// "Em uma palavra" essence marker. The LLM emits it ONCE as a line
-// containing "em uma palavra" (any heading depth #..####, **bold**, any
-// case, optional separator), then the phrase — same line
-// (`## Em uma palavra: …` / `— …`) OR following lines.
+// Essence marker. The LLM emits it ONCE as a line containing the essence
+// heading (any heading depth #..####, **bold**, any case, optional
+// separator), then the phrase — same line (`## …: …` / `— …`) OR following
+// lines.
+//
+// 07.4-36 (founder): the heading is now "Em poucas palavras" (the phrase is
+// 15-30 words — "uma palavra" was a misnomer). The legacy alternative
+// "em uma palavra" is STILL matched so stored/legacy raw buffers (and any
+// re-parse path) keep extracting — the storage key `essence_phrase` is
+// unchanged, so this is purely the heading text.
 //
 // Phase 7.4-35 (founder): the essence is now generated LAST — emitted
 // AFTER §15 (synthesised from the completed analysis, anchored on a
 // visible structure), not improvised before §1. Extraction therefore
 // prefers the post-§15 tail; it falls back to the pre-§1 region so
 // legacy buffers (essence emitted upfront) keep parsing. The marker is
-// line-anchored (`^|\n`) so it won't fire on prose like "…em uma palavra:".
+// line-anchored (`^|\n`) so it won't fire on prose like "…em poucas palavras:".
 const ESSENCE_MARKER_RE =
-  /(?:^|\n)[ \t]*(?:#{1,4}[ \t]+)?\*{0,2}[ \t]*em uma palavra[ \t]*\*{0,2}[ \t]*(?:[:—–-][ \t]*)?/iu
+  /(?:^|\n)[ \t]*(?:#{1,4}[ \t]+)?\*{0,2}[ \t]*em (?:poucas palavras|uma palavra)[ \t]*\*{0,2}[ \t]*(?:[:—–-][ \t]*)?/iu
 
 /**
  * Absolute buffer index of the essence-marker line, searching only from

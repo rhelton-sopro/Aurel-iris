@@ -10,7 +10,7 @@
  * Composition (top → bottom):
  *   1. Header — horizontal logo + client name (h1) + reading date, teal rule
  *   2. topActionsSlot — right-aligned button group (Exportar PDF / Editar / …)
- *   3. "Em uma palavra" — essence_phrase as a distinct centered block
+ *   3. "Em poucas palavras" — essence_phrase as a distinct centered block
  *   4. Índice — anchor links to each present section (clickable, scrolls)
  *   5. Sections — `{N} — {Title}` (teal num) + teal rule + markdown body;
  *        §14 = letter treatment; §15 = tinted card grid (shared palette)
@@ -199,7 +199,7 @@ export function ReportReadView({
             className="text-xs uppercase"
             style={{ color: C.teal, letterSpacing: '0.25em' }}
           >
-            Em uma palavra
+            Em poucas palavras
           </p>
           <p
             className="mt-6 max-w-md text-2xl italic"

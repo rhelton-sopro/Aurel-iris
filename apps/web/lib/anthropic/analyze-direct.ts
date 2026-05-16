@@ -15,7 +15,7 @@
  *   - system block 2 = VISUAL_MODE_OVERRIDE — neutralizes the JSON-feature
  *     reading instructions and the "[cite a feature]" anchoring, redirecting
  *     the calibration anchor to a structure SEEN in the photos. Everything
- *     else (15 sections, "Em uma palavra", Regra 3, §2 subsections, §15
+ *     else (15 sections, "Em poucas palavras", Regra 3, §2 subsections, §15
  *     card grid, server-appended encerramento) stays identical.
  *   - user content = client_context + 6 labeled image blocks + the
  *     visual-analysis instruction. NO <features>, NO <knowledge>.
@@ -114,7 +114,7 @@ Substituições obrigatórias em relação às instruções acima:
    você localiza internamente mas traduz para significado clínico no texto).
 5. Todo o resto é **idêntico** ao caminho normal: comece direto na §1, as
    15 seções sequenciais, as duas subseções da §2, a §15 Síntese Rápida em
-   6 blocos, e o bloco "## Em uma palavra" como ÚLTIMO conteúdo (DEPOIS da
+   6 blocos, e o bloco "## Em poucas palavras" como ÚLTIMO conteúdo (DEPOIS da
    §15 — síntese final ancorada numa estrutura visível, ver system prompt),
    o vocabulário LGPD, o tom. NÃO emita o encerramento/disclaimer (o
    servidor anexa o texto literal).

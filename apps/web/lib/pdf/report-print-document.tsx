@@ -6,7 +6,7 @@
  *   page carries a horizontal-logo header. Chromium print headers apply to
  *   ALL pages with no per-page skip, so the route renders TWO PDFs and merges:
  *     1. COVER  — renderCoverHtml  → its own PDF, zero margins, no header/footer
- *     2. BODY   — renderBodyHtml   → Índice + "Em uma palavra" + §1..§15 +
+ *     2. BODY   — renderBodyHtml   → Índice + "Em poucas palavras" + §1..§15 +
  *                disclaimer, with the Gotenberg header.html (horizontal logo +
  *                client + p.N/total) and a slim footer band
  *   The two are concatenated via Gotenberg /forms/pdfengines/merge. Page
@@ -21,7 +21,7 @@
  *      gap 48px; first section on the first content page starts flush
  *   4. TOC keeps dotted leaders + a navigation footnote; clickable bookmark
  *      tree comes from Gotenberg generateDocumentOutline (set in the route)
- *   5. "Em uma palavra" page between Índice and §1 (essence_phrase)
+ *   5. "Em poucas palavras" page between Índice and §1 (essence_phrase)
  *
  * Design tokens (colors / fonts / §15 palette) are shared with the web
  * reading view via lib/design/report-tokens — the two surfaces must match.
@@ -202,7 +202,7 @@ const PRINT_CSS = `
     line-height: 1.6;
   }
 
-  /* ---- "Em uma palavra" page ---- */
+  /* ---- "Em poucas palavras" page ---- */
   .essence-page {
     background: var(--white);
     min-height: 215mm;
@@ -397,7 +397,7 @@ export function renderCoverHtml(props: ReportPrintDocumentProps): string {
 }
 
 /**
- * BODY — Índice + "Em uma palavra" + §1..§15 + disclaimer. Rendered with the
+ * BODY — Índice + "Em poucas palavras" + §1..§15 + disclaimer. Rendered with the
  * Gotenberg header.html / footer.html bands (page numbers count these pages).
  * `react-dom/server` is dynamically imported — Next App Router hard-bans the
  * static import (assumes client bundling).
@@ -433,10 +433,10 @@ export async function renderBodyHtml(
         </div>
       </div>
 
-      {/* Em uma palavra */}
+      {/* Em poucas palavras */}
       {essence && (
         <div className="essence-page">
-          <p className="essence-label">Em uma palavra</p>
+          <p className="essence-label">Em poucas palavras</p>
           <p className="essence-phrase">{essence}</p>
           <div className="essence-divider" />
           <p className="essence-foot">

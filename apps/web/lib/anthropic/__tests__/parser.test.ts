@@ -269,7 +269,7 @@ Qux.`
 })
 
 describe('lib/anthropic/parser — extractEssencePhrase (Plan 28 CHANGE 5)', () => {
-  it('extracts the phrase from a leading "## Em uma palavra" block', () => {
+  it('LEGACY backward-compat: extracts from a leading "## Em uma palavra" block (07.4-36 — stored buffers keep parsing)', () => {
     const buf =
       '## Em uma palavra\nUm organismo que aprendeu a sustentar — e que agora pede permissão para ser sustentado.\n\n## 1. Constituição e Temperamento\nCorpo.'
     expect(extractEssencePhrase(buf)).toBe(
@@ -279,14 +279,14 @@ describe('lib/anthropic/parser — extractEssencePhrase (Plan 28 CHANGE 5)', () 
 
   it('strips blockquote, emphasis and wrapping quotes; collapses whitespace', () => {
     const buf =
-      '### Em uma palavra\n> *"Há aqui a força de quem carrega\n> e a sabedoria que começa a perceber o peso."*\n\n## 1. X\nY'
+      '### Em poucas palavras\n> *"Há aqui a força de quem carrega\n> e a sabedoria que começa a perceber o peso."*\n\n## 1. X\nY'
     expect(extractEssencePhrase(buf)).toBe(
       'Há aqui a força de quem carrega e a sabedoria que começa a perceber o peso.',
     )
   })
 
   it('tolerates a colon and **bold** marker form', () => {
-    const buf = '**Em uma palavra:**\nA vida desta íris se organiza em torno de uma pergunta.\n## 1. X\nY'
+    const buf = '**Em poucas palavras:**\nA vida desta íris se organiza em torno de uma pergunta.\n## 1. X\nY'
     expect(extractEssencePhrase(buf)).toBe(
       'A vida desta íris se organiza em torno de uma pergunta.',
     )
@@ -299,7 +299,7 @@ describe('lib/anthropic/parser — extractEssencePhrase (Plan 28 CHANGE 5)', () 
 
   it('is NOT picked up as a numbered boundary (monotonicity intact)', () => {
     const buf =
-      '## Em uma palavra\nFrase.\n\n## 1. Constituição\nA\n\n## 2. Mapa\nB'
+      '## Em poucas palavras\nFrase.\n\n## 1. Constituição\nA\n\n## 2. Mapa\nB'
     const b = findAllBoundaries(buf)
     expect(b).toHaveLength(2)
     expect(b[0].headingNumber).toBe('1')
@@ -309,23 +309,23 @@ describe('lib/anthropic/parser — extractEssencePhrase (Plan 28 CHANGE 5)', () 
   // same-line phrase, and ALL-CAPS heading.
   it('survives a preamble before the marker (pre-§1 region search)', () => {
     const buf =
-      '# Leitura Iridológica\n\n## Em uma palavra\nFrase essência aqui.\n\n## 1. Constituição\nCorpo.'
+      '# Leitura Iridológica\n\n## Em poucas palavras\nFrase essência aqui.\n\n## 1. Constituição\nCorpo.'
     expect(extractEssencePhrase(buf)).toBe('Frase essência aqui.')
   })
 
   it('extracts a same-line phrase after an em-dash separator', () => {
-    const buf = '## Em uma palavra — A frase na mesma linha.\n\n## 1. X\nCorpo.'
+    const buf = '## Em poucas palavras — A frase na mesma linha.\n\n## 1. X\nCorpo.'
     expect(extractEssencePhrase(buf)).toBe('A frase na mesma linha.')
   })
 
   it('tolerates an ALL-CAPS heading', () => {
-    const buf = '## EM UMA PALAVRA\nFrase em caixa alta de cabeçalho.\n## 1. X\nY'
+    const buf = '## EM POUCAS PALAVRAS\nFrase em caixa alta de cabeçalho.\n## 1. X\nY'
     expect(extractEssencePhrase(buf)).toBe('Frase em caixa alta de cabeçalho.')
   })
 
-  it('does not false-match prose "em uma palavra:" inside §1 body', () => {
+  it('does not false-match prose "em poucas palavras:" inside §1 body', () => {
     const buf =
-      '## 1. Constituição\nResumindo em uma palavra: equilíbrio.\n\n## 2. Mapa\nB'
+      '## 1. Constituição\nResumindo em poucas palavras: equilíbrio.\n\n## 2. Mapa\nB'
     expect(extractEssencePhrase(buf)).toBeNull()
   })
 
@@ -333,7 +333,7 @@ describe('lib/anthropic/parser — extractEssencePhrase (Plan 28 CHANGE 5)', () 
   // then §1..§15. The essence phrase must surface intact.
   it('extracts the essence from a realistic full-report stream', () => {
     const buf = [
-      '## Em uma palavra',
+      '## Em poucas palavras',
       'Um corpo que aprendeu a se proteger contendo, e que agora começa a perguntar o que aconteceria se confiasse.',
       '',
       '## 1. Constituição e Temperamento',
@@ -355,7 +355,7 @@ describe('lib/anthropic/parser — extractEssencePhrase (Plan 28 CHANGE 5)', () 
     // And it must NOT have polluted §1's content.
     const closed = closeSections(findAllBoundaries(buf), buf)
     const sec1 = closed.find((c) => c.key === '1_constituicao_temperamento')
-    expect(sec1?.content).not.toContain('Em uma palavra')
+    expect(sec1?.content).not.toContain('Em poucas palavras')
     expect(sec1?.content).toContain('Fibras compactas')
   })
 
@@ -368,11 +368,25 @@ describe('lib/anthropic/parser — extractEssencePhrase (Plan 28 CHANGE 5)', () 
     ).join('\n\n')
     const phrase =
       'Uma íris de fundo claro e fibras finas e tensas — um organismo que processa rápido e ainda não achou o freio.'
-    const buf = `${secs}\n\n## Em uma palavra\n${phrase}`
+    const buf = `${secs}\n\n## Em poucas palavras\n${phrase}`
     expect(extractEssencePhrase(buf)).toBe(phrase)
     const closed = closeSections(findAllBoundaries(buf), buf)
     const sec15 = closed.find((c) => c.key === '15_sintese_rapida')
-    expect(sec15?.content).not.toContain('Em uma palavra')
+    expect(sec15?.content).not.toContain('Em poucas palavras')
     expect(sec15?.content).toContain('Conteúdo da seção 15')
+  })
+
+  // 07.4-36 — heading renamed to "Em poucas palavras"; the parser keeps the
+  // legacy "Em uma palavra" alternative so already-stored raw buffers (and
+  // any re-parse path) still surface their essence in the post-§15 position.
+  it('LEGACY backward-compat: a post-§15 "## Em uma palavra" block still extracts', () => {
+    const secs = Array.from(
+      { length: 15 },
+      (_, i) => `## ${i + 1}. Seção ${i + 1}\nConteúdo da seção ${i + 1}.`,
+    ).join('\n\n')
+    const phrase =
+      'Uma íris de fibras finas e tensas — um organismo que ainda procura o freio.'
+    const buf = `${secs}\n\n## Em uma palavra\n${phrase}`
+    expect(extractEssencePhrase(buf)).toBe(phrase)
   })
 })

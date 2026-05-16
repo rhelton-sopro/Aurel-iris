@@ -94,7 +94,7 @@ maybe('Column C — Sonnet direct runner', () => {
           'scripts/output',
           `sonnet-direct-${READING_ID}.md`,
         )
-        const body = ['## Em uma palavra', '', r.essence_phrase ?? '(nenhuma)', '']
+        const body = ['## Em poucas palavras', '', r.essence_phrase ?? '(nenhuma)', '']
         for (const k of keys.sort((a, b) => {
           const na = parseInt(a, 10)
           const nb = parseInt(b, 10)

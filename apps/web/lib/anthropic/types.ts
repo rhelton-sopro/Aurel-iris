@@ -56,12 +56,13 @@ export type NumberedSectionKey = Exclude<
 >
 
 /**
- * Marker heading the LLM emits ONCE, before §1, carrying the "essence phrase"
- * (Plan 7.4-28 CHANGE 5 — the "Em uma palavra" page). It is intentionally NOT
- * a numbered boundary (no digit), so `findAllBoundaries` ignores it and
+ * Marker heading the LLM emits ONCE, AFTER §15 (07.4-35 contract), carrying
+ * the "essence phrase" — the "Em poucas palavras" page. It is intentionally
+ * NOT a numbered boundary (no digit), so `findAllBoundaries` ignores it and
  * monotonicity is unaffected; `extractEssencePhrase` pulls it separately.
+ * Legacy buffers used "Em uma palavra"; the parser marker still matches both.
  */
-export const ESSENCE_PHRASE_HEADING = 'Em uma palavra'
+export const ESSENCE_PHRASE_HEADING = 'Em poucas palavras'
 
 /**
  * Ordered heading-number strings for the 15 numbered sections, in canonical

@@ -82,10 +82,13 @@ describe('lib/anthropic/prompts — file content (Plan 21 — 16-section Iris Co
     expect(sys).not.toContain('<features>')
   })
 
-  it('system.md: "Em uma palavra" é o ÚLTIMO bloco (pós-§15) com contrato de âncora visual (07.4-35 fix 3)', () => {
+  it('system.md: "Em poucas palavras" é o ÚLTIMO bloco (pós-§15) com contrato de âncora visual + comprimento (07.4-36)', () => {
     const sys = loadSystemPrompt()
     // Imperative, unmissable, still mandatory.
-    expect(sys).toContain('## Em uma palavra')
+    expect(sys).toContain('## Em poucas palavras')
+    // Legacy heading must be fully gone from the prompt (only the parser
+    // keeps the backward-compat alternative for stored buffers).
+    expect(sys).not.toContain('## Em uma palavra')
     expect(sys).toMatch(/OBRIGAT[ÓO]RIO/i)
     expect(sys).toMatch(/NÃO PULE|N[ÃA]O pule|não pule/i)
     // NEW contract: generated LAST, AFTER §15 — NOT before §1.
@@ -95,8 +98,12 @@ describe('lib/anthropic/prompts — file content (Plan 21 — 16-section Iris Co
     expect(sys).toMatch(/Contrato de ancoragem visual/i)
     expect(sys).toMatch(/estrutura VIS[ÍI]VEL/i)
     expect(sys).toMatch(/Forer/i)
-    // 15-25 word constraint still present.
-    expect(sys).toMatch(/15-25 palavras/)
+    // 07.4-36: ceiling widened to 15-30 words; the OLD 15-25 must be gone.
+    expect(sys).toMatch(/15-30 palavras/)
+    expect(sys).not.toMatch(/15-25 palavras/)
+    // Hard length-regen contract: >30 words ⇒ regenerate (founder Check 1).
+    expect(sys).toMatch(/mais de 30 palavras/i)
+    expect(sys).toMatch(/regerar/i)
     // The OLD "antes da seção 1" essence instruction must be GONE.
     expect(sys).not.toMatch(/primeir[íi]ssimo conte[úu]do/i)
   })

@@ -332,7 +332,7 @@ prontuário — exatamente o oposto do que este relatório é.
 
 ## Formato de saída (obrigatório)
 
-### ⚠️ OBRIGATÓRIO — "Em uma palavra" é o ÚLTIMO bloco (depois da §15)
+### ⚠️ OBRIGATÓRIO — "Em poucas palavras" é o ÚLTIMO bloco (depois da §15)
 
 **Você gera a frase-essência POR ÚLTIMO — depois de terminar a §15 —, não
 no começo.** Toda leitura tem essa frase; ela é exibida no TOPO para o
@@ -344,14 +344,14 @@ Improvisar uma abertura poética antes de analisar produz frase genérica
 Depois da §15, emita, como bloco FINAL do output, exatamente:
 
 ```
-## Em uma palavra
-[uma única frase, 15-25 palavras, derivada do achado VISUAL mais marcante
+## Em poucas palavras
+[uma única frase, 15-30 palavras, derivada do achado VISUAL mais marcante
 que você acabou de descrever — ver contrato abaixo]
 ```
 
 **Isto é output obrigatório. NÃO pule.** Não emita nada depois dele (o
 servidor anexa o disclaimer). Especificação completa + contrato de
-ancoragem em "Em uma palavra (síntese final)" abaixo.
+ancoragem em "Em poucas palavras (síntese final)" abaixo.
 
 ---
 
@@ -359,7 +359,7 @@ Comece **direto na seção 1** (sem preâmbulo, sem frase-essência no topo) e
 emita **EXATAMENTE 15 seções markdown**, na ordem e com os títulos abaixo,
 usando o padrão `## N. Título` (sem o símbolo §; com ponto após o número;
 N é estritamente sequencial 1..15 — sem fração, sem pulo, sem repetição);
-**termine com o bloco `## Em uma palavra`** (síntese final, depois da §15):
+**termine com o bloco `## Em poucas palavras`** (síntese final, depois da §15):
 
 ```
 ## 1. Constituição e Temperamento
@@ -387,8 +387,8 @@ um quadro completo do organismo]
 ## 15. Síntese Rápida
 [conteúdo da seção 15 — 6 subsections card grid; veja §15 abaixo]
 
-## Em uma palavra
-[UMA frase 15-25 palavras, derivada do achado visual mais marcante —
+## Em poucas palavras
+[UMA frase 15-30 palavras, derivada do achado visual mais marcante —
 contrato abaixo. É o ÚLTIMO bloco; nada depois dele.]
 ```
 
@@ -396,9 +396,9 @@ contrato abaixo. É o ÚLTIMO bloco; nada depois dele.]
 seção 1 (sem "# Leitura Iridológica", sem "## Cliente: Nome · Idade", sem
 abertura poética no topo) — o primeiro conteúdo do output é literalmente
 `## 1. Constituição e Temperamento`.
-**Não** emita ENCERRAMENTO ou DISCLAIMER — nem após §15 nem após "Em uma
-palavra"; o servidor anexa esse texto LGPD automaticamente. O bloco
-`## Em uma palavra` vem DEPOIS da §15 e é o último conteúdo que você emite.
+**Não** emita ENCERRAMENTO ou DISCLAIMER — nem após §15 nem após "Em
+poucas palavras"; o servidor anexa esse texto LGPD automaticamente. O bloco
+`## Em poucas palavras` vem DEPOIS da §15 e é o último conteúdo que você emite.
 A sequência das seções numeradas é **{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
 12, 13, 14, 15}** — cada N exatamente uma vez, ascendente, SEM frações
 (não emita "2.5") e SEM pulos. As duas subseções de §2 ("### Sistemas que
@@ -412,21 +412,21 @@ abandonado por escolha de UX da fundadora.
 
 ---
 
-## Em uma palavra (síntese final — depois da §15)
+## Em poucas palavras (síntese final — depois da §15)
 
 **Output OBRIGATÓRIO — sempre presente, nunca omitido. É o ÚLTIMO bloco do
 output.** Tendo terminado a §15, **releia tudo o que você escreveu** e
 identifique o **ÚNICO achado mais marcante desta íris** — aquele que mais
-EXIGE que esta íris seja como é. Condense-o em UMA frase. **15-25
+EXIGE que esta íris seja como é. Condense-o em UMA frase. **15-30
 palavras.** Linguagem evocativa, NÃO diagnóstica. Emita exatamente assim,
 como bloco final (depois da §15):
 
 ```
-## Em uma palavra
+## Em poucas palavras
 [a frase, em uma única linha]
 ```
 
-### Contrato de ancoragem visual (DURO — sem isso, regerar)
+### Contrato de ancoragem visual + comprimento (DURO — sem âncora visual OU mais de 30 palavras, regerar)
 
 A frase **DEVE nomear, ou derivar inequivocamente de, uma estrutura
 VISÍVEL específica que você já descreveu em §1 ou §2** — a cor de base, o
@@ -440,6 +440,13 @@ diretamente de uma estrutura visível nomeada desta íris?
   ancorar numa estrutura visível.
 - Se **SIM** (ex.: parte da cor de base / da trama de fibras / de uma marca
   que você descreveu) → válida.
+
+**Checagem de comprimento (DURA — conte as palavras antes de emitir):** a
+frase tem entre **15 e 30 palavras**? Conte. Se passar de 30, corte ou
+reescreva até caber em 15-30 **mantendo a âncora visual**. Uma frase com
+mais de 30 palavras = **regerar**, mesmo que esteja perfeitamente
+ancorada. (O teto não é estético: frase longa dilui o achado e vira
+parágrafo, não essência.)
 
 A frase pode ser evocativa, mas a evocação tem que **brotar da estrutura
 visível**, não pairar sobre psicologia genérica. A estrutura é a raiz; a
@@ -1019,7 +1026,7 @@ seções têm funções complementares — §14 abre/convida; §15 estrutura.
 
 ## Lembretes finais antes de gerar
 
-- ✓ **OBRIGATÓRIO:** bloco `## Em uma palavra` é o ÚLTIMO do output (DEPOIS da §15) — gerado por último, derivado do achado VISUAL mais marcante (cor de base / trama de fibras / marca específica de §1/§2). Frase só-psicológica sem âncora visual = Forer = ERRADO, regerar. Output começa direto em `## 1.`. Nunca pule.
+- ✓ **OBRIGATÓRIO:** bloco `## Em poucas palavras` é o ÚLTIMO do output (DEPOIS da §15) — gerado por último, derivado do achado VISUAL mais marcante (cor de base / trama de fibras / marca específica de §1/§2). Frase só-psicológica sem âncora visual OU com mais de 30 palavras = ERRADO, regerar (alvo 15-30 palavras). Output começa direto em `## 1.`. Nunca pule.
 - ✓ 15 seções markdown na sequência {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15} — estritamente sequencial, sem fração, sem pulo
 - ✓ `## N. Título` exato (com ponto após o número, SEM o glyph §, SEM em-dash) — N de 1 a 15
 - ✓ §2 = parágrafo de abertura + `### Sistemas que requerem atenção` + `### Sistemas em bom funcionamento` (duas subseções H3 DENTRO de §2)
@@ -1040,7 +1047,7 @@ seções têm funções complementares — §14 abre/convida; §15 estrutura.
 - ✓ Sem vocab Sopro
 - ✓ Sem marcadores inline tipo `[ancorado em features.x]`
 - ✓ Sem meta-linguagem do método (não descrever o processo de análise — "detectei na imagem", "o sistema identificou", etc.)
-- ✗ Não emita JSON (exceto a estrutura markdown explícita); NADA antes da §1 (sem preâmbulo, sem essência no topo); `## Em uma palavra` vem DEPOIS da §15 como bloco final; não emita encerramento (servidor anexa o disclaimer LGPD literal)
+- ✗ Não emita JSON (exceto a estrutura markdown explícita); NADA antes da §1 (sem preâmbulo, sem essência no topo); `## Em poucas palavras` vem DEPOIS da §15 como bloco final; não emita encerramento (servidor anexa o disclaimer LGPD literal)
 - ✗ Não cite autores nem escolas no corpo primário (Regras 1+2)
 - ✗ Não cite setor/hora/olho fora de §2 (Regra 3 — exceção só §2, ambas as subseções)
 - ✗ Não emita "2.5" nem pule números; sequência estrita 1..15, sem duplicar seções
