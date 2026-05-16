@@ -511,8 +511,12 @@ def run_pipeline_sam(reading_id: str, image_urls: list[dict]) -> dict:
             if (results.get("right_eye") or results.get("left_eye"))
             else _classify_error_summary(warnings)
         ),
-        "segment_diagnostics": seg_diagnostics,
-        "variant": "sam",
+        # MUST use the schema's existing `detect_diagnostics` field — the
+        # ProcessingMetadata model is ConfigDict(extra="forbid"), so a
+        # `segment_diagnostics`/`variant` key makes model_validate raise
+        # (→ Modal 500 → admin route 502). The SAM variant is already
+        # identified by model_version = SAM_MODEL_VERSION.
+        "detect_diagnostics": seg_diagnostics,
     }
 
     if results.get("right_eye") is None and results.get("left_eye") is None:
