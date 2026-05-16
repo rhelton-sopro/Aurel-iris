@@ -35,7 +35,9 @@ import 'server-only'
 import { NextResponse } from 'next/server'
 
 import { analyzeReading } from '@/lib/anthropic/analyze'
+import { MODEL } from '@/lib/anthropic/client'
 import { runAudit } from '@/lib/anthropic/audit'
+import { logReportGeneration } from '@/lib/calibration/log-generation'
 import {
   findAllBoundaries,
   closeSections,
@@ -247,9 +249,10 @@ export async function POST(
   }
 
   let buffer = ''
+  let finalization: Awaited<ReturnType<typeof analysis.finalize>> | null = null
   try {
     for await (const text of analysis.stream) buffer += text
-    await analysis.finalize()
+    finalization = await analysis.finalize()
   } catch (err) {
     return NextResponse.json(
       {
@@ -287,6 +290,19 @@ export async function POST(
       } as unknown as never,
     })
     .eq('id', readingId)
+
+  // Instrumentation (best-effort; never blocks). method=sam, model_version =
+  // the Sonnet model that produced the report (comparable across methods).
+  await logReportGeneration(service, {
+    reading_id: readingId,
+    method: 'sam',
+    latency_ms: finalization?.latency_ms ?? null,
+    cost_usd:
+      finalization != null ? Number(finalization.cost_estimate_usd.toFixed(5)) : null,
+    tokens_in: finalization?.usage.input_tokens ?? null,
+    tokens_out: finalization?.usage.output_tokens ?? null,
+    model_version: MODEL,
+  })
 
   return NextResponse.json({
     reading_id: readingId,

@@ -27,6 +27,8 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { revalidatePath } from 'next/cache'
 
 import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/service'
+import { logReportGeneration } from '@/lib/calibration/log-generation'
 import { analyzeReading } from '@/lib/anthropic/analyze'
 import { isFounderEmail } from '@/lib/auth/founder'
 import { mergeCanonicalIrisColor } from '@/lib/canonicalize/merge-iris-color'
@@ -278,6 +280,19 @@ export async function POST(
             report_raw_text: buffer as unknown as never,
           })
           .eq('id', readingId)
+
+        // Instrumentation (best-effort; never blocks the stream). Uses a
+        // service client because report_generations RLS is founder-only —
+        // a therapist's user-scoped client would be blocked. method=vigente.
+        await logReportGeneration(createServiceClient(), {
+          reading_id: readingId,
+          method: 'vigente',
+          latency_ms: finalization.latency_ms,
+          cost_usd: Number(finalization.cost_estimate_usd.toFixed(5)),
+          tokens_in: finalization.usage.input_tokens,
+          tokens_out: finalization.usage.output_tokens,
+          model_version: MODEL,
+        })
 
         revalidatePath(`/leituras/${readingId}`)
         revalidatePath(`/leituras/${readingId}/editar`)

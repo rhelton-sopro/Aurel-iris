@@ -354,6 +354,9 @@ export type Database = {
           report_generated_sam: Json | null
           report_generated_sam_at: string | null
           sam_run_metadata: Json | null
+          report_generated_sonnet_direct: Json | null
+          report_generated_sonnet_direct_at: string | null
+          sonnet_direct_run_metadata: Json | null
           vision_features: Json | null
           vision_features_sam: Json | null
           zonas_editadas: Json | null
@@ -393,6 +396,9 @@ export type Database = {
           report_generated_sam?: Json | null
           report_generated_sam_at?: string | null
           sam_run_metadata?: Json | null
+          report_generated_sonnet_direct?: Json | null
+          report_generated_sonnet_direct_at?: string | null
+          sonnet_direct_run_metadata?: Json | null
           vision_features?: Json | null
           vision_features_sam?: Json | null
           zonas_editadas?: Json | null
@@ -432,6 +438,9 @@ export type Database = {
           report_generated_sam?: Json | null
           report_generated_sam_at?: string | null
           sam_run_metadata?: Json | null
+          report_generated_sonnet_direct?: Json | null
+          report_generated_sonnet_direct_at?: string | null
+          sonnet_direct_run_metadata?: Json | null
           vision_features?: Json | null
           vision_features_sam?: Json | null
           zonas_editadas?: Json | null
@@ -452,6 +461,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      report_generations: {
+        Row: {
+          id: string
+          reading_id: string
+          method: string
+          generated_at: string
+          latency_ms: number | null
+          cost_usd: number | null
+          tokens_in: number | null
+          tokens_out: number | null
+          model_version: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          reading_id: string
+          method: string
+          generated_at?: string
+          latency_ms?: number | null
+          cost_usd?: number | null
+          tokens_in?: number | null
+          tokens_out?: number | null
+          model_version?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          reading_id?: string
+          method?: string
+          generated_at?: string
+          latency_ms?: number | null
+          cost_usd?: number | null
+          tokens_in?: number | null
+          tokens_out?: number | null
+          model_version?: string | null
+          created_at?: string
+        }
+        Relationships: []
       }
       subscriptions: {
         Row: {
