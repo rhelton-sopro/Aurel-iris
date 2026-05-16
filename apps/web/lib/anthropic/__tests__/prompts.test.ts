@@ -61,18 +61,25 @@ describe('lib/anthropic/prompts — file content (Plan 21 — 16-section Iris Co
     }
   })
 
-  it('system.md distingue pigmentacao de lacuna e proíbe findings-vazio=limpo (Plan 31 FIX 13)', () => {
+  it('system.md preserva a regra clínica pigmento/lacuna em linguagem VISUAL, sem termos JSON (07.4-35 cleanup, decisão C)', () => {
     const sys = loadSystemPrompt()
+    // Clinical principle SURVIVES the Sonnet-direct cleanup...
+    expect(sys).toMatch(/Leitura visual/i)
     expect(sys).toMatch(/pigment/i)
-    expect(sys).toContain('pigmentacao')
-    expect(sys).toContain('lacuna')
+    expect(sys).toMatch(/lacuna/i)
     // pigment ≠ lacuna, both directions
-    expect(sys).toMatch(/Pigment.{0,40}N[ÃA]O.{0,40}lacuna/i)
-    // findings:[] is not "clean" — must check sectoral_pigments
-    expect(sys).toContain('sectoral_pigments')
-    expect(sys).toMatch(/n[ãa]o significa.{0,40}limpo|n[ãa]o.{0,20}"?limpo"?/i)
-    // must consume the new asymmetry direction
-    expect(sys).toContain('carga_pigmentar_assimetrica')
+    expect(sys).toMatch(/Pigmento n[ãa]o é lacuna e lacuna n[ãa]o é pigmento/i)
+    // sector without cavity but with dense pigment = LOADED, not clean
+    expect(sys).toMatch(/n[ãa]o significa setor limpo/i)
+    expect(sys).toContain('CARREGADO')
+    // respect the observed asymmetry direction
+    expect(sys).toMatch(/assimetria observada/i)
+    // ...but the JSON/pipeline scaffolding is GONE (the whole point of C):
+    expect(sys).not.toContain('sectoral_pigments')
+    expect(sys).not.toContain('asymmetry_notes')
+    expect(sys).not.toContain('carga_pigmentar_assimetrica')
+    expect(sys).not.toContain('findings[]')
+    expect(sys).not.toContain('<features>')
   })
 
   it('system.md torna o bloco "Em uma palavra" OBRIGATÓRIO antes da §1 (Plan 29 FIX 3)', () => {
