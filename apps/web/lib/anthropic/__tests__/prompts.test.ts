@@ -82,16 +82,23 @@ describe('lib/anthropic/prompts — file content (Plan 21 — 16-section Iris Co
     expect(sys).not.toContain('<features>')
   })
 
-  it('system.md torna o bloco "Em uma palavra" OBRIGATÓRIO antes da §1 (Plan 29 FIX 3)', () => {
+  it('system.md: "Em uma palavra" é o ÚLTIMO bloco (pós-§15) com contrato de âncora visual (07.4-35 fix 3)', () => {
     const sys = loadSystemPrompt()
-    // Imperative, unmissable instruction — not a soft/optional spec.
+    // Imperative, unmissable, still mandatory.
     expect(sys).toContain('## Em uma palavra')
     expect(sys).toMatch(/OBRIGAT[ÓO]RIO/i)
     expect(sys).toMatch(/NÃO PULE|N[ÃA]O pule|não pule/i)
-    // It must instruct emission BEFORE section 1.
-    expect(sys).toMatch(/antes (?:de gerar )?(?:a )?seção 1/i)
-    // 15-25 word evocative, non-diagnostic constraint still present.
+    // NEW contract: generated LAST, AFTER §15 — NOT before §1.
+    expect(sys).toMatch(/[ÚU]LTIMO bloco|depois da §15|DEPOIS da §15/i)
+    expect(sys).toMatch(/come[çc]e direto na seção 1|primeiro conteúdo do output é literalmente/i)
+    // Hard visual-anchor contract (the anti-Forer core of the fix).
+    expect(sys).toMatch(/Contrato de ancoragem visual/i)
+    expect(sys).toMatch(/estrutura VIS[ÍI]VEL/i)
+    expect(sys).toMatch(/Forer/i)
+    // 15-25 word constraint still present.
     expect(sys).toMatch(/15-25 palavras/)
+    // The OLD "antes da seção 1" essence instruction must be GONE.
+    expect(sys).not.toMatch(/primeir[íi]ssimo conte[úu]do/i)
   })
 
   it('system.md NÃO instrui JSON output (Plan 11 supersedes 8-block JSON)', () => {
@@ -189,7 +196,8 @@ describe('lib/anthropic/prompts — Plan 16 absolute rules + structural restruct
     expect(sys).toContain('## Regras absolutas (mandatórias)')
     expect(sys).toContain('Regra 1 — Nunca cite autores')
     expect(sys).toContain('Regra 2 — Nunca cite escolas')
-    expect(sys).toContain('Regra 3 — Nenhuma referência a setores')
+    // 07.4-35 fix 1: Regra 3 hardened (title now covers olho-lateralization).
+    expect(sys).toMatch(/Regra 3 — Sem coordenadas NEM lateraliza[çc][ãa]o de olho/i)
     expect(sys).toContain('Regra 4 — §3 Linha do Tempo: APENAS 4 campos clínicos')
     expect(sys).toContain('Regra 5 — §10 Arquetípica abre simbolicamente')
     expect(sys).toContain('Regra 6 — §13 Síntese: apenas temas humanos')

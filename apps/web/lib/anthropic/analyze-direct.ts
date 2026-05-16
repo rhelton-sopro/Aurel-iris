@@ -112,10 +112,12 @@ Substituições obrigatórias em relação às instruções acima:
    pipeline nesta geração. As **9 Regras absolutas** continuam valendo na
    íntegra, em especial a Regra 3 (sem hora/setor/lado de olho fora da §2 —
    você localiza internamente mas traduz para significado clínico no texto).
-5. Todo o resto é **idêntico** ao caminho normal: as 15 seções sequenciais,
-   o bloco "## Em uma palavra" antes da §1, as duas subseções da §2, a §15
-   Síntese Rápida em 6 blocos, o vocabulário LGPD, o tom. NÃO emita o
-   encerramento/disclaimer (o servidor anexa o texto literal).
+5. Todo o resto é **idêntico** ao caminho normal: comece direto na §1, as
+   15 seções sequenciais, as duas subseções da §2, a §15 Síntese Rápida em
+   6 blocos, e o bloco "## Em uma palavra" como ÚLTIMO conteúdo (DEPOIS da
+   §15 — síntese final ancorada numa estrutura visível, ver system prompt),
+   o vocabulário LGPD, o tom. NÃO emita o encerramento/disclaimer (o
+   servidor anexa o texto literal).
 
 Gere o relatório completo agora, baseado exclusivamente na sua observação
 visual direta das 6 imagens.`

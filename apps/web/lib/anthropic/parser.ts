@@ -88,32 +88,48 @@ export function findAllBoundaries(buffer: string): BoundaryMatch[] {
   return matches
 }
 
-// "Em uma palavra" essence marker (Plan 7.4-28 CHANGE 5; hardened iter-5
-// FIX 3). The LLM emits, ONCE, before §1: a line containing "em uma palavra"
-// (any heading depth #..####, **bold**, any case, optional separator), then
-// the phrase — same line (`## Em uma palavra: …` / `— …`) OR following lines.
+// "Em uma palavra" essence marker. The LLM emits it ONCE as a line
+// containing "em uma palavra" (any heading depth #..####, **bold**, any
+// case, optional separator), then the phrase — same line
+// (`## Em uma palavra: …` / `— …`) OR following lines.
 //
-// Robustness (iter-5): the search is RESTRICTED to the pre-§1 region (text
-// before the first numbered boundary). This (a) lets a stray preamble exist
-// before the marker without breaking extraction — the #1 suspected miss
-// cause was the old `^`-anchored regex dying on any LLM preamble — and
-// (b) makes a false match inside a section body impossible. The marker is
+// Phase 7.4-35 (founder): the essence is now generated LAST — emitted
+// AFTER §15 (synthesised from the completed analysis, anchored on a
+// visible structure), not improvised before §1. Extraction therefore
+// prefers the post-§15 tail; it falls back to the pre-§1 region so
+// legacy buffers (essence emitted upfront) keep parsing. The marker is
 // line-anchored (`^|\n`) so it won't fire on prose like "…em uma palavra:".
 const ESSENCE_MARKER_RE =
   /(?:^|\n)[ \t]*(?:#{1,4}[ \t]+)?\*{0,2}[ \t]*em uma palavra[ \t]*\*{0,2}[ \t]*(?:[:—–-][ \t]*)?/iu
 
 /**
- * Extract the "essence phrase" from the raw stream buffer (Plan 7.4-28
- * CHANGE 5, hardened iter-5 FIX 3). Searches only the pre-§1 region, finds
- * the "em uma palavra" marker, and returns everything after it as one
- * cleaned line (markdown heading/emphasis/blockquote + wrapping quotes
- * stripped, whitespace collapsed). null when the marker is absent.
- * Length-capped defensively (the prompt asks for 15-25 words).
+ * Absolute buffer index of the essence-marker line, searching only from
+ * `fromIdx` onward. -1 when absent. Used to (a) extract the post-§15
+ * essence and (b) stop the last section from swallowing it.
+ */
+function essenceMarkerIndex(buffer: string, fromIdx: number): number {
+  const m = ESSENCE_MARKER_RE.exec(buffer.slice(fromIdx))
+  return m ? fromIdx + m.index : -1
+}
+
+/**
+ * Extract the "essence phrase". New contract (07.4-35): the marker sits in
+ * the region AFTER the last numbered boundary (post-§15). If not found
+ * there, fall back to the pre-§1 region (legacy buffers). Returns the
+ * phrase as one cleaned line (markdown/blockquote/wrapping-quotes stripped,
+ * whitespace collapsed). null when the marker is absent. Length-capped.
  */
 export function extractEssencePhrase(buffer: string): string | null {
   const boundaries = findAllBoundaries(buffer)
-  const region =
-    boundaries.length > 0 ? buffer.slice(0, boundaries[0]!.startIdx) : buffer
+  let region: string
+  if (boundaries.length > 0) {
+    const tailStart = boundaries[boundaries.length - 1]!.startIdx
+    region = ESSENCE_MARKER_RE.test(buffer.slice(tailStart))
+      ? buffer.slice(tailStart) // new contract: essence after §15
+      : buffer.slice(0, boundaries[0]!.startIdx) // legacy: essence pre-§1
+  } else {
+    region = buffer
+  }
   const m = ESSENCE_MARKER_RE.exec(region)
   if (!m) return null
   const cleaned = region
@@ -143,10 +159,22 @@ export interface ClosedSection {
  */
 export function closeSections(boundaries: BoundaryMatch[], buffer: string): ClosedSection[] {
   const result: ClosedSection[] = []
+  // 07.4-35: the essence block is emitted AFTER the last section (§15). The
+  // last section must NOT swallow it — truncate the last section at the
+  // essence marker when it appears after the final boundary.
+  const lastStart = boundaries.length
+    ? boundaries[boundaries.length - 1]!.startIdx
+    : 0
+  const essenceIdx = boundaries.length
+    ? essenceMarkerIndex(buffer, lastStart)
+    : -1
   for (let i = 0; i < boundaries.length; i++) {
     const boundary = boundaries[i]!
     const nextBoundary = boundaries[i + 1]
-    const endIdx = nextBoundary ? nextBoundary.startIdx : buffer.length
+    let endIdx = nextBoundary ? nextBoundary.startIdx : buffer.length
+    if (!nextBoundary && essenceIdx !== -1 && essenceIdx > boundary.startIdx) {
+      endIdx = essenceIdx
+    }
     const content = buffer.slice(boundary.startIdx, endIdx).trim()
     result.push({ key: boundary.key, content })
   }

@@ -358,4 +358,21 @@ describe('lib/anthropic/parser — extractEssencePhrase (Plan 28 CHANGE 5)', () 
     expect(sec1?.content).not.toContain('Em uma palavra')
     expect(sec1?.content).toContain('Fibras compactas')
   })
+
+  // 07.4-35 — NEW contract: essence is emitted LAST, after §15. The parser
+  // must extract it from the post-§15 tail AND §15 must not swallow it.
+  it('extracts the essence from a post-§15 block (07.4-35 contract)', () => {
+    const secs = Array.from(
+      { length: 15 },
+      (_, i) => `## ${i + 1}. Seção ${i + 1}\nConteúdo da seção ${i + 1}.`,
+    ).join('\n\n')
+    const phrase =
+      'Uma íris de fundo claro e fibras finas e tensas — um organismo que processa rápido e ainda não achou o freio.'
+    const buf = `${secs}\n\n## Em uma palavra\n${phrase}`
+    expect(extractEssencePhrase(buf)).toBe(phrase)
+    const closed = closeSections(findAllBoundaries(buf), buf)
+    const sec15 = closed.find((c) => c.key === '15_sintese_rapida')
+    expect(sec15?.content).not.toContain('Em uma palavra')
+    expect(sec15?.content).toContain('Conteúdo da seção 15')
+  })
 })
