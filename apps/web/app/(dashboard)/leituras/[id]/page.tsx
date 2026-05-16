@@ -66,6 +66,18 @@ export default async function LeituraDetailPage({
   const reportGeneratedAt =
     (reading as { report_generated_at?: string }).report_generated_at ?? null
 
+  // Phase 7.4 Sonnet-direct: signal (no hard block) when ≥1 photo was read
+  // from a non-iris-centered frame (canonicalization fallback).
+  const fallbackCount =
+    (reading.audit_metadata as { canonical_fallback_count?: number } | null)
+      ?.canonical_fallback_count ?? 0
+  const technicalNotice =
+    fallbackCount > 0
+      ? `Observação técnica: ${fallbackCount} ${
+          fallbackCount === 1 ? 'imagem foi analisada' : 'imagens foram analisadas'
+        } a partir de uma foto não perfeitamente centrada na íris (enquadramento da câmera). A leitura permanece válida; para máxima precisão, recapture essa(s) foto(s).`
+      : undefined
+
   // ---- READING MODE (Plan 18 default) ----
   // Continuous flowing serif document with top action buttons.
   if (isReadingMode) {
@@ -85,6 +97,7 @@ export default async function LeituraDetailPage({
           sections={reportToShow}
           clientName={clientName}
           readingDate={reportGeneratedAt ?? reading.created_at}
+          technicalNotice={technicalNotice}
           topActionsSlot={
             <ReadingModeActions
               readingId={readingId}

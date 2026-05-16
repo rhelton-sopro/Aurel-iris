@@ -15,14 +15,13 @@
  */
 import 'server-only'
 
-import sharp from 'sharp'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 import {
   analyzeReadingDirect,
   SONNET_DIRECT_METHOD_VERSION,
-  type DirectImage,
 } from '@/lib/anthropic/analyze-direct'
+import { prepareDirectImages } from '@/lib/anthropic/prepare-direct-images'
 import { MODEL } from '@/lib/anthropic/client'
 import {
   findAllBoundaries,
@@ -32,9 +31,6 @@ import {
 import { runAudit } from '@/lib/anthropic/audit'
 import { ENCERRAMENTO_LITERAL, type ReportJsonb } from '@/lib/anthropic/types'
 import { logReportGeneration } from '@/lib/calibration/log-generation'
-
-const SIGNED_URL_TTL_SECONDS = 600
-const IMAGE_PX = 800
 
 export interface SonnetDirectResult {
   ok: boolean
@@ -53,6 +49,8 @@ export interface SonnetDirectResult {
   tokens_in?: number
   tokens_out?: number
   n_images?: number
+  /** # images that fell back to the raw original (canonical NULL). */
+  canonical_fallback_count?: number
   model_version?: string
   error?: string
   /** Populated only when opts.includeReport is set (runner eyeballing). */
@@ -94,60 +92,18 @@ export async function generateSonnetDirectReport(
     return { ok: false, reading_id: readingId, status: 'reading_not_found', error: readErr?.message }
   }
 
-  // 2. reading_images — prefer the canonical 800×800 crop the pipeline saw.
-  const { data: images, error: imgErr } = await service
-    .from('reading_images')
-    .select('eye, angle, storage_path, canonical_storage_path')
-    .eq('reading_id', readingId)
-  if (imgErr || !images || images.length === 0) {
-    return { ok: false, reading_id: readingId, status: 'no_images', error: imgErr?.message }
-  }
-
-  const paths = images.map(
-    (i) => (i.canonical_storage_path as string | null) ?? (i.storage_path as string),
-  )
-  const { data: signed, error: signErr } = await service.storage
-    .from('iris-captures')
-    .createSignedUrls(paths, SIGNED_URL_TTL_SECONDS)
-  if (signErr || !signed) {
+  // 2+3. reading_images → canonical(800×800) ?? raw → sharp → base64
+  //       (shared helper; also yields the canonicalization fallbackCount).
+  const prep = await prepareDirectImages(service, readingId)
+  if (!prep.ok) {
     return {
       ok: false,
       reading_id: readingId,
-      status: 'generation_failed',
-      error: `signed URL creation failed: ${signErr?.message ?? 'unknown'}`,
+      status: prep.reason === 'no_images' ? 'no_images' : 'generation_failed',
+      error: prep.message,
     }
   }
-
-  // 3. Fetch each photo, normalize to ≤800×800 JPEG, base64.
-  let directImages: DirectImage[]
-  try {
-    directImages = await Promise.all(
-      images.map(async (img, idx) => {
-        const url = signed[idx]?.signedUrl
-        if (!url) throw new Error(`missing signed URL for image ${idx}`)
-        const res = await fetch(url)
-        if (!res.ok) throw new Error(`fetch image ${idx} → HTTP ${res.status}`)
-        const input = Buffer.from(await res.arrayBuffer())
-        const jpeg = await sharp(input)
-          .resize(IMAGE_PX, IMAGE_PX, { fit: 'inside', withoutEnlargement: true })
-          .jpeg({ quality: 90 })
-          .toBuffer()
-        return {
-          eye: img.eye as string,
-          angle: img.angle as string,
-          mediaType: 'image/jpeg' as const,
-          base64: jpeg.toString('base64'),
-        }
-      }),
-    )
-  } catch (err) {
-    return {
-      ok: false,
-      reading_id: readingId,
-      status: 'generation_failed',
-      error: `image prep failed: ${err instanceof Error ? err.message : 'unknown'}`,
-    }
-  }
+  const directImages = prep.images
 
   // 4. Client context for the prompt.
   const client = getClient(reading.client)
@@ -207,6 +163,7 @@ export async function generateSonnetDirectReport(
     tokens_in: finalization.usage.input_tokens,
     tokens_out: finalization.usage.output_tokens,
     n_images: directImages.length,
+    canonical_fallback_count: prep.fallbackCount,
     model_version: SONNET_DIRECT_METHOD_VERSION,
     ...(opts.includeReport ? { report: completed } : {}),
   }
@@ -223,7 +180,8 @@ export async function generateSonnetDirectReport(
     triggered_by: triggeredBy,
     triggered_at: new Date().toISOString(),
     n_images: directImages.length,
-    image_px: IMAGE_PX,
+    image_px: 800,
+    canonical_fallback_count: prep.fallbackCount,
     latency_ms: finalization.latency_ms,
     cost_usd: summary.cost_usd,
     tokens_in: finalization.usage.input_tokens,

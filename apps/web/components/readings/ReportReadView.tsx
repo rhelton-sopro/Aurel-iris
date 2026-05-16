@@ -123,6 +123,9 @@ export interface ReportReadViewProps {
   readingDate: string | null
   /** Optional right-aligned action button row above the body. */
   topActionsSlot?: ReactNode
+  /** Optional technical notice (e.g. canonicalization fallback). Rendered as
+   * a small muted banner above the body — NOT clinical content. */
+  technicalNotice?: string
 }
 
 export function ReportReadView({
@@ -130,6 +133,7 @@ export function ReportReadView({
   clientName,
   readingDate,
   topActionsSlot,
+  technicalNotice,
 }: ReportReadViewProps) {
   const encerramento = sections['encerramento_disclaimer']
   const essence = sections['essence_phrase']?.trim()
@@ -174,6 +178,16 @@ export function ReportReadView({
         <div className="flex flex-wrap items-center justify-end gap-2">
           {topActionsSlot}
         </div>
+      )}
+
+      {technicalNotice && (
+        <p
+          data-testid="report-technical-notice"
+          className="rounded-md border px-3 py-2 text-xs"
+          style={{ color: C.mist, borderColor: C.mist }}
+        >
+          {technicalNotice}
+        </p>
       )}
 
       {essence && (

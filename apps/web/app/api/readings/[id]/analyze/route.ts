@@ -1,27 +1,26 @@
 /**
  * POST /api/readings/[id]/analyze
  *
- * Streaming endpoint for Phase 7 LLM analysis. Owned by the Reading detail
- * page (`/leituras/[id]`); user fires "Gerar análise" button → fetch POST
- * → consume ReadableStream of text deltas → re-fetch on close.
+ * Streaming endpoint for the LLM analysis. Owned by the Reading detail page
+ * (`/leituras/[id]`); user fires "Gerar análise" → fetch POST → consume
+ * ReadableStream of text deltas → re-fetch on close.
+ *
+ * Phase 7.4 (2026-05-16): **flipped to the Sonnet-direct pipeline.** This is
+ * now the single production path — Sonnet reads the 6 canonical 800×800
+ * crops DIRECTLY (no Modal features, no RAG). The Modal vision-service / SAM
+ * / RAG are retired (archived). Streaming, auth gates, regeneration cap/log,
+ * audit, and `report_generated` storage are preserved unchanged so the
+ * therapist UX + downstream consumers are byte-compatible.
  *
  * Auth gates (T-7-AUTH a-e):
- *   a) Session present (`auth.getUser()`)
+ *   a) Session present
  *   b) reading.therapist_id === user.id
- *   c) reading.status === 'ready'
- *   d) reading.report_delivered IS NULL (not yet delivered to client)
- *   e) reading.regeneration_count < 3 (D-S4 cap)
+ *   c) reading.status === 'ready'  (now set by the canonicalize step, not
+ *      the Modal webhook — see finalizeReadingAction / process route)
+ *   d) reading.report_delivered IS NULL
+ *   e) reading.regeneration_count < 3 (founder-bypassed for calibration)
  *
- * Streaming (D-S1, D-S2):
- *   - Web Streams API: `Response(new ReadableStream({...}))`
- *   - Plain text/plain; charset=utf-8 + Transfer-Encoding: chunked
- *   - Section-boundary parser (07-04) detects each `^### N. ` and persists
- *     completed sections via UPDATE jsonb_set (D-S2 — 14 writes total)
- *   - ENCERRAMENTO_LITERAL appended server-side AFTER stream end (D-P3)
- *   - On error: partial save preserved; regeneration_count NOT incremented
- *     (D-S3 — infra failures don't punish the user)
- *
- * Phase 7 | Plan 07-08 | Decisions: D-S1, D-S2, D-S3, D-S4, D-P3, D-T1
+ * Phase 7 | Plan 07-08 → Phase 7.4 Sonnet-direct flip
  */
 import { NextResponse, type NextRequest } from 'next/server'
 import { revalidatePath } from 'next/cache'
@@ -29,11 +28,9 @@ import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { logReportGeneration } from '@/lib/calibration/log-generation'
-import { analyzeReading } from '@/lib/anthropic/analyze'
+import { analyzeReadingDirect } from '@/lib/anthropic/analyze-direct'
+import { prepareDirectImages } from '@/lib/anthropic/prepare-direct-images'
 import { isFounderEmail } from '@/lib/auth/founder'
-import { mergeCanonicalIrisColor } from '@/lib/canonicalize/merge-iris-color'
-import type { CanonicalMetadata } from '@/lib/anthropic/types'
-import type { IrisFeaturesForRag } from '@/lib/rag/build-queries'
 import {
   findAllBoundaries,
   closeSections,
@@ -66,11 +63,12 @@ export async function POST(
     return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
   }
 
-  // Load reading + features (RLS + explicit therapist_id check)
+  // Load reading (RLS + explicit therapist_id check). No vision_features /
+  // canonical merge — the Sonnet-direct path consumes the photos directly.
   const { data: reading, error: readingError } = await supabase
     .from('readings')
     .select(
-      'id, therapist_id, status, vision_features, canonical_metadata, report_delivered, regeneration_count, regeneration_log, therapist_notes, client:clients(full_name, birth_date)',
+      'id, therapist_id, status, report_delivered, regeneration_count, regeneration_log, client:clients(full_name, birth_date)',
     )
     .eq('id', readingId)
     .maybeSingle()
@@ -99,10 +97,7 @@ export async function POST(
       { status: 409 },
     )
   }
-  // Gate (e): regen cap — 3/3 for therapists (D-S4), bypassed for the founder
-  // during calibration iteration. regeneration_count still increments below for
-  // telemetry parity. is_delivered gate above still applies — founder cannot
-  // regenerate a delivered report (business rule, not a friction guard).
+  // Gate (e): regen cap — 3/3 for therapists (D-S4), founder-bypassed.
   const currentCount = reading.regeneration_count ?? 0
   const isFounder = isFounderEmail(user.email)
   if (currentCount >= 3 && !isFounder) {
@@ -112,66 +107,38 @@ export async function POST(
     )
   }
 
-  // Compute client age for prompt injection
-  const clientName = (reading.client as { full_name?: string } | null)?.full_name ?? 'Cliente'
-  const clientBirth = (reading.client as { birth_date?: string } | null)?.birth_date ?? null
+  const clientName =
+    (reading.client as { full_name?: string } | null)?.full_name ?? 'Cliente'
+  const clientBirth =
+    (reading.client as { birth_date?: string } | null)?.birth_date ?? null
   const clientAge = clientBirth
     ? Math.floor((Date.now() - new Date(clientBirth).getTime()) / 31_557_600_000)
     : null
 
-  // Phase 07.1.6 UAT item 2: canonical iris_color is authoritative. Modal's
-  // post-canonicalize callback overwrites vision_features.{eye}.iris_color with
-  // its stale LAB-centroid analysis; merge canonical_metadata.iris_color_by_eye
-  // back in here so the LLM sees the Sonnet-extracted color + iridological hint.
-  // No-op when canonical_metadata is null (pre-07.1.6 readings).
-  const rawVisionFeatures = reading.vision_features as Record<string, unknown> | null
-  const rawCanonicalMetadata = reading.canonical_metadata as unknown as CanonicalMetadata | null
-  const mergedVisionFeatures = mergeCanonicalIrisColor(
-    rawVisionFeatures,
-    rawCanonicalMetadata,
-  )
-
-  // Phase 07.1.6 UAT-1 diagnostic logging (2026-05-12).
-  // Surfaces in Vercel logs whether the merge ran, what canonical iris_color
-  // looked like, and which constitution value reached the LLM. Remove this
-  // block when the report-generation pipeline is stable across canonical readings.
-  const diagSnapshot = {
-    readingId,
-    has_canonical_metadata: !!rawCanonicalMetadata,
-    canonical_iris_color_right: rawCanonicalMetadata?.iris_color_by_eye?.right?.primary ?? null,
-    canonical_iris_color_left: rawCanonicalMetadata?.iris_color_by_eye?.left?.primary ?? null,
-    pre_merge_top_constitution:
-      (rawVisionFeatures as { constitution?: { primary?: string } } | null)?.constitution?.primary ?? null,
-    pre_merge_right_eye_constitution:
-      (rawVisionFeatures as { right_eye?: { constitution?: { primary?: string } } } | null)?.right_eye
-        ?.constitution?.primary ?? null,
-    merged_top_constitution:
-      (mergedVisionFeatures as { constitution?: { primary?: string } }).constitution?.primary ?? null,
-    merged_right_eye_constitution:
-      (mergedVisionFeatures as { right_eye?: { constitution?: { primary?: string } } }).right_eye
-        ?.constitution?.primary ?? null,
-    has_right_eye_block: 'right_eye' in (mergedVisionFeatures ?? {}),
-    has_left_eye_block: 'left_eye' in (mergedVisionFeatures ?? {}),
-    has_right_eye_sectors: Array.isArray(
-      (mergedVisionFeatures as { right_eye?: { sectors?: unknown[] } }).right_eye?.sectors,
-    ),
-    vision_features_keys: Object.keys(mergedVisionFeatures ?? {}),
+  // Prepare the 6 photos (canonical 800×800 ?? raw → sharp → base64).
+  // Service client for storage signing (mirrors /process — avoids RLS tax);
+  // ownership already enforced above with the user client.
+  const service = createServiceClient()
+  const prep = await prepareDirectImages(service, readingId)
+  if (!prep.ok) {
+    const status = prep.reason === 'no_images' ? 404 : 502
+    return NextResponse.json(
+      { error: `Image preparation failed: ${prep.reason} ${prep.message ?? ''}`.trim() },
+      { status },
+    )
   }
-  console.log('[analyze/route] merge-diag', JSON.stringify(diagSnapshot))
 
-  // Open the analysis stream
-  const analysis = await analyzeReading({
+  // Open the Sonnet-direct stream (same {stream,finalize} contract).
+  const analysis = await analyzeReadingDirect({
     readingId,
     therapistId: user.id,
-    visionFeatures: mergedVisionFeatures as unknown as IrisFeaturesForRag & Record<string, unknown>,
+    images: prep.images,
     clientName,
     clientAge,
-    therapistNotes: null, // Phase 7 doesn't surface notes; Fase 9 polish may add
-    irisMap: 'jensen',
+    therapistNotes: null,
     signal: request.signal,
   })
 
-  // Web Streams shell — drives Anthropic deltas to client + DB
   const encoder = new TextEncoder()
   const completedSections: ReportJsonb = {}
   let buffer = ''
@@ -184,20 +151,15 @@ export async function POST(
           buffer += text
           controller.enqueue(encoder.encode(text))
 
-          // Detect new boundaries — only trigger persistence when section CLOSES
           const boundaries = findAllBoundaries(buffer)
           if (boundaries.length > lastBoundaryCount) {
-            // Close all sections except the latest (still open)
             const closed = closeSections(boundaries.slice(0, -1), buffer)
             for (const section of closed) {
               if (completedSections[section.key] !== section.content) {
                 completedSections[section.key] = section.content
-                // Atomic write of just this key via jsonb_set
                 await supabase
                   .from('readings')
-                  .update({
-                    report_generated: { ...completedSections },
-                  })
+                  .update({ report_generated: { ...completedSections } })
                   .eq('id', readingId)
               }
             }
@@ -205,18 +167,11 @@ export async function POST(
           }
         }
 
-        // Stream ended — close last section
         const finalBoundaries = findAllBoundaries(buffer)
-        const allClosed = closeSections(finalBoundaries, buffer)
-        for (const section of allClosed) {
+        for (const section of closeSections(finalBoundaries, buffer)) {
           completedSections[section.key] = section.content
         }
 
-        // Phase 07.1.6 UAT-1 diagnostic: log stream output state BEFORE appending
-        // encerramento. Reveals empty-report case (LLM produced no section
-        // boundaries; previously this was masked by encerramento_disclaimer
-        // being the only key, making hasReport=true on the page even though
-        // the actual report is missing).
         const sectionKeysBeforeEncerramento = Object.keys(completedSections)
         console.log(
           '[analyze/route] stream-finalize',
@@ -225,30 +180,20 @@ export async function POST(
             buffer_length: buffer.length,
             sections_completed: sectionKeysBeforeEncerramento,
             boundaries_count: lastBoundaryCount,
+            canonical_fallback_count: prep.fallbackCount,
           }),
         )
 
-        // Plan 7.4-28 CHANGE 5 — pull the "Em uma palavra" essence phrase the
-        // LLM emits before §1. Not a numbered boundary, so closeSections never
-        // captured it; extract from the raw buffer. Absent = page is skipped.
         const essence = extractEssencePhrase(buffer)
         if (essence) completedSections.essence_phrase = essence
-
-        // D-P3 server-appended encerramento
         completedSections.encerramento_disclaimer = ENCERRAMENTO_LITERAL
 
-        // If LLM produced zero numbered sections, surface this loudly so the
-        // founder sees a clear "report came back empty" error instead of a
-        // page that looks blank. This is almost always upstream (missing
-        // vision_features eye blocks, Modal didn't run, etc.) — leave the
-        // partial buffer in report_raw_text below for forensic inspection.
         if (sectionKeysBeforeEncerramento.length === 0) {
           console.error(
             `[analyze/route] EMPTY-REPORT reading=${readingId} buffer_head=${buffer.slice(0, 400).replace(/\n/g, ' ⏎ ')}`,
           )
         }
 
-        // Finalize: usage + audit + regeneration_log
         const finalization = await analysis.finalize()
         const audit = runAudit(completedSections)
 
@@ -269,6 +214,14 @@ export async function POST(
           ? (reading.regeneration_log as unknown as RegenerationLogEntry[])
           : []
 
+        // (f) Persist the canonicalization fallback count alongside the audit
+        // (queryable for the >30%/2-week instrumentation + the in-report
+        // notice rendered by ReportReadView).
+        const auditWithFallback = {
+          ...audit,
+          canonical_fallback_count: prep.fallbackCount,
+        }
+
         await supabase
           .from('readings')
           .update({
@@ -276,17 +229,14 @@ export async function POST(
             report_generated_at: new Date().toISOString(),
             regeneration_count: currentCount + 1,
             regeneration_log: [...existingLog, logEntry] as unknown as never,
-            audit_metadata: audit as unknown as never,
+            audit_metadata: auditWithFallback as unknown as never,
             report_raw_text: buffer as unknown as never,
           })
           .eq('id', readingId)
 
-        // Instrumentation (best-effort; never blocks the stream). Uses a
-        // service client because report_generations RLS is founder-only —
-        // a therapist's user-scoped client would be blocked. method=vigente.
-        await logReportGeneration(createServiceClient(), {
+        await logReportGeneration(service, {
           reading_id: readingId,
-          method: 'vigente',
+          method: 'sonnet_direct',
           latency_ms: finalization.latency_ms,
           cost_usd: Number(finalization.cost_estimate_usd.toFixed(5)),
           tokens_in: finalization.usage.input_tokens,
@@ -300,15 +250,11 @@ export async function POST(
 
         controller.close()
       } catch (err) {
-        // D-S3: do NOT increment regeneration_count on error
         console.error(
           '[analyze] stream error reading=' + readingId + ' err=',
           err instanceof Error ? err.message : 'unknown',
         )
         try {
-          // Persist partial sections that were already closed mid-stream +
-          // raw buffer (defensive: lets us debug parser misses post-mortem
-          // even when error aborts the stream before audit/finalize ran).
           if (Object.keys(completedSections).length > 0 || buffer.length > 0) {
             const partialEssence = extractEssencePhrase(buffer)
             if (partialEssence) completedSections.essence_phrase = partialEssence
@@ -332,8 +278,6 @@ export async function POST(
     },
 
     async cancel() {
-      // Caller (browser) aborted the fetch → analyze.ts AbortSignal cascades
-      // to llmStream.controller.abort() (already wired in analyze.ts)
       console.info('[analyze] stream cancelled by caller reading=' + readingId)
     },
   })

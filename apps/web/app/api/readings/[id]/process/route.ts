@@ -22,6 +22,7 @@ import { NextResponse } from 'next/server'
 
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
+import { isModalPipelineEnabled } from '@/lib/vision/pipeline-flag'
 import {
   ModalTriggerError,
   triggerVisionPipeline,
@@ -65,6 +66,29 @@ export async function POST(
       { error: `Reading status '${reading.status}' is not retriggerable` },
       { status: 404 },
     )
+  }
+
+  // Phase 7.4 Sonnet-direct flip: Modal vision-service RETIRED. When the
+  // pipeline is disabled (default), there is no segmentation/feature step —
+  // the report path reads the canonical crops (produced by the canonicalize
+  // step that runs before this trigger) DIRECTLY. So this route just marks
+  // the reading analyzable. status='ready' is what the Modal webhook used to
+  // set; the analyze gate (status==='ready') is unchanged. Reversible: set
+  // MODAL_PIPELINE_ENABLED=true to restore the old path below.
+  if (!isModalPipelineEnabled()) {
+    const svc = createServiceClient()
+    const { error: readyError } = await svc
+      .from('readings')
+      .update({ status: 'ready' })
+      .eq('id', readingId)
+    if (readyError) {
+      return NextResponse.json(
+        { error: `Mark-ready failed: ${readyError.message}` },
+        { status: 500 },
+      )
+    }
+    revalidatePath('/leituras')
+    return new NextResponse(null, { status: 202 })
   }
 
   // 3. Fetch the 6 reading_images

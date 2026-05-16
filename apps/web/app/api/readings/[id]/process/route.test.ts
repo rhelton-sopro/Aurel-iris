@@ -102,8 +102,29 @@ describe('POST /api/readings/[id]/process', () => {
     process.env.MODAL_ANALYZE_ENDPOINT_URL = 'https://example.modal.run/analyze'
     process.env.MODAL_TOKEN_ID = 'mk'
     process.env.MODAL_TOKEN_SECRET = 'ms'
+    // Phase 7.4: Modal is retired (default OFF). These legacy-path tests
+    // exercise the still-present, flag-gated Modal code → opt in explicitly.
+    // The new default (flag off → 202 + status='ready') is covered separately.
+    process.env.MODAL_PIPELINE_ENABLED = 'true'
   })
-  afterEach(() => vi.clearAllMocks())
+  afterEach(() => {
+    delete process.env.MODAL_PIPELINE_ENABLED
+    vi.clearAllMocks()
+  })
+
+  it('Sonnet-direct default (Modal disabled): 202 + status=ready, no trigger', async () => {
+    delete process.env.MODAL_PIPELINE_ENABLED
+    mockCreateClient.mockResolvedValue(
+      buildUserClient({
+        user: { id: 'u' },
+        reading: { id: 'abc-123', status: 'pending', therapist_id: 'u' },
+      }),
+    )
+    mockCreateServiceClient.mockReturnValue(buildServiceClient({}))
+    const res = await POST(makeRequest(), makeParams())
+    expect(res.status).toBe(202)
+    expect(mockTrigger).not.toHaveBeenCalled()
+  })
 
   it('returns 401 when unauthenticated', async () => {
     mockCreateClient.mockResolvedValue(buildUserClient({ user: null }))

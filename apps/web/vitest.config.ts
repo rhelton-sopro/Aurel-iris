@@ -16,7 +16,15 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./tests/setup.ts'],
     include: ['**/*.{test,spec}.{ts,tsx}'],
-    exclude: ['**/node_modules/**', '**/.next/**'],
+    // The Column C manual runner is executed ONLY via its isolated config
+    // (scripts/runner.vitest.config.ts — node env, no jsdom setup). Its
+    // `@vitest-environment node` docblock breaks collection under the main
+    // jsdom setup, so it must never join the normal suite.
+    exclude: [
+      '**/node_modules/**',
+      '**/.next/**',
+      'scripts/run-sonnet-direct.spec.ts',
+    ],
   },
   resolve: {
     alias: {
