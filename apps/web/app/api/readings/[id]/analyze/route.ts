@@ -38,10 +38,12 @@ import {
 } from '@/lib/anthropic/parser'
 import { runAudit } from '@/lib/anthropic/audit'
 import { MODEL } from '@/lib/anthropic/client'
+import { getSystemPromptVersion } from '@/lib/anthropic/prompts'
 import {
   ENCERRAMENTO_LITERAL,
   type ReportJsonb,
   type RegenerationLogEntry,
+  type CanonicalMetadata,
 } from '@/lib/anthropic/types'
 
 export const runtime = 'nodejs'
@@ -68,7 +70,7 @@ export async function POST(
   const { data: reading, error: readingError } = await supabase
     .from('readings')
     .select(
-      'id, therapist_id, status, report_delivered, regeneration_count, regeneration_log, client:clients(full_name, birth_date)',
+      'id, therapist_id, status, report_delivered, regeneration_count, regeneration_log, client_id, canonical_metadata, client:clients(full_name, birth_date)',
     )
     .eq('id', readingId)
     .maybeSingle()
@@ -234,6 +236,11 @@ export async function POST(
           })
           .eq('id', readingId)
 
+        // 07.4-36: bbox cost/latency already persisted by canonicalizeReading
+        // into readings.canonical_metadata — read it here (no extra call).
+        const canon = (reading as { canonical_metadata?: unknown })
+          .canonical_metadata as CanonicalMetadata | null
+
         await logReportGeneration(service, {
           reading_id: readingId,
           method: 'sonnet_direct',
@@ -242,6 +249,20 @@ export async function POST(
           tokens_in: finalization.usage.input_tokens,
           tokens_out: finalization.usage.output_tokens,
           model_version: MODEL,
+          prompt_version: getSystemPromptVersion(),
+          canonical_fallback_count: prep.fallbackCount,
+          audit_summary: audit,
+          regeneration_count: currentCount + 1,
+          client_id:
+            (reading as { client_id?: string | null }).client_id ?? null,
+          bbox_cost_usd:
+            typeof canon?.cost_usd === 'number'
+              ? Number(canon.cost_usd.toFixed(5))
+              : null,
+          bbox_latency_ms:
+            typeof canon?.bbox_latency_ms === 'number'
+              ? canon.bbox_latency_ms
+              : null,
         })
 
         revalidatePath(`/leituras/${readingId}`)

@@ -107,6 +107,7 @@ export async function canonicalizeReading(
   therapistId: string,
 ): Promise<CanonicalizeReadingOutput> {
   const enabled = process.env.CANONICAL_CAPTURE_ENABLED !== 'false' // D-04 default ON
+  const startedAt = Date.now() // 07.4-36: wall-clock for bbox_latency_ms
   const service = createServiceClient()
 
   // Fetch the reading_images (typically 6: 2 eyes × 3 angles)
@@ -142,6 +143,7 @@ export async function canonicalizeReading(
       cost_usd: 0,
       status_summary: { ok: 0, fallback: 0, disabled: disabledResults.length },
       canonicalized_at: new Date().toISOString(),
+      bbox_latency_ms: Date.now() - startedAt,
     }
     return { results: disabledResults, metadata }
   }
@@ -351,6 +353,7 @@ export async function canonicalizeReading(
     cost_usd: totalCost,
     status_summary: summary,
     canonicalized_at: new Date().toISOString(),
+    bbox_latency_ms: Date.now() - startedAt,
     gate_diagnostics,
     iris_color_by_eye,
   }

@@ -1,16 +1,31 @@
 // Phase 7 | Plan 07-03 — Prompt loader + mustache substitution + ENCERRAMENTO_LITERAL.
 // Source: 07-VALIDATION.md line 57, 07-RESEARCH.md line 1082 (Pitfall 4).
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
+import { createHash } from 'node:crypto'
 import {
   loadSystemPrompt,
   loadInjectionTemplate,
   renderInjection,
+  getSystemPromptVersion,
   _resetPromptsCache,
 } from '../prompts'
 import { ENCERRAMENTO_LITERAL } from '../types'
 
 beforeEach(() => {
   _resetPromptsCache()
+})
+
+describe('lib/anthropic/prompts — getSystemPromptVersion (07.4-36)', () => {
+  it('é 12 hex chars, estável entre chamadas, e = sha256(system.md).slice(0,12)', () => {
+    const v = getSystemPromptVersion()
+    expect(v).toMatch(/^[0-9a-f]{12}$/)
+    expect(getSystemPromptVersion()).toBe(v) // cached / deterministic
+    const expected = createHash('sha256')
+      .update(loadSystemPrompt())
+      .digest('hex')
+      .slice(0, 12)
+    expect(v).toBe(expected)
+  })
 })
 
 describe('lib/anthropic/prompts — file content (Plan 21 — 16-section Iris Codex V1, no § symbol)', () => {

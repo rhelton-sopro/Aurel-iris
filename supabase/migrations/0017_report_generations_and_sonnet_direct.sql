@@ -43,20 +43,58 @@ comment on column public.readings.sonnet_direct_run_metadata is
 
 -- ── 2. report_generations: per-method instrumentation ──────────────────────
 create table if not exists public.report_generations (
-  id            uuid primary key default gen_random_uuid(),
-  reading_id    uuid not null,
-  method        text not null check (method in ('vigente', 'sam', 'sonnet_direct')),
-  generated_at  timestamptz not null default now(),
-  latency_ms    integer,
-  cost_usd      numeric(10, 5),
-  tokens_in     integer,
-  tokens_out    integer,
-  model_version text,
-  created_at    timestamptz not null default now()
+  id                       uuid primary key default gen_random_uuid(),
+  reading_id               uuid not null,
+  method                   text not null check (method in ('vigente', 'sam', 'sonnet_direct')),
+  generated_at             timestamptz not null default now(),
+  latency_ms               integer,
+  cost_usd                 numeric(10, 5),
+  tokens_in                integer,
+  tokens_out               integer,
+  model_version            text,
+  -- 07.4-36 founder amendment — production analytics surface (2-3 week horizon):
+  prompt_version           text,
+  canonical_fallback_count integer,
+  audit_summary            jsonb,
+  regeneration_count       integer,
+  client_id                uuid,
+  bbox_cost_usd            numeric(10, 5),
+  bbox_latency_ms          integer,
+  created_at               timestamptz not null default now()
 );
+
+-- Idempotent guard: if a partial/earlier 0017 was ever applied, `create table
+-- if not exists` is a no-op and would NOT add the amendment columns — so add
+-- them explicitly too. Safe on a fresh table (already present → no-op).
+alter table public.report_generations
+  add column if not exists prompt_version           text,
+  add column if not exists canonical_fallback_count integer,
+  add column if not exists audit_summary            jsonb,
+  add column if not exists regeneration_count       integer,
+  add column if not exists client_id                uuid,
+  add column if not exists bbox_cost_usd            numeric(10, 5),
+  add column if not exists bbox_latency_ms          integer;
 
 comment on table public.report_generations is
   'Phase 7.4 calibration instrumentation: one row per report generation across the 3 comparison methods (vigente | sam | sonnet_direct). Best-effort insert — never blocks a generation. No FK on reading_id (decoupled from readings lifecycle / migration order).';
+comment on column public.report_generations.cost_usd is
+  'Cost of the REPORT generation Anthropic call only (Sonnet writing the 15 sections). Excludes the canonicalization bbox call — see bbox_cost_usd.';
+comment on column public.report_generations.model_version is
+  'Anthropic MODEL id (e.g. claude-sonnet-…). NOT the prompt version — see prompt_version.';
+comment on column public.report_generations.prompt_version is
+  '07.4-36: short sha256 of the effective system.md content at generation time (getSystemPromptVersion). Lets quality/cost shifts be attributed to prompt iteration vs model change.';
+comment on column public.report_generations.canonical_fallback_count is
+  '07.4-36: # of the 6 photos that fell back to the raw uncentered frame (canonicalization trust-gate) for THIS generation. Per-generation snapshot (readings.audit_metadata is overwritten each regen).';
+comment on column public.report_generations.audit_summary is
+  '07.4-36: the AuditMetadata for this generation (low_anchor_rate, anchor_rate_pct, forbidden_vocab[], audited_at). Per-generation snapshot.';
+comment on column public.report_generations.regeneration_count is
+  '07.4-36: readings.regeneration_count AFTER this generation (1 = first generation, 2 = first regen, …). Authoritative even if a best-effort insert is ever lost.';
+comment on column public.report_generations.client_id is
+  '07.4-36: denormalized readings.client_id (no FK — mirrors the reading_id decoupling). Survives reading deletion; avoids a join for per-client cost rollups.';
+comment on column public.report_generations.bbox_cost_usd is
+  '07.4-36: cost of the SEPARATE canonicalization (Sonnet-bbox) Anthropic call for this reading, read from readings.canonical_metadata.cost_usd. Total reading $ = cost_usd + bbox_cost_usd.';
+comment on column public.report_generations.bbox_latency_ms is
+  '07.4-36: wall-clock latency of the canonicalization batch (6 parallel bbox calls), from readings.canonical_metadata.bbox_latency_ms.';
 
 create index if not exists report_generations_reading_id_idx
   on public.report_generations (reading_id);

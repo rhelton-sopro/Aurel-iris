@@ -18,10 +18,12 @@
  */
 import 'server-only'
 import { readFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
 import path from 'node:path'
 
 let _systemCache: string | null = null
 let _injectionCache: string | null = null
+let _systemVersionCache: string | null = null
 
 const PROMPTS_DIR = path.join(process.cwd(), 'prompts')
 
@@ -52,6 +54,23 @@ export function loadSystemPrompt(): string {
   return _systemCache
 }
 
+/**
+ * Stable short fingerprint of the EFFECTIVE system.md content (12 hex chars
+ * of sha256). Persisted per generation in `report_generations.prompt_version`
+ * so production quality/cost shifts can be attributed to prompt iteration vs
+ * model change (07.4-36 founder amendment). Derived from the same cached
+ * buffer as `loadSystemPrompt()` — no extra disk read; cache reset by
+ * `_resetPromptsCache` (test only).
+ */
+export function getSystemPromptVersion(): string {
+  if (_systemVersionCache !== null) return _systemVersionCache
+  _systemVersionCache = createHash('sha256')
+    .update(loadSystemPrompt())
+    .digest('hex')
+    .slice(0, 12)
+  return _systemVersionCache
+}
+
 export function loadInjectionTemplate(): string {
   if (_injectionCache !== null) return _injectionCache
   const filepath = path.join(PROMPTS_DIR, 'feature-injection.md')
@@ -77,4 +96,5 @@ export function renderInjection(template: string, vars: Record<string, string>):
 export function _resetPromptsCache(): void {
   _systemCache = null
   _injectionCache = null
+  _systemVersionCache = null
 }

@@ -355,6 +355,14 @@ export interface CanonicalMetadata {
   /** ISO timestamp when canonicalize finished */
   canonicalized_at: string
   /**
+   * Wall-clock latency of the canonicalization batch (the 6 parallel
+   * Sonnet-bbox calls + crop/upload), milliseconds. 07.4-36: surfaced into
+   * `report_generations.bbox_latency_ms` so total per-reading generation time
+   * = report latency + this. Optional — readings canonicalized before this
+   * patch won't carry it.
+   */
+  bbox_latency_ms?: number
+  /**
    * Per-photo diagnostic trail (Phase 07.1.6 UAT — surfaced after item 1
    * showed 5/6 fallback for the first real reading). Optional para preservar
    * backward-compat com readings canonicalizadas antes do diagnostic patch.
