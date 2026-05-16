@@ -190,19 +190,31 @@ export async function analyzeReadingDirect(
   const systemPrompt = loadSystemPrompt()
   const userContent = buildUserContent(args)
 
-  const llmStream = anthropicClient.messages.stream({
-    model: MODEL,
-    max_tokens: MAX_OUTPUT_TOKENS,
-    system: [
-      {
-        type: 'text',
-        text: systemPrompt,
-        cache_control: DEFAULT_SYSTEM_CACHE_CONTROL,
-      },
-      { type: 'text', text: VISUAL_MODE_OVERRIDE },
-    ],
-    messages: [{ role: 'user', content: userContent }],
-  })
+  const llmStream = anthropicClient.messages.stream(
+    {
+      model: MODEL,
+      max_tokens: MAX_OUTPUT_TOKENS,
+      system: [
+        {
+          type: 'text',
+          text: systemPrompt,
+          cache_control: DEFAULT_SYSTEM_CACHE_CONTROL,
+        },
+        { type: 'text', text: VISUAL_MODE_OVERRIDE },
+      ],
+      messages: [{ role: 'user', content: userContent }],
+    },
+    // Per-request override (does NOT touch the shared client used by the
+    // production vigente / SAM paths). The SDK default maxRetries=2 silently
+    // re-issues the WHOLE request on a transient error; on this long
+    // (~150s) 6-image + 16k-system stream Anthropic bills the failed partial
+    // attempt too, but finalMessage().usage only reports the final attempt —
+    // so a retry doubled real cost while report_generations under-counted.
+    // For a cost-measurement harness, accurate accounting > silent recovery:
+    // fail fast on transient errors (founder re-triggers = one honest bill;
+    // logged tokens == billed tokens).
+    { maxRetries: 0 },
+  )
 
   if (args.signal) {
     args.signal.addEventListener('abort', () => {
