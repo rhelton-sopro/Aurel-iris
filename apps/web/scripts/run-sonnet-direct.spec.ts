@@ -88,12 +88,25 @@ maybe('Column C — Sonnet direct runner', () => {
           (k) => k !== 'encerramento_disclaimer' && k !== 'essence_phrase',
         )
         console.log('\n----- essence_phrase -----\n', r.essence_phrase ?? '(nenhuma)')
-        const firstKey = keys.sort()[0]
-        if (firstKey) {
-          console.log(
-            `\n----- ${firstKey} (preview) -----\n`,
-            String(r[firstKey] ?? '').slice(0, 1000),
-          )
+        // Full report dump → gitignored scripts/output/ for review.
+        const outPath = path.resolve(
+          process.cwd(),
+          'scripts/output',
+          `sonnet-direct-${READING_ID}.md`,
+        )
+        const body = ['## Em uma palavra', '', r.essence_phrase ?? '(nenhuma)', '']
+        for (const k of keys.sort((a, b) => {
+          const na = parseInt(a, 10)
+          const nb = parseInt(b, 10)
+          return (isNaN(na) ? 0 : na) - (isNaN(nb) ? 0 : nb)
+        })) {
+          body.push(String(r[k] ?? ''), '')
+        }
+        try {
+          require('node:fs').writeFileSync(outPath, body.join('\n'), 'utf8')
+          console.log(`\n----- full report written -----\n${outPath}`)
+        } catch (e) {
+          console.log('full-report write failed:', (e as Error).message)
         }
         console.log('\n----- section keys -----\n', keys.join(', '))
       }
