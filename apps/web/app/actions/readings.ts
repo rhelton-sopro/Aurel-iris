@@ -271,16 +271,24 @@ export async function discardReadingAction(
     return { error: 'reading_id inválido' }
   }
 
-  // 1) Listar storage_paths antes do delete (RLS de reading_images filtra para apenas próprios)
+  // 1) Listar storage_paths antes do delete (RLS de reading_images filtra para apenas próprios).
+  //    canonical_storage_path inclui os blobs canonicalizados (pipeline 07.1.6) —
+  //    sem remover, leituras completas deixam blob órfão no Storage.
   const { data: images } = await supabase
     .from('reading_images')
-    .select('storage_path')
+    .select('storage_path, canonical_storage_path')
     .eq('reading_id', parsed.data.reading_id)
 
   // 2) Remover blobs (best-effort: erro aqui não bloqueia o delete do reading row)
   if (images && images.length > 0) {
-    const paths = images.map((i) => i.storage_path)
-    await supabase.storage.from('iris-captures').remove(paths)
+    const paths = images.flatMap((i) =>
+      [i.storage_path, i.canonical_storage_path].filter(
+        (p): p is string => typeof p === 'string' && p.length > 0,
+      ),
+    )
+    if (paths.length > 0) {
+      await supabase.storage.from('iris-captures').remove(paths)
+    }
   }
 
   // 3) RLS garante ownership; cascade apaga reading_images
