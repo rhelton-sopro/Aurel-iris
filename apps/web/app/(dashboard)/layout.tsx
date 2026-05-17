@@ -30,7 +30,11 @@ export default async function DashboardLayout({
   const subscriptionStatus = profile?.subscription_status ?? null
 
   return (
-    <SidebarProvider>
+    <SidebarProvider
+      style={
+        { '--sidebar-width': '15rem', '--sidebar-width-icon': '4rem' } as React.CSSProperties
+      }
+    >
       <AppSidebar />
       <SidebarInset>
         <DashboardHeader
@@ -38,11 +42,11 @@ export default async function DashboardLayout({
           trialEndsAt={trialEndsAt}
           subscriptionStatus={subscriptionStatus}
         />
-        <main className="flex-1 p-6">
+        <main className="flex-1 px-7 py-6">
           {children}
         </main>
-        <footer className="px-6 pb-4">
-          <p className="text-xs text-muted-foreground">
+        <footer className="px-7 pb-5">
+          <p className="text-[10.5px] uppercase tracking-label text-mist">
             Ferramenta de apoio à anamnese terapêutica integrativa, não substitui avaliação médica.
           </p>
         </footer>

@@ -38,11 +38,11 @@ export function DashboardHeader({ fullName, trialEndsAt, subscriptionStatus }: D
   }
 
   return (
-    <header className="h-[calc(3.5rem+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)] border-b flex items-center justify-between px-4">
+    <header className="sticky top-0 z-10 flex h-[calc(4rem+env(safe-area-inset-top))] items-center justify-between border-b border-[#EAEAEA] bg-white px-6 pt-[env(safe-area-inset-top)]">
       <div className="flex items-center gap-2">
-        <SidebarTrigger />
+        <SidebarTrigger className="size-9 hover:bg-transparent hover:text-teal" />
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-4">
         {isTrial && daysLeft !== null && (
           <Badge variant={isTrialUrgent ? 'destructive' : 'outline'}>
             Trial: {daysLeft} dias
@@ -53,14 +53,17 @@ export function DashboardHeader({ fullName, trialEndsAt, subscriptionStatus }: D
             className="cursor-pointer rounded-full"
             aria-label={`${fullName} — menu da conta`}
           >
-            <Avatar className="h-8 w-8">
-              <AvatarFallback className="bg-primary text-primary-foreground text-sm font-medium">
+            <Avatar className="h-9 w-9">
+              <AvatarFallback className="bg-primary text-primary-foreground text-xs font-normal">
                 {initial}
               </AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+          <DropdownMenuContent align="end" className="min-w-40 rounded-none border border-ink p-0 shadow-none">
+            <DropdownMenuItem
+              onClick={handleLogout}
+              className="cursor-pointer rounded-none px-3.5 py-3 text-[11px] font-normal uppercase tracking-label focus:bg-ivory"
+            >
               <LogOut className="mr-2 h-4 w-4" />
               Sair
             </DropdownMenuItem>
