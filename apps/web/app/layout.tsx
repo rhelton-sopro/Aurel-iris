@@ -1,11 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Raleway, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+// Brand voice = Raleway (mesma família do wordmark do logo). Light/ExtraLight
+// com tracking largo carrega o "luxo silencioso". latin-ext cobre acentos pt-BR.
+const raleway = Raleway({
+  variable: "--font-raleway",
+  subsets: ["latin", "latin-ext"],
+  weight: ["200", "300", "400", "500", "600"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
@@ -37,10 +41,8 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="pt-BR">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang="pt-BR" className={`${raleway.variable} ${geistMono.variable}`}>
+      <body className="antialiased">
         {children}
         <Toaster
           position="bottom-center"
