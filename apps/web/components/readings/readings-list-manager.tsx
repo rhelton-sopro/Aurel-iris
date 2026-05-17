@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils'
 import { StatusBadge, type ReadingStatus } from '@/components/readings/StatusBadge'
 import { ReprocessButton } from '@/components/readings/ReprocessButton'
 import { DeleteReadingDialog } from '@/components/readings/delete-reading-dialog'
+import { AutoRefreshWhileProcessing } from '@/components/readings/AutoRefreshWhileProcessing'
 
 type ClientRef = { full_name: string | null }
 
@@ -52,6 +53,10 @@ export function ReadingsListManager({
   const [pendingDelete, setPendingDelete] = useState<string[] | null>(null)
 
   const allIds = useMemo(() => readings.map(r => r.id), [readings])
+  const anyProcessing = useMemo(
+    () => readings.some(r => r.status === 'processing'),
+    [readings],
+  )
   const allSelected = selected.size > 0 && selected.size === allIds.length
   const someSelected = selected.size > 0 && !allSelected
 
@@ -89,6 +94,7 @@ export function ReadingsListManager({
 
   return (
     <>
+      <AutoRefreshWhileProcessing active={anyProcessing} />
       {selected.size > 0 && (
         <div className="flex items-center justify-between rounded-md border bg-muted/40 px-3 py-2">
           <span className="text-sm font-medium">

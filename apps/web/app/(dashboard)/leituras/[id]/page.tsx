@@ -32,6 +32,7 @@ import { StatusBadge } from '@/components/readings/StatusBadge'
 import { AnalysisHero } from '@/components/readings/AnalysisHero'
 import { ReportReadView } from '@/components/readings/ReportReadView'
 import { ReadingModeActions } from '@/components/readings/ReadingModeActions'
+import { AutoRefreshWhileProcessing } from '@/components/readings/AutoRefreshWhileProcessing'
 import { AnaliseClient } from './analise-client'
 
 export const dynamic = 'force-dynamic'
@@ -115,6 +116,7 @@ export default async function LeituraDetailPage({
   // Preserved AnalysisHero + AnaliseClient path.
   return (
     <div className="space-y-6 px-6 py-8">
+      <AutoRefreshWhileProcessing active={status === 'processing'} />
       <div className="flex items-center justify-between">
         <Link
           href="/leituras"
