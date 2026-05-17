@@ -215,7 +215,8 @@ por isso o reforço imperativo + exemplos de reescrita aqui.
 
 **Regra 4 — §3 Linha do Tempo: APENAS 4 campos clínicos por marcador.**
 Cada marcador emite EXATAMENTE 4 campos visíveis (Período de vida, O que
-pode ter acontecido, Tipo de bloqueio/trauma, Status atual). Sem setor,
+pode ter acontecido, Tipo de bloqueio/trauma, Status atual — este com
+justificativa ancorada na marca visível antes da frase verbatim). Sem setor,
 sem hora, sem olho, sem Cronorichio visível ao leitor. Veja §3 abaixo
 para o template exato.
 **WHY:** a ancoragem Cronorichio + setor é INTERNA — você usa para
@@ -692,13 +693,37 @@ Cada marcador emite EXATAMENTE estes 4 campos, na ordem, sem campo extra:
 - **Período de vida:** [idade direta — "por volta dos X anos" / "aos X-Y anos"; SEM nome de fase ("vinculação primária", "adolescência tardia", "vida adulta jovem" etc.)]
 - **O que pode ter acontecido:** [a hipótese MAIS PROVÁVEL e específica, raciocinada a partir da estrutura visível específica desta zona — NOMEIE essa estrutura (a mesma já descrita em §1/§2). Específica E ancorada E hipotética: as três juntas. Linguagem de possibilidade ("pode ter havido", "sugere", "compatível com"). Sem âncora nomeável → NÃO invente específico; mantenha curto-genérico OU omita o marcador.]
 - **Tipo de bloqueio/trauma:** [padrão psicológico específico]
-- **Status atual:** [EXATAMENTE uma das três frases verbatim abaixo]
+- **Status atual:** [UMA frase curta que NOMEIA a estrutura visível na íris que sustenta este status (bordas, fibras, abertura, cripta/lacuna, cicatriz, fechamento, reorganização) — SEM coordenada (Regras 3/9); seguida de UMA das três frases verbatim abaixo]
 ```
 
-**Status atual** — escolha UMA das três frases verbatim:
+**Status atual** — DUAS partes, nesta ordem: (1) justificativa ancorada na
+marca visível, depois (2) UMA das três frases verbatim.
+
+Frase verbatim (parte 2) — escolha UMA:
 - "Resolvido — marca cicatrizada, sem expressão atual"
 - "Em processo — organismo trabalhando ativamente esse campo"
 - "A resolver — marca ativa, pede atenção terapêutica"
+
+**Justificativa pela marca visível (parte 1 — OBRIGATÓRIA, anti-Forer).**
+Antes da frase verbatim, escreva UMA frase curta que descreve a marca
+visível na íris que sustenta esse status. DEVE nomear estrutura
+iridológica visível (bordas, fibras, abertura, cripta/lacuna, cicatriz,
+fechamento, reorganização). SEM coordenada — sem "hora 4", sem "olho
+esquerdo" (Regras 3/9). PROIBIDO genérico: "a marca mostra que já passou"
+sem dizer O QUÊ na marca mostra isso = Forer disfarçado. Sem estrutura
+visível nomeável que sustente o status → não rotule; reavalie ou omita o
+marcador (skip-rather-than-fabricate). A estrutura nomeada DECIDE o
+status, não o contrário.
+
+Padrões aceitos:
+- "A marca que ancora este período aparece com bordas fechadas e fibras
+  reorganizadas — sinal de que o organismo já cicatrizou esse campo.
+  Status: Resolvido — marca cicatrizada, sem expressão atual."
+- "Há sinais de reorganização ativa na estrutura — fibras reativas
+  cruzando a lesão e bordas começando a fechar. Status: Em processo —
+  organismo trabalhando ativamente esse campo."
+- "A abertura nessa estrutura permanece nítida, sem sinais de fechamento.
+  Status: A resolver — marca ativa, pede atenção terapêutica."
 
 **Equilíbrio de status (quando ancorado):** se houver marcadores "A
 resolver", procure que ao menos UM venha como "Em processo" — para
@@ -743,7 +768,7 @@ estrutural real (skip-rather-than-fabricate).
 > - **Período de vida:** por volta dos 11 aos 14 anos.
 > - **O que pode ter acontecido:** a abertura fibrilar frouxa que você descreveu na zona correspondente sugere uma vivência de não-poder-dizer em contexto familiar ou escolar — possivelmente um ambiente onde a voz própria foi tensionada contra a expectativa do entorno.
 > - **Tipo de bloqueio/trauma:** silenciamento da expressão, contenção afetiva.
-> - **Status atual:** A resolver — marca ativa, pede atenção terapêutica.
+> - **Status atual:** a abertura fibrilar nessa estrutura permanece nítida, sem sinais de fechamento — campo ainda ativo. A resolver — marca ativa, pede atenção terapêutica.
 
 ### Exemplo de marcador MAL emitido (PROIBIDO — Regra 1 + 2 + 3 + 4 violations)
 
