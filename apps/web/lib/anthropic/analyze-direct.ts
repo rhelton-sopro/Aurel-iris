@@ -55,7 +55,6 @@ export interface AnalyzeDirectArgs {
   images: DirectImage[]
   clientName: string
   clientAge: number | null
-  therapistNotes: string | null
   /** Optional AbortSignal — Route Handler passes request.signal here. */
   signal?: AbortSignal
 }
@@ -134,15 +133,24 @@ function eyeLabel(eye: string): string {
 /**
  * Build the user message content: client context, then each of the 6 photos
  * preceded by an eye/angle label, then the closing instruction.
+ *
+ * INVARIANTE §5 (anti-viés de confirmação): o bloco <client_context>
+ * carrega SOMENTE nome + idade + mapa. NENHUM dado clínico/anamnese
+ * (queixa, condições, medicamentos, observações do terapeuta) pode entrar
+ * aqui. A barreira é por construção — `AnalyzeDirectArgs` não tem campo de
+ * texto livre clínico; reintroduzir um quebra `analyze-direct.guard.test`
+ * (regex de rótulos clínicos) E o `tsc` (type-level keyof guard). Se este
+ * teste falhar, NÃO afrouxe o teste — reverta a mudança que reabriu o canal.
+ *
+ * `export` apenas para o teste-guarda consumir a montagem real.
  */
-function buildUserContent(
+export function buildUserContent(
   args: AnalyzeDirectArgs,
 ): Array<Anthropic.TextBlockParam | Anthropic.ImageBlockParam> {
   const ctx =
     `<client_context>\n` +
     `Nome: ${args.clientName}\n` +
     `Idade: ${args.clientAge != null ? String(args.clientAge) : ''}\n` +
-    `Observações do terapeuta: ${args.therapistNotes ?? ''}\n` +
     `Mapa preferido: jensen\n` +
     `</client_context>\n\n` +
     `Abaixo estão as 6 fotografias da íris desta pessoa (olho direito e ` +
@@ -250,7 +258,7 @@ export async function analyzeReadingDirect(
     const latencyMs = Date.now() - startedAt
     const cost = estimateCostUsd(usage)
 
-    // D-T1 telemetry — NO PII (no clientName, no therapistNotes, no report text)
+    // D-T1 telemetry — NO PII (no clientName, no report text)
     console.info({
       event: 'llm_generate_direct',
       reading_id: args.readingId,

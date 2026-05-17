@@ -123,7 +123,6 @@ export async function generateSonnetDirectReport(
       images: directImages,
       clientName,
       clientAge,
-      therapistNotes: null,
       signal: opts.signal,
     })
     for await (const text of analysis.stream) buffer += text

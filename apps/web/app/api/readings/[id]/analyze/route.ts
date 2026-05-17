@@ -137,7 +137,6 @@ export async function POST(
     images: prep.images,
     clientName,
     clientAge,
-    therapistNotes: null,
     signal: request.signal,
   })
 
