@@ -81,6 +81,21 @@ const _F3 = ['c', 'u', 'r', 'a'].join('')
 export const FORBIDDEN_VOCAB_RE = new RegExp(`\\b(${_F1}|${_F2}|${_F3})\\b`, 'giu')
 
 /**
+ * Paradigm-leak guardrail (2026-05-17). The §3 prompt now carries an
+ * INTERNAL-ONLY orientation block naming the Lo Rito / Microsemiótica
+ * Irídea / Cronorischio school + B.S.N.A./collarette/setênio vocabulary as
+ * the model's reasoning compass. Rules 1/2/9 forbid ANY of it in the
+ * client-facing output, but `runAudit` previously screened only the 3 LGPD
+ * terms — author/school/jargon leakage was unmonitored. This regex makes
+ * that leak risk visible (audit banner) and blocks delivery via the same
+ * `extractForbiddenHits` defense-in-depth path `saveReportDelivered` uses.
+ * These terms have NO legitimate use in §1..§15, so no negative-context
+ * exemption applies (unlike the LGPD terms).
+ */
+export const PARADIGM_LEAK_RE =
+  /(lo\s+rito|cronorisch\w*|microsemi[óo]tica|collarette|b\.s\.n\.a\.?|\bbsna\b|set[êe]nios?)/giu
+
+/**
  * LGPD-correct negative-construction patterns. When a forbidden term is
  * preceded by one of these phrases in the same sentence, the usage is
  * compliant ("não um diagnóstico médico", "não substitui tratamento", etc)
@@ -127,6 +142,15 @@ export function extractForbiddenHits(text: string, section: string): ForbiddenHi
     const preceding = text.slice(lookbackStart, m.index)
     if (NEG_CONTEXT_RE.test(preceding)) continue
     const term = m[0]!.toLowerCase()
+    counts.set(term, (counts.get(term) ?? 0) + 1)
+  }
+  // Paradigm-leak scan (2026-05-17) — author/school/jargon Rules 1/2/9
+  // forbid in client output. No negative-context exemption: there is no
+  // legitimate "não é collarette" construction (unlike the LGPD terms).
+  const leakRe = new RegExp(PARADIGM_LEAK_RE.source, PARADIGM_LEAK_RE.flags)
+  let lm: RegExpExecArray | null
+  while ((lm = leakRe.exec(text)) !== null) {
+    const term = lm[0]!.toLowerCase().replace(/\s+/g, ' ')
     counts.set(term, (counts.get(term) ?? 0) + 1)
   }
   return Array.from(counts.entries()).map(([term, occurrences]) => ({

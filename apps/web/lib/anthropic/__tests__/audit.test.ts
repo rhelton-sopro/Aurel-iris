@@ -460,6 +460,46 @@ describe('lib/anthropic/audit — extractForbiddenHits (helper for save-action D
   })
 })
 
+describe('lib/anthropic/audit — paradigm-leak guardrail (Lo Rito / B.S.N.A. / setênio)', () => {
+  it('flagueia escola/autor no output (Lo Rito, Cronorischio, Microsemiótica)', () => {
+    const hits = extractForbiddenHits(
+      'A leitura segue o método Cronorischio de Lo Rito (Microsemiótica Irídea).',
+      '3_linha_tempo_emocional',
+    )
+    const terms = hits.map((h) => h.term)
+    expect(terms).toContain('lo rito')
+    expect(terms).toContain('cronorischio')
+    expect(terms).toContain('microsemiótica')
+  })
+
+  it('flagueia jargão de locus no output (collarette, B.S.N.A., setênio)', () => {
+    const hits = extractForbiddenHits(
+      'O sinal na collarette, sobre a B.S.N.A., no 2º setênio.',
+      '3_linha_tempo_emocional',
+    )
+    const terms = hits.map((h) => h.term)
+    expect(terms).toContain('collarette')
+    expect(terms).toContain('b.s.n.a.')
+    expect(terms).toContain('setênio')
+  })
+
+  it('runAudit expõe o vazamento de paradigma em forbidden_vocab', () => {
+    const result = runAudit({
+      '3_linha_tempo_emocional': 'Conforme o Cronorischio de Lo Rito na collarette.',
+    } as ReportJsonb)
+    expect(result.forbidden_vocab.length).toBeGreaterThan(0)
+    expect(result.forbidden_vocab.map((h) => h.term)).toContain('lo rito')
+  })
+
+  it('texto clínico-funcional limpo NÃO dispara o guardrail', () => {
+    const hits = extractForbiddenHits(
+      'A marca na linha interna rendada sugere uma vivência por volta dos 13 anos.',
+      '3_linha_tempo_emocional',
+    )
+    expect(hits).toEqual([])
+  })
+})
+
 describe('lib/anthropic/audit — meta-invariante: source file is clean', () => {
   it('audit.ts source NÃO contém os 3 termos proibidos como substring literal (self-match guard)', () => {
     const auditSrc = readFileSync(path.resolve(__dirname, '..', 'audit.ts'), 'utf8')
