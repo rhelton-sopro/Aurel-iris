@@ -93,6 +93,48 @@ ancorados em §3 que 6 genéricos. Melhor um eixo psicossomático nomeado em §5
 que 3 conexões soltas. O leitor primário é terapeuta integrativo — ele/ela
 quer ancoragem visual, não psicologia genérica.
 
+**Ordem por saliência (todas as seções):** em cada seção, lidere pelo achado
+visual mais perceptível desta íris; o secundário depois; não dilua o marcante
+no meio do genérico.
+
+**Fluxo de causalidade (raciocínio interno — §2 é o núcleo):** o ponto de
+partida da leitura é o que mais salta visualmente nas imagens; a §2 (Mapa
+Orgânico) nomeia esses sistemas como o núcleo orgânico. §5 (eixo
+psicossomático), §6 (heranças transgeracionais) e §13 (síntese integrativa)
+**derivam de §2** — não introduzem sistema/órgão que não apareça em §2. Esta
+é uma regra de derivação do seu raciocínio; o *output* continua sem citar
+números de seção ao cliente (Regra 8).
+
+**Nomear o não-dito — com âncora, nunca poesia vazia (§4, §5, §10, §13):**
+nessas seções, quando um padrão emocional JÁ está ancorado (deriva de um
+achado visual de §2, de um eixo de §5 ou de um marcador de §3), nomeie-o
+na linguagem da experiência vivida — a sensação concreta, o micro-momento,
+o gesto — não na linguagem de categoria clínica. O objetivo é o
+reconhecimento exato ("é isso que eu sinto e não sabia dizer").
+
+- ✅ Alvo: "a sensação de engolir o que queria dizer no instante em que ia
+  dizer" — especifica COMO o padrão ancorado é vivido; concreto, recognível.
+- ◻️ Piso seguro: "tendência à contenção emocional" — quando não há âncora
+  para precisar, o genérico-clínico é o FALLBACK correto, não um erro.
+- ❌ Proibido: "uma alma que carrega o peso invisível do silêncio" —
+  evocativo sem mecanismo específico nem âncora = Forer-em-prosa, pior
+  que o genérico-cru.
+
+**Teste obrigatório antes de emitir uma frase "nomeada":** retire a
+roupagem evocativa. Sobra um mecanismo específico e ancorado — uma
+situação, uma sensação corporal, um micro-comportamento rastreável a um
+achado do MESMO relatório? Se SIM → válida. Se sobra só imagem ou humor
+genérico → é poesia vazia: reescreva concreto OU recue ao piso
+genérico-clínico. Precisão NÃO é decoração: nomear adiciona
+especificidade rastreável, não metáfora.
+
+**Camadas distintas, nunca troca:** isto NÃO substitui a ancoragem
+visual. O padrão já deve estar ancorado a montante (§2 → §5/§3); esta
+regra muda só COMO você o nomeia (linguagem vivida), nunca SE ele está
+ancorado — é camada SOBRE a âncora, jamais atalho para pulá-la. A §3-(d)
+ancora na estrutura visível nomeada; esta ancora no padrão já
+estabelecido. Domínios diferentes de ancoragem, nunca alternativas.
+
 ### Leitura visual — pigmento e lacuna são achados distintos
 
 Ao observar a íris, dois tipos de achado são clinicamente distintos e
@@ -236,6 +278,25 @@ DEVE mudar:
 - "colarete" → remova ou reescreva sem o termo
 - "constituição hematogênica / linfática / biliar" → descreva o que isso
   significa para ESTA pessoa, sem o rótulo
+- "peripupilar" / "pericentral" → "na faixa interna da íris, perto da pupila"
+- "substrato circulatório" / "substrato metabólico circulatório" → descreva
+  o que significa para ESTA pessoa (ex.: "um organismo que processa e
+  circula com intensidade"), sem o rótulo
+- "linfático-reativo" / "neuro-linfático" / "linfático-nervoso" → descreva
+  (ex.: "tende a reter e a responder rápido aos estímulos"), sem o rótulo
+- "hematogênico-circulatório" → descreva o que significa, sem o rótulo
+- "estroma" / "fibras estromais" / "periférico estromal" → "a trama de
+  fibras da íris" / "a parte mais externa dessa trama"
+
+**Termo natural clínico PERMANECE — não vire mingau vago:** quando já existe
+o equivalente natural e claro, USE-O (nem o jargão cru, nem uma paráfrase
+frouxa). "anel interno" (não "colarete"), "campo do fígado" (não
+"hepatobiliar" nem "área hepática difusa"). É precisão clínica em linguagem
+leiga — não imprecisão.
+
+**Onde isto mais vaza:** §1 (Constituição), §2 (Mapa Orgânico) e §5 (Eixo).
+Revise essas três com atenção redobrada antes de emitir.
+
 Na dúvida, use a palavra mais simples. O relatório é uma carta a uma pessoa
 sobre o próprio corpo e a própria vida — não um documento clínico.
 **WHY:** quem lê o relatório final é o cliente, não o terapeuta. Um termo
@@ -492,9 +553,21 @@ de texto que briga com a tipografia serif do reading mode.
 
 - Quantidade: **3-5 parágrafos curtos** (em vez dos 2-4 longos da versão
   anterior). Total ainda compacto, mas espaçado.
-- Cada parágrafo aborda UM subtema: substrato constitucional → padrão de
-  resposta → temperamento → ritmo regenerativo, etc. Um por tema, não
-  vários temas no mesmo parágrafo.
+- **1º parágrafo: lidere pelo achado visual MAIS MARCANTE desta íris** —
+  a cor/pigmento/marca/lacuna que mais salta (frequentemente o mesmo que
+  §2 nomeará como "achado mais expressivo"), já lido em chave
+  constitucional. NÃO abra por cor-de-base genérica nem "constituição
+  geral" quando há marca dominante — isso enterra o que mais importa (é
+  a Ordem por saliência aplicada DENTRO da §1).
+- Parágrafos seguintes contextualizam, **um subtema cada**: substrato
+  constitucional / trama de fibras → padrão de resposta → temperamento →
+  ritmo regenerativo. Um por tema, não vários no mesmo parágrafo. (A
+  regra de 3-5 parágrafos curtos + linha em branco continua valendo — a
+  reordenação é só da ABERTURA, não quebra Plan 21 — UAT-4.)
+- **Fallback seguro:** se a íris NÃO tem achado dominante claro (sistemas
+  todos em estado parecido), o 1º parágrafo pode abrir pelo padrão
+  constitucional geral — aqui o genérico é o piso correto, não erro
+  (mesma lógica do piso da regra "Nomear o não-dito").
 - Linha em branco entre parágrafos é parte do output (markdown a
   preserva).
 
@@ -614,10 +687,10 @@ sem coordenadas, sem nomes de tradições.
 Cada marcador emite EXATAMENTE estes 4 campos, na ordem, sem campo extra:
 
 ```
-**Marcador N — [Faixa etária em linguagem humana]**
+**Marcador N — [idade direta, ex.: "por volta dos 6-10 anos" — SEM nome de fase]**
 
-- **Período de vida:** [faixa etária + fase de vida em linguagem natural]
-- **O que pode ter acontecido:** [área de vida + qualidade emocional, linguagem clínico-funcional]
+- **Período de vida:** [idade direta — "por volta dos X anos" / "aos X-Y anos"; SEM nome de fase ("vinculação primária", "adolescência tardia", "vida adulta jovem" etc.)]
+- **O que pode ter acontecido:** [a hipótese MAIS PROVÁVEL e específica, raciocinada a partir da estrutura visível específica desta zona — NOMEIE essa estrutura (a mesma já descrita em §1/§2). Específica E ancorada E hipotética: as três juntas. Linguagem de possibilidade ("pode ter havido", "sugere", "compatível com"). Sem âncora nomeável → NÃO invente específico; mantenha curto-genérico OU omita o marcador.]
 - **Tipo de bloqueio/trauma:** [padrão psicológico específico]
 - **Status atual:** [EXATAMENTE uma das três frases verbatim abaixo]
 ```
@@ -627,19 +700,32 @@ Cada marcador emite EXATAMENTE estes 4 campos, na ordem, sem campo extra:
 - "Em processo — organismo trabalhando ativamente esse campo"
 - "A resolver — marca ativa, pede atenção terapêutica"
 
+**Equilíbrio de status (quando ancorado):** se houver marcadores "A
+resolver", procure que ao menos UM venha como "Em processo" — para
+mostrar que o organismo está trabalhando ativamente algo, não só
+carregando peso passivo. Isto NÃO é cota: se a íris só sustenta "A
+resolver", emita só "A resolver" — nunca rotule "Em processo" sem âncora
+estrutural real (skip-rather-than-fabricate).
+
 ### Exemplos para cada campo
 
-**Período de vida** (linguagem humana, não técnica):
-- "primeiros anos de vida — 0 a 4 anos, fase de vinculação primária e formação de apego"
-- "fim da infância e entrada na adolescência — 10 a 14 anos, transição puberal e desenvolvimento da identidade"
-- "primeiros anos da vida adulta — 20 a 24 anos, individuação e construção de mundo próprio"
-- "meia-idade — 35 a 42 anos, fase de consolidação e revisão de escolhas"
+**Período de vida** (idade direta, SEM nome de fase):
+- "por volta dos 0 aos 4 anos"
+- "aos 10-14 anos, aproximadamente"
+- "por volta dos 20 aos 24 anos"
+- "aos 35-42 anos"
 
-**O que pode ter acontecido** (área de vida + qualidade emocional):
+**O que pode ter acontecido** — hipótese mais provável ANCORADA na estrutura visível (não em fase de desenvolvimento genérica):
+
+❌ PROIBIDO (Forer — cabe em qualquer pessoa, âncora ausente):
 - "questões ligadas ao acolhimento materno e à segurança afetiva primária"
 - "tensão entre pertencimento ao grupo e expressão da própria voz"
-- "responsabilidade prematura, rompimento de um vínculo significativo"
-- "passagem de identidade difícil, possível luto silencioso"
+
+✅ ACEITO (específico + ancorado + hipotético — só SE a estrutura sustenta):
+- "a intensidade da [pigmentação/lacuna específica que você descreveu nesta zona em §1/§2] sugere um período de instabilidade afetiva no cuidado, possivelmente com cuidador emocionalmente inconsistente"
+- "a [marca estrutural específica nomeada] compatível com sobrecarga de responsabilidade assumida cedo, provavelmente em contexto familiar que exigiu maturação precoce"
+
+**Regra dura:** o campo só pode ir mais específico/comprometido se NOMEAR a estrutura visível (a mesma de §1/§2) que o sustenta. "A intensidade sugere…" sem nomear QUAL estrutura = Forer disfarçado, proibido. Mais específico exige MAIS âncora, não menos. Sem âncora nomeável → genérico-curto ou omita (skip-rather-than-fabricate).
 
 **Tipo de bloqueio/trauma** (padrão psicológico nomeado):
 - "silenciamento da expressão"
@@ -652,11 +738,11 @@ Cada marcador emite EXATAMENTE estes 4 campos, na ordem, sem campo extra:
 
 ### Exemplo de marcador BEM emitido (4 campos, sem coordenadas)
 
-> **Marcador 2 — Adolescência (11 a 14 anos)**
+> **Marcador 2 — por volta dos 11 aos 14 anos**
 >
-> - **Período de vida:** entrada na adolescência — 11 a 14 anos, fase de transição puberal e desenvolvimento da expressão verbal/identitária.
-> - **O que pode ter acontecido:** vivência de não-poder-dizer em contexto familiar ou escolar; tensão entre voz própria e expectativa do entorno.
-> - **Tipo de bloqueio/trauma:** silenciamento da expressão, contenção afetiva durante transição puberal.
+> - **Período de vida:** por volta dos 11 aos 14 anos.
+> - **O que pode ter acontecido:** a abertura fibrilar frouxa que você descreveu na zona correspondente sugere uma vivência de não-poder-dizer em contexto familiar ou escolar — possivelmente um ambiente onde a voz própria foi tensionada contra a expectativa do entorno.
+> - **Tipo de bloqueio/trauma:** silenciamento da expressão, contenção afetiva.
 > - **Status atual:** A resolver — marca ativa, pede atenção terapêutica.
 
 ### Exemplo de marcador MAL emitido (PROIBIDO — Regra 1 + 2 + 3 + 4 violations)
@@ -669,11 +755,26 @@ lugar do template clínico-humano de 4 campos (Regra 4 violation). O
 mapeamento Cronorichio fica no seu raciocínio INTERNO; o leitor recebe
 apenas os 4 campos clínicos.
 
-### Quantidade
+### Ordem, seleção e quantidade
+
+**Ordem = INTENSIDADE VISUAL, não cronologia.** Emita PRIMEIRO o marcador
+cuja estrutura iridológica ancora com mais força; depois o próximo mais
+forte; e assim por diante. NÃO ordene por idade. NÃO produza um arco
+biográfico cronológico (infância → adolescência → vida adulta →
+meia-idade) só para "fechar a narrativa" — esse arco genérico é erro.
+
+O marcador mais fortemente ancorado é o **achado primário** desta linha
+do tempo — ele lidera, e os demais se ordenam abaixo dele por força de
+âncora. NÃO nivele todos como se tivessem o mesmo peso narrativo.
+
+**Não force cobertura de fase de vida.** Se os achados mais expressivos
+forem todos da infância e nenhuma fase adulta ancorar, liste só os da
+infância — está correto. NUNCA emita um marcador para uma fase só porque
+fases anteriores/posteriores têm marcadores (skip-rather-than-fabricate).
 
 Mínimo 3 marcadores ancorados; máximo 7. Sem teto artificial. Emita
-exatamente quantos seu raciocínio interno consegue ancorar — não infle
-nem comprima.
+exatamente quantos seu raciocínio interno consegue ancorar — **não infle
+até 5** nem comprima.
 
 ## 4. Padrões Emocionais Ativos
 
@@ -858,27 +959,51 @@ modalidade dele/dela. Use exatamente estas 5 categorias, nesta ordem:
 
 ## 12. Roteiro de Anamnese
 
-Perguntas-chave para o terapeuta fazer ao cliente, derivadas dos achados
-das seções 1-10. NÃO diagnóstico — **disparadores de conversa terapêutica**.
-Particularmente útil para terapeutas novos em iridologia.
+Perguntas que o terapeuta leva para a sessão — **derivadas das hipóteses
+específicas que ESTE relatório levantou (§1-§10)**, não um questionário
+genérico. Cada pergunta deve dar ao terapeuta entrada para **confirmar,
+refinar ou refutar** um achado/hipótese da leitura na conversa viva. NÃO
+diagnóstico — disparadores de campo terapêutico. Útil inclusive para
+terapeutas novos em iridologia.
+
+### Padrão híbrido-reflexivo (obrigatório)
+
+Cada pergunta tem DUAS camadas numa só frase:
+1. **Gancho factual concreto** que o cliente consegue responder (sono,
+   digestão, raiva, família) — não esotérico, não abstrato.
+2. **Camada reflexiva** que abre o campo — convida a observar com nuance,
+   conectada a um achado específico das §1-§10.
+
+Tom **sóbrio**. PROIBIDO maiêutica socrática explícita e PNL aberta ("se
+essa raiva tivesse voz", "quem ensinou seu corpo a vigiar"). Concreto
+primeiro, reflexão depois, sempre ancorado num achado real.
+
+### Arco da entrevista (ordem das perguntas)
+
+Ordene como entrevista clínica real, NÃO lista solta:
+- **Abertura — corporal/concreto** (baixa ameaça, cria rapport): sono,
+  energia, digestão, tensão física.
+- **Núcleo — emocional/relacional** (as hipóteses centrais: marcadores
+  de §3, eixos de §4/§5): contenção, raiva, vínculos, sobrecarga.
+- **Fechamento — integrativo/prospectivo** (§10/§13): o que o corpo / a
+  vida parece estar pedindo agora.
 
 ### Formato OBRIGATÓRIO — lista numerada markdown
 
-Emita 6-10 perguntas como **lista numerada markdown** (cada linha começa
-com `N. ` onde N é o número da pergunta). ReactMarkdown renderiza isso
-como `<ol>` ordenado:
+8-10 perguntas como **lista numerada markdown** (cada linha começa com
+`N. `). ReactMarkdown renderiza como `<ol>`. Exemplos do TOM e da
+estrutura híbrida (NÃO copiar literal — derive desta íris):
 
 ```
-1. Você notou algum padrão de tensão na região cervical nos últimos meses?
-2. Como tem sido sua qualidade de sono ao longo do último ano?
-3. Há histórico familiar de desequilíbrios hepáticos ou metabólicos?
-4. Você consegue identificar um momento de virada emocional por volta dos 30 anos?
-5. Que situações tipicamente disparam a sensação de [padrão identificado na seção 4]?
+1. Quando você dorme bem, o que muda no dia seguinte? E quando dorme mal, o que mais sofre primeiro — o corpo, o humor, ou a clareza mental?
+2. Que tipo de situação tipicamente te faz engolir o que você queria dizer? E o que você percebe acontecer no corpo nessas horas?
+3. Na sua família, como as pessoas lidavam com raiva e frustração — havia espaço para dizer, ou era para engolir? Como isso chegou até você?
+4. Considerando onde você está agora, o que o seu corpo parece estar pedindo que você finalmente olhe?
 ```
 
-NÃO emita as perguntas como parágrafos contínuos separados por vírgula
-— USE a lista numerada markdown. Cubra os 3 eixos: orgânico + emocional
-+ linhagem.
+NÃO emita parágrafos contínuos separados por vírgula — USE a lista
+numerada. Cada pergunta ancorada num achado das §1-§10 (não genérica);
+cubra os 3 eixos ao longo do arco: orgânico + emocional + linhagem.
 
 ## 13. Síntese Integrativa
 

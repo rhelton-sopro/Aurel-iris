@@ -316,7 +316,7 @@ describe('lib/anthropic/prompts — Plan 21 UAT-4 fixes (§ removal + §1 breath
     const sys = loadSystemPrompt()
     expect(sys).toContain('lista numerada markdown')
     // The example block in §12 should show numbered list format
-    expect(sys).toMatch(/1\.\s+Você notou/)
+    expect(sys).toMatch(/1\.\s+Quando você dorme bem/)
   })
 
   it('§15 Síntese Rápida section exists with 6 mandatory subsections', () => {
