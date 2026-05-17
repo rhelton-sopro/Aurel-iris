@@ -8,6 +8,7 @@ import { cookies } from 'next/headers'
 import {
   createReadingSchema,
   readingIdSchema,
+  readingIdsSchema,
   CAPTURE_METHODS,
   type CaptureMethod,
   type ReadingFormState,
@@ -249,37 +250,43 @@ export async function saveReadingImagesAction(
 }
 
 /**
- * Descarta um reading rascunho:
- *   1) Lista storage_paths via reading_images (RLS filtra para apenas próprios)
+ * Exclui uma ou mais readings (rascunho ou completas), em lote:
+ *   1) Lista storage_path + canonical_storage_path via reading_images
+ *      (RLS filtra para apenas próprios)
  *   2) Remove os blobs do bucket iris-captures (RLS de storage também valida)
- *   3) Deleta reading row — cascade apaga reading_images do banco
+ *   3) Deleta as reading rows — cascade apaga reading_images do banco
  *
  * CRÍTICO: cascade do banco NÃO apaga arquivos do Storage. Sem o passo 2,
- * blobs órfãos consomem cota.
+ * blobs órfãos consomem cota. canonical_storage_path cobre os blobs
+ * canonicalizados (pipeline 07.1.6) de leituras completas.
+ *
+ * Ownership: o delete usa o client do usuário — RLS impede excluir readings
+ * de outro terapeuta (linhas fora da policy simplesmente não são deletadas,
+ * sem erro). report_generations é retido por design (analytics desacoplado,
+ * sem PII — migration 0017); só o erasure LGPD do cliente o anonimiza.
  */
-export async function discardReadingAction(
-  readingId: string
-): Promise<{ error?: string }> {
+export async function discardReadingsAction(
+  readingIds: string[]
+): Promise<{ error?: string; deleted?: number }> {
   const supabase = await createClient()
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (!user || authError) {
     redirect('/login')
   }
 
-  const parsed = readingIdSchema.safeParse({ reading_id: readingId })
+  const parsed = readingIdsSchema.safeParse({ reading_ids: readingIds })
   if (!parsed.success) {
-    return { error: 'reading_id inválido' }
+    return { error: 'Seleção inválida.' }
   }
+  const ids = parsed.data.reading_ids
 
-  // 1) Listar storage_paths antes do delete (RLS de reading_images filtra para apenas próprios).
-  //    canonical_storage_path inclui os blobs canonicalizados (pipeline 07.1.6) —
-  //    sem remover, leituras completas deixam blob órfão no Storage.
+  // 1) storage_path + canonical_storage_path de todas as imagens (RLS filtra).
   const { data: images } = await supabase
     .from('reading_images')
     .select('storage_path, canonical_storage_path')
-    .eq('reading_id', parsed.data.reading_id)
+    .in('reading_id', ids)
 
-  // 2) Remover blobs (best-effort: erro aqui não bloqueia o delete do reading row)
+  // 2) Remover blobs (best-effort: erro aqui não bloqueia o delete das rows)
   if (images && images.length > 0) {
     const paths = images.flatMap((i) =>
       [i.storage_path, i.canonical_storage_path].filter(
@@ -292,10 +299,10 @@ export async function discardReadingAction(
   }
 
   // 3) RLS garante ownership; cascade apaga reading_images
-  const { error } = await supabase
+  const { error, count } = await supabase
     .from('readings')
-    .delete()
-    .eq('id', parsed.data.reading_id)
+    .delete({ count: 'exact' })
+    .in('id', ids)
 
   if (error) {
     return { error: error.message }
@@ -303,7 +310,18 @@ export async function discardReadingAction(
 
   revalidatePath('/dashboard')
   revalidatePath('/leituras')
-  return {}
+  return { deleted: count ?? ids.length }
+}
+
+/**
+ * Exclui uma única reading. Mantida por compat de assinatura
+ * (`{ error? }`) — delega para a action em lote (fonte única da lógica).
+ */
+export async function discardReadingAction(
+  readingId: string
+): Promise<{ error?: string }> {
+  const { error } = await discardReadingsAction([readingId])
+  return error ? { error } : {}
 }
 
 

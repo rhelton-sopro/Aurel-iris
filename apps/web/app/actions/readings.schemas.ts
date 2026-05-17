@@ -22,6 +22,12 @@ export const readingIdSchema = z.object({
   reading_id: z.string().uuid('reading_id inválido'),
 })
 
+// Exclusão em lote: cap de 200 evita payloads/queries abusivas; .min(1)
+// garante que a action nunca rode um delete sem filtro.
+export const readingIdsSchema = z.object({
+  reading_ids: z.array(z.string().uuid('reading_id inválido')).min(1).max(200),
+})
+
 export type ReadingFormState = {
   error?: Record<string, string[]> | string | null
   readingId?: string

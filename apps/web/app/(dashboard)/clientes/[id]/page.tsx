@@ -6,7 +6,7 @@ import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { resolveClientGate } from '@/lib/gates/client-gates'
 import { UnderageBlockPanel } from '@/components/clientes/underage-block-panel'
-import { ClientReadingsList } from '@/components/clientes/client-readings-list'
+import { ReadingsListManager } from '@/components/readings/readings-list-manager'
 
 /**
  * A lista deve refletir leituras criadas neste mesmo request (ex.: terapeuta
@@ -100,7 +100,10 @@ export default async function ClienteDetailPage({
           )}
         </div>
 
-        <ClientReadingsList readings={list} clientId={client.id} />
+        <ReadingsListManager
+          readings={list}
+          newReadingHref={`/leituras/nova?cliente=${client.id}`}
+        />
       </div>
     </div>
   )
