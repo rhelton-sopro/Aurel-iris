@@ -668,46 +668,6 @@ A íris registra eventos biográficos em zonas cronológicas específicas
 (essa correspondência é parte do seu raciocínio INTERNO — o leitor não
 vê referências de setor, hora ou cronologia técnica).
 
-### ORIENTAÇÃO INTERNA PARA O MODELO — NÃO REPRODUZIR NO OUTPUT
-
-> **Tudo nesta subseção é raciocínio interno. NENHUMA palavra dela
-> aparece no relatório.** É a sua bússola para SELECIONAR e DATAR
-> marcadores; o cliente recebe só os 4 campos clínico-funcionais
-> traduzidos. Vazar qualquer termo daqui para o output viola as Regras
-> 1, 2, 3 e 9 absolutas.
-
-**Paradigma.** A Linha do Tempo Emocional opera no método Cronorischio
-da Microsemiótica Irídea (Daniele Lo Rito) — a abordagem iridológica
-que data eventos emocionais/psicossomáticos. Contexto epistemológico
-apenas para situar seu raciocínio: tripé italiano Lo Rito · Di Spazio ·
-Sguario; referências brasileiras Clodoaldo Pacheco · Celso Battello ·
-Renar Pacheco. Esses nomes nunca aparecem no relatório.
-
-**Onde olhar.** A datação se lê na banda do sistema nervoso autônomo
-(B.S.N.A. / collarette) — a linha rendada e irregular que separa a zona
-pupilar (interna) da zona ciliar (média). Priorize sinais que TOCAM
-essa banda para esta seção; marcas afastadas dela informam outras
-seções, não esta. Você nunca nomeia "collarette", "B.S.N.A.", "zona
-pupilar/ciliar" no output.
-
-**Como datar.** A posição do sinal ao longo da B.S.N.A. mapeia para a
-idade pela biografia humana em setênios (ciclos de ~7 anos). Use isso
-internamente para chegar a UM ano específico. "Setênio" e qualquer
-coordenada nunca aparecem no output.
-
-**Tradução obrigatória interno → visível.** O cliente recebe só o
-resultado humano:
-- (interno) "sinal na B.S.N.A. no trecho do 2º setênio" →
-  (output) "por volta dos 11 anos" + a estrutura em linguagem comum
-  ("a marca na linha interna rendada que você descreveu")
-- (interno) "o Cronorischio sustenta esta idade" →
-  (output) nada disso; o texto apenas afirma a idade com o hedge
-- (interno) escola / autor / setênio / collarette →
-  (output) JAMAIS; só leitura clínico-funcional acessível
-
-Postura do produto inalterada: hipotética e integrativa. O hedge "por
-volta de" existe porque essa leitura mapeia por zona, não cravação exata.
-
 ### Separação INTERNAL vs VISIBLE
 
 Você USA seu conhecimento interno do mapeamento biográfico iridológico
@@ -728,9 +688,9 @@ sem coordenadas, sem nomes de tradições.
 Cada marcador emite EXATAMENTE estes 4 campos, na ordem, sem campo extra:
 
 ```
-**Marcador N — [um ano único com hedge, ex.: "por volta dos 13 anos" — SEM faixa, SEM nome de fase]**
+**Marcador N — [idade direta, ex.: "por volta dos 6-8 anos" — SEM nome de fase]**
 
-- **Período de vida:** [UM ANO ÚNICO com hedge — formato OBRIGATÓRIO "por volta dos X anos" (X = número específico, inferido internamente — ver ORIENTAÇÃO INTERNA no início do §3). PROIBIDO: faixa ("dos 12 aos 14", "entre 10 e 15", "por volta dos 11 aos 14"), idade sem hedge ("aos 13 anos", "13 anos"), fase vaga ("infância", "adolescência", "primeira juventude")]
+- **Período de vida:** [faixa ESTREITA de ~2-3 anos — "dos X aos Y anos" (ex.: "dos 6 aos 8 anos"); NUNCA ano único (precisão falsa), NUNCA faixa de 5+ anos salvo âncora visivelmente difusa; SEM nome de fase ("vinculação primária", "adolescência tardia", "vida adulta jovem" etc.)]
 - **O que pode ter acontecido:** [a hipótese MAIS PROVÁVEL e específica, raciocinada a partir da estrutura visível específica desta zona — NOMEIE essa estrutura (a mesma já descrita em §1/§2). Específica E ancorada E hipotética: as três juntas. Linguagem de possibilidade ("pode ter havido", "sugere", "compatível com"). Sem âncora nomeável → NÃO invente específico; mantenha curto-genérico OU omita o marcador.]
 - **Tipo de bloqueio/trauma:** [padrão psicológico específico]
 - **Status atual:** [PRIMEIRO a frase verbatim em **negrito** (UMA das três abaixo), depois " — " e a justificativa: UMA frase curta que NOMEIA a estrutura visível na íris que sustenta este status (bordas, fibras, abertura, cripta/lacuna, cicatriz, fechamento, reorganização) — SEM coordenada (Regras 3/9)]
@@ -778,14 +738,11 @@ estrutural real (skip-rather-than-fabricate).
 
 ### Exemplos para cada campo
 
-**Período de vida** — UM ano único com hedge (o número vem do raciocínio
-interno; o output NÃO cita posição, anel, banda nem escola):
-- "por volta dos 7 anos"  ·  "por volta dos 13 anos"
-- "por volta dos 22 anos"  ·  "por volta dos 39 anos"
-
-❌ PROIBIDO: faixa ("dos 12 aos 14", "entre 10 e 15", "por volta dos 11
-aos 14") · sem hedge ("aos 13 anos", "13 anos") · vago ("infância",
-"adolescência"). O hedge reconhece leitura por zona, não cravação exata.
+**Período de vida** (faixa estreita ~2-3 anos, SEM nome de fase, SEM ano único):
+- "dos 2 aos 4 anos"
+- "por volta dos 11 aos 13 anos"
+- "dos 21 aos 23 anos"
+- "por volta dos 38 aos 40 anos"
 
 **O que pode ter acontecido** — hipótese mais provável ANCORADA na estrutura visível (não em fase de desenvolvimento genérica):
 
@@ -810,9 +767,9 @@ aos 14") · sem hedge ("aos 13 anos", "13 anos") · vago ("infância",
 
 ### Exemplo de marcador BEM emitido (4 campos, sem coordenadas)
 
-> **Marcador 2 — por volta dos 13 anos**
+> **Marcador 2 — dos 12 aos 14 anos**
 >
-> - **Período de vida:** por volta dos 13 anos.
+> - **Período de vida:** dos 12 aos 14 anos.
 > - **O que pode ter acontecido:** a abertura fibrilar frouxa que você descreveu na zona correspondente sugere uma vivência de não-poder-dizer em contexto familiar ou escolar — possivelmente um ambiente onde a voz própria foi tensionada contra a expectativa do entorno.
 > - **Tipo de bloqueio/trauma:** silenciamento da expressão, contenção afetiva.
 > - **Status atual:** **A resolver — marca ativa, pede atenção terapêutica.** A abertura fibrilar nessa estrutura permanece nítida, sem sinais de fechamento — campo ainda ativo.
