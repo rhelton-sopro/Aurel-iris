@@ -13,6 +13,7 @@ import {
 import { DeleteClientDialog } from './delete-client-dialog'
 import { cn } from '@/lib/utils'
 import type { Database } from '@/types/database'
+import { evaluateProfileCompleteness } from '@/lib/gates/profile-completeness'
 
 type Client = Database['public']['Tables']['clients']['Row']
 
@@ -62,9 +63,23 @@ export function ClientsTable({ clients }: ClientsTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filtered.map(client => (
+            {filtered.map(client => {
+              const gate = evaluateProfileCompleteness(client)
+              return (
               <TableRow key={client.id}>
-                <TableCell className="font-medium">{client.full_name}</TableCell>
+                <TableCell className="font-medium">
+                  {client.full_name}
+                  {gate.status === 'incomplete' && (
+                    <span className="ml-2 inline-block rounded bg-amber-100 text-amber-800 text-xs px-1.5 py-0.5 align-middle">
+                      perfil incompleto
+                    </span>
+                  )}
+                  {gate.status === 'blocked_underage' && (
+                    <span className="ml-2 inline-block rounded bg-destructive/10 text-destructive text-xs px-1.5 py-0.5 align-middle">
+                      menor — bloqueado
+                    </span>
+                  )}
+                </TableCell>
                 <TableCell>
                   {client.birth_date
                     ? format(new Date(client.birth_date + 'T00:00:00'), 'dd/MM/yyyy')
@@ -104,7 +119,8 @@ export function ClientsTable({ clients }: ClientsTableProps) {
                   </div>
                 </TableCell>
               </TableRow>
-            ))}
+              )
+            })}
           </TableBody>
         </Table>
       )}

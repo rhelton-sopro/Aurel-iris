@@ -102,38 +102,91 @@ export type Database = {
           },
         ]
       }
+      client_consents: {
+        Row: {
+          client_id: string | null
+          consent_channel: string
+          consented_at: string
+          created_at: string
+          event_type: string
+          id: string
+          ip: string | null
+          reading_id: string | null
+          term_version: string
+          user_agent: string | null
+        }
+        Insert: {
+          client_id?: string | null
+          consent_channel: string
+          consented_at?: string
+          created_at?: string
+          event_type: string
+          id?: string
+          ip?: string | null
+          reading_id?: string | null
+          term_version: string
+          user_agent?: string | null
+        }
+        Update: {
+          client_id?: string | null
+          consent_channel?: string
+          consented_at?: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          ip?: string | null
+          reading_id?: string | null
+          term_version?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_consents_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           birth_date: string | null
-          consent_document_url: string | null
-          consent_signed_at: string | null
+          biological_sex: string | null
+          consent_current_version: string | null
+          consent_last_at: string | null
           created_at: string | null
+          email: string | null
           full_name: string
-          gender: string | null
           id: string
           notes: string | null
+          phone: string | null
           therapist_id: string
         }
         Insert: {
           birth_date?: string | null
-          consent_document_url?: string | null
-          consent_signed_at?: string | null
+          biological_sex?: string | null
+          consent_current_version?: string | null
+          consent_last_at?: string | null
           created_at?: string | null
+          email?: string | null
           full_name: string
-          gender?: string | null
           id?: string
           notes?: string | null
+          phone?: string | null
           therapist_id: string
         }
         Update: {
           birth_date?: string | null
-          consent_document_url?: string | null
-          consent_signed_at?: string | null
+          biological_sex?: string | null
+          consent_current_version?: string | null
+          consent_last_at?: string | null
           created_at?: string | null
+          email?: string | null
           full_name?: string
-          gender?: string | null
           id?: string
           notes?: string | null
+          phone?: string | null
           therapist_id?: string
         }
         Relationships: [
@@ -145,6 +198,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      consent_terms: {
+        Row: {
+          body: string
+          content_sha256: string
+          created_at: string
+          effective_from: string
+          id: string
+          is_current: boolean
+          version: string
+        }
+        Insert: {
+          body: string
+          content_sha256: string
+          created_at?: string
+          effective_from?: string
+          id?: string
+          is_current?: boolean
+          version: string
+        }
+        Update: {
+          body?: string
+          content_sha256?: string
+          created_at?: string
+          effective_from?: string
+          id?: string
+          is_current?: boolean
+          version?: string
+        }
+        Relationships: []
       }
       knowledge_chunks: {
         Row: {
@@ -473,6 +556,13 @@ export type Database = {
           tokens_in: number | null
           tokens_out: number | null
           model_version: string | null
+          prompt_version: string | null
+          canonical_fallback_count: number | null
+          audit_summary: Json | null
+          regeneration_count: number | null
+          client_id: string | null
+          bbox_cost_usd: number | null
+          bbox_latency_ms: number | null
           created_at: string
         }
         Insert: {
@@ -485,6 +575,13 @@ export type Database = {
           tokens_in?: number | null
           tokens_out?: number | null
           model_version?: string | null
+          prompt_version?: string | null
+          canonical_fallback_count?: number | null
+          audit_summary?: Json | null
+          regeneration_count?: number | null
+          client_id?: string | null
+          bbox_cost_usd?: number | null
+          bbox_latency_ms?: number | null
           created_at?: string
         }
         Update: {
@@ -497,6 +594,13 @@ export type Database = {
           tokens_in?: number | null
           tokens_out?: number | null
           model_version?: string | null
+          prompt_version?: string | null
+          canonical_fallback_count?: number | null
+          audit_summary?: Json | null
+          regeneration_count?: number | null
+          client_id?: string | null
+          bbox_cost_usd?: number | null
+          bbox_latency_ms?: number | null
           created_at?: string
         }
         Relationships: []

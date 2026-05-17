@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { resolveClientGate } from '@/lib/gates/client-gates'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
@@ -63,6 +64,20 @@ export async function createReadingAction(
   if (!parsed.success) {
     return { error: parsed.error.flatten().fieldErrors }
   }
+
+  // Gate de completude (T1 — garantia DURA server-side; não dá pra burlar
+  // pelo seletor). RLS de clients só expõe o próprio cliente do terapeuta.
+  const { data: gateClient } = await supabase
+    .from('clients')
+    .select('id, full_name, birth_date, biological_sex, email, phone')
+    .eq('id', parsed.data.client_id)
+    .maybeSingle()
+  if (!gateClient) {
+    return { error: 'Cliente não encontrado.' }
+  }
+  const gate = resolveClientGate(gateClient)
+  if (gate.status === 'incomplete') redirect(gate.completionPath)
+  if (gate.status === 'blocked_underage') redirect(gate.detailPath)
 
   // RLS de clients (Fase 1 D-12) impede inserir reading apontando para client de outro terapeuta:
   // o INSERT abaixo só sucede se o client_id pertencer ao auth.uid() — caso contrário, FK constraint

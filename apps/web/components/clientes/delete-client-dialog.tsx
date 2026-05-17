@@ -12,23 +12,21 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import type { Database } from '@/types/database'
-
-type Client = Database['public']['Tables']['clients']['Row']
-
 interface DeleteClientDialogProps {
-  client: Client
+  client: { id: string; full_name: string }
   open: boolean
   onOpenChange: (open: boolean) => void
+  onDeleted?: () => void
 }
 
-export function DeleteClientDialog({ client, open, onOpenChange }: DeleteClientDialogProps) {
+export function DeleteClientDialog({ client, open, onOpenChange, onDeleted }: DeleteClientDialogProps) {
   const [isPending, startTransition] = useTransition()
 
   function handleDelete() {
     startTransition(async () => {
       const result = await deleteClientAction(client.id)
       if (!result?.error) {
+        onDeleted?.()
         onOpenChange(false)
       }
     })

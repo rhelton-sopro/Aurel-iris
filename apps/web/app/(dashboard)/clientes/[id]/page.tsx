@@ -1,16 +1,11 @@
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { format } from 'date-fns'
 import { createClient } from '@/lib/supabase/server'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-
-const GENDER_LABELS: Record<string, string> = {
-  masculino: 'Masculino',
-  feminino: 'Feminino',
-  outro: 'Outro',
-  não_informado: 'Não informado',
-}
+import { resolveClientGate } from '@/lib/gates/client-gates'
+import { UnderageBlockPanel } from '@/components/clientes/underage-block-panel'
 
 export default async function ClienteDetailPage({
   params,
@@ -30,6 +25,20 @@ export default async function ClienteDetailPage({
     notFound()
   }
 
+  const gate = resolveClientGate(client)
+  if (gate.status === 'incomplete') {
+    redirect(gate.completionPath)
+  }
+  if (gate.status === 'blocked_underage') {
+    return (
+      <UnderageBlockPanel
+        clientId={client.id}
+        fullName={client.full_name}
+        birthDate={gate.birthDate}
+      />
+    )
+  }
+
   return (
     <div className="space-y-6 max-w-2xl">
       <div className="flex items-center justify-between">
@@ -44,12 +53,6 @@ export default async function ClienteDetailPage({
           <p>
             <span className="font-medium">Nascimento:</span>{' '}
             {format(new Date(client.birth_date + 'T00:00:00'), 'dd/MM/yyyy')}
-          </p>
-        )}
-        {client.gender && (
-          <p>
-            <span className="font-medium">Gênero:</span>{' '}
-            {GENDER_LABELS[client.gender] ?? client.gender}
           </p>
         )}
         {client.notes && (

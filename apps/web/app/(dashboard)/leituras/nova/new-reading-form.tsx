@@ -34,7 +34,7 @@ type FormValues = z.infer<typeof formSchema>
 type CaptureMethod = 'mobile_camera' | 'desktop_upload'
 
 interface NewReadingFormProps {
-  clients: { id: string; full_name: string }[]
+  clients: { id: string; full_name: string; gateStatus: 'ok' | 'incomplete' | 'blocked_underage' }[]
   preselectedClientId?: string
 }
 
@@ -121,6 +121,8 @@ export function NewReadingForm({ clients, preselectedClientId }: NewReadingFormP
                     {clients.map((c) => (
                       <SelectItem key={c.id} value={c.id}>
                         {c.full_name}
+                        {c.gateStatus === 'incomplete' && ' — perfil incompleto'}
+                        {c.gateStatus === 'blocked_underage' && ' — menor de idade (bloqueado)'}
                       </SelectItem>
                     ))}
                   </SelectContent>

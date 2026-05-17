@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { NewReadingForm } from './new-reading-form'
+import { evaluateProfileCompleteness } from '@/lib/gates/profile-completeness'
 
 export default async function NovaLeituraPage({
   searchParams,
@@ -15,10 +16,14 @@ export default async function NovaLeituraPage({
   // RLS filtra automaticamente para clientes do terapeuta logado
   const { data: clients } = await supabase
     .from('clients')
-    .select('id, full_name')
+    .select('id, full_name, birth_date, biological_sex, email, phone')
     .order('full_name', { ascending: true })
 
-  const list = clients ?? []
+  const list = (clients ?? []).map((c) => ({
+    id: c.id,
+    full_name: c.full_name,
+    gateStatus: evaluateProfileCompleteness(c).status,
+  }))
 
   return (
     <div className="space-y-6 max-w-lg">

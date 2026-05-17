@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import Link from 'next/link'
 import { Loader2 } from 'lucide-react'
+
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -28,19 +29,22 @@ import { BirthDateInput } from '@/components/clientes/birth-date-input'
 import { cn } from '@/lib/utils'
 import type { ClientFormState } from '@/app/actions/clients'
 import type { Database } from '@/types/database'
+import { MIN_AGE, isAdult } from '@/lib/gates/profile-completeness'
 
 type Client = Database['public']['Tables']['clients']['Row']
 
+// Mesma forma do schema servidor (app/actions/clients.ts). A REGRA de idade
+// vem da fonte única (isAdult) — aqui aplicada via watch (não via .refine)
+// para dar bloqueio visível + submit desabilitado sem mensagem duplicada.
 const clientSchema = z.object({
   full_name: z.string().min(1, 'Nome é obrigatório'),
-  birth_date: z
+  birth_date: z.string().min(1, 'Data de nascimento é obrigatória'),
+  biological_sex: z.enum(['feminino', 'masculino']),
+  email: z
     .string()
-    .optional()
-    .refine(
-      (s) => !s || new Date(`${s}T00:00:00`) <= new Date(),
-      'Data de nascimento não pode estar no futuro',
-    ),
-  gender: z.enum(['masculino', 'feminino', 'outro', 'não_informado']).optional(),
+    .min(1, 'E-mail é obrigatório')
+    .refine((v) => /.+@.+\..+/.test(v), 'E-mail inválido'),
+  phone: z.string().min(1, 'Telefone é obrigatório'),
   notes: z.string().max(2000).optional(),
 })
 
@@ -62,10 +66,18 @@ export function ClientForm({ mode, client, action }: ClientFormProps) {
     defaultValues: {
       full_name: client?.full_name ?? '',
       birth_date: client?.birth_date ?? '',
-      gender: (client?.gender as ClientFormValues['gender']) ?? undefined,
+      biological_sex:
+        (client?.biological_sex as ClientFormValues['biological_sex']) ?? undefined,
+      email: client?.email ?? '',
+      phone: client?.phone ?? '',
       notes: client?.notes ?? '',
     },
   })
+
+  // Gate de idade inline — usa a FONTE ÚNICA (isAdult). null = data
+  // incompleta/inválida (não bloqueia enquanto digita).
+  const birthDate = form.watch('birth_date')
+  const isUnderage = birthDate ? isAdult(birthDate) === false : false
 
   const title = mode === 'create' ? 'Novo cliente' : 'Editar cliente'
   const submitLabel = mode === 'create' ? 'Salvar cliente' : 'Atualizar cliente'
@@ -111,15 +123,23 @@ export function ClientForm({ mode, client, action }: ClientFormProps) {
               </FormItem>
             )}
           />
+
+          {isUnderage && (
+            <div className="bg-destructive/10 border border-destructive text-sm px-4 py-2 rounded text-destructive">
+              O Iris Codex atende apenas pessoas com {MIN_AGE} anos ou mais —
+              não é possível cadastrar este cliente.
+            </div>
+          )}
+
           <FormField
             control={form.control}
-            name="gender"
+            name="biological_sex"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Gênero</FormLabel>
-                {/* base-ui Select: name prop injeta hidden input no form para FormData */}
+                <FormLabel>Sexo biológico de nascimento</FormLabel>
+                {/* base-ui Select: name injeta hidden input no FormData */}
                 <Select
-                  name="gender"
+                  name="biological_sex"
                   value={field.value ?? null}
                   onValueChange={field.onChange}
                 >
@@ -129,12 +149,44 @@ export function ClientForm({ mode, client, action }: ClientFormProps) {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="masculino">Masculino</SelectItem>
                     <SelectItem value="feminino">Feminino</SelectItem>
-                    <SelectItem value="outro">Outro</SelectItem>
-                    <SelectItem value="não_informado">Não informado</SelectItem>
+                    <SelectItem value="masculino">Masculino</SelectItem>
                   </SelectContent>
                 </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>E-mail</FormLabel>
+                <FormControl>
+                  <Input
+                    type="email"
+                    placeholder="email@exemplo.com"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Telefone / WhatsApp</FormLabel>
+                <FormControl>
+                  <Input
+                    type="tel"
+                    placeholder="(11) 99999-9999"
+                    {...field}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -156,7 +208,11 @@ export function ClientForm({ mode, client, action }: ClientFormProps) {
             )}
           />
           <div className="flex gap-3 pt-2">
-            <Button type="submit" disabled={isPending} aria-busy={isPending}>
+            <Button
+              type="submit"
+              disabled={isPending || isUnderage}
+              aria-busy={isPending}
+            >
               {isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
