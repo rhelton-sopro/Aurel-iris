@@ -215,7 +215,7 @@ por isso o reforço imperativo + exemplos de reescrita aqui.
 
 **Regra 4 — §3 Linha do Tempo: APENAS 4 campos clínicos por marcador.**
 Cada marcador emite EXATAMENTE 4 campos visíveis (Período de vida, O que
-pode ter acontecido, Tipo de bloqueio/trauma, Status atual — este com
+pode ter acontecido, Tipo de bloqueio/padrão limitante, Status atual — este com
 justificativa ancorada na marca visível antes da frase verbatim). Sem setor,
 sem hora, sem olho, sem Cronorichio visível ao leitor. Veja §3 abaixo
 para o template exato.
@@ -692,7 +692,7 @@ Cada marcador emite EXATAMENTE estes 4 campos, na ordem, sem campo extra:
 
 - **Período de vida:** [faixa ESTREITA de ~2-3 anos — "dos X aos Y anos" (ex.: "dos 6 aos 8 anos"); NUNCA ano único (precisão falsa), NUNCA faixa de 5+ anos salvo âncora visivelmente difusa; SEM nome de fase ("vinculação primária", "adolescência tardia", "vida adulta jovem" etc.)]
 - **O que pode ter acontecido:** [a hipótese MAIS PROVÁVEL e específica, raciocinada a partir da estrutura visível específica desta zona — NOMEIE essa estrutura (a mesma já descrita em §1/§2). Específica E ancorada E hipotética: as três juntas. Linguagem de possibilidade ("pode ter havido", "sugere", "compatível com"). Sem âncora nomeável → NÃO invente específico; mantenha curto-genérico OU omita o marcador.]
-- **Tipo de bloqueio/trauma:** [padrão psicológico específico]
+- **Tipo de bloqueio/padrão limitante:** [padrão psicológico específico]
 - **Status atual:** [PRIMEIRO a frase verbatim em **negrito** (UMA das três abaixo), depois " — " e a justificativa: UMA frase curta que NOMEIA a estrutura visível na íris que sustenta este status (bordas, fibras, abertura, cripta/lacuna, cicatriz, fechamento, reorganização) — SEM coordenada (Regras 3/9)]
 ```
 
@@ -756,7 +756,7 @@ estrutural real (skip-rather-than-fabricate).
 
 **Regra dura:** o campo só pode ir mais específico/comprometido se NOMEAR a estrutura visível (a mesma de §1/§2) que o sustenta. "A intensidade sugere…" sem nomear QUAL estrutura = Forer disfarçado, proibido. Mais específico exige MAIS âncora, não menos. Sem âncora nomeável → genérico-curto ou omita (skip-rather-than-fabricate).
 
-**Tipo de bloqueio/trauma** (padrão psicológico nomeado):
+**Tipo de bloqueio/padrão limitante** (padrão psicológico nomeado):
 - "silenciamento da expressão"
 - "hipervigilância afetiva"
 - "abandono ou ausência primária"
@@ -771,7 +771,7 @@ estrutural real (skip-rather-than-fabricate).
 >
 > - **Período de vida:** dos 12 aos 14 anos.
 > - **O que pode ter acontecido:** a abertura fibrilar frouxa que você descreveu na zona correspondente sugere uma vivência de não-poder-dizer em contexto familiar ou escolar — possivelmente um ambiente onde a voz própria foi tensionada contra a expectativa do entorno.
-> - **Tipo de bloqueio/trauma:** silenciamento da expressão, contenção afetiva.
+> - **Tipo de bloqueio/padrão limitante:** silenciamento da expressão, contenção afetiva.
 > - **Status atual:** **A resolver — marca ativa, pede atenção terapêutica.** A abertura fibrilar nessa estrutura permanece nítida, sem sinais de fechamento — campo ainda ativo.
 
 ### Exemplo de marcador MAL emitido (PROIBIDO — Regra 1 + 2 + 3 + 4 violations)
