@@ -38,6 +38,11 @@ import { cn } from '@/lib/utils'
 import { DeliverDialog } from './DeliverDialog'
 import { ExportPdfButton } from './ExportPdfButton'
 import { markReadingDelivered } from '@/app/actions/analise'
+import { AnalysisStream } from './AnalysisStream'
+
+// Mirrors AnaliseClient / parser.ts BOUNDARY_RE — best-effort UI counter
+// for the regenerate progress card; the server parser stays authoritative.
+const BOUNDARY_RE = /^[ \t]*#{2,3}[ \t]+§?[ \t]*\d{1,2}(?:\.\d)?[ \t]*[\p{Pd}.][ \t]*/gmu
 
 export interface ReadingModeActionsProps {
   readingId: string
@@ -56,6 +61,7 @@ export function ReadingModeActions({
   const [deliverOpen, setDeliverOpen] = useState(false)
   const [deliverPending, setDeliverPending] = useState(false)
   const [regenPending, startRegenTransition] = useTransition()
+  const [sectionsReceived, setSectionsReceived] = useState(0)
 
   if (isDelivered) {
     // Plan 19: ExportPdfButton stays visible — therapist can re-export a
@@ -104,6 +110,7 @@ export function ReadingModeActions({
 
   function onRegenerate() {
     startRegenTransition(async () => {
+      setSectionsReceived(0)
       try {
         const res = await fetch(`/api/readings/${readingId}/analyze`, { method: 'POST' })
         if (!res.ok) {
@@ -112,15 +119,18 @@ export function ReadingModeActions({
           toast.error(`Falha ao regenerar análise: ${msg}`)
           return
         }
-        // Drain the stream — we don't show a progress UI here (the page
-        // refresh below will pick up the new report). The fetch promise
-        // resolves once the route handler returns headers; the body stream
-        // continues server-side. router.refresh() will re-read once the
-        // analyze route finishes persisting.
+        // Consume the stream and count `## N.` boundaries for the progress
+        // card (mirrors AnaliseClient). The body continues server-side; the
+        // route persists report_generated; router.refresh() re-reads it.
         const reader = res.body?.getReader()
         if (reader) {
-          while (!(await reader.read()).done) {
-            /* drain */
+          const decoder = new TextDecoder()
+          let acc = ''
+          for (;;) {
+            const { value, done } = await reader.read()
+            if (done) break
+            acc += decoder.decode(value, { stream: true })
+            setSectionsReceived((acc.match(BOUNDARY_RE) ?? []).length)
           }
         }
         toast.success('Análise regenerada. Atualizando…')
@@ -130,6 +140,10 @@ export function ReadingModeActions({
         toast.error(`Falha ao regenerar: ${msg}`)
       }
     })
+  }
+
+  if (regenPending) {
+    return <AnalysisStream sectionsReceived={sectionsReceived} />
   }
 
   const regenButton = (
