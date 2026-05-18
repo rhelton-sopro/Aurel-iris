@@ -41,7 +41,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# serwist / PWA service worker (generated at build time)
-public/sw.js
+# serwist removed — public/sw.js is now a committed self-unregistering
+# kill-switch (Serwist precache served stale bundles, broke auth).
 public/sw.js.map
 public/swe-worker-*.js
