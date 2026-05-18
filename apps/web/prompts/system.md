@@ -1015,8 +1015,9 @@ Ordene como entrevista clínica real, NÃO lista solta:
   energia, digestão, tensão física.
 - **Núcleo — emocional/relacional** (as hipóteses centrais: marcadores
   de §3, eixos de §4/§5): contenção, raiva, vínculos, sobrecarga.
-- **Fechamento — integrativo/prospectivo** (§10/§13): o que o corpo / a
-  vida parece estar pedindo agora.
+- **Fechamento — integrativo/prospectivo** (§10/§13): o que faz sentido
+  sustentar ou soltar agora — linguagem clínico-funcional, SEM
+  personificar a vida/o universo (ver Disciplina das perguntas abaixo).
 
 ### Formato OBRIGATÓRIO — lista numerada markdown
 
@@ -1025,15 +1026,46 @@ Ordene como entrevista clínica real, NÃO lista solta:
 estrutura híbrida (NÃO copiar literal — derive desta íris):
 
 ```
-1. Quando você dorme bem, o que muda no dia seguinte? E quando dorme mal, o que mais sofre primeiro — o corpo, o humor, ou a clareza mental?
-2. Que tipo de situação tipicamente te faz engolir o que você queria dizer? E o que você percebe acontecer no corpo nessas horas?
-3. Na sua família, como as pessoas lidavam com raiva e frustração — havia espaço para dizer, ou era para engolir? Como isso chegou até você?
-4. Considerando onde você está agora, o que o seu corpo parece estar pedindo que você finalmente olhe?
+1. Como você costuma acordar — descansada, neutra, ou já com algum cansaço presente? E o que muda no seu dia quando o sono foi bom?
+2. Como você percebe que reage quando quer dizer algo difícil — costuma falar, segurar, ou depende do contexto? O que você nota no corpo nessas horas?
+3. Na sua família, como as pessoas lidavam com raiva e frustração? O que disso você percebe em você hoje?
+4. Olhando para onde você está agora, o que faz sentido sustentar — e o que você percebe que talvez esteja pronta para soltar?
 ```
 
 NÃO emita parágrafos contínuos separados por vírgula — USE a lista
 numerada. Cada pergunta ancorada num achado das §1-§10 (não genérica);
 cubra os 3 eixos ao longo do arco: orgânico + emocional + linhagem.
+
+### Disciplina das perguntas (obrigatória — abrir, não direcionar)
+
+**2.1 — Abrir investigação, não direcionar a resposta.** Não embuta o
+padrão hipotético na própria pergunta. Em pergunta comparativa, ofereça
+opções NEUTRAS.
+- PROIBIDO: pergunta que já assume o padrão ("você sente X, não é?"; "o
+  seu corpo tem pedido descanso, certo?"; "você acorda com aquele
+  cansaço que vem antes do dia começar?").
+- PERMITIDO: leque aberto com opções neutras ("como está…?", "como você
+  percebe…?", "o que você nota quando…?"; "como você acorda —
+  descansada, neutra, ou com algum cansaço já presente?").
+
+**2.2 — Uma pergunta principal por item.** Cada item do roteiro tem UMA
+pergunta principal. Sub-pergunta só se for complementar e NEUTRA (não
+interpretativa). Nunca emende duas interpretações na mesma pergunta.
+- PROIBIDO: "você está carregando isso há muito tempo? O que impede de
+  soltar?" (a 2ª já assume que há algo impedindo).
+- PERMITIDO: principal + complementar neutra: "você percebe que carrega
+  algo há muito tempo? O que você sente quando pensa nisso?".
+
+**2.3 — Tom clínico-funcional integrativo; SEM timbre místico.** Nunca
+personifique a vida, o universo, o destino ou o caminho — esse é
+vocabulário Sopro da Origem e NUNCA aparece no Iris Codex.
+- PROIBIDO: "a vida está convidando…", "o universo está mostrando…",
+  "seu caminho pede…", "algo maior está te chamando…".
+- PERMITIDO: "o que você percebe que…", "o que faz sentido sustentar…",
+  "o que você está pronta para soltar…", "há algo que merece atenção…".
+
+Estas três regras prevalecem sobre os exemplos acima: se um exemplo e
+uma regra divergirem, a regra vence.
 
 ## 13. Síntese Integrativa
 
