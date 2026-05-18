@@ -87,6 +87,26 @@ export async function POST(
         { status: 500 },
       )
     }
+    // Beta cap: conta esta leitura EXATAMENTE 1x, na 1ª saída de 'pending'
+    // (ponto real de consumo em prod — Modal aposentado → caminho é
+    // pending→ready, não pending→processing). CAS em beta_counted torna
+    // idempotente vs reprocess/regen/duplo-fire; o tally durável vive em
+    // profiles → apagar a leitura nunca libera vaga. (Branch Modal está
+    // retirado; se reativar, replicar este bloco lá.)
+    if (reading.status === 'pending') {
+      const { data: claimed } = await svc
+        .from('readings')
+        .update({ beta_counted: true })
+        .eq('id', readingId)
+        .eq('beta_counted', false)
+        .select('therapist_id')
+        .maybeSingle()
+      if (claimed?.therapist_id) {
+        await svc.rpc('increment_beta_readings_used', {
+          p_therapist: claimed.therapist_id,
+        })
+      }
+    }
     revalidatePath('/leituras')
     return new NextResponse(null, { status: 202 })
   }

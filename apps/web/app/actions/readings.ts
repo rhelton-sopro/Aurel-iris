@@ -53,19 +53,18 @@ export async function createReadingAction(
     redirect('/login')
   }
 
-  // Beta: cap de 2 leituras por terapeuta. Conta só leituras que saíram de
-  // 'pending' (= captura finalizada / exame de fato submetido) — rascunho
-  // abandonado antes da 1ª foto NÃO queima cota (evita lock por duplo-clique).
-  // Autoexame conta normal (é reading comum). RLS já filtra por therapist_id;
-  // o .eq explícito é defesa em profundidade. Apagar leitura libera vaga —
-  // aceitável no beta (alunos conhecidos), não blindado contra abuso.
+  // Beta: cap de 2 leituras por terapeuta via contador monotônico do
+  // profiles (incrementado 1x por leitura na transição pending→ready em
+  // /api/readings/[id]/process; nunca decrementado → apagar/reprocessar
+  // leitura NÃO libera vaga). RLS de profiles permite o terapeuta ler a
+  // própria linha.
   const BETA_READING_CAP = 2
-  const { count: usedReadings } = await supabase
-    .from('readings')
-    .select('id', { count: 'exact', head: true })
-    .eq('therapist_id', user.id)
-    .neq('status', 'pending')
-  if ((usedReadings ?? 0) >= BETA_READING_CAP) {
+  const { data: betaProfile } = await supabase
+    .from('profiles')
+    .select('beta_readings_used')
+    .eq('id', user.id)
+    .maybeSingle()
+  if ((betaProfile?.beta_readings_used ?? 0) >= BETA_READING_CAP) {
     return {
       error: `Limite do beta atingido: ${BETA_READING_CAP} leituras realizadas. Fale com o suporte para liberar mais.`,
     }

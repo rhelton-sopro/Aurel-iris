@@ -270,6 +270,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          beta_readings_used: number
           bio: string | null
           city: string | null
           created_at: string | null
@@ -283,6 +284,7 @@ export type Database = {
           trial_ends_at: string | null
         }
         Insert: {
+          beta_readings_used?: number
           bio?: string | null
           city?: string | null
           created_at?: string | null
@@ -296,6 +298,7 @@ export type Database = {
           trial_ends_at?: string | null
         }
         Update: {
+          beta_readings_used?: number
           bio?: string | null
           city?: string | null
           created_at?: string | null
@@ -404,6 +407,7 @@ export type Database = {
       readings: {
         Row: {
           audit_metadata: Json | null
+          beta_counted: boolean
           canonical_metadata: Json | null
           capture_method: string | null
           client_id: string
@@ -446,6 +450,7 @@ export type Database = {
         }
         Insert: {
           audit_metadata?: Json | null
+          beta_counted?: boolean
           canonical_metadata?: Json | null
           capture_method?: string | null
           client_id: string
@@ -488,6 +493,7 @@ export type Database = {
         }
         Update: {
           audit_metadata?: Json | null
+          beta_counted?: boolean
           canonical_metadata?: Json | null
           capture_method?: string | null
           client_id?: string
@@ -648,6 +654,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      increment_beta_readings_used: {
+        Args: {
+          p_therapist: string
+        }
+        Returns: undefined
+      }
       match_knowledge_chunks: {
         Args: {
           match_count?: number
