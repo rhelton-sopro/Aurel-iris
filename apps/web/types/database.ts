@@ -159,6 +159,7 @@ export type Database = {
           email: string | null
           full_name: string
           id: string
+          is_self: boolean
           notes: string | null
           phone: string | null
           therapist_id: string
@@ -172,6 +173,7 @@ export type Database = {
           email?: string | null
           full_name: string
           id?: string
+          is_self?: boolean
           notes?: string | null
           phone?: string | null
           therapist_id: string
@@ -185,6 +187,7 @@ export type Database = {
           email?: string | null
           full_name?: string
           id?: string
+          is_self?: boolean
           notes?: string | null
           phone?: string | null
           therapist_id?: string
@@ -278,9 +281,12 @@ export type Database = {
           id: string
           phone: string | null
           professional_id: string | null
+          specialties: string[] | null
           state: string | null
           stripe_customer_id: string | null
           subscription_status: string | null
+          tos_accepted_at: string | null
+          tos_version: string | null
           trial_ends_at: string | null
         }
         Insert: {
@@ -292,9 +298,12 @@ export type Database = {
           id: string
           phone?: string | null
           professional_id?: string | null
+          specialties?: string[] | null
           state?: string | null
           stripe_customer_id?: string | null
           subscription_status?: string | null
+          tos_accepted_at?: string | null
+          tos_version?: string | null
           trial_ends_at?: string | null
         }
         Update: {
@@ -306,9 +315,12 @@ export type Database = {
           id?: string
           phone?: string | null
           professional_id?: string | null
+          specialties?: string[] | null
           state?: string | null
           stripe_customer_id?: string | null
           subscription_status?: string | null
+          tos_accepted_at?: string | null
+          tos_version?: string | null
           trial_ends_at?: string | null
         }
         Relationships: []
