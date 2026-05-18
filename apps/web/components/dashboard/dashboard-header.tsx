@@ -54,7 +54,7 @@ export function DashboardHeader({ fullName, trialEndsAt, subscriptionStatus }: D
             aria-label={`${fullName} — menu da conta`}
           >
             <Avatar className="h-9 w-9">
-              <AvatarFallback className="bg-primary text-primary-foreground text-xs font-normal">
+              <AvatarFallback className="bg-teal-dark text-white text-xs font-normal tracking-label">
                 {initial}
               </AvatarFallback>
             </Avatar>
