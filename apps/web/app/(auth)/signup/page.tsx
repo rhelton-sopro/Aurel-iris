@@ -23,11 +23,7 @@ const signupSchema = z.object({
   email: z.string().min(1, 'E-mail é obrigatório').email('E-mail inválido'),
   full_name: z.string().min(1, 'Nome é obrigatório'),
 })
-const codeSchema = z.object({
-  code: z.string().trim().min(1, 'Digite o código recebido por e-mail'),
-})
 type SignupFormValues = z.infer<typeof signupSchema>
-type CodeValues = z.infer<typeof codeSchema>
 
 export default function SignupPage() {
   const [step, setStep] = useState<'form' | 'code'>('form')
@@ -35,15 +31,13 @@ export default function SignupPage() {
     email: '',
     full_name: '',
   })
+  const [code, setCode] = useState('')
+  const [verifying, setVerifying] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
     defaultValues: { email: '', full_name: '' },
-  })
-  const codeForm = useForm<CodeValues>({
-    resolver: zodResolver(codeSchema),
-    defaultValues: { code: '' },
   })
 
   async function onSubmit(values: SignupFormValues) {
@@ -86,12 +80,19 @@ export default function SignupPage() {
     setStep('code')
   }
 
-  async function onVerifyCode(values: CodeValues) {
+  async function onVerifyCode(e: React.FormEvent) {
+    e.preventDefault()
+    const token = code.trim()
+    if (!token) {
+      setFormError('Digite o código recebido por e-mail.')
+      return
+    }
     setFormError(null)
+    setVerifying(true)
     const supabase = createClient()
     const { error } = await supabase.auth.verifyOtp({
       email: pending.email,
-      token: values.code,
+      token,
       type: 'email',
     })
 
@@ -105,9 +106,10 @@ export default function SignupPage() {
       if (error.status === 429 || error.message.toLowerCase().includes('rate limit')) {
         setFormError('Muitas tentativas. Aguarde alguns minutos e tente novamente.')
       } else {
-        setFormError('Código inválido ou expirado. Confira os 6 dígitos ou solicite um novo.')
+        setFormError('Código inválido ou expirado. Confira o código ou solicite um novo.')
       }
-      codeForm.reset()
+      setCode('')
+      setVerifying(false)
       return
     }
 
@@ -137,7 +139,7 @@ export default function SignupPage() {
         <CardHeader>
           <CardTitle className="text-2xl">Digite o código</CardTitle>
           <CardDescription>
-            Enviamos um código de 6 dígitos para <strong>{pending.email}</strong>.
+            Enviamos um código de acesso para <strong>{pending.email}</strong>.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -146,48 +148,43 @@ export default function SignupPage() {
               {formError}
             </div>
           )}
-          <Form {...codeForm}>
-            <form onSubmit={codeForm.handleSubmit(onVerifyCode)} className="space-y-4">
-              <FormField
-                control={codeForm.control}
+          {/* Plain controlled input — deliberately NO react-hook-form /
+              FormField / FormControl here: that stack was leaving this
+              field inert. The signup step above keeps RHF (it works). */}
+          <form onSubmit={onVerifyCode} className="space-y-4">
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="otp-code" className="text-sm font-medium">
+                Código de acesso
+              </label>
+              <input
+                id="otp-code"
                 name="code"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Código de acesso</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="text"
-                        inputMode="text"
-                        autoComplete="one-time-code"
-                        maxLength={10}
-                        placeholder="Código do e-mail"
-                        autoFocus
-                        className="text-center text-xl tracking-[0.3em] font-light"
-                        {...field}
-                        onChange={(e) => field.onChange(e.target.value.trim())}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                type="text"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                autoFocus
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                placeholder="Código do e-mail"
+                className="h-12 w-full rounded-none border-0 border-b border-b-ink bg-transparent px-3 text-center text-2xl tracking-[0.3em] font-light outline-none transition-colors duration-[180ms] placeholder:text-base placeholder:tracking-normal placeholder:text-mist focus-visible:border-b-teal"
               />
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={codeForm.formState.isSubmitting}
-                aria-busy={codeForm.formState.isSubmitting}
-              >
-                {codeForm.formState.isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Verificando...
-                  </>
-                ) : (
-                  'Criar conta e entrar'
-                )}
-              </Button>
-            </form>
-          </Form>
+            </div>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={verifying}
+              aria-busy={verifying}
+            >
+              {verifying ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Verificando...
+                </>
+              ) : (
+                'Criar conta e entrar'
+              )}
+            </Button>
+          </form>
           <div className="mt-4 flex flex-col items-center gap-2 text-sm text-muted-foreground">
             <button type="button" onClick={onResend} className="underline">
               Não recebeu? Reenviar código
@@ -197,7 +194,7 @@ export default function SignupPage() {
               onClick={() => {
                 setStep('form')
                 setFormError(null)
-                codeForm.reset()
+                setCode('')
               }}
               className="underline"
             >
