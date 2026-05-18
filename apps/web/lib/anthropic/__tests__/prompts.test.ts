@@ -273,6 +273,27 @@ describe('lib/anthropic/prompts — Plan 16 absolute rules + structural restruct
     expect(sys).toMatch(/5 sistemas/)
   })
 
+  it('§1 contém as duas subseções (Síntese inicial client-facing + Leitura de base técnica) com guarda anti-Forer', () => {
+    const sys = loadSystemPrompt()
+    expect(sys).toContain('## 1. Constituição e Temperamento')
+    expect(sys).toContain('### Síntese inicial')
+    expect(sys).toContain('### Leitura de base')
+    // Anti-Forer guard + mandatory final reframe sentence
+    expect(sys).toMatch(/caberia em qualquer mulher de\n?\s*35-40 anos, está ERRADA/)
+    expect(sys).toContain('Você não é X — você é alguém que')
+    // Soul synthesis must NOT be the visual anchor source for "Em poucas palavras"
+    expect(sys).toContain('Esta subseção NÃO é a âncora visual')
+  })
+
+  it('§11 inclui categoria Adaptógenos e Florais sem rótulo "genéricos"', () => {
+    const sys = loadSystemPrompt()
+    expect(sys).toContain('estas 6 categorias')
+    expect(sys).toContain('**Adaptógenos**')
+    expect(sys).toContain('ashwagandha')
+    expect(sys).toContain('**Florais**')
+    expect(sys).not.toContain('**Florais (genéricos, sem marca)**')
+  })
+
   it('§10 instructions enforce symbolic opening (not anatomical)', () => {
     const sys = loadSystemPrompt()
     expect(sys).toContain('§10 ABRE com a leitura arquetípica')

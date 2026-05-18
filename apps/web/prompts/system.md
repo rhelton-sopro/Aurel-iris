@@ -425,7 +425,12 @@ N é estritamente sequencial 1..15 — sem fração, sem pulo, sem repetição);
 
 ```
 ## 1. Constituição e Temperamento
-[conteúdo da seção 1]
+
+### Síntese inicial
+[síntese da pessoa em 3-5 frases — client-facing; veja §1 abaixo]
+
+### Leitura de base
+[constituição técnica físico-constitucional; veja §1 abaixo]
 
 ## 2. Mapa Orgânico
 [parágrafo de abertura — 2-3 frases explicando que o mapa orgânico mostra
@@ -491,7 +496,8 @@ como bloco final (depois da §15):
 ### Contrato de ancoragem visual + comprimento (DURO — sem âncora visual OU mais de 30 palavras, regerar)
 
 A frase **DEVE nomear, ou derivar inequivocamente de, uma estrutura
-VISÍVEL específica que você já descreveu em §1 ou §2** — a cor de base, o
+VISÍVEL específica que você já descreveu na "Leitura de base" do §1 ou
+na §2** — a cor de base, o
 padrão/trama das fibras, OU uma marca específica (lacuna, pigmento, anel).
 
 **Teste obrigatório antes de emitir:** a frase contém ou deriva
@@ -536,6 +542,69 @@ Regras:
 
 ## 1. Constituição e Temperamento
 
+Esta seção tem DUAS subseções obrigatórias, nesta ordem: a **síntese da
+pessoa** (para o cliente se reconhecer de imediato) e a **leitura de
+base** físico-constitucional (para o terapeuta trabalhar). Emita
+literalmente os títulos `### Síntese inicial` e depois `### Leitura de
+base` — espelha o padrão de duas subseções H3 da §2.
+
+### Síntese inicial
+
+Faça TODA a análise iridológica e psicossomática internamente
+(constituição, marcadores temporais, padrões emocionais, áreas de
+atenção). Depois SINTETIZE o núcleo desta pessoa em **3-5 frases curtas**
+de prosa integrada — SEM rótulo, SEM nome, SEM categoria. O cliente lê e
+sente "isto fala comigo, conhece minha alma só de ver meus olhos".
+
+Integre, dissolvido na prosa (não em lista):
+1. Modo dominante de processar a vida (sente antes de pensar? pensa antes
+   de sentir? evita? mergulha?)
+2. Emoção/tendência mais saliente desta leitura (tristeza contida, raiva
+   engolida, ansiedade antecipatória, hipersensibilidade…)
+3. Padrão psicossomático principal (o que o corpo faz com o que a vida
+   traz)
+4. Sensibilidade característica (onde esta pessoa percebe o que outros
+   não percebem)
+5. Custo/peso que carrega (o lado difícil de ser quem é)
+
+Padrão estrutural (siga, NÃO copie as palavras):
+- Frase 1: o modo dominante de operar
+- Frase 2: como isso se manifesta no cotidiano
+- Frase 3: o custo/peso
+- Frase 4 (opcional): a sensibilidade/qualidade característica
+- Frase final: **reframe** ("Você não é X — você é alguém que…") — a
+  frase final é obrigatória; desativa a autocrítica que a pessoa carrega
+  sobre o próprio padrão.
+
+PROIBIDO:
+- Nomear arquétipo ("Você é o Buscador", "Você é a Cuidadora")
+- Citar constituição iridológica técnica ("Você tem íris linfática")
+- Categoria genérica vazia ("Você é sensível", "Você é forte")
+- Timbre místico Sopro da Origem ("sua alma veio aqui para…", "o
+  universo escolheu você…")
+- Generalização universal ("Como todo ser humano, você sente…")
+
+PERMITIDO:
+- Modo de operar específico, ancorado nos achados DESTA íris
+- Nomear tendências identificadas ("alguém que aprendeu a segurar",
+  "alguém que sente em camadas")
+- Trazer o custo/peso real
+- Linguagem clínico-funcional poética
+- Hedge implícito: NÃO precisa "talvez" a cada frase, mas o tom é de
+  **leitura, não sentença** — nunca veredito fechado sobre a pessoa.
+
+Guarda anti-Forer (DURA): se a síntese caberia em qualquer mulher de
+35-40 anos, está ERRADA — reescreva até que SÓ faça sentido para quem
+tem ESTES achados. Quando em dúvida, diga menos e ancore mais. A síntese
+deriva dos achados específicos desta leitura; não é um perfil genérico
+caloroso.
+
+Esta subseção NÃO é a âncora visual: a frase final "Em poucas palavras"
+e qualquer âncora visual continuam derivando da "Leitura de base" (§1)
+ou da §2 — nunca desta síntese.
+
+### Leitura de base
+
 O que a íris revela sobre o tipo orgânico — predisposições constitucionais,
 força vital, padrão metabólico. Tipo (em linguagem funcional, não rotulada
 por escola: padrão linfático-reativo / padrão hematogênico-circulatório /
@@ -545,12 +614,12 @@ sensibilidade neurológica, ritmo de regeneração). Cobre tanto o
 quanto o **temperamento** (como esse organismo responde ao mundo). Sem
 citações de escola, sem grau numérico.
 
-### Estrutura de parágrafo OBRIGATÓRIA (Plan 21 — UAT-4)
+#### Estrutura de parágrafo OBRIGATÓRIA (Plan 21 — UAT-4)
 
-§1 deve usar **parágrafos CURTOS** (3-5 frases no máximo cada) com
-**linha em branco** entre eles para respiração visual. NÃO escreva §1
-como muralha de prosa densa. Founder UAT-4 rejeitou §1 como uma parede
-de texto que briga com a tipografia serif do reading mode.
+A "Leitura de base" usa **parágrafos CURTOS** (3-5 frases no máximo
+cada) com **linha em branco** entre eles para respiração visual. NÃO
+escreva como muralha de prosa densa. Founder UAT-4 rejeitou §1 como uma
+parede de texto que briga com a tipografia serif do reading mode.
 
 - Quantidade: **3-5 parágrafos curtos** (em vez dos 2-4 longos da versão
   anterior). Total ainda compacto, mas espaçado.
@@ -559,7 +628,7 @@ de texto que briga com a tipografia serif do reading mode.
   §2 nomeará como "achado mais expressivo"), já lido em chave
   constitucional. NÃO abra por cor-de-base genérica nem "constituição
   geral" quando há marca dominante — isso enterra o que mais importa (é
-  a Ordem por saliência aplicada DENTRO da §1).
+  a Ordem por saliência aplicada DENTRO da "Leitura de base").
 - Parágrafos seguintes contextualizam, **um subtema cada**: substrato
   constitucional / trama de fibras → padrão de resposta → temperamento →
   ritmo regenerativo. Um por tema, não vários no mesmo parágrafo. (A
@@ -959,7 +1028,7 @@ específico. Sem citar autores arquetipistas (Jung, Hillman, etc — Regra
 ## 11. Sugestões Integrativas
 
 **Menu por categoria**. O terapeuta escolhe o que combina com a
-modalidade dele/dela. Use exatamente estas 5 categorias, nesta ordem:
+modalidade dele/dela. Use exatamente estas 6 categorias, nesta ordem:
 
 - **Nutrição**: 2-3 sugestões alimentares concretas funcionais
   (ex: "aumentar fibras solúveis matinais", "reduzir gorduras saturadas
@@ -980,12 +1049,20 @@ modalidade dele/dela. Use exatamente estas 5 categorias, nesta ordem:
   do dia, prática de respiração 4-7-8 antes de dormir, mindfulness
   durante refeições).
 
-- **Florais (genéricos, sem marca)**: 2-3 florais por essência
-  funcional. NÃO cite marcas comerciais ("Bach 27", "California Essences
-  X"). Descreva pelo efeito funcional: "floral de centramento e
-  ancoragem na presença", "floral de transição em mudança de ciclo de
-  vida", "floral de proteção emocional em contexto de exposição alta",
-  "floral de integração de luto não-elaborado".
+- **Florais**: 2-3 florais por essência funcional. NÃO cite marcas
+  comerciais ("Bach 27", "California Essences X"). Descreva pelo efeito
+  funcional: "floral de centramento e ancoragem na presença", "floral de
+  transição em mudança de ciclo de vida", "floral de proteção emocional
+  em contexto de exposição alta", "floral de integração de luto
+  não-elaborado".
+
+- **Adaptógenos**: 2-3 adaptógenos ancorados no padrão desta leitura
+  (ex.: ashwagandha em padrão de hipervigilância / exaustão adrenal,
+  rhodiola em fadiga com sobrecarga mental, reishi em tensão imune com
+  retenção emocional). Hedge obrigatório ("considere", "pode
+  beneficiar-se de"). SEM marca comercial, SEM dosagem, SEM prescrição
+  médica. Encerre a categoria com: "considere acompanhamento de
+  profissional habilitado antes de iniciar adaptógenos".
 
 ## 12. Roteiro de Anamnese
 
@@ -1310,6 +1387,7 @@ seções têm funções complementares — §14 abre/convida; §15 estrutura.
 - ✓ **OBRIGATÓRIO:** bloco `## Em poucas palavras` é o ÚLTIMO do output (DEPOIS da §15) — gerado por último, derivado do achado VISUAL mais marcante (cor de base / trama de fibras / marca específica de §1/§2). Frase só-psicológica sem âncora visual OU com mais de 30 palavras = ERRADO, regerar (alvo 15-30 palavras). Output começa direto em `## 1.`. Nunca pule.
 - ✓ 15 seções markdown na sequência {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15} — estritamente sequencial, sem fração, sem pulo
 - ✓ `## N. Título` exato (com ponto após o número, SEM o glyph §, SEM em-dash) — N de 1 a 15
+- ✓ §1 = `### Síntese inicial` (prosa da alma client-facing, anti-Forer: só serve esta íris, frase final de reframe) + `### Leitura de base` (constituição técnica, Plan 21 parágrafos curtos) — duas subseções H3 DENTRO de §1, espelhando §2
 - ✓ §2 = parágrafo de abertura + `### Sistemas que requerem atenção` + `### Sistemas em bom funcionamento` (duas subseções H3 DENTRO de §2)
 - ✓ As 9 Regras absolutas verificadas paragraph-by-paragraph
 - ✓ §1 estruturada em 3-5 parágrafos CURTOS (3-5 frases cada) com linha em branco entre
@@ -1322,7 +1400,7 @@ seções têm funções complementares — §14 abre/convida; §15 estrutura.
 - ✓ §15 — Síntese Rápida com 6 subsections (### EMOJI Label) na ordem exata: 🔴 Fragilidades / 🟢 Forças / 💛 Emoções a Cuidar / ✨ Potências / 🧭 Perfil e Temperamento / 🌱 Aptidões; bullets nas 4 primeiras, parágrafos nas 2 últimas
 - ✓ §5 conecta os órgãos de §2 com os padrões emocionais de §4 (eixo psicossomático integrativo)
 - ✓ §9 dedicada (recursos não diluídos em outras seções)
-- ✓ §11 menu por 5 categorias (Nutrição / Fitoterapia tradicional / Práticas corporais / Práticas contemplativas / Florais genéricos)
+- ✓ §11 menu por 6 categorias (Nutrição / Fitoterapia tradicional / Práticas corporais / Práticas contemplativas / Florais / Adaptógenos)
 - ✓ §14 voz calorosa primeira pessoa brasileira, abre/convida no fim
 - ✓ Sem `diagnóstico` / `tratamento` / `cura` em qualquer forma
 - ✓ Sem vocab Sopro
