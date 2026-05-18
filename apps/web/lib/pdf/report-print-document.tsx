@@ -191,6 +191,23 @@ const PRINT_CSS = `
   .toc-num { width: 32px; color: var(--teal); font-size: 11pt; }
   .toc-name { color: var(--ink); font-size: 12pt; }
   .toc-leader { flex: 1; border-bottom: 1px dotted #C0C0C0; margin: 0 8px 4px; }
+  /* TOC rows are anchor links (clickable nav in every reader incl. mobile —
+     survives the cover+body pdfcpu merge, unlike the outline). Keep them
+     visually identical to plain rows: no underline, no link-blue. */
+  a.toc-row { text-decoration: none; color: inherit; }
+  a.toc-row:hover { text-decoration: none; }
+  /* Visually-hidden but present in the layout/heading tree so the body
+     PDF carries a well-formed outline root (bonus for if/when the merge
+     stops stripping outlines). display:none would drop it from the tree. */
+  .doc-title {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
 
   /* ---- "Em poucas palavras" page ---- */
   .essence-page {
@@ -406,16 +423,19 @@ export async function renderBodyHtml(
 
   const inner = renderToStaticMarkup(
     <>
+      {/* Outline root — visually hidden, present in the heading tree */}
+      <h1 className="doc-title">Iris Codex — Leitura de {clientName}</h1>
+
       {/* Índice */}
       <div className="toc">
         <div className="toc-title">Índice</div>
         <div className="toc-rule" />
         {present.map((h) => (
-          <div className="toc-row" key={h}>
+          <a className="toc-row" key={h} href={`#sec-${h}`}>
             <span className="toc-num">{h}</span>
             <span className="toc-name">{sectionDisplayTitle(h, clientName)}</span>
             <span className="toc-leader" />
-          </div>
+          </a>
         ))}
       </div>
 
@@ -444,6 +464,7 @@ export async function renderBodyHtml(
           const subs = isSintese ? parseSubsections(body) : []
           return (
             <section
+              id={`sec-${headingStr}`}
               className={`report-section${isLetter ? ' letter' : ''}`}
               key={key}
             >

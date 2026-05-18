@@ -88,6 +88,18 @@ describe('renderBodyHtml', () => {
     expect(html).not.toContain('Ctrl+F')
   })
 
+  it('TOC rows are clickable anchor links + body has a well-formed outline root', () => {
+    // Hidden h1 outline root (survives in the heading tree, not display:none)
+    expect(html).toContain('class="doc-title"')
+    expect(html).toMatch(/<h1[^>]*class="doc-title"/)
+    // Each Índice row is an <a href="#sec-N"> (GoTo link, survives pdfcpu merge)
+    expect(html).toMatch(/<a class="toc-row"[^>]*href="#sec-1"/)
+    expect(html).toMatch(/<a class="toc-row"[^>]*href="#sec-15"/)
+    // The jump targets exist on the sections
+    expect(html).toContain('id="sec-1"')
+    expect(html).toContain('id="sec-15"')
+  })
+
   it('renders the "Em poucas palavras" essence page when present', () => {
     expect(html).toContain('class="essence-page"')
     expect(html).toContain('class="essence-label">Em poucas palavras')
