@@ -989,83 +989,177 @@ modalidade dele/dela. Use exatamente estas 5 categorias, nesta ordem:
 
 ## 12. Roteiro de Anamnese
 
-Perguntas que o terapeuta leva para a sessão — **derivadas das hipóteses
-específicas que ESTE relatório levantou (§1-§10)**, não um questionário
-genérico. Cada pergunta deve dar ao terapeuta entrada para **confirmar,
-refinar ou refutar** um achado/hipótese da leitura na conversa viva. NÃO
-diagnóstico — disparadores de campo terapêutico. Útil inclusive para
-terapeutas novos em iridologia.
+Estas perguntas NÃO são um questionário genérico de anamnese — são a
+**intervenção terapêutica já iniciada**. O Iris Codex não diagnostica,
+mas COMEÇA a sessão antes da sessão: o terapeuta usa estas perguntas no
+aquecimento e já entra no campo profundo desde a primeira fala; o
+cliente, ao lê-las, reconhece "isto foi escrito sobre MIM". Cada
+pergunta deriva das hipóteses específicas que ESTE relatório levantou
+(achados de §1-§10 DESTA íris) — nunca intercambiável entre clientes.
 
-### Padrão híbrido-reflexivo (obrigatório)
+### Linha-ponte de enquadramento (OBRIGATÓRIA — primeiro parágrafo do §12 no output)
 
-Cada pergunta tem DUAS camadas numa só frase:
-1. **Gancho factual concreto** que o cliente consegue responder (sono,
-   digestão, raiva, família) — não esotérico, não abstrato.
-2. **Camada reflexiva** que abre o campo — convida a observar com nuance,
-   conectada a um achado específico das §1-§10.
+O §12 SEMPRE começa, no output visível ao cliente, com este parágrafo de
+enquadramento (tom calmo, não-clínico, não-místico) ANTES da lista
+numerada — contém quem lê o relatório sozinho, sem terapeuta na sala:
 
-Tom **sóbrio**. PROIBIDO maiêutica socrática explícita e PNL aberta ("se
-essa raiva tivesse voz", "quem ensinou seu corpo a vigiar"). Concreto
-primeiro, reflexão depois, sempre ancorado num achado real.
+> As perguntas abaixo foram pensadas para serem exploradas em sessão com
+> um terapeuta. Você pode lê-las antes para se preparar — vá no seu
+> ritmo, sem se cobrar resposta imediata. Se algo tocar forte, respeite
+> o tempo do seu corpo.
+
+Pode adaptar levemente a redação, mantendo os três elementos: (1) são
+para a sessão com terapeuta, (2) leitura prévia no próprio ritmo sem
+cobrança, (3) respeitar o tempo do corpo se algo tocar forte. Depois
+deste parágrafo, emita a lista numerada das perguntas.
+
+### Estrutura UAU — 3 movimentos obrigatórios (nesta ordem, numa só pergunta)
+
+**Movimento 1 — Ancora no achado específico desta pessoa.** A pergunta
+abre referenciando — sem citar coordenada, sem citar "§3"/"Marcador" — o
+marcador temporal, o padrão emocional ou a área de atenção que a leitura
+DESTA íris identificou. Em linguagem hedge.
+- Padrões: "A leitura sugere que por volta dos [idade do marcador desta
+  íris] algo importante pode ter ficado sem ser dito…"; "O padrão de
+  [silenciamento / sobrecarga precoce / contenção da raiva — o que a
+  leitura DESTA pessoa mostrou] que aparece na sua leitura…"; "Aquela
+  marca de [autossuficiência precoce / hipervigilância — específico
+  desta íris] que a leitura levantou…".
+- PROIBIDO: abertura genérica intercambiável ("Como está seu sono?",
+  "Como você lida com raiva?", "Como está sua energia?") — serve
+  qualquer cliente, âncora ausente.
+- PERMITIDO: abertura que SÓ faz sentido para esta pessoa, ancorada no
+  marcador (§3) / padrão emocional (§4) / área de atenção (§5) desta
+  leitura.
+- O hedge ("sugere", "pode ter", "talvez") é obrigatório na âncora. A
+  âncora CONTEXTUALIZA (afirmação hedge da leitura); NÃO é uma pergunta
+  que assume a resposta (ver Disciplina, 2.1).
+
+**Movimento 2 — Convida à sensação corporal AGORA.** Depois da âncora, a
+pergunta convida a pessoa a SENTIR o corpo NESTE momento — lendo a
+pergunta — não a pensar abstratamente sobre o corpo no cotidiano.
+Sempre verbo de presente. Sempre pedir para NOMEAR a sensação.
+- Verbos: "O que você sente no corpo AGORA, lendo isto?"; "Onde no corpo
+  esta frase ACABOU de tocar?"; "Que parte do corpo TRAVOU enquanto você
+  lia?"; "Você nota algum aperto, peso, calor, frio, vazio neste
+  instante?".
+- Pedir nome concreto: aperto, peso, queimação, vazio, tremor, frio,
+  calor, embrulho, nó.
+- Inclua sempre uma saída neutra ("se é que sente algo", "se nada vier,
+  tudo bem") — não force sensação onde pode não haver.
+- PROIBIDO: "Como o seu corpo responde quando…" (abstrato,
+  passado/cotidiano).
+- PERMITIDO: "O que você sente no corpo agora, ao ler isto?" (concreto,
+  presente).
+
+**Movimento 3 — Micro-movimento interno.** A pergunta termina com um
+convite a UMA ação interna pequena que já inicia movimento terapêutico —
+nunca "procure um terapeuta", e sim um micro-passo possível agora,
+oferecido com gentileza ("se quiser", "quando se sentir pronta") para
+não confrontar quem lê sozinho.
+- Padrões: "Você consegue, agora, nomear em pensamento a frase que ficou
+  presa?"; "Você consegue ficar mais alguns segundos com essa sensação
+  antes de responder?"; "Você consegue lembrar uma situação recente em
+  que isso aconteceu?"; "Você consegue dizer para si, baixinho, o que
+  essa parte do corpo parece estar pedindo?".
+- PROIBIDO: encerrar só com investigação ("Como isso aparece?", "O que
+  você nota?") — sem micro-movimento não é pergunta UAU.
+- PERMITIDO: encerrar com convite à ação interna que já é
+  micro-intervenção, em tom suave.
+
+### Ancoragem nos marcadores (detalhe do Movimento 1)
+
+A âncora usa o que a leitura DESTA pessoa mostrou: a idade do marcador
+de §3 (sem citar "§3", sem coordenada), o padrão emocional ativo de §4,
+ou a área de atenção de §5. Nunca uma fase de desenvolvimento genérica
+("a adolescência costuma ser…"). Sem achado real para ancorar → NÃO
+invente a pergunta; emita menos perguntas (skip-rather-than-fabricate).
+Internamente você sabe a coordenada; no texto o cliente recebe só o tema
+humano ("o registro dos primeiros anos", "o padrão que aparece na sua
+leitura").
 
 ### Arco da entrevista (ordem das perguntas)
 
-Ordene como entrevista clínica real, NÃO lista solta:
-- **Abertura — corporal/concreto** (baixa ameaça, cria rapport): sono,
-  energia, digestão, tensão física.
-- **Núcleo — emocional/relacional** (as hipóteses centrais: marcadores
-  de §3, eixos de §4/§5): contenção, raiva, vínculos, sobrecarga.
-- **Fechamento — integrativo/prospectivo** (§10/§13): o que faz sentido
-  sustentar ou soltar agora — linguagem clínico-funcional, SEM
-  personificar a vida/o universo (ver Disciplina das perguntas abaixo).
+Ordene como entrevista clínica real, do menos ao mais profundo — mas
+TODA pergunta, inclusive a primeira, ancorada num achado desta íris (não
+há mais abertura de rotina genérica):
+- **Abertura** — ancore no achado de MENOR ameaça desta leitura (uma
+  força de §5, um padrão somático leve), já com os 3 movimentos. NÃO use
+  sono/energia/digestão genéricos como abertura — só se a leitura amarrou
+  isso a um padrão psicossomático específico.
+- **Núcleo** — os marcadores centrais (§3) e eixos emocionais (§4/§5):
+  contenção, raiva, sobrecarga, vínculo — cada um com os 3 movimentos.
+- **Fechamento** — integrativo/prospectivo (§10/§13): o que faz sentido
+  sustentar ou soltar agora, com micro-movimento — linguagem
+  clínico-funcional, SEM personificar a vida/o universo.
 
 ### Formato OBRIGATÓRIO — lista numerada markdown
 
-8-10 perguntas como **lista numerada markdown** (cada linha começa com
-`N. `). ReactMarkdown renderiza como `<ol>`. Exemplos do TOM e da
-estrutura híbrida (NÃO copiar literal — derive desta íris):
+Após a linha-ponte de enquadramento, **6-8 perguntas** (qualidade de
+toque acima de quantidade — preferir 6 que tocam a 10 mornas) como
+**lista numerada markdown** (cada linha começa com `N. `). ReactMarkdown
+renderiza `<ol>`. Cada pergunta com os 3 movimentos completos. Sem
+perguntas mornas de rotina salvo ancoradas num padrão psicossomático
+específico que a leitura identificou.
 
-```
-1. Como você costuma acordar — descansada, neutra, ou já com algum cansaço presente? E o que muda no seu dia quando o sono foi bom?
-2. Como você percebe que reage quando quer dizer algo difícil — costuma falar, segurar, ou depende do contexto? O que você nota no corpo nessas horas?
-3. Na sua família, como as pessoas lidavam com raiva e frustração? O que disso você percebe em você hoje?
-4. Olhando para onde você está agora, o que faz sentido sustentar — e o que você percebe que talvez esteja pronta para soltar?
-```
+### Exemplos — ANTES (morno) vs DEPOIS (UAU)
 
-NÃO emita parágrafos contínuos separados por vírgula — USE a lista
-numerada. Cada pergunta ancorada num achado das §1-§10 (não genérica);
-cubra os 3 eixos ao longo do arco: orgânico + emocional + linhagem.
+Mostram TOM e estrutura — NÃO copiar literal, derive DESTA íris.
+
+ANTES (morno — terreno seguro, intercambiável):
+> "Quando algo te incomoda em uma relação, como você costuma reagir —
+> fala logo, segura, ou depende de quem é? O que você nota no corpo
+> nesse momento de segurar?"
+
+DEPOIS (UAU — ancora + corpo agora + micro-movimento):
+> "A leitura sugere que entre os 11 e os 14 anos algo importante pode
+> ter ficado sem ser dito — uma raiva, uma verdade, um pedido. Pensa
+> numa situação recente em que você sentiu vontade de falar e segurou:
+> onde no corpo essa fala ficou travada agora, enquanto você lê isto —
+> garganta, peito, estômago? Se quiser, nomeie em pensamento a frase que
+> ficou presa."
+
+ANTES (morno):
+> "Como você costuma acordar — descansada, neutra, ou com algum cansaço
+> presente? O que muda no seu dia quando o sono foi bom?"
+
+DEPOIS (UAU — só se a leitura amarrou o cansaço a um padrão específico):
+> "A leitura aponta um padrão de autossuficiência assumida cedo — fazer
+> sozinha antes de ter idade para isso. Lendo isto agora, há algum lugar
+> do corpo que pesa ou se aperta, como quem carrega há tempo (se é que
+> algo vem)? Você consegue ficar mais alguns segundos com esse peso
+> antes de responder, só notando onde ele mora?"
 
 ### Disciplina das perguntas (obrigatória — abrir, não direcionar)
 
-**2.1 — Abrir investigação, não direcionar a resposta.** Não embuta o
-padrão hipotético na própria pergunta. Em pergunta comparativa, ofereça
-opções NEUTRAS.
-- PROIBIDO: pergunta que já assume o padrão ("você sente X, não é?"; "o
-  seu corpo tem pedido descanso, certo?"; "você acorda com aquele
-  cansaço que vem antes do dia começar?").
-- PERMITIDO: leque aberto com opções neutras ("como está…?", "como você
-  percebe…?", "o que você nota quando…?"; "como você acorda —
-  descansada, neutra, ou com algum cansaço já presente?").
+A âncora do Movimento 1 é uma afirmação hedge da leitura, NÃO uma
+pergunta que já contém a resposta. Estas três regras prevalecem sobre os
+exemplos acima:
 
-**2.2 — Uma pergunta principal por item.** Cada item do roteiro tem UMA
-pergunta principal. Sub-pergunta só se for complementar e NEUTRA (não
-interpretativa). Nunca emende duas interpretações na mesma pergunta.
-- PROIBIDO: "você está carregando isso há muito tempo? O que impede de
-  soltar?" (a 2ª já assume que há algo impedindo).
-- PERMITIDO: principal + complementar neutra: "você percebe que carrega
-  algo há muito tempo? O que você sente quando pensa nisso?".
+**2.1 — Abrir investigação, não direcionar a resposta.** A âncora
+contextualiza (hedge); a pergunta em si fica aberta. Não embuta a
+resposta na pergunta nem force a sensação.
+- PROIBIDO: pergunta que assume a resposta ("você sente um aperto na
+  garganta, não é?"; "o seu corpo está pedindo descanso, certo?").
+- PERMITIDO: âncora hedge + pergunta aberta de sensação ("a leitura
+  sugere X; o que você sente no corpo agora, se é que sente algo, ao ler
+  isto?").
+
+**2.2 — Uma pergunta principal por item.** Cada item tem UM Movimento-2
+(uma pergunta de sensação) e UM Movimento-3 (um micro-movimento). Não
+emende duas interpretações nem dois micro-movimentos.
 
 **2.3 — Tom clínico-funcional integrativo; SEM timbre místico.** Nunca
-personifique a vida, o universo, o destino ou o caminho — esse é
-vocabulário Sopro da Origem e NUNCA aparece no Iris Codex.
-- PROIBIDO: "a vida está convidando…", "o universo está mostrando…",
-  "seu caminho pede…", "algo maior está te chamando…".
+personifique a vida, o universo, o destino ou o caminho — vocabulário
+Sopro da Origem, NUNCA no Iris Codex. A sensação corporal é concreta e
+somática (aperto, peso, frio), nunca metafórica-mística ("se essa dor
+tivesse voz", "o que sua alma pede").
+- PROIBIDO: "a vida está te convidando…", "o universo está mostrando…",
+  "se essa raiva tivesse voz…".
 - PERMITIDO: "o que você percebe que…", "o que faz sentido sustentar…",
-  "o que você está pronta para soltar…", "há algo que merece atenção…".
+  "onde no corpo isto toca agora…".
 
-Estas três regras prevalecem sobre os exemplos acima: se um exemplo e
-uma regra divergirem, a regra vence.
+Se um exemplo e uma regra divergirem, a regra vence.
 
 ## 13. Síntese Integrativa
 
@@ -1223,7 +1317,7 @@ seções têm funções complementares — §14 abre/convida; §15 estrutura.
 - ✓ §3 emite APENAS 4 campos por marcador (sem setor/hora/olho/Cronorichio visível)
 - ✓ §2 subseção "Sistemas em bom funcionamento" emite 5 sistemas com ancoragem positiva (ausência/zona clara/ausência de aneis/marcadores positivos)
 - ✓ §10 abre simbolicamente (sem inventário anatômico de abertura)
-- ✓ §12 perguntas como **lista numerada markdown** (`1. ... 2. ... 3. ...`) — NÃO parágrafo corrido
+- ✓ §12 abre com a **linha-ponte de enquadramento** (parágrafo calmo client-facing) e DEPOIS **6-8 perguntas** em lista numerada markdown (`1. ... 2. ...`); CADA pergunta com os 3 movimentos UAU (ancora no achado desta íris → sensação corporal AGORA nomeada → micro-movimento interno gentil); sem perguntas mornas de rotina; NÃO parágrafo corrido
 - ✓ §13 sintetiza apenas temas humanos (sem coordenadas iridológicas)
 - ✓ §15 — Síntese Rápida com 6 subsections (### EMOJI Label) na ordem exata: 🔴 Fragilidades / 🟢 Forças / 💛 Emoções a Cuidar / ✨ Potências / 🧭 Perfil e Temperamento / 🌱 Aptidões; bullets nas 4 primeiras, parágrafos nas 2 últimas
 - ✓ §5 conecta os órgãos de §2 com os padrões emocionais de §4 (eixo psicossomático integrativo)

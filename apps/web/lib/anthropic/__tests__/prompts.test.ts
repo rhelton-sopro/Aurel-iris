@@ -312,11 +312,18 @@ describe('lib/anthropic/prompts — Plan 21 UAT-4 fixes (§ removal + §1 breath
     expect(sys).toContain('organização funcional de base')
   })
 
-  it('§12 explicit numbered markdown list instruction', () => {
+  it('§12 UAU structure: bridge line + numbered list + 3 movements', () => {
     const sys = loadSystemPrompt()
     expect(sys).toContain('lista numerada markdown')
-    // The example block in §12 should show numbered list format
-    expect(sys).toMatch(/1\.\s+Quando você dorme bem/)
+    // Client-facing bridge line (containment for self-reading clients)
+    expect(sys).toContain('As perguntas abaixo foram pensadas para serem exploradas em sessão com')
+    expect(sys).toContain('Se algo tocar forte, respeite')
+    // 3 mandatory UAU movements
+    expect(sys).toContain('Movimento 1 — Ancora no achado específico')
+    expect(sys).toContain('Movimento 2 — Convida à sensação corporal AGORA')
+    expect(sys).toContain('Movimento 3 — Micro-movimento interno')
+    // Quality-over-quantity target
+    expect(sys).toContain('6-8 perguntas')
   })
 
   it('§15 Síntese Rápida section exists with 6 mandatory subsections', () => {
