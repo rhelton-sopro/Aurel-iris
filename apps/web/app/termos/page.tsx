@@ -51,29 +51,50 @@ export default function TermosPage() {
 
         <section className="space-y-2">
           <h2 className="text-base font-medium">
-            4. Dados de examinados e LGPD
+            4. Dados de examinados, LGPD e papel de operador
           </h2>
           <p>
-            Em relação aos dados dos seus examinados (clientes), você atua como{' '}
-            <strong>controlador</strong> dos dados pessoais, e o Iris Codex como{' '}
-            <strong>operador</strong>, tratando-os conforme suas instruções. Você
-            é responsável por obter e registrar o consentimento do examinado — a
-            plataforma fornece o fluxo de consentimento para esse fim. O
-            tratamento de dados pessoais observa a Lei nº 13.709/2018 (LGPD),
-            conforme a{' '}
-            <Link href="/privacidade" className="underline">
-              Política de Privacidade
-            </Link>
-            .
+            Em relação aos dados dos seus examinados, você atua como{' '}
+            <strong>controlador</strong> e o Iris Codex como{' '}
+            <strong>operador</strong>. Esses dados podem conter{' '}
+            <strong>dados pessoais sensíveis</strong> (saúde) e{' '}
+            <strong>biométricos</strong> (imagem de íris), exigindo de você
+            consentimento específico e destacado nos termos do art. 11 da LGPD —
+            a plataforma fornece o fluxo de consentimento para esse fim. Se o
+            examinado for menor de idade, aplica-se o art. 14 da LGPD
+            (consentimento de responsável).
           </p>
+          <p>Como operador, o Iris Codex:</p>
+          <ul className="ml-5 list-disc space-y-1">
+            <li>
+              tratará os dados de examinados exclusivamente conforme suas
+              instruções e estes Termos;
+            </li>
+            <li>manterá confidencialidade;</li>
+            <li>
+              auxiliará você no atendimento a titulares e em incidentes de
+              segurança;
+            </li>
+            <li>
+              ao término, eliminará ou devolverá os dados, ressalvada a guarda
+              legal;
+            </li>
+            <li>
+              utilizará apenas os subprocessadores listados na{' '}
+              <Link href="/privacidade" className="underline">
+                Política de Privacidade
+              </Link>
+              , notificando alterações.
+            </li>
+          </ul>
         </section>
 
         <section className="space-y-2">
           <h2 className="text-base font-medium">5. Fase beta</h2>
           <p>
-            A ferramenta encontra-se em fase beta. Funcionalidades podem mudar,
-            há limite de leituras por conta no período, e pode haver
-            instabilidades. Recursos podem ser adicionados, alterados ou
+            A ferramenta encontra-se em fase beta restrita. Funcionalidades
+            podem mudar, há limite de leituras por conta no período, e pode
+            haver instabilidades. Recursos podem ser adicionados, alterados ou
             removidos sem aviso prévio.
           </p>
         </section>
@@ -100,7 +121,10 @@ export default function TermosPage() {
             como ferramenta de apoio, sem garantia de resultado clínico ou
             terapêutico. Na máxima extensão permitida pela lei, o Iris Codex não
             se responsabiliza por decisões clínicas, interpretações ou condutas
-            adotadas pelo terapeuta a partir do uso da ferramenta.
+            adotadas pelo terapeuta a partir do uso da ferramenta. As limitações
+            deste item aplicam-se na máxima extensão permitida pela lei e{' '}
+            <strong>não afastam direitos irrenunciáveis do consumidor, quando
+            aplicável o Código de Defesa do Consumidor</strong>.
           </p>
         </section>
 
@@ -119,8 +143,9 @@ export default function TermosPage() {
           <h2 className="text-base font-medium">9. Alterações</h2>
           <p>
             Estes Termos podem ser atualizados. Mudanças relevantes serão
-            sinalizadas e poderá ser solicitado novo aceite. A versão vigente é
-            identificada no topo desta página.
+            sinalizadas (por e-mail cadastrado e/ou no acesso à plataforma) e
+            poderá ser solicitado novo aceite. A versão vigente é identificada
+            no topo desta página.
           </p>
         </section>
 
@@ -146,8 +171,8 @@ export default function TermosPage() {
       </div>
 
       <div className="mt-12 border-t border-b-ink/20 pt-6 text-sm">
-        <Link href="/signup" className="underline">
-          Voltar ao cadastro
+        <Link href="/" className="underline">
+          Voltar
         </Link>
       </div>
     </main>
