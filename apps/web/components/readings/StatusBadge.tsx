@@ -65,7 +65,7 @@ export function StatusBadge({
   if (streaming) {
     return (
       <Badge variant="secondary" data-status="streaming" className="gap-1">
-        <Loader2 className="h-3 w-3 animate-spin" aria-hidden />
+        <Loader2 className="h-3 w-3 animate-spin text-teal" aria-hidden />
         Gerando…
       </Badge>
     )

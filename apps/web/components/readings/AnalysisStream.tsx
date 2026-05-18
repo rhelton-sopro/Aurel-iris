@@ -48,7 +48,7 @@ export function AnalysisStream({ sectionsReceived, error }: AnalysisStreamProps)
     <Card className="max-w-3xl">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-xl">
-          <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+          <Loader2 className="h-4 w-4 animate-spin text-teal" aria-hidden />
           <span>
             Gerando relatório… {safe}/{TOTAL_SECTIONS} seções
           </span>

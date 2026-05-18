@@ -93,9 +93,9 @@ export const FORBIDDEN_VOCAB_RE = new RegExp(`\\b(${_F1}|${_F2}|${_F3})\\b`, 'gi
  * emits ("nao é"). 'é' and 'e' both included for the same reason.
  */
 const NEG_CONTEXT_RE =
-  /n[ãa]o\s+(um|uma|constitui|é|e|substitui|representa|significa)\s*$/iu
+  /(?:n[ãa]o|nem)\s+(um|uma|constitui|constituem|é|e|substitui|representa|significa|pretende|caracteriza)\s*$/iu
 
-const NEG_LOOKBACK_CHARS = 30
+const NEG_LOOKBACK_CHARS = 48
 
 const SENTENCE_SPLIT_RE = /[.!?]+(?=\s|$)/u
 const ANCHOR_THRESHOLD_PCT = 95

@@ -16,7 +16,8 @@ import { notFound } from 'next/navigation'
 
 import { createClient } from '@/lib/supabase/server'
 import { LocalDateTime } from '@/components/ui/local-date-time'
-import type { AuditMetadata } from '@/lib/anthropic/types'
+import { runAudit } from '@/lib/anthropic/audit'
+import type { ReportJsonb } from '@/lib/anthropic/types'
 import { EditarClient } from './editar-client'
 
 export const dynamic = 'force-dynamic'
@@ -45,7 +46,15 @@ export default async function LeituraEditarPage({
   // Legacy 1.0 path — EditarClient + EditorAccordion render unchanged.
   const reportGenerated = (reading.report_generated as Record<string, string> | null) ?? {}
   const reportDelivered = (reading.report_delivered as Record<string, string> | null) ?? null
-  const auditMetadata = (reading.audit_metadata as AuditMetadata | null) ?? null
+  // Recompute audit from the CURRENT report (not the frozen generate-time
+  // snapshot) so the banner reflects edits + the live detection rules and
+  // pinpoints the section. Delivery hard-block stays in the save action.
+  const reportForAudit =
+    reportDelivered ??
+    (Object.keys(reportGenerated).length > 0 ? reportGenerated : null)
+  const auditMetadata = reportForAudit
+    ? runAudit(reportForAudit as unknown as ReportJsonb)
+    : null
 
   return (
     <div className="space-y-6 px-6 py-8">
