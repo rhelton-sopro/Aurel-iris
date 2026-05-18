@@ -173,4 +173,10 @@
   svg.lucide {
     stroke-width: 1.5px;
   }
+  /* Toast (sonner): marca = zero sombra + cantos quadrados; sonner
+     injeta box-shadow próprio, daí o !important. */
+  .cn-toast {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
 }

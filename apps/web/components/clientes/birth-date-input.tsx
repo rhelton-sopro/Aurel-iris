@@ -392,14 +392,14 @@ export function BirthDateInput({
                     aria-label={cell.iso}
                     aria-pressed={isSelected}
                     className={cn(
-                      'h-9 w-9 rounded text-sm transition-colors flex items-center justify-center',
+                      'h-9 w-9 rounded-none text-sm transition-colors flex items-center justify-center',
                       cell.monthRel === 'current'
                         ? 'text-foreground'
                         : 'text-muted-foreground/40',
                       isFuture && cell.monthRel === 'current' && 'text-muted-foreground/40',
                       !disabled && !isSelected && 'hover:bg-accent hover:text-accent-foreground',
-                      isSelected && 'bg-primary text-primary-foreground hover:bg-primary',
-                      isToday && !isSelected && 'ring-1 ring-primary',
+                      isSelected && 'bg-teal-dark text-white hover:bg-teal-dark',
+                      isToday && !isSelected && 'ring-1 ring-teal',
                       disabled && 'cursor-not-allowed',
                     )}
                   >
