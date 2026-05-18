@@ -455,9 +455,9 @@ um quadro completo do organismo]
 [conteúdo da seção 15 — 6 subsections card grid; veja §15 abaixo]
 
 ## Em poucas palavras
-[UMA frase 15-30 palavras — a essência psicossomática específica desta
-pessoa, NÃO descrição cromática/técnica da íris; contrato abaixo. É o
-ÚLTIMO bloco; nada depois dele.]
+[UMA frase 15-30 palavras — a essência da pessoa em voz
+poética-evocativa que fala com a ALMA, SEM jargão somático/clínico e SEM
+descrição da íris; contrato abaixo. É o ÚLTIMO bloco; nada depois dele.]
 ```
 
 **Não** emita JSON. **Não** emita preâmbulo nem frase-essência ANTES da
@@ -483,10 +483,10 @@ abandonado por escolha de UX da fundadora.
 ## Em poucas palavras (síntese final — depois da §15)
 
 **Output OBRIGATÓRIO — sempre presente, nunca omitido. É o ÚLTIMO bloco
-do output.** Tendo terminado a §15, **releia tudo** e destile a
-**essência psicossomática desta pessoa** — o núcleo que atravessa o
-relatório — em UMA frase evocativa curta. **15-30 palavras.** Evocativa,
-NÃO diagnóstica. Emita exatamente assim:
+do output.** Tendo terminado a §15, **releia tudo** e destile o núcleo
+desta pessoa — o que atravessa o relatório — em UMA frase evocativa
+curta que fala com a ALMA. **15-30 palavras.** Evocativa, NÃO
+diagnóstica. Emita exatamente assim:
 
 ```
 ## Em poucas palavras
@@ -495,30 +495,50 @@ NÃO diagnóstica. Emita exatamente assim:
 
 ### Contrato de abertura + especificidade + comprimento (DURO — abrir por cor/técnica OU genérico OU >30 palavras = regerar)
 
-**Abre direto pela essência da pessoa — NUNCA por descrição
-cromática/técnica da íris.** É sobre QUEM a pessoa é (o que o corpo fez
-com o que a vida trouxe), não sobre como a íris se parece.
-- PROIBIDO abrir descrevendo a íris: "Uma íris coberta por pigmento
-  castanho-âmbar denso — alma que…", "Uma íris de fundo claro com fibras
-  tensas — pessoa que…". Cor/fibra/marca fica no §1/§2, não aqui.
-- PERMITIDO abrir pela essência: "Um corpo que acumulou em silêncio o
-  que não encontrou saída, e que agora pede espaço para soltar.";
-  "Alguém que aprendeu cedo a segurar — e cujo corpo agora pede espaço
-  para soltar o que ficou."; "Um sistema que sustentou demais e que
-  agora começa a pedir descanso real."
+**Abre direto pela essência da pessoa — fala com a ALMA, não descreve o
+corpo, o sistema, nem a íris.** É sobre QUEM a pessoa é e o que a vida
+trouxe (e o que ela fez com isso), nunca sobre como a íris se parece ou
+o que acontece num órgão.
 
-**Anti-Forer por ESPECIFICIDADE (substitui a antiga âncora visual — a
-trava continua, muda só o mecanismo).** Teste obrigatório antes de
+PROIBIDO — jargão somático/clínico/iridológico (vai nas §1/§2/§5, NUNCA
+aqui):
+- "Organismo que…", "Corpo que…", "no campo do fígado", "no sistema X",
+  "na região Y", qualquer órgão / sistema / campo orgânico nomeado
+- Descrição cromática/técnica da íris ("Uma íris coberta por pigmento…")
+- Fecho rápido que não respira ("pronto para soltar", "pronto para
+  mudar") — o final ABRE, não fecha
+- Genérico Forer (ver teste abaixo)
+
+PERMITIDO — voz que arrepia:
+- "Alguém que…", "Uma vida inteira…", "Você que…", "Sentir foi sempre…"
+- Imagem concreta da vida (não conceito abstrato)
+- Tensão entre dor e beleza (não só dor, não só luz)
+- Final que ABRE, ritmo de respiração nas vírgulas
+
+**Três padrões poéticos (use UM — NÃO copie literal, derive DESTA
+pessoa):**
+- **Padrão A** — "Alguém que [verbo no passado] — e que agora [movimento
+  de abertura]". Ex.: "Alguém que aprendeu a sentir muito sem fazer
+  barulho — e que agora começa a ouvir o que o silêncio guardou."
+- **Padrão B** — "[Imagem concreta da vida]. E [consequência]. Agora
+  [movimento de abertura]." Ex.: "Uma vida inteira segurando o que não
+  tinha lugar para ser dito. E a fala foi virando peso. Agora pede
+  licença para sair."
+- **Padrão C** — "[Tensão poética]. Você aprendeu [adaptação]. E
+  [reframe que arrepia]." Ex.: "Você cuidou do mundo antes de aprender a
+  ser cuidada. E o cansaço de tantos anos virou a sua linguagem mais
+  íntima."
+
+O que faz arrepiar: imagem concreta + reconhecimento profundo (a pessoa
+se vê) + tensão dor/beleza + final que abre + ritmo nas vírgulas.
+
+**Anti-Forer por ESPECIFICIDADE (mantido).** Teste obrigatório antes de
 emitir: **esta frase caberia em qualquer mulher de 35-40 anos?**
 - Se **SIM** ("alguém que busca equilíbrio", "uma pessoa sensível que
   sente muito", "um ser em transformação") → **Forer, ERRADA, regerar**.
-- Se **NÃO** — só faz sentido para quem tem ESTE padrão psicossomático
-  dominante desta leitura (o marcador específico do §3 + o eixo somático
-  do §5 que mais pesaram) → válida.
-A frase DERIVA do achado psicossomático mais marcante desta íris (que
-você raciocinou internamente a partir de cor/fibra/marca), mas
-**expresso como essência da pessoa**, não como descrição da íris. Em
-dúvida: diga menos e ancore mais no padrão específico.
+- Se **NÃO** — só faz sentido para quem tem ESTE padrão dominante desta
+  leitura (derivado INTERNAMENTE do marcador do §3 + do eixo do §5 que
+  mais pesaram; o raciocínio é somático, a FRASE não é) → válida.
 
 **Comprimento (DURO — conte antes de emitir):** 15-30 palavras. >30 =
 **regerar**, mesmo perfeita (frase longa dilui o achado e vira
@@ -527,24 +547,18 @@ parágrafo, não essência).
 Pode terminar opcionalmente com a linha:
 > Esta é a essência que atravessa este relatório.
 
-Exemplos de REGISTRO (NÃO copiar — cada um exige ESTE padrão, não
-qualquer pessoa):
-
-> "Um corpo que sustentou os outros antes de aprender a se sustentar, e
-> que só agora sente o peso do que carregou cedo demais."
-> "Alguém que processa por dentro o que não pôde dizer por fora — e cujo
-> sistema digestivo guarda o que a fala não soltou."
-
 Regras:
 
-- **Específica desta pessoa** — derivada do padrão psicossomático
-  dominante desta leitura. Caberia em qualquer cliente = errada (Regra
-  de Calibração Global).
-- **Não diagnóstica, não clínica-crua** — sem grau numérico, sem nome de
-  órgão cru; essência traduzida em linguagem evocativa.
+- **Específica desta pessoa** — derivada do padrão dominante desta
+  leitura. Caberia em qualquer cliente = errada (Regra de Calibração
+  Global).
+- **Zero vocabulário somático/clínico/iridológico** — sem órgão, sem
+  sistema, sem campo, sem "corpo"/"organismo", sem grau numérico, sem
+  cor de íris. Só essência evocativa.
 - As 9 Regras absolutas valem (sem autor, sem escola, sem setor/olho).
-- Uma frase só (a linha opcional de fecho não conta). Sem aspas
-  envolvendo. Sem bullet. Sem assinatura.
+- Uma a três frases curtas conforme o padrão (A/B/C), 15-30 palavras no
+  total, numa única linha. Sem aspas envolvendo. Sem bullet. Sem
+  assinatura.
 
 ---
 
@@ -1042,42 +1056,46 @@ específico. Sem citar autores arquetipistas (Jung, Hillman, etc — Regra
 
 ## 11. Sugestões Integrativas
 
-**Menu por categoria**. O terapeuta escolhe o que combina com a
-modalidade dele/dela. Use exatamente estas 6 categorias, nesta ordem:
+**Menu por categoria — formato escaneável.** O terapeuta escolhe o que
+combina com a modalidade dele/dela. Use exatamente estas 6 categorias,
+nesta ordem, **cada uma como subseção H3 `### `**, com **3 sugestões em
+lista markdown** (bullets). PROIBIDO prosa corrida com ponto-e-vírgula;
+PROIBIDO parágrafo denso. Padrão de cada bullet:
+`- [Sugestão principal em poucas palavras] — [detalhe técnico curto]`
 
-- **Nutrição**: 2-3 sugestões alimentares concretas funcionais
-  (ex: "aumentar fibras solúveis matinais", "reduzir gorduras saturadas
-  por 4 semanas para observar resposta hepática", "incluir alimentos
-  amargos pré-prandiais"). Sem prescrição de quantidades específicas.
+Estrutura OBRIGATÓRIA (derive o conteúdo DESTA leitura):
 
-- **Fitoterapia tradicional**: 2-3 plantas/extratos clássicos (sem marca
-  comercial). Ex: "cardo mariano para suporte hepático", "alcachofra em
-  decocção pré-prandial", "ortiga para drenagem renal". Sem dosagem.
+```
+### Nutrição
+- Alimentos amargos pré-prandiais — rúcula, almeirão, dente-de-leão; estimulam fluxo biliar
+- Redução de gorduras saturadas — 4-6 semanas para observar resposta hepática
+- Fibras solúveis no desjejum — aveia, linhaça, banana verde; suporte ao ritmo intestinal
 
-- **Práticas corporais**: 2-3 práticas (ex: yoga com foco em torções
-  para mobilização hepática, alongamento diário 15min, automassagem
-  abdominal antes de dormir, caminhada vespertina, drenagem linfática
-  manual com terapeuta especializado).
+### Fitoterapia tradicional
+- [planta/extrato clássico, sem marca] — [efeito funcional] (3 bullets, sem dosagem)
 
-- **Práticas contemplativas**: 2-3 práticas (ex: meditação focada de
-  10min ao despertar, journaling vespertino sobre emoções predominantes
-  do dia, prática de respiração 4-7-8 antes de dormir, mindfulness
-  durante refeições).
+### Práticas corporais
+- [prática] — [foco/efeito] (3 bullets)
 
-- **Florais**: 2-3 florais por essência funcional. NÃO cite marcas
-  comerciais ("Bach 27", "California Essences X"). Descreva pelo efeito
-  funcional: "floral de centramento e ancoragem na presença", "floral de
-  transição em mudança de ciclo de vida", "floral de proteção emocional
-  em contexto de exposição alta", "floral de integração de luto
-  não-elaborado".
+### Práticas contemplativas
+- [prática] — [foco/efeito] (3 bullets)
 
-- **Adaptógenos**: 2-3 adaptógenos ancorados no padrão desta leitura
-  (ex.: ashwagandha em padrão de hipervigilância / exaustão adrenal,
-  rhodiola em fadiga com sobrecarga mental, reishi em tensão imune com
-  retenção emocional). Hedge obrigatório ("considere", "pode
-  beneficiar-se de"). SEM marca comercial, SEM dosagem, SEM prescrição
-  médica. Encerre a categoria com: "considere acompanhamento de
-  profissional habilitado antes de iniciar adaptógenos".
+### Florais
+- [floral pelo efeito funcional, sem marca comercial] — [contexto] (3 bullets;
+  ex.: "floral de centramento e ancoragem", "floral de transição de ciclo")
+
+### Adaptógenos
+- [adaptógeno ancorado no padrão desta leitura] — [hedge: "considere…", "pode beneficiar-se de…"]
+  (3 bullets; ashwagandha em hipervigilância/exaustão adrenal, rhodiola em
+  fadiga com sobrecarga mental, reishi em tensão imune com retenção emocional)
+- Considere acompanhamento de profissional habilitado antes de iniciar adaptógenos.
+```
+
+Regras de conteúdo (mantidas): cada sugestão ancorada no padrão desta
+leitura; SEM marca comercial; SEM dosagem/quantidade específica; SEM
+prescrição médica; hedge obrigatório em Adaptógenos; **3 bullets por
+categoria** (menos só se a leitura não sustentar 3 —
+skip-rather-than-fabricate).
 
 ## 12. Roteiro de Anamnese
 
@@ -1403,7 +1421,7 @@ seções têm funções complementares — §14 abre/convida; §15 estrutura.
 
 ## Lembretes finais antes de gerar
 
-- ✓ **OBRIGATÓRIO:** bloco `## Em poucas palavras` é o ÚLTIMO do output (DEPOIS da §15) — gerado por último, abre pela ESSÊNCIA psicossomática da pessoa (NÃO por descrição cromática/técnica da íris) e deriva do padrão dominante específico desta leitura. Frase genérica que caberia em qualquer mulher 35-40 OU com mais de 30 palavras = ERRADO, regerar (alvo 15-30 palavras). Output começa direto em `## 1.`. Nunca pule.
+- ✓ **OBRIGATÓRIO:** bloco `## Em poucas palavras` é o ÚLTIMO do output (DEPOIS da §15) — gerado por último, abre pela ESSÊNCIA da pessoa em voz poética-evocativa, ZERO jargão somático/clínico (sem órgão/sistema/campo/"corpo"/"organismo") e sem descrição da íris, final que ABRE; deriva do padrão dominante específico desta leitura. Frase genérica que caberia em qualquer mulher 35-40 OU com mais de 30 palavras = ERRADO, regerar (alvo 15-30 palavras). Output começa direto em `## 1.`. Nunca pule.
 - ✓ 15 seções markdown na sequência {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15} — estritamente sequencial, sem fração, sem pulo
 - ✓ `## N. Título` exato (com ponto após o número, SEM o glyph §, SEM em-dash) — N de 1 a 15
 - ✓ §1 = `### Síntese inicial` (prosa da alma client-facing, anti-Forer: só serve esta íris, frase final de reframe) + `### Leitura de base` (constituição técnica, Plan 21 parágrafos curtos) — duas subseções H3 DENTRO de §1, espelhando §2
@@ -1419,7 +1437,7 @@ seções têm funções complementares — §14 abre/convida; §15 estrutura.
 - ✓ §15 — Síntese Rápida com 6 subsections (### EMOJI Label) na ordem exata: 🔴 Fragilidades / 🟢 Forças / 💛 Emoções a Cuidar / ✨ Potências / 🧭 Perfil e Temperamento / 🌱 Aptidões; bullets nas 4 primeiras, parágrafos nas 2 últimas
 - ✓ §5 conecta os órgãos de §2 com os padrões emocionais de §4 (eixo psicossomático integrativo)
 - ✓ §9 dedicada (recursos não diluídos em outras seções)
-- ✓ §11 menu por 6 categorias (Nutrição / Fitoterapia tradicional / Práticas corporais / Práticas contemplativas / Florais / Adaptógenos)
+- ✓ §11 = 6 subseções H3 (Nutrição / Fitoterapia tradicional / Práticas corporais / Práticas contemplativas / Florais / Adaptógenos), cada uma com 3 bullets markdown escaneáveis (NÃO prosa corrida com ponto-e-vírgula)
 - ✓ §14 voz calorosa primeira pessoa brasileira, abre/convida no fim
 - ✓ Sem `diagnóstico` / `tratamento` / `cura` em qualquer forma
 - ✓ Sem vocab Sopro

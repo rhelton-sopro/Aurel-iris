@@ -113,9 +113,12 @@ describe('lib/anthropic/prompts — file content (Plan 21 — 16-section Iris Co
     // mechanism: opens by the person's essence, NOT iris description;
     // generic-fits-any-woman ⇒ regenerate).
     expect(sys).toMatch(/Contrato de abertura \+ especificidade/i)
-    expect(sys).toMatch(/NUNCA por descrição/i)
     expect(sys).toMatch(/caberia em qualquer mulher de 35-40 anos/i)
     expect(sys).toMatch(/Forer/i)
+    // AJUSTE 1: speaks to the SOUL, zero somatic/clinical jargon, 3 poetic patterns.
+    expect(sys).toContain('fala com a ALMA')
+    expect(sys).toMatch(/Três padrões poéticos/i)
+    expect(sys).toMatch(/Zero vocabulário somático/i)
     // 07.4-36: ceiling widened to 15-30 words; the OLD 15-25 must be gone.
     expect(sys).toMatch(/15-30 palavras/)
     expect(sys).not.toMatch(/15-25 palavras/)
@@ -291,9 +294,9 @@ describe('lib/anthropic/prompts — Plan 16 absolute rules + structural restruct
   it('§11 inclui categoria Adaptógenos e Florais sem rótulo "genéricos"', () => {
     const sys = loadSystemPrompt()
     expect(sys).toContain('estas 6 categorias')
-    expect(sys).toContain('**Adaptógenos**')
+    expect(sys).toContain('### Adaptógenos')
     expect(sys).toContain('ashwagandha')
-    expect(sys).toContain('**Florais**')
+    expect(sys).toContain('### Florais')
     expect(sys).not.toContain('**Florais (genéricos, sem marca)**')
   })
 
