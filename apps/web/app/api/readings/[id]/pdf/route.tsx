@@ -239,25 +239,11 @@ export async function GET(
     }
     const bodyPdf = await bodyRes.arrayBuffer()
 
-    // DIAGNOSTIC (clickable-nav investigation): ?part=body returns the
-    // un-merged body PDF so we can isolate whether the cover+body pdfcpu
-    // merge is what breaks the in-document anchor links (same suspected
-    // root as the stripped outline). Same RLS/owner gate as the normal
-    // download — no new PII surface. Remove once the merge-vs-template
-    // question is settled.
-    if (request.nextUrl.searchParams.get('part') === 'body') {
-      return new Response(bodyPdf, {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/pdf',
-          'Content-Disposition': 'inline; filename="body-debug.pdf"',
-          'Cache-Control': 'no-store, max-age=0',
-        },
-      })
-    }
-
     // Merge cover + body. Gotenberg orders by filename — the numeric prefixes
-    // keep cover first.
+    // keep cover first. Merge engine is forced to pdftk first
+    // (render.yaml --pdfengines-merge-engines=pdftk,qpdf,pdfcpu): pdftk `cat`
+    // preserves the body's named destinations so the Índice anchor links
+    // survive the merge. qpdf `--pages` (the prior default) dropped them.
     const mergeForm = new FormData()
     mergeForm.append(
       'files',
