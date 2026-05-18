@@ -180,12 +180,15 @@ export async function GET(
   bodyForm.append('files', blob(footerHtml), 'footer.html')
   bodyForm.append('paperWidth', '8.27')
   bodyForm.append('paperHeight', '11.69')
-  // iter-5 FIX 2 — more breathing. marginTop reserves the header band +
-  // generous gap below its rule; marginBottom keeps content well clear of
-  // the footer; L/R 0.7in is the content column (internal CSS padding is now
-  // ~0 so insets don't double). Cover render keeps all margins 0 (bleed).
-  bodyForm.append('marginTop', '0.85')
-  bodyForm.append('marginBottom', '0.7')
+  // iter-6 — breathing doubled. The header/footer render in fixed-height
+  // bands inside marginTop/marginBottom; widening the margins is the only
+  // per-page lever for the gap between the running header/footer and the
+  // body (CSS padding can't reach the repeated bands). marginTop/Bottom
+  // ≈ 2× the prior post-header/pre-footer gap. L/R 0.7in is the content
+  // column (internal CSS padding ~0 so insets don't double). Cover render
+  // keeps all margins 0 (bleed).
+  bodyForm.append('marginTop', '1.2')
+  bodyForm.append('marginBottom', '1.0')
   bodyForm.append('marginLeft', '0.7')
   bodyForm.append('marginRight', '0.7')
   bodyForm.append('printBackground', 'true')

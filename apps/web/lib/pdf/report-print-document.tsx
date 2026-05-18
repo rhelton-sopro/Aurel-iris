@@ -191,16 +191,6 @@ const PRINT_CSS = `
   .toc-num { width: 32px; color: var(--teal); font-size: 11pt; }
   .toc-name { color: var(--ink); font-size: 12pt; }
   .toc-leader { flex: 1; border-bottom: 1px dotted #C0C0C0; margin: 0 8px 4px; }
-  .toc-foot {
-    margin-top: 34px;
-    padding-top: 14px;
-    border-top: 1px solid #E4E4E4;
-    font-size: 9pt;
-    font-style: italic;
-    color: var(--mist);
-    text-align: center;
-    line-height: 1.6;
-  }
 
   /* ---- "Em poucas palavras" page ---- */
   .essence-page {
@@ -427,10 +417,6 @@ export async function renderBodyHtml(
             <span className="toc-leader" />
           </div>
         ))}
-        <div className="toc-foot">
-          Use o painel de marcadores/índice do seu leitor de PDF, ou a busca
-          (Ctrl+F / ⌘F), para navegar entre as seções.
-        </div>
       </div>
 
       {/* Em poucas palavras */}

@@ -78,14 +78,14 @@ describe('renderBodyHtml', () => {
     expect(html).not.toContain('class="cover"')
   })
 
-  it('renders an Índice page with dotted leaders + a navigation footnote', () => {
+  it('renders an Índice page with dotted leaders (no technical footnote)', () => {
     expect(html).toContain('class="toc"')
     expect(html).toContain('Índice')
     expect(html).toContain('class="toc-leader"')
     expect(html).toContain('class="toc-name">Constituição e Temperamento')
     expect(html).toContain('class="toc-name">Síntese Rápida')
-    expect(html).toContain('class="toc-foot"')
-    expect(html).toContain('Ctrl+F')
+    expect(html).not.toContain('class="toc-foot"')
+    expect(html).not.toContain('Ctrl+F')
   })
 
   it('renders the "Em poucas palavras" essence page when present', () => {
