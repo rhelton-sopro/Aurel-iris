@@ -38,7 +38,7 @@ export default async function LeiturasPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Leituras</h1>
+        <h1 className="text-[22px] font-light uppercase tracking-display text-ink">Leituras</h1>
         {list.length > 0 && (
           <Link href="/leituras/nova" className={cn(buttonVariants())}>
             Nova leitura

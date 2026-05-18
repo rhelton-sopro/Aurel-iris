@@ -15,7 +15,7 @@ export default async function ClientesPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Clientes</h1>
+        <h1 className="text-[22px] font-light uppercase tracking-display text-ink">Clientes</h1>
         <Link href="/clientes/novo" className={cn(buttonVariants())}>
           Novo cliente
         </Link>

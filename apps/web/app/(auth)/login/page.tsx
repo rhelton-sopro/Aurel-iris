@@ -88,7 +88,7 @@ function LoginForm() {
       <Card>
         <CardContent className="pt-6 flex flex-col items-center text-center gap-4">
           <MailCheck className="w-12 h-12 text-primary" />
-          <h2 className="text-xl font-semibold">Verifique seu e-mail</h2>
+          <h2 className="text-sm font-light uppercase tracking-display text-ink">Verifique seu e-mail</h2>
           <p className="text-sm text-muted-foreground">
             Enviamos um link de acesso para <strong>{sentEmail}</strong>. Clique no link para entrar.
             O link é válido por 24 horas.
@@ -104,12 +104,12 @@ function LoginForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-2xl">Entrar</CardTitle>
+        <CardTitle className="text-[22px] font-light uppercase tracking-display text-ink">Entrar</CardTitle>
         <CardDescription>Acesse sua conta Iris Codex</CardDescription>
       </CardHeader>
       <CardContent>
         {formError && (
-          <div className="mb-4 bg-destructive/10 border border-destructive text-sm px-4 py-2 rounded text-destructive">
+          <div className="mb-4 bg-destructive/10 border border-destructive text-sm px-4 py-2 rounded-none text-destructive">
             {formError}
             {formError.includes('Não encontramos') && (
               <span>
