@@ -109,9 +109,12 @@ describe('lib/anthropic/prompts — file content (Plan 21 — 16-section Iris Co
     // NEW contract: generated LAST, AFTER §15 — NOT before §1.
     expect(sys).toMatch(/[ÚU]LTIMO bloco|depois da §15|DEPOIS da §15/i)
     expect(sys).toMatch(/come[çc]e direto na seção 1|primeiro conteúdo do output é literalmente/i)
-    // Hard visual-anchor contract (the anti-Forer core of the fix).
-    expect(sys).toMatch(/Contrato de ancoragem visual/i)
-    expect(sys).toMatch(/estrutura VIS[ÍI]VEL/i)
+    // Specificity-based anti-Forer contract (replaced the visual-anchor
+    // mechanism: opens by the person's essence, NOT iris description;
+    // generic-fits-any-woman ⇒ regenerate).
+    expect(sys).toMatch(/Contrato de abertura \+ especificidade/i)
+    expect(sys).toMatch(/NUNCA por descrição/i)
+    expect(sys).toMatch(/caberia em qualquer mulher de 35-40 anos/i)
     expect(sys).toMatch(/Forer/i)
     // 07.4-36: ceiling widened to 15-30 words; the OLD 15-25 must be gone.
     expect(sys).toMatch(/15-30 palavras/)
@@ -281,8 +284,8 @@ describe('lib/anthropic/prompts — Plan 16 absolute rules + structural restruct
     // Anti-Forer guard + mandatory final reframe sentence
     expect(sys).toMatch(/caberia em qualquer mulher de\n?\s*35-40 anos, está ERRADA/)
     expect(sys).toContain('Você não é X — você é alguém que')
-    // Soul synthesis must NOT be the visual anchor source for "Em poucas palavras"
-    expect(sys).toContain('Esta subseção NÃO é a âncora visual')
+    // "Em poucas palavras" must NOT be a one-line rehash of Síntese inicial
+    expect(sys).toContain('NÃO é um resumo de uma linha desta Síntese')
   })
 
   it('§11 inclui categoria Adaptógenos e Florais sem rótulo "genéricos"', () => {

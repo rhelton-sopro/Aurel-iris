@@ -455,8 +455,9 @@ um quadro completo do organismo]
 [conteúdo da seção 15 — 6 subsections card grid; veja §15 abaixo]
 
 ## Em poucas palavras
-[UMA frase 15-30 palavras, derivada do achado visual mais marcante —
-contrato abaixo. É o ÚLTIMO bloco; nada depois dele.]
+[UMA frase 15-30 palavras — a essência psicossomática específica desta
+pessoa, NÃO descrição cromática/técnica da íris; contrato abaixo. É o
+ÚLTIMO bloco; nada depois dele.]
 ```
 
 **Não** emita JSON. **Não** emita preâmbulo nem frase-essência ANTES da
@@ -481,62 +482,69 @@ abandonado por escolha de UX da fundadora.
 
 ## Em poucas palavras (síntese final — depois da §15)
 
-**Output OBRIGATÓRIO — sempre presente, nunca omitido. É o ÚLTIMO bloco do
-output.** Tendo terminado a §15, **releia tudo o que você escreveu** e
-identifique o **ÚNICO achado mais marcante desta íris** — aquele que mais
-EXIGE que esta íris seja como é. Condense-o em UMA frase. **15-30
-palavras.** Linguagem evocativa, NÃO diagnóstica. Emita exatamente assim,
-como bloco final (depois da §15):
+**Output OBRIGATÓRIO — sempre presente, nunca omitido. É o ÚLTIMO bloco
+do output.** Tendo terminado a §15, **releia tudo** e destile a
+**essência psicossomática desta pessoa** — o núcleo que atravessa o
+relatório — em UMA frase evocativa curta. **15-30 palavras.** Evocativa,
+NÃO diagnóstica. Emita exatamente assim:
 
 ```
 ## Em poucas palavras
 [a frase, em uma única linha]
 ```
 
-### Contrato de ancoragem visual + comprimento (DURO — sem âncora visual OU mais de 30 palavras, regerar)
+### Contrato de abertura + especificidade + comprimento (DURO — abrir por cor/técnica OU genérico OU >30 palavras = regerar)
 
-A frase **DEVE nomear, ou derivar inequivocamente de, uma estrutura
-VISÍVEL específica que você já descreveu na "Leitura de base" do §1 ou
-na §2** — a cor de base, o
-padrão/trama das fibras, OU uma marca específica (lacuna, pigmento, anel).
+**Abre direto pela essência da pessoa — NUNCA por descrição
+cromática/técnica da íris.** É sobre QUEM a pessoa é (o que o corpo fez
+com o que a vida trouxe), não sobre como a íris se parece.
+- PROIBIDO abrir descrevendo a íris: "Uma íris coberta por pigmento
+  castanho-âmbar denso — alma que…", "Uma íris de fundo claro com fibras
+  tensas — pessoa que…". Cor/fibra/marca fica no §1/§2, não aqui.
+- PERMITIDO abrir pela essência: "Um corpo que acumulou em silêncio o
+  que não encontrou saída, e que agora pede espaço para soltar.";
+  "Alguém que aprendeu cedo a segurar — e cujo corpo agora pede espaço
+  para soltar o que ficou."; "Um sistema que sustentou demais e que
+  agora começa a pedir descanso real."
 
-**Teste obrigatório antes de emitir:** a frase contém ou deriva
-diretamente de uma estrutura visível nomeada desta íris? 
-- Se **NÃO** (fala só de padrão emocional/psicológico inferido — "aprendeu
-  a vigiar", "pede permissão para descansar", "carrega e começa a perceber
-  o peso") → é **Forer, cabe em qualquer pessoa, ERRADA**. Reescreva até
-  ancorar numa estrutura visível.
-- Se **SIM** (ex.: parte da cor de base / da trama de fibras / de uma marca
-  que você descreveu) → válida.
+**Anti-Forer por ESPECIFICIDADE (substitui a antiga âncora visual — a
+trava continua, muda só o mecanismo).** Teste obrigatório antes de
+emitir: **esta frase caberia em qualquer mulher de 35-40 anos?**
+- Se **SIM** ("alguém que busca equilíbrio", "uma pessoa sensível que
+  sente muito", "um ser em transformação") → **Forer, ERRADA, regerar**.
+- Se **NÃO** — só faz sentido para quem tem ESTE padrão psicossomático
+  dominante desta leitura (o marcador específico do §3 + o eixo somático
+  do §5 que mais pesaram) → válida.
+A frase DERIVA do achado psicossomático mais marcante desta íris (que
+você raciocinou internamente a partir de cor/fibra/marca), mas
+**expresso como essência da pessoa**, não como descrição da íris. Em
+dúvida: diga menos e ancore mais no padrão específico.
 
-**Checagem de comprimento (DURA — conte as palavras antes de emitir):** a
-frase tem entre **15 e 30 palavras**? Conte. Se passar de 30, corte ou
-reescreva até caber em 15-30 **mantendo a âncora visual**. Uma frase com
-mais de 30 palavras = **regerar**, mesmo que esteja perfeitamente
-ancorada. (O teto não é estético: frase longa dilui o achado e vira
-parágrafo, não essência.)
+**Comprimento (DURO — conte antes de emitir):** 15-30 palavras. >30 =
+**regerar**, mesmo perfeita (frase longa dilui o achado e vira
+parágrafo, não essência).
 
-A frase pode ser evocativa, mas a evocação tem que **brotar da estrutura
-visível**, não pairar sobre psicologia genérica. A estrutura é a raiz; a
-frase é a flor.
+Pode terminar opcionalmente com a linha:
+> Esta é a essência que atravessa este relatório.
 
-Exemplos de REGISTRO (NÃO copiar — e note que cada um ancora numa
-estrutura visível, não em insight psicológico solto):
+Exemplos de REGISTRO (NÃO copiar — cada um exige ESTE padrão, não
+qualquer pessoa):
 
-> "Uma íris de fundo claro e fibras finas e tensas — um organismo que
-> processa rápido e ainda não encontrou o freio."
-> "A trama densa e compacta desta íris guarda uma vitalidade de base que
-> a vida ainda não gastou."
+> "Um corpo que sustentou os outros antes de aprender a se sustentar, e
+> que só agora sente o peso do que carregou cedo demais."
+> "Alguém que processa por dentro o que não pôde dizer por fora — e cujo
+> sistema digestivo guarda o que a fala não soltou."
 
 Regras:
 
-- **Específica desta íris** — ancorada na estrutura visível mais marcante.
-  Se caberia em qualquer cliente, está errada (Regra de Calibração Global).
+- **Específica desta pessoa** — derivada do padrão psicossomático
+  dominante desta leitura. Caberia em qualquer cliente = errada (Regra
+  de Calibração Global).
 - **Não diagnóstica, não clínica-crua** — sem grau numérico, sem nome de
-  órgão; mas a âncora visual (cor/fibra/marca) PODE e DEVE aparecer
-  traduzida em linguagem evocativa.
+  órgão cru; essência traduzida em linguagem evocativa.
 - As 9 Regras absolutas valem (sem autor, sem escola, sem setor/olho).
-- Uma frase só. Sem aspas envolvendo. Sem bullet. Sem assinatura.
+- Uma frase só (a linha opcional de fecho não conta). Sem aspas
+  envolvendo. Sem bullet. Sem assinatura.
 
 ---
 
@@ -599,9 +607,9 @@ tem ESTES achados. Quando em dúvida, diga menos e ancore mais. A síntese
 deriva dos achados específicos desta leitura; não é um perfil genérico
 caloroso.
 
-Esta subseção NÃO é a âncora visual: a frase final "Em poucas palavras"
-e qualquer âncora visual continuam derivando da "Leitura de base" (§1)
-ou da §2 — nunca desta síntese.
+A frase "Em poucas palavras" NÃO é um resumo de uma linha desta Síntese
+inicial — destila o MESMO núcleo por outro ângulo (o achado
+psicossomático mais marcante), sem repetir suas frases.
 
 ### Leitura de base
 
@@ -768,6 +776,13 @@ Cada marcador emite EXATAMENTE estes 4 campos, na ordem, sem campo extra:
 **Status atual** — DUAS partes, nesta ordem de TEXTO: (1) a frase verbatim
 em **negrito**, depois (2) " — " e a justificativa ancorada na marca
 visível.
+
+**FORMATAÇÃO (DURA) — negrito obrigatório nas DUAS partes.** O rótulo
+`**Status atual:**` E a frase verbatim `**A resolver — …**` saem AMBOS
+em negrito markdown (`**…**`), inclusive dentro de item de lista. Output
+sem `**` em qualquer das duas = ERRADO. Correto:
+`- **Status atual:** **A resolver — marca ativa, pede atenção
+terapêutica.** A pigmentação interna permanece densa…`
 
 Frase verbatim (parte 1, em **negrito**) — escolha UMA:
 - "Resolvido — marca cicatrizada, sem expressão atual"
@@ -1320,36 +1335,37 @@ combine blocos. NÃO renomeie labels. NÃO troque emojis.
 
 ### 🔴 Fragilidades
 
-- bullet 1 (específico desta íris)
+- bullet 1 (os 3 MAIS expressivos desta íris)
 - bullet 2
 - bullet 3
-- bullet 4 (opcional)
+(máx. 3; se a íris não sustentar 3, emita menos — skip-rather-than-fabricate)
 
 ### 🟢 Forças
 
 - bullet 1
 - bullet 2
 - bullet 3
-- bullet 4 (opcional)
 
 ### 💛 Emoções a Cuidar
 
 - bullet 1
 - bullet 2
 - bullet 3
-- bullet 4 (opcional)
 
 ### ✨ Potências
 
 - bullet 1
 - bullet 2
 - bullet 3
-- bullet 4 (opcional)
 
 ### 🧭 Perfil e Temperamento
 
-[2-3 frases corridas — NÃO bullets — sobre o estilo de personalidade
-desta pessoa. Linguagem clínico-funcional + humano-temática.]
+[1-2 frases CURTAS e compactas — cartão de visita funcional do paciente
+para o terapeuta consultar entre sessões. NÃO repetir a Síntese inicial
+do §1; essência funcional, não profundidade poética. Ex.: "Processamento
+interno profundo. Tendência à contenção emocional com carga somática
+hepático-digestiva. Vitalidade preservada, mas ritmo de entrega supera
+reabastecimento."]
 
 ### 🌱 Aptidões
 
@@ -1369,9 +1385,12 @@ inclinações observadas. Linguagem clínico-funcional + humano-temática.]
 - **Emojis OBRIGATÓRIOS** — eles são parte da estrutura visível ao
   leitor + parsing do renderer.
 - **Bullets nas 4 primeiras subseções** (Fragilidades / Forças /
-  Emoções a Cuidar / Potências) — markdown `- ` lista. **Frases corridas
-  nas 2 últimas** (Perfil e Temperamento / Aptidões) — parágrafos sem
-  bullet.
+  Emoções a Cuidar / Potências) — markdown `- ` lista, **máximo 3 itens**
+  por bloco, os 3 mais expressivos desta íris (menos se não sustentar 3 —
+  skip-rather-than-fabricate). **Frases corridas nas 2 últimas** (Perfil
+  e Temperamento / Aptidões) — parágrafos sem bullet. **🧭 Perfil e
+  Temperamento = 1-2 frases compactas, função cartão-de-visita, SEM
+  repetir a Síntese inicial do §1.**
 
 ### Por quê
 
@@ -1384,7 +1403,7 @@ seções têm funções complementares — §14 abre/convida; §15 estrutura.
 
 ## Lembretes finais antes de gerar
 
-- ✓ **OBRIGATÓRIO:** bloco `## Em poucas palavras` é o ÚLTIMO do output (DEPOIS da §15) — gerado por último, derivado do achado VISUAL mais marcante (cor de base / trama de fibras / marca específica de §1/§2). Frase só-psicológica sem âncora visual OU com mais de 30 palavras = ERRADO, regerar (alvo 15-30 palavras). Output começa direto em `## 1.`. Nunca pule.
+- ✓ **OBRIGATÓRIO:** bloco `## Em poucas palavras` é o ÚLTIMO do output (DEPOIS da §15) — gerado por último, abre pela ESSÊNCIA psicossomática da pessoa (NÃO por descrição cromática/técnica da íris) e deriva do padrão dominante específico desta leitura. Frase genérica que caberia em qualquer mulher 35-40 OU com mais de 30 palavras = ERRADO, regerar (alvo 15-30 palavras). Output começa direto em `## 1.`. Nunca pule.
 - ✓ 15 seções markdown na sequência {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15} — estritamente sequencial, sem fração, sem pulo
 - ✓ `## N. Título` exato (com ponto após o número, SEM o glyph §, SEM em-dash) — N de 1 a 15
 - ✓ §1 = `### Síntese inicial` (prosa da alma client-facing, anti-Forer: só serve esta íris, frase final de reframe) + `### Leitura de base` (constituição técnica, Plan 21 parágrafos curtos) — duas subseções H3 DENTRO de §1, espelhando §2
