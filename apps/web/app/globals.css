@@ -167,4 +167,10 @@
   html {
     @apply font-sans;
   }
+  /* Iconografia: lucide-react renderiza stroke-width 2 por padrão; o
+     Claude Design usa 1.5 (monoline refinado — README Iconography +
+     ui_kits Icon component). CSS sobrepõe o atributo de apresentação. */
+  svg.lucide {
+    stroke-width: 1.5px;
+  }
 }
