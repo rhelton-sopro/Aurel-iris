@@ -24,7 +24,7 @@ const emailSchema = z.object({
   email: z.string().min(1, 'E-mail é obrigatório').email('E-mail inválido'),
 })
 const codeSchema = z.object({
-  code: z.string().regex(/^\d{6}$/, 'O código tem 6 dígitos'),
+  code: z.string().trim().min(1, 'Digite o código recebido por e-mail'),
 })
 type EmailValues = z.infer<typeof emailSchema>
 type CodeValues = z.infer<typeof codeSchema>
@@ -151,15 +151,14 @@ function LoginForm() {
                     <FormControl>
                       <Input
                         type="text"
-                        inputMode="numeric"
+                        inputMode="text"
                         autoComplete="one-time-code"
-                        pattern="[0-9]*"
-                        maxLength={6}
-                        placeholder="------"
+                        maxLength={10}
+                        placeholder="Código do e-mail"
                         autoFocus
-                        className="text-center text-2xl tracking-[0.5em] font-light"
+                        className="text-center text-xl tracking-[0.3em] font-light"
                         {...field}
-                        onChange={(e) => field.onChange(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                        onChange={(e) => field.onChange(e.target.value.trim())}
                       />
                     </FormControl>
                     <FormMessage />
