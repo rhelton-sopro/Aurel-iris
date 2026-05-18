@@ -53,6 +53,24 @@ export async function createReadingAction(
     redirect('/login')
   }
 
+  // Beta: cap de 2 leituras por terapeuta. Conta só leituras que saíram de
+  // 'pending' (= captura finalizada / exame de fato submetido) — rascunho
+  // abandonado antes da 1ª foto NÃO queima cota (evita lock por duplo-clique).
+  // Autoexame conta normal (é reading comum). RLS já filtra por therapist_id;
+  // o .eq explícito é defesa em profundidade. Apagar leitura libera vaga —
+  // aceitável no beta (alunos conhecidos), não blindado contra abuso.
+  const BETA_READING_CAP = 2
+  const { count: usedReadings } = await supabase
+    .from('readings')
+    .select('id', { count: 'exact', head: true })
+    .eq('therapist_id', user.id)
+    .neq('status', 'pending')
+  if ((usedReadings ?? 0) >= BETA_READING_CAP) {
+    return {
+      error: `Limite do beta atingido: ${BETA_READING_CAP} leituras realizadas. Fale com o suporte para liberar mais.`,
+    }
+  }
+
   // CONTEXT D-03: lê method do FormData. `formData.get` retorna null quando
   // ausente; passar `undefined` ativa o default do Zod (`.default('mobile_camera')`).
   // Tampering (T-04-02-01) é mitigado pelo z.enum — valor fora da whitelist
