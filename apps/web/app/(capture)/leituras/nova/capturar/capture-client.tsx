@@ -193,26 +193,15 @@ export function CaptureClient({
           toast.dismiss(toastId)
           return
         }
-        const diag = (err as Error)?.message ?? String(err)
-        console.error('[capture-client] upload error — eye:', SEQUENCE[currentSlotIdx].eye, 'angle:', SEQUENCE[currentSlotIdx].angle, 'detail:', diag)
-        // Beacon de diagnóstico (temporário): manda o erro real pro servidor
-        // (logs Vercel) — não depende de ler o toast no iPhone.
-        void fetch('/api/debug/upload-error', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            src: 'capture-client',
-            slot: currentSlotIdx + 1,
-            eye: SEQUENCE[currentSlotIdx].eye,
-            angle: SEQUENCE[currentSlotIdx].angle,
-            diag,
-          }),
-          keepalive: true,
-        }).catch(() => {})
-        // DIAGNÓSTICO TEMPORÁRIO (2026-05-19): este é o fluxo do iPhone
-        // (câmera nativa). Expõe a causa real do Supabase no toast (iOS
-        // não tem devtools). Reverter junto com o do upload-client.
-        toast.error(`Falha ao salvar imagem ${currentSlotIdx + 1}/6: ${diag}`, {
+        console.error(
+          '[capture-client] upload error — eye:',
+          SEQUENCE[currentSlotIdx].eye,
+          'angle:',
+          SEQUENCE[currentSlotIdx].angle,
+          'detail:',
+          (err as Error)?.message ?? String(err),
+        )
+        toast.error(`Falha ao salvar imagem ${currentSlotIdx + 1}/6. Tente refazer.`, {
           id: toastId,
           duration: Infinity,
         })
