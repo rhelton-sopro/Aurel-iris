@@ -33,12 +33,15 @@ export type ValidationReason =
     soft-warning a hard-block — fotos sem fibras contáveis OU com reflexo
     cobrindo a íris destroem análise iridológica downstream (parser produz
     lixo, classifier produz lixo); melhor pedir refazer do que processar
-    pixel-soup. */
+    pixel-soup.
+    2026-05-19 (founder): 'muito_longe' REBAIXADO a soft-warning — fotos
+    boas estavam sendo recusadas por distância. Continua mostrando a
+    mensagem, mas "Confirmar" fica habilitado (terapeuta decide). Borrão
+    segue hard-block e foi endurecido no prompt do VLM. */
 export const BLOCKING_REASONS: readonly string[] = [
   'sem_olho',
   'dois_olhos',
   'olho_fechado',
-  'muito_longe',
   'borrado',
   'reflexo_total',
 ]

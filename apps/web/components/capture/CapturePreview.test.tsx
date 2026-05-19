@@ -106,7 +106,10 @@ describe('CapturePreview', () => {
     expect(screen.getByRole('button', { name: /Confirmar/ })).toBeDisabled()
   })
 
-  it('blocks Confirmar when VLM rejects with muito_longe (hard reject após round 8)', () => {
+  it('allows Confirmar with muito_longe — soft-warning desde 2026-05-19 (founder: distância não bloqueia)', () => {
+    // muito_longe saiu de BLOCKING_REASONS: fotos boas eram recusadas por
+    // distância. Continua mostrando a mensagem (header não-bloqueante),
+    // mas o terapeuta pode confirmar. Borrão/dois_olhos seguem hard-block.
     const analysis: PostCaptureAnalysis = {
       imageWidth: 3840,
       imageHeight: 2160,
@@ -125,8 +128,8 @@ describe('CapturePreview', () => {
       />
     )
     expect(screen.getByText(/Rosto\/olho muito distante/)).toBeInTheDocument()
-    expect(screen.getByText(/Foto rejeitada/)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Confirmar/ })).toBeDisabled()
+    expect(screen.getByText(/Qualidade abaixo do ideal/)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Confirmar/ })).not.toBeDisabled()
   })
 
   it('blocks Confirmar when VLM rejects with borrado (Phase 07.1.6 hard-block)', () => {
