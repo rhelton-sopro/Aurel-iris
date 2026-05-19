@@ -85,19 +85,14 @@ export function CapturePreview({
     ? isBlockingRejection(analysis.vlmValidation)
     : false
 
-  // Debug overlay escondido em prod por default. Suporte instrui o terapeuta
-  // a abrir com ?debug=1 / ?diag=1 quando precisa diagnosticar rejeição de
-  // foto. Dev local sempre visível. (Sem sinal de staging hoje — o param é o
-  // mecanismo universal.)
-  const [showDebug, setShowDebug] = React.useState(false)
-  React.useEffect(() => {
-    if (process.env.NODE_ENV !== 'production') {
-      setShowDebug(true)
-      return
-    }
-    const q = new URLSearchParams(window.location.search)
-    if (q.has('debug') || q.has('diag')) setShowDebug(true)
-  }, [])
+  // ⚠️ TEMP DEBUG (2026-05-19) — overlay SEMPRE visível em prod p/
+  // diagnosticar a calibração #2 (borrada→"boa" / boa→"distante") sem
+  // precisar de ?debug=1 (fricção no iPhone/PWA). NÃO É PERMANENTE:
+  // reverter ao gate do 8d4f3a3 (NODE_ENV !== 'production' || ?debug=1/
+  // ?diag=1 via useState/useEffect — está no git em 8d4f3a3) assim que o
+  // root-cause do #2 for diagnosticado. Senão expõe overlay técnico a
+  // todos os terapeutas do beta.
+  const showDebug = true
 
   return (
     <div
