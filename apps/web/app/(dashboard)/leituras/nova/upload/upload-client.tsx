@@ -225,13 +225,18 @@ export function UploadClient({
           toast.dismiss(toastId)
           return
         }
+        const diag = (err as Error)?.message ?? String(err)
         console.error(
           '[upload-client] upload error -- eye:',
           SEQUENCE[currentSlotIdx].eye,
           'angle:',
           SEQUENCE[currentSlotIdx].angle,
+          'detail:',
+          diag,
         )
-        toast.error(`Falha ao salvar imagem ${currentSlotIdx + 1}/6. Tente refazer.`, {
+        // DIAGNÓSTICO TEMPORÁRIO (2026-05-19): iPhone Chrome não tem devtools —
+        // expõe a causa real do Supabase no toast. Reverter após diagnosticar.
+        toast.error(`Falha ao salvar imagem ${currentSlotIdx + 1}/6: ${diag}`, {
           id: toastId,
           duration: Infinity,
         })
