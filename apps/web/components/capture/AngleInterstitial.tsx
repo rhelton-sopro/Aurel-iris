@@ -34,7 +34,7 @@ export function AngleInterstitial({ nextSlot, slotIndex, onProceed, mode }: Angl
       role="dialog"
       aria-label={copy.heading}
       aria-modal="true"
-      className="absolute inset-0 z-50 bg-background text-foreground flex flex-col items-center justify-center px-6 py-12 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-300"
+      className="absolute inset-0 z-50 bg-background text-foreground flex flex-col items-center justify-center px-6 pt-[calc(env(safe-area-inset-top)+128px)] pb-12 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-300"
     >
       <div className="flex flex-col items-center gap-8 max-w-sm w-full">
         <div className="text-center space-y-3">

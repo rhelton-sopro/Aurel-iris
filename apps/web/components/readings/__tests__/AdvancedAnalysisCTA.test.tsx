@@ -36,7 +36,7 @@ describe('components/readings/AdvancedAnalysisCTA (D-ADD2) — Plan 07.4-07', ()
     )
     expect(dialog).toHaveTextContent('Custo previsto: 1 crédito por leitura.')
     expect(dialog).toHaveTextContent(
-      /Persistência: análise salva por paciente\. Você acessa quantas vezes quiser depois, sem cobrar de novo\./,
+      /Persistência: análise salva por cliente\. Você acessa quantas vezes quiser depois, sem cobrar de novo\./,
     )
   })
 

@@ -97,11 +97,11 @@ export function ReadingsListManager({
     <>
       <AutoRefreshWhileProcessing active={anyProcessing} />
       {selected.size > 0 && (
-        <div className="flex items-center justify-between rounded-none border bg-muted/40 px-3 py-2">
+        <div className="flex flex-col gap-2 rounded-none border bg-muted/40 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
           <span className="text-sm font-medium">
             {selected.size} selecionada{selected.size > 1 ? 's' : ''}
           </span>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 self-end sm:self-auto">
             <Button
               variant="ghost"
               size="sm"
