@@ -176,7 +176,7 @@ Definições (importante seguir exatamente):
 
 - iris_bbox.center_x_pct, center_y_pct: coordenadas do CENTRO geométrico da íris (não da pupila — o centro da íris coincide com o centro da pupila), expressas como fração da largura e altura da imagem. Ex: 0.5/0.5 = centro perfeito da imagem.
 - iris_bbox.radius_pct: raio da íris em fração da MENOR dimensão da imagem. Ex: 0.18 em uma imagem 1000x800 = raio de 144 px (0.18 * 800).
-- rotation_angle_deg: graus para rotacionar a imagem no sentido HORÁRIO (clockwise) para deixar a linha imaginária entre o canto INTERNO e o canto EXTERNO do olho HORIZONTAL (paralela à borda inferior da imagem). Positivo = sentido horário. Negativo = anti-horário. Ex: se o canto interno está mais ALTO que o externo no momento (cabeça inclinada para a esquerda do paciente / direita do observador), retorne valor POSITIVO (rotacionar CW endireita).
+- rotation_angle_deg: graus para rotacionar a imagem no sentido HORÁRIO (clockwise) para deixar a linha imaginária entre o canto INTERNO e o canto EXTERNO do olho HORIZONTAL (paralela à borda inferior da imagem). Positivo = sentido horário. Negativo = anti-horário. Ex: se o canto interno está mais ALTO que o externo no momento (cabeça inclinada para a esquerda do cliente / direita do observador), retorne valor POSITIVO (rotacionar CW endireita).
 - inner_canthus = canto INTERNO do olho (lado do nariz). outer_canthus = canto EXTERNO (lado da têmpora).
 - confidence: sua confiança na precisão das coordenadas reportadas (0.0 = chute, 1.0 = certeza absoluta).
 - iris_color.primary: cor predominante da íris em vocabulário iridológico. Escolha UMA, observando atentamente o tom da MAIOR parte da área visível da íris:
@@ -187,7 +187,7 @@ Definições (importante seguir exatamente):
   - "cinza" (acromático puro — sem dominância de verde, azul, ou castanho)
   - "avela" (avelã/hazel — castanho-claro com nuance verde-amarelada)
   - "acinzentado" (íris fundamentalmente gray-tinted, mas com cor base não identificável claramente — ex: gray puxando levemente pra azul-cinza ou verde-cinza sem dominância)
-  - "verde_acinzentado" (íris verde com nuance cinza VISÍVEL — gray-green, comum em pacientes com predominância biliar-linfática iridológica; distingue-se de "verde" puro pela presença de gray visível no estroma)
+  - "verde_acinzentado" (íris verde com nuance cinza VISÍVEL — gray-green, comum em clientes com predominância biliar-linfática iridológica; distingue-se de "verde" puro pela presença de gray visível no estroma)
   - "azul_acinzentado" (íris azul com nuance cinza VISÍVEL — blue-gray, comum em constituição linfática iridológica pura)
   - "castanho_acinzentado" (íris castanha com nuance cinza VISÍVEL — brown-gray)
   Use null SOMENTE se a foto não permite ver cor (totalmente embaçada, sem foco, foto de pálpebra fechada).

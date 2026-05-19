@@ -60,7 +60,7 @@ export function CapturePreview({
   if (analysis?.vlmInvalidAlert && analysis.vlmValidation) {
     const r = analysis.vlmValidation.reason
     const messages: Record<string, string> = {
-      sem_olho: 'Foto não contém um olho — refaça apontando para o olho do paciente',
+      sem_olho: 'Foto não contém um olho — refaça apontando para o olho do cliente',
       dois_olhos: 'Apenas um olho por foto — refaça com close de um único olho',
       muito_longe: 'Rosto/olho muito distante — aproxime a câmera para um close apenas do olho',
       borrado: 'Foto borrada — as fibras da íris não estão visíveis. Segure firme e tente novamente.',
@@ -85,6 +85,20 @@ export function CapturePreview({
     ? isBlockingRejection(analysis.vlmValidation)
     : false
 
+  // Debug overlay escondido em prod por default. Suporte instrui o terapeuta
+  // a abrir com ?debug=1 / ?diag=1 quando precisa diagnosticar rejeição de
+  // foto. Dev local sempre visível. (Sem sinal de staging hoje — o param é o
+  // mecanismo universal.)
+  const [showDebug, setShowDebug] = React.useState(false)
+  React.useEffect(() => {
+    if (process.env.NODE_ENV !== 'production') {
+      setShowDebug(true)
+      return
+    }
+    const q = new URLSearchParams(window.location.search)
+    if (q.has('debug') || q.has('diag')) setShowDebug(true)
+  }, [])
+
   return (
     <div
       role="dialog"
@@ -103,13 +117,13 @@ export function CapturePreview({
         variant="outline"
         className={`absolute top-[calc(env(safe-area-inset-top)+12px)] left-3 ${LEVEL_BG_CLASS[level]} ${LEVEL_TEXT_CLASS[level]} border-0`}
       >
-        {LEVEL_LABEL[level]} · {Math.round(qualityScore * 100)}%
+        {LEVEL_LABEL[level]}
       </Badge>
 
       {/* Debug overlay — UAT 03. Mostra dados de validação pra diagnóstico
           em devices sem console (iPhone Chrome). Remove ou gate com ?debug=1
           quando estabilizar. */}
-      {analysis && (
+      {showDebug && analysis && (
         <div className="absolute top-[calc(env(safe-area-inset-top)+12px)] right-3 max-w-[60%] bg-black/80 text-green-300 font-mono text-[10px] leading-tight px-2 py-1.5 rounded">
           <div>quality: {analysis.vlmValidation.quality}</div>
           <div>reason: {analysis.vlmValidation.reason}</div>

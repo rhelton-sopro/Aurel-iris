@@ -38,8 +38,8 @@ export type SlotPhase =
 
 /**
  * Sequência canônica de 6 capturas.
- * Começa pelo olho esquerdo do paciente (aparece à DIREITA na tela com câmera traseira),
- * depois olho direito do paciente (aparece à ESQUERDA na tela).
+ * Começa pelo olho esquerdo do cliente (aparece à DIREITA na tela com câmera traseira),
+ * depois olho direito do cliente (aparece à ESQUERDA na tela).
  * AngleInterstitial fullscreen aparece ANTES do índice 3 (transição de olho).
  */
 export const SEQUENCE: readonly Slot[] = [
@@ -58,13 +58,13 @@ export const EYE_LABEL: Record<Eye, string> = {
 
 /**
  * Labels visíveis ao usuário. PROTOCOLO REVISTO 2026-05-12: descrevem
- * INCLINAÇÃO DA CÂMERA (não rotação do paciente). Paciente fica fixo
+ * INCLINAÇÃO DA CÂMERA (não rotação do cliente). Cliente fica fixo
  * olhando para um ponto; o terapeuta inclina a câmera levemente.
  *   - frontal:   câmera frontal direta à íris
  *   - lateral:   câmera inclinada ~15° para a direita
  *   - backlight: câmera inclinada ~15° para a esquerda
  *
- * Razão da revisão: o protocolo antigo (paciente gira ~90°) produzia
+ * Razão da revisão: o protocolo antigo (cliente gira ~90°) produzia
  * íris em posições muito diferentes entre os 3 ângulos da mesma íris,
  * frustrando detect/segment (Phase 07.1.5 verdict B_INFEASIBLE) e o
  * gate de convergência geométrica do photometric stereo.
@@ -116,7 +116,7 @@ export function getSlotProgressLabel(slotIndex: number): string {
  * Copy de instrução por slot, exibida na AngleInterstitial antes de cada foto.
  *
  * PROTOCOLO REVISTO 2026-05-12 (founder testou empiricamente no iPhone):
- *  - PACIENTE fica FIXO olhando para um ponto na parede; NÃO gira o corpo.
+ *  - CLIENTE fica FIXO olhando para um ponto na parede; NÃO gira o corpo.
  *  - TERAPEUTA muda a posição da CÂMERA entre as 3 fotos da mesma íris:
  *      frontal   → câmera direta à íris
  *      lateral   → câmera inclinada ~15° à DIREITA do terapeuta
@@ -124,7 +124,7 @@ export function getSlotProgressLabel(slotIndex: number): string {
  *  - FLASH ATIVO em todas as fotos (revela fibras radiais; pupila contrai
  *    naturalmente; reflexo localizado é pequeno e não atrapalha).
  *
- * Razão: o protocolo antigo (paciente gira ~90°) deslocava a íris muito
+ * Razão: o protocolo antigo (cliente gira ~90°) deslocava a íris muito
  * entre as 3 fotos, frustrando convergência geométrica do photometric
  * stereo (Phase 07.1.5 B_INFEASIBLE). Tilt sutil de câmera mantém a íris
  * geometricamente próxima entre fotos enquanto varia a iluminação o
@@ -142,15 +142,15 @@ export function getSlotInstructionCopy(
   switch (slot.angle) {
     case 'frontal':
       angleLabel = 'Frente'
-      subtitle = `Paciente olhando para um ponto fixo na parede. Câmera FRONTAL direta ao olho ${eyeUpper}, com FLASH ATIVO.`
+      subtitle = `O cliente olha para um ponto fixo na parede, sem mover a cabeça. Mantenha a câmera de frente para o olho ${eyeUpper} e tire a foto com o flash ativado.`
       break
     case 'lateral':
       angleLabel = 'Câmera à direita'
-      subtitle = 'Paciente continua olhando para o mesmo ponto fixo (não se move). Incline a CÂMERA ~15° para a DIREITA, mantendo o flash ativo.'
+      subtitle = 'O cliente continua olhando para o mesmo ponto fixo, sem mover a cabeça. Incline a câmera 15° para a direita e tire a foto com o flash ativado.'
       break
     case 'backlight':
       angleLabel = 'Câmera à esquerda'
-      subtitle = 'Paciente continua olhando para o mesmo ponto fixo (não se move). Incline a CÂMERA ~15° para a ESQUERDA, mantendo o flash ativo.'
+      subtitle = 'O cliente continua olhando para o mesmo ponto fixo, sem mover a cabeça. Incline a câmera 15° para a esquerda e tire a foto com o flash ativado.'
       break
   }
 

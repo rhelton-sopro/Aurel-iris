@@ -73,7 +73,7 @@ export function AdvancedAnalysisCTA() {
             </p>
             <p>Custo previsto: 1 crédito por leitura.</p>
             <p>
-              Persistência: análise salva por paciente. Você acessa quantas vezes quiser
+              Persistência: análise salva por cliente. Você acessa quantas vezes quiser
               depois, sem cobrar de novo.
             </p>
           </div>

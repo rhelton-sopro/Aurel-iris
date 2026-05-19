@@ -286,13 +286,13 @@ export function CaptureClient({
           className="absolute top-0 left-0 right-0 z-[60] pt-[env(safe-area-inset-top)] bg-amber-500/95 backdrop-blur-sm border-b border-amber-700/30"
         >
           <p className="px-4 py-1.5 text-xs font-medium text-amber-950 text-center">
-            Mantenha a luz de frente ou lateral — nunca atrás do paciente
+            Luz de frente ou lateral — nunca atrás do cliente
           </p>
         </div>
       )}
 
       <header className="absolute top-[calc(env(safe-area-inset-top)+30px)] left-0 right-0 z-[55] flex items-center justify-between px-4 py-2">
-        <span className="text-sm text-foreground/80 truncate max-w-[60%]">{clientName}</span>
+        <span className="text-sm text-foreground/80 max-w-[70%] leading-tight">{clientName}</span>
         <Link
           href="/leituras"
           aria-label="Cancelar leitura"
