@@ -27,7 +27,7 @@ export default async function LeiturasPage() {
       vision_features,
       report_generated,
       is_delivered,
-      client:clients(full_name),
+      client:clients(full_name, is_self),
       reading_images(count)
     `)
     .order('created_at', { ascending: false })

@@ -16,12 +16,13 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
+import { Badge } from '@/components/ui/badge'
 import { StatusBadge, type ReadingStatus } from '@/components/readings/StatusBadge'
 import { ReprocessButton } from '@/components/readings/ReprocessButton'
 import { DeleteReadingDialog } from '@/components/readings/delete-reading-dialog'
 import { AutoRefreshWhileProcessing } from '@/components/readings/AutoRefreshWhileProcessing'
 
-type ClientRef = { full_name: string | null }
+type ClientRef = { full_name: string | null; is_self?: boolean | null }
 
 export interface ReadingRow {
   id: string
@@ -200,6 +201,11 @@ export function ReadingsListManager({
                 {showClient && (
                   <TableCell className="font-medium">
                     {client?.full_name ?? <span className="text-muted-foreground">—</span>}
+                    {client?.is_self && (
+                      <Badge variant="secondary" className="ml-2">
+                        Meu exame
+                      </Badge>
+                    )}
                   </TableCell>
                 )}
                 <TableCell className="text-muted-foreground">

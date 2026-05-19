@@ -1,5 +1,8 @@
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { SummaryCards } from '@/components/dashboard/summary-cards'
+import { buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -20,7 +23,15 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Dashboard</h1>
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="text-2xl font-semibold">Dashboard</h1>
+        <Link
+          href="/leituras/autoexame"
+          className={cn(buttonVariants())}
+        >
+          Fazer meu próprio exame
+        </Link>
+      </div>
       <SummaryCards
         clientsCount={clientsCount ?? 0}
         trialEndsAt={profile?.trial_ends_at ?? null}
