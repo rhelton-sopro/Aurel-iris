@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { withNetworkRetry, isNetworkError } from '@/lib/net/retry'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -45,12 +46,14 @@ function LoginForm() {
   async function onRequestCode(values: EmailValues) {
     setFormError(null)
     const supabase = createClient()
-    const { error } = await supabase.auth.signInWithOtp({
-      email: values.email,
-      options: {
-        shouldCreateUser: false, // NÃO cria usuário se não existir (login)
-      },
-    })
+    const { error } = await withNetworkRetry(() =>
+      supabase.auth.signInWithOtp({
+        email: values.email,
+        options: {
+          shouldCreateUser: false, // NÃO cria usuário se não existir (login)
+        },
+      }),
+    )
 
     if (error) {
       // Loga erro completo no console pra diagnóstico (status code, message,
@@ -67,6 +70,8 @@ function LoginForm() {
         setFormError('Não encontramos uma conta com este e-mail.')
       } else if (error.status === 429 || error.message.toLowerCase().includes('rate limit')) {
         setFormError('Muitas tentativas. Aguarde alguns minutos e tente novamente.')
+      } else if (isNetworkError(error)) {
+        setFormError('Falha de conexão ao enviar o código. Verifique a internet e toque em "Enviar" de novo.')
       } else {
         setFormError(`Erro ao enviar código: ${error.message} (status ${error.status ?? 'desconhecido'})`)
       }
@@ -87,11 +92,13 @@ function LoginForm() {
     setFormError(null)
     setVerifying(true)
     const supabase = createClient()
-    const { error } = await supabase.auth.verifyOtp({
-      email,
-      token,
-      type: 'email',
-    })
+    const { error } = await withNetworkRetry(() =>
+      supabase.auth.verifyOtp({
+        email,
+        token,
+        type: 'email',
+      }),
+    )
 
     if (error) {
       console.error('[login] verifyOtp error:', {
@@ -118,10 +125,12 @@ function LoginForm() {
   async function onResend() {
     setFormError(null)
     const supabase = createClient()
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { shouldCreateUser: false },
-    })
+    const { error } = await withNetworkRetry(() =>
+      supabase.auth.signInWithOtp({
+        email,
+        options: { shouldCreateUser: false },
+      }),
+    )
     if (error) {
       setFormError('Não foi possível reenviar o código. Aguarde um instante e tente de novo.')
     }

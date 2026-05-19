@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Loader2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { withNetworkRetry, isNetworkError } from '@/lib/net/retry'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -69,13 +70,15 @@ export default function SignupPage() {
 
     setSubmitting(true)
     const supabase = createClient()
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        data: buildMeta(),
-        shouldCreateUser: true,
-      },
-    })
+    const { error } = await withNetworkRetry(() =>
+      supabase.auth.signInWithOtp({
+        email,
+        options: {
+          data: buildMeta(),
+          shouldCreateUser: true,
+        },
+      }),
+    )
 
     if (error) {
       console.error('[signup] signInWithOtp error:', {
@@ -90,6 +93,8 @@ export default function SignupPage() {
         setFormError('Este e-mail já tem conta. Use a tela de login.')
       } else if (error.message.toLowerCase().includes('signups') && error.message.toLowerCase().includes('disabled')) {
         setFormError('Cadastros estão desabilitados no momento. Contate o administrador.')
+      } else if (isNetworkError(error)) {
+        setFormError('Falha de conexão ao enviar o código. Verifique a internet e toque em "Enviar" de novo.')
       } else {
         setFormError(`Erro ao criar conta: ${error.message} (status ${error.status ?? 'desconhecido'})`)
       }
@@ -111,11 +116,13 @@ export default function SignupPage() {
     setFormError(null)
     setVerifying(true)
     const supabase = createClient()
-    const { error } = await supabase.auth.verifyOtp({
-      email,
-      token,
-      type: 'email',
-    })
+    const { error } = await withNetworkRetry(() =>
+      supabase.auth.verifyOtp({
+        email,
+        token,
+        type: 'email',
+      }),
+    )
 
     if (error) {
       console.error('[signup] verifyOtp error:', {
@@ -141,10 +148,12 @@ export default function SignupPage() {
   async function onResend() {
     setFormError(null)
     const supabase = createClient()
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { data: buildMeta(), shouldCreateUser: true },
-    })
+    const { error } = await withNetworkRetry(() =>
+      supabase.auth.signInWithOtp({
+        email,
+        options: { data: buildMeta(), shouldCreateUser: true },
+      }),
+    )
     if (error) {
       setFormError('Não foi possível reenviar o código. Aguarde um instante e tente de novo.')
     }

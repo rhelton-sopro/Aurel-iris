@@ -99,12 +99,16 @@ export async function uploadCaptureImage(args: UploadArgs): Promise<UploadResult
 }
 
 /**
- * Wrapper com retry exponencial (CONTEXT: 2 tentativas com backoff 1s, 2s).
- * Não faz retry em AbortError (intencional via signal).
+ * Wrapper com retry exponencial. 2026-05-19: 2 → 4 tentativas, backoff
+ * 1s/2s/4s — quedas de conexão transitórias (ERR_CONNECTION_CLOSED /
+ * Failed to fetch) na 1ª tentativa funcionavam no re-clique manual; 4
+ * tentativas com backoff maior cobrem isso + 5xx transitório do Storage.
+ * Qualquer erro NÃO-Abort é retentável (storage/db/rede). AbortError
+ * (Refazer cancela slot) nunca faz retry.
  */
 export async function uploadWithRetry(
   args: UploadArgs,
-  maxAttempts = 2,
+  maxAttempts = 4,
 ): Promise<UploadResult> {
   let lastError: Error | undefined
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -118,7 +122,7 @@ export async function uploadWithRetry(
       lastError = err
       if (err.name === 'AbortError') throw err
       if (attempt < maxAttempts) {
-        await new Promise(r => setTimeout(r, 1000 * attempt))
+        await new Promise(r => setTimeout(r, 1000 * 2 ** (attempt - 1)))
       }
     }
   }
