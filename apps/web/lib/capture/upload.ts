@@ -78,37 +78,57 @@ export async function uploadCaptureImage(args: UploadArgs): Promise<UploadResult
     throw new Error(`[upload] storage falhou: ${storageError.message}`)
   }
 
-  const { error: dbError } = await supabase.from('reading_images').upsert(
-    {
-      reading_id: readingId,
-      eye,
-      angle,
-      storage_path: path,
-      quality_score: qualityScore,
-      width,
-      height,
-    },
-    { onConflict: 'reading_id,eye,angle' },
-  )
-
-  if (dbError) {
-    throw new Error(`[upload] insert reading_images falhou: ${dbError.message}`)
+  // Insert reading_images: retry DEDICADO (esta é a request que dava
+  // "Load failed" no iOS — confirmado por beacon/bisect 2026-05-19).
+  // 1 tentativa + 3 retries, backoff 0.5s/1s/2s, SEM re-subir o Storage
+  // (o blob 4K já foi; só o JSON leve retenta). console.error por
+  // tentativa → frequência visível nos logs pós-fix.
+  const INSERT_BACKOFF_MS = [500, 1000, 2000] as const
+  let dbError: { message: string } | null = null
+  for (let i = 0; i <= INSERT_BACKOFF_MS.length; i++) {
+    if (signal?.aborted) {
+      throw new DOMException('Upload abortado', 'AbortError')
+    }
+    const res = await supabase.from('reading_images').upsert(
+      {
+        reading_id: readingId,
+        eye,
+        angle,
+        storage_path: path,
+        quality_score: qualityScore,
+        width,
+        height,
+      },
+      { onConflict: 'reading_id,eye,angle' },
+    )
+    if (!res.error) {
+      return { path }
+    }
+    dbError = res.error
+    console.error(
+      `[upload] reading_images upsert falhou (try ${i + 1}/${INSERT_BACKOFF_MS.length + 1}): ${res.error.message}`,
+    )
+    if (i < INSERT_BACKOFF_MS.length) {
+      await new Promise(r => setTimeout(r, INSERT_BACKOFF_MS[i]))
+    }
   }
 
-  return { path }
+  throw new Error(
+    `[upload] insert reading_images falhou: ${dbError?.message ?? 'desconhecido'}`,
+  )
 }
 
 /**
- * Wrapper com retry exponencial. 2026-05-19: 2 → 4 tentativas, backoff
- * 1s/2s/4s — quedas de conexão transitórias (ERR_CONNECTION_CLOSED /
- * Failed to fetch) na 1ª tentativa funcionavam no re-clique manual; 4
- * tentativas com backoff maior cobrem isso + 5xx transitório do Storage.
- * Qualquer erro NÃO-Abort é retentável (storage/db/rede). AbortError
- * (Refazer cancela slot) nunca faz retry.
+ * Fallback geral: 2 tentativas, backoff curto fixo (800ms). 2026-05-19
+ * (regressão `6e030c7` revertida): o retry 4× re-subia o blob 4K a cada
+ * tentativa → no iOS multiplicava a exposição a "Load failed" e
+ * estourava o tempo. Agora o blob pesado sobe no MÁX 2× (fallback
+ * geral); o retry fino vive no insert dentro de uploadCaptureImage.
+ * AbortError (Refazer cancela slot) nunca faz retry.
  */
 export async function uploadWithRetry(
   args: UploadArgs,
-  maxAttempts = 4,
+  maxAttempts = 2,
 ): Promise<UploadResult> {
   let lastError: Error | undefined
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -122,7 +142,7 @@ export async function uploadWithRetry(
       lastError = err
       if (err.name === 'AbortError') throw err
       if (attempt < maxAttempts) {
-        await new Promise(r => setTimeout(r, 1000 * 2 ** (attempt - 1)))
+        await new Promise(r => setTimeout(r, 800))
       }
     }
   }
