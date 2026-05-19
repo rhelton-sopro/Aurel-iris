@@ -193,8 +193,12 @@ export function CaptureClient({
           toast.dismiss(toastId)
           return
         }
-        console.error('[capture-client] upload error — eye:', SEQUENCE[currentSlotIdx].eye, 'angle:', SEQUENCE[currentSlotIdx].angle)
-        toast.error(`Falha ao salvar imagem ${currentSlotIdx + 1}/6. Tente refazer.`, {
+        const diag = (err as Error)?.message ?? String(err)
+        console.error('[capture-client] upload error — eye:', SEQUENCE[currentSlotIdx].eye, 'angle:', SEQUENCE[currentSlotIdx].angle, 'detail:', diag)
+        // DIAGNÓSTICO TEMPORÁRIO (2026-05-19): este é o fluxo do iPhone
+        // (câmera nativa). Expõe a causa real do Supabase no toast (iOS
+        // não tem devtools). Reverter junto com o do upload-client.
+        toast.error(`Falha ao salvar imagem ${currentSlotIdx + 1}/6: ${diag}`, {
           id: toastId,
           duration: Infinity,
         })
