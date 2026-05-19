@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { BirthDateInput } from '@/components/clientes/birth-date-input'
 import { startSelfExamAction } from '@/app/actions/profile'
 
 const inputClass =
@@ -56,15 +57,11 @@ export function AutoexameForm(p: {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="birth" className="text-sm font-medium">
-          Data de nascimento
-        </label>
-        <input
-          id="birth"
-          type="date"
+        <span className="text-sm font-medium">Data de nascimento</span>
+        <BirthDateInput
           value={birth}
-          onChange={(e) => setBirth(e.target.value)}
-          className={inputClass}
+          onChange={setBirth}
+          aria-label="Data de nascimento"
         />
       </div>
 
