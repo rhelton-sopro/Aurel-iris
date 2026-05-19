@@ -407,8 +407,8 @@ Depois da §15, emita, como bloco FINAL do output, exatamente:
 
 ```
 ## Em poucas palavras
-[uma única frase, 15-30 palavras, derivada do achado VISUAL mais marcante
-que você acabou de descrever — ver contrato abaixo]
+[15-50 palavras, tecida a partir dos 3 achados mais marcantes que você
+acabou de descrever — ver contrato abaixo]
 ```
 
 **Isto é output obrigatório. NÃO pule.** Não emita nada depois dele (o
@@ -455,9 +455,9 @@ um quadro completo do organismo]
 [conteúdo da seção 15 — 6 subsections card grid; veja §15 abaixo]
 
 ## Em poucas palavras
-[UMA frase 15-30 palavras — a essência da pessoa em voz
-poética-evocativa que fala com a ALMA, SEM jargão somático/clínico e SEM
-descrição da íris; contrato abaixo. É o ÚLTIMO bloco; nada depois dele.]
+[15-50 palavras — a essência da pessoa em voz poética-evocativa que
+fala com a ALMA, tecida de 3 características, SEM jargão somático/clínico
+e SEM descrição da íris; contrato abaixo. É o ÚLTIMO bloco; nada depois dele.]
 ```
 
 **Não** emita JSON. **Não** emita preâmbulo nem frase-essência ANTES da
@@ -485,7 +485,7 @@ abandonado por escolha de UX da fundadora.
 **Output OBRIGATÓRIO — sempre presente, nunca omitido. É o ÚLTIMO bloco
 do output.** Tendo terminado a §15, **releia tudo** e destile o núcleo
 desta pessoa — o que atravessa o relatório — em UMA frase evocativa
-curta que fala com a ALMA. **15-30 palavras.** Evocativa, NÃO
+curta que fala com a ALMA. **15-50 palavras.** Evocativa, NÃO
 diagnóstica. Emita exatamente assim:
 
 ```
@@ -493,7 +493,7 @@ diagnóstica. Emita exatamente assim:
 [a frase, em uma única linha]
 ```
 
-### Contrato de abertura + especificidade + comprimento (DURO — abrir por cor/técnica OU genérico OU >30 palavras = regerar)
+### Contrato de abertura + especificidade + comprimento (DURO — abrir por cor/técnica OU genérico OU >50 palavras = regerar)
 
 **Abre direto pela essência da pessoa — fala com a ALMA, não descreve o
 corpo, o sistema, nem a íris.** É sobre QUEM a pessoa é e o que a vida
@@ -540,9 +540,51 @@ emitir: **esta frase caberia em qualquer mulher de 35-40 anos?**
   leitura (derivado INTERNAMENTE do marcador do §3 + do eixo do §5 que
   mais pesaram; o raciocínio é somático, a FRASE não é) → válida.
 
-**Comprimento (DURO — conte antes de emitir):** 15-30 palavras. >30 =
-**regerar**, mesmo perfeita (frase longa dilui o achado e vira
-parágrafo, não essência).
+### Núcleo de 3 características + discriminabilidade (DURO — falhar = regerar)
+
+NÃO destile a frase de UM só achado dominante. Identifique os **3
+achados mais marcantes DESTA leitura** (o dominante + 2 secundários) e
+teça a frase a partir dos TRÊS — é isso que a torna desta pessoa e não
+de outra com o mesmo padrão clínico amplo. Dois clientes com a mesma
+carga dominante (ex.: mesmo eixo hepático) precisam receber frases
+nitidamente diferentes porque os 2 achados secundários diferem.
+
+ZERO jargão (mantido): sem órgão, sistema, campo, cor de íris, sem a
+palavra "íris". Só a tradução vivida — cena, micro-momento, o que a vida
+trouxe e o que a pessoa fez com isso. A âncora técnica dos 3 achados
+fica no raciocínio interno; a frase é voz de alma, como hoje.
+
+PROIBIDO como núcleo (cabe em qualquer um): "tendência à contenção
+emocional", "padrão de sobrecarga sustentada", "organismo em estado de
+alerta", "estrutura que aprendeu a sustentar", "campo que pede
+integração" — e qualquer "padrão/estrutura/organismo que…" sem os 3
+particulares específicos desta leitura.
+
+Teste de discriminabilidade (antes de emitir): mostrada a outro
+terapeuta para dois clientes com o MESMO padrão clínico amplo — ele
+distinguiria um do outro só por esta frase? Se NÃO → genérica, regerar
+puxando os 3 particulares.
+
+Auditoria automática (3 checks; falhar 1 = reescrever): (1) a frase
+tece 3 características específicas, não 1? (2) algum trecho é piso
+genérico da lista proibida ou equivalente? (3) discriminaria duas
+pessoas de mesmo gênero, idade próxima e constituição similar?
+
+O efeito-alvo no leitor: "caramba, isto é específico, fala da MINHA
+pessoa, dos eventos da minha vida, da minha alma — nenhum terapeuta me
+leu com essa profundidade".
+
+EXEMPLO FRACO (1 achado, genérico): "Uma alma que aprendeu a conter
+desde a infância."
+EXEMPLO FORTE (3 achados, sem jargão, voz de alma): "Alguém que aprendeu
+cedo a engolir a frase pela metade, a cuidar de todos antes de ser
+cuidada, e a transformar o cansaço em linguagem — e que hoje, pela
+primeira vez, sente o corpo pedir licença para devolver voz ao que ficou
+guardado."
+
+**Comprimento (DURO — conte antes de emitir):** 15-50 palavras. >50 =
+**regerar** (frase longa demais vira parágrafo e dilui; até 50 dá espaço
+para os 3 achados sem virar texto corrido).
 
 Pode terminar opcionalmente com a linha:
 > Esta é a essência que atravessa este relatório.
@@ -556,7 +598,7 @@ Regras:
   sistema, sem campo, sem "corpo"/"organismo", sem grau numérico, sem
   cor de íris. Só essência evocativa.
 - As 9 Regras absolutas valem (sem autor, sem escola, sem setor/olho).
-- Uma a três frases curtas conforme o padrão (A/B/C), 15-30 palavras no
+- Uma a três frases curtas conforme o padrão (A/B/C), 15-50 palavras no
   total, numa única linha. Sem aspas envolvendo. Sem bullet. Sem
   assinatura.
 
@@ -1421,7 +1463,7 @@ seções têm funções complementares — §14 abre/convida; §15 estrutura.
 
 ## Lembretes finais antes de gerar
 
-- ✓ **OBRIGATÓRIO:** bloco `## Em poucas palavras` é o ÚLTIMO do output (DEPOIS da §15) — gerado por último, abre pela ESSÊNCIA da pessoa em voz poética-evocativa, ZERO jargão somático/clínico (sem órgão/sistema/campo/"corpo"/"organismo") e sem descrição da íris, final que ABRE; deriva do padrão dominante específico desta leitura. Frase genérica que caberia em qualquer mulher 35-40 OU com mais de 30 palavras = ERRADO, regerar (alvo 15-30 palavras). Output começa direto em `## 1.`. Nunca pule.
+- ✓ **OBRIGATÓRIO:** bloco `## Em poucas palavras` é o ÚLTIMO do output (DEPOIS da §15) — gerado por último, abre pela ESSÊNCIA da pessoa em voz poética-evocativa, ZERO jargão somático/clínico (sem órgão/sistema/campo/"corpo"/"organismo") e sem descrição da íris, final que ABRE; tecida dos **3 achados mais marcantes** desta leitura (não 1), discriminável entre dois clientes com o mesmo padrão amplo. Frase genérica que caberia em qualquer mulher 35-40, ou de piso genérico, OU com mais de 50 palavras = ERRADO, regerar (alvo 15-50 palavras). Output começa direto em `## 1.`. Nunca pule.
 - ✓ 15 seções markdown na sequência {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15} — estritamente sequencial, sem fração, sem pulo
 - ✓ `## N. Título` exato (com ponto após o número, SEM o glyph §, SEM em-dash) — N de 1 a 15
 - ✓ §1 = `### Síntese inicial` (prosa da alma client-facing, anti-Forer: só serve esta íris, frase final de reframe) + `### Leitura de base` (constituição técnica, Plan 21 parágrafos curtos) — duas subseções H3 DENTRO de §1, espelhando §2
