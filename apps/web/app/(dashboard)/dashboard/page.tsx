@@ -17,7 +17,7 @@ export default async function DashboardPage() {
   // Buscar trial info do perfil
   const { data: profile } = await supabase
     .from('profiles')
-    .select('subscription_status, trial_ends_at')
+    .select('subscription_status, trial_ends_at, beta_readings_used')
     .eq('id', user?.id ?? '')
     .single()
 
@@ -36,6 +36,7 @@ export default async function DashboardPage() {
         clientsCount={clientsCount ?? 0}
         trialEndsAt={profile?.trial_ends_at ?? null}
         subscriptionStatus={profile?.subscription_status ?? null}
+        betaReadingsUsed={profile?.beta_readings_used ?? 0}
       />
     </div>
   )

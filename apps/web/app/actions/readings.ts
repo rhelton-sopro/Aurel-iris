@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { resolveClientGate } from '@/lib/gates/client-gates'
+import { BETA_READING_CAP } from '@/lib/beta/config'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
@@ -58,7 +59,7 @@ export async function createReadingAction(
   // /api/readings/[id]/process; nunca decrementado → apagar/reprocessar
   // leitura NÃO libera vaga). RLS de profiles permite o terapeuta ler a
   // própria linha.
-  const BETA_READING_CAP = 2
+  // Cap = fonte única em lib/beta/config (importado no topo).
   const { data: betaProfile } = await supabase
     .from('profiles')
     .select('beta_readings_used')
