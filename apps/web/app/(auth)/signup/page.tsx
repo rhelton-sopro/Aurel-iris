@@ -1,69 +1,89 @@
 'use client'
 
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import Link from 'next/link'
 import { Loader2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
+  SPECIALTIES,
+  OTHER,
+  MAX_SPECIALTIES,
+  formatPhoneBR,
+  phoneIsValidBR,
+  buildSpecialties,
+} from '@/lib/profile/fields'
+import { TOS_VERSION } from '@/lib/consent/tos'
 
-const signupSchema = z.object({
-  email: z.string().min(1, 'E-mail é obrigatório').email('E-mail inválido'),
-  full_name: z.string().min(1, 'Nome é obrigatório'),
-})
-type SignupFormValues = z.infer<typeof signupSchema>
+const inputClass =
+  'h-11 w-full rounded-none border-0 border-b border-b-ink bg-transparent px-3 text-base outline-none transition-colors duration-[180ms] placeholder:text-mist focus-visible:border-b-teal'
 
 export default function SignupPage() {
   const [step, setStep] = useState<'form' | 'code'>('form')
-  const [pending, setPending] = useState<{ email: string; full_name: string }>({
-    email: '',
-    full_name: '',
-  })
+
+  // Campos do cadastro
+  const [fullName, setFullName] = useState('')
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
+  const [selected, setSelected] = useState<string[]>([])
+  const [otherText, setOtherText] = useState('')
+  const [tosAccepted, setTosAccepted] = useState(false)
+
+  const [submitting, setSubmitting] = useState(false)
   const [code, setCode] = useState('')
   const [verifying, setVerifying] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
 
-  const form = useForm<SignupFormValues>({
-    resolver: zodResolver(signupSchema),
-    defaultValues: { email: '', full_name: '' },
-  })
+  const otherSelected = selected.includes(OTHER)
 
-  async function onSubmit(values: SignupFormValues) {
+  function toggleSpecialty(s: string) {
+    setSelected((prev) => {
+      if (prev.includes(s)) return prev.filter((x) => x !== s)
+      if (prev.length >= MAX_SPECIALTIES) return prev
+      return [...prev, s]
+    })
+  }
+
+  function buildMeta() {
+    return {
+      full_name: fullName.trim(),
+      phone,
+      specialties: buildSpecialties(selected, otherText),
+      tos_accepted_at: new Date().toISOString(),
+      tos_version: TOS_VERSION,
+    }
+  }
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault()
     setFormError(null)
+
+    if (!fullName.trim()) return setFormError('Informe seu nome completo.')
+    if (!/.+@.+\..+/.test(email)) return setFormError('E-mail inválido.')
+    if (!phoneIsValidBR(phone)) return setFormError('WhatsApp inválido (DDD + número).')
+    const specs = buildSpecialties(selected, otherText)
+    if (specs.length < 1) return setFormError('Selecione ao menos 1 especialidade.')
+    if (!tosAccepted)
+      return setFormError('É necessário aceitar os Termos e a Política de Privacidade.')
+
+    setSubmitting(true)
     const supabase = createClient()
     const { error } = await supabase.auth.signInWithOtp({
-      email: values.email,
+      email,
       options: {
-        data: {
-          full_name: values.full_name, // lido pelo trigger: raw_user_meta_data->>'full_name'
-        },
-        shouldCreateUser: true, // cria usuário se não existir (signup)
+        data: buildMeta(),
+        shouldCreateUser: true,
       },
     })
 
     if (error) {
-      // Loga erro completo no console pra diagnóstico (status code, message,
-      // name) — não vaza dados sensíveis porque é client-side e só roda no
-      // próprio browser do user. Mesmo padrão de login/page.tsx (#267ff50).
       console.error('[signup] signInWithOtp error:', {
         message: error.message,
         status: error.status,
         name: error.name,
         code: (error as { code?: string }).code,
       })
-
       if (error.status === 429 || error.message.toLowerCase().includes('rate limit')) {
         setFormError('Muitas tentativas. Aguarde alguns minutos e tente novamente.')
       } else if (error.message.toLowerCase().includes('already registered') || error.message.toLowerCase().includes('user already')) {
@@ -73,10 +93,11 @@ export default function SignupPage() {
       } else {
         setFormError(`Erro ao criar conta: ${error.message} (status ${error.status ?? 'desconhecido'})`)
       }
+      setSubmitting(false)
       return
     }
 
-    setPending({ email: values.email, full_name: values.full_name })
+    setSubmitting(false)
     setStep('code')
   }
 
@@ -91,7 +112,7 @@ export default function SignupPage() {
     setVerifying(true)
     const supabase = createClient()
     const { error } = await supabase.auth.verifyOtp({
-      email: pending.email,
+      email,
       token,
       type: 'email',
     })
@@ -113,8 +134,7 @@ export default function SignupPage() {
       return
     }
 
-    // Hard navigation: garante request novo onde o middleware lê o cookie de
-    // sessão recém-gravado (mais robusto que router.push no PWA standalone).
+    // Hard navigation: middleware lê o cookie de sessão recém-gravado.
     window.location.assign('/dashboard')
   }
 
@@ -122,11 +142,8 @@ export default function SignupPage() {
     setFormError(null)
     const supabase = createClient()
     const { error } = await supabase.auth.signInWithOtp({
-      email: pending.email,
-      options: {
-        data: { full_name: pending.full_name },
-        shouldCreateUser: true,
-      },
+      email,
+      options: { data: buildMeta(), shouldCreateUser: true },
     })
     if (error) {
       setFormError('Não foi possível reenviar o código. Aguarde um instante e tente de novo.')
@@ -139,7 +156,7 @@ export default function SignupPage() {
         <CardHeader>
           <CardTitle className="text-2xl">Digite o código</CardTitle>
           <CardDescription>
-            Enviamos um código de acesso para <strong>{pending.email}</strong>.
+            Enviamos um código de acesso para <strong>{email}</strong>.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -148,9 +165,8 @@ export default function SignupPage() {
               {formError}
             </div>
           )}
-          {/* Plain controlled input — deliberately NO react-hook-form /
-              FormField / FormControl here: that stack was leaving this
-              field inert. The signup step above keeps RHF (it works). */}
+          {/* Plain controlled input — sem react-hook-form/FormControl (esse
+              stack deixava o campo inerte; ver login/page.tsx). */}
           <form onSubmit={onVerifyCode} className="space-y-4">
             <div className="flex flex-col gap-1.5">
               <label htmlFor="otp-code" className="text-sm font-medium">
@@ -218,51 +234,133 @@ export default function SignupPage() {
             {formError}
           </div>
         )}
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
+        <form onSubmit={onSubmit} className="space-y-5">
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="full_name" className="text-sm font-medium">
+              Nome completo
+            </label>
+            <input
+              id="full_name"
               name="full_name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nome completo</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Nome do terapeuta" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              type="text"
+              autoComplete="name"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Nome do terapeuta"
+              className={inputClass}
             />
-            <FormField
-              control={form.control}
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="email" className="text-sm font-medium">
+              E-mail
+            </label>
+            <input
+              id="email"
               name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>E-mail</FormLabel>
-                  <FormControl>
-                    <Input type="email" placeholder="seu@email.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="seu@email.com"
+              className={inputClass}
             />
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={form.formState.isSubmitting}
-              aria-busy={form.formState.isSubmitting}
-            >
-              {form.formState.isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Enviando...
-                </>
-              ) : (
-                'Enviar código de acesso'
-              )}
-            </Button>
-          </form>
-        </Form>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="phone" className="text-sm font-medium">
+              WhatsApp
+            </label>
+            <input
+              id="phone"
+              name="phone"
+              type="tel"
+              inputMode="numeric"
+              autoComplete="tel"
+              value={phone}
+              onChange={(e) => setPhone(formatPhoneBR(e.target.value))}
+              placeholder="(11) 99999-9999"
+              className={inputClass}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <span className="text-sm font-medium">
+              Especialidades{' '}
+              <span className="text-mist">(1 a {MAX_SPECIALTIES})</span>
+            </span>
+            <div className="flex flex-wrap gap-2">
+              {SPECIALTIES.map((s) => {
+                const on = selected.includes(s)
+                const disabled = !on && selected.length >= MAX_SPECIALTIES
+                return (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => toggleSpecialty(s)}
+                    disabled={disabled}
+                    aria-pressed={on}
+                    className={
+                      'rounded-none border px-3 py-1.5 text-sm transition-colors ' +
+                      (on
+                        ? 'border-teal bg-teal text-white'
+                        : disabled
+                          ? 'border-b-ink/20 text-mist cursor-not-allowed'
+                          : 'border-ink text-ink hover:border-teal hover:text-teal')
+                    }
+                  >
+                    {s}
+                  </button>
+                )
+              })}
+            </div>
+            {otherSelected && (
+              <input
+                type="text"
+                value={otherText}
+                onChange={(e) => setOtherText(e.target.value)}
+                placeholder="Qual especialidade?"
+                className={inputClass + ' mt-1'}
+              />
+            )}
+          </div>
+
+          <label className="flex items-start gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={tosAccepted}
+              onChange={(e) => setTosAccepted(e.target.checked)}
+              className="mt-1"
+            />
+            <span>
+              Li e aceito os{' '}
+              <Link href="/termos" target="_blank" className="underline">
+                Termos de Uso
+              </Link>{' '}
+              e a{' '}
+              <Link href="/privacidade" target="_blank" className="underline">
+                Política de Privacidade
+              </Link>
+              .
+            </span>
+          </label>
+
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={submitting}
+            aria-busy={submitting}
+          >
+            {submitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Enviando...
+              </>
+            ) : (
+              'Enviar código de acesso'
+            )}
+          </Button>
+        </form>
         <p className="mt-4 text-center text-sm text-muted-foreground">
           Já tem conta?{' '}
           <Link href="/login" className="underline">
