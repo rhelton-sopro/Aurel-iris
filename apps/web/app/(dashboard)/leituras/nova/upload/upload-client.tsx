@@ -234,6 +234,19 @@ export function UploadClient({
           'detail:',
           diag,
         )
+        // Beacon de diagnóstico (temporário): erro real pro servidor (logs).
+        void fetch('/api/debug/upload-error', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            src: 'upload-client',
+            slot: currentSlotIdx + 1,
+            eye: SEQUENCE[currentSlotIdx].eye,
+            angle: SEQUENCE[currentSlotIdx].angle,
+            diag,
+          }),
+          keepalive: true,
+        }).catch(() => {})
         // DIAGNÓSTICO TEMPORÁRIO (2026-05-19): iPhone Chrome não tem devtools —
         // expõe a causa real do Supabase no toast. Reverter após diagnosticar.
         toast.error(`Falha ao salvar imagem ${currentSlotIdx + 1}/6: ${diag}`, {
