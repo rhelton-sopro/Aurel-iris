@@ -119,11 +119,14 @@ describe('lib/anthropic/prompts — file content (Plan 21 — 16-section Iris Co
     expect(sys).toContain('fala com a ALMA')
     expect(sys).toMatch(/Três padrões poéticos/i)
     expect(sys).toMatch(/Zero vocabulário somático/i)
-    // 07.4-36: ceiling widened to 15-30 words; the OLD 15-25 must be gone.
-    expect(sys).toMatch(/15-30 palavras/)
+    // UAT 2026-05-19: ceiling widened 50→60 words; OLD 15-25/15-30/15-50
+    // must all be gone (stale-ref guard — same rot we killed in the prompt).
+    expect(sys).toMatch(/15-60 palavras/)
     expect(sys).not.toMatch(/15-25 palavras/)
-    // Hard length-regen contract: >30 words ⇒ regenerate (founder Check 1).
-    expect(sys).toMatch(/mais de 30 palavras/i)
+    expect(sys).not.toMatch(/15-30 palavras/)
+    expect(sys).not.toMatch(/15-50 palavras/)
+    // Hard length-regen contract: >60 words ⇒ regenerate (founder Check 1).
+    expect(sys).toMatch(/mais de 60 palavras/i)
     expect(sys).toMatch(/regerar/i)
     // The OLD "antes da seção 1" essence instruction must be GONE.
     expect(sys).not.toMatch(/primeir[íi]ssimo conte[úu]do/i)
