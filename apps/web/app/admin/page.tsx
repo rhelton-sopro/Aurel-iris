@@ -25,6 +25,12 @@ const SECTIONS: Array<{
     description:
       'Revisar leituras de todos terapeutas e anotar para calibração (Sonnet/SAM/comparar/re-parsers).',
   },
+  {
+    href: '/admin/relatorios',
+    title: 'Relatórios',
+    description:
+      'Métricas gerenciais do beta: funil de leituras, qualidade das fotos (aproveitamento da captura), custo AI e throughput por terapeuta. Filtro por data.',
+  },
 ]
 
 export default async function AdminPortalPage() {

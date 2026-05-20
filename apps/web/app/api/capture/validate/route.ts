@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { NextResponse, type NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/service'
 
 // Force Node.js runtime — Anthropic SDK não roda em Edge runtime.
 export const runtime = 'nodejs'
@@ -8,6 +9,12 @@ export const runtime = 'nodejs'
 // Modelo: Claude Haiku 4.5 (vision-capable, baixo custo, rápido).
 // Não trocar pra modelos mais antigos sem re-validar accuracy do gate.
 const MODEL = 'claude-haiku-4-5-20251001'
+
+// Tabela de preços Haiku 4.5 (USD/MTok, ref. 2026-01). Local porque
+// só este endpoint estima custo; se outro endpoint precisar, mover p/
+// lib/anthropic/pricing.ts.
+const HAIKU_IN_USD_PER_MTOK = 0.80
+const HAIKU_OUT_USD_PER_MTOK = 4.00
 
 // max_tokens conservador — esperamos JSON curto. Margem pra raciocínio
 // inline se Haiku decidir verbalizar antes do JSON.
@@ -143,6 +150,7 @@ export async function POST(request: NextRequest) {
   const client = new Anthropic({ apiKey, timeout: REQUEST_TIMEOUT_MS })
 
   let response
+  const anthropicStart = Date.now()
   try {
     response = await client.messages.create({
       model: MODEL,
@@ -217,6 +225,43 @@ export async function POST(request: NextRequest) {
   const reason = (VALID_REASON_VALUES as readonly string[]).includes(parsed.reason)
     ? (parsed.reason as (typeof VALID_REASON_VALUES)[number])
     : 'olho_detectado'
+
+  // Log best-effort em capture_attempts (migration 0023) — alimenta o
+  // /admin/relatorios (taxa de aproveitamento, custo Haiku, top reasons
+  // de recusa por terapeuta). NUNCA bloqueia a resposta: erro no insert
+  // só vai pro console, usuário recebe quality/reason normalmente.
+  const tokens_in = response.usage?.input_tokens ?? null
+  const tokens_out = response.usage?.output_tokens ?? null
+  const cost_estimate_usd =
+    tokens_in != null && tokens_out != null
+      ? (tokens_in * HAIKU_IN_USD_PER_MTOK + tokens_out * HAIKU_OUT_USD_PER_MTOK) /
+        1_000_000
+      : null
+  try {
+    const service = createServiceClient()
+    // `as never` porque types/database.ts ainda não tem capture_attempts
+    // (founder regenera os types após aplicar 0023). Insert continua
+    // validado pelos check constraints da migration.
+    const { error: logErr } = await service.from('capture_attempts' as never).insert({
+      therapist_id: user.id,
+      vlm_quality: quality,
+      vlm_reason: reason,
+      accepted: quality !== 'ruim',
+      image_bytes: body.imageBase64.length,
+      latency_ms: Date.now() - anthropicStart,
+      tokens_in,
+      tokens_out,
+      cost_estimate_usd,
+      model_version: response.model ?? MODEL,
+    } as never)
+    if (logErr) {
+      // Tabela ainda não existe (0023 não aplicada) OU RLS bloqueou
+      // service-role (não deveria — service bypassa). Não-fatal.
+      console.error('[capture/validate] capture_attempts insert falhou:', logErr.message)
+    }
+  } catch (err) {
+    console.error('[capture/validate] capture_attempts log skipped:', err instanceof Error ? err.message : err)
+  }
 
   return NextResponse.json({ quality, reason })
 }
