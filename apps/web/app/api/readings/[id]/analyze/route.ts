@@ -75,6 +75,14 @@ export async function POST(
     .eq('id', readingId)
     .maybeSingle()
 
+  // analysis_started_at (0027) em query separada — types/database.ts
+  // ainda não tem a coluna até founder regenerar.
+  const { data: progress } = await supabase
+    .from('readings')
+    .select('analysis_started_at' as never)
+    .eq('id', readingId)
+    .maybeSingle<{ analysis_started_at: string | null }>()
+
   if (readingError) {
     return NextResponse.json({ error: 'Database error' }, { status: 500 })
   }
@@ -109,6 +117,24 @@ export async function POST(
     )
   }
 
+  // Gate (f): "Already running" — evita duplo-spend se cliente clica
+  // Gerar 2x ou se fechou aba no meio (handler continua server-side;
+  // segundo POST encontraria started_at preenchido). 5min é o teto
+  // de tolerância (Sonnet stream ~150s + finalize). Após isso, libera.
+  // FIX 2026-05-20 founder UAT: o caso real foi exatamente este —
+  // fechou página → 2º click duplicou custo + regeneration_count.
+  const startedAt = progress?.analysis_started_at ?? null
+  if (startedAt) {
+    const ageMs = Date.now() - new Date(startedAt).getTime()
+    if (ageMs < 5 * 60 * 1000) {
+      return NextResponse.json(
+        { error: 'Análise em andamento — aguarde terminar antes de regenerar.' },
+        { status: 409 },
+      )
+    }
+    // started_at > 5min = considerado handler morto, deixa rodar de novo.
+  }
+
   const clientName =
     (reading.client as { full_name?: string } | null)?.full_name ?? 'Cliente'
   const clientBirth =
@@ -130,14 +156,31 @@ export async function POST(
     )
   }
 
+  // Marca "em curso" ANTES de abrir o stream — caller pode fechar a
+  // aba a qualquer momento, mas o handler continua até finalize. O CLEAR
+  // do started_at fica no try-final + catch abaixo (controller.start).
+  // Service-role pra garantir UPDATE mesmo se sessão tiver lifecycle
+  // estranho durante o stream longo (~150s).
+  await service
+    .from('readings')
+    .update({ analysis_started_at: new Date().toISOString() } as never)
+    .eq('id', readingId)
+
   // Open the Sonnet-direct stream (same {stream,finalize} contract).
+  // IMPORTANTE: NÃO passamos request.signal. Antes (founder UAT 2026-05-20
+  // bug), o signal abortava o llmStream quando cliente fechava a página
+  // → analysis.finalize() nunca rodava → audit/log/cost não persistiam +
+  // sections parciais ficavam sem o último update. Em Vercel Fluid
+  // Compute, o handler continua até completar mesmo após cliente
+  // desconectar (até maxDuration=300s). Trade-off aceito: cliente
+  // abusivo pagaria Sonnet completo mesmo se cancelar — mitigado pelo
+  // gate (f) "already running" acima.
   const analysis = await analyzeReadingDirect({
     readingId,
     therapistId: user.id,
     images: prep.images,
     clientName,
     clientAge,
-    signal: request.signal,
   })
 
   const encoder = new TextEncoder()
@@ -147,10 +190,23 @@ export async function POST(
 
   const responseStream = new ReadableStream({
     async start(controller) {
+      // Helper: enqueue silencioso. Quando cliente desconecta, o controller
+      // entra em estado fechado e .enqueue() throw — sem este try, o erro
+      // mata o for-await e o finalize() nunca roda (era exatamente o bug
+      // do founder UAT 2026-05-20). Agora ignoramos; o handler segue
+      // até completar e persistir tudo no DB.
+      const enqueueSilent = (chunk: Uint8Array): void => {
+        try {
+          controller.enqueue(chunk)
+        } catch {
+          // controller fechado pelo client disconnect — no-op, segue.
+        }
+      }
+
       try {
         for await (const text of analysis.stream) {
           buffer += text
-          controller.enqueue(encoder.encode(text))
+          enqueueSilent(encoder.encode(text))
 
           const boundaries = findAllBoundaries(buffer)
           if (boundaries.length > lastBoundaryCount) {
@@ -268,7 +324,11 @@ export async function POST(
         revalidatePath(`/leituras/${readingId}/editar`)
         revalidatePath('/leituras')
 
-        controller.close()
+        try {
+          controller.close()
+        } catch {
+          // already closed by client disconnect — no-op
+        }
       } catch (err) {
         console.error(
           '[analyze] stream error reading=' + readingId + ' err=',
@@ -286,14 +346,26 @@ export async function POST(
               })
               .eq('id', readingId)
           }
-          controller.enqueue(
+          enqueueSilent(
             encoder.encode(
               '\n\n[erro]: ' + (err instanceof Error ? err.message : 'desconhecido'),
             ),
           )
         } finally {
-          controller.close()
+          try {
+            controller.close()
+          } catch {
+            // already closed — no-op
+          }
         }
+      } finally {
+        // CLEAR analysis_started_at — libera próxima geração (independente
+        // de sucesso/erro). Sem isso, started_at ficaria "permanente" até
+        // o stale-window de 5min, bloqueando o terapeuta de regenerar.
+        await service
+          .from('readings')
+          .update({ analysis_started_at: null } as never)
+          .eq('id', readingId)
       }
     },
 

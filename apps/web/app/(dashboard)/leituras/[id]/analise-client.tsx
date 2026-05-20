@@ -41,6 +41,14 @@ export interface AnaliseClientProps {
   hasInitialReport: boolean
   regenerationCount: number
   isDelivered: boolean
+  /**
+   * Server-side flag: análise rodando agora (started_at < 5min, sem
+   * finalize ainda). Quando true, esconde o CTA "Gerar análise" pra
+   * evitar duplo-click (gate server-side já bloqueia, mas UI clara
+   * é melhor que erro 409). Página tem AutoRefresh que recarrega
+   * quando terminar.
+   */
+  isAnalysisInProgress?: boolean
 }
 
 export function AnaliseClient({
@@ -48,6 +56,7 @@ export function AnaliseClient({
   hasInitialReport,
   regenerationCount,
   isDelivered,
+  isAnalysisInProgress = false,
 }: AnaliseClientProps) {
   const router = useRouter()
   const [streaming, setStreaming] = useState(false)
@@ -99,6 +108,16 @@ export function AnaliseClient({
       setStreaming(false)
     }
   }, [readingId, router, streaming])
+
+  // In-progress server-side (handler rodando após cliente fechar): UI
+  // espera sem CTA. Auto-refresh server-side já atualiza quando terminar.
+  if (isAnalysisInProgress && !streaming) {
+    return (
+      <div className="rounded-md border border-border bg-card px-4 py-6 text-center text-sm text-muted-foreground">
+        Aguardando análise terminar…
+      </div>
+    )
+  }
 
   return (
     <>

@@ -53,6 +53,15 @@ export default async function LeituraDetailPage({
     .eq('id', readingId)
     .maybeSingle()
 
+  // analysis_started_at vem em query separada porque types/database.ts
+  // ainda não tem a coluna (founder regenera após aplicar 0027). Cast
+  // 'as never' isola o type-check; RLS authed garante isolation.
+  const { data: progress } = await supabase
+    .from('readings')
+    .select('analysis_started_at' as never)
+    .eq('id', readingId)
+    .maybeSingle<{ analysis_started_at: string | null }>()
+
   if (error || !reading) notFound()
 
   // Marca como "vista pelo terapeuta" — derruba o badge de notificação
@@ -79,6 +88,16 @@ export default async function LeituraDetailPage({
   const reportToShow = (reportDelivered ?? reportGenerated) as Record<string, string>
   const reportGeneratedAt =
     (reading as { report_generated_at?: string }).report_generated_at ?? null
+
+  // Geração em andamento (0027): set no início do POST /analyze, clear
+  // no finalize. Janela de 5min (após isso, considera handler morto
+  // — UI libera retry). FIX founder UAT 2026-05-20.
+  const analysisStartedAt = progress?.analysis_started_at ?? null
+  const isAnalysisInProgress = (() => {
+    if (!analysisStartedAt) return false
+    const ageMs = Date.now() - new Date(analysisStartedAt).getTime()
+    return ageMs < 5 * 60 * 1000
+  })()
 
   // Phase 7.4 Sonnet-direct: signal (no hard block) when ≥1 photo was read
   // from a non-iris-centered frame (canonicalization fallback).
@@ -129,7 +148,7 @@ export default async function LeituraDetailPage({
   // Preserved AnalysisHero + AnaliseClient path.
   return (
     <div className="space-y-6 px-6 py-8">
-      <AutoRefreshWhileProcessing active={status === 'processing'} />
+      <AutoRefreshWhileProcessing active={status === 'processing' || isAnalysisInProgress} />
       <div className="flex items-center justify-between">
         <Link
           href="/leituras"
@@ -150,6 +169,17 @@ export default async function LeituraDetailPage({
         <StatusBadge status={status as never} />
       </div>
 
+      {isAnalysisInProgress && (
+        <div className="rounded-md border-2 border-amber-500 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          <p className="font-medium">Análise em andamento</p>
+          <p className="mt-1 text-amber-900/90">
+            A geração do relatório está rodando no servidor (~2-3 minutos no
+            total). Esta página atualiza sozinha quando terminar — pode fechar e
+            voltar à vontade, a análise continua mesmo se você sair daqui.
+          </p>
+        </div>
+      )}
+
       <AnalysisHero
         readingId={readingId}
         hasReport={hasReport}
@@ -165,6 +195,7 @@ export default async function LeituraDetailPage({
           hasInitialReport={hasReport}
           regenerationCount={regenerationCount}
           isDelivered={isDelivered}
+          isAnalysisInProgress={isAnalysisInProgress}
         />
       </AnalysisHero>
     </div>
