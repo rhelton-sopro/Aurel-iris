@@ -55,6 +55,19 @@ export default async function LeituraDetailPage({
 
   if (error || !reading) notFound()
 
+  // Marca como "vista pelo terapeuta" — derruba o badge de notificação
+  // no /dashboard (0026 readings.seen_by_therapist_at). Idempotente:
+  // só atualiza se ainda for NULL; UPDATE WHERE seen IS NULL impede
+  // sobrescrever timestamp original em aberturas subsequentes.
+  // RLS authed garante que só o dono atualiza.
+  // Cast 'as never' temporário: types/database.ts ainda não tem a coluna
+  // (founder regenera depois de aplicar 0026).
+  await supabase
+    .from('readings')
+    .update({ seen_by_therapist_at: new Date().toISOString() } as never)
+    .eq('id', readingId)
+    .is('seen_by_therapist_at' as never, null)
+
   const clientName = (reading.client as { full_name?: string } | null)?.full_name ?? 'Cliente'
   const reportGenerated = reading.report_generated as Record<string, string> | null
   const reportDelivered = reading.report_delivered as Record<string, string> | null

@@ -23,6 +23,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { validateToken, markTokenUsed } from '@/lib/invite/tokens'
+import { markReadingReady } from '@/lib/readings/mark-ready'
 
 export const runtime = 'nodejs'
 
@@ -65,7 +66,7 @@ export async function POST(
   const service = createServiceClient()
   const { data: reading } = await service
     .from('readings')
-    .select('id, therapist_id, client_id')
+    .select('id, therapist_id, client_id, status')
     .eq('id', readingId)
     .maybeSingle()
   if (!reading || reading.therapist_id !== validation.token.therapist_id) {
@@ -104,22 +105,26 @@ export async function POST(
     }
   }
 
-  // Dispara pipeline. Internal fetch — auth via cookie do terapeuta
-  // NÃO existe aqui (cliente sem sessão). Os endpoints internos
-  // /api/capture/canonicalize e /api/readings/[id]/process EXIGEM
-  // sessão authed. Pra não bloquear o cliente, NÃO chamamos aqui.
+  // Marca a leitura como pronta (Modal aposentado em prod — Sonnet-direct
+  // lê os canonicals direto quando terapeuta clica "Gerar análise" depois).
+  // markReadingReady faz: status='ready' + CAS beta_counted +
+  // increment_beta_readings_used (founder UAT 2026-05-20: counter
+  // incrementa na transição pending→ready, idêntico ao path authed via
+  // /api/readings/[id]/process).
   //
-  // Modelo de "trigger eventual": a leitura fica em 'pending' até o
-  // terapeuta entrar em /leituras/[id] e o "AutoRefreshWhileProcessing"
-  // ou o botão "Reprocessar" disparar o pipeline com a sessão dele
-  // (RLS funciona — therapist_id da reading é dele). Founder valida
-  // esse modelo na 1ª leitura via convite; se for fricção, virar
-  // service-role trigger fica como TODO.
-  //
-  // Alternativa futura: criar endpoint internal-only token-authed
-  // (/api/internal/trigger?token=...&reading_id=...) que aceita um
-  // bearer secret tipo INTERNAL_TRIGGER_SECRET + service-role. Por
-  // hora, fica como "graceful degradation explícita".
+  // FIX 2026-05-20: antes, esta rota não disparava nada e a leitura
+  // ficava em 'pending' indefinidamente — terapeuta abria /leituras e
+  // via "aguardando" sem ação clara. Agora a leitura entra direto em
+  // 'ready' (mesmo estado do path authed após finalize).
+  const readyRes = await markReadingReady({
+    readingId,
+    currentStatus: reading.status,
+  })
+  if (readyRes.error) {
+    console.error(`[invite-finalize] markReadingReady falhou token=${token} reading=${readingId}: ${readyRes.error}`)
+    // Não bloqueia o cliente — leitura/fotos estão salvas; terapeuta
+    // pode usar "Reprocessar" no /leituras pra refazer.
+  }
 
   return NextResponse.json({ ok: true })
 }

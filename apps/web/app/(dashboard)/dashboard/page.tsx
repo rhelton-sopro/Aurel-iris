@@ -1,8 +1,13 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { SummaryCards } from '@/components/dashboard/summary-cards'
+import { InviteNotifications } from '@/components/dashboard/invite-notifications'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+
+// Notifications devem refletir aberturas de /leituras/[id] do mesmo
+// request (founder abre uma, volta pro dashboard — card tem que sumir).
+export const dynamic = 'force-dynamic'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -32,6 +37,7 @@ export default async function DashboardPage() {
           Fazer meu próprio exame
         </Link>
       </div>
+      <InviteNotifications />
       <SummaryCards
         clientsCount={clientsCount ?? 0}
         trialEndsAt={profile?.trial_ends_at ?? null}

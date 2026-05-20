@@ -23,6 +23,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { isModalPipelineEnabled } from '@/lib/vision/pipeline-flag'
+import { markReadingReady } from '@/lib/readings/mark-ready'
 import {
   ModalTriggerError,
   triggerVisionPipeline,
@@ -76,36 +77,18 @@ export async function POST(
   // set; the analyze gate (status==='ready') is unchanged. Reversible: set
   // MODAL_PIPELINE_ENABLED=true to restore the old path below.
   if (!isModalPipelineEnabled()) {
-    const svc = createServiceClient()
-    const { error: readyError } = await svc
-      .from('readings')
-      .update({ status: 'ready' })
-      .eq('id', readingId)
-    if (readyError) {
-      return NextResponse.json(
-        { error: `Mark-ready failed: ${readyError.message}` },
-        { status: 500 },
-      )
-    }
-    // Beta cap: conta esta leitura EXATAMENTE 1x, na 1ª saída de 'pending'
-    // (ponto real de consumo em prod — Modal aposentado → caminho é
-    // pending→ready, não pending→processing). CAS em beta_counted torna
-    // idempotente vs reprocess/regen/duplo-fire; o tally durável vive em
-    // profiles → apagar a leitura nunca libera vaga. (Branch Modal está
-    // retirado; se reativar, replicar este bloco lá.)
-    if (reading.status === 'pending') {
-      const { data: claimed } = await svc
-        .from('readings')
-        .update({ beta_counted: true })
-        .eq('id', readingId)
-        .eq('beta_counted', false)
-        .select('therapist_id')
-        .maybeSingle()
-      if (claimed?.therapist_id) {
-        await svc.rpc('increment_beta_readings_used', {
-          p_therapist: claimed.therapist_id,
-        })
-      }
+    // Lógica de "marca ready + CAS beta_counted" extraída p/ função
+    // compartilhada (lib/readings/mark-ready.ts) — chamada também por
+    // /api/convite/[token]/finalize (path público sem sessão authed).
+    // Esta rota mantém seu próprio auth gate (linhas 44-69) que cobre
+    // os 3 callers authed (finalizeReadingAction + ReprocessButton +
+    // Modal webhook quando ativo).
+    const result = await markReadingReady({
+      readingId,
+      currentStatus: reading.status,
+    })
+    if (result.error) {
+      return NextResponse.json({ error: result.error }, { status: 500 })
     }
     revalidatePath('/leituras')
     return new NextResponse(null, { status: 202 })
