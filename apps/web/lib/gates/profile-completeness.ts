@@ -2,7 +2,11 @@
 // Importado pelo Zod (app/actions/clients.ts) E pelo gate — zero drift.
 // Pura, sem side-effects, sem 'use server' — unit-testável isolada.
 
-export const MIN_AGE = 18 as const
+// Beta de testes 2026-05-20: cadastro de menores liberado p/ permitir
+// crianças (founder). RESTAURAR p/ 18 antes do GA — fonte única; flip
+// cascateia em Zod (actions/clients.ts, actions/profile.ts), client-form
+// gate inline e evaluateProfileCompleteness.
+export const MIN_AGE = 0 as const
 
 export type ProfileGap =
   | 'full_name'
