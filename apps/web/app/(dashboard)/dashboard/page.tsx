@@ -1,12 +1,12 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { SummaryCards } from '@/components/dashboard/summary-cards'
-import { InviteNotifications } from '@/components/dashboard/invite-notifications'
+import { InviteReadingsSection } from '@/components/dashboard/invite-readings-section'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
-// Notifications devem refletir aberturas de /leituras/[id] do mesmo
-// request (founder abre uma, volta pro dashboard — card tem que sumir).
+// Seção de convite reflete leituras criadas em tempo real (cliente faz,
+// terapeuta vê na hora) e o flag "vista" muda no mesmo session.
 export const dynamic = 'force-dynamic'
 
 export default async function DashboardPage() {
@@ -37,7 +37,7 @@ export default async function DashboardPage() {
           Fazer meu próprio exame
         </Link>
       </div>
-      <InviteNotifications />
+      <InviteReadingsSection />
       <SummaryCards
         clientsCount={clientsCount ?? 0}
         trialEndsAt={profile?.trial_ends_at ?? null}
