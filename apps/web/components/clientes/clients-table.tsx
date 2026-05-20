@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Eye, Pencil, Trash2 } from 'lucide-react'
+import { Pencil, Trash2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { Input } from '@/components/ui/input'
 import { Button, buttonVariants } from '@/components/ui/button'
@@ -68,7 +68,12 @@ export function ClientsTable({ clients }: ClientsTableProps) {
               return (
               <TableRow key={client.id}>
                 <TableCell className="font-medium">
-                  {client.full_name}
+                  <Link
+                    href={`/clientes/${client.id}`}
+                    className="hover:underline focus-visible:underline outline-none"
+                  >
+                    {client.full_name}
+                  </Link>
                   {gate.status === 'incomplete' && (
                     <span className="ml-2 inline-block rounded bg-amber-100 text-amber-800 text-xs px-1.5 py-0.5 align-middle">
                       perfil incompleto
@@ -91,14 +96,6 @@ export function ClientsTable({ clients }: ClientsTableProps) {
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-1">
-                    <Link
-                      href={`/clientes/${client.id}`}
-                      title="Ver cliente"
-                      aria-label="Ver cliente"
-                      className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }))}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Link>
                     <Link
                       href={`/clientes/${client.id}/editar`}
                       title="Editar cliente"

@@ -22,7 +22,7 @@ import { ReprocessButton } from '@/components/readings/ReprocessButton'
 import { DeleteReadingDialog } from '@/components/readings/delete-reading-dialog'
 import { AutoRefreshWhileProcessing } from '@/components/readings/AutoRefreshWhileProcessing'
 
-type ClientRef = { full_name: string | null; is_self?: boolean | null }
+type ClientRef = { id?: string | null; full_name: string | null; is_self?: boolean | null }
 
 export interface ReadingRow {
   id: string
@@ -200,7 +200,16 @@ export function ReadingsListManager({
                 </TableCell>
                 {showClient && (
                   <TableCell className="font-medium">
-                    {client?.full_name ?? <span className="text-muted-foreground">—</span>}
+                    {client?.id && client?.full_name ? (
+                      <Link
+                        href={`/clientes/${client.id}`}
+                        className="hover:underline focus-visible:underline outline-none"
+                      >
+                        {client.full_name}
+                      </Link>
+                    ) : (
+                      client?.full_name ?? <span className="text-muted-foreground">—</span>
+                    )}
                     {client?.is_self && (
                       <Badge variant="secondary" className="ml-2">
                         Meu exame
