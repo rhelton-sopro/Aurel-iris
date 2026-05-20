@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Pencil, Trash2 } from 'lucide-react'
+import { Pencil, Trash2, Link as LinkIcon } from 'lucide-react'
 import { format } from 'date-fns'
 import { Input } from '@/components/ui/input'
 import { Button, buttonVariants } from '@/components/ui/button'
@@ -11,6 +11,7 @@ import {
   TableHeader, TableRow,
 } from '@/components/ui/table'
 import { DeleteClientDialog } from './delete-client-dialog'
+import { InviteLinkDialog } from './InviteLinkDialog'
 import { cn } from '@/lib/utils'
 import type { Database } from '@/types/database'
 import { evaluateProfileCompleteness } from '@/lib/gates/profile-completeness'
@@ -24,6 +25,7 @@ interface ClientsTableProps {
 export function ClientsTable({ clients }: ClientsTableProps) {
   const [query, setQuery] = useState('')
   const [deletingClient, setDeletingClient] = useState<Client | null>(null)
+  const [invitingClient, setInvitingClient] = useState<Client | null>(null)
 
   // Busca client-side case-insensitive (sem debounce para MVP)
   const filtered = clients.filter(c =>
@@ -96,6 +98,15 @@ export function ClientsTable({ clients }: ClientsTableProps) {
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      title="Convidar para leitura remota"
+                      aria-label="Convidar para leitura remota"
+                      onClick={() => setInvitingClient(client)}
+                    >
+                      <LinkIcon className="h-4 w-4" />
+                    </Button>
                     <Link
                       href={`/clientes/${client.id}/editar`}
                       title="Editar cliente"
@@ -127,6 +138,14 @@ export function ClientsTable({ clients }: ClientsTableProps) {
           client={deletingClient}
           open={!!deletingClient}
           onOpenChange={(open) => { if (!open) setDeletingClient(null) }}
+        />
+      )}
+
+      {invitingClient && (
+        <InviteLinkDialog
+          open={!!invitingClient}
+          onOpenChange={(open) => { if (!open) setInvitingClient(null) }}
+          client={{ id: invitingClient.id, full_name: invitingClient.full_name }}
         />
       )}
     </div>
