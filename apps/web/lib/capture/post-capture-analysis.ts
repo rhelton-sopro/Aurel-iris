@@ -40,16 +40,22 @@ export interface PostCaptureAnalysis {
 
 /**
  * @param blob JPEG original da câmera nativa (não recomprimido).
+ * @param inviteToken opcional — repassado p/ validateImageWithClaude. Quando
+ *   presente, o endpoint /api/capture/validate aceita token em vez de sessão
+ *   (path público /convite/[token]/capturar).
  *
  * Pipeline em paralelo:
  *  - decode (browser, ~50ms — só pra obter naturalWidth/Height)
  *  - EXIF camera detection (browser, ~10ms)
  *  - VLM validation (server roundtrip, ~500ms-1s)
  */
-export async function analyzeCapturedJpeg(blob: Blob): Promise<PostCaptureAnalysis> {
+export async function analyzeCapturedJpeg(
+  blob: Blob,
+  inviteToken?: string,
+): Promise<PostCaptureAnalysis> {
   // Disparam em paralelo. validateImageWithClaude faz seu próprio resize.
   const cameraDetectionPromise = detectCameraSource(blob)
-  const vlmValidationPromise = validateImageWithClaude(blob)
+  const vlmValidationPromise = validateImageWithClaude(blob, inviteToken)
 
   const url = URL.createObjectURL(blob)
   const img = new Image()

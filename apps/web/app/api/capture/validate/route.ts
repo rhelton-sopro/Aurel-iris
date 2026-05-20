@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { getPricingFor, computeCostUsd } from '@/lib/anthropic/pricing'
 import { parseUserAgent } from '@/lib/admin/device-ua'
+import { validateToken } from '@/lib/invite/tokens'
 
 // Force Node.js runtime — Anthropic SDK não roda em Edge runtime.
 export const runtime = 'nodejs'
@@ -103,20 +104,45 @@ const VALID_REASON_VALUES = [
   'olho_fechado',
 ] as const
 
-export async function POST(request: NextRequest) {
-  // Auth gate — só terapeuta autenticado consome o endpoint (e a quota Anthropic).
-  const supabase = await createClient()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (!user || authError) {
-    return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
-  }
+interface ValidateBody {
+  imageBase64?: unknown
+  /**
+   * Auth alternativo p/ path PÚBLICO /convite/[token]/capturar.
+   * Quando presente, valida o token em vez de exigir sessão Supabase.
+   * therapist_id atribuído ao log = token.therapist_id (não auth.uid()).
+   */
+  inviteToken?: unknown
+}
 
-  // Parse + validate body.
-  let body: ValidateRequestBody
+export async function POST(request: NextRequest) {
+  // Parse body cedo pra ler inviteToken antes do auth (path público
+  // /convite/[token]/capturar não tem sessão).
+  let body: ValidateBody
   try {
-    body = (await request.json()) as ValidateRequestBody
+    body = (await request.json()) as ValidateBody
   } catch {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
+  }
+
+  // Auth: ou sessão de terapeuta OU inviteToken válido.
+  // therapist_id pra log = uid da sessão OU therapist_id do token.
+  let therapistId: string | null = null
+  if (typeof body.inviteToken === 'string' && body.inviteToken.length > 0) {
+    const validation = await validateToken(body.inviteToken)
+    if (validation.status !== 'ok') {
+      return NextResponse.json(
+        { error: `Token ${validation.status}` },
+        { status: validation.status === 'not_found' ? 404 : 410 },
+      )
+    }
+    therapistId = validation.token.therapist_id
+  } else {
+    const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (!user || authError) {
+      return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
+    }
+    therapistId = user.id
   }
 
   if (typeof body.imageBase64 !== 'string' || body.imageBase64.length === 0) {
@@ -244,7 +270,7 @@ export async function POST(request: NextRequest) {
     // (founder regenera os types após aplicar 0023/0024). Insert continua
     // validado pelos check constraints da migration.
     const { error: logErr } = await service.from('capture_attempts' as never).insert({
-      therapist_id: user.id,
+      therapist_id: therapistId,
       vlm_quality: quality,
       vlm_reason: reason,
       accepted: quality !== 'ruim',

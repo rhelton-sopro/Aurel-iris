@@ -116,8 +116,15 @@ async function resizeBlobToBase64(blob: Blob): Promise<string> {
  * Valida se a foto contém um olho humano com íris visível adequada para
  * análise iridológica. Retorna fallback graceful (valid:true) em caso de
  * erro de rede/timeout — não bloqueia o terapeuta.
+ *
+ * @param inviteToken opcional — quando presente, o body inclui o token
+ *  para o endpoint /api/capture/validate aceitar como auth alternativo
+ *  (path público /convite/[token]/capturar não tem sessão Supabase).
  */
-export async function validateImageWithClaude(blob: Blob): Promise<ValidationResult> {
+export async function validateImageWithClaude(
+  blob: Blob,
+  inviteToken?: string,
+): Promise<ValidationResult> {
   // Fallback graceful em qualquer falha de rede/timeout/parse: assume 'boa'
   // (não 'excelente' — não temos base pra afirmar isso) e não bloqueia o
   // terapeuta. Source='fallback' sinaliza no debug overlay que não houve
@@ -143,7 +150,7 @@ export async function validateImageWithClaude(blob: Blob): Promise<ValidationRes
     const res = await fetch('/api/capture/validate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ imageBase64 }),
+      body: JSON.stringify(inviteToken ? { imageBase64, inviteToken } : { imageBase64 }),
       signal: controller.signal,
     })
     window.clearTimeout(timeoutId)

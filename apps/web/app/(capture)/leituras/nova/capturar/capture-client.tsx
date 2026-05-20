@@ -14,6 +14,7 @@ import {
   type PostCaptureAnalysis,
 } from '@/lib/capture/post-capture-analysis'
 import { uploadWithRetry } from '@/lib/capture/upload'
+import { uploadInvite, finalizeInvite } from '@/lib/capture/upload-invite'
 import { createClient } from '@/lib/supabase/client'
 import {
   SEQUENCE,
@@ -59,6 +60,21 @@ interface CaptureClientProps {
   clientName: string
   capturedSlots: CapturedSlot[]
   resumeMode: boolean
+  /**
+   * Quando presente, ativa o modo CONVITE PÚBLICO (/convite/[token]/capturar):
+   * - uploads vão para /api/convite/[token]/upload (service-role + token-auth)
+   *   em vez de supabase direct (sem sessão);
+   * - validate-image gate inclui token no body;
+   * - finalize chama /api/convite/[token]/finalize em vez de
+   *   finalizeReadingAction (server action authed);
+   * - clientId é necessário pra finalize.
+   * Quando undefined, comportamento normal (terapeuta authed).
+   */
+  inviteToken?: string
+  /** Obrigatório se inviteToken setado. */
+  clientId?: string
+  /** Pra onde redirecionar quando finalize completa. Default '/leituras'. */
+  finalizeRedirect?: string
 }
 
 interface PendingPreview {
@@ -83,7 +99,14 @@ export function CaptureClient({
   clientName,
   capturedSlots: initialCaptured,
   resumeMode: _resumeMode,
+  inviteToken,
+  clientId,
+  finalizeRedirect,
 }: CaptureClientProps) {
+  const isInviteMode = Boolean(inviteToken)
+  if (isInviteMode && !clientId) {
+    throw new Error('CaptureClient: inviteToken requer clientId')
+  }
   const supabase = React.useMemo(() => createClient(), [])
   const router = useRouter()
 
@@ -123,7 +146,9 @@ export function CaptureClient({
     try {
       // Análise paralela: Laplacian + EXIF camera detection + VLM validation.
       // VLM substitui pupil detection (falha pixel-based em UAT 03).
-      const analysis = await analyzeCapturedJpeg(file)
+      // inviteToken é passado para o endpoint /api/capture/validate aceitar
+      // o token-auth quando o caller é o fluxo público /convite/[token]/capturar.
+      const analysis = await analyzeCapturedJpeg(file, inviteToken)
 
       // Bloqueio de câmera frontal detectada via EXIF (iPhone ~100% confiável).
       if (analysis.cameraDetection.kind === 'front') {
@@ -152,7 +177,7 @@ export function CaptureClient({
       toast.error('Falha ao processar imagem. Tente novamente.')
       setPhase('instruction')
     }
-  }, [slotIndex])
+  }, [slotIndex, inviteToken])
 
   // Lógica de upload — chamada direta quando cameraDetection é 'rear', OU
   // após confirmação manual via dialog quando 'unknown'. NÃO deve ser chamada
@@ -169,18 +194,32 @@ export function CaptureClient({
 
     const toastId = toast.loading(`Salvando imagem ${currentSlotIdx + 1}/6...`)
 
-    const uploadP = uploadWithRetry({
-      supabase,
-      blob: preview.blob,
-      width: preview.width,
-      height: preview.height,
-      therapistId,
-      readingId,
-      eye: SEQUENCE[currentSlotIdx].eye,
-      angle: SEQUENCE[currentSlotIdx].angle,
-      qualityScore: preview.qualityScore,
-      signal: ac.signal,
-    })
+    // Branch: convite (público, token-auth via API service-role) vs
+    // fluxo normal (terapeuta authed, supabase direct via RLS).
+    const uploadP = inviteToken
+      ? uploadInvite({
+          blob: preview.blob,
+          width: preview.width,
+          height: preview.height,
+          readingId,
+          eye: SEQUENCE[currentSlotIdx].eye,
+          angle: SEQUENCE[currentSlotIdx].angle,
+          qualityScore: preview.qualityScore,
+          inviteToken,
+          signal: ac.signal,
+        })
+      : uploadWithRetry({
+          supabase,
+          blob: preview.blob,
+          width: preview.width,
+          height: preview.height,
+          therapistId,
+          readingId,
+          eye: SEQUENCE[currentSlotIdx].eye,
+          angle: SEQUENCE[currentSlotIdx].angle,
+          qualityScore: preview.qualityScore,
+          signal: ac.signal,
+        })
     uploadPromisesRef.current.set(currentSlotIdx, uploadP)
     void uploadP
       .then(() => {
@@ -218,7 +257,7 @@ export function CaptureClient({
       setSlotIndex(next)
       setPhase('instruction')
     }
-  }, [pendingPreview, slotIndex, supabase, therapistId, readingId])
+  }, [pendingPreview, slotIndex, supabase, therapistId, readingId, inviteToken])
 
   // Gate de câmera: 'front' é bloqueado em handleFileSelected (toast + reject).
   // 'unknown' (EXIF stripado por iOS, ou device sem LensModel) confia no aviso
@@ -250,6 +289,23 @@ export function CaptureClient({
       // navega — garante que /leituras vai ler a nova leitura no SELECT.
       const pending = Array.from(uploadPromisesRef.current.values())
       if (pending.length > 0) await Promise.allSettled(pending)
+
+      if (inviteToken && clientId) {
+        // Modo convite: token-authed finalize via API (sem sessão). NÃO
+        // dispara pipeline aqui — terapeuta faz isso quando abrir
+        // /leituras/[id] (modelo de "graceful trigger" — ver
+        // /api/convite/[token]/finalize/route.ts).
+        try {
+          await finalizeInvite(inviteToken, readingId, clientId)
+        } catch (err) {
+          console.error('[capture-client] finalizeInvite error:', err)
+          toast.error('Falha ao finalizar leitura. O terapeuta receberá mesmo assim.')
+          // Não para o redirect — leitura está salva, o terapeuta vê.
+        }
+        router.push(finalizeRedirect ?? `/convite/${inviteToken}/obrigada`)
+        return
+      }
+
       const result = await finalizeReadingAction(readingId)
       if (result.error) {
         toast.error(`Falha ao finalizar leitura: ${result.error}`)
@@ -257,13 +313,13 @@ export function CaptureClient({
         return
       }
       toast.success('Leitura registrada.')
-      router.push('/leituras')
+      router.push(finalizeRedirect ?? '/leituras')
       // router.refresh() invalida o RSC cache do client; sem isso uma navegação
       // soft pode renderizar /leituras com a lista pré-captura.
       router.refresh()
     }
     void run()
-  }, [phase, readingId, router])
+  }, [phase, readingId, router, inviteToken, clientId, finalizeRedirect])
 
   React.useEffect(() => {
     const abortMap = slotAbortRefs.current
