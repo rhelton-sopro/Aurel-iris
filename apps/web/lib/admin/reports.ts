@@ -438,6 +438,82 @@ export async function fetchThroughput(
   }
 }
 
+// ── 5. APROVEITAMENTO POR DISPOSITIVO ─────────────────────────────────
+
+export interface DeviceBreakdownRow {
+  key: string         // os_family OU browser_family
+  total: number
+  accepted: number
+  rejected: number
+  aproveitamento_pct: number
+}
+
+export interface DeviceBreakdownStats {
+  // null se migration 0023 (capture_attempts) OU 0024 (device cols)
+  // ainda não aplicadas. Page mostra "—" no bloco.
+  by_os: DeviceBreakdownRow[] | null
+  by_browser: DeviceBreakdownRow[] | null
+  by_device_type: DeviceBreakdownRow[] | null
+}
+
+export async function fetchDeviceBreakdown(
+  range: DateRange,
+): Promise<DeviceBreakdownStats> {
+  const service = createServiceClient()
+  try {
+    const { data, error } = await service
+      .from('capture_attempts' as never)
+      .select('accepted, os_family, browser_family, device_type')
+      .gte('created_at', range.from)
+      .lte('created_at', range.to)
+    if (error) {
+      // Tabela existe mas algo deu errado — log e devolve nulls.
+      console.error('[reports] fetchDeviceBreakdown error:', error.message)
+      return { by_os: null, by_browser: null, by_device_type: null }
+    }
+    const rows = (data ?? []) as Array<{
+      accepted: boolean
+      os_family: string | null
+      browser_family: string | null
+      device_type: string | null
+    }>
+    // Se a tabela existe mas as colunas device ainda não (0023 sem 0024),
+    // todos os campos vêm null — agrega tudo em "unknown" silenciosamente.
+    return {
+      by_os: aggregateByKey(rows, (r) => r.os_family),
+      by_browser: aggregateByKey(rows, (r) => r.browser_family),
+      by_device_type: aggregateByKey(rows, (r) => r.device_type),
+    }
+  } catch {
+    return { by_os: null, by_browser: null, by_device_type: null }
+  }
+}
+
+function aggregateByKey<T extends { accepted: boolean }>(
+  rows: T[],
+  keyFn: (r: T) => string | null,
+): DeviceBreakdownRow[] {
+  const map = new Map<string, { total: number; accepted: number }>()
+  for (const r of rows) {
+    const k = keyFn(r) ?? 'unknown'
+    const cur = map.get(k) ?? { total: 0, accepted: 0 }
+    cur.total++
+    if (r.accepted) cur.accepted++
+    map.set(k, cur)
+  }
+  const out: DeviceBreakdownRow[] = []
+  for (const [key, v] of map.entries()) {
+    out.push({
+      key,
+      total: v.total,
+      accepted: v.accepted,
+      rejected: v.total - v.accepted,
+      aproveitamento_pct: pct(v.accepted, v.total),
+    })
+  }
+  return out.sort((a, b) => b.total - a.total)
+}
+
 // ── helpers ───────────────────────────────────────────────────────────
 
 function pct(n: number, d: number): number {

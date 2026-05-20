@@ -2,6 +2,8 @@ import Anthropic from '@anthropic-ai/sdk'
 import { NextResponse, type NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
+import { getPricingFor, computeCostUsd } from '@/lib/anthropic/pricing'
+import { parseUserAgent } from '@/lib/admin/device-ua'
 
 // Force Node.js runtime — Anthropic SDK não roda em Edge runtime.
 export const runtime = 'nodejs'
@@ -9,12 +11,6 @@ export const runtime = 'nodejs'
 // Modelo: Claude Haiku 4.5 (vision-capable, baixo custo, rápido).
 // Não trocar pra modelos mais antigos sem re-validar accuracy do gate.
 const MODEL = 'claude-haiku-4-5-20251001'
-
-// Tabela de preços Haiku 4.5 (USD/MTok, ref. 2026-01). Local porque
-// só este endpoint estima custo; se outro endpoint precisar, mover p/
-// lib/anthropic/pricing.ts.
-const HAIKU_IN_USD_PER_MTOK = 0.80
-const HAIKU_OUT_USD_PER_MTOK = 4.00
 
 // max_tokens conservador — esperamos JSON curto. Margem pra raciocínio
 // inline se Haiku decidir verbalizar antes do JSON.
@@ -226,21 +222,26 @@ export async function POST(request: NextRequest) {
     ? (parsed.reason as (typeof VALID_REASON_VALUES)[number])
     : 'olho_detectado'
 
-  // Log best-effort em capture_attempts (migration 0023) — alimenta o
-  // /admin/relatorios (taxa de aproveitamento, custo Haiku, top reasons
-  // de recusa por terapeuta). NUNCA bloqueia a resposta: erro no insert
-  // só vai pro console, usuário recebe quality/reason normalmente.
+  // Log best-effort em capture_attempts (migration 0023+0024) — alimenta
+  // o /admin/relatorios (taxa de aproveitamento, custo Haiku, top reasons
+  // de recusa por terapeuta, aproveitamento por dispositivo). NUNCA
+  // bloqueia a resposta: erro no insert só vai pro console.
   const tokens_in = response.usage?.input_tokens ?? null
   const tokens_out = response.usage?.output_tokens ?? null
-  const cost_estimate_usd =
-    tokens_in != null && tokens_out != null
-      ? (tokens_in * HAIKU_IN_USD_PER_MTOK + tokens_out * HAIKU_OUT_USD_PER_MTOK) /
-        1_000_000
-      : null
+  const model_version = response.model ?? MODEL
+  // Preço VIGENTE NA HORA da chamada (lookup em ai_model_pricing,
+  // fallback hardcoded se 0024 pendente). Custo persistido é o real
+  // daquela data — histórico fica congelado.
+  const pricing = await getPricingFor(model_version, new Date())
+  const cost_estimate_usd = computeCostUsd(tokens_in, tokens_out, pricing)
+  // UA parsing (0024): habilita o bloco "Aproveitamento por dispositivo".
+  // Pré-0024 (sem as colunas), o insert ignora os campos extra silenciosamente.
+  const ua = request.headers.get('user-agent')
+  const parsedUa = parseUserAgent(ua)
   try {
     const service = createServiceClient()
     // `as never` porque types/database.ts ainda não tem capture_attempts
-    // (founder regenera os types após aplicar 0023). Insert continua
+    // (founder regenera os types após aplicar 0023/0024). Insert continua
     // validado pelos check constraints da migration.
     const { error: logErr } = await service.from('capture_attempts' as never).insert({
       therapist_id: user.id,
@@ -252,7 +253,11 @@ export async function POST(request: NextRequest) {
       tokens_in,
       tokens_out,
       cost_estimate_usd,
-      model_version: response.model ?? MODEL,
+      model_version,
+      user_agent: ua,
+      device_type: parsedUa.device_type,
+      os_family: parsedUa.os_family,
+      browser_family: parsedUa.browser_family,
     } as never)
     if (logErr) {
       // Tabela ainda não existe (0023 não aplicada) OU RLS bloqueou

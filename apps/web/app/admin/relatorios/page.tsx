@@ -9,6 +9,7 @@ import {
   fetchQuality,
   fetchCost,
   fetchThroughput,
+  fetchDeviceBreakdown,
   resolveRange,
   type RangePreset,
 } from '@/lib/admin/reports'
@@ -51,11 +52,12 @@ export default async function RelatoriosAdminPage({
 
   // Fetch tudo em paralelo. fetchThroughput precisa do mapa de terapeutas.
   const therapistsMap = await fetchTherapistsMap()
-  const [funnel, quality, cost, throughput] = await Promise.all([
+  const [funnel, quality, cost, throughput, devices] = await Promise.all([
     fetchFunnel(range),
     fetchQuality(range),
     fetchCost(range),
     fetchThroughput(range, therapistsMap),
+    fetchDeviceBreakdown(range),
   ])
 
   return (
@@ -390,6 +392,39 @@ export default async function RelatoriosAdminPage({
           </div>
         </div>
       </Block>
+
+      {/* Bloco 5: Aproveitamento por dispositivo */}
+      <Block title="Aproveitamento por dispositivo (gate Haiku)">
+        {devices.by_os == null ? (
+          <p className="text-xs text-muted-foreground">
+            Migration 0023/0024 pendente — sem dados de capture_attempts /
+            device cols ainda. Aplique no Supabase pra popular este bloco.
+          </p>
+        ) : devices.by_os.length === 0 ? (
+          <p className="text-xs text-muted-foreground">
+            Sem tentativas de captura no período.
+          </p>
+        ) : (
+          <div className="space-y-4">
+            <div>
+              <h5 className="mb-1 text-xs text-muted-foreground">Por sistema operacional</h5>
+              <DeviceTable rows={devices.by_os} />
+            </div>
+            {devices.by_device_type && devices.by_device_type.length > 0 && (
+              <div>
+                <h5 className="mb-1 text-xs text-muted-foreground">Por tipo de aparelho</h5>
+                <DeviceTable rows={devices.by_device_type} />
+              </div>
+            )}
+            {devices.by_browser && devices.by_browser.length > 0 && (
+              <div>
+                <h5 className="mb-1 text-xs text-muted-foreground">Por navegador</h5>
+                <DeviceTable rows={devices.by_browser} />
+              </div>
+            )}
+          </div>
+        )}
+      </Block>
     </div>
   )
 }
@@ -422,6 +457,47 @@ function Block({ title, children }: { title: string; children: React.ReactNode }
       </h3>
       {children}
     </section>
+  )
+}
+
+function DeviceTable({
+  rows,
+}: {
+  rows: Array<{
+    key: string
+    total: number
+    accepted: number
+    rejected: number
+    aproveitamento_pct: number
+  }>
+}) {
+  return (
+    <div className="rounded-md border overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead className="border-b bg-muted/30 text-left text-muted-foreground">
+          <tr>
+            <th className="px-3 py-2 font-medium">Categoria</th>
+            <th className="px-3 py-2 font-medium text-right">Total</th>
+            <th className="px-3 py-2 font-medium text-right">Aceitas</th>
+            <th className="px-3 py-2 font-medium text-right">Recusadas</th>
+            <th className="px-3 py-2 font-medium text-right">Aproveit.</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr key={r.key} className="border-t">
+              <td className="px-3 py-2 font-medium">{r.key}</td>
+              <td className="px-3 py-2 text-right tabular-nums">{r.total.toLocaleString('pt-BR')}</td>
+              <td className="px-3 py-2 text-right tabular-nums">{r.accepted.toLocaleString('pt-BR')}</td>
+              <td className="px-3 py-2 text-right tabular-nums">{r.rejected.toLocaleString('pt-BR')}</td>
+              <td className="px-3 py-2 text-right tabular-nums">
+                {r.aproveitamento_pct.toFixed(1)}%
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   )
 }
 
