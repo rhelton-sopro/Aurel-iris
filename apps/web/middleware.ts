@@ -8,10 +8,26 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 const PROTECTED_PATHS = ['/dashboard', '/clientes', '/leituras', '/assinatura']
 const ADMIN_PREFIX = '/admin'
+// Path público de convite — terapeuta gera link, cliente abre sem sessão
+// (faz cadastro + captura via token-auth). NÃO entra em PROTECTED_PATHS
+// nem no profile gate. Auth real é validação do token (service-role) no
+// path. Inclui /api/convite/* (uploads/finalize) e /api/capture/validate
+// (Haiku gate aceita Authorization: Bearer <token> em vez de sessão).
+const PUBLIC_INVITE_PREFIXES = ['/convite/', '/api/convite/']
 
 export async function middleware(request: NextRequest) {
-  const { supabase, supabaseResponse, user } = await updateSession(request)
   const pathname = request.nextUrl.pathname
+
+  // Bail-out cedo p/ rotas públicas de convite: nem corre updateSession
+  // (não precisa Supabase auth) e definitivamente não entra no profile
+  // gate. Sem isso, /convite/[token] em desktop sem cookie cairia em
+  // /login (PROTECTED_PATHS não cobre, mas updateSession ainda criaria
+  // overhead).
+  if (PUBLIC_INVITE_PREFIXES.some((p) => pathname.startsWith(p))) {
+    return NextResponse.next()
+  }
+
+  const { supabase, supabaseResponse, user } = await updateSession(request)
 
   // /admin/* — founder-only gate. Returns 404 (not 403) to avoid leaking
   // existence of admin routes to non-founders. Defense-in-depth: app/admin/layout.tsx

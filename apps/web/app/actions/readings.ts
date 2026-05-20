@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { resolveClientGate } from '@/lib/gates/client-gates'
 import { BETA_READING_CAP } from '@/lib/beta/config'
+import { isFounderEmail } from '@/lib/auth/founder'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
@@ -60,14 +61,25 @@ export async function createReadingAction(
   // leitura NÃO libera vaga). RLS de profiles permite o terapeuta ler a
   // própria linha.
   // Cap = fonte única em lib/beta/config (importado no topo).
-  const { data: betaProfile } = await supabase
-    .from('profiles')
-    .select('beta_readings_used')
-    .eq('id', user.id)
-    .maybeSingle()
-  if ((betaProfile?.beta_readings_used ?? 0) >= BETA_READING_CAP) {
-    return {
-      error: `Limite do beta atingido: ${BETA_READING_CAP} leituras realizadas. Fale com o suporte para liberar mais.`,
+  //
+  // REGRA DE CAP — convites & founder (2026-05-20, founder UAT):
+  //  - Founder (isFounderEmail) BYPASSA o cap. Razão: ele está rodando
+  //    testes em volume com clientes reais via /convite/[token] — cap=2
+  //    inviabilizaria. Bypass é só pra ele.
+  //  - Terapeutas NÃO-founder: convite via /convite/[token] CONTA no
+  //    plano deles igual qualquer outra leitura. Não há quota separada
+  //    pra convite. Quando o produto sair do beta, isso vira parte do
+  //    plano comercial — ver [[invite-link-cap-rules]].
+  if (!isFounderEmail(user.email)) {
+    const { data: betaProfile } = await supabase
+      .from('profiles')
+      .select('beta_readings_used')
+      .eq('id', user.id)
+      .maybeSingle()
+    if ((betaProfile?.beta_readings_used ?? 0) >= BETA_READING_CAP) {
+      return {
+        error: `Limite do beta atingido: ${BETA_READING_CAP} leituras realizadas. Fale com o suporte para liberar mais.`,
+      }
     }
   }
 
