@@ -115,42 +115,50 @@ export function getSlotProgressLabel(slotIndex: number): string {
 /**
  * Copy de instrução por slot, exibida na AngleInterstitial antes de cada foto.
  *
- * PROTOCOLO REVISTO 2026-05-12 (founder testou empiricamente no iPhone):
+ * PROTOCOLO REVISTO 2026-05-20 (founder UAT — empírico: leitura ficou
+ * melhor com 2 com flash + 1 sem por olho):
  *  - CLIENTE fica FIXO olhando para um ponto na parede; NÃO gira o corpo.
  *  - TERAPEUTA muda a posição da CÂMERA entre as 3 fotos da mesma íris:
- *      frontal   → câmera direta à íris
- *      lateral   → câmera inclinada ~15° à DIREITA do terapeuta
- *      backlight → câmera inclinada ~15° à ESQUERDA do terapeuta
- *  - FLASH ATIVO em todas as fotos (revela fibras radiais; pupila contrai
- *    naturalmente; reflexo localizado é pequeno e não atrapalha).
+ *      frontal   → câmera direta à íris            · COM FLASH
+ *      lateral   → câmera inclinada ~15° à direita · COM FLASH
+ *      backlight → câmera inclinada ~15° à esquerda · SEM FLASH
+ *  - Razão das 2 fotos com flash: fibras radiais nítidas + colorimetria
+ *    consistente. Razão da 3ª sem flash: revela pigmento real (sem
+ *    branqueamento do reflexo especular) e melhora a leitura.
+ *  - O nome 'backlight' do schema (path no Storage, coluna `angle` em
+ *    reading_images) volta a fazer sentido — é a foto sem iluminação
+ *    direta. Compatibilidade do schema preservada.
  *
- * Razão: o protocolo antigo (cliente gira ~90°) deslocava a íris muito
- * entre as 3 fotos, frustrando convergência geométrica do photometric
- * stereo (Phase 07.1.5 B_INFEASIBLE). Tilt sutil de câmera mantém a íris
- * geometricamente próxima entre fotos enquanto varia a iluminação o
- * suficiente pra photometric stereo funcionar.
+ * Histórico:
+ *   2026-05-12: protocolo "tilt + flash em todas" (substituía o antigo
+ *   "cliente gira 90°" que matava convergência do photometric stereo).
+ *   2026-05-20: founder UAT empírica → 3ª sem flash dá leitura melhor.
  */
 export function getSlotInstructionCopy(
   slot: Slot,
   slotIndex: number,
   mode: CaptureMode = 'camera',
-): { heading: string; subtitle: string; cta: string } {
+): { heading: string; subtitle: string; cta: string; flashOn: boolean } {
   const eyeUpper = slot.eye === 'left' ? 'ESQUERDO' : 'DIREITO'
 
   let subtitle: string
   let angleLabel: string
+  let flashOn: boolean
   switch (slot.angle) {
     case 'frontal':
       angleLabel = 'Frente'
-      subtitle = `O cliente olha para um ponto fixo na parede, sem mover a cabeça. Mantenha a câmera de frente para o olho ${eyeUpper} e tire a foto com o flash ativado.`
+      flashOn = true
+      subtitle = `O cliente olha para um ponto fixo na parede, sem mover a cabeça. Mantenha a câmera de frente para o olho ${eyeUpper}. Tire esta foto COM flash.`
       break
     case 'lateral':
       angleLabel = 'Câmera à direita'
-      subtitle = 'O cliente continua olhando para o mesmo ponto fixo, sem mover a cabeça. Incline a câmera 15° para a direita e tire a foto com o flash ativado.'
+      flashOn = true
+      subtitle = 'O cliente continua olhando para o mesmo ponto fixo, sem mover a cabeça. Incline a câmera 15° para a direita. Tire esta foto COM flash.'
       break
     case 'backlight':
       angleLabel = 'Câmera à esquerda'
-      subtitle = 'O cliente continua olhando para o mesmo ponto fixo, sem mover a cabeça. Incline a câmera 15° para a esquerda e tire a foto com o flash ativado.'
+      flashOn = false
+      subtitle = 'O cliente continua olhando para o mesmo ponto fixo, sem mover a cabeça. Incline a câmera 15° para a esquerda. Tire esta foto SEM flash — esta é a 3ª foto deste olho, e revela o pigmento real sem o reflexo do flash.'
       break
   }
 
@@ -158,5 +166,6 @@ export function getSlotInstructionCopy(
     heading: `Foto ${slotIndex + 1} de ${SEQUENCE.length} — Olho ${eyeUpper} · ${angleLabel}`,
     subtitle,
     cta: mode === 'upload' ? 'Selecionar arquivo' : 'Abrir câmera',
+    flashOn,
   }
 }

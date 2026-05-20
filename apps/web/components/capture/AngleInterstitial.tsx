@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import { Zap, ZapOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { Slot, CaptureMode } from '@/lib/capture/sequence'
 import { getSlotInstructionCopy } from '@/lib/capture/sequence'
@@ -20,11 +21,12 @@ interface AngleInterstitialProps {
  * Tela fullscreen exibida antes de cada foto do fluxo de captura nativa.
  * Copy é específica do slot (frontal/câmera-à-direita/câmera-à-esquerda).
  *
- * PROTOCOLO REVISTO 2026-05-12: cliente fica fixo olhando para um ponto;
- * terapeuta inclina levemente a câmera entre as 3 fotos. FLASH ATIVO em
- * todas as fotos (revela fibras radiais; reverte política anterior). Ver
- * comentário em sequence.ts:getSlotInstructionCopy para detalhes do
- * protocolo e razão da revisão.
+ * PROTOCOLO REVISTO 2026-05-20 (founder UAT empírico): 2 fotos COM flash
+ * (frontal+lateral) + 1 SEM flash (backlight) por olho. O card de flash
+ * é o elemento visual dominante da tela — alto contraste (amarelo/preto
+ * quando LIGAR, vermelho/branco quando DESLIGAR) pra deixar impossível
+ * o terapeuta esquecer de ajustar entre fotos. Ver
+ * sequence.ts:getSlotInstructionCopy para a tabela completa.
  */
 export function AngleInterstitial({ nextSlot, slotIndex, onProceed, mode }: AngleInterstitialProps) {
   const copy = getSlotInstructionCopy(nextSlot, slotIndex, mode)
@@ -36,33 +38,81 @@ export function AngleInterstitial({ nextSlot, slotIndex, onProceed, mode }: Angl
       aria-modal="true"
       className="absolute inset-0 z-50 bg-background text-foreground flex flex-col items-center justify-center px-6 pt-[calc(env(safe-area-inset-top)+128px)] pb-12 motion-safe:animate-in motion-safe:fade-in motion-safe:duration-300"
     >
-      <div className="flex flex-col items-center gap-8 max-w-sm w-full">
-        <div className="text-center space-y-3">
+      <div className="flex flex-col items-center gap-6 max-w-sm w-full">
+        <div className="text-center space-y-2">
           <h1 className="text-xl font-semibold">{copy.heading}</h1>
           <p className="text-base text-muted-foreground">{copy.subtitle}</p>
         </div>
 
-        <div className="w-full bg-muted/60 border border-border rounded-lg px-4 py-3 text-left space-y-2">
-          <p className="text-sm font-medium text-foreground">Antes de fotografar</p>
-          <p className="text-sm text-foreground/80">
-            Use a câmera traseira (não a frontal) e ative o flash tocando no ícone do raio.
+        {/* CARD DOMINANTE — flash on/off. Alto contraste por design pra
+            impossibilitar erro entre fotos. */}
+        <FlashCard flashOn={copy.flashOn} />
+
+        {/* Lembretes secundários, compactos — não competem com o card. */}
+        <div className="w-full rounded-lg border border-border bg-muted/40 px-4 py-2.5 text-left space-y-1">
+          <p className="text-xs text-foreground/80">
+            • Câmera <strong>traseira</strong> (não a frontal).
           </p>
-          <p className="text-sm text-foreground/80">
-            A iluminação direta sobre o olho é o que revela as fibras radiais da íris — sem flash, a foto não serve para análise.
-          </p>
-          <p className="text-sm text-foreground/80">
-            Se o exame é da sua íris, peça a outra pessoa para fotografar você.
+          <p className="text-xs text-foreground/80">
+            • Se o exame é seu, peça a outra pessoa para fotografar você.
           </p>
         </div>
       </div>
 
-      <div className="mt-12 w-full max-w-sm pb-[env(safe-area-inset-bottom)]">
+      <div className="mt-8 w-full max-w-sm pb-[env(safe-area-inset-bottom)]">
         <Button
           onClick={onProceed}
           className="w-full h-12 text-base"
         >
           {copy.cta}
         </Button>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Card visual de flash. Dominante por design — alto contraste, ícone
+ * grande, texto uppercase bold. É o que o terapeuta enxerga primeiro
+ * ao abrir cada interstitial. Founder UAT 2026-05-20: tem que ser
+ * impossível ignorar.
+ */
+function FlashCard({ flashOn }: { flashOn: boolean }) {
+  if (flashOn) {
+    return (
+      <div
+        role="status"
+        aria-live="polite"
+        className="w-full rounded-lg border-2 border-amber-600 bg-amber-400 px-4 py-4 flex items-center gap-3 shadow-md"
+      >
+        <Zap className="h-10 w-10 flex-shrink-0 text-amber-950 fill-amber-950" strokeWidth={2.5} />
+        <div className="flex flex-col">
+          <span className="text-base font-extrabold uppercase tracking-wide text-amber-950 leading-tight">
+            Ligue o flash
+          </span>
+          <span className="text-xs text-amber-950/80 leading-tight mt-0.5">
+            Toque no ícone do raio na câmera antes de fotografar.
+          </span>
+        </div>
+      </div>
+    )
+  }
+  // SEM flash — tratamento mais agressivo porque é o erro mais provável
+  // (fácil esquecer de desligar entre fotos).
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className="w-full rounded-lg border-2 border-red-700 bg-red-600 px-4 py-4 flex items-center gap-3 shadow-md"
+    >
+      <ZapOff className="h-10 w-10 flex-shrink-0 text-white" strokeWidth={2.5} />
+      <div className="flex flex-col">
+        <span className="text-base font-extrabold uppercase tracking-wide text-white leading-tight">
+          Desligue o flash
+        </span>
+        <span className="text-xs text-white/90 leading-tight mt-0.5">
+          Esta é a 3ª foto deste olho. SEM flash — toque no raio pra desativar.
+        </span>
       </div>
     </div>
   )

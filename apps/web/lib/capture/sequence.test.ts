@@ -137,50 +137,62 @@ describe('getSlotProgressLabel', () => {
 })
 
 describe('getSlotInstructionCopy', () => {
-  // Protocolo revisto 2026-05-12: paciente fixo, câmera tilt + flash ativo.
-  // Substitui o protocolo antigo (paciente gira ~90°) que produzia íris
-  // geometricamente divergentes entre os 3 ângulos da mesma íris.
+  // Protocolo revisto 2026-05-20 (founder UAT empírico): cliente fixo,
+  // câmera tilt; 2 fotos COM flash (frontal+lateral) + 1 SEM flash
+  // (backlight) por olho. Substitui o protocolo 2026-05-12 que mandava
+  // flash em todas as 3.
 
-  it('foto 1 (left/frontal) instrui cliente fixo + câmera frontal + flash, SEM "continua" (AJUSTE 2 — é a primeira)', () => {
+  it('foto 1 (left/frontal) — COM flash, cliente fixo, SEM "continua" (é a primeira)', () => {
     const copy = getSlotInstructionCopy({ eye: 'left', angle: 'frontal' }, 0)
     expect(copy.heading).toContain('Foto 1 de 6')
     expect(copy.heading).toContain('ESQUERDO')
     expect(copy.heading).toContain('Frente')
     expect(copy.subtitle).toContain('olho ESQUERDO')
     expect(copy.subtitle).toContain('câmera de frente')
-    expect(copy.subtitle).toContain('flash ativado')
+    expect(copy.subtitle).toContain('COM flash')
     expect(copy.subtitle).toContain('ponto fixo')
     expect(copy.subtitle).not.toContain('continua')
+    expect(copy.flashOn).toBe(true)
     expect(copy.cta).toBe('Abrir câmera')
   })
 
-  it('foto 2 (left/lateral) instrui inclinar câmera 15° para a direita, cliente NÃO move a cabeça', () => {
+  it('foto 2 (left/lateral) — COM flash, inclinar câmera 15° para a direita', () => {
     const copy = getSlotInstructionCopy({ eye: 'left', angle: 'lateral' }, 1)
     expect(copy.heading).toContain('Foto 2 de 6')
     expect(copy.heading).toContain('Câmera à direita')
     expect(copy.subtitle).toContain('15° para a direita')
     expect(copy.subtitle).toContain('Incline a câmera')
-    expect(copy.subtitle).toContain('flash ativado')
+    expect(copy.subtitle).toContain('COM flash')
     expect(copy.subtitle).toContain('sem mover a cabeça')
     expect(copy.subtitle).toContain('continua')
+    expect(copy.flashOn).toBe(true)
   })
 
-  it('foto 3 (left/backlight) instrui inclinar câmera 15° para a esquerda, cliente NÃO move a cabeça', () => {
+  it('foto 3 (left/backlight) — SEM flash (3ª foto deste olho), inclinar câmera 15° para a esquerda', () => {
     const copy = getSlotInstructionCopy({ eye: 'left', angle: 'backlight' }, 2)
     expect(copy.heading).toContain('Foto 3 de 6')
     expect(copy.heading).toContain('Câmera à esquerda')
     expect(copy.subtitle).toContain('15° para a esquerda')
-    expect(copy.subtitle).toContain('flash ativado')
+    expect(copy.subtitle).toContain('SEM flash')
     expect(copy.subtitle).toContain('sem mover a cabeça')
     expect(copy.subtitle).toContain('continua')
+    expect(copy.flashOn).toBe(false)
   })
 
-  it('foto 4 (right/frontal) repete o padrão frontal para olho DIREITO', () => {
+  it('foto 4 (right/frontal) — COM flash, repete o padrão frontal para olho DIREITO', () => {
     const copy = getSlotInstructionCopy({ eye: 'right', angle: 'frontal' }, 3)
     expect(copy.heading).toContain('Foto 4 de 6')
     expect(copy.heading).toContain('DIREITO')
     expect(copy.subtitle).toContain('olho DIREITO')
-    expect(copy.subtitle).toContain('flash ativado')
+    expect(copy.subtitle).toContain('COM flash')
+    expect(copy.flashOn).toBe(true)
+  })
+
+  it('foto 6 (right/backlight) — SEM flash (3ª foto do olho direito)', () => {
+    const copy = getSlotInstructionCopy({ eye: 'right', angle: 'backlight' }, 5)
+    expect(copy.heading).toContain('Foto 6 de 6')
+    expect(copy.subtitle).toContain('SEM flash')
+    expect(copy.flashOn).toBe(false)
   })
 
   it('cta é "Abrir câmera" em todas as fotos', () => {
