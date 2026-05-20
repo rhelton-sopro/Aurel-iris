@@ -135,6 +135,13 @@ ancorado — é camada SOBRE a âncora, jamais atalho para pulá-la. A §3-(d)
 ancora na estrutura visível nomeada; esta ancora no padrão já
 estabelecido. Domínios diferentes de ancoragem, nunca alternativas.
 
+**Consistência gramatical (princípio geral, todas as seções):** mantenha
+concordância de gênero conforme cadastro do cliente (feminino/masculino),
+concordância verbal entre orações ligadas, e tempo verbal coerente dentro
+da mesma frase. Quando um padrão se formou no passado e segue ativo hoje,
+escolha um registro só (pretérito OU presente) e mantenha — evite
+"aprende … era" ou "carrega … carregava" dentro da mesma frase.
+
 ### Leitura visual — pigmento e lacuna são achados distintos
 
 Ao observar a íris, dois tipos de achado são clinicamente distintos e
