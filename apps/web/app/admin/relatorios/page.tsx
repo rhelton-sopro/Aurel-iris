@@ -3,6 +3,7 @@ import Link from 'next/link'
 
 import { createClient } from '@/lib/supabase/server'
 import { isFounderEmail } from '@/lib/auth/founder'
+import { REPORT_PROMPT_LABEL, getSystemPromptVersion } from '@/lib/anthropic/prompts'
 import {
   fetchTherapistsMap,
   fetchFunnel,
@@ -392,6 +393,19 @@ export default async function RelatoriosAdminPage({
           </div>
         </div>
       </Block>
+
+      {/* Versão atual do prompt de geração — referência rápida */}
+      <div className="rounded-md border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+        <span className="font-medium text-foreground">Prompt de relatório:</span>{' '}
+        <span className="font-mono">{REPORT_PROMPT_LABEL}</span>
+        <span className="ml-2 text-muted-foreground/70">
+          (sha <span className="font-mono">{getSystemPromptVersion()}</span>)
+        </span>
+        <span className="ml-2 text-muted-foreground/60">
+          — label humano em <span className="font-mono">lib/anthropic/prompts.ts</span>;
+          bumpe no commit de mudança de prompt.
+        </span>
+      </div>
 
       {/* Bloco 5: Aproveitamento por dispositivo */}
       <Block title="Aproveitamento por dispositivo (gate Haiku)">

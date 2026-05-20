@@ -55,6 +55,26 @@ export function loadSystemPrompt(): string {
 }
 
 /**
+ * Label humano da versão do prompt de geração de relatório (semver).
+ * Bumpe MANUALMENTE quando:
+ *   - major (v2.0.0): redesign estrutural (nova arquitetura de seções,
+ *     mudança de modelo, troca de método);
+ *   - minor (v1.1.0): mudança de comportamento (regra nova/removida,
+ *     seção nova, novo bloco de exemplos);
+ *   - patch (v1.0.1): polimento / correção de copy / threshold de
+ *     calibração / pequenas substituições.
+ *
+ * v1.0.0 = beta launch state pós-Plan 7.4-36 + UAT 2026-05-20 (essence
+ * phrase 60w + flash 2-com-1-sem-protocolo + sonnet-direct estável).
+ * Founder UAT-aprovado em iriscodex.com 2026-05-20.
+ *
+ * Pareado com getSystemPromptVersion() (sha curto) — label é o nome
+ * humano, sha é a impressão digital exata do conteúdo (varia a cada
+ * edit; label só varia quando você bumpa).
+ */
+export const REPORT_PROMPT_LABEL = 'v1.0.0' as const
+
+/**
  * Stable short fingerprint of the EFFECTIVE system.md content (12 hex chars
  * of sha256). Persisted per generation in `report_generations.prompt_version`
  * so production quality/cost shifts can be attributed to prompt iteration vs
