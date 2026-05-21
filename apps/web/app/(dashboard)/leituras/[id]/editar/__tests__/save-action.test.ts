@@ -192,12 +192,13 @@ describe('saveReportDelivered (D-A2 + WR-08 + CR-05)', () => {
 })
 
 describe('markReadingDelivered (CR-04 + SC2 + WR-08-existing)', () => {
-  it('BLOCK quando report_delivered é null (CR-04 empty-content gate)', async () => {
+  it('BLOCK quando report_delivered E report_generated ambos vazios (CR-04 evoluído)', async () => {
     const supabaseMock = createMockSupabase({
       reading: {
         id: VALID_READING_UUID,
         therapist_id: 'user-1',
         report_delivered: null,
+        report_generated: null,
         is_delivered: false,
         audit_metadata: VALID_AUDIT_META,
       },
@@ -206,16 +207,41 @@ describe('markReadingDelivered (CR-04 + SC2 + WR-08-existing)', () => {
 
     const result = await markReadingDelivered(VALID_READING_UUID)
 
-    expect(result.error).toBe('Salve a edição antes de entregar ao cliente.')
+    expect(result.error).toBe('Relatório ainda não foi gerado. Aguarde a análise concluir.')
     expect(supabaseMock.__update).not.toHaveBeenCalled()
   })
 
-  it('BLOCK quando report_delivered é objeto vazio {} (CR-04)', async () => {
+  it('SUCCESS quando report_delivered=null mas report_generated populado — fallback (2026-05-21)', async () => {
+    const supabaseMock = createMockSupabase({
+      reading: {
+        id: VALID_READING_UUID,
+        therapist_id: 'user-1',
+        report_delivered: null,
+        report_generated: VALID_REPORT_DELIVERED,
+        is_delivered: false,
+        audit_metadata: VALID_AUDIT_META,
+      },
+    })
+    vi.mocked(createClient).mockResolvedValueOnce(supabaseMock as never)
+
+    const result = await markReadingDelivered(VALID_READING_UUID)
+
+    expect(result.success).toBe(true)
+    expect(supabaseMock.__update).toHaveBeenCalled()
+    // Confirma que report_generated foi copiado pra report_delivered no UPDATE.
+    const updateArg = (supabaseMock.__update.mock.calls as unknown as Array<[Record<string, unknown>]>)[0][0]
+    expect(updateArg.is_delivered).toBe(true)
+    expect(updateArg.report_delivered).toEqual(VALID_REPORT_DELIVERED)
+    expect(updateArg.status).toBe('edited')
+  })
+
+  it('SUCCESS quando report_delivered={} mas report_generated populado — fallback (2026-05-21)', async () => {
     const supabaseMock = createMockSupabase({
       reading: {
         id: VALID_READING_UUID,
         therapist_id: 'user-1',
         report_delivered: {},
+        report_generated: VALID_REPORT_DELIVERED,
         is_delivered: false,
         audit_metadata: VALID_AUDIT_META,
       },
@@ -224,8 +250,8 @@ describe('markReadingDelivered (CR-04 + SC2 + WR-08-existing)', () => {
 
     const result = await markReadingDelivered(VALID_READING_UUID)
 
-    expect(result.error).toBe('Salve a edição antes de entregar ao cliente.')
-    expect(supabaseMock.__update).not.toHaveBeenCalled()
+    expect(result.success).toBe(true)
+    expect(supabaseMock.__update).toHaveBeenCalled()
   })
 
   it('BLOCK quando audit_metadata.low_anchor_rate=true (SC2 gate)', async () => {
@@ -270,7 +296,7 @@ describe('markReadingDelivered (CR-04 + SC2 + WR-08-existing)', () => {
     const result = await markReadingDelivered(VALID_READING_UUID)
 
     expect(result.error).toBe(
-      'Auditoria de ancoragem ausente ou pendente. Re-salve o relatório para re-rodar a auditoria.',
+      'Auditoria de ancoragem ausente. Re-gere a análise para re-rodar a auditoria.',
     )
     expect(supabaseMock.__update).not.toHaveBeenCalled()
   })

@@ -141,4 +141,21 @@ describe('components/readings/ReadingModeActions (Plan 7.4-18 — UAT-3 reading-
     // Dialog title appears
     expect(screen.getByText(/Entregar ao cliente\?/)).toBeDefined()
   })
+
+  it('autoexame (isSelfReading=true): hides "Entregar ao cliente" button (2026-05-21)', () => {
+    render(
+      <ReadingModeActions
+        readingId="reading-self"
+        regenerationCount={0}
+        isDelivered={false}
+        deliveredAt={null}
+        isSelfReading={true}
+      />,
+    )
+    // Outros 3 botões seguem renderizando — só o deliver é escondido
+    expect(screen.getByTestId('reading-mode-export-pdf')).toBeDefined()
+    expect(screen.getByTestId('reading-mode-edit')).toBeDefined()
+    expect(screen.getByTestId('reading-mode-regenerate')).toBeDefined()
+    expect(screen.queryByTestId('reading-mode-deliver')).toBeNull()
+  })
 })

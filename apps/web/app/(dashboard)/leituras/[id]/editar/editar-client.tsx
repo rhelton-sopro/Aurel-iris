@@ -18,6 +18,12 @@ export interface EditarClientProps {
   reportDelivered: Record<string, string> | null
   auditMetadata: AuditMetadata | null
   isDelivered: boolean
+  /** Autoexame: esconde "Entregar ao cliente" (terapeuta = cliente). */
+  isSelfReading?: boolean
+  /** Nome do cliente — usado no greeting do WhatsApp. */
+  clientName?: string
+  /** Telefone do cliente — opcional; sem ele, abre WhatsApp sem destinatário. */
+  clientPhone?: string | null
 }
 
 export function EditarClient({
@@ -26,6 +32,9 @@ export function EditarClient({
   reportDelivered: initialDelivered,
   auditMetadata,
   isDelivered,
+  isSelfReading = false,
+  clientName,
+  clientPhone,
 }: EditarClientProps) {
   const router = useRouter()
   const [pending, startTransition] = useTransition()
@@ -58,13 +67,54 @@ export function EditarClient({
   async function onDeliverConfirm() {
     setDeliverPending(true)
     try {
+      // Se tem edição local não salva, persiste primeiro — senão server cai
+      // no fallback report_generated e o trabalho do terapeuta seria descartado.
+      if (editedCount > 0) {
+        const saveResult = await saveReportDelivered(readingId, delivered)
+        if (saveResult.error) {
+          toast.error(`Falha ao salvar antes de entregar: ${saveResult.error}`)
+          return
+        }
+      }
       const result = await markReadingDelivered(readingId)
       if (result.error) {
         toast.error(result.error)
         return
       }
-      toast.success('Análise entregue. O cliente pode receber o relatório.')
       setDeliverOpen(false)
+
+      toast.success('Análise entregue. Gerando PDF…')
+      try {
+        const res = await fetch(`/api/readings/${readingId}/pdf`, { method: 'GET' })
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        const blob = await res.blob()
+        const cd = res.headers.get('Content-Disposition')
+        const m = cd?.match(/filename\*?=(?:UTF-8''|")?([^";]+)/)
+        const filename = m ? decodeURIComponent(m[1]!.replace(/^"|"$/g, '')) : `leitura-${readingId}.pdf`
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = filename
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        setTimeout(() => URL.revokeObjectURL(url), 500)
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'desconhecido'
+        toast.error(`PDF não baixou: ${msg}. Acesse a leitura e use Exportar PDF.`)
+        router.refresh()
+        return
+      }
+
+      const greeting = clientName ? `Olá, ${clientName}!` : 'Olá!'
+      const waMsg = `${greeting}\n\nSegue em anexo o relatório da sua leitura iridológica. Qualquer dúvida estou à disposição.`
+      const phoneDigits = clientPhone?.replace(/\D/g, '') ?? ''
+      const waUrl = phoneDigits
+        ? `https://wa.me/${phoneDigits}?text=${encodeURIComponent(waMsg)}`
+        : `https://wa.me/?text=${encodeURIComponent(waMsg)}`
+      window.open(waUrl, '_blank', 'noopener,noreferrer')
+
+      toast.success('PDF baixado. WhatsApp aberto — anexe o arquivo e envie.')
       router.refresh()
     } finally {
       setDeliverPending(false)
@@ -104,9 +154,11 @@ export function EditarClient({
               <Button variant="default" onClick={onSave} disabled={pending}>
                 {pending ? 'Salvando…' : 'Salvar edição'}
               </Button>
-              <Button variant="default" onClick={() => setDeliverOpen(true)}>
-                Entregar ao cliente
-              </Button>
+              {!isSelfReading && (
+                <Button variant="default" onClick={() => setDeliverOpen(true)}>
+                  Entregar ao cliente
+                </Button>
+              )}
             </div>
           </div>
         </div>

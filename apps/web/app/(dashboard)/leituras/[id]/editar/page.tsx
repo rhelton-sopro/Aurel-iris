@@ -32,14 +32,18 @@ export default async function LeituraEditarPage({
   const { data: reading, error } = await supabase
     .from('readings')
     .select(
-      'id, status, report_generated, report_delivered, audit_metadata, is_delivered, delivered_at, report_generated_at, client:clients(full_name)',
+      'id, status, report_generated, report_delivered, audit_metadata, is_delivered, delivered_at, report_generated_at, client:clients(id, full_name, phone, is_self)',
     )
     .eq('id', readingId)
     .maybeSingle()
   if (error || !reading) notFound()
 
-  const clientName =
-    (reading.client as { full_name?: string } | null)?.full_name ?? 'Cliente'
+  const clientRel = reading.client as
+    | { full_name?: string; phone?: string | null; is_self?: boolean }
+    | null
+  const clientName = clientRel?.full_name ?? 'Cliente'
+  const clientPhone = clientRel?.phone ?? null
+  const isSelfReading = clientRel?.is_self === true
   const isDelivered = reading.is_delivered ?? false
   const reportGeneratedAt = reading.report_generated_at ?? null
 
@@ -82,6 +86,9 @@ export default async function LeituraEditarPage({
         reportDelivered={reportDelivered}
         auditMetadata={auditMetadata}
         isDelivered={isDelivered}
+        isSelfReading={isSelfReading}
+        clientName={clientName}
+        clientPhone={clientPhone}
       />
     </div>
   )

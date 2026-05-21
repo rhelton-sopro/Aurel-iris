@@ -35,8 +35,9 @@ export function DeliverDialog({ open, onOpenChange, onConfirm, pending }: Delive
         <DialogHeader>
           <DialogTitle>Entregar ao cliente?</DialogTitle>
           <DialogDescription>
-            Após entregar, esta análise fica congelada e não poderá mais ser editada. Confirme
-            para prosseguir.
+            Ao confirmar: a análise fica congelada e não poderá mais ser editada, o PDF é
+            gerado e baixado pra este dispositivo, e o WhatsApp do cliente abre com uma mensagem
+            pré-pronta — você só precisa anexar o PDF e enviar.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex justify-end gap-2">

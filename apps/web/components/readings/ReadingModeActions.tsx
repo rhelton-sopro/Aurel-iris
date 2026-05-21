@@ -49,6 +49,12 @@ export interface ReadingModeActionsProps {
   regenerationCount: number
   isDelivered: boolean
   deliveredAt: string | null
+  /** Autoexame (terapeuta = cliente): esconde "Entregar ao cliente". */
+  isSelfReading?: boolean
+  /** Nome do cliente — usado no greeting do WhatsApp deeplink. */
+  clientName?: string
+  /** Telefone do cliente (E.164 ou só dígitos) — opcional; sem ele, abre WhatsApp sem destinatário. */
+  clientPhone?: string | null
 }
 
 export function ReadingModeActions({
@@ -56,6 +62,9 @@ export function ReadingModeActions({
   regenerationCount,
   isDelivered,
   deliveredAt,
+  isSelfReading = false,
+  clientName,
+  clientPhone,
 }: ReadingModeActionsProps) {
   const router = useRouter()
   const [deliverOpen, setDeliverOpen] = useState(false)
@@ -95,13 +104,49 @@ export function ReadingModeActions({
   async function onDeliverConfirm() {
     setDeliverPending(true)
     try {
+      // 1. Marca como entregue (flipa is_delivered, congela report_delivered).
       const result = await markReadingDelivered(readingId)
       if (result.error) {
         toast.error(result.error)
         return
       }
-      toast.success('Análise entregue. O cliente pode receber o relatório.')
       setDeliverOpen(false)
+
+      // 2. Gera + baixa o PDF (Gotenberg/Chromium → /api/readings/[id]/pdf).
+      toast.success('Análise entregue. Gerando PDF…')
+      try {
+        const res = await fetch(`/api/readings/${readingId}/pdf`, { method: 'GET' })
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        const blob = await res.blob()
+        const cd = res.headers.get('Content-Disposition')
+        const m = cd?.match(/filename\*?=(?:UTF-8''|")?([^";]+)/)
+        const filename = m ? decodeURIComponent(m[1]!.replace(/^"|"$/g, '')) : `leitura-${readingId}.pdf`
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = filename
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        setTimeout(() => URL.revokeObjectURL(url), 500)
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'desconhecido'
+        toast.error(`PDF não baixou: ${msg}. Use o botão Exportar PDF para baixar novamente.`)
+        router.refresh()
+        return
+      }
+
+      // 3. Abre WhatsApp com mensagem pré-pronta pro telefone do cliente.
+      //    PDF não anexa via deeplink — terapeuta arrasta o arquivo baixado no chat.
+      const greeting = clientName ? `Olá, ${clientName}!` : 'Olá!'
+      const waMsg = `${greeting}\n\nSegue em anexo o relatório da sua leitura iridológica. Qualquer dúvida estou à disposição.`
+      const phoneDigits = clientPhone?.replace(/\D/g, '') ?? ''
+      const waUrl = phoneDigits
+        ? `https://wa.me/${phoneDigits}?text=${encodeURIComponent(waMsg)}`
+        : `https://wa.me/?text=${encodeURIComponent(waMsg)}`
+      window.open(waUrl, '_blank', 'noopener,noreferrer')
+
+      toast.success('PDF baixado. WhatsApp aberto — anexe o arquivo e envie.')
       router.refresh()
     } finally {
       setDeliverPending(false)
@@ -174,15 +219,17 @@ export function ReadingModeActions({
         Editar análise
       </Link>
 
-      <Button
-        type="button"
-        onClick={() => setDeliverOpen(true)}
-        className="gap-2"
-        data-testid="reading-mode-deliver"
-      >
-        <Send className="h-4 w-4" aria-hidden />
-        Entregar ao cliente
-      </Button>
+      {!isSelfReading && (
+        <Button
+          type="button"
+          onClick={() => setDeliverOpen(true)}
+          className="gap-2"
+          data-testid="reading-mode-deliver"
+        >
+          <Send className="h-4 w-4" aria-hidden />
+          Entregar ao cliente
+        </Button>
+      )}
 
       {regenTooltip ? (
         <TooltipProvider>

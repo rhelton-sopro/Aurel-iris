@@ -128,32 +128,37 @@ export async function markReadingDelivered(readingId: string): Promise<DeliverRe
   const idParsed = readingIdSchema.safeParse({ reading_id: readingId })
   if (!idParsed.success) return { error: 'reading_id inválido' }
 
-  // Defense in depth — re-audit report_delivered before terminal flip
+  // Defense in depth — re-audit antes da terminal flip
   const { data: reading, error: readingError } = await supabase
     .from('readings')
-    .select('id, therapist_id, report_delivered, is_delivered, audit_metadata')
+    .select('id, therapist_id, report_delivered, report_generated, is_delivered, audit_metadata')
     .eq('id', readingId)
     .eq('therapist_id', user.id)
     .single()
   if (readingError || !reading) return { error: 'Leitura não encontrada' }
   if (reading.is_delivered) return { error: 'Leitura já entregue ao cliente' }
 
-  // Guarda D — CR-04: bloqueia entrega de relatório vazio
+  // 2026-05-21 (founder UAT): se terapeuta não editou (report_delivered vazio),
+  // entregar usa o report_generated como conteúdo final — não bloqueia mais.
+  // Cópia explícita pra report_delivered congela o snapshot da entrega.
   const delivered = (reading.report_delivered as ReportJsonb | null)
-  if (!delivered || Object.keys(delivered).length === 0) {
-    return { error: 'Salve a edição antes de entregar ao cliente.' }
+  const generated = (reading.report_generated as ReportJsonb | null)
+  const hasDelivered = delivered && Object.keys(delivered).length > 0
+  const finalDelivered: ReportJsonb | null = hasDelivered ? delivered : generated
+  if (!finalDelivered || Object.keys(finalDelivered).length === 0) {
+    return { error: 'Relatório ainda não foi gerado. Aguarde a análise concluir.' }
   }
 
   // Guarda C — SC2: fail-closed em audit_metadata ausente/low_anchor_rate
   const audit = reading.audit_metadata as AuditMetadata | null
-  if (!audit || audit.low_anchor_rate !== false) {
-    if (!audit) {
-      return { error: 'Auditoria de ancoragem ausente ou pendente. Re-salve o relatório para re-rodar a auditoria.' }
-    }
+  if (!audit) {
+    return { error: 'Auditoria de ancoragem ausente. Re-gere a análise para re-rodar a auditoria.' }
+  }
+  if (audit.low_anchor_rate !== false) {
     return { error: 'Âncora insuficiente — taxa de ancoragem abaixo de 95% nas seções clínicas. Edite e re-salve antes de entregar.' }
   }
   const allHits = []
-  for (const [key, value] of Object.entries(delivered)) {
+  for (const [key, value] of Object.entries(finalDelivered)) {
     if (typeof value !== 'string') continue
     allHits.push(...extractForbiddenHits(value, key))
   }
@@ -164,9 +169,20 @@ export async function markReadingDelivered(readingId: string): Promise<DeliverRe
     }
   }
 
+  const updatePayload: Record<string, unknown> = {
+    is_delivered: true,
+    delivered_at: new Date().toISOString(),
+  }
+  // Congela o snapshot: se terapeuta não editou, copia o generated pra delivered.
+  if (!hasDelivered) {
+    updatePayload.report_delivered = finalDelivered as unknown as never
+    updatePayload.report_delivered_at = new Date().toISOString()
+    updatePayload.status = 'edited'
+  }
+
   const { error: updateError } = await supabase
     .from('readings')
-    .update({ is_delivered: true, delivered_at: new Date().toISOString() })
+    .update(updatePayload as never)
     .eq('id', readingId)
 
   if (updateError) return { error: `Falha ao entregar: ${updateError.message}` }

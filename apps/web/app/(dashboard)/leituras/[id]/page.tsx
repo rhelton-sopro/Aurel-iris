@@ -48,7 +48,7 @@ export default async function LeituraDetailPage({
   const { data: reading, error } = await supabase
     .from('readings')
     .select(
-      'id, status, created_at, report_generated, report_delivered, audit_metadata, regeneration_count, is_delivered, delivered_at, vision_features, client:clients(full_name, birth_date)',
+      'id, status, created_at, report_generated, report_delivered, audit_metadata, regeneration_count, is_delivered, delivered_at, vision_features, client:clients(id, full_name, birth_date, phone, is_self)',
     )
     .eq('id', readingId)
     .maybeSingle()
@@ -77,7 +77,12 @@ export default async function LeituraDetailPage({
     .eq('id', readingId)
     .is('seen_by_therapist_at' as never, null)
 
-  const clientName = (reading.client as { full_name?: string } | null)?.full_name ?? 'Cliente'
+  const clientRel = reading.client as
+    | { id?: string; full_name?: string; phone?: string | null; is_self?: boolean }
+    | null
+  const clientName = clientRel?.full_name ?? 'Cliente'
+  const clientPhone = clientRel?.phone ?? null
+  const isSelfReading = clientRel?.is_self === true
   const reportGenerated = reading.report_generated as Record<string, string> | null
   const reportDelivered = reading.report_delivered as Record<string, string> | null
   const hasReport = reportGenerated != null && Object.keys(reportGenerated).length > 0
@@ -137,6 +142,9 @@ export default async function LeituraDetailPage({
               regenerationCount={regenerationCount}
               isDelivered={isDelivered}
               deliveredAt={reading.delivered_at}
+              isSelfReading={isSelfReading}
+              clientName={clientName}
+              clientPhone={clientPhone}
             />
           }
         />
