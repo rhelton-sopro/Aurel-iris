@@ -136,6 +136,11 @@ export function ReadingsListManager({
             Object.keys(r.report_generated as Record<string, unknown>).length > 0
           const isDelivered = r.is_delivered ?? false
           const isSelected = selected.has(r.id)
+          // 2026-05-21: founder UAT — qualquer leitura pending com <6 fotos
+          // mostra "Continuar" (inclui count=0, ex: convite abandonado pelo
+          // cliente). Antes só count>0 disparava — leitura zerada ficava
+          // só "Aguardando" sem caminho de retomar.
+          const canContinue = status === 'pending' && count < 6
 
           let action: ReactNode = (
             <span className="text-sm text-muted-foreground">—</span>
@@ -171,7 +176,7 @@ export function ReadingsListManager({
             )
           }
 
-          const continueAction = isRascunho ? (
+          const continueAction = canContinue ? (
             <Link
               href={`/leituras/nova/capturar?reading=${r.id}`}
               className={cn(buttonVariants({ size: 'sm' }))}
