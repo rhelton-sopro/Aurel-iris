@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Trash2 } from 'lucide-react'
@@ -121,147 +121,233 @@ export function ReadingsListManager({
         </div>
       )}
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-10">
-              <Checkbox
-                aria-label="Selecionar todas"
-                checked={allSelected}
-                indeterminate={someSelected}
-                onCheckedChange={(checked) => toggleAll(checked === true)}
-              />
-            </TableHead>
-            {showClient && <TableHead>Cliente</TableHead>}
-            <TableHead>Data</TableHead>
-            <TableHead>Fotos</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="w-32" />
-            <TableHead>Análise</TableHead>
-            <TableHead className="w-12" />
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {readings.map(r => {
-            const client = Array.isArray(r.client) ? r.client[0] : r.client
-            const count = (r.reading_images?.[0]?.count as number | undefined) ?? 0
-            const status = r.status ?? 'pending'
-            const isRascunho = status === 'pending' && count > 0 && count < 6
-            const errorSummary =
-              (r.vision_features as { processing_metadata?: { error_summary?: string } } | null)
-                ?.processing_metadata?.error_summary ?? null
-            const hasReport =
-              r.report_generated != null &&
-              Object.keys(r.report_generated as Record<string, unknown>).length > 0
-            const isDelivered = r.is_delivered ?? false
-            const isSelected = selected.has(r.id)
+      {(() => {
+        // Derivação por linha — compartilhada entre desktop table e mobile cards (Gmail-style).
+        const derived = readings.map(r => {
+          const client = Array.isArray(r.client) ? r.client[0] : r.client
+          const count = (r.reading_images?.[0]?.count as number | undefined) ?? 0
+          const status = r.status ?? 'pending'
+          const isRascunho = status === 'pending' && count > 0 && count < 6
+          const errorSummary =
+            (r.vision_features as { processing_metadata?: { error_summary?: string } } | null)
+              ?.processing_metadata?.error_summary ?? null
+          const hasReport =
+            r.report_generated != null &&
+            Object.keys(r.report_generated as Record<string, unknown>).length > 0
+          const isDelivered = r.is_delivered ?? false
+          const isSelected = selected.has(r.id)
 
-            // rascunho cai no default (—); a ação "Continuar" fica na coluna própria
-            let action = <span className="text-sm text-muted-foreground">—</span>
-            if (!isRascunho && isDelivered) {
-              action = (
-                <Link
-                  href={`/leituras/${r.id}`}
-                  className={cn(buttonVariants({ size: 'sm', variant: 'outline' }))}
-                >
-                  Ver entregue
-                </Link>
-              )
-            } else if (status === 'edited') {
-              action = (
-                <Link
-                  href={`/leituras/${r.id}/editar`}
-                  className={cn(buttonVariants({ size: 'sm', variant: 'outline' }))}
-                >
-                  Continuar editando
-                </Link>
-              )
-            } else if (status === 'ready') {
-              action = (
-                <Link
-                  href={`/leituras/${r.id}`}
-                  className={cn(
-                    buttonVariants({ size: 'sm', variant: hasReport ? 'outline' : 'default' }),
-                  )}
-                >
-                  {hasReport ? 'Ver análise' : 'Gerar análise'}
-                </Link>
-              )
-            }
-
-            return (
-              <TableRow key={r.id} data-state={isSelected ? 'selected' : undefined}>
-                <TableCell>
-                  <Checkbox
-                    aria-label={`Selecionar leitura ${client?.full_name ?? r.id}`}
-                    checked={isSelected}
-                    onCheckedChange={(checked) => toggle(r.id, checked === true)}
-                  />
-                </TableCell>
-                {showClient && (
-                  <TableCell className="font-medium">
-                    {client?.id && client?.full_name ? (
-                      <Link
-                        href={`/clientes/${client.id}`}
-                        className="hover:underline focus-visible:underline outline-none"
-                      >
-                        {client.full_name}
-                      </Link>
-                    ) : (
-                      client?.full_name ?? <span className="text-muted-foreground">—</span>
-                    )}
-                    {client?.is_self && (
-                      <Badge variant="secondary" className="ml-2">
-                        Meu exame
-                      </Badge>
-                    )}
-                  </TableCell>
-                )}
-                <TableCell className="text-muted-foreground">
-                  <LocalDateTime iso={r.created_at} />
-                </TableCell>
-                <TableCell>
-                  <span className={count < 6 ? 'text-muted-foreground' : 'text-foreground'}>
-                    {count}/6
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <StatusBadge
-                    status={(status as ReadingStatus) ?? 'pending'}
-                    isRascunho={isRascunho}
-                    errorSummary={errorSummary}
-                  />
-                </TableCell>
-                <TableCell>
-                  {isRascunho && (
-                    <Link
-                      href={`/leituras/nova/capturar?reading=${r.id}`}
-                      className={cn(buttonVariants({ size: 'sm' }))}
-                    >
-                      Continuar
-                    </Link>
-                  )}
-                  {status === 'failed' && (
-                    <ReprocessButton readingId={r.id} status={status as ReadingStatus} />
-                  )}
-                </TableCell>
-                <TableCell>{action}</TableCell>
-                <TableCell>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    title="Excluir leitura"
-                    aria-label="Excluir leitura"
-                    onClick={() => setPendingDelete([r.id])}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                </TableCell>
-              </TableRow>
+          let action: ReactNode = (
+            <span className="text-sm text-muted-foreground">—</span>
+          )
+          if (!isRascunho && isDelivered) {
+            action = (
+              <Link
+                href={`/leituras/${r.id}`}
+                className={cn(buttonVariants({ size: 'sm', variant: 'outline' }))}
+              >
+                Ver entregue
+              </Link>
             )
-          })}
-        </TableBody>
-      </Table>
+          } else if (status === 'edited') {
+            action = (
+              <Link
+                href={`/leituras/${r.id}/editar`}
+                className={cn(buttonVariants({ size: 'sm', variant: 'outline' }))}
+              >
+                Continuar editando
+              </Link>
+            )
+          } else if (status === 'ready') {
+            action = (
+              <Link
+                href={`/leituras/${r.id}`}
+                className={cn(
+                  buttonVariants({ size: 'sm', variant: hasReport ? 'outline' : 'default' }),
+                )}
+              >
+                {hasReport ? 'Ver análise' : 'Gerar análise'}
+              </Link>
+            )
+          }
+
+          const continueAction = isRascunho ? (
+            <Link
+              href={`/leituras/nova/capturar?reading=${r.id}`}
+              className={cn(buttonVariants({ size: 'sm' }))}
+            >
+              Continuar
+            </Link>
+          ) : status === 'failed' ? (
+            <ReprocessButton readingId={r.id} status={status as ReadingStatus} />
+          ) : null
+
+          return { r, client, count, status, isRascunho, errorSummary, hasReport, isDelivered, isSelected, action, continueAction }
+        })
+
+        return (
+          <>
+            {/* Desktop table (≥md) */}
+            <div className="hidden md:block">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-10">
+                      <Checkbox
+                        aria-label="Selecionar todas"
+                        checked={allSelected}
+                        indeterminate={someSelected}
+                        onCheckedChange={(checked) => toggleAll(checked === true)}
+                      />
+                    </TableHead>
+                    {showClient && <TableHead>Cliente</TableHead>}
+                    <TableHead>Data</TableHead>
+                    <TableHead>Fotos</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="w-32" />
+                    <TableHead>Análise</TableHead>
+                    <TableHead className="w-12" />
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {derived.map(({ r, client, count, status, isRascunho, errorSummary, isSelected, action, continueAction }) => (
+                    <TableRow key={r.id} data-state={isSelected ? 'selected' : undefined}>
+                      <TableCell>
+                        <Checkbox
+                          aria-label={`Selecionar leitura ${client?.full_name ?? r.id}`}
+                          checked={isSelected}
+                          onCheckedChange={(checked) => toggle(r.id, checked === true)}
+                        />
+                      </TableCell>
+                      {showClient && (
+                        <TableCell className="font-medium">
+                          {client?.id && client?.full_name ? (
+                            <Link
+                              href={`/clientes/${client.id}`}
+                              className="hover:underline focus-visible:underline outline-none"
+                            >
+                              {client.full_name}
+                            </Link>
+                          ) : (
+                            client?.full_name ?? <span className="text-muted-foreground">—</span>
+                          )}
+                          {client?.is_self && (
+                            <Badge variant="secondary" className="ml-2">
+                              Meu exame
+                            </Badge>
+                          )}
+                        </TableCell>
+                      )}
+                      <TableCell className="text-muted-foreground">
+                        <LocalDateTime iso={r.created_at} />
+                      </TableCell>
+                      <TableCell>
+                        <span className={count < 6 ? 'text-muted-foreground' : 'text-foreground'}>
+                          {count}/6
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge
+                          status={(status as ReadingStatus) ?? 'pending'}
+                          isRascunho={isRascunho}
+                          errorSummary={errorSummary}
+                        />
+                      </TableCell>
+                      <TableCell>{continueAction}</TableCell>
+                      <TableCell>{action}</TableCell>
+                      <TableCell>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="Excluir leitura"
+                          aria-label="Excluir leitura"
+                          onClick={() => setPendingDelete([r.id])}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Mobile cards (<md) — Gmail-style stack, sem scroll horizontal */}
+            <ul className="block md:hidden space-y-2">
+              {derived.map(({ r, client, count, status, isRascunho, errorSummary, isSelected, action, continueAction }) => (
+                <li
+                  key={r.id}
+                  className={cn(
+                    'rounded-md border border-border bg-card p-3 space-y-2',
+                    isSelected && 'ring-2 ring-primary',
+                  )}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-start gap-2 min-w-0 flex-1">
+                      <Checkbox
+                        aria-label={`Selecionar leitura ${client?.full_name ?? r.id}`}
+                        checked={isSelected}
+                        onCheckedChange={(checked) => toggle(r.id, checked === true)}
+                        className="mt-0.5"
+                      />
+                      <div className="min-w-0 flex-1">
+                        {showClient && (
+                          <div className="font-medium text-sm truncate">
+                            {client?.id && client?.full_name ? (
+                              <Link
+                                href={`/clientes/${client.id}`}
+                                className="hover:underline focus-visible:underline outline-none"
+                              >
+                                {client.full_name}
+                              </Link>
+                            ) : (
+                              client?.full_name ?? <span className="text-muted-foreground">—</span>
+                            )}
+                            {client?.is_self && (
+                              <Badge variant="secondary" className="ml-2">
+                                Meu exame
+                              </Badge>
+                            )}
+                          </div>
+                        )}
+                        <div className="text-xs text-muted-foreground mt-0.5 flex items-center gap-2">
+                          <LocalDateTime iso={r.created_at} />
+                          <span aria-hidden>·</span>
+                          <span className={count < 6 ? '' : 'text-foreground'}>
+                            {count}/6 fotos
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      title="Excluir leitura"
+                      aria-label="Excluir leitura"
+                      onClick={() => setPendingDelete([r.id])}
+                      className="flex-shrink-0 -mr-1 -mt-1"
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-2 flex-wrap pl-7">
+                    <StatusBadge
+                      status={(status as ReadingStatus) ?? 'pending'}
+                      isRascunho={isRascunho}
+                      errorSummary={errorSummary}
+                    />
+                    <div className="flex items-center gap-2 ml-auto">
+                      {continueAction}
+                      {action}
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </>
+        )
+      })()}
 
       {pendingDelete && pendingDelete.length > 0 && (
         <DeleteReadingDialog
