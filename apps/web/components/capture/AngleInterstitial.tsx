@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { Zap, ZapOff, Camera, RotateCcw } from 'lucide-react'
+import { Zap, ZapOff, Camera, RotateCcw, X, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { Slot, CaptureMode } from '@/lib/capture/sequence'
 import { getSlotInstructionCopy } from '@/lib/capture/sequence'
@@ -19,14 +19,17 @@ interface AngleInterstitialProps {
 
 /**
  * Tela fullscreen exibida antes de cada foto do fluxo de captura nativa.
- * Copy é específica do slot (frontal/câmera-à-direita/câmera-à-esquerda).
+ * Copy é específica do slot (1ª/2ª/3ª foto de cada olho).
  *
- * PROTOCOLO REVISTO 2026-05-20 (founder UAT empírico): 2 fotos COM flash
- * (frontal+lateral) + 1 SEM flash (backlight) por olho. O card de flash
- * é o elemento visual dominante da tela — alto contraste (amarelo/preto
- * quando LIGAR, vermelho/branco quando DESLIGAR) pra deixar impossível
- * o terapeuta esquecer de ajustar entre fotos. Ver
- * sequence.ts:getSlotInstructionCopy para a tabela completa.
+ * PROTOCOLO 2026-05-22 (caso Evanilce/Caroline): 3 fotos frontais por
+ * olho, 2 com flash + 1 sem. Tilt eliminado.
+ *
+ * FlashCard amarelo ("LIGUE O FLASH") reforça com 3 ícones lado a lado
+ * (Auto ❌, Desligado ❌, Ligado ✓) — cliente leigo confunde "ligado"
+ * com "automático", e modo automático não dispara em luz ambiente forte
+ * o que produz fotos sem reflexo especular (Sonnet aprovava silenciosamente).
+ *
+ * FlashCard vermelho ("DESLIGUE O FLASH") aparece antes das fotos 3 e 6.
  */
 export function AngleInterstitial({ nextSlot, slotIndex, onProceed, mode }: AngleInterstitialProps) {
   const copy = getSlotInstructionCopy(nextSlot, slotIndex, mode)
@@ -77,8 +80,13 @@ export function AngleInterstitial({ nextSlot, slotIndex, onProceed, mode }: Angl
 /**
  * Card visual de flash. Dominante por design — alto contraste, ícone
  * grande, texto uppercase bold. É o que o terapeuta enxerga primeiro
- * ao abrir cada interstitial. Founder UAT 2026-05-20: tem que ser
- * impossível ignorar.
+ * ao abrir cada interstitial.
+ *
+ * 2026-05-22 (caso Evanilce/Caroline): redesign do flash-LIGADO com 3
+ * ícones lado a lado (Auto ❌, Desligado ❌, Ligado ✓) — cliente leigo
+ * confunde "ligado" com "automático", e modo automático NÃO dispara em
+ * luz ambiente forte → fotos saem sem reflexo especular → Sonnet aprovava
+ * silenciosamente → relatório sai com base em fotos ruins.
  */
 function FlashCard({ flashOn }: { flashOn: boolean }) {
   if (flashOn) {
@@ -86,21 +94,57 @@ function FlashCard({ flashOn }: { flashOn: boolean }) {
       <div
         role="status"
         aria-live="polite"
-        className="w-full rounded-lg border-2 border-amber-600 bg-amber-400 px-4 py-4 flex items-center gap-3 shadow-md"
+        className="w-full rounded-lg border-2 border-amber-600 bg-amber-400 px-4 py-4 shadow-md"
       >
-        <Zap className="h-10 w-10 flex-shrink-0 text-amber-950 fill-amber-950" strokeWidth={2.5} />
-        <div className="flex flex-col">
+        <div className="flex items-center gap-2 mb-3">
+          <Zap className="h-7 w-7 flex-shrink-0 text-amber-950 fill-amber-950" strokeWidth={2.5} aria-hidden />
           <span className="text-base font-extrabold uppercase tracking-wide text-amber-950 leading-tight">
             Ligue o flash
           </span>
-          <span className="text-xs text-amber-950/80 leading-tight mt-0.5">
-            Toque no ícone do raio na câmera antes de fotografar.
-          </span>
         </div>
+
+        {/* 3 sub-cards: Auto (❌), Desligado (❌), Ligado (✓).
+            grid-cols-3 + gap-2 cabe em iPhone SE (375px). */}
+        <div className="grid grid-cols-3 gap-2">
+          {/* AUTO — ERRADO */}
+          <div className="rounded-md bg-white/95 border border-red-300 px-2 py-2 flex flex-col items-center gap-1">
+            <div className="relative">
+              <Zap className="h-7 w-7 text-amber-950" strokeWidth={2.5} aria-hidden />
+              <span
+                className="absolute -bottom-0.5 -right-1 h-4 w-4 bg-amber-950 text-amber-50 rounded-full text-[9px] font-bold flex items-center justify-center"
+                aria-hidden
+              >
+                A
+              </span>
+            </div>
+            <X className="h-5 w-5 text-red-600" strokeWidth={3} aria-hidden />
+            <span className="text-[10px] font-medium text-amber-950/80 leading-none">Auto</span>
+          </div>
+
+          {/* DESLIGADO — ERRADO */}
+          <div className="rounded-md bg-white/95 border border-red-300 px-2 py-2 flex flex-col items-center gap-1">
+            <ZapOff className="h-7 w-7 text-amber-950" strokeWidth={2.5} aria-hidden />
+            <X className="h-5 w-5 text-red-600" strokeWidth={3} aria-hidden />
+            <span className="text-[10px] font-medium text-amber-950/80 leading-none">Desligado</span>
+          </div>
+
+          {/* LIGADO — CERTO (destaque visual) */}
+          <div className="rounded-md bg-white border-2 border-green-600 px-2 py-2 flex flex-col items-center gap-1 shadow-sm">
+            <Zap className="h-7 w-7 text-amber-950 fill-amber-950" strokeWidth={2.5} aria-hidden />
+            <Check className="h-5 w-5 text-green-700" strokeWidth={3} aria-hidden />
+            <span className="text-[10px] font-bold text-green-700 leading-none">Ligado</span>
+          </div>
+        </div>
+
+        <p className="text-xs text-amber-950/90 leading-tight mt-3">
+          Toque no raio na câmera até aparecer <strong>&quot;Ligado&quot;</strong>.
+          A luz precisa <strong>piscar a cada foto</strong>. Modo automático NÃO serve —
+          em ambiente iluminado ele não dispara.
+        </p>
       </div>
     )
   }
-  // SEM flash — tratamento mais agressivo porque é o erro mais provável
+  // SEM flash — tratamento agressivo porque é o erro mais provável
   // (fácil esquecer de desligar entre fotos).
   return (
     <div
@@ -108,7 +152,7 @@ function FlashCard({ flashOn }: { flashOn: boolean }) {
       aria-live="polite"
       className="w-full rounded-lg border-2 border-red-700 bg-red-600 px-4 py-4 flex items-center gap-3 shadow-md"
     >
-      <ZapOff className="h-10 w-10 flex-shrink-0 text-white" strokeWidth={2.5} />
+      <ZapOff className="h-10 w-10 flex-shrink-0 text-white" strokeWidth={2.5} aria-hidden />
       <div className="flex flex-col">
         <span className="text-base font-extrabold uppercase tracking-wide text-white leading-tight">
           Desligue o flash
@@ -135,10 +179,11 @@ function RearCameraWarning() {
       className="w-full rounded-lg border-2 border-red-700 bg-red-600 px-4 py-4 flex items-center gap-3 shadow-md"
     >
       <div className="relative flex-shrink-0">
-        <Camera className="h-10 w-10 text-white" strokeWidth={2.5} />
+        <Camera className="h-10 w-10 text-white" strokeWidth={2.5} aria-hidden />
         <RotateCcw
           className="absolute -bottom-1 -right-1 h-4 w-4 text-white bg-red-700 rounded-full p-0.5"
           strokeWidth={3}
+          aria-hidden
         />
       </div>
       <div className="flex flex-col">

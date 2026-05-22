@@ -131,6 +131,25 @@ function eyeLabel(eye: string): string {
 }
 
 /**
+ * Label visível ao Sonnet, descrevendo a foto em termos do protocolo
+ * 2026-05-22 (3 frontais por olho, variação só de iluminação). NÃO usa
+ * mais "ângulo: X" porque o identifier `lateral`/`backlight` ficou
+ * semanticamente desatualizado (ver doc em lib/capture/sequence.ts).
+ *
+ * Mapeamento:
+ *   frontal   → "frontal, com flash" (1ª foto do olho)
+ *   lateral   → "frontal, com flash" (2ª foto do olho — redundância)
+ *   backlight → "frontal, sem flash" (3ª foto, revela pigmento real)
+ *
+ * Sonnet recebe esse texto como contexto verbal junto com cada imagem.
+ * Não interpreta como geometria — só como rótulo descritivo da iluminação.
+ */
+function photoDescriptionLabel(angle: string): string {
+  if (angle === 'backlight') return 'frontal, sem flash'
+  return 'frontal, com flash'
+}
+
+/**
  * Build the user message content: client context, then each of the 6 photos
  * preceded by an eye/angle label, then the closing instruction.
  *
@@ -165,7 +184,7 @@ export function buildUserContent(
   args.images.forEach((img, i) => {
     content.push({
       type: 'text',
-      text: `\n— Imagem ${i + 1}/${args.images.length}: ${eyeLabel(img.eye)}, ângulo: ${img.angle}`,
+      text: `\n— Imagem ${i + 1}/${args.images.length}: ${eyeLabel(img.eye)}, ${photoDescriptionLabel(img.angle)}`,
     })
     content.push({
       type: 'image',

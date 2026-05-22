@@ -15,11 +15,11 @@ describe('SEQUENCE', () => {
     expect(SEQUENCE).toHaveLength(6)
   })
 
-  it('starts with left/frontal (olho esquerdo do paciente = direita da tela)', () => {
+  it('starts with left/frontal (olho esquerdo do paciente)', () => {
     expect(SEQUENCE[0]).toEqual({ eye: 'left', angle: 'frontal' })
   })
 
-  it('ends with right/backlight', () => {
+  it('ends with right/backlight (3ª foto do olho direito, sem flash)', () => {
     expect(SEQUENCE[5]).toEqual({ eye: 'right', angle: 'backlight' })
   })
 
@@ -34,7 +34,7 @@ describe('SEQUENCE', () => {
     expect(lastLeft).toBeLessThan(firstRight)
   })
 
-  it('covers all 3 angles per eye', () => {
+  it('covers all 3 angles per eye (identifier schema preserved)', () => {
     const right = SEQUENCE.filter(s => s.eye === 'right').map(s => s.angle).sort()
     const left = SEQUENCE.filter(s => s.eye === 'left').map(s => s.angle).sort()
     expect(right).toEqual(['backlight', 'frontal', 'lateral'])
@@ -52,9 +52,7 @@ describe('getResumeSlotIndex', () => {
     expect(getResumeSlotIndex([])).toBe(0)
   })
 
-  it('returns 0 when left/frontal and left/lateral captured (left eye first now)', () => {
-    // Com nova SEQUENCE (left first), right/frontal e right/lateral estão nos índices 3 e 4.
-    // Se apenas right/* capturados, o primeiro ausente da SEQUENCE é left/frontal (índice 0).
+  it('returns 0 when only right/* captured (left first now)', () => {
     expect(getResumeSlotIndex([
       { eye: 'right', angle: 'frontal' },
       { eye: 'right', angle: 'lateral' },
@@ -73,7 +71,6 @@ describe('getResumeSlotIndex', () => {
   })
 
   it('returns first MISSING slot even if captured contains later slots out of order', () => {
-    // Pulou o left/lateral e capturou os outros — primeiro ausente é index 1 (left/lateral)
     const captured = [
       { eye: 'left', angle: 'frontal' },
       { eye: 'left', angle: 'backlight' },
@@ -104,10 +101,10 @@ describe('isOuterEyeTransition', () => {
   it('true when crossing index 2 → 3 (left/backlight → right/frontal)', () => {
     expect(isOuterEyeTransition(2, 3)).toBe(true)
   })
-  it('false within right (0 → 1)', () => {
+  it('false within left (0 → 1)', () => {
     expect(isOuterEyeTransition(0, 1)).toBe(false)
   })
-  it('false within left (3 → 4)', () => {
+  it('false within right (3 → 4)', () => {
     expect(isOuterEyeTransition(3, 4)).toBe(false)
   })
   it('false on out-of-bounds from index', () => {
@@ -116,10 +113,10 @@ describe('isOuterEyeTransition', () => {
   it('false on out-of-bounds to index', () => {
     expect(isOuterEyeTransition(5, 6)).toBe(false)
   })
-  it('false within right (1 → 2)', () => {
+  it('false within left (1 → 2)', () => {
     expect(isOuterEyeTransition(1, 2)).toBe(false)
   })
-  it('false within left (4 → 5)', () => {
+  it('false within right (4 → 5)', () => {
     expect(isOuterEyeTransition(4, 5)).toBe(false)
   })
 })
@@ -136,61 +133,72 @@ describe('getSlotProgressLabel', () => {
   })
 })
 
-describe('getSlotInstructionCopy', () => {
-  // Protocolo revisto 2026-05-20 (founder UAT empírico): cliente fixo,
-  // câmera tilt; 2 fotos COM flash (frontal+lateral) + 1 SEM flash
-  // (backlight) por olho. Substitui o protocolo 2026-05-12 que mandava
-  // flash em todas as 3.
+describe('getSlotInstructionCopy (PROTOCOLO REVISTO 2026-05-22 — 6 frontais)', () => {
+  // 3 fotos frontais por olho. SEM tilt — câmera sempre frontal direta ao
+  // olho. Variação apenas de iluminação:
+  //   slot 1 (frontal):   COM flash
+  //   slot 2 (lateral):   COM flash (redundância)
+  //   slot 3 (backlight): SEM flash
 
-  it('foto 1 (left/frontal) — COM flash, cliente fixo, SEM "continua" (é a primeira)', () => {
+  it('foto 1 (left/frontal) — COM flash, câmera frontal', () => {
     const copy = getSlotInstructionCopy({ eye: 'left', angle: 'frontal' }, 0)
     expect(copy.heading).toContain('Foto 1 de 6')
     expect(copy.heading).toContain('ESQUERDO')
-    expect(copy.heading).toContain('Frente')
+    expect(copy.heading).toContain('COM flash')
     expect(copy.subtitle).toContain('olho ESQUERDO')
-    expect(copy.subtitle).toContain('câmera de frente')
+    expect(copy.subtitle).toContain('FRONTAL')
     expect(copy.subtitle).toContain('COM flash')
-    expect(copy.subtitle).toContain('ponto fixo')
-    expect(copy.subtitle).not.toContain('continua')
+    // Protocolo novo não menciona "15°" nem instrui tilt
+    expect(copy.subtitle).not.toContain('15°')
+    expect(copy.subtitle).not.toMatch(/incline a câmera/i)
     expect(copy.flashOn).toBe(true)
     expect(copy.cta).toBe('Abrir câmera')
   })
 
-  it('foto 2 (left/lateral) — COM flash, inclinar câmera 15° para a direita', () => {
+  it('foto 2 (left/lateral) — COM flash, câmera FRONTAL (sem tilt)', () => {
     const copy = getSlotInstructionCopy({ eye: 'left', angle: 'lateral' }, 1)
     expect(copy.heading).toContain('Foto 2 de 6')
-    expect(copy.heading).toContain('Câmera à direita')
-    expect(copy.subtitle).toContain('15° para a direita')
-    expect(copy.subtitle).toContain('Incline a câmera')
+    expect(copy.heading).toContain('ESQUERDO')
+    expect(copy.heading).toContain('COM flash')
+    expect(copy.subtitle).toContain('FRONTAL')
     expect(copy.subtitle).toContain('COM flash')
-    expect(copy.subtitle).toContain('sem mover a cabeça')
-    expect(copy.subtitle).toContain('continua')
+    expect(copy.subtitle).toContain('2ª foto')
+    // Protocolo novo não menciona "15°" nem instrui tilt
+    expect(copy.subtitle).not.toContain('15°')
+    expect(copy.subtitle).not.toMatch(/incline a câmera/i)
     expect(copy.flashOn).toBe(true)
   })
 
-  it('foto 3 (left/backlight) — SEM flash (3ª foto deste olho), inclinar câmera 15° para a esquerda', () => {
+  it('foto 3 (left/backlight) — SEM flash, câmera FRONTAL', () => {
     const copy = getSlotInstructionCopy({ eye: 'left', angle: 'backlight' }, 2)
     expect(copy.heading).toContain('Foto 3 de 6')
-    expect(copy.heading).toContain('Câmera à esquerda')
-    expect(copy.subtitle).toContain('15° para a esquerda')
+    expect(copy.heading).toContain('ESQUERDO')
+    expect(copy.heading).toContain('SEM flash')
+    expect(copy.subtitle).toContain('FRONTAL')
     expect(copy.subtitle).toContain('SEM flash')
-    expect(copy.subtitle).toContain('sem mover a cabeça')
-    expect(copy.subtitle).toContain('continua')
+    expect(copy.subtitle).toMatch(/3ª.*foto/i)
+    // Protocolo novo não menciona "15°" nem instrui tilt
+    expect(copy.subtitle).not.toContain('15°')
+    expect(copy.subtitle).not.toMatch(/incline a câmera/i)
     expect(copy.flashOn).toBe(false)
   })
 
-  it('foto 4 (right/frontal) — COM flash, repete o padrão frontal para olho DIREITO', () => {
+  it('foto 4 (right/frontal) — COM flash, repete o padrão para olho DIREITO', () => {
     const copy = getSlotInstructionCopy({ eye: 'right', angle: 'frontal' }, 3)
     expect(copy.heading).toContain('Foto 4 de 6')
     expect(copy.heading).toContain('DIREITO')
+    expect(copy.heading).toContain('COM flash')
     expect(copy.subtitle).toContain('olho DIREITO')
-    expect(copy.subtitle).toContain('COM flash')
+    expect(copy.subtitle).toContain('FRONTAL')
     expect(copy.flashOn).toBe(true)
   })
 
-  it('foto 6 (right/backlight) — SEM flash (3ª foto do olho direito)', () => {
+  it('foto 6 (right/backlight) — SEM flash, frontal', () => {
     const copy = getSlotInstructionCopy({ eye: 'right', angle: 'backlight' }, 5)
     expect(copy.heading).toContain('Foto 6 de 6')
+    expect(copy.heading).toContain('DIREITO')
+    expect(copy.heading).toContain('SEM flash')
+    expect(copy.subtitle).toContain('FRONTAL')
     expect(copy.subtitle).toContain('SEM flash')
     expect(copy.flashOn).toBe(false)
   })
@@ -199,6 +207,11 @@ describe('getSlotInstructionCopy', () => {
     for (let i = 0; i < SEQUENCE.length; i++) {
       expect(getSlotInstructionCopy(SEQUENCE[i], i).cta).toBe('Abrir câmera')
     }
+  })
+
+  it('flashOn pattern: foto 1,2,4,5 COM flash; foto 3,6 SEM flash', () => {
+    const pattern = SEQUENCE.map((s, i) => getSlotInstructionCopy(s, i).flashOn)
+    expect(pattern).toEqual([true, true, false, true, true, false])
   })
 })
 
@@ -243,12 +256,11 @@ describe('labels', () => {
     expect(EYE_LABEL.left).toBe('esquerdo')
     expect(EYE_LABEL.right).toBe('direito')
   })
-  it('ANGLE_LABEL reflete a INCLINAÇÃO DA CÂMERA (paciente fica fixo) — protocolo revisto 2026-05-12', () => {
-    // Strings preservadas (compat) mas semântica invertida: agora descrevem
-    // direção de tilt da câmera, não rotação do paciente. Ver comentário em
-    // sequence.ts ANGLE_LABEL para detalhes do protocolo.
-    expect(ANGLE_LABEL.frontal).toBe('frente')
-    expect(ANGLE_LABEL.lateral).toBe('direita')
-    expect(ANGLE_LABEL.backlight).toBe('esquerda')
+  it('ANGLE_LABEL reflete o protocolo 2026-05-22 (3 frontais — flash on/on/off)', () => {
+    // Identifiers preservados pra compat de schema (frontal/lateral/backlight).
+    // Labels visíveis ao cliente refletem ordinal + flash, sem tilt.
+    expect(ANGLE_LABEL.frontal).toBe('1ª (com flash)')
+    expect(ANGLE_LABEL.lateral).toBe('2ª (com flash)')
+    expect(ANGLE_LABEL.backlight).toBe('3ª (sem flash)')
   })
 })
