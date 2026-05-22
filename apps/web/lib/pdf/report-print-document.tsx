@@ -272,7 +272,7 @@ const PRINT_CSS = `
     margin: 10px 0 20px;
   }
 
-  .section-body { font-size: 12pt; line-height: 1.9; color: ${C.body}; }
+  .section-body { font-size: 13.5pt; line-height: 1.9; color: ${C.body}; }
   .section-body p { margin: 0 0 16px; }
   .section-body p:last-child { margin-bottom: 0; }
   .section-body ul, .section-body ol { margin: 0 0 16px; padding-left: 22px; }
@@ -280,7 +280,7 @@ const PRINT_CSS = `
   .section-body strong { font-weight: 700; color: var(--ink); }
   .section-body em { font-style: italic; }
   .section-body h3 {
-    font-size: 13pt;
+    font-size: 14pt;
     font-weight: 700;
     font-style: italic;
     color: var(--teal);
@@ -291,7 +291,7 @@ const PRINT_CSS = `
     padding: 2px 0 2px 22px;
     border-left: 2px solid var(--teal);
     font-style: italic;
-    font-size: 13.5pt;
+    font-size: 14.5pt;
     line-height: 1.7;
     color: var(--teal-dark);
   }

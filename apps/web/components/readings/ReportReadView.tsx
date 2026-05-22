@@ -330,13 +330,13 @@ export function ReportReadView({
                     isLetter
                       ? {
                           ...SERIF,
-                          fontSize: '13pt',
+                          fontSize: '13.5pt',
                           backgroundColor: C.ivory,
                           borderLeft: `3px solid ${C.teal}`,
                           padding: '24px 28px',
                           color: '#2A2420',
                         }
-                      : { ...SERIF, fontSize: '13pt' }
+                      : { ...SERIF, fontSize: '13.5pt' }
                   }
                 >
                   <ReactMarkdown
