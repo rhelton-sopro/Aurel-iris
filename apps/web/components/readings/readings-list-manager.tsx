@@ -176,6 +176,12 @@ export function ReadingsListManager({
             )
           }
 
+          // 2026-05-22 (caso Caroline): leituras com 6 fotos mas status='pending'
+          // (auto-finalize do servidor não rodou) mostram Reprocessar inline,
+          // sem precisar abrir o detalhe. Cobre ambas as listas: /leituras
+          // (global) e /clientes/[id] (por cliente).
+          const canReprocessInline =
+            status === 'failed' || (status === 'pending' && count >= 6)
           const continueAction = canContinue ? (
             <Link
               href={`/leituras/nova/capturar?reading=${r.id}`}
@@ -183,7 +189,7 @@ export function ReadingsListManager({
             >
               Continuar
             </Link>
-          ) : status === 'failed' ? (
+          ) : canReprocessInline ? (
             <ReprocessButton readingId={r.id} status={status as ReadingStatus} />
           ) : null
 
