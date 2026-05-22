@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { SummaryCards } from '@/components/dashboard/summary-cards'
 import { InviteReadingsSection } from '@/components/dashboard/invite-readings-section'
+import { AutoRefreshWhileProcessing } from '@/components/readings/AutoRefreshWhileProcessing'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -28,6 +29,11 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      {/* Polling 15s — atualiza a seção "Leituras via convite" + badges
+          NOVO sem F5. Padrão arquitetural existente (router.refresh()),
+          zero infra nova. Cliente terminar foto via /convite reflete em
+          até 15s pra terapeuta com dashboard aberto. */}
+      <AutoRefreshWhileProcessing active intervalMs={15000} />
       <div className="flex items-center justify-between gap-4">
         <h1 className="text-2xl font-semibold">Dashboard</h1>
         <Link
