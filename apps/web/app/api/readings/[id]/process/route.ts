@@ -25,7 +25,6 @@ import { createServiceClient } from '@/lib/supabase/service'
 import { isModalPipelineEnabled } from '@/lib/vision/pipeline-flag'
 import { markReadingReady } from '@/lib/readings/mark-ready'
 import {
-  ModalTriggerError,
   triggerVisionPipeline,
   type ImageUrlEntry,
 } from '@/lib/vision/modal-client'
@@ -77,6 +76,32 @@ export async function POST(
   // set; the analyze gate (status==='ready') is unchanged. Reversible: set
   // MODAL_PIPELINE_ENABLED=true to restore the old path below.
   if (!isModalPipelineEnabled()) {
+    // 2026-05-22 (caso Caroline): validar que a captura está COMPLETA
+    // antes de marcar ready. Sem isso, Reprocessar numa reading com
+    // 3 fotos marca ela ready e o Sonnet roda com captura incompleta —
+    // relatório lixo. Founder pediu mensagem clara nesse caso pra UI.
+    const serviceClient = createServiceClient()
+    const { count: imgCount, error: countErr } = await serviceClient
+      .from('reading_images')
+      .select('id', { count: 'exact', head: true })
+      .eq('reading_id', readingId)
+    if (countErr) {
+      return NextResponse.json(
+        { error: `Failed to count images: ${countErr.message}` },
+        { status: 500 },
+      )
+    }
+    if ((imgCount ?? 0) < 6) {
+      return NextResponse.json(
+        {
+          error: 'incomplete_capture',
+          message: `Apenas ${imgCount ?? 0} de 6 fotos foram recebidas. Não é possível reprocessar uma captura incompleta.`,
+          image_count: imgCount ?? 0,
+        },
+        { status: 400 },
+      )
+    }
+
     // Lógica de "marca ready + CAS beta_counted" extraída p/ função
     // compartilhada (lib/readings/mark-ready.ts) — chamada também por
     // /api/convite/[token]/finalize (path público sem sessão authed).
@@ -91,6 +116,7 @@ export async function POST(
       return NextResponse.json({ error: result.error }, { status: 500 })
     }
     revalidatePath('/leituras')
+    revalidatePath(`/leituras/${readingId}`)
     return new NextResponse(null, { status: 202 })
   }
 

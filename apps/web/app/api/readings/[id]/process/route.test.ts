@@ -74,18 +74,49 @@ function buildUserClient({
 
 function buildServiceClient({
   signedUrls,
+  imageCount = 6,
 }: {
   signedUrls?: { signedUrl: string }[]
+  /** Quantas reading_images existem (pro count check do Sonnet-direct path).
+   *  Default 6 = captura completa (rota marca ready). Use 3 pra simular
+   *  captura incompleta (rota retorna 400 incomplete_capture). */
+  imageCount?: number
 }) {
   const createSignedUrls = vi.fn().mockResolvedValue({
     data: signedUrls ?? null,
     error: signedUrls ? null : { message: 'sign failed' },
   })
   const storage = { from: vi.fn().mockReturnValue({ createSignedUrls }) }
-  const update = vi.fn().mockReturnValue({
-    eq: vi.fn().mockResolvedValue({ error: null }),
+  // markReadingReady em lib/readings/mark-ready.ts faz 2 UPDATEs:
+  //   1. .update({status: 'ready'}).eq('id', ...)                 ← 1 eq
+  //   2. .update({beta_counted: true}).eq('id',...).eq('beta_counted',false).select('therapist_id').maybeSingle()  ← chain
+  // Mock cobre ambos: o primeiro .eq() retorna objeto que resolve ({error: null}) E
+  // ALSO suporta .eq().select().maybeSingle() chain pro segundo path.
+  const update = vi.fn().mockImplementation(() => {
+    const maybeSingle = vi.fn().mockResolvedValue({ data: null, error: null })
+    const select = vi.fn().mockReturnValue({ maybeSingle })
+    const eqInner = vi.fn().mockReturnValue({ select, maybeSingle })
+    const eqOuter = vi.fn().mockImplementation(() => {
+      // Promise-like + chainable (Supabase builder behavior)
+      const p = Promise.resolve({ error: null })
+      return Object.assign(p, { eq: eqInner, select, maybeSingle })
+    })
+    return { eq: eqOuter }
   })
-  const from = vi.fn().mockReturnValue({ update })
+  // Count check do Sonnet-direct path (2026-05-22): rota chama
+  //   service.from('reading_images').select('id', { count: 'exact', head: true }).eq('reading_id', X)
+  // Discrimina por tabela pra retornar a forma certa.
+  const from = vi.fn().mockImplementation((table: string) => {
+    if (table === 'reading_images') {
+      return {
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockResolvedValue({ count: imageCount, error: null }),
+        }),
+      }
+    }
+    // 'readings' (default): só update na rota
+    return { update }
+  })
   return { storage, from } as unknown as ReturnType<typeof createServiceClient>
 }
 
@@ -120,9 +151,27 @@ describe('POST /api/readings/[id]/process', () => {
         reading: { id: 'abc-123', status: 'pending', therapist_id: 'u' },
       }),
     )
-    mockCreateServiceClient.mockReturnValue(buildServiceClient({}))
+    mockCreateServiceClient.mockReturnValue(buildServiceClient({ imageCount: 6 }))
     const res = await POST(makeRequest(), makeParams())
     expect(res.status).toBe(202)
+    expect(mockTrigger).not.toHaveBeenCalled()
+  })
+
+  it('Sonnet-direct + incomplete capture (count<6): 400 incomplete_capture (caso Caroline)', async () => {
+    delete process.env.MODAL_PIPELINE_ENABLED
+    mockCreateClient.mockResolvedValue(
+      buildUserClient({
+        user: { id: 'u' },
+        reading: { id: 'abc-123', status: 'pending', therapist_id: 'u' },
+      }),
+    )
+    mockCreateServiceClient.mockReturnValue(buildServiceClient({ imageCount: 3 }))
+    const res = await POST(makeRequest(), makeParams())
+    expect(res.status).toBe(400)
+    const body = (await res.json()) as { error: string; message: string; image_count: number }
+    expect(body.error).toBe('incomplete_capture')
+    expect(body.message).toContain('3 de 6')
+    expect(body.image_count).toBe(3)
     expect(mockTrigger).not.toHaveBeenCalled()
   })
 

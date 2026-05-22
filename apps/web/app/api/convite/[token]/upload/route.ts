@@ -22,8 +22,9 @@
  */
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/service'
-import { validateToken } from '@/lib/invite/tokens'
+import { validateToken, markTokenUsed } from '@/lib/invite/tokens'
 import { buildOriginalStoragePath } from '@/lib/capture/storage-path'
+import { markReadingReady } from '@/lib/readings/mark-ready'
 
 export const runtime = 'nodejs'
 
@@ -134,6 +135,64 @@ export async function POST(
   if (insertErr) {
     console.error(`[invite-upload] reading_images falhou token=${token} reading=${readingId}: ${insertErr.message}`)
     return NextResponse.json({ error: 'reading_images falhou' }, { status: 502 })
+  }
+
+  // Caso Caroline (2026-05-22): cliente terminou os 6 uploads mas finalize
+  // do client falhou silenciosamente (network blip / aba fechada / iOS
+  // background-kill entre o último upload e o redirect). Reading ficava
+  // órfã em 'pending' pra sempre, sem botão de ação pro terapeuta.
+  //
+  // Fix server-side: derivar "captura completa" do estado do banco em vez
+  // de cooperação do client. Quando o INSERT acima leva a count=6, este
+  // handler — que JÁ rodou com sucesso (storage + DB) — marca ready +
+  // queima token. Idempotente: markReadingReady só age se status='pending'
+  // (CAS interno); markTokenUsed só age se used_at IS NULL.
+  //
+  // Race safety: count=6 é determinístico no Postgres. Se 5 e 6 chegam
+  // paralelos, apenas UM request vê count=6; os outros veem ≤5 e ignoram.
+  //
+  // /api/convite/[token]/finalize continua como segundo caminho redundante
+  // (idempotente — se status já não-pending, retorna ok sem refazer).
+  const { count: imgCount, error: countErr } = await service
+    .from('reading_images')
+    .select('id', { count: 'exact', head: true })
+    .eq('reading_id', readingId)
+
+  if (!countErr && imgCount === 6) {
+    const { data: readingNow } = await service
+      .from('readings')
+      .select('status, client_id')
+      .eq('id', readingId)
+      .maybeSingle()
+
+    if (readingNow?.status === 'pending') {
+      const readyRes = await markReadingReady({
+        readingId,
+        currentStatus: 'pending',
+      })
+      if (readyRes.error) {
+        // Non-fatal: upload sucedeu (resposta abaixo retorna ok). Reading
+        // segue pending — terapeuta pode usar Reprocessar em /leituras/[id].
+        console.error(
+          `[invite-upload] auto-finalize markReadingReady falhou token=${token} reading=${readingId}: ${readyRes.error}`,
+        )
+      } else if (readingNow.client_id) {
+        const markRes = await markTokenUsed(
+          validation.token.id,
+          readingNow.client_id,
+          readingId,
+        )
+        if (markRes.error) {
+          console.error(
+            `[invite-upload] auto-finalize markTokenUsed falhou token=${token}: ${markRes.error}`,
+          )
+        } else {
+          console.log(
+            `[invite-upload] auto-finalize OK token=${token} reading=${readingId} (count=6 atingido)`,
+          )
+        }
+      }
+    }
   }
 
   return NextResponse.json({ path })

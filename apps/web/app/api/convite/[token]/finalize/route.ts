@@ -105,25 +105,22 @@ export async function POST(
     }
   }
 
-  // Marca a leitura como pronta (Modal aposentado em prod — Sonnet-direct
-  // lê os canonicals direto quando terapeuta clica "Gerar análise" depois).
-  // markReadingReady faz: status='ready' + CAS beta_counted +
-  // increment_beta_readings_used (founder UAT 2026-05-20: counter
-  // incrementa na transição pending→ready, idêntico ao path authed via
-  // /api/readings/[id]/process).
-  //
-  // FIX 2026-05-20: antes, esta rota não disparava nada e a leitura
-  // ficava em 'pending' indefinidamente — terapeuta abria /leituras e
-  // via "aguardando" sem ação clara. Agora a leitura entra direto em
-  // 'ready' (mesmo estado do path authed após finalize).
-  const readyRes = await markReadingReady({
-    readingId,
-    currentStatus: reading.status,
-  })
-  if (readyRes.error) {
-    console.error(`[invite-finalize] markReadingReady falhou token=${token} reading=${readingId}: ${readyRes.error}`)
-    // Não bloqueia o cliente — leitura/fotos estão salvas; terapeuta
-    // pode usar "Reprocessar" no /leituras pra refazer.
+  // Idempotência (2026-05-22, caso Caroline): este endpoint vira segundo
+  // caminho redundante. O primary é o auto-finalize em /api/convite/[token]/
+  // upload quando o INSERT do 6º reading_image leva count=6 (markReadingReady
+  // + markTokenUsed lá). Aqui só age se a reading ainda está em 'pending'
+  // (auto-finalize ainda não rodou — ex: count check falhou, ou upload 6
+  // chegou em paralelo com o finalize do client).
+  if (reading.status === 'pending') {
+    const readyRes = await markReadingReady({
+      readingId,
+      currentStatus: 'pending',
+    })
+    if (readyRes.error) {
+      console.error(`[invite-finalize] markReadingReady falhou token=${token} reading=${readingId}: ${readyRes.error}`)
+      // Não bloqueia o cliente — leitura/fotos estão salvas; terapeuta
+      // pode usar "Reprocessar" em /leituras/[id] pra disparar manualmente.
+    }
   }
 
   return NextResponse.json({ ok: true })

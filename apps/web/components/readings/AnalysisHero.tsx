@@ -11,6 +11,7 @@ import { ReactNode } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { LocalDateTime } from '@/components/ui/local-date-time'
+import { ReprocessButton } from '@/components/readings/ReprocessButton'
 
 export interface AnalysisHeroProps {
   readingId: string
@@ -25,6 +26,7 @@ export interface AnalysisHeroProps {
 }
 
 export function AnalysisHero({
+  readingId,
   status,
   hasReport,
   reportGeneratedAt,
@@ -34,15 +36,35 @@ export function AnalysisHero({
 }: AnalysisHeroProps) {
   // Status not ready = State "waiting"
   if (status !== 'ready' && status !== 'edited' && !hasReport) {
+    // 2026-05-22 (caso Caroline): leituras que ficaram presas em 'pending'
+    // — auto-finalize do upload route não rodou, finalize do client falhou
+    // silenciosamente — precisam de um caminho de cura manual pro terapeuta.
+    // ReprocessButton valida count=6 server-side; se faltar foto, mostra
+    // toast claro em vez de aceitar a captura incompleta.
+    const showReprocess = status === 'pending' || status === 'failed'
     return (
       <Card className="max-w-3xl">
         <CardHeader>
-          <CardTitle className="text-xl">Aguardando o pipeline de visão</CardTitle>
+          <CardTitle className="text-xl">
+            {status === 'failed'
+              ? 'Processamento falhou'
+              : 'Captura aguardando finalização'}
+          </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            Aguardando o pipeline de visão terminar. Você poderá gerar a análise quando o status mudar para &quot;Pronto&quot;.
+            {status === 'failed'
+              ? 'O processamento desta leitura falhou. Clique em Reprocessar para tentar novamente.'
+              : 'Esta leitura ainda não foi marcada como pronta. Se a captura está completa (6 fotos), clique em Reprocessar para liberar a geração da análise.'}
           </p>
+          {showReprocess && (
+            <ReprocessButton
+              readingId={readingId}
+              status={status}
+              size="default"
+              variant="default"
+            />
+          )}
         </CardContent>
       </Card>
     )

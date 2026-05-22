@@ -8,6 +8,20 @@ vi.mock('next/navigation', () => ({
   useRouter: vi.fn(() => ({ refresh: vi.fn() })),
 }))
 
+const sonnerMocks = vi.hoisted(() => ({
+  loading: vi.fn(() => 'toast-id'),
+  success: vi.fn(),
+  error: vi.fn(),
+}))
+
+vi.mock('sonner', () => ({
+  toast: {
+    loading: sonnerMocks.loading,
+    success: sonnerMocks.success,
+    error: sonnerMocks.error,
+  },
+}))
+
 import { useRouter } from 'next/navigation'
 import { ReprocessButton } from './ReprocessButton'
 
@@ -27,7 +41,12 @@ function mockRouter(refresh = vi.fn()) {
 }
 
 describe('ReprocessButton', () => {
-  beforeEach(() => mockRouter())
+  beforeEach(() => {
+    mockRouter()
+    sonnerMocks.loading.mockClear()
+    sonnerMocks.success.mockClear()
+    sonnerMocks.error.mockClear()
+  })
   afterEach(() => {
     global.fetch = ORIGINAL_FETCH
     vi.clearAllMocks()
@@ -49,6 +68,11 @@ describe('ReprocessButton', () => {
     expect(screen.getByTestId('reprocess-button')).not.toBeDisabled()
   })
 
+  it('is enabled when status="pending" (caso Caroline 2026-05-22)', () => {
+    render(<ReprocessButton readingId={READING_ID} status="pending" />)
+    expect(screen.getByTestId('reprocess-button')).not.toBeDisabled()
+  })
+
   it('POSTs to /api/readings/<id>/process on click', async () => {
     const fetchMock = vi.fn(async () => new Response(null, { status: 202 }))
     global.fetch = fetchMock as typeof global.fetch
@@ -61,7 +85,7 @@ describe('ReprocessButton', () => {
     expect((init as RequestInit).method).toBe('POST')
   })
 
-  it('calls router.refresh on 202', async () => {
+  it('calls router.refresh + toast.success on 202', async () => {
     const refresh = mockRouter()
     global.fetch = vi.fn(async () =>
       new Response(null, { status: 202 }),
@@ -69,6 +93,27 @@ describe('ReprocessButton', () => {
     render(<ReprocessButton readingId={READING_ID} status="failed" />)
     fireEvent.click(screen.getByTestId('reprocess-button'))
     await waitFor(() => expect(refresh).toHaveBeenCalledTimes(1))
+    expect(sonnerMocks.success).toHaveBeenCalledTimes(1)
+  })
+
+  it('shows server message on 400 incomplete_capture (caso Caroline)', async () => {
+    global.fetch = vi.fn(async () =>
+      new Response(
+        JSON.stringify({
+          error: 'incomplete_capture',
+          message: 'Apenas 3 de 6 fotos foram recebidas. Não é possível reprocessar uma captura incompleta.',
+          image_count: 3,
+        }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } },
+      ),
+    ) as typeof global.fetch
+    const refresh = mockRouter()
+    render(<ReprocessButton readingId={READING_ID} status="pending" />)
+    fireEvent.click(screen.getByTestId('reprocess-button'))
+    await waitFor(() => expect(sonnerMocks.error).toHaveBeenCalledTimes(1))
+    const [msg] = sonnerMocks.error.mock.calls[0]!
+    expect(msg).toContain('Apenas 3 de 6')
+    expect(refresh).not.toHaveBeenCalled()
   })
 
   it('does NOT call router.refresh on 502', async () => {
@@ -82,6 +127,7 @@ describe('ReprocessButton', () => {
       expect(screen.getByTestId('reprocess-button')).not.toBeDisabled(),
     )
     expect(refresh).not.toHaveBeenCalled()
+    expect(sonnerMocks.error).toHaveBeenCalledTimes(1)
   })
 
   it('disables button while POST is in flight', async () => {

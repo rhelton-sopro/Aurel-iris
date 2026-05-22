@@ -291,16 +291,26 @@ export function CaptureClient({
       if (pending.length > 0) await Promise.allSettled(pending)
 
       if (inviteToken && clientId) {
-        // Modo convite: token-authed finalize via API (sem sessão). NÃO
-        // dispara pipeline aqui — terapeuta faz isso quando abrir
-        // /leituras/[id] (modelo de "graceful trigger" — ver
-        // /api/convite/[token]/finalize/route.ts).
+        // Modo convite: token-authed finalize via API (sem sessão).
+        //
+        // 2026-05-22 (caso Caroline): mesmo que esta chamada client falhe
+        // por network blip / aba sendo fechada / iOS background-kill, o
+        // servidor JÁ marcou a reading ready quando o INSERT do 6º upload
+        // atingiu count=6 (auto-finalize em /api/convite/[token]/upload).
+        // Este finalize aqui é segundo caminho redundante — bom-de-ter pra
+        // queimar token via path único histórico, mas NÃO é load-bearing.
+        // Por isso a UX da falha pode ser honesta (não mentir "o terapeuta
+        // vai receber") — o caminho do servidor já cobre o caso normal.
         try {
           await finalizeInvite(inviteToken, readingId, clientId)
         } catch (err) {
           console.error('[capture-client] finalizeInvite error:', err)
-          toast.error('Falha ao finalizar leitura. O terapeuta receberá mesmo assim.')
-          // Não para o redirect — leitura está salva, o terapeuta vê.
+          toast.error(
+            'Tivemos um problema na confirmação final. Se algo parecer faltando, recarregue esta página.',
+            { duration: 6000 },
+          )
+          // Não bloqueia redirect — auto-finalize do servidor já fechou o
+          // ciclo no caso normal.
         }
         router.push(finalizeRedirect ?? `/convite/${inviteToken}/obrigada`)
         return
