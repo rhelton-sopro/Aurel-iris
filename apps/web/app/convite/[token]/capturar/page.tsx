@@ -64,38 +64,75 @@ export default async function ConviteCapturarPage({
     redirect(`/convite/${token}`)
   }
 
-  // Cria reading com therapist_id do token, capture_method='mobile_camera'
-  // (path público é sempre mobile — cliente abre no celular). Service-role
-  // bypassa RLS — não há sessão authed do cliente.
-  const { data: reading, error: readingErr } = await service
-    .from('readings')
-    .insert({
-      client_id: client.id,
-      therapist_id: validation.token.therapist_id,
-      status: 'pending',
-      capture_method: 'mobile_camera',
-    })
-    .select('id')
-    .single()
-  if (readingErr || !reading) {
-    return (
-      <div className="mx-auto max-w-md px-4 py-12 space-y-2">
-        <h2 className="text-xl font-semibold">Não conseguimos iniciar sua leitura</h2>
-        <p className="text-sm text-muted-foreground">
-          Tente recarregar a página. Se persistir, peça um novo link ao seu
-          terapeuta.
-        </p>
-      </div>
-    )
+  // 2026-05-22 fix (founder UAT — Evanilce gerou 5 readings sujas):
+  // se token já tem used_by_reading_id apontando pra reading em pending,
+  // retoma. Senão cria nova + pré-vincula no token pra próxima reentrada.
+  // Zero migration — coluna client_invite_tokens.used_by_reading_id já
+  // existe (0025), antes só era preenchida no finalize.
+  let readingId: string | null = null
+  let capturedSlots: { eye: string; angle: string }[] = []
+
+  if (validation.token.used_by_reading_id) {
+    const { data: existing } = await service
+      .from('readings')
+      .select('id, status, reading_images(eye, angle)')
+      .eq('id', validation.token.used_by_reading_id)
+      .maybeSingle()
+    if (existing && existing.status === 'pending') {
+      readingId = existing.id
+      capturedSlots = (existing.reading_images ?? []).map(
+        (img: { eye: string; angle: string }) => ({
+          eye: img.eye,
+          angle: img.angle,
+        }),
+      )
+    }
+    // se status != 'pending' (já promovida) ou reading foi deletada (FK
+    // on-delete-set-null já zerou used_by_reading_id), cai pro path de
+    // criação abaixo.
+  }
+
+  if (!readingId) {
+    const { data: created, error: createErr } = await service
+      .from('readings')
+      .insert({
+        client_id: client.id,
+        therapist_id: validation.token.therapist_id,
+        status: 'pending',
+        capture_method: 'mobile_camera',
+      })
+      .select('id')
+      .single()
+    if (createErr || !created) {
+      return (
+        <div className="mx-auto max-w-md px-4 py-12 space-y-2">
+          <h2 className="text-xl font-semibold">Não conseguimos iniciar sua leitura</h2>
+          <p className="text-sm text-muted-foreground">
+            Tente recarregar a página. Se persistir, peça um novo link ao seu
+            terapeuta.
+          </p>
+        </div>
+      )
+    }
+    readingId = created.id
+    // Pre-vincula no token pra próxima reentrada do mesmo link reusar esta.
+    // Cast 'as never' espelha markTokenUsed em lib/invite/tokens.ts (types
+    // não geraram client_invite_tokens ainda — founder regen depois).
+    await service
+      .from('client_invite_tokens' as never)
+      .update({ used_by_reading_id: readingId } as never)
+      .eq('id', validation.token.id)
   }
 
   return (
     <InviteCaptureWrapper
-      readingId={reading.id}
+      readingId={readingId}
       clientId={client.id}
       clientName={client.full_name}
       therapistId={validation.token.therapist_id}
       inviteToken={token}
+      capturedSlots={capturedSlots}
+      resumeMode={capturedSlots.length > 0}
     />
   )
 }

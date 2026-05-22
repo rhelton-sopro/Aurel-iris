@@ -18,12 +18,16 @@ export function InviteCaptureWrapper({
   clientName,
   therapistId,
   inviteToken,
+  capturedSlots,
+  resumeMode,
 }: {
   readingId: string
   clientId: string
   clientName: string
   therapistId: string
   inviteToken: string
+  capturedSlots: { eye: string; angle: string }[]
+  resumeMode: boolean
 }) {
   return (
     <div className="relative flex-1 min-h-dvh flex flex-col">
@@ -32,8 +36,8 @@ export function InviteCaptureWrapper({
         clientId={clientId}
         clientName={clientName}
         therapistId={therapistId}
-        capturedSlots={[]}
-        resumeMode={false}
+        capturedSlots={capturedSlots}
+        resumeMode={resumeMode}
         inviteToken={inviteToken}
         finalizeRedirect={`/convite/${inviteToken}/obrigada`}
       />

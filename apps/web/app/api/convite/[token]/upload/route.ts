@@ -91,6 +91,14 @@ export async function POST(
   if (!reading || reading.therapist_id !== validation.token.therapist_id) {
     return NextResponse.json({ error: 'reading não pertence ao convite' }, { status: 403 })
   }
+  // Defesa em profundidade (2026-05-22): além do therapist match, exige que
+  // a reading seja exatamente a vinculada ao token (used_by_reading_id
+  // pré-setado em /convite/[token]/capturar quando cria/retoma a reading).
+  // Protege contra 2 abas simultâneas: a aba perdedora do race no UPDATE
+  // do used_by_reading_id para de uploadar (recebe 403).
+  if (validation.token.used_by_reading_id && reading.id !== validation.token.used_by_reading_id) {
+    return NextResponse.json({ error: 'reading não vinculada ao convite atual' }, { status: 403 })
+  }
 
   const therapistId = validation.token.therapist_id
   const path = buildOriginalStoragePath(
