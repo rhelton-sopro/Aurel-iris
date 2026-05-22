@@ -17,7 +17,9 @@ import 'server-only'
 import { createServiceClient } from '@/lib/supabase/service'
 
 const RESEND_API_URL = 'https://api.resend.com/emails'
-const DEFAULT_FROM = 'Iris Codex <onboarding@resend.dev>'
+// Domínio iriscodex.com verificado no Resend desde 2026-05-22 (founder).
+// Override via RESEND_FROM_EMAIL no env se quiser outro endereço.
+const DEFAULT_FROM = 'Iris Codex <noreply@iriscodex.com>'
 
 export async function notifyTherapistReadingReady(readingId: string): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY
