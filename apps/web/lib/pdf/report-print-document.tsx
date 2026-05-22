@@ -272,7 +272,7 @@ const PRINT_CSS = `
     margin: 10px 0 20px;
   }
 
-  .section-body { font-size: 13pt; line-height: 1.9; color: ${C.body}; }
+  .section-body { font-size: 12pt; line-height: 1.9; color: ${C.body}; }
   .section-body p { margin: 0 0 16px; }
   .section-body p:last-child { margin-bottom: 0; }
   .section-body ul, .section-body ol { margin: 0 0 16px; padding-left: 22px; }
@@ -291,7 +291,7 @@ const PRINT_CSS = `
     padding: 2px 0 2px 22px;
     border-left: 2px solid var(--teal);
     font-style: italic;
-    font-size: 14.5pt;
+    font-size: 13.5pt;
     line-height: 1.7;
     color: var(--teal-dark);
   }
@@ -303,7 +303,7 @@ const PRINT_CSS = `
     background: var(--ivory);
     border-left: 3px solid var(--teal);
     padding: 26px 30px;
-    font-size: 13.5pt;
+    font-size: 12.5pt;
     line-height: 2.0;
     color: #2A2420;
   }
@@ -336,7 +336,7 @@ const PRINT_CSS = `
     margin: 0 0 10px;
     padding-bottom: 10px;
   }
-  .sintese-card .sintese-body { font-size: 12.5pt; line-height: 1.7; color: ${C.body}; }
+  .sintese-card .sintese-body { font-size: 11.5pt; line-height: 1.7; color: ${C.body}; }
   .sintese-card .sintese-body p { margin: 0 0 8px; }
   .sintese-card .sintese-body p:last-child { margin-bottom: 0; }
   .sintese-card .sintese-body ul,
