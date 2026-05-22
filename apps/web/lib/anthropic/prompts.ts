@@ -91,6 +91,12 @@ export function loadSystemPrompt(): string {
  * default; sweep anti-Forer reforçado em §7/§10/§11. Snapshot v1 fica
  * recuperável via env REPORT_PROMPT_VERSION=v1.
  *
+ * v2.1.0 (2026-05-22) = §11 anti-template EXPANDIDO pras outras 5
+ * categorias (Nutrição, Fitoterapia, Práticas corporais, Florais,
+ * Adaptógenos). Cada categoria tem defaults proibidos explícitos +
+ * eixos de seleção ancorados em achados §1-§10. Teste meta-§11
+ * obrigatório no final ("releia 18 bullets — funcionaria pra outra íris?").
+ *
  * Pareado com getSystemPromptVersion() (sha curto) — label é o nome
  * humano, sha é a impressão digital exata do conteúdo (varia a cada
  * edit; label só varia quando você bumpa).
@@ -98,8 +104,8 @@ export function loadSystemPrompt(): string {
 export const REPORT_PROMPT_LABEL = (
   process.env.REPORT_PROMPT_VERSION?.trim().toLowerCase() === 'v1'
     ? 'v1.0.0'
-    : 'v2.0.0'
-) as 'v1.0.0' | 'v2.0.0'
+    : 'v2.1.0'
+) as 'v1.0.0' | 'v2.1.0'
 
 /**
  * Stable short fingerprint of the EFFECTIVE system.md content (12 hex chars

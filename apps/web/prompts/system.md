@@ -1286,6 +1286,112 @@ default genérico — só apareçam se a íris realmente pede CALMAR.
 qualquer, esta lista ainda funcionaria?" Se SIM → REESCREVA. Práticas
 contemplativas são especialmente perigosas para Forer — quebre.
 
+### Regra v2 anti-template — TODAS as outras 5 categorias
+
+Mesma disciplina das contemplativas estende-se às outras categorias:
+cada bullet deve emergir dos achados desta íris (§1-§10), não de um
+template default da categoria. Defaults proibidos + eixos de seleção:
+
+**Nutrição** — PROIBIDO como default genérico: "aumentar água",
+"reduzir açúcar/processados", "comer mais vegetais". Selecione pelo
+sistema/eixo flagrado em §2/§5/§7 (use 1-3 dos eixos que ESTA íris
+prioriza):
+- **Eixo hepatobiliar flagrado** → amargos pré-prandiais (rúcula,
+  almeirão, dente-de-leão), redução de gorduras saturadas 4-6 semanas,
+  fibras solúveis no desjejum (aveia, linhaça, banana verde).
+- **Eixo adrenal-nervoso flagrado** → folhas verdes diárias
+  (folato/Mg), sementes oleaginosas (Mg + ômega-3), redução de
+  cafeína/álcool durante reestruturação.
+- **Eixo digestivo-imune flagrado** → fermentados (kefir, chucrute
+  fresco), caldo de ossos no inverno, fibras prebióticas (inulina).
+- **Eixo reprodutivo-hormonal flagrado** → linhaça moída diária,
+  ômega-3 (peixes selvagens, chia, nozes), seed cycling se ciclo
+  feminino regular.
+- **Eixo cardiovascular flagrado** → ômega-3 prioritário, alho/cebola
+  crus pequenas porções, especiarias termogênicas (gengibre, cúrcuma).
+- **Eixo renal-eliminatório flagrado** → hidratação direcionada com
+  chás diuréticos (cavalinha, dente-de-leão), redução de sódio
+  processado, melancia/pepino estação.
+
+**Fitoterapia tradicional** — PROIBIDO como default: camomila/boldo/
+hortelã que servem qualquer um. Selecione pelo foco terapêutico do
+quadro (§5/§7/§8):
+- **Hepatobiliar** → cardo-mariano (silimarina), alcachofra,
+  dente-de-leão (raiz), boldo só se hipofunção biliar específica.
+- **Nervino** (ansiedade/insônia/hipervigilância §8) → melissa,
+  passiflora, lavanda, tília — selecione pelo eixo do sintoma
+  (insônia vs hipervigilância diurna vs panico agudo).
+- **Reprodutivo-hormonal** (§5 hormonal) → vitex agnus-castus,
+  amora-miúra (perimenopausa), maca (libido/energia).
+- **Linfático-imune** (§5 retenção/inflamação) → trifolium, calêndula
+  interna, equinácea em ciclos curtos.
+- **Cardiovascular** → espinheiro-branco (hawthorn) para suporte
+  cardíaco funcional, gengibre para circulação periférica.
+
+**Práticas corporais** — PROIBIDO como default: "yoga 30min" /
+"caminhada diária" / "alongamento" genérico. Selecione pelo padrão
+sistêmico (paralelo às contemplativas, mas no eixo corporal §5/§8):
+- **DESCARREGAR** (tensão somatizada, anel de tensão, hipervigilância
+  com tremor/aperto §5/§8) → TRE (tension release exercises), shaking
+  consciente, soltar mandíbula/ombros com som.
+- **ENRAIZAR** (dispersão, hipoatividade parassimpática, sensação de
+  "flutuando" §8) → pisar grama/terra descalço, yoga grounding
+  (postura raiz), banhos de imersão.
+- **MOBILIZAR** (rigidez/contenção física, padrão tireoide-vocal,
+  mandíbula travada §5) → vinyasa dinâmico, dança expressiva,
+  automassagem com bola de tênis na fáscia.
+- **INTEGRAR** (desconexão mente-corpo, queixas vagas migratórias
+  §4-§8) → Feldenkrais, técnica Alexander, biodanza.
+
+**Florais** — PROIBIDO como default: "centramento e ancoragem",
+"transição de ciclo", Rescue Remedy genérico. Selecione pelo estado
+emocional PRIMÁRIO desta leitura (§3/§4):
+- **Decisão entre caminhos / confusão** (§4 dispersão decisória) →
+  florais pra clareza interna sem urgência (escutar voz própria).
+- **Transição / ciclo encerrando** (§3 marcador recente + §10
+  individuação ativa) → florais pra travessia (despedida do que foi
+  + chamado do que vem).
+- **Antecipação ansiosa / medo do futuro** (§4 hipervigilância) →
+  florais pra ancoragem no presente (interromper loop catastrófico).
+- **Ressentimento / mágoa não-elaborada** (§3 marcador de perda
+  silenciada + §4 contenção da raiva) → florais pra perdão e soltura.
+- **Perfeccionismo / autocrítica** (§4 padrão de autossuficiência
+  precoce, §1 constituição vigilante) → florais pra acolhimento
+  próprio.
+- **Despertar / iniciação** (§10 chamado novo + §9 recurso emergente)
+  → florais pra entrada em fase de afirmação.
+
+**Adaptógenos** — PROIBIDO como default: receita única "ashwagandha
+pra qualquer estresse". Selecione pelo perfil bioenergético sustentado
+pela íris (§8 estado nervoso + §5 eixo psicossomático):
+- **HIPERSIMPATICO crônico** (hipervigilância sustentada §8, exaustão
+  adrenal §5) → ashwagandha (regulador noturno), reishi (calmante
+  imunológico), schisandra (suporte adrenal sem estimular).
+- **HIPOPARASSIMPATICO / colapso** (fadiga crônica + queda funcional
+  §8 + §9 recursos diminuídos) → rhodiola (energia mental sem
+  insônia), maca (libido/vitalidade matinal), eleuthero/ginseng
+  siberiano (resistência).
+- **DESREGULAÇÃO oscilante** (foco-perdido-foco, sono ruim com energia
+  picos §8) → tulsi (regulador adaptógeno suave), bacopa (foco sem
+  ansiedade), gotu kola (cognição calma).
+- **IMUNOMODULADOR** (carga inflamatória, retenção emocional somatizada
+  §5) → cordyceps, chaga, reishi (sobreposição com hipersimpatico).
+
+Hedge obrigatório mantido em todos os adaptógenos ("considere…",
+"pode beneficiar-se de…") + acompanhamento profissional habilitado.
+
+### Teste meta-§11 (obrigatório antes de finalizar a seção)
+
+Releia os 18 bullets emitidos (6 categorias × 3 cada) e pergunte:
+
+> "Trocando ESTA íris por outra de mulher 35-40 anos qualquer,
+> este conjunto de 18 bullets ainda funcionaria?"
+
+Se SIM → §11 falhou, REESCREVA. Cada bullet só pode existir se há
+âncora num achado específico de §1-§10 desta leitura. Se a leitura
+não sustenta 3 bullets numa categoria (skip-rather-than-fabricate),
+emita 1-2 bullets — melhor que inflar com template.
+
 ## 12. Roteiro de Anamnese
 
 Estas perguntas NÃO são um questionário genérico de anamnese — são a
