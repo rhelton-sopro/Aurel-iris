@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { Zap, ZapOff } from 'lucide-react'
+import { Zap, ZapOff, Camera, RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { Slot, CaptureMode } from '@/lib/capture/sequence'
 import { getSlotInstructionCopy } from '@/lib/capture/sequence'
@@ -48,11 +48,14 @@ export function AngleInterstitial({ nextSlot, slotIndex, onProceed, mode }: Angl
             impossibilitar erro entre fotos. */}
         <FlashCard flashOn={copy.flashOn} />
 
-        {/* Lembretes secundários, compactos — não competem com o card. */}
-        <div className="w-full rounded-lg border border-border bg-muted/40 px-4 py-2.5 text-left space-y-1">
-          <p className="text-xs text-foreground/80">
-            • Câmera <strong>traseira</strong> (não a frontal).
-          </p>
+        {/* Aviso de câmera traseira — alto contraste vermelho.
+            Founder UAT 2026-05-22: uma cliente tirou com frontal apesar do
+            aviso cinza. Equiparado ao FlashCard dominante: cor + ícone +
+            ilustração de troca de câmera, impossível ignorar. */}
+        <RearCameraWarning />
+
+        {/* Lembrete secundário, compacto — não compete com o card vermelho. */}
+        <div className="w-full rounded-lg border border-border bg-muted/40 px-4 py-2.5 text-left">
           <p className="text-xs text-foreground/80">
             • Se o exame é seu, peça a outra pessoa para fotografar você.
           </p>
@@ -112,6 +115,39 @@ function FlashCard({ flashOn }: { flashOn: boolean }) {
         </span>
         <span className="text-xs text-white/90 leading-tight mt-0.5">
           Esta é a 3ª foto deste olho. SEM flash — toque no raio pra desativar.
+        </span>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Aviso de câmera traseira — alto contraste vermelho, mesmo nível visual
+ * do FlashCard. Founder UAT 2026-05-22: cliente tirou com câmera frontal
+ * apesar do aviso anterior (cinza/text-xs). Tratamento: ícone Camera grande
+ * + RotateCcw indicando "vire/troque" + texto bold uppercase vermelho.
+ */
+function RearCameraWarning() {
+  return (
+    <div
+      role="alert"
+      aria-live="assertive"
+      className="w-full rounded-lg border-2 border-red-700 bg-red-600 px-4 py-4 flex items-center gap-3 shadow-md"
+    >
+      <div className="relative flex-shrink-0">
+        <Camera className="h-10 w-10 text-white" strokeWidth={2.5} />
+        <RotateCcw
+          className="absolute -bottom-1 -right-1 h-4 w-4 text-white bg-red-700 rounded-full p-0.5"
+          strokeWidth={3}
+        />
+      </div>
+      <div className="flex flex-col">
+        <span className="text-base font-extrabold uppercase tracking-wide text-white leading-tight">
+          Use a câmera traseira
+        </span>
+        <span className="text-xs text-white/90 leading-tight mt-0.5">
+          NÃO a selfie/frontal. Se o app abriu na frontal, toque no ícone de
+          troca de câmera antes de fotografar.
         </span>
       </div>
     </div>

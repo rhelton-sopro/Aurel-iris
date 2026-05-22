@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Camera, RotateCcw } from 'lucide-react'
 
 import { validateToken } from '@/lib/invite/tokens'
 import { createServiceClient } from '@/lib/supabase/service'
@@ -48,10 +49,34 @@ export default async function InviteLandingPage({
           </p>
         </div>
 
+        {/* Aviso de câmera traseira destacado — founder UAT 2026-05-22:
+            cliente tirou com frontal apesar do aviso anterior. Mesmo
+            tratamento alto-contraste do AngleInterstitial. */}
+        <div
+          role="alert"
+          aria-live="assertive"
+          className="rounded-lg border-2 border-red-700 bg-red-600 px-4 py-4 flex items-center gap-3 shadow-md"
+        >
+          <div className="relative flex-shrink-0">
+            <Camera className="h-10 w-10 text-white" strokeWidth={2.5} />
+            <RotateCcw
+              className="absolute -bottom-1 -right-1 h-4 w-4 text-white bg-red-700 rounded-full p-0.5"
+              strokeWidth={3}
+            />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-base font-extrabold uppercase tracking-wide text-white leading-tight">
+              Use a câmera traseira
+            </span>
+            <span className="text-xs text-white/90 leading-tight mt-0.5">
+              NÃO a selfie/frontal. Peça outra pessoa para fotografar você.
+            </span>
+          </div>
+        </div>
+
         <div className="rounded-md border border-border bg-muted/30 p-3 space-y-2 text-sm">
           <p className="font-medium">Para uma boa leitura:</p>
           <ul className="list-disc pl-5 space-y-1 text-foreground/80">
-            <li>Use a câmera <strong>traseira</strong> (não a frontal).</li>
             <li>Tire as fotos com <strong>boa iluminação</strong>.</li>
             <li>Peça <strong>outra pessoa</strong> para fotografar você.</li>
           </ul>

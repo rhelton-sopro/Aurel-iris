@@ -48,9 +48,13 @@ export default async function LeiturasPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-2">
+      {/* Mobile: título + actions empilhados verticalmente. Desktop (sm+):
+          row com space-between. Founder UAT 2026-05-22: "Nova leitura"
+          saía do enquadramento em telas pequenas porque o flex row não
+          quebrava — agora wrap em col abaixo de sm. */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-2">
         <h1 className="text-[22px] font-light uppercase tracking-display text-ink">Leituras</h1>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <LeiturasHeaderActions availableClients={availableClients} />
           {list.length > 0 && (
             <Link href="/leituras/nova" className={cn(buttonVariants())}>

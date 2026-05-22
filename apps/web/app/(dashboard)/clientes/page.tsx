@@ -17,9 +17,10 @@ export default async function ClientesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-2">
+      {/* Mesma responsividade de /leituras: empilha em mobile, row em sm+. */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-2">
         <h1 className="text-[22px] font-light uppercase tracking-display text-ink">Clientes</h1>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <ClientesHeaderActions
             availableClients={list.map((c) => ({ id: c.id, full_name: c.full_name }))}
           />
