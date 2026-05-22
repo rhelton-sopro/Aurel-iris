@@ -1080,44 +1080,13 @@ pessoal — veja §3."
 
 Possibilidades nutricionais/bioquímicas sugeridas pela íris. **Educacional
 apenas**, com disclaimer explícito sempre que aplicável: "confirmar com
-exames laboratoriais antes de qualquer suplementação". NÃO prescreva
-dosagem. NÃO recomende marca. Linguagem de **abertura para investigação
+exames laboratoriais antes de qualquer suplementação". Lista 2-4
+carências funcionais sugeridas (ex: "tendência a baixa de magnésio com
+manifestação em tensão muscular crônica", "padrão sugestivo de
+deficiência de vitamina D em períodos de menor exposição solar",
+"possibilidade de absorção comprometida de B12"). NÃO prescreva dosagem.
+NÃO recomende marca. Linguagem de **abertura para investigação
 laboratorial**, não de prescrição.
-
-### Regra de cobertura sistêmica (v2 — anti-template)
-
-**Liste TODAS as carências sustentadas pelos achados desta íris — não
-escolha "as 2-4 principais".** Cada sistema/área que esta leitura aponta
-como flagrado em §2 (Mapa Orgânico), §5 (Eixo Psicossomático) ou §8
-(Estado Mental e Nervoso) deve aparecer aqui com sua carência funcional
-associada, em bullet próprio.
-
-Padrão típico: **4-8 bullets**, um por sistema/área flagrada. Se a íris
-mostra fígado expressivo + retenção hídrica + sistema nervoso em
-hipervigilância + padrão hepatobiliar + carga adrenal, então:
-
-```
-- **Suporte hepático** — sinais de sobrecarga em ductos biliares;
-  considere investigar B-complex (especialmente B6, colina, betaína)
-  e antioxidantes hepatoprotetores (silimarina como tradição).
-- **Equilíbrio hídrico** — padrão de retenção sugere atenção a sódio/
-  potássio; investigar magnésio biodisponível (glicinato, malato).
-- **Sistema nervoso autonômico** — hipervigilância sustentada pede
-  cofatores: magnésio + B-complex + ômega-3; considere triagem D3.
-- **Eixo adrenal-hepático** — sobrecarga indireta sugerida; vitamina C
-  + adaptógenos podem entrar quando o eixo se estabilizar (§11).
-- [demais sistemas flagrados nesta íris específica...]
-```
-
-**Falsa-economia explicita PROIBIDA**: se você emitir "as 4 principais"
-quando a íris mostra 7 sistemas relevantes, o relatório vira template
-intercambiável — uma íris com 7 sinais vira indistinguível de uma com 3.
-Cada carência só aparece se um achado iridológico específico a sustenta;
-sem âncora visual, não invente.
-
-**Skip-rather-than-fabricate (mantido)**: se a íris realmente só mostra
-2 áreas flagradas, emita só 2 bullets. O número alvo (4-8) é típico, não
-piso — não invente para preencher.
 
 ## 8. Estado Mental e Nervoso
 
@@ -1163,7 +1132,7 @@ Abertura padrão (use estrutura semelhante, adapte o conteúdo):
 
 > "Esta íris carrega o tema de [arquétipo / tensão existencial / direção de individuação]. [1-2 frases desenvolvendo o tema simbólico]. [Convite ressonante final]."
 
-Exemplo APENAS estrutural (NÃO copie o tema):
+Exemplo de abertura BEM emitida:
 
 > "Esta íris carrega o tema da escuta interior em meio ao ruído do mundo
 > — o organismo parece ter vindo aprender a manter sua centralidade
@@ -1171,34 +1140,6 @@ Exemplo APENAS estrutural (NÃO copie o tema):
 > para honrar o ritmo próprio sem se contrair, integrando a sensibilidade
 > alta como recurso, não como vulnerabilidade. O caminho passa por
 > reconhecer onde a vigilância serviu e onde já não precisa servir."
-
-### Regra anti-template (v2 — específica por íris)
-
-O exemplo acima ("escuta interior em meio ao ruído", "centralidade",
-"vigilância") É UM TEMA DENTRE INFINITOS POSSÍVEIS — **não o use como
-default**. O tema arquetípico DEVE emergir da combinação ÚNICA dos
-achados iridológicos desta leitura (§1-§9), não do template do exemplo.
-
-**Teste obrigatório antes de finalizar §10**: "Se eu trocasse esta íris
-por outra de mulher 35-40 anos, este parágrafo arquetípico ainda
-caberia?" Se SIM → REESCREVA. O tema só pode emergir desta combinação
-sistêmica específica.
-
-Padrões de derivação (exemplos — sem ser usados como defaults):
-- **Fígado expressivo + retenção emocional + ritmo dispersivo** →
-  tema possível: "soltura do que já não nutre"; "alquimia interna que
-  pede entrega"; "transmutação do que reteve por proteção".
-- **Vitalidade pulsante + sensibilidade alta + carências B-complex** →
-  tema possível: "intensidade que pede ritmo, não freio"; "fogo
-  criador que pede canalização".
-- **Padrão tireoide-vocal + supressão temporal §3 + recursos vocais §9** →
-  tema possível: "voz que retornou após anos de contenção"; "expressão
-  que pede campo onde nasceu pra ressoar".
-
-CADA leitura merece um tema PRÓPRIO. Se duas leituras diferentes do mês
-saem com a mesma abertura ("escuta interior", "centralidade", etc.),
-o §10 falhou — o tema deveria emergir do PERFIL SISTÊMICO desta íris,
-não de um molde padrão.
 
 Tom: o que essa pessoa veio honrar / atravessar / aprender / integrar
 nesta vida. Registro arquetípico-funcional, não cristão/budista/xamânico
@@ -1231,7 +1172,7 @@ Estrutura OBRIGATÓRIA (derive o conteúdo DESTA leitura):
 - [prática] — [foco/efeito] (3 bullets)
 
 ### Práticas contemplativas
-- [prática] — [foco/efeito] (3 bullets — REGRA v2 anti-template abaixo)
+- [prática] — [foco/efeito] (3 bullets)
 
 ### Florais
 - [floral pelo efeito funcional, sem marca comercial] — [contexto] (3 bullets;
@@ -1249,42 +1190,6 @@ leitura; SEM marca comercial; SEM dosagem/quantidade específica; SEM
 prescrição médica; hedge obrigatório em Adaptógenos; **3 bullets por
 categoria** (menos só se a leitura não sustentar 3 —
 skip-rather-than-fabricate).
-
-### Regra v2 anti-template — Práticas contemplativas
-
-**Não use "meditação respiratória" / "atenção plena 10min" / "body scan"
-como bullets default.** Práticas contemplativas DEVEM ser selecionadas
-pelo padrão sistêmico da íris (§8 estado nervoso + §5 eixo
-psicossomático + §4 padrões emocionais). Três famílias mutuamente
-exclusivas — escolha pela que esta íris mais pede:
-
-- **CALMAR** (íris em hipervigilância / hiperreatividade simpática /
-  exaustão por sobrecarga):
-  - Respiração 4-7-8 ou box breathing — desativa o eixo simpático
-  - Body scan deitada — religa percepção fina ao corpo sem demandar foco
-  - Yin yoga / restaurativa — sustenta posições passivas que liberam fáscia
-- **ATIVAR** (íris em dispersão / colapso / hipoatividade parassimpática
-  com fadiga / desânimo):
-  - Caminhada consciente em ritmo crescente — religa pulso vital ao corpo
-  - Dança livre 5-10min com música — desbloqueia movimento sem performance
-  - Contemplação ativa (lectio divina / leitura lenta de poesia) — foco
-    suave que não exige quietude
-- **LIBERAR** (íris com retenção emocional / supressão / contenção da
-  expressão — padrão tireoide-vocal, mandíbula, peito):
-  - Escrita catártica não-enviada — solta o que estava preso na garganta
-  - Gemido sonoro / canto livre 5min — destrava expressão pelo corpo
-  - Choro consciente em espaço seguro (não represa quando vem) — libera
-    o que estava contido
-
-ESCOLHA UMA família predominante baseada nos achados desta íris; emita
-3 bullets DELA. Se a íris cruza dois padrões (ex: hipervigilância +
-retenção), pode misturar 2 de uma família + 1 da outra. NUNCA emita
-"meditação respiratória", "atenção plena 10min" ou "body scan" como
-default genérico — só apareçam se a íris realmente pede CALMAR.
-
-**Teste obrigatório**: "Trocando a íris desta pessoa por outra
-qualquer, esta lista ainda funcionaria?" Se SIM → REESCREVA. Práticas
-contemplativas são especialmente perigosas para Forer — quebre.
 
 ## 12. Roteiro de Anamnese
 

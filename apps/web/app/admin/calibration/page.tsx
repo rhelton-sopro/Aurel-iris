@@ -111,12 +111,13 @@ export default async function CalibrationListPage({
 
   const supabase = createServiceClient()
 
-  // Fetch readings with vision_features in completed states.
+  // 2026-05-22 founder UAT: mostra TODAS as leituras, não só ready/edited.
+  // Founder usa essa página pra "olhar as fotos como ficaram" pra ajustar
+  // calibração — pending/processing/failed também são relevantes (a foto
+  // foi capturada antes do pipeline rodar).
   const { data: readings } = await supabase
     .from('readings')
     .select('id, created_at, status, vision_features, client:clients(full_name)')
-    .not('vision_features', 'is', null)
-    .in('status', ['ready', 'edited'])
     .order('created_at', { ascending: false })
 
   const allReadings = (readings ?? []) as ReadingRow[]

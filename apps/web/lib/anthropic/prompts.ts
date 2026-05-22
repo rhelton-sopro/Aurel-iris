@@ -35,9 +35,24 @@ const PROMPTS_DIR = path.join(process.cwd(), 'prompts')
 const CACHE_CONTROL_TOKEN_MARGIN = 2200
 const CHARS_PER_TOKEN_ESTIMATE = 4
 
+/**
+ * Versionamento ao vivo do prompt do relatório (founder UAT 2026-05-22).
+ * Default = v2 (system.md). Setar env `REPORT_PROMPT_VERSION=v1` força o
+ * fallback pra system-v1.md (snapshot do estado pré-v2). Permite rollback
+ * sem revert no git: muda env no Vercel e redeploya.
+ *
+ * Toda nova versão segue o mesmo padrão: cópia atual vira system-v{N-1}.md,
+ * system.md recebe a nova versão.
+ */
+function resolvePromptFile(): string {
+  const version = process.env.REPORT_PROMPT_VERSION?.trim().toLowerCase()
+  if (version === 'v1') return 'system-v1.md'
+  return 'system.md'
+}
+
 export function loadSystemPrompt(): string {
   if (_systemCache !== null) return _systemCache
-  const filepath = path.join(PROMPTS_DIR, 'system.md')
+  const filepath = path.join(PROMPTS_DIR, resolvePromptFile())
   _systemCache = readFileSync(filepath, 'utf8')
   // Pitfall 4 — token-count check no first load.
   // Aproximação: 1 token ≈ 4 chars para pt-BR + estrutura markdown.
@@ -68,11 +83,23 @@ export function loadSystemPrompt(): string {
  * phrase 60w + flash 2-com-1-sem-protocolo + sonnet-direct estável).
  * Founder UAT-aprovado em iriscodex.com 2026-05-20.
  *
+ * v2.0.0 (2026-05-22) = anti-template push: §7 lista TODAS as carências
+ * sustentadas (não 2-4 "principais"); §10 arquétipo deve emergir da
+ * combinação ÚNICA desta íris (banido template "escuta interior em meio
+ * ao ruído" como default); §11.Práticas contemplativas seleciona por
+ * padrão sistêmico (calmar/ativar/liberar) — sem "meditação respiratória"
+ * default; sweep anti-Forer reforçado em §7/§10/§11. Snapshot v1 fica
+ * recuperável via env REPORT_PROMPT_VERSION=v1.
+ *
  * Pareado com getSystemPromptVersion() (sha curto) — label é o nome
  * humano, sha é a impressão digital exata do conteúdo (varia a cada
  * edit; label só varia quando você bumpa).
  */
-export const REPORT_PROMPT_LABEL = 'v1.0.0' as const
+export const REPORT_PROMPT_LABEL = (
+  process.env.REPORT_PROMPT_VERSION?.trim().toLowerCase() === 'v1'
+    ? 'v1.0.0'
+    : 'v2.0.0'
+) as 'v1.0.0' | 'v2.0.0'
 
 /**
  * Stable short fingerprint of the EFFECTIVE system.md content (12 hex chars

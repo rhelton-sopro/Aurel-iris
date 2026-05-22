@@ -272,7 +272,7 @@ const PRINT_CSS = `
     margin: 10px 0 20px;
   }
 
-  .section-body { font-size: 11pt; line-height: 1.9; color: ${C.body}; }
+  .section-body { font-size: 13pt; line-height: 1.9; color: ${C.body}; }
   .section-body p { margin: 0 0 16px; }
   .section-body p:last-child { margin-bottom: 0; }
   .section-body ul, .section-body ol { margin: 0 0 16px; padding-left: 22px; }
