@@ -120,7 +120,7 @@ export default async function LeituraDetailPage({
   // Continuous flowing serif document with top action buttons.
   if (isReadingMode) {
     return (
-      <div className="space-y-6 px-6 py-8">
+      <div className="space-y-6 -mx-7 px-4 py-8 sm:mx-0 sm:px-6">
         <div className="flex items-center justify-between">
           <Link
             href="/leituras"
@@ -155,7 +155,7 @@ export default async function LeituraDetailPage({
   // ---- WAITING / EMPTY / STREAMING (State A or State B) ----
   // Preserved AnalysisHero + AnaliseClient path.
   return (
-    <div className="space-y-6 px-6 py-8">
+    <div className="space-y-6 -mx-7 px-4 py-8 sm:mx-0 sm:px-6">
       <AutoRefreshWhileProcessing active={status === 'processing' || isAnalysisInProgress} />
       <div className="flex items-center justify-between">
         <Link

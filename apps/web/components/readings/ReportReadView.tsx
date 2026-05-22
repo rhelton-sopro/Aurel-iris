@@ -150,7 +150,7 @@ export function ReportReadView({
       style={{
         ...SERIF,
         color: C.ink,
-        hyphens: 'auto',
+        hyphens: 'manual',
         overflowWrap: 'break-word',
         wordBreak: 'normal',
       }}
