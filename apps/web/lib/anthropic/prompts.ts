@@ -41,12 +41,17 @@ let _systemVersionCache: string | null = null
  *     calibração do bloco anti-repetição em recent-phrases-context.ts:
  *     regra dura sobre FÓRMULAS ESTRUTURAIS a evitar (não palavras a
  *     substituir). Stage 1 inalterado.
+ *   - `sonnet_2x_0.2.0` (v2.4.0, 2026-05-23) = mesma arquitetura, bloco
+ *     overlay VOICE_OVERRIDE_V2_4 entra como 3º system block na Stage 2
+ *     pra recuperar voz visceral/somática/com presença de observador
+ *     drenada pelo JSON estruturado. Bump MINOR — mudança qualitativa
+ *     de registro, não calibração pequena. Stage 1 inalterado.
  *
  * Persistido em `report_findings.method_version` e
  * `report_generations.method_version` pra atribuir variação de
  * qualidade/custo a mudanças arquiteturais vs cirurgias no prompt.
  */
-export const METHOD_VERSION = 'sonnet_2x_0.1.1' as const
+export const METHOD_VERSION = 'sonnet_2x_0.2.0' as const
 
 const PROMPTS_DIR = path.join(process.cwd(), 'prompts')
 
