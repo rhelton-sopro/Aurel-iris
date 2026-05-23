@@ -37,12 +37,16 @@ let _systemVersionCache: string | null = null
  *     Etapa 2 compõe as 15 seções ancoradas no JSON + memória de 10
  *     últimas frases do terapeuta. system.md INTOCADO entre as 2
  *     versões — única mudança é orquestração + injeção.
+ *   - `sonnet_2x_0.1.1` (v2.3.0.1, 2026-05-23) = mesma arquitetura,
+ *     calibração do bloco anti-repetição em recent-phrases-context.ts:
+ *     regra dura sobre FÓRMULAS ESTRUTURAIS a evitar (não palavras a
+ *     substituir). Stage 1 inalterado.
  *
  * Persistido em `report_findings.method_version` e
  * `report_generations.method_version` pra atribuir variação de
  * qualidade/custo a mudanças arquiteturais vs cirurgias no prompt.
  */
-export const METHOD_VERSION = 'sonnet_2x_0.1.0' as const
+export const METHOD_VERSION = 'sonnet_2x_0.1.1' as const
 
 const PROMPTS_DIR = path.join(process.cwd(), 'prompts')
 

@@ -416,15 +416,20 @@ function buildStage2UserContent(args: ComposeStage2Args): Anthropic.TextBlockPar
   return blocks
 }
 
-export const STAGE2_METHOD_VERSION = 'sonnet_2x_0.1.0' as const
+export const STAGE2_METHOD_VERSION = 'sonnet_2x_0.1.1' as const
 
 // v2.3.0 (2026-05-23): split do STAGE2_METHOD_VERSION em method qualitativo +
 // semver pra alinhar com a convenção nova de report_generations (migration
-// 0031: method='sonnet_2x' + method_version='0.1.0'). report_findings e
+// 0031: method='sonnet_2x' + method_version='0.1.x'). report_findings e
 // report_phrases mantêm a string concatenada por compatibilidade — débito
 // de harmonização registrado pra v2.3.x.
+//
+// v2.3.0.1 (2026-05-23): bump 0.1.0 → 0.1.1 — calibração do bloco
+// anti-repetição em recent-phrases-context.ts (regra dura sobre fórmulas
+// estruturais vs palavras). Stage 1 NÃO mudou — STAGE1_METHOD_VERSION
+// permanece 0.1.0.
 export const STAGE2_METHOD = 'sonnet_2x' as const
-export const STAGE2_VERSION = '0.1.0' as const
+export const STAGE2_VERSION = '0.1.1' as const
 
 /**
  * Etapa 2 do pipeline Sonnet 2x — composição streaming ancorada no JSON

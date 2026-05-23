@@ -98,8 +98,22 @@ function formatContextBlock(rows: RecentPhrasesRow[]): string {
   const intro = [
     'Aqui estão aberturas e sínteses dos seus relatórios mais recentes',
     'pra este terapeuta. **NÃO repita estas frases nem variações próximas',
-    'neste novo relatório.** Mantenha o MESMO TOM, a MESMA VOZ, o MESMO',
-    'REGISTRO — varie só a SINTAXE e a IMAGEM CONCRETA.',
+    'neste novo relatório.** Mantenha o MESMO TOM, a MESMA VOZ, o MESMO REGISTRO.',
+    '',
+    'Sobre VARIAÇÃO ESTRUTURAL — atenção máxima:',
+    '',
+    '- Se uma abertura anterior usou a fórmula "Alguém que aprendeu [verbo],',
+    '  a [verbo], a [verbo]...", a nova abertura DEVE ter estrutura sintática',
+    '  diferente. Não basta trocar as palavras dentro da mesma fórmula.',
+    '- Se uma abertura anterior usou "Esta íris carrega o tema de [X]", a nova',
+    '  abertura DEVE começar diferente. Pode ser uma imagem direta, uma pergunta,',
+    '  uma afirmação corporal, uma observação visual.',
+    '- Se uma abertura anterior usou "[Nome], o que a sua íris me trouxe hoje',
+    '  é...", a nova abertura DEVE começar de outro modo.',
+    '',
+    'REGRA DURA: leia as aberturas anteriores como FÓRMULAS A EVITAR, não como',
+    'palavras a substituir. Se a estrutura é igual, não é variação — é repetição',
+    'disfarçada.',
   ].join('\n')
 
   return [

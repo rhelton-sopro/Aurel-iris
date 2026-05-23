@@ -31,6 +31,7 @@ import { logReportGeneration } from '@/lib/calibration/log-generation'
 import {
   analyzeReadingComposeStage2,
   STAGE2_METHOD,
+  STAGE2_METHOD_VERSION,
   STAGE2_VERSION,
 } from '@/lib/anthropic/analyze-direct'
 import { runStage1Scan } from '@/lib/anthropic/stage1-scan'
@@ -411,7 +412,7 @@ export async function POST(
               p_therapist_id: user.id,
               p_prompt_version: getSystemPromptVersion(),
               p_prompt_sha: getSystemPromptVersion(),
-              p_method_version: 'sonnet_2x_0.1.0',
+              p_method_version: STAGE2_METHOD_VERSION,
               p_phrases: extracted as unknown as Record<string, unknown>,
               p_markdown_blob_url: null,
             } as never,
