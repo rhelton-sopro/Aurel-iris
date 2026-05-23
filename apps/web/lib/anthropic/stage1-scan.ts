@@ -92,7 +92,12 @@ import { createHash } from 'node:crypto'
 import type { DirectImage } from './analyze-direct'
 
 const STAGE1_PROMPT_FILENAME = 'stage1-scan.md'
-const STAGE1_METHOD_VERSION = 'sonnet_2x_0.1.0' as const
+// v2.3.0 (2026-05-23): 0.1.0 init.
+// v2.3.1 (2026-05-23): 0.1.0 → 0.1.2 — calibração linha_temporal em
+// stage1-scan.md (mínimo 3 marcadores não-negociável, conhecimento
+// multi-escolas, declaração de limitação em íris ilegível). Pula 0.1.1
+// pra alinhar com Stage 2 que foi 0.1.0→0.1.1 (anti-fórmula).
+const STAGE1_METHOD_VERSION = 'sonnet_2x_0.1.2' as const
 
 let _stage1PromptCache: string | null = null
 let _stage1ShaCache: string | null = null

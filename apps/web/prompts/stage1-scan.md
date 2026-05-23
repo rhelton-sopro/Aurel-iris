@@ -17,7 +17,11 @@
   motivo do system.md — explicitamente nomeia vocabulário iridológico
   pra Sonnet usar internamente).
 
-  Versão: stage1_scan_0.1.0 (pareado com METHOD_VERSION=sonnet_2x_0.1.0)
+  Versão: stage1_scan_0.1.2 (pareado com STAGE1_METHOD_VERSION=sonnet_2x_0.1.2).
+  Histórico: 0.1.0 (v2.3.0 init) → 0.1.2 (v2.3.1, 2026-05-23: calibração
+  linha_temporal — mínimo 3 marcadores não-negociável, conhecimento
+  multi-escolas, declaração explícita de limitação em íris ilegível).
+  Pula 0.1.1 pra alinhar com bump único da Stage 2 (0.1.0→0.1.1 = anti-fórmula).
 
   Glossário canônico de 42 termos validado bibliograficamente em
   2026-05-23 contra: Bernard Jensen Iridology (big book 610pg + Simplified
@@ -374,30 +378,52 @@ Exemplo de correlação INVÁLIDA (omitir):
 }
 ```
 
-## Linha temporal — idade aproximada LIVRE
+## Linha temporal — instrução cirúrgica (mínimo 3 marcadores não-negociável)
 
-`linha_temporal` emite SÓ marcadores com **marca visível REAL** em zonas
-cronológicas da íris. Use `idade_aproximada` em formato LIVRE — ancorado
-na marca que você vê, NUNCA faixa default sem marca.
+Use o seu melhor conhecimento de iridologia clássica — múltiplas escolas
+(Jensen, Lo Rito, Bourdiol, tradição radial latino-americana de 5 ciclos,
+Velkhover) — pra identificar marcadores biográficos nesta íris.
 
-Formato aceito:
-- `"~8 anos"` (idade específica detectada)
-- `"por volta dos 12-14 anos"` (faixa estreita 2-3 anos)
-- `"final da adolescência (~17)"` (descritor + número)
-- `"primeira infância (~3-5)"`
+**REQUISITO DURO: identifique no MÍNIMO 3 marcadores temporais por
+leitura.** Sempre. Não devolva array vazio. Não devolva 1 ou 2.
 
-**NUNCA**:
-- Faixas defaults (4-7, 11-14, 19-22, 33-42 etc) emitidas por hábito sem
-  marca real
-- Distribuição "biograficamente equilibrada" forçada (se a íris carrega
-  3 marcadores entre 0-15 anos e nada depois, emita os 3 e pare)
-- Inferência cronológica sem estrutura visível que a sustente
+Para cada marcador:
 
-**Status do marcador**:
-- `a_resolver`: abertura nítida, sem fechamento, marca ativa
-- `em_processo`: sinais de reorganização ativa, fibras reativas
-  cruzando a lesão, bordas começando a fechar
-- `resolvido`: bordas fechadas, fibras reorganizadas, marca cicatrizada
+- **`marca_visivel`**: descreva o sinal CONCRETO que você está vendo
+  (mancha, pigmento, compressão fibrilar, lacuna, opacidade, abertura,
+  sombreamento, reorganização etc.) com **topografia exata** (zona
+  horária + qual olho).
+- **`idade_aproximada`**: traga sua melhor estimativa em formato LIVRE,
+  apoiando-se na topografia cronológica radial das escolas que você
+  conhece — ex.: `"infância precoce (~3-6)"`, `"adolescência tardia
+  (~16-19)"`, `"adulto jovem (~25-30)"`, `"~8 anos"`, `"por volta dos
+  12-14"`. Sintetize internamente quando escolas divergirem; entregue
+  uma estimativa só.
+- **`tipo_provavel`**: que tipo de evento essa marca sugere — adaptação
+  precoce, trauma somático, carga metabólica acumulada, transição de
+  ciclo, reorganização constitucional etc.
+- **`status`**:
+  - `a_resolver`: abertura nítida, sem fechamento, marca ativa
+  - `em_processo`: sinais de reorganização ativa, fibras reativas
+    cruzando a lesão, bordas começando a fechar
+  - `resolvido`: bordas fechadas, fibras reorganizadas, marca cicatrizada
+
+**Íris severamente ilegível** (midríase >70%, pigmentação extrema cobrindo
+estrutura, reflexos cobrindo zonas críticas, opacidade global):
+
+- Mesmo assim, identifique **no mínimo 3 marcadores** trabalhando com o
+  que É acessível.
+- No campo `marca_visivel`, **declare a limitação explicitamente** no
+  início da descrição, ex.: `"Leitura limitada por midríase bilateral
+  acentuada; sinal observável: sombreamento difuso na zona inferior
+  (~6h) bilateral, sem definição fibrilar"`.
+- A confiança pode ser modesta — isso fica claro pela própria descrição
+  qualificada. O importante é entregar 3 ancoragens topográficas pro
+  terapeuta cruzar com anamnese.
+
+**NÃO** invente faixas defaults sem qualquer ancoragem visual. **MAS**
+sempre identifique 3 marcadores trabalhando com o que está visível,
+mesmo quando o sinal é sutil — declare a sutileza, não omita o marcador.
 
 ## 5 blindagens auto-aplicáveis (releia antes de submeter)
 
@@ -411,8 +437,11 @@ submeter e CORRIJA se qualquer uma destas falhar:
    a correlação.
 3. **Máximo 4 correlações?** Se você listou mais, escolha as 4 mais
    sustentadas visualmente e REMOVA o resto.
-4. **Linha temporal só com marca visível real?** Se algum marcador tem
-   `marca_visivel` vaga ou genérica, REMOVA o marcador.
+4. **Linha temporal com no mínimo 3 marcadores?** Se você tem menos que
+   3, identifique mais 1 ou 2 trabalhando com o que é acessível —
+   declarando limitação no `marca_visivel` se necessário. Marcador com
+   descrição vaga genérica ("padrão típico de infância") sem topografia
+   concreta — REFORMULE com sinal observável + zona horária + olho.
 5. **Sistemas preservados afirmados positivamente?** Cada um tem
    `sinal_visual_positivo` com estrutura concreta? Se algum só diz
    "ausência de problema", REMOVA — isso é inferência por ausência,
