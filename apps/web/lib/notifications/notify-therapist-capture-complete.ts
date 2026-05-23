@@ -1,16 +1,29 @@
 /**
- * Notifica o terapeuta por email quando uma leitura via convite é processada
- * (Sonnet terminou de gerar o relatório). Disparado pelo /api/readings/[id]/analyze
- * após o UPDATE final que persiste o report_generated.
+ * Notifica o terapeuta por email quando o cliente termina a captura via
+ * convite (6 fotos uploaded). Disparado pelo /api/convite/[token]/upload
+ * no auto-finalize (count=6) E pelo /api/convite/[token]/finalize manual,
+ * sempre DENTRO do guard `if (status === 'pending')` que precede o
+ * `markReadingReady` — CAS interno garante que apenas UM dos dois caminhos
+ * efetivamente dispara em qualquer cenário (race entre upload-6 e
+ * finalize manual: só quem ganhar o CAS vê pending, o outro vê ready).
  *
- * Filtro: SÓ notifica leituras de origem invite (client_invite_tokens linkado
- * via used_by_reading_id). Leituras capturadas pelo terapeuta diretamente
- * não disparam — ele já sabe.
+ * Tom: avisa que a captura chegou e a análise está em andamento. Founder
+ * decision (2026-05-23): durante UAT a notificação "relatório pronto"
+ * vira ruído (founder fica refrescando antes da hora). O que importa é
+ * "cliente terminou as fotos" — daí pra frente o terapeuta acompanha
+ * direto no app.
  *
- * Resend via fetch direto (sem SDK — evita install). API REST: POST /emails.
- * Sem RESEND_API_KEY no env → degrade silencioso (não bloqueia pipeline).
+ * Filtro: SÓ notifica leituras de origem invite (used_by_reading_id ===
+ * readingId no client_invite_tokens). Capturas diretas do terapeuta não
+ * disparam — ele já sabe que terminou.
  *
- * 2026-05-22 — founder: tom acolhedor/marca.
+ * Resend via fetch direto (sem SDK). Sem RESEND_API_KEY → degrade
+ * silencioso (não bloqueia pipeline).
+ *
+ * 2026-05-23 — renomeado de notify-therapist-reading-ready.ts pra
+ * notify-therapist-capture-complete.ts. Antes era disparado em
+ * analyze/route.ts (após Stage 2 markdown pronto); agora dispara muito
+ * antes, no momento da captura completa.
  */
 import 'server-only'
 
@@ -21,7 +34,7 @@ const RESEND_API_URL = 'https://api.resend.com/emails'
 // Override via RESEND_FROM_EMAIL no env se quiser outro endereço.
 const DEFAULT_FROM = 'Iris Codex <noreply@iriscodex.com>'
 
-export async function notifyTherapistReadingReady(readingId: string): Promise<void> {
+export async function notifyTherapistCaptureComplete(readingId: string): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY
   if (!apiKey) {
     console.log('[notify] RESEND_API_KEY ausente — pulando email')
@@ -73,13 +86,13 @@ export async function notifyTherapistReadingReady(readingId: string): Promise<vo
   const readingUrl = `${baseUrl}/leituras/${readingId}`
 
   const fromEmail = process.env.RESEND_FROM_EMAIL ?? DEFAULT_FROM
-  const subject = `Nova leitura pronta para sua análise — ${clientName}`
+  const subject = `Captura recebida — análise em andamento — ${clientName}`
 
   const textBody = `${greeting},
 
-Que bom! ${clientName} completou a captura e a leitura iridológica já foi processada — está esperando sua revisão.
+${clientName} completou a captura das 6 fotografias da íris. A leitura iridológica entrou em processamento e ficará pronta em poucos minutos.
 
-Acesse aqui: ${readingUrl}
+Você pode acompanhar aqui: ${readingUrl}
 
 Boas reflexões,
 Equipe Iris Codex`
@@ -90,9 +103,9 @@ Equipe Iris Codex`
 <body style="font-family: Georgia, 'Times New Roman', serif; color: #1a1a1a; max-width: 560px; margin: 0 auto; padding: 32px 24px; line-height: 1.6;">
   <h1 style="font-size: 20px; font-weight: 300; letter-spacing: 0.08em; text-transform: uppercase; color: #1a1a1a; margin: 0 0 24px;">Iris Codex</h1>
   <p style="margin: 0 0 16px;">${greeting},</p>
-  <p style="margin: 0 0 16px;">Que bom! <strong>${escapeHtml(clientName)}</strong> completou a captura e a leitura iridológica já foi processada — está esperando sua revisão.</p>
+  <p style="margin: 0 0 16px;"><strong>${escapeHtml(clientName)}</strong> completou a captura das 6 fotografias da íris. A leitura iridológica entrou em processamento e ficará pronta em poucos minutos.</p>
   <p style="margin: 24px 0;">
-    <a href="${readingUrl}" style="display: inline-block; background-color: #1e6b65; color: #ffffff; text-decoration: none; padding: 12px 24px; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;">Abrir leitura</a>
+    <a href="${readingUrl}" style="display: inline-block; background-color: #1e6b65; color: #ffffff; text-decoration: none; padding: 12px 24px; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;">Acompanhar leitura</a>
   </p>
   <p style="margin: 24px 0 0; color: #6b6b6b; font-size: 13px;">Boas reflexões,<br>Equipe Iris Codex</p>
 </body>

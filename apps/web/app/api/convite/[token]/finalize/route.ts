@@ -24,6 +24,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { validateToken, markTokenUsed } from '@/lib/invite/tokens'
 import { markReadingReady } from '@/lib/readings/mark-ready'
+import { notifyTherapistCaptureComplete } from '@/lib/notifications/notify-therapist-capture-complete'
 
 export const runtime = 'nodejs'
 
@@ -120,6 +121,19 @@ export async function POST(
       console.error(`[invite-finalize] markReadingReady falhou token=${token} reading=${readingId}: ${readyRes.error}`)
       // Não bloqueia o cliente — leitura/fotos estão salvas; terapeuta
       // pode usar "Reprocessar" em /leituras/[id] pra disparar manualmente.
+    } else {
+      // Notifica terapeuta: cliente terminou captura, análise rolando.
+      // Caminho secundário (primário é o auto-finalize em upload route
+      // quando count=6). CAS interno do markReadingReady garante que
+      // apenas o caminho vencedor da race dispara o email. Non-fatal.
+      try {
+        await notifyTherapistCaptureComplete(readingId)
+      } catch (err) {
+        console.error(
+          '[invite-finalize] notify falhou (non-fatal):',
+          err instanceof Error ? err.message : err,
+        )
+      }
     }
   }
 

@@ -39,7 +39,6 @@ import { buildRecentPhrasesContext } from '@/lib/anthropic/recent-phrases-contex
 import { extractPhrases } from '@/lib/anthropic/extract-phrases'
 import { prepareDirectImages } from '@/lib/anthropic/prepare-direct-images'
 import { isFounderEmail } from '@/lib/auth/founder'
-import { notifyTherapistReadingReady } from '@/lib/notifications/notify-therapist-reading-ready'
 import {
   findAllBoundaries,
   closeSections,
@@ -467,18 +466,12 @@ export async function POST(
         revalidatePath(`/leituras/${readingId}/editar`)
         revalidatePath('/leituras')
 
-        // Notifica terapeuta por email (Resend) — só dispara se a leitura
-        // veio de invite (filter feito dentro da função). Degrade silencioso
-        // se RESEND_API_KEY ausente. Non-fatal: erro de email não quebra
-        // o pipeline da análise.
-        try {
-          await notifyTherapistReadingReady(readingId)
-        } catch (err) {
-          console.error(
-            '[analyze] notify falhou (non-fatal):',
-            err instanceof Error ? err.message : err,
-          )
-        }
+        // (2026-05-23) Notificação por email foi movida daqui pra antes:
+        // dispara no /api/convite/[token]/upload (auto-finalize count=6) e
+        // /api/convite/[token]/finalize (manual). Founder decision: sinal
+        // útil é "cliente terminou a captura", não "relatório pronto" —
+        // este último vira ruído durante UAT. Ver
+        // lib/notifications/notify-therapist-capture-complete.ts.
 
         try {
           controller.close()

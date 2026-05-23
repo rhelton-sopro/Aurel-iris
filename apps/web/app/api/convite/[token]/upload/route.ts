@@ -25,6 +25,7 @@ import { createServiceClient } from '@/lib/supabase/service'
 import { validateToken, markTokenUsed } from '@/lib/invite/tokens'
 import { buildOriginalStoragePath } from '@/lib/capture/storage-path'
 import { markReadingReady } from '@/lib/readings/mark-ready'
+import { notifyTherapistCaptureComplete } from '@/lib/notifications/notify-therapist-capture-complete'
 
 export const runtime = 'nodejs'
 
@@ -189,6 +190,18 @@ export async function POST(
         } else {
           console.log(
             `[invite-upload] auto-finalize OK token=${token} reading=${readingId} (count=6 atingido)`,
+          )
+        }
+        // Notifica terapeuta: cliente terminou captura, análise rolando.
+        // Dentro do guard `if (status === 'pending')` que precede o
+        // markReadingReady — apenas UM caminho dispara (CAS race-safe).
+        // Non-fatal.
+        try {
+          await notifyTherapistCaptureComplete(readingId)
+        } catch (err) {
+          console.error(
+            '[invite-upload] notify falhou (non-fatal):',
+            err instanceof Error ? err.message : err,
           )
         }
       }
