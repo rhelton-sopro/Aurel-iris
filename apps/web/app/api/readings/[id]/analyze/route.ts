@@ -55,7 +55,14 @@ import {
 } from '@/lib/anthropic/types'
 
 export const runtime = 'nodejs'
-export const maxDuration = 300
+// v2.4 (2026-05-23): bump 300s → 800s. Stage 2 com VOICE_OVERRIDE_V2_4
+// (3º system block) + auto-checagens internas fazem Sonnet iterar mais →
+// latência subiu pra ~290s, no limite anterior. Edge timeout cortava
+// post-stream cleanup → report_generated ficava sem §14/§15/essence
+// (bug pre-existente do consumer agravado pela voz v2.4). Fluid Compute
+// no plano Pro suporta até 800s; espaço de respiro confortável e libera
+// margem pro Sonnet pensar.
+export const maxDuration = 800
 
 export async function POST(
   request: NextRequest,
@@ -292,7 +299,6 @@ export async function POST(
   const encoder = new TextEncoder()
   const completedSections: ReportJsonb = {}
   let buffer = ''
-  let lastBoundaryCount = 0
 
   const responseStream = new ReadableStream({
     async start(controller) {
@@ -310,24 +316,22 @@ export async function POST(
       }
 
       try {
+        // v2.4 (2026-05-23): UPDATE incremental REMOVIDO. Antes o consumer
+        // fazia UPDATE em report_generated a cada nova boundary detectada
+        // (com `boundaries.slice(0, -1)` — só fechava as anteriores). Se
+        // o stream era cortado por timeout, report_generated ficava em
+        // estado PARCIAL CORROMPIDO (faltando §14, §15, essence_phrase)
+        // sobrescrevendo geração anterior boa. Bug grave de regen.
+        //
+        // Novo fluxo: acumula buffer em memória durante stream, faz parse
+        // + UPDATE ATÔMICO único no fim. Trade-off: UI que recarregar a
+        // página durante stream NÃO vê parcial — vê banner "Análise em
+        // andamento" + AutoRefreshWhileProcessing. Aceitável (já é a UX
+        // documentada do banner). Stream pro cliente em tempo real
+        // continua intacto via enqueueSilent.
         for await (const text of analysis.stream) {
           buffer += text
           enqueueSilent(encoder.encode(text))
-
-          const boundaries = findAllBoundaries(buffer)
-          if (boundaries.length > lastBoundaryCount) {
-            const closed = closeSections(boundaries.slice(0, -1), buffer)
-            for (const section of closed) {
-              if (completedSections[section.key] !== section.content) {
-                completedSections[section.key] = section.content
-                await supabase
-                  .from('readings')
-                  .update({ report_generated: { ...completedSections } })
-                  .eq('id', readingId)
-              }
-            }
-            lastBoundaryCount = boundaries.length
-          }
         }
 
         const finalBoundaries = findAllBoundaries(buffer)
@@ -342,7 +346,7 @@ export async function POST(
             readingId,
             buffer_length: buffer.length,
             sections_completed: sectionKeysBeforeEncerramento,
-            boundaries_count: lastBoundaryCount,
+            boundaries_count: finalBoundaries.length,
             canonical_fallback_count: prep.fallbackCount,
           }),
         )

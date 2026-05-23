@@ -146,6 +146,135 @@ Bar.`
     expect(result).toHaveLength(1)
     expect(result[0].headingNumber).toBe('1')
   })
+
+  // Regressão Caroline/Evanilce (v2.4 UAT, reading e8976f11, 2026-05-23):
+  // o report_generated dessa leitura ficou com APENAS 13 chaves (§1..§13),
+  // faltando §14, §15 e essence_phrase — mesmo o markdown bruto (raw_text)
+  // tendo todas as 15 seções corretamente. O bug era no CONSUMER
+  // (route.ts:analyze) que fazia UPDATE incremental sobrescrevendo
+  // report_generated parcial e o edge timeout cortava antes do post-stream
+  // cleanup. Este teste blinda: dado o raw_text exato emitido por Sonnet
+  // 4.6 v2.3.0.1 com ## N. (H2, sem § glyph), findAllBoundaries DEVE
+  // retornar exatamente 15 boundaries e extractEssencePhrase DEVE retornar
+  // a frase final. Se isso quebrar no futuro, regredimos o fix.
+  it('regression e8976f11 — buffer real v2.3.0.1 (## N. H2 + Em poucas palavras pós-§15) retorna 15 boundaries + essence', () => {
+    const buf = `## 1. Constituição e Temperamento
+
+### Síntese inicial
+Foo.
+
+### Leitura de base
+Bar.
+
+## 2. Mapa Orgânico
+
+### Sistemas que requerem atenção
+Baz.
+
+### Sistemas em bom funcionamento
+Qux.
+
+## 3. Linha do Tempo Emocional
+
+Conteúdo §3.
+
+## 4. Padrões Emocionais Ativos
+
+Conteúdo §4.
+
+## 5. Eixo Psicossomático
+
+Conteúdo §5.
+
+## 6. Heranças Transgeracionais Sugeridas
+
+Conteúdo §6.
+
+## 7. Carências Funcionais
+
+Conteúdo §7.
+
+## 8. Estado Mental e Nervoso
+
+Conteúdo §8.
+
+## 9. Recursos e Forças
+
+Conteúdo §9.
+
+## 10. Dimensão Arquetípica / Espiritual
+
+Conteúdo §10.
+
+## 11. Sugestões Integrativas
+
+### Nutrição
+- bullet
+
+### Fitoterapia tradicional
+- bullet
+
+### Práticas corporais
+- bullet
+
+### Práticas contemplativas
+- bullet
+
+### Florais
+- bullet
+
+### Adaptógenos
+- bullet
+
+## 12. Roteiro de Anamnese
+
+1. pergunta
+2. pergunta
+
+## 13. Síntese Integrativa
+
+Conteúdo §13.
+
+---
+
+## 14. Mensagem para o Cliente
+
+Evanilce, o que esta leitura me trouxe sobre você é a imagem de uma mulher que foi ficando muito boa em sustentar.
+
+## 15. Síntese Rápida
+
+### 🔴 Fragilidades
+- bullet
+
+### 🟢 Forças
+- bullet
+
+### 💛 Emoções a Cuidar
+- bullet
+
+### ✨ Potências
+- bullet
+
+### 🧭 Perfil e Temperamento
+Introversão funcional com alta carga vital.
+
+### 🌱 Aptidões
+Sensibilidade e profundidade.
+
+## Em poucas palavras
+
+Uma vida inteira sendo o chão firme que os outros pisaram sem perceber o quanto aquilo custava.`
+
+    const boundaries = findAllBoundaries(buf)
+    expect(boundaries).toHaveLength(15)
+    expect(boundaries.map((b) => b.headingNumber)).toEqual(ALL_15)
+    expect(boundaries[13].key).toBe('14_mensagem_cliente')
+    expect(boundaries[14].key).toBe('15_sintese_rapida')
+
+    const essence = extractEssencePhrase(buf)
+    expect(essence).toBeTruthy()
+    expect(essence).toContain('chão firme')
+  })
 })
 
 describe('lib/anthropic/parser — closeSections', () => {
