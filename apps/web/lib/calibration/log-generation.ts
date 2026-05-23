@@ -18,7 +18,11 @@ import 'server-only'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { AuditMetadata } from '@/lib/anthropic/types'
 
-export type ReportGenerationMethod = 'vigente' | 'sam' | 'sonnet_direct'
+export type ReportGenerationMethod =
+  | 'vigente'
+  | 'sam'
+  | 'sonnet_direct'
+  | 'sonnet_2x_0.1.0' // v2.3.0 Caminho 1 (Etapa 1 tool use + Etapa 2 ancorada)
 
 export interface ReportGenerationLog {
   reading_id: string

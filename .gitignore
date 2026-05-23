@@ -42,3 +42,5 @@ apps/web/scripts/output/*
 # supabase
 supabase/.branches
 supabase/.temp
+
+.vercel

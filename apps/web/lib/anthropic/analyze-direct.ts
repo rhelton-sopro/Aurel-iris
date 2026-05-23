@@ -303,3 +303,213 @@ export async function analyzeReadingDirect(
 
   return { stream: toTextStream(), finalize }
 }
+
+// ============================================================
+// v2.3.0 — Etapa 2 (composição ancorada no exame da Etapa 1)
+// ============================================================
+
+import type { ExameIridologico } from './stage1-schema'
+
+/**
+ * Override do system prompt da Etapa 2: explica que a observação visual
+ * JÁ FOI feita pela Etapa 1 e o JSON estruturado está injetado no user
+ * content. Substitui o VISUAL_MODE_OVERRIDE (que assumia que Sonnet ia
+ * olhar as fotos).
+ *
+ * Mantém as 9 Regras Absolutas + estrutura de 15 seções + tom do system.md
+ * atual (que produziu o UAU 2026-05-23). NÃO pede pra Sonnet "ver" fotos
+ * porque não há fotos nesta chamada.
+ */
+const STAGE2_MODE_OVERRIDE = `# MODO DE ANÁLISE: COMPOSIÇÃO ANCORADA (Etapa 2 do pipeline Sonnet 2x)
+
+Nesta geração você NÃO recebe as 6 fotografias da íris. A observação
+visual já foi feita pela Etapa 1 e está estruturada em formato JSON no
+bloco \`<exame_iridologico_da_etapa_1>\` dentro do user content abaixo.
+
+Substituições obrigatórias em relação às instruções do system principal:
+
+1. Onde o prompt original manda OLHAR as fotos / observar diretamente / citar
+   estrutura visual que você vê: agora você ancora em \`achados_de_atencao[]\`,
+   \`sistemas_preservados[]\`, \`correlacoes_observadas[]\`, \`linha_temporal[]\`
+   e \`constituicao_base\` do JSON injetado. Trate esses dados como SEU
+   raciocínio interno cristalizado — você compõe o relatório a partir deles.
+
+2. **Ordem por saliência** (Regra global do system): use \`achados_de_atencao[0]\`
+   como protagonista (já ordenado por intensidade DESC pela Etapa 1).
+   §2 "Sistemas que requerem atenção" lista os achados na ordem do array.
+   §15 🔴 Fragilidades = top 3 achados; 🟢 Forças = sistemas_preservados.
+
+3. **§3 Linha do Tempo**: use APENAS os marcadores em \`linha_temporal[]\`
+   (cada um já validado com marca_visivel real pela Etapa 1). Array vazio
+   = §3 com 1 parágrafo curto explicando ausência de marcadores. NUNCA
+   invente faixas que não estão no array.
+
+4. **§5/§10 — eixos psicossomáticos e arquetípico**: ancore nas
+   \`correlacoes_observadas[]\` que a Etapa 1 já costurou. Use a
+   \`ancora_visual\` da correlação como sustentação CLÍNICA mental, mas
+   no texto fala da PESSOA (vida emocional, padrão, sensação) — não da
+   estrutura iridológica. Aspectos visuais ficam no raciocínio interno.
+
+5. **MEMÓRIA inter-leituras**: se o user content trouxer o bloco
+   \`<relatorios_recentes_deste_terapeuta>\`, leia com atenção e
+   **NÃO repita as frases listadas nem variações próximas**. Mantém o
+   MESMO TOM, a MESMA VOZ, o MESMO REGISTRO — varia só a SINTAXE e a
+   IMAGEM CONCRETA. O TOM é o que faz a pessoa chorar; sintaxe repetida
+   é o que faz a pessoa desconfiar.
+
+6. As **9 Regras absolutas** do system principal continuam valendo na
+   íntegra (sem autor / sem escola / sem hora-setor-olho fora de §2 /
+   §3 4 campos / §10 simbólico / §13 humano / §1 polimento / sem
+   §-cross-refs / sem jargão não-explicado).
+
+Gere o relatório completo agora, ancorado exclusivamente no
+\`<exame_iridologico_da_etapa_1>\` do user content.`
+
+export interface ComposeStage2Args {
+  readingId: string
+  therapistId: string
+  /** JSON estruturado validado da Etapa 1 */
+  exameIridologico: ExameIridologico
+  /**
+   * Bloco XML pré-formatado da memória inter-leituras. Empty string se
+   * primeira leitura do terapeuta — orquestrador trata como ausente.
+   */
+  recentPhrasesBlock: string
+  clientName: string
+  clientAge: number | null
+  signal?: AbortSignal
+}
+
+function buildStage2UserContent(args: ComposeStage2Args): Anthropic.TextBlockParam[] {
+  const ctx =
+    `<client_context>\n` +
+    `Nome: ${args.clientName}\n` +
+    `Idade: ${args.clientAge != null ? String(args.clientAge) : ''}\n` +
+    `Mapa preferido: jensen\n` +
+    `</client_context>`
+
+  const exameBlock =
+    `<exame_iridologico_da_etapa_1>\n` +
+    JSON.stringify(args.exameIridologico, null, 2) +
+    `\n</exame_iridologico_da_etapa_1>`
+
+  const blocks: Anthropic.TextBlockParam[] = [
+    { type: 'text', text: ctx },
+    { type: 'text', text: exameBlock },
+  ]
+
+  // Memória inter-leituras só entra se terapeuta já tem leituras anteriores
+  if (args.recentPhrasesBlock.trim().length > 0) {
+    blocks.push({ type: 'text', text: args.recentPhrasesBlock })
+  }
+
+  blocks.push({
+    type: 'text',
+    text:
+      `\nGere agora as 15 seções no formato Iris Codex, ancorando cada ` +
+      `interpretação no <exame_iridologico_da_etapa_1> acima. Texto fala ` +
+      `da PESSOA, das emoções, do que ela viveu — vocabulário visual ` +
+      `iridológico fica no raciocínio interno (ancoragem), NÃO no texto ` +
+      `entregue ao cliente.`,
+  })
+
+  return blocks
+}
+
+export const STAGE2_METHOD_VERSION = 'sonnet_2x_0.1.0' as const
+
+/**
+ * Etapa 2 do pipeline Sonnet 2x — composição streaming ancorada no JSON
+ * da Etapa 1. Mesmo contract `{stream, finalize}` que `analyzeReadingDirect`
+ * pra o caller (route.ts) não precisar mudar a lógica de stream consumption.
+ *
+ * Diferenças vs analyzeReadingDirect:
+ *   - NÃO envia imagens (Etapa 1 já viu, JSON é o pacto)
+ *   - System block 2 = STAGE2_MODE_OVERRIDE (não VISUAL_MODE_OVERRIDE)
+ *   - User content = ctx + JSON Etapa 1 + memória recente + instrução
+ *
+ * Mantém: streaming, cost estimation, cache control no system principal,
+ * abort signal handling, finalize() promise contract.
+ */
+export async function analyzeReadingComposeStage2(
+  args: ComposeStage2Args,
+): Promise<AnalyzeDirectResult> {
+  const startedAt = Date.now()
+
+  const systemPrompt = loadSystemPrompt()
+  const userContent = buildStage2UserContent(args)
+
+  const llmStream = anthropicClient.messages.stream(
+    {
+      model: MODEL,
+      max_tokens: MAX_OUTPUT_TOKENS,
+      system: [
+        {
+          type: 'text',
+          text: systemPrompt,
+          cache_control: DEFAULT_SYSTEM_CACHE_CONTROL,
+        },
+        { type: 'text', text: STAGE2_MODE_OVERRIDE },
+      ],
+      messages: [{ role: 'user', content: userContent }],
+    },
+    { maxRetries: 0 },
+  )
+
+  if (args.signal) {
+    args.signal.addEventListener('abort', () => {
+      try {
+        llmStream.controller.abort()
+      } catch {
+        // already ended — no-op
+      }
+    })
+  }
+
+  async function* toTextStream(): AsyncIterable<string> {
+    for await (const event of llmStream) {
+      if (
+        event.type === 'content_block_delta' &&
+        event.delta.type === 'text_delta'
+      ) {
+        yield event.delta.text
+      }
+    }
+  }
+
+  async function finalize(): Promise<AnalyzeDirectFinalization> {
+    const final = await llmStream.finalMessage()
+    const usage = {
+      input_tokens: final.usage.input_tokens ?? 0,
+      output_tokens: final.usage.output_tokens ?? 0,
+      cache_creation_input_tokens: final.usage.cache_creation_input_tokens ?? 0,
+      cache_read_input_tokens: final.usage.cache_read_input_tokens ?? 0,
+    }
+    const latencyMs = Date.now() - startedAt
+    const cost = estimateCostUsd(usage)
+
+    console.info({
+      event: 'llm_generate_stage2',
+      reading_id: args.readingId,
+      therapist_id: args.therapistId,
+      method_version: STAGE2_METHOD_VERSION,
+      model_version: MODEL,
+      n_images: 0, // Stage 2 não envia imagens
+      latency_ms: latencyMs,
+      tokens_in: usage.input_tokens,
+      tokens_out: usage.output_tokens,
+      cache_creation_input_tokens: usage.cache_creation_input_tokens,
+      cache_read_input_tokens: usage.cache_read_input_tokens,
+      cost_estimate_usd: Number(cost.toFixed(4)),
+    })
+
+    return {
+      usage,
+      latency_ms: latencyMs,
+      cost_estimate_usd: cost,
+      n_images: 0,
+    }
+  }
+
+  return { stream: toTextStream(), finalize }
+}

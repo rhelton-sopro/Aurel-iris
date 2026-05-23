@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_model_pricing: {
+        Row: {
+          created_at: string
+          id: string
+          input_usd_per_mtok: number
+          model_pattern: string
+          notes: string | null
+          output_usd_per_mtok: number
+          valid_from: string
+          valid_to: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          input_usd_per_mtok: number
+          model_pattern: string
+          notes?: string | null
+          output_usd_per_mtok: number
+          valid_from?: string
+          valid_to?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          input_usd_per_mtok?: number
+          model_pattern?: string
+          notes?: string | null
+          output_usd_per_mtok?: number
+          valid_from?: string
+          valid_to?: string | null
+        }
+        Relationships: []
+      }
       calibration_annotations: {
         Row: {
           annotated_at: string
@@ -102,6 +135,63 @@ export type Database = {
           },
         ]
       }
+      capture_attempts: {
+        Row: {
+          accepted: boolean
+          browser_family: string | null
+          cost_estimate_usd: number | null
+          created_at: string
+          device_type: string | null
+          id: string
+          image_bytes: number
+          latency_ms: number
+          model_version: string
+          os_family: string | null
+          therapist_id: string
+          tokens_in: number | null
+          tokens_out: number | null
+          user_agent: string | null
+          vlm_quality: string
+          vlm_reason: string
+        }
+        Insert: {
+          accepted: boolean
+          browser_family?: string | null
+          cost_estimate_usd?: number | null
+          created_at?: string
+          device_type?: string | null
+          id?: string
+          image_bytes: number
+          latency_ms: number
+          model_version: string
+          os_family?: string | null
+          therapist_id: string
+          tokens_in?: number | null
+          tokens_out?: number | null
+          user_agent?: string | null
+          vlm_quality: string
+          vlm_reason: string
+        }
+        Update: {
+          accepted?: boolean
+          browser_family?: string | null
+          cost_estimate_usd?: number | null
+          created_at?: string
+          device_type?: string | null
+          id?: string
+          image_bytes?: number
+          latency_ms?: number
+          model_version?: string
+          os_family?: string | null
+          therapist_id?: string
+          tokens_in?: number | null
+          tokens_out?: number | null
+          user_agent?: string | null
+          vlm_quality?: string
+          vlm_reason?: string
+        }
+        Relationships: []
+      }
       client_consents: {
         Row: {
           client_id: string | null
@@ -110,7 +200,7 @@ export type Database = {
           created_at: string
           event_type: string
           id: string
-          ip: string | null
+          ip: unknown
           reading_id: string | null
           term_version: string
           user_agent: string | null
@@ -122,7 +212,7 @@ export type Database = {
           created_at?: string
           event_type: string
           id?: string
-          ip?: string | null
+          ip?: unknown
           reading_id?: string | null
           term_version: string
           user_agent?: string | null
@@ -134,7 +224,7 @@ export type Database = {
           created_at?: string
           event_type?: string
           id?: string
-          ip?: string | null
+          ip?: unknown
           reading_id?: string | null
           term_version?: string
           user_agent?: string | null
@@ -149,10 +239,75 @@ export type Database = {
           },
         ]
       }
+      client_invite_tokens: {
+        Row: {
+          client_id: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          therapist_id: string
+          token: string
+          used_at: string | null
+          used_by_client_id: string | null
+          used_by_reading_id: string | null
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          therapist_id: string
+          token: string
+          used_at?: string | null
+          used_by_client_id?: string | null
+          used_by_reading_id?: string | null
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          therapist_id?: string
+          token?: string
+          used_at?: string | null
+          used_by_client_id?: string | null
+          used_by_reading_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_invite_tokens_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_invite_tokens_therapist_id_fkey"
+            columns: ["therapist_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_invite_tokens_used_by_client_id_fkey"
+            columns: ["used_by_client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_invite_tokens_used_by_reading_id_fkey"
+            columns: ["used_by_reading_id"]
+            isOneToOne: false
+            referencedRelation: "readings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
-          birth_date: string | null
           biological_sex: string | null
+          birth_date: string | null
           consent_current_version: string | null
           consent_last_at: string | null
           created_at: string | null
@@ -165,8 +320,8 @@ export type Database = {
           therapist_id: string
         }
         Insert: {
-          birth_date?: string | null
           biological_sex?: string | null
+          birth_date?: string | null
           consent_current_version?: string | null
           consent_last_at?: string | null
           created_at?: string | null
@@ -179,8 +334,8 @@ export type Database = {
           therapist_id: string
         }
         Update: {
-          birth_date?: string | null
           biological_sex?: string | null
+          birth_date?: string | null
           consent_current_version?: string | null
           consent_last_at?: string | null
           created_at?: string | null
@@ -418,6 +573,8 @@ export type Database = {
       }
       readings: {
         Row: {
+          analysis_completed_at: string | null
+          analysis_started_at: string | null
           audit_metadata: Json | null
           beta_counted: boolean
           canonical_metadata: Json | null
@@ -439,6 +596,10 @@ export type Database = {
           report_delivered_at: string | null
           report_generated: Json | null
           report_generated_at: string | null
+          report_generated_sam: Json | null
+          report_generated_sam_at: string | null
+          report_generated_sonnet_direct: Json | null
+          report_generated_sonnet_direct_at: string | null
           report_raw_text: string | null
           report_v2: Json | null
           report_v2_delivered: Json | null
@@ -446,21 +607,20 @@ export type Database = {
           report_v2_edit_diff: Json | null
           report_v2_generated_at: string | null
           report_version: string
+          sam_run_metadata: Json | null
+          seen_by_therapist_at: string | null
+          sonnet_direct_run_metadata: Json | null
           status: string | null
           therapist_id: string
           therapist_notes: string | null
           tipo_edicao: string[] | null
-          report_generated_sam: Json | null
-          report_generated_sam_at: string | null
-          sam_run_metadata: Json | null
-          report_generated_sonnet_direct: Json | null
-          report_generated_sonnet_direct_at: string | null
-          sonnet_direct_run_metadata: Json | null
           vision_features: Json | null
           vision_features_sam: Json | null
           zonas_editadas: Json | null
         }
         Insert: {
+          analysis_completed_at?: string | null
+          analysis_started_at?: string | null
           audit_metadata?: Json | null
           beta_counted?: boolean
           canonical_metadata?: Json | null
@@ -482,6 +642,10 @@ export type Database = {
           report_delivered_at?: string | null
           report_generated?: Json | null
           report_generated_at?: string | null
+          report_generated_sam?: Json | null
+          report_generated_sam_at?: string | null
+          report_generated_sonnet_direct?: Json | null
+          report_generated_sonnet_direct_at?: string | null
           report_raw_text?: string | null
           report_v2?: Json | null
           report_v2_delivered?: Json | null
@@ -489,21 +653,20 @@ export type Database = {
           report_v2_edit_diff?: Json | null
           report_v2_generated_at?: string | null
           report_version?: string
+          sam_run_metadata?: Json | null
+          seen_by_therapist_at?: string | null
+          sonnet_direct_run_metadata?: Json | null
           status?: string | null
           therapist_id: string
           therapist_notes?: string | null
           tipo_edicao?: string[] | null
-          report_generated_sam?: Json | null
-          report_generated_sam_at?: string | null
-          sam_run_metadata?: Json | null
-          report_generated_sonnet_direct?: Json | null
-          report_generated_sonnet_direct_at?: string | null
-          sonnet_direct_run_metadata?: Json | null
           vision_features?: Json | null
           vision_features_sam?: Json | null
           zonas_editadas?: Json | null
         }
         Update: {
+          analysis_completed_at?: string | null
+          analysis_started_at?: string | null
           audit_metadata?: Json | null
           beta_counted?: boolean
           canonical_metadata?: Json | null
@@ -525,6 +688,10 @@ export type Database = {
           report_delivered_at?: string | null
           report_generated?: Json | null
           report_generated_at?: string | null
+          report_generated_sam?: Json | null
+          report_generated_sam_at?: string | null
+          report_generated_sonnet_direct?: Json | null
+          report_generated_sonnet_direct_at?: string | null
           report_raw_text?: string | null
           report_v2?: Json | null
           report_v2_delivered?: Json | null
@@ -532,16 +699,13 @@ export type Database = {
           report_v2_edit_diff?: Json | null
           report_v2_generated_at?: string | null
           report_version?: string
+          sam_run_metadata?: Json | null
+          seen_by_therapist_at?: string | null
+          sonnet_direct_run_metadata?: Json | null
           status?: string | null
           therapist_id?: string
           therapist_notes?: string | null
           tipo_edicao?: string[] | null
-          report_generated_sam?: Json | null
-          report_generated_sam_at?: string | null
-          sam_run_metadata?: Json | null
-          report_generated_sonnet_direct?: Json | null
-          report_generated_sonnet_direct_at?: string | null
-          sonnet_direct_run_metadata?: Json | null
           vision_features?: Json | null
           vision_features_sam?: Json | null
           zonas_editadas?: Json | null
@@ -563,63 +727,159 @@ export type Database = {
           },
         ]
       }
-      report_generations: {
+      report_findings: {
         Row: {
-          id: string
-          reading_id: string
-          method: string
-          generated_at: string
-          latency_ms: number | null
           cost_usd: number | null
+          exame_json: Json
+          generated_at: string
+          id: string
+          latency_ms: number | null
+          method_version: string
+          model: string
+          prompt_sha: string
+          prompt_version: string
+          raw_xml: string
+          reading_id: string
+          superseded_at: string | null
+          therapist_id: string
           tokens_in: number | null
           tokens_out: number | null
-          model_version: string | null
-          prompt_version: string | null
-          canonical_fallback_count: number | null
-          audit_summary: Json | null
-          regeneration_count: number | null
-          client_id: string | null
-          bbox_cost_usd: number | null
-          bbox_latency_ms: number | null
-          created_at: string
+          validation_status: string
         }
         Insert: {
-          id?: string
-          reading_id: string
-          method: string
-          generated_at?: string
-          latency_ms?: number | null
           cost_usd?: number | null
+          exame_json: Json
+          generated_at?: string
+          id?: string
+          latency_ms?: number | null
+          method_version: string
+          model: string
+          prompt_sha: string
+          prompt_version: string
+          raw_xml: string
+          reading_id: string
+          superseded_at?: string | null
+          therapist_id: string
           tokens_in?: number | null
           tokens_out?: number | null
-          model_version?: string | null
-          prompt_version?: string | null
-          canonical_fallback_count?: number | null
-          audit_summary?: Json | null
-          regeneration_count?: number | null
-          client_id?: string | null
-          bbox_cost_usd?: number | null
-          bbox_latency_ms?: number | null
-          created_at?: string
+          validation_status: string
         }
         Update: {
-          id?: string
-          reading_id?: string
-          method?: string
-          generated_at?: string
-          latency_ms?: number | null
           cost_usd?: number | null
+          exame_json?: Json
+          generated_at?: string
+          id?: string
+          latency_ms?: number | null
+          method_version?: string
+          model?: string
+          prompt_sha?: string
+          prompt_version?: string
+          raw_xml?: string
+          reading_id?: string
+          superseded_at?: string | null
+          therapist_id?: string
           tokens_in?: number | null
           tokens_out?: number | null
-          model_version?: string | null
-          prompt_version?: string | null
-          canonical_fallback_count?: number | null
+          validation_status?: string
+        }
+        Relationships: []
+      }
+      report_generations: {
+        Row: {
+          audit_summary: Json | null
+          bbox_cost_usd: number | null
+          bbox_latency_ms: number | null
+          canonical_fallback_count: number | null
+          client_id: string | null
+          cost_usd: number | null
+          created_at: string
+          generated_at: string
+          id: string
+          latency_ms: number | null
+          method: string
+          model_version: string | null
+          prompt_version: string | null
+          reading_id: string
+          regeneration_count: number | null
+          tokens_in: number | null
+          tokens_out: number | null
+        }
+        Insert: {
           audit_summary?: Json | null
-          regeneration_count?: number | null
-          client_id?: string | null
           bbox_cost_usd?: number | null
           bbox_latency_ms?: number | null
+          canonical_fallback_count?: number | null
+          client_id?: string | null
+          cost_usd?: number | null
           created_at?: string
+          generated_at?: string
+          id?: string
+          latency_ms?: number | null
+          method: string
+          model_version?: string | null
+          prompt_version?: string | null
+          reading_id: string
+          regeneration_count?: number | null
+          tokens_in?: number | null
+          tokens_out?: number | null
+        }
+        Update: {
+          audit_summary?: Json | null
+          bbox_cost_usd?: number | null
+          bbox_latency_ms?: number | null
+          canonical_fallback_count?: number | null
+          client_id?: string | null
+          cost_usd?: number | null
+          created_at?: string
+          generated_at?: string
+          id?: string
+          latency_ms?: number | null
+          method?: string
+          model_version?: string | null
+          prompt_version?: string | null
+          reading_id?: string
+          regeneration_count?: number | null
+          tokens_in?: number | null
+          tokens_out?: number | null
+        }
+        Relationships: []
+      }
+      report_phrases: {
+        Row: {
+          generated_at: string
+          id: string
+          markdown_blob_url: string | null
+          method_version: string
+          phrases: Json
+          prompt_sha: string
+          prompt_version: string
+          reading_id: string
+          superseded_at: string | null
+          therapist_id: string
+        }
+        Insert: {
+          generated_at?: string
+          id?: string
+          markdown_blob_url?: string | null
+          method_version: string
+          phrases: Json
+          prompt_sha: string
+          prompt_version: string
+          reading_id: string
+          superseded_at?: string | null
+          therapist_id: string
+        }
+        Update: {
+          generated_at?: string
+          id?: string
+          markdown_blob_url?: string | null
+          method_version?: string
+          phrases?: Json
+          prompt_sha?: string
+          prompt_version?: string
+          reading_id?: string
+          superseded_at?: string | null
+          therapist_id?: string
         }
         Relationships: []
       }
@@ -667,9 +927,7 @@ export type Database = {
     }
     Functions: {
       increment_beta_readings_used: {
-        Args: {
-          p_therapist: string
-        }
+        Args: { p_therapist: string }
         Returns: undefined
       }
       match_knowledge_chunks: {
@@ -688,6 +946,36 @@ export type Database = {
           source_page: number
           source_type: string
         }[]
+      }
+      persist_report_findings_versioned: {
+        Args: {
+          p_cost_usd: number
+          p_exame_json: Json
+          p_latency_ms: number
+          p_method_version: string
+          p_model: string
+          p_prompt_sha: string
+          p_prompt_version: string
+          p_raw_xml: string
+          p_reading_id: string
+          p_therapist_id: string
+          p_tokens_in: number
+          p_tokens_out: number
+          p_validation_status: string
+        }
+        Returns: string
+      }
+      persist_report_phrases_versioned: {
+        Args: {
+          p_markdown_blob_url: string
+          p_method_version: string
+          p_phrases: Json
+          p_prompt_sha: string
+          p_prompt_version: string
+          p_reading_id: string
+          p_therapist_id: string
+        }
+        Returns: string
       }
     }
     Enums: {

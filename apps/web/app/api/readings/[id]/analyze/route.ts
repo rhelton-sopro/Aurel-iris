@@ -28,7 +28,10 @@ import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { logReportGeneration } from '@/lib/calibration/log-generation'
-import { analyzeReadingDirect } from '@/lib/anthropic/analyze-direct'
+import { analyzeReadingComposeStage2 } from '@/lib/anthropic/analyze-direct'
+import { runStage1Scan } from '@/lib/anthropic/stage1-scan'
+import { buildRecentPhrasesContext } from '@/lib/anthropic/recent-phrases-context'
+import { extractPhrases } from '@/lib/anthropic/extract-phrases'
 import { prepareDirectImages } from '@/lib/anthropic/prepare-direct-images'
 import { isFounderEmail } from '@/lib/auth/founder'
 import { notifyTherapistReadingReady } from '@/lib/notifications/notify-therapist-reading-ready'
@@ -76,13 +79,17 @@ export async function POST(
     .eq('id', readingId)
     .maybeSingle()
 
-  // analysis_started_at (0027) em query separada — types/database.ts
-  // ainda não tem a coluna até founder regenerar.
+  // analysis_started_at (0027) + analysis_completed_at (0030) em query
+  // separada — types/database.ts ainda não tem essas colunas até founder
+  // regenerar. Idempotency gate (f) usa o par {started, completed}.
   const { data: progress } = await supabase
     .from('readings')
-    .select('analysis_started_at' as never)
+    .select('analysis_started_at, analysis_completed_at' as never)
     .eq('id', readingId)
-    .maybeSingle<{ analysis_started_at: string | null }>()
+    .maybeSingle<{
+      analysis_started_at: string | null
+      analysis_completed_at: string | null
+    }>()
 
   if (readingError) {
     return NextResponse.json({ error: 'Database error' }, { status: 500 })
@@ -121,19 +128,27 @@ export async function POST(
   // Gate (f): "Already running" — evita duplo-spend se cliente clica
   // Gerar 2x ou se fechou aba no meio (handler continua server-side;
   // segundo POST encontraria started_at preenchido). 5min é o teto
-  // de tolerância (Sonnet stream ~150s + finalize). Após isso, libera.
-  // FIX 2026-05-20 founder UAT: o caso real foi exatamente este —
-  // fechou página → 2º click duplicou custo + regeneration_count.
+  // de tolerância (Stage 1 ~60s + Stage 2 stream ~150s + finalize +
+  // slack = ~5min na pior hipótese). Após isso, libera.
+  //
+  // v2.3.0 (2026-05-23): par {started_at, completed_at}. Inflight =
+  // started IS NOT NULL E completed IS NULL. Quando handler termina
+  // (sucesso OU erro final), seta completed_at no finally — libera
+  // imediatamente em vez de esperar a janela de 5min expirar.
   const startedAt = progress?.analysis_started_at ?? null
-  if (startedAt) {
+  const completedAt = progress?.analysis_completed_at ?? null
+  if (startedAt && !completedAt) {
     const ageMs = Date.now() - new Date(startedAt).getTime()
     if (ageMs < 5 * 60 * 1000) {
       return NextResponse.json(
-        { error: 'Análise em andamento — aguarde terminar antes de regenerar.' },
+        {
+          error: 'Análise em andamento. Aguarde a conclusão antes de tentar novamente.',
+          retry_after_seconds: Math.ceil((5 * 60 * 1000 - ageMs) / 1000),
+        },
         { status: 409 },
       )
     }
-    // started_at > 5min = considerado handler morto, deixa rodar de novo.
+    // started_at sem completed_at e age > 5min = handler stale, libera retry.
   }
 
   const clientName =
@@ -157,17 +172,97 @@ export async function POST(
     )
   }
 
-  // Marca "em curso" ANTES de abrir o stream — caller pode fechar a
-  // aba a qualquer momento, mas o handler continua até finalize. O CLEAR
-  // do started_at fica no try-final + catch abaixo (controller.start).
-  // Service-role pra garantir UPDATE mesmo se sessão tiver lifecycle
-  // estranho durante o stream longo (~150s).
+  // ===== v2.3.0 Sonnet 2x pipeline =====
+  // Marca "em curso" ANTES de Stage 1 — idempotency gate (f) já protege
+  // re-entradas. completed_at: null garante que reprocessamento limpe
+  // completed antigo (se houver) pra gate funcionar.
   await service
     .from('readings')
-    .update({ analysis_started_at: new Date().toISOString() } as never)
+    .update({
+      analysis_started_at: new Date().toISOString(),
+      analysis_completed_at: null,
+    } as never)
     .eq('id', readingId)
 
-  // Open the Sonnet-direct stream (same {stream,finalize} contract).
+  // ===== ETAPA 1 — Observação estruturada (Sonnet vê 6 fotos) =====
+  // runStage1Scan faz tool_use com REGISTRAR_EXAME_TOOL, valida (5
+  // blindagens), retry 1x em invalid, retorna JSON estruturado.
+  // Fallback Sonnet 4.6 → 4.5 inline em 429/503/5xx.
+  const stage1 = await runStage1Scan({
+    readingId,
+    therapistId: user.id,
+    images: prep.images,
+    clientName,
+    clientAge,
+  })
+
+  // Persistência via RPC (transação atômica superseded_at).
+  // Migration 0030 cria o RPC; se pendente, log warn e segue (analytics
+  // perde linha mas relatório não trava).
+  const validationStatusForDb =
+    stage1.validation_status === 'valid' ||
+    stage1.validation_status === 'valid_with_warnings'
+      ? 'valid'
+      : stage1.validation_status === 'invalid_retried'
+        ? 'invalid_retried'
+        : 'invalid_final'
+  const { error: findingsErr } = await service.rpc(
+    'persist_report_findings_versioned' as never,
+    {
+      p_reading_id: readingId,
+      p_therapist_id: user.id,
+      p_prompt_version: stage1.prompt_version,
+      p_prompt_sha: stage1.prompt_sha,
+      p_method_version: stage1.method_version,
+      p_model: stage1.model,
+      p_exame_json: stage1.exame ?? {},
+      p_raw_xml: stage1.raw_output,
+      p_validation_status: validationStatusForDb,
+      p_tokens_in: stage1.tokens_in,
+      p_tokens_out: stage1.tokens_out,
+      p_cost_usd: Number(stage1.cost_usd.toFixed(6)),
+      p_latency_ms: stage1.latency_ms,
+    } as never,
+  )
+  if (findingsErr) {
+    console.warn(
+      '[analyze] persist_report_findings_versioned RPC failed (migration 0030 pending?):',
+      findingsErr.message,
+    )
+  }
+
+  // Aborta Etapa 2 se Stage 1 falhou 2x. Preserva custo Sonnet (~$0.15)
+  // e qualidade do produto (não gera relatório fraco sem ancoragem).
+  // Terapeuta clica Reprocessar; pipeline tenta de novo.
+  if (stage1.validation_status === 'invalid_final' || !stage1.exame) {
+    console.error('[analyze] Stage 1 invalid_final — aborting Stage 2', {
+      readingId,
+      tokens_in: stage1.tokens_in,
+      tokens_out: stage1.tokens_out,
+      cost_usd: stage1.cost_usd,
+    })
+    await service
+      .from('readings')
+      .update({ analysis_completed_at: new Date().toISOString() } as never)
+      .eq('id', readingId)
+    return NextResponse.json(
+      {
+        error: 'Falha na observação estruturada da íris. Clique em Reprocessar pra tentar novamente.',
+        stage: 1,
+        validation_status: stage1.validation_status,
+      },
+      { status: 502 },
+    )
+  }
+
+  // ===== Builder do contexto recente (10 últimas frases do terapeuta) =====
+  // Best-effort: se Supabase falhar ou tabela report_phrases pendente,
+  // retorna empty string — orquestrador segue sem memória (primeira
+  // leitura do terapeuta também passa por aqui com empty).
+  const recentPhrasesBlock = await buildRecentPhrasesContext(user.id)
+
+  // ===== ETAPA 2 — Composição ancorada (Sonnet NÃO vê fotos) =====
+  // Mesmo contract {stream, finalize} de analyzeReadingDirect.
   // IMPORTANTE: NÃO passamos request.signal. Antes (founder UAT 2026-05-20
   // bug), o signal abortava o llmStream quando cliente fechava a página
   // → analysis.finalize() nunca rodava → audit/log/cost não persistiam +
@@ -176,10 +271,11 @@ export async function POST(
   // desconectar (até maxDuration=300s). Trade-off aceito: cliente
   // abusivo pagaria Sonnet completo mesmo se cancelar — mitigado pelo
   // gate (f) "already running" acima.
-  const analysis = await analyzeReadingDirect({
+  const analysis = await analyzeReadingComposeStage2({
     readingId,
     therapistId: user.id,
-    images: prep.images,
+    exameIridologico: stage1.exame, // garantido não-null pelo check acima
+    recentPhrasesBlock,
     clientName,
     clientAge,
   })
@@ -292,6 +388,38 @@ export async function POST(
           })
           .eq('id', readingId)
 
+        // ===== v2.3.0 Extração de frases-chave + persistência da memória =====
+        // Roda DEPOIS do stream fechar e DEPOIS do report_generated estar
+        // persistido. PII scrub via clientName. Best-effort: se RPC falhar
+        // (migration 0030 pendente), apenas loga warn — memória inter-leituras
+        // perde uma entry mas pipeline não trava.
+        try {
+          const extracted = extractPhrases(buffer, clientName)
+          const { error: phrasesErr } = await service.rpc(
+            'persist_report_phrases_versioned' as never,
+            {
+              p_reading_id: readingId,
+              p_therapist_id: user.id,
+              p_prompt_version: getSystemPromptVersion(),
+              p_prompt_sha: getSystemPromptVersion(),
+              p_method_version: 'sonnet_2x_0.1.0',
+              p_phrases: extracted as unknown as Record<string, unknown>,
+              p_markdown_blob_url: null,
+            } as never,
+          )
+          if (phrasesErr) {
+            console.warn(
+              '[analyze] persist_report_phrases_versioned RPC failed (migration 0030 pending?):',
+              phrasesErr.message,
+            )
+          }
+        } catch (err) {
+          console.warn(
+            '[analyze] extract_phrases/persist failed (non-fatal):',
+            err instanceof Error ? err.message : err,
+          )
+        }
+
         // 07.4-36: bbox cost/latency already persisted by canonicalizeReading
         // into readings.canonical_metadata — read it here (no extra call).
         const canon = (reading as { canonical_metadata?: unknown })
@@ -299,7 +427,7 @@ export async function POST(
 
         await logReportGeneration(service, {
           reading_id: readingId,
-          method: 'sonnet_direct',
+          method: 'sonnet_2x_0.1.0',
           latency_ms: finalization.latency_ms,
           cost_usd: Number(finalization.cost_estimate_usd.toFixed(5)),
           tokens_in: finalization.usage.input_tokens,
@@ -373,13 +501,21 @@ export async function POST(
           }
         }
       } finally {
-        // CLEAR analysis_started_at — libera próxima geração (independente
-        // de sucesso/erro). Sem isso, started_at ficaria "permanente" até
-        // o stale-window de 5min, bloqueando o terapeuta de regenerar.
-        await service
+        // v2.3.0: marca completed_at (mantém started_at intacto pra
+        // histórico). Idempotency gate (f) lê {started, completed} —
+        // completed populado = handler terminou (sucesso OU erro final),
+        // libera retentativa imediatamente. Sem isso, terapeuta teria que
+        // esperar a janela de 5min stale expirar.
+        const { error: completedErr } = await service
           .from('readings')
-          .update({ analysis_started_at: null } as never)
+          .update({ analysis_completed_at: new Date().toISOString() } as never)
           .eq('id', readingId)
+        if (completedErr) {
+          console.warn(
+            '[analyze] analysis_completed_at update failed (migration 0030 pending?):',
+            completedErr.message,
+          )
+        }
       }
     },
 

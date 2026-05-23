@@ -11,7 +11,9 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:changed": "vitest run --changed",
-    "audit:vocabulary": "node scripts/audit-vocabulary.mjs"
+    "audit:vocabulary": "node scripts/audit-vocabulary.mjs",
+    "generate:schema-artifacts": "tsx scripts/generate-schema-artifacts.ts",
+    "generate:schema-artifacts:check": "tsx scripts/generate-schema-artifacts.ts --check"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.92.0",
@@ -60,6 +62,7 @@
     "serwist": "9.5.10",
     "sharp": "^0.34.5",
     "tailwindcss": "^4",
+    "tsx": "^4.19.2",
     "typescript": "^5",
     "vitest": "^2.1.9"
   }

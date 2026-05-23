@@ -25,6 +25,25 @@ let _systemCache: string | null = null
 let _injectionCache: string | null = null
 let _systemVersionCache: string | null = null
 
+/**
+ * Versão do MÉTODO de geração do relatório (orquestração + arquitetura),
+ * independente do conteúdo do prompt (`REPORT_PROMPT_LABEL`).
+ *
+ * Histórico:
+ *   - `sonnet_direct_0.1.0` (Plan 7.4-36) = single-call Sonnet vendo as 6
+ *     fotos e gerando as 15 seções diretamente
+ *   - `sonnet_2x_0.1.0` (v2.3.0, 2026-05-23) = arquitetura 2-call:
+ *     Etapa 1 com tool use produz exame_iridologico estruturado;
+ *     Etapa 2 compõe as 15 seções ancoradas no JSON + memória de 10
+ *     últimas frases do terapeuta. system.md INTOCADO entre as 2
+ *     versões — única mudança é orquestração + injeção.
+ *
+ * Persistido em `report_findings.method_version` e
+ * `report_generations.method_version` pra atribuir variação de
+ * qualidade/custo a mudanças arquiteturais vs cirurgias no prompt.
+ */
+export const METHOD_VERSION = 'sonnet_2x_0.1.0' as const
+
 const PROMPTS_DIR = path.join(process.cwd(), 'prompts')
 
 /**
@@ -47,6 +66,7 @@ const CHARS_PER_TOKEN_ESTIMATE = 4
 function resolvePromptFile(): string {
   const version = process.env.REPORT_PROMPT_VERSION?.trim().toLowerCase()
   if (version === 'v1') return 'system-v1.md'
+  if (version === 'v2-1') return 'system-v2-1.md'
   return 'system.md'
 }
 
@@ -97,15 +117,27 @@ export function loadSystemPrompt(): string {
  * eixos de seleção ancorados em achados §1-§10. Teste meta-§11
  * obrigatório no final ("releia 18 bullets — funcionaria pra outra íris?").
  *
+ * v2.3.0 (2026-05-23) = NÃO mexe em system.md (intocado byte-by-byte
+ * — snapshot em system-v2-1.md). Bump puramente ARQUITETURAL: o
+ * pipeline passa de single-call (sonnet_direct_0.1.0) pra 2-call
+ * (sonnet_2x_0.1.0 — ver METHOD_VERSION acima). Etapa 1 (apps/web/
+ * prompts/stage1-scan.md) faz observação estruturada com tool use;
+ * Etapa 2 usa system.md atual + JSON injetado da Etapa 1 + memória
+ * de 10 últimas frases por terapeuta (anti-repetição inter-leituras).
+ * Pula v2.2.0 (cirurgia no system.md foi descartada — system.md atual
+ * fez 2 pessoas chorarem em UAT, intocável). Detalhe em
+ * memory/project_caminho_1_sonnet_2x_architecture.md.
+ *
  * Pareado com getSystemPromptVersion() (sha curto) — label é o nome
  * humano, sha é a impressão digital exata do conteúdo (varia a cada
  * edit; label só varia quando você bumpa).
  */
-export const REPORT_PROMPT_LABEL = (
-  process.env.REPORT_PROMPT_VERSION?.trim().toLowerCase() === 'v1'
-    ? 'v1.0.0'
-    : 'v2.1.0'
-) as 'v1.0.0' | 'v2.1.0'
+export const REPORT_PROMPT_LABEL = (() => {
+  const v = process.env.REPORT_PROMPT_VERSION?.trim().toLowerCase()
+  if (v === 'v1') return 'v1.0.0'
+  if (v === 'v2-1') return 'v2.1.0'
+  return 'v2.3.0'
+})() as 'v1.0.0' | 'v2.1.0' | 'v2.3.0'
 
 /**
  * Stable short fingerprint of the EFFECTIVE system.md content (12 hex chars
