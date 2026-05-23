@@ -215,6 +215,10 @@ export async function generateSonnetDirectReport(
     cost_usd: summary.cost_usd ?? null,
     tokens_in: finalization.usage.input_tokens,
     tokens_out: finalization.usage.output_tokens,
+    // Migration 0031: cache buckets pro pipeline antigo também — completude
+    // do custo real em analytics. Colunas nullable até a migration rodar.
+    cache_creation_input_tokens: finalization.usage.cache_creation_input_tokens,
+    cache_read_input_tokens: finalization.usage.cache_read_input_tokens,
     // report_generations.model_version = the Sonnet model that produced the
     // report (comparable across methods). The method id (sonnet_direct_0.1.0)
     // lives in `method` + sonnet_direct_run_metadata.method_version.

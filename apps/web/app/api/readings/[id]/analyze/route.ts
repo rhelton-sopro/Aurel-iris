@@ -28,7 +28,11 @@ import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { logReportGeneration } from '@/lib/calibration/log-generation'
-import { analyzeReadingComposeStage2 } from '@/lib/anthropic/analyze-direct'
+import {
+  analyzeReadingComposeStage2,
+  STAGE2_METHOD,
+  STAGE2_VERSION,
+} from '@/lib/anthropic/analyze-direct'
 import { runStage1Scan } from '@/lib/anthropic/stage1-scan'
 import { buildRecentPhrasesContext } from '@/lib/anthropic/recent-phrases-context'
 import { extractPhrases } from '@/lib/anthropic/extract-phrases'
@@ -222,6 +226,11 @@ export async function POST(
       p_tokens_out: stage1.tokens_out,
       p_cost_usd: Number(stage1.cost_usd.toFixed(6)),
       p_latency_ms: stage1.latency_ms,
+      // Migration 0031: cache buckets (RPC tem defaults NULL — se migration
+      // ainda não foi aplicada, postgres aceita os params extras só se a RPC
+      // já tem a nova assinatura; senão erro fica preso no findingsErr below).
+      p_cache_creation_input_tokens: stage1.cache_creation_input_tokens,
+      p_cache_read_input_tokens: stage1.cache_read_input_tokens,
     } as never,
   )
   if (findingsErr) {
@@ -427,11 +436,15 @@ export async function POST(
 
         await logReportGeneration(service, {
           reading_id: readingId,
-          method: 'sonnet_2x_0.1.0',
+          method: STAGE2_METHOD,
+          method_version: STAGE2_VERSION,
           latency_ms: finalization.latency_ms,
           cost_usd: Number(finalization.cost_estimate_usd.toFixed(5)),
           tokens_in: finalization.usage.input_tokens,
           tokens_out: finalization.usage.output_tokens,
+          cache_creation_input_tokens:
+            finalization.usage.cache_creation_input_tokens,
+          cache_read_input_tokens: finalization.usage.cache_read_input_tokens,
           model_version: MODEL,
           prompt_version: getSystemPromptVersion(),
           canonical_fallback_count: prep.fallbackCount,

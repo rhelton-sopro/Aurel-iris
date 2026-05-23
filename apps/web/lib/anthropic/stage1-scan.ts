@@ -143,6 +143,10 @@ export interface Stage1ScanResult {
   model: string
   tokens_in: number
   tokens_out: number
+  /** Anthropic cache writes acumulados cross-attempt. Migration 0031. */
+  cache_creation_input_tokens: number
+  /** Anthropic cache reads acumulados cross-attempt. Migration 0031. */
+  cache_read_input_tokens: number
   cost_usd: number
   latency_ms: number
 }
@@ -296,6 +300,8 @@ export async function runStage1Scan(
   // tentativas porque Anthropic cobra cada uma).
   let totalTokensIn = 0
   let totalTokensOut = 0
+  let totalCacheCreation = 0
+  let totalCacheRead = 0
   let totalCost = 0
 
   const ctx = { reading_id: args.readingId, therapist_id: args.therapistId }
@@ -304,6 +310,8 @@ export async function runStage1Scan(
   const attempt1 = await callSonnetWithTool(systemPrompt, userContent, ctx)
   totalTokensIn += attempt1.message.usage.input_tokens ?? 0
   totalTokensOut += attempt1.message.usage.output_tokens ?? 0
+  totalCacheCreation += attempt1.message.usage.cache_creation_input_tokens ?? 0
+  totalCacheRead += attempt1.message.usage.cache_read_input_tokens ?? 0
   totalCost += estimateCostUsd({
     input_tokens: attempt1.message.usage.input_tokens ?? 0,
     output_tokens: attempt1.message.usage.output_tokens ?? 0,
@@ -332,6 +340,8 @@ export async function runStage1Scan(
       filtered_out: validation1.filteredOut,
       tokens_in: totalTokensIn,
       tokens_out: totalTokensOut,
+      cache_creation_input_tokens: totalCacheCreation,
+      cache_read_input_tokens: totalCacheRead,
       cost_usd: totalCost,
       latency_ms: Date.now() - overallStartedAt,
       model: attempt1.message.model,
@@ -356,6 +366,8 @@ export async function runStage1Scan(
   )
   totalTokensIn += attempt2.message.usage.input_tokens ?? 0
   totalTokensOut += attempt2.message.usage.output_tokens ?? 0
+  totalCacheCreation += attempt2.message.usage.cache_creation_input_tokens ?? 0
+  totalCacheRead += attempt2.message.usage.cache_read_input_tokens ?? 0
   totalCost += estimateCostUsd({
     input_tokens: attempt2.message.usage.input_tokens ?? 0,
     output_tokens: attempt2.message.usage.output_tokens ?? 0,
@@ -384,6 +396,8 @@ export async function runStage1Scan(
       filtered_out: validation2.filteredOut,
       tokens_in: totalTokensIn,
       tokens_out: totalTokensOut,
+      cache_creation_input_tokens: totalCacheCreation,
+      cache_read_input_tokens: totalCacheRead,
       cost_usd: totalCost,
       latency_ms: Date.now() - overallStartedAt,
       model: attempt2.message.model,
@@ -406,6 +420,8 @@ export async function runStage1Scan(
     filtered_out: { correlacoes_vagas: 0, marcadores_narrativos: 0, preservados_por_ausencia: 0 },
     tokens_in: totalTokensIn,
     tokens_out: totalTokensOut,
+    cache_creation_input_tokens: totalCacheCreation,
+    cache_read_input_tokens: totalCacheRead,
     cost_usd: totalCost,
     latency_ms: Date.now() - overallStartedAt,
     model: attempt2.message.model,
@@ -420,6 +436,8 @@ function assembleResult(partial: {
   filtered_out: Stage1ScanResult['filtered_out']
   tokens_in: number
   tokens_out: number
+  cache_creation_input_tokens: number
+  cache_read_input_tokens: number
   cost_usd: number
   latency_ms: number
   model: string
