@@ -55,13 +55,13 @@ import {
 } from '@/lib/anthropic/types'
 
 export const runtime = 'nodejs'
-// v2.4 (2026-05-24): bump pra 800s REJEITADO no deploy — projeto está
-// no plano Hobby da Vercel, max=300s. Mantém 300s; risco real de timeout
-// em Stage 2 v2.4 (Evanilce e8976f11 timeoutou em 2026-05-23). Mitigação
-// imediata: Frente 1 (consumer atômico) ao menos não corrompe estado
-// quando timeoutar. Mitigação real requer upgrade pra Pro ($20/mo, libera
-// até 800s) OU enxugar VOICE_OVERRIDE_V2_4 — decisão founder pendente.
-export const maxDuration = 300
+// v2.4 (2026-05-24): bump 300s → 800s. Founder upgrade pro plano Pro
+// confirmado em 2026-05-24 — libera até 800s no Fluid Compute. Stage 2
+// v2.4 (com VOICE_OVERRIDE_V2_4) demorava ~290-310s em íris densas
+// (Evanilce timeoutou 2x consecutivas no limite de 300s do Hobby).
+// 800s dá margem confortável de >2x a latência observada — voz v2.4
+// preservada sem risco operacional de timeout em UAT.
+export const maxDuration = 800
 
 export async function POST(
   request: NextRequest,
