@@ -133,11 +133,20 @@ export interface DosageHit {
 // `g` global.
 // ---------------------------------------------------------------------------
 
+// v2.5.3 F2: expandido pra cobrir "unidades", "porções", "porcoes"
+// (Cristiane regen=4 emitiu "castanha-do-pará (1-2 unidades/dia)" que
+// passou batido). Frequência "/dia" sem "vezes"/"x" também era brecha.
 const DOSAGE_QUANTITY_RE =
-  /\b\d+(?:[.,]\d+)?(?:\s*[-–—]\s*\d+(?:[.,]\d+)?)?\s*(?:mg|µg|mcg|ui|ml|cl|dl|l|g|kg|gotas?|c[áa]psulas?|comprimidos?|drágeas?|colheres?|xícaras?)\b/giu
+  /\b\d+(?:[.,]\d+)?(?:\s*[-–—]\s*\d+(?:[.,]\d+)?)?\s*(?:mg|µg|mcg|ui|ml|cl|dl|l|g|kg|gotas?|c[áa]psulas?|comprimidos?|drágeas?|colheres?|xícaras?|unidades?|porç[oõ]es?|porcoes|punhados?|sach[eê]s?)\b/giu
 
 const DOSAGE_FREQUENCY_RE =
   /\b\d+\s*(?:x|vezes?)\s+(?:ao|por|na|no|nas|nos)\s+(?:dia|semana|m[êe]s|ano)s?\b/giu
+
+// v2.5.3 F2: padrão "/dia", "/semana", "/mês" depois de quantidade ou
+// substantivo (ex: "1-2 unidades/dia", "castanha 1/dia"). Captura
+// frequência camuflada sem verbo "x" ou "vezes".
+const DOSAGE_SLASH_FREQUENCY_RE =
+  /\b\d+(?:[.,]\d+)?(?:\s*[-–—]\s*\d+(?:[.,]\d+)?)?\s*[\wáàâãéêíîóôõúç]*\s*\/\s*(?:dia|semana|sem|m[êe]s|ano)s?\b/giu
 
 const DOSAGE_DURATION_RE =
   /\b(?:por|durante|ao longo de|em ciclos? de)\s+\d+\s+(?:dia|semana|m[êe]s|ano)s?\b/giu
@@ -145,6 +154,7 @@ const DOSAGE_DURATION_RE =
 const DOSAGE_PATTERNS: ReadonlyArray<RegExp> = [
   DOSAGE_QUANTITY_RE,
   DOSAGE_FREQUENCY_RE,
+  DOSAGE_SLASH_FREQUENCY_RE,
   DOSAGE_DURATION_RE,
 ]
 
