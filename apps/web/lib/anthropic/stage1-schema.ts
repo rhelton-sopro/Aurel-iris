@@ -32,8 +32,10 @@ import { z } from 'zod'
 import type Anthropic from '@anthropic-ai/sdk'
 
 // Re-exports do glossary puro (sem 'server-only' guard)
-export { GLOSSARY, KNOWN_CAMPOS } from './stage1-glossary'
+export { GLOSSARY, KNOWN_CAMPOS, KNOWN_CAMPOS_LIST, CAMPO_ZONA_MAP } from './stage1-glossary'
 export type { GlossaryEntry } from './stage1-glossary'
+
+import { KNOWN_CAMPOS, KNOWN_CAMPOS_LIST, CAMPO_ZONA_MAP } from './stage1-glossary'
 
 // ============================================================
 // ENUMS + ZOD SCHEMAS
@@ -84,25 +86,44 @@ export const BORDAS_PUPILARES = [
   'irregulares',
 ] as const
 
+// v2.5.1 (Fix 2): campo agora é ENUM forçado dos 40 termos canônicos
+// do glossário. Antes era string aberta (min 2 chars) e o glossário só
+// alimentava log de observabilidade — Sonnet podia inventar termos
+// como "sistema_circulatorio_periferico_acinzentado" e passar. Agora,
+// termo fora do enum = zod rejeita = retry com correção automática.
+// Tuple cast com `as [string, ...string[]]` é exigência do z.enum
+// pra aceitar runtime array (KNOWN_CAMPOS_LIST é readonly string[]).
+const CAMPO_ENUM = [...KNOWN_CAMPOS_LIST] as [string, ...string[]]
+
 const AchadoSchema = z.object({
-  campo: z.string().min(2),
+  campo: z.enum(CAMPO_ENUM),
   intensidade: z.number().int().min(1).max(5),
   natureza_da_carga: z.enum(NATUREZA_DA_CARGA),
   lateralidade: z.enum(LATERALIDADE),
   descricao_visual: z.string().min(15),
   observacao_qualifying: z.string().nullable(),
+  // v2.5.1 (Fix 3): meta-flag populado pelo validator quando as horas
+  // mencionadas em descricao_visual não batem com a zona canônica do
+  // campo (ex: campo='figado_vesicula' descrevendo zona ~10-11h, mas
+  // glossário define fígado em 5-7h). Modo warning: não rejeita, só
+  // marca pro Stage 2 ver e contextualizar. NÃO vem do LLM —
+  // popula-se em validateExameIridologico após o parse.
+  coherence_warning: z.string().nullable().optional(),
 })
 
 const SistemaPreservadoSchema = z.object({
-  campo: z.string().min(2),
+  campo: z.enum(CAMPO_ENUM),
   polaridade_funcional: z.enum(POLARIDADE_FUNCIONAL),
   sinal_visual_positivo: z.string().min(15),
   implicacao_funcional: z.string().min(15),
   observacao_qualifying: z.string().nullable(),
 })
 
+// Correlações têm 2 campos por entry; mantemos enum também — coerente
+// com achados/preservados, evita "campos": ["fígado", "stress_chronico"]
+// (segundo elemento não-canônico).
 const CorrelacaoSchema = z.object({
-  campos: z.array(z.string().min(2)).length(2),
+  campos: z.array(z.enum(CAMPO_ENUM)).length(2),
   natureza: z.string().min(20),
   ancora_visual: z.string().min(20),
 })
@@ -186,7 +207,7 @@ export const REGISTRAR_EXAME_TOOL: Anthropic.Tool = {
             'lateralidade', 'descricao_visual', 'observacao_qualifying',
           ],
           properties: {
-            campo: { type: 'string', minLength: 2 },
+            campo: { type: 'string', enum: CAMPO_ENUM },
             intensidade: { type: 'integer', minimum: 1, maximum: 5 },
             natureza_da_carga: { type: 'string', enum: NATUREZA_DA_CARGA as unknown as string[] },
             lateralidade: { type: 'string', enum: LATERALIDADE as unknown as string[] },
@@ -204,7 +225,7 @@ export const REGISTRAR_EXAME_TOOL: Anthropic.Tool = {
             'implicacao_funcional', 'observacao_qualifying',
           ],
           properties: {
-            campo: { type: 'string', minLength: 2 },
+            campo: { type: 'string', enum: CAMPO_ENUM },
             polaridade_funcional: { type: 'string', enum: POLARIDADE_FUNCIONAL as unknown as string[] },
             sinal_visual_positivo: { type: 'string', minLength: 15 },
             implicacao_funcional: { type: 'string', minLength: 15 },
@@ -222,7 +243,7 @@ export const REGISTRAR_EXAME_TOOL: Anthropic.Tool = {
           properties: {
             campos: {
               type: 'array',
-              items: { type: 'string', minLength: 2 },
+              items: { type: 'string', enum: CAMPO_ENUM },
               minItems: 2,
               maxItems: 2,
             },
@@ -304,7 +325,72 @@ export const GENERIC_PHRASE_PATTERNS = {
 // VALIDATOR + NORMALIZER + OFF-GLOSSARY LOG
 // ============================================================
 
-import { KNOWN_CAMPOS } from './stage1-glossary'
+// ============================================================
+// COHERENCE CAMPO↔ZONA (v2.5.1 Fix 3 — modo warning)
+// ============================================================
+
+/**
+ * Extrai horas (1-12) mencionadas num texto qualquer.
+ *
+ * Aceita formatos: '5h', '~5-7h', '5-7h', '~10h', 'às 12:30h',
+ * '6 horas', '5-6 horas'. Range '5-7h' expande para [5,6,7].
+ * Retorna [] se nenhuma hora detectada.
+ *
+ * Filosofia conservadora: não tenta parsear "noite", "metade", etc.
+ * Só dígitos. Erros falsos-positivos são piores que falsos-negativos
+ * aqui (warning errado polui Stage 2; warning omitido é só ruído
+ * silencioso de qualidade).
+ */
+function extractHoras(text: string): number[] {
+  const horas = new Set<number>()
+  // range '5-7h' / '~5-7h' / '5-7 horas'
+  const rangeRe = /~?(\d{1,2})\s*-\s*(\d{1,2})(?:h\b|:\d{2}h?\b|\s*horas?\b)/giu
+  let m: RegExpExecArray | null
+  while ((m = rangeRe.exec(text)) !== null) {
+    const start = parseInt(m[1]!, 10)
+    const end = parseInt(m[2]!, 10)
+    if (start >= 1 && start <= 12 && end >= 1 && end <= 12 && end >= start) {
+      for (let h = start; h <= end; h++) horas.add(h)
+    }
+  }
+  // singletons '5h' / '~5h' / '12:30h' / '5 horas'
+  const singleRe = /~?(\d{1,2})(?:h\b|:\d{2}h?\b|\s*horas?\b)/giu
+  while ((m = singleRe.exec(text)) !== null) {
+    const h = parseInt(m[1]!, 10)
+    if (h >= 1 && h <= 12) horas.add(h)
+  }
+  return [...horas].sort((a, b) => a - b)
+}
+
+/**
+ * Verifica se o achado descreve zona horária coerente com o campo
+ * canônico do glossário. Retorna warning string ou null.
+ *
+ * Modo WARNING (não rejeita). Casos:
+ * - Campo sem zona horária no glossário (sistêmico/global) → null
+ * - Descrição sem horas detectáveis → null (não dá pra checar)
+ * - Pelo menos UMA hora da descrição cai na zona canônica → null
+ * - Nenhuma hora bate → warning citando zona canônica vs zona descrita
+ */
+function checkCampoZonaCoherence(
+  campo: string,
+  descricaoVisual: string,
+): string | null {
+  const zonaCanonica = CAMPO_ZONA_MAP.get(campo)
+  if (!zonaCanonica) return null
+  const horasCanonicas = extractHoras(zonaCanonica)
+  if (horasCanonicas.length === 0) return null // sistêmico/global
+  const horasDescritas = extractHoras(descricaoVisual)
+  if (horasDescritas.length === 0) return null // não dá pra checar
+  const canonSet = new Set(horasCanonicas)
+  const hit = horasDescritas.some((h) => canonSet.has(h))
+  if (hit) return null
+  return (
+    `descricao_visual menciona horas [${horasDescritas.join(',')}] ` +
+    `mas zona canônica de '${campo}' é '${zonaCanonica}' ` +
+    `(horas [${horasCanonicas.join(',')}]). Stage 2: usar com cautela.`
+  )
+}
 
 export type ValidationOutcome =
   | {
@@ -350,6 +436,41 @@ export function validateExameIridologico(input: unknown): ValidationOutcome {
   exame.achados_de_atencao = [...exame.achados_de_atencao].sort(
     (a, b) => b.intensidade - a.intensidade,
   )
+
+  // v2.5.1 (Fix 3): popula coherence_warning quando descricao_visual
+  // menciona horas que não batem com a zona canônica do campo. Modo
+  // warning (não rejeita) — Stage 2 vê a meta-flag via JSON e pode
+  // contextualizar. Aplicado em achados E preservados (mesmas regras
+  // de coerência espacial).
+  let coherenceWarnings = 0
+  for (const a of exame.achados_de_atencao) {
+    const w = checkCampoZonaCoherence(a.campo, a.descricao_visual)
+    if (w) {
+      a.coherence_warning = w
+      coherenceWarnings++
+    }
+  }
+  for (const p of exame.sistemas_preservados) {
+    const w = checkCampoZonaCoherence(p.campo, p.sinal_visual_positivo)
+    if (w) {
+      // Sistemas_preservados não tem campo coherence_warning no schema
+      // (eles raramente carregam zona horária em sinal_visual_positivo —
+      // descrevem integridade, não localização). Aqui apenas LOGAMOS,
+      // sem mutar o objeto.
+      console.info({
+        event: 'stage1_coherence_warning_preservado',
+        campo: p.campo,
+        warning: w,
+      })
+      coherenceWarnings++
+    }
+  }
+  if (coherenceWarnings > 0) {
+    console.info({
+      event: 'stage1_coherence_warnings_total',
+      count: coherenceWarnings,
+    })
+  }
 
   // Blindagem 3: filtra correlações com ancora_visual genérica
   const correlacoesVagas = exame.correlacoes_observadas.filter(c =>

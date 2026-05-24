@@ -97,7 +97,26 @@ const STAGE1_PROMPT_FILENAME = 'stage1-scan.md'
 // stage1-scan.md (mínimo 3 marcadores não-negociável, conhecimento
 // multi-escolas, declaração de limitação em íris ilegível). Pula 0.1.1
 // pra alinhar com Stage 2 que foi 0.1.0→0.1.1 (anti-fórmula).
-const STAGE1_METHOD_VERSION = 'sonnet_2x_0.1.2' as const
+//
+// v2.5.1 (2026-05-24): bump MINOR 0.1.2 → 0.2.0 — calibração
+// determinística Stage 1, 5 fixes paralelos motivados pela variância
+// Cristiane regen=1 vs regen=2 (5 achados viraram 8, fígado mudou de
+// 10-11h pra 5-7h sem novo sinal visual):
+//   1. temperature: 0.1 no requestBody (estabilidade entre regens)
+//   2. campo agora é zod enum forçado (KNOWN_CAMPOS_LIST, 40 termos)
+//      + enum no Anthropic tool input_schema (Sonnet vê a restrição)
+//   3. validação coerência campo↔zona em modo warning: descricao_
+//      visual c/ horas fora da zona canônica do glossário → meta-flag
+//      coherence_warning no achado + log estruturado (não rejeita)
+//   4. 6ª blindagem auto-aplicável no prompt: cada achado tem
+//      descricao_visual com (zona horária + olho + foto número + tipo
+//      de marca) — promovida de implícita-via-few-shot a regra explícita
+//   5. bloco novo "Quando midríase bilateral obscurece pericentrais":
+//      NÃO OMITIR pineal_hipotalamica / eixo_pituitario_adrenal /
+//      anel_neuroendocrino quando midríase obscurece — registrar como
+//      indeterminada + caveat explícito. Skip silencioso → silêncio
+//      ambíguo. Indeterminada explícita → auditável.
+const STAGE1_METHOD_VERSION = 'sonnet_2x_0.2.0' as const
 
 let _stage1PromptCache: string | null = null
 let _stage1ShaCache: string | null = null
@@ -248,6 +267,12 @@ async function callSonnetWithTool(
   const requestBody = (model: string) => ({
     model,
     max_tokens: 8192,
+    // v2.5.1 (2026-05-24): Stage 1 é extração estruturada com tool_choice
+    // forçado — temperature baixa garante estabilidade entre regens. Voz
+    // vive no Stage 2 que permanece em temperature default. Causa raiz #1
+    // da variância Cristiane regen=1 vs regen=2 (achado dominante mudando
+    // de coordenada 10-11h → 5-7h sem mudança no input visual).
+    temperature: 0.1,
     system: [
       {
         type: 'text' as const,

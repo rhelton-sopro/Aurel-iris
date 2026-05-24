@@ -446,6 +446,51 @@ submeter e CORRIJA se qualquer uma destas falhar:
    `sinal_visual_positivo` com estrutura concreta? Se algum só diz
    "ausência de problema", REMOVA — isso é inferência por ausência,
    não evidência positiva.
+6. **Cada `achados_de_atencao[].descricao_visual` carrega TODOS os
+   elementos de âncora completa?**
+   - (a) zona horária específica (ex: "5-7h", "~10-11h", "12:30h")
+   - (b) olho onde está mais visível (OD, OE, ou "bilateral")
+   - (c) foto número onde o sinal foi confirmado (ex: "imagem 4",
+     "fotos 1 e 3")
+   - (d) tipo de marca visual concreta (pigmento, lacuna, opacidade,
+     anel, mancha, vasos dilatados, fibras irregulares, etc.)
+
+   Se ALGUM elemento falta na descricao_visual, REESCREVA antes de
+   emitir. Achado sem âncora completa = sinal duvidoso = invenção
+   passando como observação. Mesma regra para `sistemas_preservados[].
+   sinal_visual_positivo` quando o sistema tem zona definida no
+   glossário.
+
+## Quando midríase bilateral acentuada obscurece zonas pericentrais
+
+Em íris com pupila muito dilatada (midríase moderada ou acentuada),
+as zonas pericentrais — em especial `pineal_hipotalamica` (12h
+interna), `eixo_pituitario_adrenal` (collarete a 12:30h) e
+`anel_neuroendocrino`/`coroa_simpatica` (zona peripupilar) — ficam
+parcial ou totalmente OBSCURECIDAS pela pupila.
+
+**Regra de declaração explícita:** NÃO OMITA esses campos quando a
+midríase os obscurecer. Para cada zona afetada, REGISTRE o achado em
+`achados_de_atencao` com:
+
+- `natureza_da_carga`: `"indeterminada"`
+- `intensidade`: 1 ou 2 (sutil, por defeito de imagem — não por
+  evidência visual de carga)
+- `descricao_visual`: cita explicitamente "leitura limitada/
+  obscurecida pela midríase bilateral nas fotos [N, M]; zona [X-Yh]
+  parcialmente fora do estroma visível"
+- `observacao_qualifying`: "Impossível confirmar ou descartar
+  [tipo de marca esperada do glossário] com as imagens disponíveis;
+  pupila ocupa [estimativa de % da área]."
+
+Skip silencioso vira gap clínico ("será que tinha sinal pineal?
+ninguém saberá nunca"). Indeterminada explícita vira nota técnica
+auditável — Stage 2 lê o flag, omite das seções de prosa (§2/§5/§7/
+§8/§10/§13 conforme regra ANCHORING) mas pode mencionar UMA VEZ em
+§12 como direção de investigação ("se houver suspeita clínica de
+desregulação X, fotos com pupila menos dilatada permitirão
+confirmar"). Skip + sem registro = silêncio ambíguo, pior que
+indeterminada explícita.
 
 ## Como submeter
 

@@ -356,3 +356,24 @@ export const KNOWN_CAMPOS: ReadonlySet<string> = new Set(
     .filter(e => e.group !== 'constitucional')
     .map(e => e.campo),
 )
+
+/**
+ * Lista ordenada dos mesmos termos. v2.5.1 (Fix 2): zod enum +
+ * Anthropic tool input_schema enum requerem array, não Set. Mantemos
+ * o Set também (acessos O(1) em validador + logger).
+ */
+export const KNOWN_CAMPOS_LIST: readonly string[] = GLOSSARY
+  .filter(e => e.group !== 'constitucional')
+  .map(e => e.campo)
+
+/**
+ * Map campo → zona canônica do glossário. v2.5.1 (Fix 3): validação
+ * de coerência campo↔zona compara horas mencionadas em
+ * descricao_visual com a zona declarada aqui. Construído uma vez
+ * (size pequeno; 40 entries).
+ */
+export const CAMPO_ZONA_MAP: ReadonlyMap<string, string> = new Map(
+  GLOSSARY
+    .filter(e => e.group !== 'constitucional' && 'zona' in e)
+    .map(e => [e.campo, (e as { zona: string }).zona]),
+)
