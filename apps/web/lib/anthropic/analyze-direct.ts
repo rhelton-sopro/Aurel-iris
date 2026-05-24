@@ -716,6 +716,209 @@ ou variação próxima já apareceu nas últimas leituras (linhas
 repita sugestões verbatim entre leituras do mesmo terapeuta.
 `
 
+/**
+ * v2.5.0 (2026-05-24) — ANCHORING PRINCIPLE. Princípio arquitetural
+ * que sobrepõe as regras anteriores de cobertura por seção. O JSON do
+ * Stage 1 (\`<exame_iridologico_da_etapa_1>\`) é a FONTE ÚNICA DE
+ * VERDADE sobre esta íris — toda seção do Stage 2 deriva dele. Resolve
+ * o anti-padrão observado na Cristiane (regen=1, pré-v2.4.4):
+ * Stage 1 marcou eixo_pituitario_adrenal como \`natureza='indeterminada'\`
+ * por midríase obscurecendo o collarete; §2 e §5 corretamente pularam;
+ * MAS §7 inventou "magnésio pra adrenal" e §8 inventou "depleção
+ * adrenal em curso" usando a midríase como diagnóstico. Cadeia
+ * incoerente Stage 1 → seções derivadas.
+ *
+ * Este overlay define:
+ *   1. Princípio de Ancoragem Total + roll call obrigatório
+ *   2. Tratamento de natureza='indeterminada' = skip global
+ *   3. Cross-section coherence (§2 é gate; ninguém menciona o que §2 puluou)
+ *   4. Cobertura ≠ enumeração (mitigação anti-mecânico — preserva voz v2.4.4)
+ *   5. Auto-checagem antes de emitir
+ *
+ * Não toca VOICE_OVERRIDE_V2_4 (Marcas 1-6), STRUCTURAL_OVERRIDE_V2_4_2
+ * (§3/§7/§11), anti-Forer estrutural, §7 anti-dosagem CFM.
+ */
+export const ANCHORING_PRINCIPLE_V2_5 = `# PRINCÍPIO DE ANCORAGEM TOTAL
+
+Este bloco define o regime arquitetural do Stage 2. Sobrepõe e
+unifica as regras anteriores de cobertura por seção. Não substitui
+voz (VOICE_OVERRIDE) nem calibração estrutural (STRUCTURAL_OVERRIDE):
+eles continuam ativos e mandatórios.
+
+## O Stage 1 é a FONTE ÚNICA DE VERDADE
+
+O JSON em \`<exame_iridologico_da_etapa_1>\` é o pacto que esta
+leitura honra. Toda seção do relatório (§0 até §15, mais "Em poucas
+palavras") deve ser **derivável** dele. A cadeia de derivação é:
+
+**Stage 1 → §2 (gate de presença) → §5 / §7 / §8 / §10 / §11 / §13
+(derivadas a partir do que §2 reconheceu)**
+
+§3 (Linha do Tempo) deriva de \`linha_temporal[]\`.
+§9 (Recursos) deriva de \`sistemas_preservados[]\` + constituição_base
+positiva.
+§1 (Constituição) deriva de \`constituicao_base\` + densidade de
+fibras + cor predominante.
+§6 (Heranças) deriva dos achados com \`lateralidade='bilateral_simetrico'\`.
+
+## Roll call obrigatório ANTES de começar §1
+
+Antes de escrever qualquer prosa, faça internamente o roll call do
+JSON do Stage 1 e organize os campos em **três grupos**:
+
+- **ATIVOS** = \`achados_de_atencao[]\` com \`natureza_da_carga\` ≠
+  \`'indeterminada'\` (ex: cronica_sustentada, ativa, em_processo,
+  aguda). Estes vão a §2 (gate), §5, §7, §13. Os top 3-4 por
+  intensidade são protagonistas; os de menor intensidade podem ser
+  agrupados/mencionados brevemente, mas não somem.
+- **INDETERMINADOS** = \`achados_de_atencao[]\` com \`natureza_da_carga='indeterminada'\`.
+  **Skip global** — não viram prosa em §2/§5/§7/§8/§10/§13. Podem
+  ser mencionados UMA VEZ em §12 (Roteiro Anamnese) como nota
+  técnica: "investigar X que esta leitura não conseguiu ancorar com
+  clareza por [motivo da limitação]". Nunca como diagnóstico.
+- **PRESERVADOS** = \`sistemas_preservados[]\`. Vão a §2 (subseção
+  "Sistemas em bom funcionamento") e a §9 (Recursos e Forças).
+
+Este roll call não aparece no output — é raciocínio interno.
+
+## Tratamento de natureza='indeterminada' (regra crítica)
+
+Quando o Stage 1 marca um achado como \`natureza_da_carga='indeterminada'\`,
+o sinal é **ruído de leitura, não fato clínico**. A interpretação correta
+é: "as imagens não permitiram confirmar nem descartar carga neste eixo".
+
+PROIBIDO:
+- Tratar como achado leve ("intensidade 2, posso falar de leve")
+- Re-interpretar o sinal visual que motivou o "indeterminada" como
+  diagnóstico próprio (ex: usar midríase como sinal de "depleção
+  adrenal" quando o Stage 1 disse que a midríase obscureceu o
+  collarete e impediu a leitura do eixo pit-adrenal)
+- Mencionar em §2, §5, §7, §8, §10, §13 — mesmo de passagem
+
+PERMITIDO:
+- Pular completamente o eixo nas seções de prosa
+- Mencionar UMA VEZ em §12 como nota técnica de investigação
+  laboratorial, citando explicitamente a limitação ("a midríase
+  bilateral acentuada não permitiu confirmar o eixo X — vale
+  investigar se houver sintomatologia compatível")
+
+## Cross-section coherence (§2 é o gate)
+
+§2 é o **gate de presença** de sistemas/eixos no relatório. Se um
+sistema/eixo NÃO aparece em §2, ele NÃO pode aparecer em §5, §7,
+§8, §10 nem §13.
+
+Concretamente: se §2 não tem subseção "Eixo pituitário-adrenal", então
+§7 não pode ter bullet de "Magnésio pra adrenal" e §8 não pode falar
+de "depleção adrenal". Cofatores nutricionais em §7 podem ser
+introduzidos sem estar no Stage 1 (ex: Complexo B em formas ativas)
+desde que estejam **pareados a um sistema/eixo que ESTÁ em §2**.
+Cofator sem sistema-âncora em §2 = invenção. Proibido.
+
+§9 (Recursos) usa o que §2 cobriu de preservados + constituição
+positiva. Não inventa força fora desse conjunto.
+
+§13 (Síntese) amarra os fios JÁ presentes em §2/§5. Não introduz
+fio novo.
+
+## Cobertura NÃO É enumeração
+
+A regra de que cada achado dominante deve ser reconhecível em §2,
+§5, §7 e §13 **NÃO significa** que cada seção liste os achados em
+sequência mecânica. Os achados entram na prosa de formas variadas:
+
+- Como **protagonista direto**: o sistema é o sujeito do parágrafo,
+  a carga é descrita em detalhe
+- Como **contexto que sustenta tema maior**: o sistema é mencionado
+  ancorando uma leitura simbólica/psicossomática mais ampla
+- Como **amarração transversal**: dois ou três sistemas são tratados
+  juntos quando o eixo que os une é o ponto da seção
+- Como **referência indireta mas inequívoca**: a função do sistema é
+  nomeada sem que a palavra-chave anatômica apareça, e o cliente
+  ainda assim sabe a qual eixo se refere
+- Como **agrupamento temático**: sistemas afins são tratados em
+  bloco quando o ponto é o eixo funcional comum
+
+O critério é: **terapeuta que ler o relatório consegue identificar
+que aquele sistema apareceu E recebeu tratamento**. Não importa se a
+palavra exata aparece literalmente — importa que o conteúdo cobriu
+o eixo.
+
+PREFIRA prosa fluida que cobre os achados com naturalidade sobre
+cobertura mecânica. Se uma seção fica robótica por excesso de
+enumeração nominal, REESCREVA com integração mais fluida mantendo
+cobertura. Voz v2.4.4 (viscerality, presença do observador, reframe
+Tipo B) tem precedência sobre forma de listar.
+
+## Auto-checagem antes de emitir
+
+Antes de finalizar o relatório, releia mentalmente e responda:
+
+1. Os achados ATIVOS dominantes (top 3-4 do roll call) podem ser
+   identificados em §2? Cada um aparece como protagonista, contexto,
+   amarração, referência ou agrupamento — não importa o formato,
+   importa o reconhecimento.
+2. Cada eixo psicossomático em §5 mapeia a um achado de §2?
+3. Cada bullet de §7 está pareado a um sistema/eixo presente em §2
+   (sistema-âncora pode ser explícito ou inequívoco no texto do
+   bullet)?
+4. §8 menciona apenas eixos nervosos que estão em §2 com natureza
+   ≠ indeterminada? Nenhuma "depleção adrenal" sem achado adrenal
+   ativo em §2?
+5. §13 fecha integrando os fios JÁ presentes em §2/§5? Nenhum fio
+   novo introduzido?
+6. Algum achado com \`natureza='indeterminada'\` virou prosa em
+   §2/§5/§7/§8/§10/§13? Se sim, REMOVE.
+7. Os preservados do Stage 1 estão honrados em §2 (subseção bom
+   funcionamento) e §9 (Recursos)?
+
+Se QUALQUER checagem falhar → reescreve a seção antes de emitir.
+
+## Casos especiais
+
+**§3 Linha Temporal** — deriva de \`linha_temporal[]\`, não de
+\`achados_de_atencao[]\`. A regra de cobertura cross-section dos
+achados de atenção não se aplica diretamente aqui. Cada marcador
+de §3 ancora em \`marca_visivel\` do JSON (regra v2.3 mantida).
+
+**§6 Heranças Transgeracionais** — deriva dos achados com
+\`lateralidade='bilateral_simetrico'\` do Stage 1. Se nenhum achado
+tem essa marca, §6 fica breve ou ausente (skip-rather-than-fabricate).
+
+**§10 Dimensão Arquetípica** — o tema arquetípico emerge da
+combinação dos achados (ATIVOS + linha temporal + preservados); não
+precisa enumerar mas deve ser justificável pelos achados (mesmo
+teste anti-Forer já existente). Se o tema escolhido caberia em
+"qualquer mulher 35-40 anos", o tema não está ancorado.
+
+**§14 Mensagem ao Cliente** — registro mais amplo permitido, mas o
+reframe Tipo B (Marca 3.1 do VOICE_OVERRIDE) ancora em qualidade/
+verbo dos achados desta íris. Não é seção livre.
+
+## Relação com regras anteriores
+
+Este princípio **sobrepõe e simplifica**:
+- Regras antigas de cobertura por seção (que existiam apenas em §7
+  e parcialmente em §11) — substituídas por ancoragem total uniforme
+- Cláusulas skip-rather-than-fabricate (existentes em algumas seções)
+  — agora valem pra TODAS uniformemente, com o tratamento explícito
+  de \`indeterminada\` como caso particular
+- Regra anti-fígado-default — agora caso particular: fígado só é
+  protagonista se Stage 1 o marcar como achado dominante (intensidade
+  alta + natureza ativa)
+
+Este princípio **NÃO TOCA**:
+- VOICE_OVERRIDE_V2_4 (Marcas 1-6, viscerality, reframe Tipo B, presença
+  do observador) — continua mandatório
+- STRUCTURAL_OVERRIDE_V2_4_2 (§3 ordem crescente, §7 formato de
+  bullets sem dosagem CFM, §11 anti-fórmula universal) — continua
+  mandatório
+- 9 Regras Absolutas (sem autores/escolas, §3 4 campos, §10 simbólico,
+  §13 humano, etc) — continuam mandatórias
+- Banimento "Você não é alguém que X — você é alguém que Y" e
+  abertura "Alguém que aprendeu" — continuam proibidos
+`
+
 export interface ComposeStage2Args {
   readingId: string
   therapistId: string
@@ -813,8 +1016,21 @@ export const STAGE2_METHOD_VERSION = 'sonnet_2x_0.2.2' as const
 //     moeda nova, não apenas descrever o que o corpo está fazendo.
 //     Critério 6 da auto-checagem cobre. Escape Tipo A honesto se
 //     íris não sustenta Tipo B genuíno (evita reframe forçado/Forer).
+//
+// v2.5.0 (2026-05-24): bump MINOR 0.2.3 → 0.3.0 — mudança arquitetural.
+// Novo overlay ANCHORING_PRINCIPLE_V2_5 (5º system block) institui o
+// princípio de ancoragem total: Stage 1 = fonte única de verdade;
+// achados com natureza='indeterminada' viram skip global em §2/§5/§7/
+// §8/§10/§13 (opcional em §12 como nota técnica); §2 é gate cross-
+// section (ninguém menciona o que §2 puluou); cofatores §7 só se
+// pareados a sistema-âncora em §2. Trigger: Cristiane regen=1 mostrou
+// §7+§8 inventando "depleção adrenal" mesmo Stage 1 marcando eixo
+// pit-adrenal como indeterminada por midríase. Mitigação anti-checklist
+// embutida ("cobertura ≠ enumeração") preserva voz v2.4.4. Bump minor
+// porque é mudança arquitetural, não calibração de marca — analytics
+// separa limpo "antes vs depois da ancoragem total".
 export const STAGE2_METHOD = 'sonnet_2x' as const
-export const STAGE2_VERSION = '0.2.3' as const
+export const STAGE2_VERSION = '0.3.0' as const
 
 /**
  * Etapa 2 do pipeline Sonnet 2x — composição streaming ancorada no JSON
@@ -859,6 +1075,12 @@ export async function analyzeReadingComposeStage2(
         // anti-fórmula). Mesmo motivo de SEM cache_control — em UAT
         // ainda, sujeito a iteração rápida.
         { type: 'text', text: STRUCTURAL_OVERRIDE_V2_4_2 },
+        // v2.5.0 (2026-05-24): princípio de ancoragem total. Stage 1 =
+        // fonte única de verdade; achados com natureza='indeterminada'
+        // viram skip global; §2 é gate cross-section. Mesmo motivo de
+        // SEM cache_control — UAT ativo, mudança arquitetural sujeita a
+        // calibração nas primeiras leituras pós-deploy.
+        { type: 'text', text: ANCHORING_PRINCIPLE_V2_5 },
       ],
       messages: [{ role: 'user', content: userContent }],
     },
