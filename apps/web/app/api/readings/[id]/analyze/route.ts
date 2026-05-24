@@ -55,14 +55,13 @@ import {
 } from '@/lib/anthropic/types'
 
 export const runtime = 'nodejs'
-// v2.4 (2026-05-23): bump 300s → 800s. Stage 2 com VOICE_OVERRIDE_V2_4
-// (3º system block) + auto-checagens internas fazem Sonnet iterar mais →
-// latência subiu pra ~290s, no limite anterior. Edge timeout cortava
-// post-stream cleanup → report_generated ficava sem §14/§15/essence
-// (bug pre-existente do consumer agravado pela voz v2.4). Fluid Compute
-// no plano Pro suporta até 800s; espaço de respiro confortável e libera
-// margem pro Sonnet pensar.
-export const maxDuration = 800
+// v2.4 (2026-05-24): bump pra 800s REJEITADO no deploy — projeto está
+// no plano Hobby da Vercel, max=300s. Mantém 300s; risco real de timeout
+// em Stage 2 v2.4 (Evanilce e8976f11 timeoutou em 2026-05-23). Mitigação
+// imediata: Frente 1 (consumer atômico) ao menos não corrompe estado
+// quando timeoutar. Mitigação real requer upgrade pra Pro ($20/mo, libera
+// até 800s) OU enxugar VOICE_OVERRIDE_V2_4 — decisão founder pendente.
+export const maxDuration = 300
 
 export async function POST(
   request: NextRequest,
