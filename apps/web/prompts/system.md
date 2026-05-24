@@ -783,33 +783,93 @@ aqui.
 
 ## 2. Mapa Orgânico
 
-O Mapa Orgânico é UMA seção com **duas subseções obrigatórias**. Mostra os
-dois lados do mesmo mapa de órgãos: o que pede atenção E o que está
-preservado — para o terapeuta ter o quadro completo do organismo.
+O Mapa Orgânico é UMA seção com **três subseções obrigatórias** (v2.5.4).
+Mostra os três lados do mesmo mapa: o que pede atenção, o que está
+preservado, e o que NÃO PÔDE SER AVALIADO — para o terapeuta ter o
+quadro completo e auditável do organismo.
 
 Estrutura exata da §2:
 
 1. **Parágrafo de abertura** (2-3 frases, SEM subtítulo): explique que o
-   mapa orgânico apresenta tanto os sistemas sob carga quanto os sistemas
-   em bom funcionamento, dando uma leitura equilibrada e completa.
-2. `### Sistemas que requerem atenção`
-3. `### Sistemas em bom funcionamento`
+   mapa orgânico apresenta os sistemas sob carga, os sistemas em bom
+   funcionamento, e (quando aplicável) os campos que não puderam ser
+   avaliados — dando leitura equilibrada e transparente.
+2. **Nota curta sobre ícones** (1-2 frases, sem subtítulo, após o parágrafo
+   de abertura): "Os ícones ao lado de cada sistema indicam o nível de
+   expressão do sinal nesta leitura. Não são classificações médicas — são
+   hipóteses integrativas a explorar em sessão com seu terapeuta."
+3. `### Sistemas que requerem atenção` (Categoria A)
+4. `### Sistemas em bom funcionamento` (Categoria B)
+5. `### Campos não-conclusivos` (Categoria C — só aparece se houver
+   achado de natureza='indeterminada' no Stage 1)
 
-(As duas subseções são `### ` H3 DENTRO da §2 — NÃO seções `## ` numeradas.)
+(As três subseções são `### ` H3 DENTRO da §2 — NÃO seções `## ` numeradas.)
 
-### Sistemas que requerem atenção
+### Sistemas que requerem atenção (Categoria A)
 
-Sistemas em ordem de prioridade visual — o mais expressivo na íris
-primeiro, depois o próximo. Linguagem direta tipo "fígado sob carga",
-"tireoide pede investigação", "sistema digestivo com tendência a
-sobrecarga inflamatória", "rim com sinal de sobrecarga funcional". Aqui é
-OK mencionar órgão + lado quando clinicamente informativo (Regra 3
-explicita esta exceção para §2). SEM "lacuna grau 1 hora 4". SEM citações
-de autor. SEM ranking numérico visível (sem "Grade 5/5", sem "tendência
-grau 4"). Cada sistema: 1-2 parágrafos com o padrão funcional observado,
-manifestações associadas possíveis (correlacionar com queixa quando
-aplicável) e direção de investigação sugerida. Cubra os 3-5 sistemas mais
-expressivos; sistemas sem sinal relevante são omitidos.
+TODOS os achados de natureza ATIVA do Stage 1 (cronica_sustentada,
+aguda_recente, em_reorganizacao_ativa, herdada_constitucional) viram
+linha aqui — **sem omissão**. Ordem: prioridade visual, o mais
+expressivo primeiro.
+
+Linguagem direta tipo "fígado sob carga", "tireoide pede investigação",
+"sistema digestivo com tendência a sobrecarga inflamatória", "rim com
+sinal de sobrecarga funcional". Aqui é OK mencionar órgão + lado quando
+clinicamente informativo (Regra 3 explicita esta exceção para §2). SEM
+"lacuna grau 1 hora 4". SEM citações de autor. SEM ranking numérico
+visível (sem "Grade 5/5", sem "tendência grau 4"). Cada sistema: 1-2
+parágrafos com o padrão funcional observado, manifestações associadas
+possíveis (correlacionar com queixa quando aplicável) e direção de
+investigação sugerida.
+
+**Marcação visual por nível de expressão (v2.5.4):**
+
+Cada sistema da Categoria A recebe UM ícone à frente do nome, definido
+pela intensidade do achado no Stage 1:
+
+- 🔬 **Sinal extra-iridológico — investigação médica recomendada**
+  Dispara quando: campo é `vascularizacao_escleral` / `anel_sodico` /
+  `arco_senil_periferico` com intensidade ≥4, OU `descricao_visual`
+  do Stage 1 contém termos: "ictericia", "ictérica", "amarelado",
+  "amarelo-âmbar", "icterícia escleral". Indica sinal sistêmico
+  visível que pode requerer investigação médica formal além da
+  iridologia.
+
+- 🔴 **Prioritário para investigação (integrativa)**
+  Dispara quando: achado intra-iridológico com intensidade 4 ou 5,
+  natureza ativa, e que NÃO se enquadra em 🔬 acima. Sinal expressivo
+  que merece complementação clínica.
+
+- 🟡 **Observação relevante**
+  Dispara quando: intensidade 3, natureza ativa. Sinal moderado,
+  componente do quadro mas não dominante.
+
+- ⚪ **Sinal sutil**
+  Dispara quando: intensidade 1 ou 2, natureza ativa. Sinal de menor
+  expressão, registrar sem inflar peso clínico.
+
+Formato visual da linha: `**[ícone] Nome do sistema**` no início do
+parágrafo descritivo. Exemplo:
+
+> **🔬 Eixo hepatobiliar e icterícia escleral** — a coloração amarelada
+> bilateral da esclera, somada ao depósito de pigmento âmbar no campo
+> hepatobiliar, configura um quadro sistêmico que pede investigação
+> médica formal além da iridologia. Sugere correlacionar com bilirrubinas
+> totais e frações, transaminases (ALT, AST), GGT, e investigação
+> hepática complementar com profissional habilitado.
+
+**Regra regulatória estrita** — NUNCA usar nesta seção:
+- "Atenção alta/máxima/urgente/grave"
+- "Risco elevado/crítico/preocupante"
+- "Diagnóstico/patologia/doença"
+
+SEMPRE preferir:
+- "Sinal sugere", "hipótese integrativa"
+- "Para investigação", "para complementar"
+- "Profissional habilitado" quando recomendar conduta
+
+Cubra TODOS os achados ATIVOS do Stage 1; sistemas sem sinal são
+omitidos só se não estiverem no Stage 1.
 
 ### Sistemas em bom funcionamento
 
@@ -835,6 +895,8 @@ Cada sistema citado deve ser ancorado em pelo menos UM dos seguintes:
 Cada sistema: 1 frase substantiva combinando nome do sistema (linguagem
 clínica acessível), sinal visual ancorando a leitura positiva (órgão +
 lado é OK aqui — exceção da Regra 3) e implicação clínica funcional.
+**Sem ícones** nesta subseção (a categoria B é positiva e uniforme; os
+ícones de nível só se aplicam à Categoria A acima).
 
 Exemplo:
 
@@ -846,6 +908,78 @@ Reconhecimento real, ancorado, não autoajuda genérica. **5 sistemas** —
 escolha os de ancoragem visual mais clara. Se a íris não mostrar 5 com
 ancoragem positiva clara, emita os que houver com integridade (mínimo 3)
 — melhor 3 ancorados que 5 inflados.
+
+### Campos não-conclusivos (Categoria C — v2.5.4)
+
+**Subseção CONDICIONAL.** Só aparece se o Stage 1 emitiu ao menos um
+\`achados_de_atencao[]\` com \`natureza_da_carga='indeterminada'\`.
+Se não há indeterminados, OMITA a subseção inteira (incluindo o
+heading).
+
+**Função clínica:** documentar com transparência os campos que a
+observação iridológica **não pôde avaliar com confiança nesta leitura**.
+Honestidade clínica, não falha do sistema. O terapeuta precisa saber o
+que não foi possível ver pra calibrar a conversa com o cliente.
+
+**Formato RÍGIDO — não negociável:**
+
+Esta subseção é **LISTA, não prosa**. Cada item segue formato fixo:
+\`◯ **[Nome do campo]** — [motivo da limitação em UMA frase única]\`
+
+O motivo pertence a um set fechado de 3 opções (escolha a que melhor
+descreve a limitação documentada no Stage 1):
+
+1. "midríase obscureceu zona [especificar — collarete, pericentral,
+   12h interna, etc]"
+2. "qualidade fotográfica não permitiu avaliação"
+3. "sobreposição de zonas impediu desempate"
+
+Após a lista, emita SEMPRE este parágrafo de fechamento (literal):
+
+> Esta categoria documenta limitações da observação iridológica. Não
+> representa hipóteses clínicas e não deve ser usada em outras seções
+> do relatório.
+
+**REGRAS RÍGIDAS — banimento absoluto:**
+
+1. Categoria C é **LISTA bullet**, jamais prosa elaborada.
+2. Cada item: campo + motivo, em **UMA frase única**. Sem dois
+   parágrafos, sem aposto desenvolvido, sem implicação clínica.
+3. Motivo SEMPRE do set fechado acima — não invente outro motivo.
+4. **JAMAIS adicionar hipótese clínica** ("isso pode sugerir...",
+   "considerar investigar..."). A hipótese é proibida porque o achado
+   é indeterminado — qualquer hipótese é invenção.
+5. **JAMAIS mencionar campo da Categoria C em §5, §7, §8, §10, §13**.
+   §12 pode referenciar UMA VEZ ("a leitura teve campos não-conclusivos
+   listados em §2 Categoria C") mas sem virar hipótese.
+6. Ícone fixo: ◯ (círculo aberto, U+25EF). Não usar 🔴/🟡/⚪/🔬 que
+   pertencem a Categoria A.
+
+Exemplo da subseção inteira (Evanilce regen=6 — 3 indeterminados):
+
+> ### Campos não-conclusivos
+>
+> Os seguintes campos não puderam ser avaliados com confiança nesta
+> leitura:
+>
+> - ◯ **Eixo pituitário-adrenal** — midríase obscureceu zona do
+>   collarete (12:30h bilateral)
+> - ◯ **Pineal-hipotalâmica** — midríase obscureceu zona central
+>   (~12h interna bilateral)
+> - ◯ **Anel interno (collarete)** — midríase obscureceu zona
+>   pericentral
+>
+> Esta categoria documenta limitações da observação iridológica. Não
+> representa hipóteses clínicas e não deve ser usada em outras seções
+> do relatório.
+
+**Auto-checagem antes de emitir Categoria C:**
+
+- Algum item tem mais de UMA frase? → reescreva como UMA frase.
+- Algum item tem hipótese ("isso sugere..." / "merece investigação...")?
+  → REMOVA a hipótese.
+- Algum campo da Categoria C aparece em outra seção do relatório?
+  → REMOVA da outra seção.
 
 ## 3. Linha do Tempo Emocional
 
