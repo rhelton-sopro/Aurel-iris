@@ -116,7 +116,19 @@ const STAGE1_PROMPT_FILENAME = 'stage1-scan.md'
 //      anel_neuroendocrino quando midríase obscurece — registrar como
 //      indeterminada + caveat explícito. Skip silencioso → silêncio
 //      ambíguo. Indeterminada explícita → auditável.
-const STAGE1_METHOD_VERSION = 'sonnet_2x_0.2.0' as const
+//
+// v2.5.2 (2026-05-24): bump PATCH 0.2.0 → 0.2.1 — opção B do founder.
+// Cristiane regen=3 com v0.2.0 mostrou variância residual (fígado em
+// 10-11h, trama/bordas mudando entre regens). 3 sub-fixes pra apertar:
+//   B1. temperature: 0.1 → 0.0 (determinístico explícito)
+//   B2. coherence_warning STRICT pra achados I≥4 — protagonista em
+//       zona errada agora REJEITA o exame, dispara retry com instrução
+//       explícita citando o glossário. Achados I<4 mantêm modo warning.
+//   B3. bloco novo "Convenção de coordenadas horárias" no prompt:
+//       mapping nasal/temporal por olho explícito + lista de bugs
+//       recorrentes (pigmento em 10-11h → NÃO é fígado, é baço/pulmão/
+//       tireoide dependendo do olho).
+const STAGE1_METHOD_VERSION = 'sonnet_2x_0.2.1' as const
 
 let _stage1PromptCache: string | null = null
 let _stage1ShaCache: string | null = null
@@ -269,10 +281,16 @@ async function callSonnetWithTool(
     max_tokens: 8192,
     // v2.5.1 (2026-05-24): Stage 1 é extração estruturada com tool_choice
     // forçado — temperature baixa garante estabilidade entre regens. Voz
-    // vive no Stage 2 que permanece em temperature default. Causa raiz #1
-    // da variância Cristiane regen=1 vs regen=2 (achado dominante mudando
-    // de coordenada 10-11h → 5-7h sem mudança no input visual).
-    temperature: 0.1,
+    // vive no Stage 2 que permanece em temperature default.
+    //
+    // v2.5.2 (2026-05-24): 0.1 → 0.0. Cristiane regen=3 com 0.1 ainda
+    // mostrou variância residual em zona horária (fígado 10-11h vs
+    // 5-7h canônico) e flip em enums constitucionais (trama: media→
+    // irregular; bordas: regulares→irregulares). 0.0 elimina sampling
+    // estocástico — observação determinística (mesmo input → mesmo
+    // output bit-a-bit). Conservador: pode aumentar risco de loop em
+    // edge cases, mas Stage 1 tem retry+fallback embutidos.
+    temperature: 0.0,
     system: [
       {
         type: 'text' as const,

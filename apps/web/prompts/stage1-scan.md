@@ -108,6 +108,54 @@ aparecem nas 3 fotos do mesmo olho na mesma posição.
 - **Par OD** = imagens 4-6 → uma observação consolidada do olho direito
 - **Lateralidade** = comparação entre as duas observações consolidadas
 
+## Convenção de coordenadas horárias (CRÍTICO — releia antes de cada achado)
+
+A iridologia clássica usa o **relógio sobre o olho do cliente**, visto
+**frontalmente** pelo observador (a mesma perspectiva das fotos). A
+hora é sempre a do relógio sobre a íris — NÃO se "espelha" entre olhos.
+O que se espelha é o eixo nasal/temporal:
+
+- **OD (olho direito do cliente)** — visto frontalmente:
+  - **9h = lado NASAL** (interno, próximo ao nariz)
+  - **3h = lado TEMPORAL** (externo, próximo à têmpora)
+  - 12h = superior · 6h = inferior
+
+- **OE (olho esquerdo do cliente)** — visto frontalmente:
+  - **3h = lado NASAL** (interno, próximo ao nariz)
+  - **9h = lado TEMPORAL** (externo, próximo à têmpora)
+  - 12h = superior · 6h = inferior
+
+Em coordenadas do GLOSSÁRIO, a expressão "temporal inferior (5-7h)"
+significa **lado externo + parte de baixo**, e cai em horas 5-7 em
+AMBOS os olhos (porque 6h é inferior em ambos; "temporal" é convenção
+de hemisfério externo, e a hora 5-7 é absoluta no relógio).
+
+**ANTES de classificar um sinal como `figado_vesicula`, `coracao`,
+`pulmoes`, `rim`, ou qualquer campo com zona horária definida no
+glossário, confirme:**
+
+1. Em que olho o sinal está mais visível? (OD ou OE)
+2. Em que hora do relógio sobre AQUELE olho? (1-12)
+3. Essa hora cai na zona canônica do glossário pra esse campo?
+
+Se a hora observada NÃO bate com a zona canônica:
+- Caso A: estou classificando errado → escolho o campo do glossário
+  cuja zona BATE com a hora observada
+- Caso B: o pigmento/sinal está em zona não-canônica → registro em
+  `observacao_qualifying` que a observação foge da convenção clássica
+  e o pareamento campo↔zona é tentativo
+
+**Bug recorrente conhecido:** pigmento âmbar visível em ~10-11h ou
+~1-2h é frequentemente classificado como `figado_vesicula` por mera
+associação cromática. **Mas a zona canônica do fígado é 5-7h, NÃO
+10-11h NEM 1-2h.** Pigmento âmbar em 10-11h provavelmente é:
+- 11h OD = zona do baço/abdômen alto (Jensen)
+- 11h OE = zona do pulmão direito/torácica
+- 1-2h = zona do estômago/diafragma
+- 10h = zona da tireoide/cervical
+Se você ver pigmento em 10-11h, escolha o campo do glossário cuja zona
+canônica BATE com 10-11h — não force o nome "fígado".
+
 ## Princípio governing — tradição clássica como base
 
 Sua observação ancora-se em iridologia clássica consolidada (Jensen,

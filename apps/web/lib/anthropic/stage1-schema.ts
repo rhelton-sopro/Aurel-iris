@@ -442,12 +442,43 @@ export function validateExameIridologico(input: unknown): ValidationOutcome {
   // warning (não rejeita) — Stage 2 vê a meta-flag via JSON e pode
   // contextualizar. Aplicado em achados E preservados (mesmas regras
   // de coerência espacial).
+  //
+  // v2.5.2 (Fix B2 — STRICT pra protagonistas): se UM achado com
+  // intensidade ≥4 tem coherence_warning, REJEITA o exame inteiro
+  // → orquestrador faz retry com instrução explícita ("o campo X
+  // estava em zona errada — releia o glossário"). Achados I<4
+  // mantêm modo warning (não bloqueiam). Razão: protagonista em zona
+  // errada compromete TODA a cascata de §2/§5/§7/§13 do Stage 2 —
+  // não vale aceitar com warning silencioso. Achados secundários
+  // toleram drift sem comprometer a leitura.
   let coherenceWarnings = 0
+  const strictViolations: Array<{ campo: string; warning: string; intensidade: number }> = []
   for (const a of exame.achados_de_atencao) {
     const w = checkCampoZonaCoherence(a.campo, a.descricao_visual)
     if (w) {
       a.coherence_warning = w
       coherenceWarnings++
+      if (a.intensidade >= 4) {
+        strictViolations.push({ campo: a.campo, warning: w, intensidade: a.intensidade })
+      }
+    }
+  }
+  if (strictViolations.length > 0) {
+    const detail = strictViolations
+      .map(v => `[${v.campo} I=${v.intensidade}] ${v.warning}`)
+      .join(' | ')
+    return {
+      status: 'invalid',
+      error:
+        `Achado(s) com intensidade ≥4 (protagonista) descrev[e][em] zona ` +
+        `horária INCOERENTE com o glossário canônico. Releia a coluna "zona ` +
+        `iridológica" do glossário e refaça a descricao_visual citando horas ` +
+        `que caem na zona canônica do campo escolhido. Se o pigmento/sinal ` +
+        `que você está vendo está em zona DIFERENTE da canônica, REPENSE ` +
+        `qual campo do glossário descreve melhor essa zona — não force o ` +
+        `nome "fígado" num achado que está na zona do "estômago", ou ` +
+        `vice-versa. Detalhe: ${detail}`,
+      partial: exame,
     }
   }
   for (const p of exame.sistemas_preservados) {
