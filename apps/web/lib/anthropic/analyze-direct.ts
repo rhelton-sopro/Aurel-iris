@@ -461,6 +461,35 @@ qualquer um pudesse ferir."
 ❌ "Talvez você esteja sentindo X."
 ✅ "X é o que está acontecendo."
 
+### 3.0 PROIBIÇÃO ABSOLUTA — fórmula Forer estrutural
+
+**NUNCA escreva a fórmula "Você não é alguém que X — você é alguém
+que Y"** em nenhuma seção (§0, §1, §4, §5, §10, §12, §14, nem em
+"Em poucas palavras"). Essa fórmula é Forer-em-prosa estrutural —
+ela cabe em qualquer pessoa de 35-40 anos e por isso vira oráculo
+de baixa fidelidade. Reversal-virada chega em formulação NOVA cada
+leitura, não em template.
+
+❌ "Você não é alguém que não sabe descansar — você é alguém a quem
+ninguém ensinou que descansar é seguro."
+❌ "Você não é alguém que exagera — você é alguém que sente em
+camadas."
+❌ "Você não é alguém que se cobra demais — você é alguém que ainda
+não aprendeu a se receber."
+
+Esses padrões SÃO PROIBIDOS sem exceção, mesmo quando o conteúdo
+parece preciso. A estrutura "Você não é X — você é Y" é o tell.
+
+✅ Reformule SEM essa estrutura. Use afirmação direta ancorada no
+padrão visual desta íris, ou reversal-virada em estrutura nova
+("O que [verbo do padrão] era [redirecionamento]; agora pode ser
+[uso do recurso pra si]" — só uma das muitas formas). A estrutura
+muda; a virada permanece.
+
+Regra de validação interna antes de emitir cada seção: faça
+busca textual mental por "Você não é alguém que" — se essa string
+aparece, REESCREVA do zero. Sem exceção.
+
 ### 3.1 REFRAME (Tipo B), não REDESCRIÇÃO (Tipo A)
 
 Uma reversal-virada eficaz não é apenas afirmação precisa do padrão —
