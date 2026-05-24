@@ -386,6 +386,84 @@ unilateral_OE          = visível só em OE
 unilateral_OD          = visível só em OD
 ```
 
+## Cobertura por olho separado quando zonas divergem
+
+Quando o sinal cromático dominante (pigmento âmbar, manchas psóricas
+agrupadas, opacidade densa, anel patológico focal) aparece em CADA
+OLHO MAS EM ZONAS HORÁRIAS DIFERENTES — ou seja, OE tem o sinal em
+zona X e OD tem o sinal em zona Y, onde X ≠ Y pelo glossário —
+**NÃO escolha o sinal global mais expressivo e silencie o secundário**.
+Cada olho merece sua leitura específica.
+
+Procedimento:
+
+1. **Localize o sinal mais expressivo em OD** — coordenada horária
+   sobre o relógio do OD + zona Jensen correspondente
+2. **Localize o sinal mais expressivo em OE** — coordenada horária
+   sobre o relógio do OE + zona Jensen correspondente
+3. **Compare as zonas:**
+   - Se OE e OD têm sinal na MESMA zona Jensen → emite UM achado com
+     lateralidade `bilateral_simetrico` (intensidades similares) ou
+     `bilateral_assimetrico` (intensidades diferentes)
+   - Se OE e OD têm sinal em ZONAS DIFERENTES do glossário → emite
+     **DOIS achados separados**:
+     * achado #A: `unilateral_OD` (ou `bilateral_assimetrico` com
+       descrição priorizando o sinal OD) no campo cuja zona BATE com
+       a hora observada em OD
+     * achado #B: `unilateral_OE` (ou `bilateral_assimetrico` com
+       descrição priorizando o sinal OE) no campo cuja zona BATE com
+       a hora observada em OE
+   - Se um olho tem o sinal e o outro não tem nada de relevante na
+     mesma zona → `unilateral_OD` ou `unilateral_OE` simples
+
+### Critério de desempate em zonas competidoras
+
+Em zonas do relógio onde múltiplos campos canônicos do glossário se
+sobrepõem (ex: 5-7h OE pode ser `figado_vesicula` por zona "Temporal
+inferior OE+OD (5-7h)" OU `pancreas` por "Lateralidade OE preferencial
+(~7-8h OE)"), aplique esta ordem de prioridade:
+
+1. **Lateralidade preferencial vence simetria bilateral.** Campo cuja
+   entrada do glossário menciona lateralidade preferencial DO OLHO em
+   questão vence campo com zona simétrica bilateral. Exemplo:
+   - Sinal em 7h OE → `pancreas` (lateralidade OE preferencial) vence
+     `figado_vesicula` (5-7h bilateral simétrico) e `sacro_coccyx`
+     (5-6h homolateral genérico)
+
+2. **Zona horária mais específica vence zona mais ampla.** Quando
+   ambos campos têm lateralidade do mesmo olho ou ambos são bilaterais,
+   a zona horária mais estreita vence a mais larga. Exemplo:
+   - Sinal em 7-8h → "7-8h" vence "5-7h" pela especificidade
+
+3. **`sinal_carga` cromático literal vence.** Empate restante após (1)
+   e (2): se o sinal observado é cromático (pigmento âmbar, mancha,
+   opacidade densa), prevalece o campo cujo `sinal_carga` no glossário
+   inclui o termo cromático literal observado.
+
+4. **Empate persistente: dois achados.** Se nenhuma das 3 regras acima
+   resolveu, emite achado em AMBOS os campos competidores com nota
+   técnica explícita em `observacao_qualifying`: "Zona compartilhada
+   por campos X e Y do glossário; emissão dupla por impossibilidade
+   de desempate". Stage 2 trata.
+
+### Anti-pattern explícito (caso real Cristiane)
+
+❌ **NÃO faça isto:**
+- Cliente tem pigmento âmbar em 10-11h OD (zona cervical-tireoide)
+  E pigmento âmbar em 5-8h nasal-inferior OE (zona pancreática)
+- Emitir UM achado `pigmento_amber I=4 bilateral_assimetrico` que
+  cita só o sinal OD (mais cromático) na descricao_visual e silencia
+  o sinal OE
+- Isso colapsa dois eixos clínicos distintos em uma observação só
+
+✅ **Faça isto:**
+- Achado #1: `tireoide` ou `coluna_cervical` `unilateral_OD` (ou
+  bilateral_assimetrico com descrição privilegiando OD) — zona
+  cervical, sinal em 10-11h OD
+- Achado #2: `pancreas` `unilateral_OE` — zona pancreática, sinal
+  em 7-8h OE
+- Os dois eixos chegam ao Stage 2 ancorados separadamente
+
 ## Correlações observadas — máx 4, âncora visual OBRIGATÓRIA
 
 Esta lista captura como achados desta íris CONVERSAM entre si —
