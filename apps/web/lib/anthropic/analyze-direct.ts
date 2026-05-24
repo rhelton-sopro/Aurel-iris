@@ -801,35 +801,52 @@ JSON do Stage 1 e organize os campos em **três grupos**:
   intensidade são protagonistas; os de menor intensidade podem ser
   agrupados/mencionados brevemente, mas não somem.
 - **INDETERMINADOS** = \`achados_de_atencao[]\` com \`natureza_da_carga='indeterminada'\`.
-  **Skip global** — não viram prosa em §2/§5/§7/§8/§10/§13. Podem
-  ser mencionados UMA VEZ em §12 (Roteiro Anamnese) como nota
-  técnica: "investigar X que esta leitura não conseguiu ancorar com
-  clareza por [motivo da limitação]". Nunca como diagnóstico.
+  **Skip de prosa narrativa** — não viram hipótese clínica em
+  §2 Categoria A, §5, §7, §8, §10, §13. **PERMITIDO listar em
+  §2 Categoria C** ('Campos não-conclusivos') no formato fixo
+  de declaração de limitação (lista, motivo único, jamais prosa
+  elaborada — ver bloco "Tratamento de natureza='indeterminada'"
+  abaixo). Podem também ser mencionados UMA VEZ em §12 (Roteiro
+  Anamnese) como nota técnica. Nunca como diagnóstico em nenhum
+  lugar.
 - **PRESERVADOS** = \`sistemas_preservados[]\`. Vão a §2 (subseção
   "Sistemas em bom funcionamento") e a §9 (Recursos e Forças).
 
 Este roll call não aparece no output — é raciocínio interno.
 
-## Tratamento de natureza='indeterminada' (regra crítica)
+## Tratamento de natureza='indeterminada' (regra crítica — v2.5.4)
 
 Quando o Stage 1 marca um achado como \`natureza_da_carga='indeterminada'\`,
 o sinal é **ruído de leitura, não fato clínico**. A interpretação correta
 é: "as imagens não permitiram confirmar nem descartar carga neste eixo".
 
 PROIBIDO:
+- Transformar achado indeterminado em prosa narrativa ou hipótese
+  clínica em §2 Categoria A, §5, §7, §8, §10, §13
 - Tratar como achado leve ("intensidade 2, posso falar de leve")
 - Re-interpretar o sinal visual que motivou o "indeterminada" como
   diagnóstico próprio (ex: usar midríase como sinal de "depleção
   adrenal" quando o Stage 1 disse que a midríase obscureceu o
   collarete e impediu a leitura do eixo pit-adrenal)
-- Mencionar em §2, §5, §7, §8, §10, §13 — mesmo de passagem
 
 PERMITIDO:
-- Pular completamente o eixo nas seções de prosa
+- **Listar achado indeterminado APENAS em §2 Categoria C
+  ('Campos não-conclusivos')** com formato fixo de declaração
+  de limitação — lista bullet, NUNCA prosa elaborada, NUNCA
+  hipótese clínica. Ver "regras rígidas Categoria C" no
+  system.md §2.
 - Mencionar UMA VEZ em §12 como nota técnica de investigação
   laboratorial, citando explicitamente a limitação ("a midríase
   bilateral acentuada não permitiu confirmar o eixo X — vale
   investigar se houver sintomatologia compatível")
+
+Evolução vs v2.5.0: a versão anterior dizia "skip global"
+(silêncio absoluto fora de §12). A v2.5.4 introduz Categoria C
+em §2 — silêncio virou transparência. Motivo empírico: Evanilce
+regen=6 teve 3 indeterminados completamente invisíveis no
+relatório, gerando gap de transparência clínica auditável pelo
+terapeuta. Categoria C resolve sem reabrir a porta pra invenção
+(porque é LISTA, não prosa).
 
 ## Cross-section coherence (§2 é o gate)
 
