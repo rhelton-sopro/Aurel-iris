@@ -1205,8 +1205,28 @@ export const STAGE2_METHOD_VERSION = 'sonnet_2x_0.2.2' as const
 // + 3 exemplos ❌ + regra de validação textual interna ("se a string
 // 'Você não é alguém que' aparece, reescreve do zero"). Sem mudança
 // arquitetural; só reforço visual da regra existente.
+//
+// v2.5.4 (2026-05-24): bump PATCH 0.3.1 → 0.3.2 — patch consolidado
+// pré-produção com 3 fixes integrados:
+//   F1 HARDLINE: novo system block ANTI_FORER_HARDLINE_V2_5_4 (6º)
+//     como última camada de defesa. UAT v2.5.3 mostrou taxa ~67% de
+//     violação da fórmula Forer mesmo com Marca 3.0 do VOICE (camada
+//     interna). Banimento BINÁRIO + 7 exemplos com nomes variados +
+//     regex de validação textual + §1 marcada como crítica.
+//   F6 (system.md §2): cobertura completa Stage 1 → §2 via 3 categorias:
+//     A (sistemas em atenção, TODOS achados ATIVOS), B (preservados),
+//     C (campos não-conclusivos — NOVA, lista rígida pra documentar
+//     indeterminados com transparência sem reabrir invenção).
+//   F7 (system.md §2): ícones de nível por intensidade do Stage 1 —
+//     🔬 extra-iridológico / 🔴 I=4-5 / 🟡 I=3 / ⚪ I=1-2 / ◯ Categoria C.
+//   ANCHORING_PRINCIPLE_V2_5: texto atualizado pra suportar Categoria C
+//     em §2 (era "skip global" → agora "lista rígida em §2 Categoria C").
+//     Anti-invenção preservado (Categoria C é LISTA não prosa, JAMAIS
+//     vira hipótese, JAMAIS aparece em §5/§7/§8/§10/§13).
+// Trigger empírico: Carol regen=3 + Evanilce regen=6 violaram F1; Evanilce
+// regen=6 teve 3 indeterminados invisíveis (gap de transparência).
 export const STAGE2_METHOD = 'sonnet_2x' as const
-export const STAGE2_VERSION = '0.3.1' as const
+export const STAGE2_VERSION = '0.3.2' as const
 
 /**
  * Etapa 2 do pipeline Sonnet 2x — composição streaming ancorada no JSON
