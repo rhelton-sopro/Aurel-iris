@@ -231,7 +231,7 @@ composto fora do glossário se a íris realmente pede.
 | `sistema_imune` | Sistêmico (espalhado) | Manchas psóricas dispersas, pigmentação difusa, perda de brilho global | Ausência de manchas dispersas, brilho saudável |
 | `sistema_nervoso_autonomico` | Anel nervoso (concêntrico no estroma médio) | Anel nervoso visível, espessamento | Ausência de anel nervoso |
 | `tireoide` | Cervical (~2-3h OE, ~9-10h OD) | Pigmentação acinzentada-escura, opacidade densa | Zona cervical limpa |
-| `pancreas` | Lateralidade OE preferencial (~7-8h OE, mais sutil em OD) | Lacunas, pigmentação na zona pancreática | Zona íntegra |
+| `pancreas` | Lateralidade OE preferencial (~7-8h OE, mais sutil em OD) | Pigmento âmbar, lacunas, pigmentação na zona pancreática | Zona íntegra |
 | `sistema_reprodutor` | Inferior medial (~6h) | Lacunas/manchas, irregularidades | Zona limpa |
 | `sistema_urinario` | Inferior (rim → ureter → bexiga) | Lacunas conectadas em sequência | Setor urinário limpo |
 | `sistema_circulatorio` | Coroa periférica + anel periférico | Anel sódico, arco senil, vascularização escleral marcante | Coroa simpática regular, ausência de anel sódico |

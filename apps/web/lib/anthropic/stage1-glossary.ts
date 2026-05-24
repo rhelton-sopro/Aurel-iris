@@ -162,7 +162,14 @@ export const GLOSSARY: readonly GlossaryEntry[] = [
   {
     group: 'sistema_orgao', campo: 'pancreas',
     zona: 'Lateralidade OE preferencial (~7-8h OE, mais sutil em OD)',
-    sinal_carga: 'Lacunas, pigmentação na zona pancreática',
+    // v2.5.3 (2026-05-24): "Pigmento âmbar" adicionado literal — Cristiane
+    // regen=4 mostrou Sonnet classificando pigmento âmbar nasal-inferior
+    // OE como pigmento_amber órfão em vez de pancreas. Causa: o sinal_carga
+    // anterior ("Lacunas, pigmentação...") não tinha match cromático
+    // óbvio com "pigmento âmbar". Glossário entry de figado_vesicula tem
+    // "Pigmento âmbar" literal → Sonnet caía em fígado por afinidade
+    // textual. Espelhamento corrige o gap.
+    sinal_carga: 'Pigmento âmbar, lacunas, pigmentação na zona pancreática',
     sinal_preservacao: 'Zona íntegra',
     bibliografia: 'Lo Rito: eixo Bazo-Pâncreas-Rim',
   },
