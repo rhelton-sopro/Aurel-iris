@@ -38,15 +38,44 @@ export default async function InviteLandingPage({
       .eq('id', validation.token.client_id)
       .maybeSingle()
 
+    // Resume detection: se token aponta pra reading em pending com 1-5
+    // imagens, o cliente abandonou no meio (provável network drop). Mostra
+    // copy de "continue de onde parou" em vez de "vai tirar 6 fotos do zero".
+    // Reading.status='ready'/'analyzing' não retoma (já completou) — auto-
+    // finalize do upload route OU finalize endpoint cobrem esse caso.
+    let resumeProgress: { captured: number; remaining: number } | null = null
+    if (validation.token.used_by_reading_id) {
+      const { data: existing } = await service
+        .from('readings')
+        .select('status, reading_images(eye)')
+        .eq('id', validation.token.used_by_reading_id)
+        .maybeSingle()
+      const captured = existing?.reading_images?.length ?? 0
+      if (existing?.status === 'pending' && captured > 0 && captured < 6) {
+        resumeProgress = { captured, remaining: 6 - captured }
+      }
+    }
+
     return (
       <div className="mx-auto w-full max-w-md px-4 py-8 space-y-6">
         <div className="space-y-2">
           <h2 className="text-2xl font-semibold">Olá, {client?.full_name ?? 'paciente'}!</h2>
-          <p className="text-sm text-muted-foreground">
-            Seu terapeuta enviou este link para você fazer uma leitura iridológica
-            pelo próprio celular. Você vai tirar <strong>6 fotos</strong> dos seus
-            olhos (3 de cada). O resultado vai direto para o seu terapeuta.
-          </p>
+          {resumeProgress ? (
+            <p className="text-sm text-muted-foreground">
+              Você já enviou <strong>{resumeProgress.captured} de 6 fotos</strong>{' '}
+              nesta leitura. Falta{resumeProgress.remaining === 1 ? '' : 'm'}{' '}
+              <strong>
+                {resumeProgress.remaining} foto{resumeProgress.remaining === 1 ? '' : 's'}
+              </strong>{' '}
+              pra concluir — vamos continuar de onde parou.
+            </p>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Seu terapeuta enviou este link para você fazer uma leitura iridológica
+              pelo próprio celular. Você vai tirar <strong>6 fotos</strong> dos seus
+              olhos (3 de cada). O resultado vai direto para o seu terapeuta.
+            </p>
+          )}
         </div>
 
         {/* Aviso de câmera traseira destacado — founder UAT 2026-05-22:
@@ -86,7 +115,7 @@ export default async function InviteLandingPage({
           href={`/convite/${token}/capturar?client=${validation.token.client_id}`}
           className="block w-full rounded-md bg-foreground py-3 text-center text-sm font-medium text-background hover:opacity-90"
         >
-          Começar leitura
+          {resumeProgress ? 'Continuar leitura' : 'Começar leitura'}
         </Link>
       </div>
     )

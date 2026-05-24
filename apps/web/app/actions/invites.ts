@@ -163,7 +163,19 @@ export async function completeInviteNewClientAction(
     return { error: clientErr?.message ?? 'Falha ao criar cliente.' }
   }
 
-  // 2. Persiste consent — 'initial' + channel 'remote_link'. Termo vigente
+  // 2. Vincula client_id ao token. Sem isto, re-entrada do cliente
+  //    (network drop mid-captura) cai no form de cadastro outra vez
+  //    porque /convite/[token]/page.tsx checa validation.token.client_id
+  //    pra decidir entre "Olá, X — começar leitura" e "form de cadastro".
+  //    Guard idempotente (is null) evita race entre 2 submits paralelos.
+  //    NÃO marca used_at — single-use é queimado só na finalize.
+  await service
+    .from('client_invite_tokens' as never)
+    .update({ client_id: client.id } as never)
+    .eq('id', validation.token.id)
+    .is('client_id', null)
+
+  // 3. Persiste consent — 'initial' + channel 'remote_link'. Termo vigente
   //    vem de consent_terms.is_current=true (0020). Se ainda não houver
   //    termo vigente (env não-semeado), o consent log entra sem term_version
   //    e o gate de produção falha — aceita risco no beta.
@@ -181,8 +193,6 @@ export async function completeInviteNewClientAction(
     } as never)
   }
 
-  // 3. Redireciona pra captura (token segue na URL — auth pública).
-  //    NÃO marca used_at aqui — single-use é queimado na finalize da
-  //    captura (rota /api/convite/[token]/finalize).
+  // 4. Redireciona pra captura (token segue na URL — auth pública).
   redirect(`/convite/${token}/capturar?client=${client.id}`)
 }
