@@ -102,6 +102,47 @@ export function AnaliseClient({
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'desconhecido'
       console.error('[analise-client] stream error', msg)
+      // Camada 1 (v2.4.5): ANTES de gritar "Geração interrompida",
+      // verifica o estado real no banco. iOS bg-kill / aba fechada /
+      // network drop fazem o stream cair sem o backend ter falhado —
+      // a análise continua rodando server-side e provavelmente já
+      // completou. Sem este reconcile, terapeuta queima regen
+      // desnecessariamente.
+      try {
+        const statusRes = await fetch(`/api/readings/${readingId}/status`, {
+          cache: 'no-store',
+        })
+        if (statusRes.ok) {
+          const data = (await statusRes.json()) as {
+            status: string
+            has_report: boolean
+          }
+          if (data.status === 'ready' && data.has_report) {
+            // Backend completou enquanto o stream caía. Suprime o erro
+            // e mostra o relatório real via RSC refresh.
+            toast.success('Relatório pronto. Conexão tinha caído, mas o servidor terminou.')
+            router.refresh()
+            setStreaming(false)
+            return
+          }
+          if (data.status === 'analyzing' || data.status === 'pending') {
+            // Backend ainda gerando. Mostra mensagem honesta + poll.
+            toast.info('Conexão caiu — análise continua rodando no servidor. Aguarde.', {
+              duration: 5000,
+            })
+            // Sai do streaming state — page.tsx vai mostrar
+            // "Aguardando análise terminar..." via isAnalysisInProgress.
+            // O AutoRefresh server-side recarrega quando finalizar.
+            setStreaming(false)
+            router.refresh()
+            return
+          }
+          // status='failed' ou outro → erro real
+        }
+      } catch (recErr) {
+        console.error('[analise-client] reconcile error', recErr)
+        // cai pro toast.error padrão abaixo
+      }
       setError(msg)
       toast.error(`Geração interrompida: ${msg}`)
     } finally {
