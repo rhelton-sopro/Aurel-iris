@@ -1077,10 +1077,57 @@ busca pelos 3 padrões na seção que você vai emitir:
   [verbo]**"
 - "Mulheres como você" / "Mulheres que [verbo]" — variante de gênero
 
-→ Se QUALQUER padrão dos 3 casar, **REESCREVE A SEÇÃO INTEIRA DO
+**Padrão 4 — Família 4 (embedded universal abstrato) — v2.5.4.2:**
+
+Mesma fórmula universal das Famílias 2/3 mas EM QUALQUER POSIÇÃO do
+texto (não só início de seção). Captura formas como "retrato de
+alguém que aprendeu", "é um corpo que aprendeu a sustentar", "uma
+pessoa que segurou décadas". O regex:
+
+\`\`\`
+/(?:^|[^a-záéíóúâêôãõç])(?:alguém|uma\\s+pessoa|um\\s+corpo|um\\s+sistema|um\\s+organismo|um\\s+ser|quem)\\s+que\\s+(?:aprendeu|cresceu|viveu|descobriu|entendeu|soube|sempre)/iu
+\`\`\`
+
+A regra de exceção (NÃO bloqueia):
+- "**este corpo** que aprendeu" / "**esta íris** que..." (demonstrativo
+  específico — refere-se à leitura atual)
+- "**O corpo de Evanilce** que aprendeu" / "**o sistema da Carol** que..."
+  (nome próprio como âncora)
+- "**Você** aprendeu" / segunda pessoa direta (não tem "alguém/um corpo")
+
+A diferença entre **"este corpo"** e **"um corpo"** é a diferença
+entre prosa ancorada NESTA cliente vs fórmula que serve a qualquer
+cliente. Use SEMPRE marcador de especificidade (demonstrativo,
+nome próprio, ou segunda pessoa).
+
+→ Se QUALQUER padrão dos 4 casar, **REESCREVE A SEÇÃO INTEIRA DO
 ZERO**, eliminando a estrutura. Não tente corrigir só a frase: a
 tentação de reusar o conteúdo Y do template fica e regride.
 Reescreva o parágrafo todo numa estrutura nova.
+
+### Exemplos ❌ Padrão 4 — Família 4 embedded (v2.5.4.2)
+
+❌ "...retrato de **alguém que aprendeu** muito cedo a funcionar em
+  nível de esforço..."
+❌ "...é **um corpo que aprendeu** a sustentar antes de aprender a
+  soltar..."
+❌ "**Uma pessoa que segurou** décadas de demanda sem reclamar..."
+❌ "**Um sistema que aprendeu** a anteceder o que os outros
+  precisam..."
+❌ "...há aqui **um organismo que viveu** anos calibrando o silêncio..."
+❌ "...esta é a história de **um ser que descobriu** cedo demais o
+  peso de continuar..."
+
+✅ Reformulações ancoradas (mesmas ideias, sem fórmula universal):
+
+✅ "...retrato de uma criança que precisou aprender muito cedo a
+  funcionar em nível de esforço..." (criança específica, não "alguém")
+✅ "**O corpo de Evanilce aprendeu** a sustentar antes de aprender
+  a soltar..." (nome próprio ancorando)
+✅ "**Você segurou** décadas de demanda sem reclamar..." (segunda
+  pessoa direta)
+✅ "**Este sistema** aprendeu a anteceder o que os outros precisam..."
+  (demonstrativo específico)
 
 ## §0 (Em poucas palavras) — regra de abertura específica (v2.5.4.1)
 
@@ -1142,6 +1189,13 @@ template.
 §0 em especial: a tentação é abrir com "Alguém que [verbo]..."
 (família 2). **Em §0, jamais.** Use uma das 3 estruturas
 permitidas (a / b / c) acima.
+
+§1 e §14 em especial (v2.5.4.2): a tentação é incluir embedded
+"retrato de alguém que aprendeu...", "um corpo que aprendeu a
+sustentar...", "uma pessoa que segurou décadas...". **Em §1 e §14,
+qualquer ocorrência embedded da Família 4 = REESCREVE**. Use o
+nome do cliente, demonstrativo "este(a)", ou segunda pessoa
+"você" pra ancorar.
 
 ## Reformulação aceita
 
@@ -1338,8 +1392,29 @@ export const STAGE2_METHOD_VERSION = 'sonnet_2x_0.2.2' as const
 // Trigger empírico literal: §0 das DUAS leituras começou com "Alguém que
 // aprendeu" — Carol "Alguém que aprendeu a manter o peito aberto",
 // Evanilce "Alguém que aprendeu cedo que segurar era mais seguro".
+//
+// v2.5.4.2 (2026-05-24): bump PATCH 0.3.3 → 0.3.4 — F1.2 hotfix.
+// Validação isolada Stage 2 v0.3.3: §0 das 2 leituras CORRIGIDAS, MAS
+// Família 4 EMBEDDED apareceu fora do início de seção:
+//   - Carol §14: "...retrato de ALGUÉM QUE APRENDEU muito cedo a
+//     funcionar em nível de esforço..."
+//   - Evanilce §1: "...é UM CORPO QUE APRENDEU a sustentar antes de
+//     aprender a soltar..."
+// Frequência alta (2/2 leituras) — padrão sistêmico embedded que F1.1
+// (`^` âncora regex) não cobria. F1.2 adiciona Padrão 4 sem âncora `^`,
+// detectando "alguém que aprendeu" / "um corpo que aprendeu" / variantes
+// EM QUALQUER POSIÇÃO do texto.
+//   Família 4 (NOVA): embedded universal abstrato — "alguém/uma pessoa/
+//     um corpo/um sistema/um organismo/um ser/quem" + "que" + verbo
+//     universal (aprendeu/cresceu/viveu/descobriu/entendeu/soube/sempre).
+//   Exceção: demonstrativo específico ("este corpo", "esta íris"),
+//     nome próprio ("O corpo de Evanilce"), ou segunda pessoa ("Você
+//     aprendeu") NÃO disparam — são âncoras de especificidade.
+//   §1 e §14 marcadas como seções onde verificar Padrão 4 explicitamente
+//     (além de §0 já marcada).
+// Push consolidado v2.5.4 = commits v0.3.2 + v0.3.3 + v0.3.4 juntos.
 export const STAGE2_METHOD = 'sonnet_2x' as const
-export const STAGE2_VERSION = '0.3.3' as const
+export const STAGE2_VERSION = '0.3.4' as const
 
 /**
  * Etapa 2 do pipeline Sonnet 2x — composição streaming ancorada no JSON
