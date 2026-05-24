@@ -393,8 +393,16 @@ camada muda só COMO o conteúdo já ancorado é entregue.
 
 O cliente entra na leitura porque o CORPO dele se reconhece — não
 porque a prosa é bonita. Sua voz chega antes da cabeça. Nas seções §1
-(Síntese inicial), §4, §5, §10, §12, §14 e no bloco "Em poucas
-palavras", carregue simultaneamente as 6 marcas abaixo.
+(Síntese inicial), §4, §5, §10, §12 e §14, carregue simultaneamente as
+6 marcas abaixo.
+
+**NOTA SOBRE "Em poucas palavras"** — este bloco tem contrato PRÓPRIO no
+system.md (voz poético-evocativa, 15-60 palavras, ZERO jargão somático/
+clínico, sem órgão/sistema/campo/corpo/organismo). **NÃO aplique a
+marca 1 (corpo localizado) nem a marca 6 (observador) nele** — elas
+conflitam com o contrato. Pode aplicar as marcas 2 (nomeação direta),
+3 (reversal-afirmação) e 4 (cadência) se couberem nas 60 palavras. A
+marca 5 (pergunta-§12) não se aplica.
 
 ## 1. Visceral e somática — PONTUADA, não saturada
 
@@ -414,10 +422,19 @@ global.
 um campo", "uma presença", "uma força quieta", "abrir espaço",
 "caminhar a jornada", "convite à escuta", "abrir-se ao novo".
 
-✅ Alvo (uma vez por seção): "aprendeu a engolir antes que saísse pela
-boca", "tranca o peito antes de pedir colo", "comprime o ventre quando
-o outro precisa primeiro", "segura a mandíbula no instante em que ia
-chorar".
+✅ ALVO — construa UMA frase ORIGINAL por seção que combine três
+elementos:
+  (a) verbo corporal específico ao que ESTA pessoa carrega (não verbo
+      genérico)
+  (b) parte do corpo nomeada onde a sensação vive
+  (c) gesto ou instante concreto da experiência cotidiana
+
+ATENÇÃO CRÍTICA — NÃO copie frases prontas que você viu como exemplo
+em prompt ou em outras leituras. Cada formulação visceral deve ser
+NOVA, ancorada nos achados específicos desta íris. Se você se pegar
+escrevendo uma frase familiar, REESCREVA com vocabulário diferente
+ancorado nos sinais únicos desta leitura. Repetição de frase visceral
+entre leituras = fórmula universal = Forer-em-prosa.
 
 ## 2. Nomeação direta, sem suavizar
 
@@ -487,8 +504,9 @@ nessas seções.
 
 ## Auto-checagem antes de fechar cada seção client-facing
 
-Antes de emitir §1, §4, §5, §10, §12, §14 ou "Em poucas palavras",
-releia o parágrafo e responda:
+Antes de emitir §1, §4, §5, §10, §12 ou §14 (NÃO se aplica a "Em
+poucas palavras" — esse bloco tem contrato próprio), releia o parágrafo
+e responda:
 
 1. **Tem AO MENOS UMA sensação corporal localizada por SEÇÃO** (parte
    do corpo + verbo corporal específico) — não uma por parágrafo? Se a
@@ -584,7 +602,7 @@ function buildStage2UserContent(args: ComposeStage2Args): Anthropic.TextBlockPar
   return blocks
 }
 
-export const STAGE2_METHOD_VERSION = 'sonnet_2x_0.2.0' as const
+export const STAGE2_METHOD_VERSION = 'sonnet_2x_0.2.1' as const
 
 // v2.3.0 (2026-05-23): split do STAGE2_METHOD_VERSION em method qualitativo +
 // semver pra alinhar com a convenção nova de report_generations (migration
@@ -603,8 +621,17 @@ export const STAGE2_METHOD_VERSION = 'sonnet_2x_0.2.0' as const
 // perdeu na transição pro pipeline Sonnet 2x. Mudança qualitativa de
 // registro (não calibração pequena) → bump minor, analytics separa
 // limpo "antes vs depois da voz v2.4".
+//
+// v2.4.1 (2026-05-24): bump PATCH 0.2.0 → 0.2.1 — fix de contaminação
+// de exemplos. UAT Evanilce mostrou Sonnet copiando 2/4 exemplos ✅
+// LITERAIS do bloco VOICE em "Em poucas palavras" ("tranca o peito
+// antes de pedir colo", "raiva engolida") — virou fórmula universal
+// disfarçada. Fix: (a) remove exemplos ✅ literais da marca 1 e
+// substitui por descrição semântica de como construir frase original;
+// (b) EXCLUI "Em poucas palavras" das marcas obrigatórias 1+6
+// (conflito com contrato system.md de zero jargão somático nesse bloco).
 export const STAGE2_METHOD = 'sonnet_2x' as const
-export const STAGE2_VERSION = '0.2.0' as const
+export const STAGE2_VERSION = '0.2.1' as const
 
 /**
  * Etapa 2 do pipeline Sonnet 2x — composição streaming ancorada no JSON

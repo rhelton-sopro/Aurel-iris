@@ -46,12 +46,17 @@ let _systemVersionCache: string | null = null
  *     pra recuperar voz visceral/somática/com presença de observador
  *     drenada pelo JSON estruturado. Bump MINOR — mudança qualitativa
  *     de registro, não calibração pequena. Stage 1 inalterado.
+ *   - `sonnet_2x_0.2.1` (v2.4.1, 2026-05-24) = patch fix de contaminação
+ *     de exemplos ✅ literais no overlay (Sonnet copiou "tranca o peito
+ *     antes de pedir colo" verbatim em "Em poucas palavras"). Remove
+ *     exemplos prontos + exclui Em poucas palavras das marcas
+ *     obrigatórias (contrato próprio no system.md, sem corpo/jargão).
  *
  * Persistido em `report_findings.method_version` e
  * `report_generations.method_version` pra atribuir variação de
  * qualidade/custo a mudanças arquiteturais vs cirurgias no prompt.
  */
-export const METHOD_VERSION = 'sonnet_2x_0.2.0' as const
+export const METHOD_VERSION = 'sonnet_2x_0.2.1' as const
 
 const PROMPTS_DIR = path.join(process.cwd(), 'prompts')
 
