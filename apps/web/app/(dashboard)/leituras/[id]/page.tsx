@@ -94,22 +94,41 @@ export default async function LeituraDetailPage({
   const reportGeneratedAt =
     (reading as { report_generated_at?: string }).report_generated_at ?? null
 
-  // Versão da análise (v2.4.4 — exibida ao lado de "Leitura realizada em").
+  // Versão da análise (v2.4.4 — exibida ao lado de "Leitura realizada em";
+  // v2.5.2 — agora mostra Stage 1 + Stage 2 separados).
   // report_generations tem 1 row por geração (regen inclui); pega a mais
-  // recente. method_version é coluna nova (0031) — types ainda sem ela,
-  // cast 'as never' isola até founder regenerar gen:types.
-  const { data: lastGen } = await supabase
-    .from('report_generations')
-    .select('method, method_version, created_at' as never)
-    .eq('reading_id', readingId)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle<{ method: string | null; method_version: string | null }>()
-  const analysisVersion = lastGen?.method_version
-    ? lastGen.method
-      ? `${lastGen.method} v${lastGen.method_version}`
-      : `v${lastGen.method_version}`
-    : null
+  // recente pro Stage 2. report_findings CURRENT (superseded_at IS NULL)
+  // dá o Stage 1 ativo. Coluna method_version é nova (0031) — types ainda
+  // sem ela, cast 'as never' isola até founder regenerar gen:types.
+  const [{ data: lastGen }, { data: currentFinding }] = await Promise.all([
+    supabase
+      .from('report_generations')
+      .select('method, method_version, created_at' as never)
+      .eq('reading_id', readingId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle<{ method: string | null; method_version: string | null }>(),
+    supabase
+      .from('report_findings')
+      .select('method_version' as never)
+      .eq('reading_id', readingId)
+      .is('superseded_at', null)
+      .maybeSingle<{ method_version: string | null }>(),
+  ])
+  // Stage 1 method_version vem como 'sonnet_2x_0.2.1' (semver embutido no
+  // ID). Stage 2 method_version vem como '0.3.0' separado de method.
+  // Display: "S1 v0.2.1 · S2 v0.3.0" — compacto, legível, comparável.
+  const stage1SemverMatch = currentFinding?.method_version?.match(/(\d+\.\d+\.\d+)$/)
+  const stage1Version = stage1SemverMatch?.[1] ?? null
+  const stage2Version = lastGen?.method_version ?? null
+  const analysisVersion =
+    stage1Version && stage2Version
+      ? `S1 v${stage1Version} · S2 v${stage2Version}`
+      : stage2Version
+        ? `v${stage2Version}`
+        : stage1Version
+          ? `S1 v${stage1Version}`
+          : null
 
   // Geração em andamento (0027): set no início do POST /analyze, clear
   // no finalize. Janela de 5min (após isso, considera handler morto
