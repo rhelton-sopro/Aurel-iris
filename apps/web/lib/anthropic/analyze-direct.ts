@@ -948,6 +948,127 @@ Este princípio **NÃO TOCA**:
   abertura "Alguém que aprendeu" — continuam proibidos
 `
 
+/**
+ * v2.5.4 (2026-05-24) — ANTI-FORER HARDLINE.
+ *
+ * Camada externa de defesa contra a fórmula sintática
+ * "Você não é alguém que X — você é alguém que Y". UAT v2.5.3
+ * mostrou taxa de violação de ~67% (Carol regen=3 + Evanilce regen=6)
+ * mesmo com a Marca 3.0 do VOICE_OVERRIDE_V2_4 (que vira camada
+ * interna; este bloco é a defesa final, posicionado como 6º system
+ * block após ANCHORING).
+ *
+ * Diagnóstico: Sonnet tratava os exemplos ❌ do VOICE_OVERRIDE como
+ * instâncias específicas; não generalizava pro padrão sintático.
+ * Solução: banimento BINÁRIO da estrutura com regex de validação
+ * textual interna + 6+ exemplos usando nomes variados pra forçar
+ * generalização + marcação explícita de §1 como seção crítica
+ * (Marca 3.0 marcava só §0 e §14).
+ */
+export const ANTI_FORER_HARDLINE_V2_5_4 = `# ANTI-FORER HARDLINE — proibição absoluta da estrutura sintática
+
+Este bloco existe como **última camada de defesa** contra a fórmula
+Forer estrutural. A Marca 3.0 do bloco VOICE (camada interna) já
+proíbe; este bloco é a camada externa redundante porque UAT mostrou
+que a fórmula recorre.
+
+## A estrutura sintática banida
+
+Qualquer frase que case o padrão regex:
+\`\`\`
+[Sujeito (Você | Nome próprio | ela | o cliente | a pessoa)]
+  + "não é alguém que" + [verbo/predicado X]
+  + "—" (ou "-" ou ":" ou ",")
+  + [Sujeito repetido ou pronome]
+  + "é alguém que" + [verbo/predicado Y]
+\`\`\`
+
+está **PROIBIDA SEM EXCEÇÃO** em todo o relatório (§0 até §15, mais
+"Em poucas palavras"), independente de como X e Y soem específicos
+ou ancorados nesta íris.
+
+## Exemplos ❌ — todos PROIBIDOS
+
+Cada um abaixo case o padrão e por isso está banido, mesmo que o
+conteúdo X/Y pareça verdadeiro pra esta íris:
+
+❌ "**Você não é alguém que** vive exagerando o que sente — **você é
+  alguém que** registra o que outros mal percebem."
+❌ "**Você não é alguém que** não sabe descansar. **Você é alguém a
+  quem** ninguém ensinou que descansar é seguro."
+❌ "**Maria não é alguém que** se cobra demais — **ela é alguém que**
+  ainda não aprendeu a se receber."
+❌ "**Carol não é alguém que** carrega por escolha — **é alguém que**
+  herdou o ofício de sustentar."
+❌ "**Evanilce não é alguém que** silencia por medo, **e sim alguém
+  que** aprendeu cedo que o silêncio era proteção."
+❌ "**A cliente não é alguém que** falha em descansar; **é alguém
+  que** nunca teve permissão pra parar."
+❌ "**Ela não é alguém que** exagera os sintomas — **é alguém que**
+  carrega o que ninguém mais consegue carregar."
+
+## Regra de validação textual interna
+
+Antes de emitir CADA seção do relatório, faça internamente uma
+busca pelo padrão sintático na seção que você vai emitir. Se
+qualquer trecho casar com:
+
+- "**não é alguém que**" (precedido por sujeito qualquer)
+- "**não é alguém a quem**" (variante)
+- "**não é uma pessoa que**" (variante substantiva)
+- "**não é o tipo que**" (variante alternativa)
+
+→ **REESCREVA A SEÇÃO INTEIRA DO ZERO**, eliminando essa estrutura.
+Não tente corrigir só a frase: a tentação de reusar Y do template
+fica e regride. Reescreva o parágrafo todo numa estrutura nova.
+
+## Seções críticas onde a fórmula mais aparece
+
+§1 (Constituição e Temperamento), §0 (Em poucas palavras), §14
+(Mensagem ao Cliente) são as 3 seções onde Sonnet historicamente
+escorrega. Releia essas 3 com atenção dobrada antes de emitir.
+
+§1 em especial: a tentação é fechar a "Síntese inicial" com um
+reframe que usa a fórmula. **Em §1, jamais.** Use afirmação direta
+ancorada no padrão visual desta íris, sem o template.
+
+## Reformulação aceita
+
+A virada pode permanecer; o que muda é a forma. Em vez de:
+
+❌ "Você não é alguém que [X] — você é alguém que [Y]"
+
+Use UMA destas estruturas (sem rotina):
+
+✅ "[Y] não veio de [X negado]; veio de [origem real do padrão]."
+✅ "O que parecia [X] sempre foi [Y]."
+✅ "[Y] é o que [verbo do padrão] tem sido o tempo todo, com nome
+  errado."
+✅ Afirmação direta sem comparação Y-vs-X: "[Y, com âncora visual
+  específica desta íris]."
+
+A virada permanece (reframe Tipo B da Marca 3.1 continua válido);
+o que muda é a estrutura sintática que viola este bloco.
+
+## Por que banimento total e não nuance
+
+A Marca 3.0 do VOICE_OVERRIDE_V2_4 tentou nuance ("se a íris
+sustenta genuinamente, talvez seja válido"). Em prática, Sonnet
+trata a nuance como permissão e a fórmula recorre. Banimento
+binário é a única regra que UAT confirmou funcionar — não há
+"exceção honesta" pra essa estrutura específica.
+
+## Relação com Marca 3.1 (reframe Tipo B)
+
+A Marca 3.1 (REFRAME, não REDESCRIÇÃO) **CONTINUA VÁLIDA E
+MANDATÓRIA** em §0 e §14. O Tipo B (verbo do padrão redirecionado
+pra própria pessoa em moeda nova) é exatamente o que se quer.
+
+A fórmula "Você não é alguém que X — você é alguém que Y" é UMA
+das formas de tentar Tipo B, e é a forma BANIDA. Use as outras
+formas listadas em "Reformulação aceita" acima.
+`
+
 export interface ComposeStage2Args {
   readingId: string
   therapistId: string
@@ -1119,6 +1240,13 @@ export async function analyzeReadingComposeStage2(
         // SEM cache_control — UAT ativo, mudança arquitetural sujeita a
         // calibração nas primeiras leituras pós-deploy.
         { type: 'text', text: ANCHORING_PRINCIPLE_V2_5 },
+        // v2.5.4 (2026-05-24): última camada de defesa contra fórmula
+        // Forer estrutural. Marca 3.0 do VOICE (camada interna) já
+        // proíbe; este bloco é redundante porque UAT mostrou taxa
+        // ~67% de violação (Carol regen=3 + Evanilce regen=6).
+        // Banimento BINÁRIO + regex de validação textual interna +
+        // §1 marcada como crítica. Sem cache_control — UAT ativo.
+        { type: 'text', text: ANTI_FORER_HARDLINE_V2_5_4 },
       ],
       messages: [{ role: 'user', content: userContent }],
     },
