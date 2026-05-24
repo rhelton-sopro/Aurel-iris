@@ -94,6 +94,23 @@ export default async function LeituraDetailPage({
   const reportGeneratedAt =
     (reading as { report_generated_at?: string }).report_generated_at ?? null
 
+  // Versão da análise (v2.4.4 — exibida ao lado de "Leitura realizada em").
+  // report_generations tem 1 row por geração (regen inclui); pega a mais
+  // recente. method_version é coluna nova (0031) — types ainda sem ela,
+  // cast 'as never' isola até founder regenerar gen:types.
+  const { data: lastGen } = await supabase
+    .from('report_generations')
+    .select('method, method_version, created_at' as never)
+    .eq('reading_id', readingId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle<{ method: string | null; method_version: string | null }>()
+  const analysisVersion = lastGen?.method_version
+    ? lastGen.method
+      ? `${lastGen.method} v${lastGen.method_version}`
+      : `v${lastGen.method_version}`
+    : null
+
   // Geração em andamento (0027): set no início do POST /analyze, clear
   // no finalize. Janela de 5min (após isso, considera handler morto
   // — UI libera retry). FIX founder UAT 2026-05-20.
@@ -135,6 +152,7 @@ export default async function LeituraDetailPage({
           sections={reportToShow}
           clientName={clientName}
           readingDate={reportGeneratedAt ?? reading.created_at}
+          analysisVersion={analysisVersion}
           technicalNotice={technicalNotice}
           topActionsSlot={
             <ReadingModeActions

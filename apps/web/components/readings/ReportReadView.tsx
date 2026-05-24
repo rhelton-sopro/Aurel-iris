@@ -121,6 +121,14 @@ export interface ReportReadViewProps {
   clientName: string
   /** ISO timestamp string of when the reading was created (or generated). */
   readingDate: string | null
+  /**
+   * Versão do método de análise que gerou esta leitura — exibido como
+   * pílula ao lado da data (ex: "sonnet_2x v0.1.3"). v2.4.4: founder
+   * pediu visibilidade da versão pra rastrear qual iteração do prompt
+   * gerou cada leitura. null quando a coluna method_version ainda não
+   * estava preenchida (rows pré-v2.3.0).
+   */
+  analysisVersion?: string | null
   /** Optional right-aligned action button row above the body. */
   topActionsSlot?: ReactNode
   /** Optional technical notice (e.g. canonicalization fallback). Rendered as
@@ -132,6 +140,7 @@ export function ReportReadView({
   sections,
   clientName,
   readingDate,
+  analysisVersion,
   topActionsSlot,
   technicalNotice,
 }: ReportReadViewProps) {
@@ -167,8 +176,19 @@ export function ReportReadView({
             {clientName}
           </h1>
           {readingDate && (
-            <p className="text-sm" style={{ color: C.mist }}>
-              Leitura realizada em <LocalDateTime iso={readingDate} />
+            <p className="text-sm flex flex-wrap items-center gap-2" style={{ color: C.mist }}>
+              <span>
+                Leitura realizada em <LocalDateTime iso={readingDate} />
+              </span>
+              {analysisVersion && (
+                <span
+                  className="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium tabular-nums"
+                  style={{ borderColor: C.mist, color: C.tealDark }}
+                  title="Versão do método de análise que gerou esta leitura"
+                >
+                  {analysisVersion}
+                </span>
+              )}
             </p>
           )}
         </div>
