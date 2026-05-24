@@ -428,6 +428,20 @@ function describesEye(text: string, eye: 'OD' | 'OE'): boolean {
   return EYE_TOKENS[eye].test(text)
 }
 
+/**
+ * TODO F5 (v2.5.3 hipótese, revisita pós-UAT Carol/Evanilce):
+ * Se pigmento_amber órfão se repetir em 2+ leituras pós-v2.5.3
+ * (warnings em F4 recorrentes), promover a regra estrutural:
+ * pigmento_amber SEMPRE deve ter sistema-órgão pareado no MESMO
+ * exame — sem pareamento = REJEIÇÃO no validateExameIridologico
+ * (não warning). Implementação: trocar `pairingWarnings` push no
+ * coherence_warning por return { status: 'invalid', error: ... }
+ * análogo ao strict de coherence I≥4.
+ *
+ * Se Carol/Evanilce vierem pareados (F3+F4+glossário pegam o caso),
+ * F5 fica como tech debt fechado — registra em memória como decisão
+ * empírica de não promover.
+ */
 function checkPigmentoAmberPairing(
   achados: ReadonlyArray<{
     campo: string

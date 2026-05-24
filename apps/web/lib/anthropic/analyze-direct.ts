@@ -1058,8 +1058,17 @@ export const STAGE2_METHOD_VERSION = 'sonnet_2x_0.2.2' as const
 // embutida ("cobertura ≠ enumeração") preserva voz v2.4.4. Bump minor
 // porque é mudança arquitetural, não calibração de marca — analytics
 // separa limpo "antes vs depois da ancoragem total".
+//
+// v2.5.3 (2026-05-24): bump PATCH 0.3.0 → 0.3.1 — F1 reforço anti-Forer.
+// Cristiane regen=4 violou em §1 com fórmula "Você não é alguém que
+// X — você é alguém que Y" (Forer estrutural). A regra já existia em
+// VOICE_OVERRIDE mas enterrada na seção "O que NÃO mudou" — Sonnet
+// passou batido. F1 adiciona subbloco Marca 3.0 com banimento explícito
+// + 3 exemplos ❌ + regra de validação textual interna ("se a string
+// 'Você não é alguém que' aparece, reescreve do zero"). Sem mudança
+// arquitetural; só reforço visual da regra existente.
 export const STAGE2_METHOD = 'sonnet_2x' as const
-export const STAGE2_VERSION = '0.3.0' as const
+export const STAGE2_VERSION = '0.3.1' as const
 
 /**
  * Etapa 2 do pipeline Sonnet 2x — composição streaming ancorada no JSON

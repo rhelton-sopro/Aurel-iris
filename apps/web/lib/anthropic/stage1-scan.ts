@@ -128,7 +128,25 @@ const STAGE1_PROMPT_FILENAME = 'stage1-scan.md'
 //       mapping nasal/temporal por olho explícito + lista de bugs
 //       recorrentes (pigmento em 10-11h → NÃO é fígado, é baço/pulmão/
 //       tireoide dependendo do olho).
-const STAGE1_METHOD_VERSION = 'sonnet_2x_0.2.1' as const
+//
+// v2.5.3 (2026-05-24): bump PATCH 0.2.1 → 0.2.2 — Cristiane regen=4
+// mostrou que B3 resolveu fígado-em-zona-errada (Sonnet reclassificou
+// como pigmento_amber+tireoide em 10-11h OD) MAS deixou o sinal massivo
+// do OE em 5-8h nasal-inferior (pâncreas) silenciado — colapsou eixos
+// clínicos diferentes em uma observação só. 3 sub-fixes:
+//   F3 (prompt): bloco "Cobertura por olho separado quando zonas
+//       divergem" + critério de desempate em zonas competidoras
+//       (lateralidade preferencial vence simetria bilateral; zona mais
+//       específica vence ampla; cromático literal vence; empate → dois
+//       achados).
+//   F4 (validator): checkPigmentoAmberPairing — warning quando
+//       pigmento_amber órfão sem sistema-órgão pareado em zona compatível.
+//       Modo warning (não rejeita). TODO F5 pós-UAT: promover a strict
+//       se órfãos recorrerem em Carol/Evanilce.
+//   Glossário: "Pigmento âmbar" adicionado literal ao sinal_carga de
+//       pancreas (antes só figado_vesicula tinha — Sonnet caía em fígado
+//       por afinidade textual mesmo em zona pancreática).
+const STAGE1_METHOD_VERSION = 'sonnet_2x_0.2.2' as const
 
 let _stage1PromptCache: string | null = null
 let _stage1ShaCache: string | null = null
