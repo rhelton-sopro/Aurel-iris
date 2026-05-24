@@ -1024,30 +1024,124 @@ conteúdo X/Y pareça verdadeiro pra esta íris:
 ❌ "**Ela não é alguém que** exagera os sintomas — **é alguém que**
   carrega o que ninguém mais consegue carregar."
 
-## Regra de validação textual interna
+## Família 2 — abertura universal "Alguém que [verbo]" (v2.5.4.1)
+
+Variante igualmente BANIDA: começar uma seção (especialmente §0
+"Em poucas palavras", §1 abertura ou §14) com frase nominal abstrata
+"Alguém que [verbo]..." OU equivalentes "Uma pessoa que [verbo]..."
+OU "Quem [verbo]..." OU "Pessoas como [Nome]...".
+
+Essa estrutura é Forer universal disfarçado de poesia: o sujeito
+abstrato ("alguém", "uma pessoa", "quem", "pessoas como") faz com
+que a frase caiba em qualquer cliente que tenha vivido qualquer
+coisa minimamente comum.
+
+### Exemplos ❌ — todos PROIBIDOS (família 2)
+
+❌ "**Alguém que aprendeu** a manter o peito aberto para o mundo
+  antes de saber que o peito também precisava ser guardado..."
+❌ "**Alguém que aprendeu** cedo que segurar era mais seguro do
+  que pedir..."
+❌ "**Alguém que cresceu** sentindo que o chão podia ceder a
+  qualquer momento..."
+❌ "**Uma pessoa que viveu** décadas funcionando como ponto de
+  apoio para os outros..."
+❌ "**Quem aprendeu** a ler o que os outros não dizem geralmente..."
+❌ "**Pessoas como Carol** carregam um tipo específico de atenção..."
+
+A regra é binária: se a seção COMEÇA com "Alguém que [verbo]",
+"Uma pessoa que [verbo]", "Quem [verbo]" ou "Pessoas como [Nome]",
+**REESCREVE DO ZERO**.
+
+## Regra de validação textual interna (3 padrões — v2.5.4.1 expandida)
 
 Antes de emitir CADA seção do relatório, faça internamente uma
-busca pelo padrão sintático na seção que você vai emitir. Se
-qualquer trecho casar com:
+busca pelos 3 padrões na seção que você vai emitir:
 
+**Padrão 1 — Família 1 (estrutura X vs Y):**
 - "**não é alguém que**" (precedido por sujeito qualquer)
 - "**não é alguém a quem**" (variante)
 - "**não é uma pessoa que**" (variante substantiva)
 - "**não é o tipo que**" (variante alternativa)
 
-→ **REESCREVA A SEÇÃO INTEIRA DO ZERO**, eliminando essa estrutura.
-Não tente corrigir só a frase: a tentação de reusar Y do template
-fica e regride. Reescreva o parágrafo todo numa estrutura nova.
+**Padrão 2 — Família 2 (abertura universal abstrata):**
+- Seção começando com "**Alguém que aprendeu**" / "**Alguém que
+  cresceu**" / "**Alguém que viveu**" / "**Alguém que descobriu**" /
+  "**Alguém que entendeu**" / "**Alguém que soube**" / "**Alguém
+  que sempre**" — ou QUALQUER variante "Alguém que [verbo]..."
+- Seção começando com "**Uma pessoa que [verbo]**..."
+- Seção começando com "**Quem [verbo]**..."
+
+**Padrão 3 — Família 3 (generalização nominal):**
+- Seção começando com "**Pessoas como [Nome]**" / "**Pessoas que
+  [verbo]**"
+- "Mulheres como você" / "Mulheres que [verbo]" — variante de gênero
+
+→ Se QUALQUER padrão dos 3 casar, **REESCREVE A SEÇÃO INTEIRA DO
+ZERO**, eliminando a estrutura. Não tente corrigir só a frase: a
+tentação de reusar o conteúdo Y do template fica e regride.
+Reescreva o parágrafo todo numa estrutura nova.
+
+## §0 (Em poucas palavras) — regra de abertura específica (v2.5.4.1)
+
+§0 NUNCA começa com fórmula universal abstrata (sem nome próprio
+do cliente, sem referência a achado visual específico desta íris).
+§0 SEMPRE começa ancorada em UMA das 3 estruturas abaixo:
+
+**(a)** Frase nominal específica sobre o padrão visual concreto
+observado nesta íris. Sem sujeito abstrato no início.
+✅ "Décadas deixando a raiva morrer no estômago antes de chegar à
+  boca — o fígado ficou guardando o que a fala não soltou."
+✅ "O radar que lia o outro com precisão nunca foi virado para
+  dentro."
+✅ "Uma vida toda de peito firme enquanto o estômago segurava o
+  que a boca não disse."
+
+**(b)** Descrição em primeira pessoa do achado mais expressivo
+desta íris (registro do observador). Sem "Alguém que...".
+✅ "O que mais me toca nesta leitura é o pigmento âmbar no campo
+  do fígado — denso, antigo, com bordas que falam de décadas."
+✅ "O que os seus olhos me trouxeram hoje foi uma midríase
+  bilateral que não passa nem com flash — sinal de um sistema
+  nervoso que nunca pediu licença pra parar."
+
+**(c)** Reframe Tipo B diretamente direcionado pelo nome do
+cliente. O nome próprio ancora; sem "Alguém que..." abstrato.
+✅ "Carol, o sistema nervoso que ficou de plantão por você e por
+  todos os outros agora pede que alguém também fique de plantão
+  por ele."
+✅ "Evanilce, a competência de sustentar que sempre te definiu
+  agora pode finalmente ser usada pra te sustentar."
+
+### O que NÃO fazer em §0
+
+❌ Começar com "Alguém que..." (qualquer variante)
+❌ Começar com "Uma vida toda..." (se for descrição universal
+  abstrata sem âncora visual específica — verifica se a frase
+  cita um achado deste relatório ou pode caber em qualquer
+  pessoa)
+❌ Começar com "O que [a maioria/todos/muitos] [verbo]..."
+
+A regra é: a primeira frase do §0 deve ser **falsa pra pelo menos
+um achado** se você trocar a íris pela do cliente do mês passado.
+Se pode-se trocar a íris e a frase ainda cabe, REESCREVA.
 
 ## Seções críticas onde a fórmula mais aparece
 
-§1 (Constituição e Temperamento), §0 (Em poucas palavras), §14
+§0 (Em poucas palavras), §1 (Constituição e Temperamento), §14
 (Mensagem ao Cliente) são as 3 seções onde Sonnet historicamente
-escorrega. Releia essas 3 com atenção dobrada antes de emitir.
+escorrega — **§0 agora marcada como crítica em v2.5.4.1 após Carol
+e Evanilce violarem família 2 nessa seção.** Releia essas 3 com
+atenção dobrada antes de emitir.
 
 §1 em especial: a tentação é fechar a "Síntese inicial" com um
-reframe que usa a fórmula. **Em §1, jamais.** Use afirmação direta
-ancorada no padrão visual desta íris, sem o template.
+reframe que usa a fórmula família 1. **Em §1, jamais.** Use
+afirmação direta ancorada no padrão visual desta íris, sem o
+template.
+
+§0 em especial: a tentação é abrir com "Alguém que [verbo]..."
+(família 2). **Em §0, jamais.** Use uma das 3 estruturas
+permitidas (a / b / c) acima.
 
 ## Reformulação aceita
 
@@ -1225,8 +1319,27 @@ export const STAGE2_METHOD_VERSION = 'sonnet_2x_0.2.2' as const
 //     vira hipótese, JAMAIS aparece em §5/§7/§8/§10/§13).
 // Trigger empírico: Carol regen=3 + Evanilce regen=6 violaram F1; Evanilce
 // regen=6 teve 3 indeterminados invisíveis (gap de transparência).
+//
+// v2.5.4.1 (2026-05-24): bump PATCH 0.3.2 → 0.3.3 — F1.1 hotfix.
+// Validação isolada Stage 2 v0.3.2 com Carol regen=3 + Evanilce regen=6:
+// F1 hardline (Família 1 "Você não é alguém que X — você é alguém que Y")
+// PASSOU em §1 das 2 leituras, MAS apareceu regressão em §0 (Em poucas
+// palavras) com Família 2 "Alguém que aprendeu [verbo]..." — fórmula
+// universal abstrata banida historicamente, não coberta pelo regex F1
+// original.
+//   Família 2 (NOVA): "Alguém que [aprendeu/cresceu/viveu/...]" /
+//     "Uma pessoa que [verbo]" / "Quem [verbo]"
+//   Família 3 (NOVA): "Pessoas como [Nome]" / "Mulheres como você"
+//   §0 explicitamente marcada como seção crítica (estava §1+§14 em v2.5.4)
+//   3 estruturas permitidas em §0 (a/b/c) com exemplos ancorados nas
+//     últimas regens válidas (Evanilce-22/05, Cristiane-regen5, Carol-regen3)
+//   6 exemplos ❌ novos especificamente do output de Carol e Evanilce
+//     (frases reais que escaparam) pra forçar generalização do padrão.
+// Trigger empírico literal: §0 das DUAS leituras começou com "Alguém que
+// aprendeu" — Carol "Alguém que aprendeu a manter o peito aberto",
+// Evanilce "Alguém que aprendeu cedo que segurar era mais seguro".
 export const STAGE2_METHOD = 'sonnet_2x' as const
-export const STAGE2_VERSION = '0.3.2' as const
+export const STAGE2_VERSION = '0.3.3' as const
 
 /**
  * Etapa 2 do pipeline Sonnet 2x — composição streaming ancorada no JSON
