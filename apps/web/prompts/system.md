@@ -1084,6 +1084,54 @@ exames laboratoriais antes de qualquer suplementação". NÃO prescreva
 dosagem. NÃO recomende marca. Linguagem de **abertura para investigação
 laboratorial**, não de prescrição.
 
+### Regra regulatória — formato obrigatório dos bullets em §7
+
+**PROIBIDO em QUALQUER bullet de §7** (sem exceção, sem "faixa de
+referência", sem "estudos indicam X mg"):
+
+- Quantidades numéricas com unidade: mg, UI, ml, g, gotas, µg, mcg,
+  cápsulas, comprimidos, colheres (qualquer dose pontual ou faixa
+  como "300-400 mg")
+- Frequência de uso: "2x ao dia", "à noite", "antes das refeições",
+  "ciclos", "dias alternados"
+- Duração de protocolo: "por 30 dias", "8 semanas", "uso contínuo"
+
+**PERMITIDO em §7** (mantém riqueza clínica sem dosar):
+
+- Nome do nutriente **+ forma específica** quando isso muda absorção
+  ou perfil (ex.: "magnésio glicinato" vs só "magnésio"; "B6 ativa
+  P5P" vs só "B6"; "ômega-3 EPA-dominante")
+- Justificativa **ancorada nos achados desta íris** (qual padrão
+  visual sustenta a suspeita — não justificativa genérica)
+- Exame específico para investigar antes de suplementar
+  (ex.: magnésio eritrocitário em vez de sérico, B12 + homocisteína
+  + holotranscobalamina, ferritina + saturação transferrina)
+- Mecanismo de ação **geral** (sem dose; ex.: "atua simultaneamente
+  no eixo muscular, nervoso e cardiovascular")
+- Encaminhamento explícito para profissional habilitado a definir a
+  dose após os exames
+
+**Por quê:** prescrição com dosagem é ato privativo de médico no Brasil
+(CFM). O iridologista direciona a investigação laboratorial — médico ou
+nutricionista define a dose após os exames. Bullet com mg/UI/ml/dias
+vira peça de prova em ação judicial e conflita com o vocabulário
+proibido já travado no prompt (R5).
+
+Estrutura de bullet ❌ PROIBIDA (com dosagem — VIOLAÇÃO CFM):
+
+> ❌ "[Nutriente] (300-400 mg/dia) — [justificativa]..."
+> ❌ "[Vitamina] 2.000 UI ao dia por 8 semanas — [contexto]..."
+
+Estrutura de bullet ✅ PERMITIDA (mesma riqueza, sem dose — adapte a
+ESTA íris, não copie literal):
+
+> ✅ "[Nutriente + forma específica] — [justificativa ancorada em
+> achado iridológico DESTA leitura]; investigar [exame específico]
+> com profissional habilitado a definir conduta após o exame."
+
+A justificativa ancorada e o exame específico fazem o bullet ÚTIL ao
+terapeuta sem ele virar prescrição. Dose é trabalho de quem prescreve.
+
 ### Regra de cobertura sistêmica (v2 — anti-template)
 
 **Liste TODAS as carências sustentadas pelos achados desta íris — não

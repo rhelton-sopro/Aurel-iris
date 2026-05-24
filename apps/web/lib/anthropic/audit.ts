@@ -106,6 +106,76 @@ export interface ForbiddenHit {
   occurrences: number
 }
 
+export interface DosageHit {
+  section: string
+  match: string
+}
+
+// ---------------------------------------------------------------------------
+// Dosage detector (v2.4.4) — CFM compliance backstop ao prompt §7.
+//
+// §7 (Carências Funcionais) já PROÍBE dosagem por instrução de prompt
+// reforçada em v2.4.4. Este regex é o detector defensivo que pega
+// regressões — Sonnet escorrega ocasionalmente em "300-400 mg/dia" mesmo
+// com regra explícita. Match aparece no AuditMetadata.dosage_hits e a
+// UI mostra na lista de alertas (igual forbidden_vocab).
+//
+// Não bloqueia save — vira metadata pra terapeuta revisar antes de enviar.
+//
+// 3 famílias de padrão:
+//   1. Quantidade numérica + unidade: "300 mg", "300-400 mg", "2 g",
+//      "2000 UI", "10 gotas", "500 µg", "2 cápsulas"
+//   2. Frequência: "2x ao dia", "3 vezes por semana", "2 vezes ao dia"
+//   3. Duração de protocolo: "por 30 dias", "por 8 semanas", "durante 4 meses"
+//
+// Word-boundary (`\b`) garante que "200mg" e "200 mg" pegam mas "magnesio"
+// não. Flag `u` correção Unicode em palavras acentuadas; `i` case-insens;
+// `g` global.
+// ---------------------------------------------------------------------------
+
+const DOSAGE_QUANTITY_RE =
+  /\b\d+(?:[.,]\d+)?(?:\s*[-–—]\s*\d+(?:[.,]\d+)?)?\s*(?:mg|µg|mcg|ui|ml|cl|dl|l|g|kg|gotas?|c[áa]psulas?|comprimidos?|drágeas?|colheres?|xícaras?)\b/giu
+
+const DOSAGE_FREQUENCY_RE =
+  /\b\d+\s*(?:x|vezes?)\s+(?:ao|por|na|no|nas|nos)\s+(?:dia|semana|m[êe]s|ano)s?\b/giu
+
+const DOSAGE_DURATION_RE =
+  /\b(?:por|durante|ao longo de|em ciclos? de)\s+\d+\s+(?:dia|semana|m[êe]s|ano)s?\b/giu
+
+const DOSAGE_PATTERNS: ReadonlyArray<RegExp> = [
+  DOSAGE_QUANTITY_RE,
+  DOSAGE_FREQUENCY_RE,
+  DOSAGE_DURATION_RE,
+]
+
+/**
+ * Scan UMA section text por dosagem numérica/frequência/duração.
+ * Devolve cada match com a substring exata pra facilitar a localização
+ * pelo terapeuta. Não merge: prefere fidelidade.
+ */
+export function extractDosageHits(text: string, section: string): DosageHit[] {
+  if (!text) return []
+  const hits: DosageHit[] = []
+  for (const pattern of DOSAGE_PATTERNS) {
+    const r = new RegExp(pattern.source, pattern.flags)
+    let m: RegExpExecArray | null
+    while ((m = r.exec(text)) !== null) {
+      hits.push({ section, match: m[0]! })
+    }
+  }
+  return hits
+}
+
+// Seções onde dosagem é violação. §7 é o alvo principal. §11 (Sugestões
+// Integrativas) já tem "SEM dosagem/quantidade específica" no prompt mas
+// é vulnerável em Adaptógenos, então scan também. Outras seções podem
+// mencionar números legitimamente (anos em §3/§6, contagens em §11
+// Práticas) — fora do escopo.
+const DOSAGE_SCAN_SECTIONS: ReadonlySet<string> = new Set([
+  '7_carencias_funcionais',
+  '11_sugestoes_integrativas',
+])
+
 /**
  * Scan a single text for forbidden vocab hits, grouped by term with
  * occurrence count. Used by `runAudit` and re-used by save-action defense
@@ -232,10 +302,15 @@ export function runAudit(report: ReportJsonb): AuditMetadata {
   // by design ("Não constitui diagnóstico médico…"). Scanning it would always
   // trip the audit even on a perfect report. Bug surfaced 2026-05-08 dogfooding.
   const forbiddenHits: ForbiddenHit[] = []
+  const dosageHits: DosageHit[] = []
   for (const [key, text] of Object.entries(report)) {
     if (typeof text !== 'string') continue
     if (key === 'encerramento_disclaimer') continue
     forbiddenHits.push(...extractForbiddenHits(text, key))
+    // Dosage scan apenas em seções regulatoriamente sensíveis (v2.4.4).
+    if (DOSAGE_SCAN_SECTIONS.has(key)) {
+      dosageHits.push(...extractDosageHits(text, key))
+    }
   }
 
   return {
@@ -243,6 +318,7 @@ export function runAudit(report: ReportJsonb): AuditMetadata {
     anchor_rate_pct: overallPct,
     anchor_rate_per_section: anchorPerSection,
     forbidden_vocab: forbiddenHits,
+    dosage_hits: dosageHits,
     audited_at: new Date().toISOString(),
     auditor_version: 'v1',
   }

@@ -170,6 +170,14 @@ export interface AuditMetadata {
   anchor_rate_pct: number
   anchor_rate_per_section: Record<string, number>
   forbidden_vocab: Array<{ section: string; term: string; occurrences: number }>
+  /**
+   * Dosagem detectada em §7 (Carências Funcionais) — adição v2.4.4 (CFM).
+   * Prescrição com dose é ato privativo de médico no Brasil. Bullets como
+   * "magnésio glicinato (300-400 mg/dia)" violam o prompt §7 e viram peça
+   * de prova em ação judicial. Cada match traz a substring exata pra
+   * facilitar reescrita manual.
+   */
+  dosage_hits: Array<{ section: string; match: string }>
   audited_at: string
   auditor_version: 'v1'
 }

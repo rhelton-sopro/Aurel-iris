@@ -461,6 +461,53 @@ qualquer um pudesse ferir."
 ❌ "Talvez você esteja sentindo X."
 ✅ "X é o que está acontecendo."
 
+### 3.1 REFRAME (Tipo B), não REDESCRIÇÃO (Tipo A)
+
+Uma reversal-virada eficaz não é apenas afirmação precisa do padrão —
+é **tradução do padrão julgado em uma MOEDA NOVA**. O cliente lê e
+algo cede porque o sistema nomeou como X o que ela achava ser Y.
+
+A **frase de fecho do §0** e a **frase de virada do §14** precisam
+fazer essa tradução, não apenas descrever o que o corpo está fazendo
+agora.
+
+**Técnica:** pegue o verbo ou substantivo dominante do padrão (cuidar,
+sustentar, segurar, dar, aguentar, conter, ler) e **redirecione-o pra
+própria pessoa**. OU pegue a qualidade que o padrão revela
+(competência, inteligência, força, presença, finura, radar) e
+**reapresente como recurso disponível agora**.
+
+**Tipo B — REFRAME (ALVO em §0 e §14):**
+- "[verbo do padrão] → [mesmo verbo redirigido pra própria pessoa]
+  com a mesma [qualidade que o padrão revelou]"
+- "[o que era julgado como X] não é X — é [Y reapresentado como
+  recurso/inteligência/forma de Z]"
+- "[qualidade usada no outro] pode finalmente ser usada pra ler/
+  cuidar/sustentar você"
+
+**Tipo A — REDESCRIÇÃO (insuficiente em §0/§14, mesmo se bonito):**
+- "o corpo faz o que a voz ainda não aprendeu" (descreve estado atual)
+- "agora o organismo está pedindo outro ritmo" (descreve necessidade)
+- "é hora de aprender a receber" (prescreve sem renomear o passado
+  como recurso)
+
+**REGRA:** se a frase de fecho do §0 ou de virada do §14 NÃO
+transformar uma qualidade/verbo do padrão em moeda redirigível pra
+própria pessoa, REESCREVA.
+
+### 3.2 Quando o reframe Tipo B não está sustentado
+
+Se nenhum reframe Tipo B for **genuinamente sustentado** pelos
+achados desta íris, é PREFERÍVEL emitir uma descrição (Tipo A)
+honesta a forçar um reframe genérico. **Tipo B falso é pior que
+Tipo A verdadeiro.**
+
+Sintoma de Tipo B falso: a frase soa universal ("você pode usar
+isso a seu favor agora", "essa força agora está disponível pra
+você", "essa qualidade agora se volta pra dentro"). Se a sua virada
+caberia em qualquer mulher de 35-40 anos, ela é Tipo B falso —
+REESCREVA pra Tipo A ancorado ou para Tipo B genuíno desta íris.
+
 ## 4. Cadência que arrasta
 
 Construa com cláusulas curtas que se acumulam e fecham em reversal.
@@ -528,6 +575,18 @@ e responda:
    trouxeram)? Se está em registro de "este relatório" ou "a análise",
    REESCREVA com sujeito vendo. (§2 e §7 ficam fora desta checagem —
    permanecem técnico-clínicos.)
+6. **A frase de fecho do §0 e a frase de virada do §14 fazem REFRAME
+   (Tipo B) ou REDESCRIÇÃO (Tipo A)?** Critério crítico — o §0 NÃO
+   pode terminar em descrição do que o corpo/voz está fazendo agora;
+   tem que terminar redirecionando o padrão pra cliente em moeda nova
+   (verbo/qualidade do padrão reusado pra própria pessoa).
+   - Se §0 E §14 são Tipo B genuíno → emite
+   - Se §14 é Tipo B mas §0 é Tipo A → REESCREVE §0 garantindo que
+     o verbo/qualidade dominante do padrão seja redirigido pra cliente
+   - Se nenhuma é Tipo B → REESCREVE as duas
+   - Se a íris NÃO sustenta Tipo B genuíno em alguma das duas → Tipo A
+     ancorado é aceitável (regra 3.2 acima — Tipo B falso é pior que
+     Tipo A verdadeiro)
 
 Se QUALQUER auto-checagem falhar → reescreva ANTES de emitir.
 
@@ -744,8 +803,18 @@ export const STAGE2_METHOD_VERSION = 'sonnet_2x_0.2.2' as const
 // Reishi+Schisandra / Escrita catártica detectadas como defaults em
 // 3/3 UAT). Plus extract-phrases capturando resumo §11 pra alimentar
 // memória inter-leituras (recent-phrases-context). Stage 1 inalterado.
+//
+// v2.4.4 (2026-05-24): bump PATCH 0.2.2 → 0.2.3 — duas calibrações:
+// (a) §7 PROIBIDO dosagem numérica/frequência/duração (CFM compliance)
+//     + audit.ts detecta dosage_hits como backstop runtime.
+// (b) Marca 3 do VOICE_OVERRIDE expandida com Tipo A (descrição) vs
+//     Tipo B (reframe-translação) — frase de fecho §0 e virada §14
+//     precisam redirigir verbo/qualidade do padrão pra cliente em
+//     moeda nova, não apenas descrever o que o corpo está fazendo.
+//     Critério 6 da auto-checagem cobre. Escape Tipo A honesto se
+//     íris não sustenta Tipo B genuíno (evita reframe forçado/Forer).
 export const STAGE2_METHOD = 'sonnet_2x' as const
-export const STAGE2_VERSION = '0.2.2' as const
+export const STAGE2_VERSION = '0.2.3' as const
 
 /**
  * Etapa 2 do pipeline Sonnet 2x — composição streaming ancorada no JSON
