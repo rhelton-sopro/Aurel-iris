@@ -551,6 +551,112 @@ Se QUALQUER auto-checagem falhar → reescreva ANTES de emitir.
 - Anti-repetição estrutural (recent-phrases-context — fórmulas, não
   palavras)`
 
+/**
+ * v2.4.2 (2026-05-24) — STRUCTURAL OVERRIDE. Calibra contrato de §3
+ * (ordem), §7 (formato de carências) e §11 (sugestões integrativas
+ * variedade + anti-fórmula universal). Complementa VOICE_OVERRIDE
+ * (que cuida do COMO da entrega) — este cuida do O QUÊ específico
+ * de 3 seções estruturais.
+ *
+ * Motivação: UAT Carol/Maeli/Evanilce mostrou §11 com fórmulas
+ * universais — TRE em 3/3 leituras, Ashwagandha+Reishi+Schisandra em
+ * 3/3, Escrita catártica em 2/3, "Floral de transição" em 3/3. §3 da
+ * Evanilce saiu em ordem descendente (40-46 → 4-7) mesmo o exame_json
+ * vindo crescente. §7 com 2/7 bullets começando por categoria do
+ * sistema em vez de nome da carência.
+ *
+ * Anti-repetição em §11 também alimentada pela extensão de
+ * extract-phrases (v2.4.2) — recent-phrases-context agora carrega
+ * resumo das 6 subseções do §11 das últimas 10 leituras do terapeuta,
+ * permitindo que Sonnet vê o que JÁ SUGERIU e escolha alternativas.
+ */
+export const STRUCTURAL_OVERRIDE_V2_4_2 = `# CALIBRAÇÃO ESTRUTURAL — §3, §7, §11
+
+Este bloco refina o contrato de 3 seções específicas. Não altera as
+9 Regras Absolutas, a Regra de calibração global, nem o VOICE_OVERRIDE
+acima.
+
+## §3 Linha do Tempo Emocional — ORDEM CRESCENTE OBRIGATÓRIA
+
+Emita os marcadores em ORDEM CRONOLÓGICA CRESCENTE — infância
+primeiro, idade atual por último. Mesmo se o JSON da Etapa 1 vier em
+ordem diferente, REORDENE no markdown:
+
+  Marcador 1 = idade mais nova
+  Marcador 2 = próxima fase
+  ...
+  Marcador N = período mais recente
+
+O leitor reconstrói a vida cronologicamente — fluxo natural de leitura.
+
+## §7 Carências Funcionais — NOME DA CARÊNCIA primeiro, não categoria
+
+Cada bullet COMEÇA pelo NOME ESPECÍFICO da carência:
+
+  ✅ "**Cardo-mariano (silimarina)** — ..."
+  ✅ "**Magnésio glicinato (300-400mg/dia)** — ..."
+  ✅ "**Complexo B ativado (B6/B9/B12 metilados)** — ..."
+  ❌ "**Suporte hepático e biliar** — considere cardo-mariano..."
+  ❌ "**Suporte renal-eliminatório** — chás de cavalinha..."
+
+Formato unificado por bullet:
+  **Nome específico (forma/dose se aplicável)** — sinal/correlação
+  visual nesta íris — lab a investigar — observação clínica relevante.
+
+ANTI-REDUNDÂNCIA: cada item entrega valor ÚNICO. Se Cardo-mariano
+está em §7, NÃO repete em §11.fitoterapia — escolha onde faz mais
+sentido (§7 = laboratorial/suplementação; §11.fitoterapia = tradição
+herbal de suporte). Vale o oposto também.
+
+Liste 5-8 carências priorizadas pelos achados desta íris, ordenadas
+por relevância clínica.
+
+## §11 Sugestões Integrativas — variedade + anti-fórmula
+
+CADA subseção (Nutrição / Fitoterapia / Práticas corporais / Práticas
+contemplativas / Florais / Adaptógenos) emite **3-5 bullets** —
+variável conforme densidade de achados desta íris, NÃO fixo em 3.
+
+**ANTI-FÓRMULA UNIVERSAL — atenção máxima.** As seguintes sugestões
+viraram default em leituras anteriores e DEVEM ser evitadas como
+primeira escolha, exceto se forem comprovadamente a melhor opção
+específica para ESTA íris:
+
+  - Práticas corporais: TRE/Tension Release Exercises — varie com
+    Qi Gong, Trager, Feldenkrais, Tai Chi, swimming, dança somática,
+    Hakomi, body rolling, biodanza
+  - Adaptógenos: trinca Ashwagandha + Reishi + Schisandra — varie
+    com Rhodiola rosea, Eleutero, Tulsi/Holy Basil, Maca, Cordyceps,
+    Codonopsis, Astragalus, Bacopa monnieri
+  - Práticas contemplativas: Escrita catártica + Choro consciente +
+    Expiração 4-8 — varie com meditação somática, contemplação de
+    natureza, oração ativa, prática de presença sensorial,
+    visualização específica, prática de fronteira (boundary), yoga
+    nidra
+  - Florais: "Floral de transição de ciclo" como bullet recorrente —
+    nomeie o floral específico (Walnut, Cherry Plum, Sweet Chestnut,
+    Olive, Pine, Star of Bethlehem, Wild Rose, Centaury, etc) ancorado
+    no padrão observado
+
+**ESPECIFICIDADE OBRIGATÓRIA**: cada bullet ANCORA EXPLICITAMENTE no
+achado desta íris — não sugestão genérica de "bom pra fígado", mas
+"bom pra ESTE padrão hepático com esclera ictérica + sobrecarga
+adrenal simultânea".
+
+**COMPROVAÇÃO**: quando aplicável, indicar evidência clínica ou
+tradicional ("uso tradicional consolidado", "evidência clínica para
+X condição", "estudos em modelos animais", "consenso entre escolas
+de fitoterapia ocidentais"). NÃO invente referências bibliográficas
+específicas.
+
+**ANTI-REPETIÇÃO ENTRE LEITURAS** (alimentado pelo bloco
+\`<relatorios_recentes_deste_terapeuta>\`): se uma sugestão idêntica
+ou variação próxima já apareceu nas últimas leituras (linhas
+\`§11 Nutrição: ...\`, \`§11 Adaptógenos: ...\` etc), REFORMULE com
+âncora visual diferente OU escolha alternativa equivalente. Não
+repita sugestões verbatim entre leituras do mesmo terapeuta.
+`
+
 export interface ComposeStage2Args {
   readingId: string
   therapistId: string
@@ -602,7 +708,7 @@ function buildStage2UserContent(args: ComposeStage2Args): Anthropic.TextBlockPar
   return blocks
 }
 
-export const STAGE2_METHOD_VERSION = 'sonnet_2x_0.2.1' as const
+export const STAGE2_METHOD_VERSION = 'sonnet_2x_0.2.2' as const
 
 // v2.3.0 (2026-05-23): split do STAGE2_METHOD_VERSION em method qualitativo +
 // semver pra alinhar com a convenção nova de report_generations (migration
@@ -630,8 +736,16 @@ export const STAGE2_METHOD_VERSION = 'sonnet_2x_0.2.1' as const
 // substitui por descrição semântica de como construir frase original;
 // (b) EXCLUI "Em poucas palavras" das marcas obrigatórias 1+6
 // (conflito com contrato system.md de zero jargão somático nesse bloco).
+//
+// v2.4.2 (2026-05-24): bump PATCH 0.2.1 → 0.2.2 — calibração estrutural
+// §3/§7/§11 via novo bloco STRUCTURAL_OVERRIDE_V2_4_2 (4º system
+// block). §3 ordem crescente obrigatória, §7 nome da carência primeiro
+// (não categoria), §11 anti-fórmula universal (TRE / Ashwagandha+
+// Reishi+Schisandra / Escrita catártica detectadas como defaults em
+// 3/3 UAT). Plus extract-phrases capturando resumo §11 pra alimentar
+// memória inter-leituras (recent-phrases-context). Stage 1 inalterado.
 export const STAGE2_METHOD = 'sonnet_2x' as const
-export const STAGE2_VERSION = '0.2.1' as const
+export const STAGE2_VERSION = '0.2.2' as const
 
 /**
  * Etapa 2 do pipeline Sonnet 2x — composição streaming ancorada no JSON
@@ -670,6 +784,12 @@ export async function analyzeReadingComposeStage2(
         // cache na primeira pesa, sobrescrever invalida. Após estabilizar
         // pós-UAT, candidate a virar cached.
         { type: 'text', text: VOICE_OVERRIDE_V2_4 },
+        // v2.4.2 (2026-05-24): calibração estrutural §3/§7/§11.
+        // Separado do VOICE pra responsabilidade clara: VOICE = como
+        // (registro/cadência); STRUCTURAL = o quê (ordem/formato/
+        // anti-fórmula). Mesmo motivo de SEM cache_control — em UAT
+        // ainda, sujeito a iteração rápida.
+        { type: 'text', text: STRUCTURAL_OVERRIDE_V2_4_2 },
       ],
       messages: [{ role: 'user', content: userContent }],
     },

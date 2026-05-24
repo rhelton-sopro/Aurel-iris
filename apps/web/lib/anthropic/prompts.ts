@@ -51,12 +51,17 @@ let _systemVersionCache: string | null = null
  *     antes de pedir colo" verbatim em "Em poucas palavras"). Remove
  *     exemplos prontos + exclui Em poucas palavras das marcas
  *     obrigatórias (contrato próprio no system.md, sem corpo/jargão).
+ *   - `sonnet_2x_0.2.2` (v2.4.2, 2026-05-24) = calibração estrutural via
+ *     STRUCTURAL_OVERRIDE_V2_4_2 (4º system block). §3 ordem crescente,
+ *     §7 nome da carência primeiro, §11 anti-fórmula universal +
+ *     anti-repetição entre leituras (alimentado por extract-phrases
+ *     capturando resumo §11 + recent-phrases-context).
  *
  * Persistido em `report_findings.method_version` e
  * `report_generations.method_version` pra atribuir variação de
  * qualidade/custo a mudanças arquiteturais vs cirurgias no prompt.
  */
-export const METHOD_VERSION = 'sonnet_2x_0.2.1' as const
+export const METHOD_VERSION = 'sonnet_2x_0.2.2' as const
 
 const PROMPTS_DIR = path.join(process.cwd(), 'prompts')
 

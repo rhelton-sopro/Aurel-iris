@@ -34,12 +34,23 @@ const RECENT_PHRASES_LIMIT = 10
  * Forma esperada do campo `phrases` em report_phrases.
  * Espelha o output de extract-phrases.ts:ExtractedPhrases.
  */
+interface SugestoesResumoPayload {
+  nutricao?: string[]
+  fitoterapia?: string[]
+  praticas_corporais?: string[]
+  praticas_contemplativas?: string[]
+  florais?: string[]
+  adaptogenos?: string[]
+}
+
 interface PhrasesPayload {
   sintese_inicial?: string[]
   abertura_secao_10?: string[]
   abertura_secao_14?: string[]
   perfil_secao_15?: string
   em_poucas_palavras?: string
+  /** v2.4.2 (2026-05-24): resumo §11 — anti-repetição de sugestões integrativas. */
+  sugestoes_integrativas_resumo?: SugestoesResumoPayload
 }
 
 interface RecentPhrasesRow {
@@ -148,6 +159,26 @@ function formatOneRelatorio(
   }
   if (p.em_poucas_palavras) {
     lines.push(`Em poucas palavras: "${p.em_poucas_palavras}"`)
+  }
+  // v2.4.2: anti-repetição §11 — lista compacta das sugestões já dadas
+  // pra que próxima Stage 2 escolha alternativas equivalentes em vez
+  // de repetir TRE / Ashwagandha+Reishi+Schisandra / Escrita catártica
+  // como fórmulas universais (founder pattern observed em 3/3 UAT).
+  const sugestoes = p.sugestoes_integrativas_resumo
+  if (sugestoes) {
+    const subsecaoLine = (label: string, items?: string[]): string | null => {
+      if (!items || items.length === 0) return null
+      return `§11 ${label}: ${items.join(' | ')}`
+    }
+    const sugestoesLines = [
+      subsecaoLine('Nutrição', sugestoes.nutricao),
+      subsecaoLine('Fitoterapia', sugestoes.fitoterapia),
+      subsecaoLine('Práticas corporais', sugestoes.praticas_corporais),
+      subsecaoLine('Práticas contemplativas', sugestoes.praticas_contemplativas),
+      subsecaoLine('Florais', sugestoes.florais),
+      subsecaoLine('Adaptógenos', sugestoes.adaptogenos),
+    ].filter((l): l is string => l !== null)
+    lines.push(...sugestoesLines)
   }
   return lines.join('\n')
 }

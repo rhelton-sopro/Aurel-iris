@@ -26,6 +26,16 @@
  */
 import 'server-only'
 
+export interface SugestoesResumo {
+  /** Primeiros tokens (nome/título) dos bullets de cada subseção §11 */
+  nutricao: string[]
+  fitoterapia: string[]
+  praticas_corporais: string[]
+  praticas_contemplativas: string[]
+  florais: string[]
+  adaptogenos: string[]
+}
+
 export interface ExtractedPhrases {
   /** 3 primeiras frases da §1 ### Síntese inicial */
   sintese_inicial: string[]
@@ -37,6 +47,15 @@ export interface ExtractedPhrases {
   perfil_secao_15: string
   /** Conteúdo inteiro do bloco `## Em poucas palavras` */
   em_poucas_palavras: string
+  /**
+   * v2.4.2 (2026-05-24): resumo condensado das 6 subseções de §11.
+   * Apenas os "nomes/títulos" dos bullets — não a descrição inteira —
+   * pra alimentar memória inter-leituras (recent-phrases-context) e
+   * permitir que próxima Stage 2 evite repetir as mesmas sugestões.
+   * Founder identificou TRE / Ashwagandha+Reishi+Schisandra / Escrita
+   * catártica como fórmulas universais em 3/3 leituras UAT.
+   */
+  sugestoes_integrativas_resumo: SugestoesResumo
 }
 
 /**
@@ -69,9 +88,96 @@ export function extractPhrases(
     ),
     perfil_secao_15: blockAfter(markdown, /^### 🧭 Perfil e Temperamento\s*$/m),
     em_poucas_palavras: blockAfter(markdown, /^## Em poucas palavras\s*$/m),
+    sugestoes_integrativas_resumo: extractSugestoesResumo(markdown),
   }
 
   return scrubPii(raw, clientName)
+}
+
+/**
+ * v2.4.2 — Extrai resumo das 6 subseções §11 pra alimentar anti-repetição.
+ * Captura SÓ o "nome/título" (primeiros tokens antes do `—` em-dash) de
+ * cada bullet — não a descrição inteira. Mantém o resumo compacto
+ * (~50 chars por bullet, ~600 chars por leitura) pra não inflar o
+ * recent-phrases-context em 10+ leituras acumuladas.
+ *
+ * Heurística regex:
+ *   - Localiza `## 11.` → próximo `## ` define limite
+ *   - Dentro de §11: mapeia 6 subseções por seu heading H3
+ *   - Cada bullet começa com `- ` (com ou sem `**bold**`)
+ *   - Extrai texto até o primeiro `—` (em-dash) OU fim da linha
+ *   - Tira markdown emphasis (**, _) + parênteses qualificadores no fim
+ */
+export function extractSugestoesResumo(markdown: string): SugestoesResumo {
+  const empty: SugestoesResumo = {
+    nutricao: [],
+    fitoterapia: [],
+    praticas_corporais: [],
+    praticas_contemplativas: [],
+    florais: [],
+    adaptogenos: [],
+  }
+
+  // Isola o bloco §11 (do heading até próximo `## ` de nível 2)
+  const lines = markdown.split('\n')
+  const startIdx = lines.findIndex(l => /^## 11\./.test(l))
+  if (startIdx === -1) return empty
+  let endIdx = lines.length
+  for (let i = startIdx + 1; i < lines.length; i++) {
+    if (/^## /.test(lines[i])) {
+      endIdx = i
+      break
+    }
+  }
+  const block = lines.slice(startIdx, endIdx)
+
+  // Mapa heading H3 → key do schema. Tolerante a variações (acentos,
+  // case, espaços), porque Sonnet pode formatar levemente diferente.
+  const SUBSECTION_PATTERNS: Array<{ re: RegExp; key: keyof SugestoesResumo }> = [
+    { re: /^###\s+Nutri[çc][ãa]o\s*$/i, key: 'nutricao' },
+    { re: /^###\s+Fitoterapia(\s+tradicional)?\s*$/i, key: 'fitoterapia' },
+    { re: /^###\s+Pr[áa]ticas\s+corporais\s*$/i, key: 'praticas_corporais' },
+    { re: /^###\s+Pr[áa]ticas\s+contemplativas\s*$/i, key: 'praticas_contemplativas' },
+    { re: /^###\s+Florais\s*$/i, key: 'florais' },
+    { re: /^###\s+Adapt[óo]genos\s*$/i, key: 'adaptogenos' },
+  ]
+
+  const result: SugestoesResumo = { ...empty, nutricao: [], fitoterapia: [],
+    praticas_corporais: [], praticas_contemplativas: [], florais: [], adaptogenos: [] }
+  let currentKey: keyof SugestoesResumo | null = null
+
+  for (const line of block) {
+    // Detecta troca de subseção
+    const match = SUBSECTION_PATTERNS.find(p => p.re.test(line))
+    if (match) {
+      currentKey = match.key
+      continue
+    }
+    if (currentKey === null) continue
+    // Bullet: linha começa com `- ` (após trim opcional)
+    const bulletMatch = line.match(/^\s*-\s+(.+)$/)
+    if (!bulletMatch) continue
+    const head = extractBulletHead(bulletMatch[1])
+    if (head.length > 0) result[currentKey].push(head)
+  }
+
+  return result
+}
+
+/**
+ * Pega o "nome/título" do bullet — texto até o primeiro em-dash, sem
+ * markdown emphasis, sem parênteses qualificadores no final. Limita
+ * a 80 chars pra evitar bullets gigantes inflar a memória.
+ */
+function extractBulletHead(raw: string): string {
+  // Texto antes do primeiro — ou – (em-dash / en-dash)
+  const cleaned = raw.split(/[—–]/)[0]
+    .replace(/\*\*/g, '')         // remove bold
+    .replace(/_+/g, '')           // remove underscores
+    .replace(/`/g, '')            // remove code ticks
+    .trim()
+  if (cleaned.length === 0) return ''
+  return cleaned.length > 80 ? `${cleaned.slice(0, 77)}…` : cleaned
 }
 
 /**
@@ -110,6 +216,17 @@ function scrubPii(
     abertura_secao_14: phrases.abertura_secao_14.map(replace),
     perfil_secao_15: replace(phrases.perfil_secao_15),
     em_poucas_palavras: replace(phrases.em_poucas_palavras),
+    // §11 resumo é só nomes de itens (vitaminas, plantas, práticas) —
+    // baixa chance de conter nome do cliente, mas aplicamos scrub
+    // por defesa em profundidade.
+    sugestoes_integrativas_resumo: {
+      nutricao: phrases.sugestoes_integrativas_resumo.nutricao.map(replace),
+      fitoterapia: phrases.sugestoes_integrativas_resumo.fitoterapia.map(replace),
+      praticas_corporais: phrases.sugestoes_integrativas_resumo.praticas_corporais.map(replace),
+      praticas_contemplativas: phrases.sugestoes_integrativas_resumo.praticas_contemplativas.map(replace),
+      florais: phrases.sugestoes_integrativas_resumo.florais.map(replace),
+      adaptogenos: phrases.sugestoes_integrativas_resumo.adaptogenos.map(replace),
+    },
   }
 }
 
