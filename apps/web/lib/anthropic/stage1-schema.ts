@@ -392,6 +392,92 @@ function checkCampoZonaCoherence(
   )
 }
 
+// ============================================================
+// PIGMENTO ÂMBAR PAIRING (v2.5.3 F4 — modo warning)
+// ============================================================
+
+/**
+ * Detecta achados `pigmento_amber` órfãos — sem sistema-órgão pareado
+ * em zona compatível no mesmo olho. Causa raiz típica: Sonnet vê
+ * pigmento âmbar mas escolhe o campo cromático genérico em vez de
+ * pesquisar qual sistema-órgão do glossário cobre a zona observada.
+ *
+ * Modo warning (não rejeita) — popula `coherence_warning` no achado +
+ * loga estruturado. Stage 2 lê via JSON e pode contextualizar.
+ *
+ * Heurística de pareamento espacial: para cada achado pigmento_amber,
+ * verifica se existe OUTRO achado de sistema-órgão (não pigmento_amber,
+ * campo presente em KNOWN_CAMPOS, com zona horária no glossário) cuja
+ * descricao_visual menciona horas que se intersectam com as horas
+ * mencionadas em pigmento_amber.descricao_visual no MESMO olho.
+ *
+ * Se não há pareamento → warning sugerindo emitir sistema-órgão
+ * correspondente à zona do pigmento.
+ *
+ * Mantém TODO F5: pós-UAT, se pigmento_amber órfão se repetir em
+ * Carol/Evanilce, F5 promove a regra "pigmento_amber SEMPRE pareado
+ * com sistema-órgão" de warning pra rejeição strict no schema.
+ */
+
+const EYE_TOKENS = {
+  OD: /\b(OD|olho\s+direito)\b/iu,
+  OE: /\b(OE|olho\s+esquerdo)\b/iu,
+} as const
+
+function describesEye(text: string, eye: 'OD' | 'OE'): boolean {
+  return EYE_TOKENS[eye].test(text)
+}
+
+function checkPigmentoAmberPairing(
+  achados: ReadonlyArray<{
+    campo: string
+    descricao_visual: string
+    lateralidade: string
+    coherence_warning?: string | null
+  }>,
+): Array<{ index: number; warning: string }> {
+  const warnings: Array<{ index: number; warning: string }> = []
+  for (let i = 0; i < achados.length; i++) {
+    const a = achados[i]!
+    if (a.campo !== 'pigmento_amber') continue
+
+    const horasPigmento = extractHoras(a.descricao_visual)
+    const eyesPigmento: Array<'OD' | 'OE'> = []
+    if (describesEye(a.descricao_visual, 'OD')) eyesPigmento.push('OD')
+    if (describesEye(a.descricao_visual, 'OE')) eyesPigmento.push('OE')
+    if (eyesPigmento.length === 0 && a.lateralidade === 'unilateral_OD') eyesPigmento.push('OD')
+    if (eyesPigmento.length === 0 && a.lateralidade === 'unilateral_OE') eyesPigmento.push('OE')
+
+    // Procura sistema-órgão pareado: outro achado, campo ≠ pigmento_amber,
+    // que mencione hora intersectando + mesmo olho na descrição.
+    const hasPaired = achados.some((other, j) => {
+      if (j === i) return false
+      if (other.campo === 'pigmento_amber') return false
+      if (!CAMPO_ZONA_MAP.has(other.campo)) return false // só sistema-órgão com zona
+      const horasOther = extractHoras(other.descricao_visual)
+      const horaMatch = horasOther.some((h) => horasPigmento.includes(h))
+      if (!horaMatch) return false
+      if (eyesPigmento.length === 0) return true // sem info de olho, hora basta
+      const eyeMatch = eyesPigmento.some((e) => describesEye(other.descricao_visual, e))
+      return eyeMatch
+    })
+
+    if (!hasPaired) {
+      warnings.push({
+        index: i,
+        warning:
+          `F4: pigmento_amber sem sistema-órgão pareado em zona ` +
+          `compatível${eyesPigmento.length > 0 ? ` (olhos: ${eyesPigmento.join(', ')})` : ''}` +
+          `${horasPigmento.length > 0 ? ` (horas: ${horasPigmento.join(',')})` : ''}. ` +
+          `Considere emitir achado adicional do sistema-órgão do glossário ` +
+          `cuja zona canônica cobre essa região (ex: tireoide em 10-11h OD, ` +
+          `pancreas em 7-8h OE, intestino_grosso na periferia, etc).`,
+      })
+    }
+  }
+  return warnings
+}
+
 export type ValidationOutcome =
   | {
       status: 'valid' | 'valid_with_warnings'
@@ -495,6 +581,24 @@ export function validateExameIridologico(input: unknown): ValidationOutcome {
       })
       coherenceWarnings++
     }
+  }
+
+  // v2.5.3 F4: pigmento_amber órfão (sem sistema-órgão pareado em zona
+  // compatível) recebe warning anexado ao coherence_warning. Modo warning
+  // não rejeita — Stage 2 vê via JSON e contextualiza. TODO F5: se UAT
+  // mostrar pigmento_amber órfão recorrente, promover a rejeição strict.
+  const pairingWarnings = checkPigmentoAmberPairing(exame.achados_de_atencao)
+  for (const pw of pairingWarnings) {
+    const a = exame.achados_de_atencao[pw.index]!
+    a.coherence_warning = a.coherence_warning
+      ? `${a.coherence_warning} | ${pw.warning}`
+      : pw.warning
+    coherenceWarnings++
+    console.info({
+      event: 'stage1_f4_pigmento_amber_orfao',
+      campo: a.campo,
+      warning: pw.warning,
+    })
   }
   if (coherenceWarnings > 0) {
     console.info({
