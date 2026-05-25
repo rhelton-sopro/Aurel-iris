@@ -177,3 +177,47 @@ describe('extractSugestoesResumo (v2.4.2)', () => {
     expect(r.sugestoes_integrativas_resumo.adaptogenos).toContain('Ashwagandha (KSM-66 ou raiz)')
   })
 })
+
+describe('extractPhrases — em_poucas_palavras heading (v2.8.4 regression)', () => {
+  // v2.7.1 numerou o heading do §0 para `## 0. Em poucas palavras`. O regex
+  // antigo `/^## Em poucas palavras\s*$/m` parou de casar e o campo ficou
+  // VAZIO em 100% das extrações pós-v2.7.1 (confirmado empiricamente N=10
+  // em report_phrases entre 18:01-23:42 UTC de 2026-05-25). Esse vazamento
+  // derrubou a anti-repetição §0 entre leituras.
+  it('casa o heading numerado pós-v2.7.1 `## 0. Em poucas palavras`', () => {
+    const md = `## 1. Foo
+
+Bar.
+
+## 0. Em poucas palavras
+
+Você filtrou o que chegava antes que chegasse.
+
+E foi deixando de se incluir na conta.
+
+---
+
+## 2. Mapa Orgânico
+
+Baz.`
+    const r = extractPhrases(md)
+    expect(r.em_poucas_palavras).toContain('Você filtrou o que chegava antes que chegasse.')
+    expect(r.em_poucas_palavras).toContain('E foi deixando de se incluir na conta.')
+  })
+
+  it('mantém compatibilidade com heading legado `## Em poucas palavras` (sem `0.`)', () => {
+    const md = `## 1. Foo
+
+Bar.
+
+## Em poucas palavras
+
+Frase legada pré-v2.7.1.
+
+---
+
+## 2. Baz`
+    const r = extractPhrases(md)
+    expect(r.em_poucas_palavras).toContain('Frase legada pré-v2.7.1.')
+  })
+})

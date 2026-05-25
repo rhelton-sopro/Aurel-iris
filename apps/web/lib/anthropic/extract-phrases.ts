@@ -87,7 +87,12 @@ export function extractPhrases(
       2,
     ),
     perfil_secao_15: blockAfter(markdown, /^### 🧭 Perfil e Temperamento\s*$/m),
-    em_poucas_palavras: blockAfter(markdown, /^## Em poucas palavras\s*$/m),
+    // v2.8.4 (2026-05-25): tolera prefixo `0.` introduzido em v2.7.1 quando
+    // o heading virou numerado (`## 0. Em poucas palavras`). Sem o `0.\s+`
+    // opcional o regex parou de casar em v2.7.1+ e `em_poucas_palavras`
+    // ficou vazio em 100% das extrações pós-v2.7.1 — derrubando silenciosamente
+    // a anti-repetição §0 entre leituras (confirmado empiricamente N=10).
+    em_poucas_palavras: blockAfter(markdown, /^##\s+(?:0\.\s+)?Em poucas palavras\s*$/m),
     sugestoes_integrativas_resumo: extractSugestoesResumo(markdown),
   }
 

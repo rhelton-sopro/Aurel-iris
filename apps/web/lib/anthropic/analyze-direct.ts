@@ -2283,7 +2283,7 @@ export const STAGE2_METHOD = 'sonnet_2x' as const
 // vinculante (v2.8.1), anti-manifestações inventadas (v2.8.1), voz
 // 2ª pessoa (v2.8.0+v2.8.1), repertório órgão→processo (v2.8.0),
 // tireoide≠cervical (v2.8.0), Stage 1 (intocado desde v2.7.0).
-export const STAGE2_VERSION = '0.6.3' as const
+export const STAGE2_VERSION = '0.6.4' as const
 
 /**
  * Etapa 2 do pipeline Sonnet 2x — composição streaming ancorada no JSON
