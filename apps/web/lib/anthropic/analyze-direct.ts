@@ -2239,7 +2239,32 @@ export const STAGE2_METHOD = 'sonnet_2x' as const
 // NÃO mexido: ANCHORING v2.7.0, cache_control 4 breakpoints
 // (v2.7.3), §7 disclaimer (v2.7.4), repertório órgão→processo
 // (v2.8.0), regra global de voz no system.md (v2.8.0).
-export const STAGE2_VERSION = '0.6.1' as const
+// v2.8.2 (2026-05-25): bump PATCH 0.6.1 → 0.6.2 — fix v2.8.1 INCOMPLETO.
+//
+// Cristiane regen=3 v0.6.1 emitiu 3 itens INVENTADOS em §2 ("Campo do
+// fígado", "Eixo adrenal", "Coroa externa") + omitiu 2 reais do Stage 1
+// (estomago, pigmento_amber como item próprio). v2.8.1 tinha "1 achado
+// ATIVO = 1 item separado" mas não fechou anti-invenção — Sonnet usou
+// conhecimento clínico próprio pra "completar o quadro" inventando
+// sistemas que Stage 1 não viu.
+//
+// Fix v2.8.2: REGRAS RÍGIDAS v2.8.1 substituídas por v2.8.2 com 5
+// regras + princípio raiz + auto-checagem obrigatória. Resumo:
+//
+// 1. 1 achado ATIVO = 1 item separado (mantém v2.8.1)
+// 2. NOVO: Quantidade EXATA — §2 Cat A emite EXATAMENTE N itens onde
+//    N = count(achados ATIVOS Stage 1). Nem mais, nem menos.
+// 3. NOVO: Nome do item reflete o `campo` Stage 1 literal — sem
+//    reclassificar (pigmento_amber em zona estômago NÃO vira "Fígado")
+// 4. observacao_qualifying é VINCULANTE (mantém v2.8.1)
+// 5. PROIBIDO inventar manifestações (mantém v2.8.1)
+// + Auto-checagem obrigatória antes de emitir cada item
+//
+// Tech debt registrado em paralelo: Stage 1 variabilidade
+// não-determinística (memory project_stage1_variability_tech_debt).
+// Stage 1 intocado desde v2.7.0 — variabilidade é do modelo, não
+// de mudanças nossas. Mitigação prio #1 (top_p: 0) adiada.
+export const STAGE2_VERSION = '0.6.2' as const
 
 /**
  * Etapa 2 do pipeline Sonnet 2x — composição streaming ancorada no JSON

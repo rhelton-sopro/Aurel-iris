@@ -746,35 +746,63 @@ aguda_recente, em_reorganizacao_ativa, herdada_constitucional) viram
 linha aqui — **sem omissão**. Ordem: prioridade visual, o mais
 expressivo primeiro.
 
-**REGRAS RÍGIDAS v2.8.1 — anti-fusão / anti-invenção (3):**
+**REGRAS RÍGIDAS v2.8.2 — anti-fusão / anti-invenção / fidelidade EXATA (5):**
 
-1. **Um achado ATIVO = um item separado**. Se o Stage 1 emitiu 5
-   achados ATIVOS distintos (cada um com seu campo, intensidade,
-   lateralidade e zona próprios), §2 Categoria A DEVE emitir 5 itens
-   separados — **PROIBIDO fundir 2 ou mais achados num único item**
-   ("Sistema circulatório e eixo hepático" combinando 3 achados é
-   violação). Cada achado merece seu próprio bullet com seu ícone,
-   seu nome, e seus parágrafos.
+> **Princípio raiz (v2.8.2)**: `achados_de_atencao` do Stage 1 é a
+> ÚNICA fonte. §2 Categoria A **NÃO pode emitir itens além do que
+> está no Stage 1**, NÃO pode omitir itens que estão no Stage 1, NÃO
+> pode reclassificar zonas, NÃO pode renomear campos pra sistemas
+> clínicos "esperados". Se Stage 1 não tem `figado_vesicula`, §2 NÃO
+> pode ter "Campo do fígado e vesícula". Se Stage 1 não tem `adrenal`,
+> §2 NÃO pode ter "Eixo adrenal". Mesmo que clinicamente faça sentido
+> "esperar" esses sistemas dado o quadro, **se Stage 1 não viu, §2 não
+> emite**. Sonnet NÃO usa conhecimento clínico próprio pra "completar
+> o quadro" — Stage 1 é o que existe nesta leitura.
 
-2. **`observacao_qualifying` do Stage 1 é VINCULANTE**. Quando o
-   Stage 1 escreve, por exemplo, "Pigmento em 10-11h OD corresponde
-   à zona cervical-tireoidiana, NÃO à zona hepática clássica" — você
-   NÃO pode classificar esse achado como hepatobiliar em §2.
-   `observacao_qualifying` carrega a interpretação clínica precisa
-   do Stage 1 sobre o que aquele achado é (e o que NÃO é). Respeite
-   literalmente — é o anti-distorção do pipeline.
+1. **Um achado ATIVO = um item separado, sem fusão**. Se Stage 1
+   emitiu 5 achados ATIVOS distintos, §2 Categoria A emite **5 itens
+   separados** — proibido fundir 2 ou mais num único.
 
-3. **PROIBIDO inventar manifestações sintomáticas sem âncora no
-   Stage 1**. Se o Stage 1 não menciona "pele com tonalidade
-   alterada", você NÃO pode adicionar isso em §2 como sintoma
-   correlacionado. Manifestações clínicas só são citáveis quando:
-   (a) o achado Stage 1 sustenta diretamente (ex: vascularização
-   escleral → "vasos visíveis na esclera"); OU (b) `observacao_qualifying`
-   nomeia explicitamente; OU (c) é hipótese investigativa generalizada
-   da escola integrativa (ex: "vale correlacionar com hábito de sono"
-   — investigação, não diagnóstico). Sintomas específicos inventados
-   ("pele alterada", "digestão lenta", "cansaço que não melhora")
-   sem âncora viram **Forer sintomático** — proibido.
+2. **Quantidade EXATA**. §2 Categoria A emite EXATAMENTE N itens onde
+   N = `count(achados_de_atencao com natureza != 'indeterminada')`.
+   Nem mais, nem menos. Achados indeterminados vão pra A.5, não A.
+
+3. **Nome do item reflete o `campo` do Stage 1**. Cada item de §2
+   Categoria A tem nome derivado literal do `campo` correspondente
+   do Stage 1. Tradução léxica permitida (ex: `vascularizacao_escleral`
+   → "Vascularização escleral / sistema vascular periférico"), MAS
+   sem reclassificar pra sistema diferente (`pigmento_amber` em zona
+   estômago/diafragma NÃO vira "Campo do fígado"; `boca_garganta`
+   NÃO vira "Eixo cervical-tireoidiano"). O `campo` Stage 1 + a
+   `observacao_qualifying` definem qual sistema.
+
+4. **`observacao_qualifying` é VINCULANTE**. Quando Stage 1 escreve
+   "Pigmento em 1-2h OD = setor estômago/diafragma, NÃO hepática" —
+   §2 NÃO classifica como hepático. Quando Stage 1 escreve "NÃO
+   classificado como figado_vesicula" — §2 NÃO emite item de fígado.
+   `observacao_qualifying` carrega a interpretação clínica PRECISA
+   do Stage 1, é anti-distorção.
+
+5. **PROIBIDO inventar manifestações sintomáticas sem âncora**. Se
+   Stage 1 não menciona "pele alterada" / "bile espessa" / "intolerância
+   a álcool", §2 NÃO pode incluir. Manifestações só são citáveis
+   quando: (a) achado Stage 1 sustenta diretamente, (b) `observacao_qualifying`
+   nomeia, (c) hipótese investigativa generalizada SEM nome de sintoma
+   ("vale correlacionar com hábito de sono" ≠ "tendência a insônia").
+   Sintomas específicos inventados viram **Forer sintomático** —
+   proibido.
+
+**Auto-checagem antes de emitir §2 Categoria A (v2.8.2 — obrigatória):**
+
+Antes de emitir cada item de §2 Categoria A, verifique:
+- O `campo` deste item EXISTE em `achados_de_atencao` ATIVOS do
+  Stage 1? Se NÃO → REMOVA o item.
+- O número de itens emitidos = número de achados ATIVOS no Stage 1?
+  Se DIFERENTE → AJUSTE (remova inventados / adicione omitidos).
+- Algum item RENOMEIA o sistema de forma a contradizer `observacao_qualifying`?
+  Se SIM → CORRIJA usando o nome do `campo` literal do Stage 1.
+- Alguma manifestação clínica citada NÃO tem âncora direta em
+  `descricao_visual` ou `observacao_qualifying`? Se SIM → REMOVA.
 
 Linguagem direta tipo "fígado sob carga", "tireoide pede investigação",
 "sistema digestivo com tendência a sobrecarga inflamatória", "rim com
