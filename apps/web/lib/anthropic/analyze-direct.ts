@@ -2034,10 +2034,14 @@ export const STAGE2_METHOD = 'sonnet_2x' as const
 // NÃO mexido: ANCHORING_PRINCIPLE_V2_5 conteúdo (só adicionado
 // cache_control), pupila demoção (v2.7.0), §2 A.5 mappings, §0 heading
 // numerado (v2.7.0/1), system.md Plan 35 reform (v2.7.1), parser/UI.
-// v2.7.3 (2026-05-25): HOTFIX bump PATCH 0.5.2 → 0.5.3 — fix erro 400
-// Anthropic causado por v2.7.2. Detalhes completos no comentário do
-// system: [...] acima. Stage 2 falhava silenciosamente desde deploy v2.7.2.
-export const STAGE2_VERSION = '0.5.3' as const
+// v2.7.4 (2026-05-25): bump PATCH 0.5.3 → 0.5.4 — §7 ganha parágrafo
+// de abertura OBRIGATÓRIO com disclaimer literal de investigação
+// laboratorial. Antes o disclaimer estava só descrito embedded no
+// prompt ("...com disclaimer explícito sempre que aplicável: ...") —
+// Sonnet emitia inconsistentemente. v2.7.4 manda emitir o parágrafo
+// literal como primeiro bloco de §7. Founder: "tinha um disclaimer...
+// é bom colocar". Zero outras mudanças.
+export const STAGE2_VERSION = '0.5.4' as const
 
 /**
  * Etapa 2 do pipeline Sonnet 2x — composição streaming ancorada no JSON

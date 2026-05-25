@@ -1242,10 +1242,13 @@ pessoal — veja §3."
 ## 7. Carências Funcionais
 
 Possibilidades nutricionais/bioquímicas sugeridas pela íris. **Educacional
-apenas**, com disclaimer explícito sempre que aplicável: "confirmar com
-exames laboratoriais antes de qualquer suplementação". NÃO prescreva
-dosagem. NÃO recomende marca. Linguagem de **abertura para investigação
-laboratorial**, não de prescrição.
+apenas**. NÃO prescreva dosagem. NÃO recomende marca. Linguagem de
+**abertura para investigação laboratorial**, não de prescrição.
+
+**Parágrafo de abertura OBRIGATÓRIO** (v2.7.4 — emita LITERAL como
+primeiro parágrafo de §7, antes dos bullets de carências):
+
+> As áreas identificadas nesta leitura sugerem abertura para investigação das seguintes carências funcionais. Confirmar com exames laboratoriais antes de qualquer suplementação.
 
 **Cobertura A.5 em §7 (v2.7.0):** Quando §2 tem Categoria A.5 com
 eixos neuroendócrinos obscurecidos, §7 deve incluir cofatores
