@@ -146,7 +146,26 @@ const STAGE1_PROMPT_FILENAME = 'stage1-scan.md'
 //   Glossário: "Pigmento âmbar" adicionado literal ao sinal_carga de
 //       pancreas (antes só figado_vesicula tinha — Sonnet caía em fígado
 //       por afinidade textual mesmo em zona pancreática).
-const STAGE1_METHOD_VERSION = 'sonnet_2x_0.2.2' as const
+//
+// v2.6.0 (2026-05-25): bump MINOR 0.2.2 → 0.3.0 — padrao_pupilar +
+// motivo_indeterminacao. Motivado por Cristiane regen=7 (midríase ~75%
+// obscurecendo 3 eixos pericentrais que ficavam silenciados em §2
+// Categoria C). Mudanças:
+//   1. padrao_pupilar como achado de primeira classe no glossário
+//      (grupo estrutura_iridologica). Emite quando pupila for
+//      clinicamente significativa (midríase sustentada >70%, miose
+//      marcada <30%, assimetria >15%, irregularidade de borda).
+//      OPCIONAL — não emitir em toda leitura, só quando expressivo.
+//   2. Atributo motivo_indeterminacao em AchadoSchema
+//      ('obscurecimento_estrutural' vs 'limitacao_tecnica'). Aplica
+//      quando natureza_da_carga='indeterminada'. Stage 2 roteia
+//      conforme valor: A.5 (estrutural) ou C (técnica).
+//   3. checkObscurecimentoStrutural — validator warning: quando achado
+//      é indeterminada com motivo='obscurecimento_estrutural', a
+//      estrutura obscurecedora (via OBSCURECIMENTO_MAP) deve estar
+//      registrada como achado ATIVO. Modo warning não rejeita —
+//      coherence_warning + log.
+const STAGE1_METHOD_VERSION = 'sonnet_2x_0.3.0' as const
 
 let _stage1PromptCache: string | null = null
 let _stage1ShaCache: string | null = null

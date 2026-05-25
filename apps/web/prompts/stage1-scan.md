@@ -322,6 +322,73 @@ indeterminada            — sinal visual ambíguo; classificação forçada
 `indeterminada` a "chutar" entre crônica e aguda quando a estrutura
 visual não permite distinguir.
 
+## Motivo da indeterminação — `motivo_indeterminacao` (v2.6.0)
+
+Quando emitir um achado com `natureza_da_carga='indeterminada'`,
+você DEVE também preencher o atributo `motivo_indeterminacao`
+explicando POR QUÊ a leitura ficou indeterminada. 2 valores possíveis:
+
+```
+obscurecimento_estrutural — a causa do obscurecimento TEM leitura
+                            iridológica própria (midríase sustentada
+                            obscurece collarete + zona pericentral;
+                            opacidade obscurece setor periférico;
+                            etc). A estrutura obscurecedora DEVE
+                            estar registrada como achado ATIVO em
+                            outro campo (geralmente padrao_pupilar
+                            ATIVO).
+
+limitacao_tecnica         — foto desfocada, mal iluminada, olho
+                            fechado, ou outra limitação técnica
+                            sem leitura clínica possível. Nem o
+                            eixo nem a causa têm sinal disponível.
+```
+
+**Roteamento downstream:** Stage 2 usa esse atributo pra rotear:
+- `obscurecimento_estrutural` → §2 Categoria A.5 ("Sinais que pedem
+  reflexão") com leitura clínica integrativa da causa
+- `limitacao_tecnica` → §2 Categoria C ("Campos não-conclusivos")
+  como nota técnica fria, bloqueada de outras seções
+
+**Regra de coerência:** se você marca um eixo como `indeterminada`
+com `motivo='obscurecimento_estrutural'`, a estrutura obscurecedora
+DEVE estar registrada como achado ATIVO em outro campo. Exemplo:
+
+- `eixo_pituitario_adrenal` indeterminada por midríase
+  → `padrao_pupilar` deve estar ATIVO com descricao_visual nomeando
+  a midríase sustentada que obscureceu o collarete.
+
+Sem o achado estrutural ativo correspondente, a indeterminação é
+flutuante (sem causa nomeada) — o validator vai disparar warning.
+
+## Padrão pupilar como achado de primeira classe (v2.6.0)
+
+`padrao_pupilar` (novo campo do glossário, grupo
+estrutura_iridologica) é achado primário quando a pupila for
+clinicamente significativa. Critérios pra emitir como achado ATIVO:
+
+- **Midríase sustentada**: dilatação >70% do diâmetro iridiano
+  em TODAS as 6 fotografias, inclusive sob flash (sob flash a
+  pupila deveria contrair — se não contrai, é sinal estrutural).
+- **Midríase moderada**: dilatação 50-70% sustentada.
+- **Miose marcada**: pupila contraída <30% sustentada.
+- **Assimetria pupilar**: >15% diferença entre OE e OD.
+- **Irregularidade de bordas**: bordas pupilares desorganizadas.
+
+NÃO emita `padrao_pupilar` se a pupila for normal (30-45%, centrada,
+simétrica, bordas regulares) — só quando for achado expressivo.
+
+Importância integrativa: midríase sustentada bilateral é leitura
+iridológica clássica de ativação simpática crônica (escola alemã
+Deck/Angerer). Quando outros eixos pericentrais ficam indeterminados
+pela midríase, padrao_pupilar ATIVO captura o achado clínico que
+estava sendo silenciado.
+
+O estado específico (midriase_sustentada / midriase_moderada /
+miose_sustentada / assimetria_pupilar / irregularidade_borda) vai
+descrito em `descricao_visual` via texto livre — não há enum
+dedicado.
+
 ## Escala de intensidade 1-5 (achados_de_atencao)
 
 Use somente em achados_de_atencao. Critérios visuais formalizados:

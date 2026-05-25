@@ -1129,39 +1129,72 @@ JSON do Stage 1 e organize os campos em **três grupos**:
 
 Este roll call não aparece no output — é raciocínio interno.
 
-## Tratamento de natureza='indeterminada' (regra crítica — v2.5.4)
+## Tratamento de natureza='indeterminada' (regra crítica — v2.6.0)
 
 Quando o Stage 1 marca um achado como \`natureza_da_carga='indeterminada'\`,
-o sinal é **ruído de leitura, não fato clínico**. A interpretação correta
-é: "as imagens não permitiram confirmar nem descartar carga neste eixo".
+verifique o atributo \`motivo_indeterminacao\` pra rotear corretamente:
 
-PROIBIDO:
-- Transformar achado indeterminado em prosa narrativa ou hipótese
-  clínica em §2 Categoria A, §5, §7, §8, §10, §13
-- Tratar como achado leve ("intensidade 2, posso falar de leve")
+### Caso 1 — \`motivo_indeterminacao='obscurecimento_estrutural'\`
+
+A causa do obscurecimento tem leitura clínica iridológica própria
+(midríase sustentada, opacidade obscurecedora). A ESTRUTURA
+OBSCURECEDORA é achado ATIVO em outro campo (geralmente
+\`padrao_pupilar\` ATIVO).
+
+**PERMITIDO (e ESPERADO):** o achado indeterminado VAI pra §2
+**Categoria A.5 (Sinais que pedem reflexão)** com leitura clínica
+integrativa ancorada na causa estrutural. NÃO é Forer porque a
+descrição clínica está ancorada em achado real mensurável
+(padrão pupilar visível nas 6 fotografias).
+
+**CASCATA cross-section:** §5, §7, §8, §10, §11, §13 PODEM e DEVEM
+referenciar os achados de A.5 com honestidade técnica preservada
+(nomear o eixo estrutural visível + reconhecer que o eixo
+específico não foi conclusivamente avaliado). Mapeamento detalhado
+no system.md §2 e em cada seção destino.
+
+**Por quê:** v2.5.4 silenciava esses achados em §2 Categoria C
+(lista fria sem leitura). Empiricamente (Cristiane regen=7 com
+midríase ~75%), os 3 eixos obscurecidos pela pupila são o achado
+EMOCIONALMENTE MAIS RICO da leitura — silenciar criava gap de
+produto vertical IA (vira coaching genérico desidratado).
+
+### Caso 2 — \`motivo_indeterminacao='limitacao_tecnica'\`
+
+A causa é foto desfocada, mal iluminada, ou outra limitação técnica
+sem leitura clínica possível. NÃO há estrutura obscurecedora com
+leitura própria.
+
+**PROIBIDO:**
+- Transformar em prosa narrativa ou hipótese clínica em §2 Categoria
+  A, §2 Categoria A.5, §5, §7, §8, §10, §11, §13
+- Tratar como achado leve
 - Re-interpretar o sinal visual que motivou o "indeterminada" como
-  diagnóstico próprio (ex: usar midríase como sinal de "depleção
-  adrenal" quando o Stage 1 disse que a midríase obscureceu o
-  collarete e impediu a leitura do eixo pit-adrenal)
+  diagnóstico próprio
 
-PERMITIDO:
-- **Listar achado indeterminado APENAS em §2 Categoria C
-  ('Campos não-conclusivos')** com formato fixo de declaração
-  de limitação — lista bullet, NUNCA prosa elaborada, NUNCA
-  hipótese clínica. Ver "regras rígidas Categoria C" no
-  system.md §2.
+**PERMITIDO:**
+- Listar APENAS em §2 **Categoria C ('Campos não-conclusivos')** com
+  formato fixo de declaração de limitação (lista bullet, NUNCA prosa
+  elaborada, NUNCA hipótese clínica).
 - Mencionar UMA VEZ em §12 como nota técnica de investigação
-  laboratorial, citando explicitamente a limitação ("a midríase
-  bilateral acentuada não permitiu confirmar o eixo X — vale
-  investigar se houver sintomatologia compatível")
+  laboratorial.
 
-Evolução vs v2.5.0: a versão anterior dizia "skip global"
-(silêncio absoluto fora de §12). A v2.5.4 introduz Categoria C
-em §2 — silêncio virou transparência. Motivo empírico: Evanilce
-regen=6 teve 3 indeterminados completamente invisíveis no
-relatório, gerando gap de transparência clínica auditável pelo
-terapeuta. Categoria C resolve sem reabrir a porta pra invenção
-(porque é LISTA, não prosa).
+### Caso 3 — \`motivo_indeterminacao\` ausente ou null
+
+Trate como Caso 2 (limitação técnica) por segurança. Não inferir
+obscurecimento estrutural sem o atributo explícito do Stage 1.
+
+### Evolução histórica
+
+- **v2.5.0**: skip global — indeterminados sumiam do relatório.
+- **v2.5.4**: Categoria C nomeada — silêncio virou transparência via
+  lista fria.
+- **v2.6.0**: Categoria A.5 nova com leitura clínica integrativa pros
+  indeterminados causados por obscurecimento estrutural. Categoria C
+  reservada exclusivamente pra limitação técnica. Motivo empírico:
+  Cristiane regen=7 com midríase ~75% — 3 eixos invisíveis na
+  Categoria C eram o achado emocionalmente mais rico, sendo
+  silenciados como ruído quando deveriam ser narrados como sinal.
 
 ## Cross-section coherence (§2 é o gate)
 
@@ -1708,6 +1741,47 @@ export const STAGE2_METHOD_VERSION = 'sonnet_2x_0.2.2' as const
 // aprendeu" — Carol "Alguém que aprendeu a manter o peito aberto",
 // Evanilce "Alguém que aprendeu cedo que segurar era mais seguro".
 //
+// v2.6.0 (2026-05-25): bump MINOR 0.3.6 → 0.4.0 — Categoria A.5 nova
+// + reforço de cobertura cross-section. Empiricamente motivado:
+// Cristiane regen=7 (midríase ~75%) com 3 eixos obscurecidos
+// (eixo_pituitario_adrenal, pineal_hipotalamica, sistema_nervoso_autonomico)
+// que iam pra Categoria C fria (silêncio técnico) — eram o achado
+// EMOCIONALMENTE mais rico da leitura, sendo silenciados como ruído
+// quando a CAUSA estrutural (midríase sustentada) é leitura clínica
+// integrativa expressiva por si só (escola alemã Deck/Angerer).
+//
+// Mudanças arquiteturais:
+//   1. Stage 1 schema: atributo motivo_indeterminacao
+//      ('obscurecimento_estrutural' vs 'limitacao_tecnica') em AchadoSchema.
+//      checkObscurecimentoStrutural valida coerência cross-field (modo warning).
+//   2. Stage 1 glossário: padrao_pupilar como achado de primeira classe
+//      no grupo estrutura_iridologica.
+//   3. Stage 2 prompt §2: nova subseção A.5 "Sinais que pedem reflexão"
+//      entre A (atenção) e B (preservados). Ícone 🌀. Max 3 itens.
+//      Roteamento: padrao_pupilar ATIVO + eixos com motivo=
+//      'obscurecimento_estrutural' → A.5. Eixos com motivo=
+//      'limitacao_tecnica' continuam em Categoria C.
+//   4. Glossário emocional novo: lib/anthropic/glossario-emocional-estruturais.ts
+//      com 5 padrões pupilares + 3 variações lexicais por categoria de
+//      manifestação (reduz repetibilidade percebida entre clientes).
+//   5. ANCHORING_PRINCIPLE_V2_5 atualizado pra roteamento condicional
+//      por motivo_indeterminacao. Caso 1 (obscurecimento_estrutural) →
+//      A.5 + cascata pra §5/§7/§8/§10/§11/§13 com honestidade técnica.
+//      Caso 2 (limitacao_tecnica) → Categoria C bloqueada de §5/§7/§8/
+//      §10/§11/§13 (mantém anti-invenção original).
+//   6. Reforço cross-section em system.md §5, §7, §8, §10, §11, §13:
+//      cada seção ganhou bloco 'Cobertura A.5 (v2.6.0)' explicitando
+//      como propagar leitura clínica dos achados de A.5.
+//
+// Princípio NÃO-Forer reforçado: descrição clínica em A.5 é ancorada em
+// achado real mensurável (padrão pupilar). Cliente sem padrão estrutural
+// ATIVO não recebe A.5. Variações lexicais entre clientes (glossário com
+// 3 variações por categoria) reduzem repetibilidade percebida.
+//
+// NÃO mexido: F1/F1.1/F1.2/F6/F7/F7.1, Marca 7 v2 / Marca 7.1, §1
+// nome+estrutura atuais (Marca 8 / §1 expandido fica pra v2.7.0 após
+// dados reais de beta de v2.6.0).
+//
 // v2.5.6 (2026-05-25): bump PATCH 0.3.5 → 0.3.6 — Marca 7 reescrita
 // + Marca 7.1 nova. Validação isolada Stage 2 v0.3.5 entregou §0
 // excelente em ambas (Carol/Evanilce) mas com órgão ainda como sujeito
@@ -1804,7 +1878,7 @@ export const STAGE2_METHOD_VERSION = 'sonnet_2x_0.2.2' as const
 //     (além de §0 já marcada).
 // Push consolidado v2.5.4 = commits v0.3.2 + v0.3.3 + v0.3.4 juntos.
 export const STAGE2_METHOD = 'sonnet_2x' as const
-export const STAGE2_VERSION = '0.3.6' as const
+export const STAGE2_VERSION = '0.4.0' as const
 
 /**
  * Etapa 2 do pipeline Sonnet 2x — composição streaming ancorada no JSON
