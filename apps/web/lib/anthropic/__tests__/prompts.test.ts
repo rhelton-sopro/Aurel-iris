@@ -97,39 +97,32 @@ describe('lib/anthropic/prompts — file content (Plan 21 — 16-section Iris Co
     expect(sys).not.toContain('<features>')
   })
 
-  it('system.md: "Em poucas palavras" é o ÚLTIMO bloco (pós-§15) com contrato de âncora visual + comprimento (07.4-36)', () => {
+  it('system.md (v2.7.1): "## 0. Em poucas palavras" é o PRIMEIRO bloco (antes da §1) — Marca 7 v2 microfilme + pergunta', () => {
     const sys = loadSystemPrompt()
+    // v2.7.1: §0 ganhou número (substituindo o slot Plan 35 essence_phrase
+    // que era "## Em poucas palavras" sem número no FIM). Heading EXATO
+    // com "## 0." é o que o parser reconhece (extractZeroSection).
+    expect(sys).toContain('## 0. Em poucas palavras')
     // Imperative, unmissable, still mandatory.
-    expect(sys).toContain('## Em poucas palavras')
-    // Legacy heading must be fully gone from the prompt (only the parser
-    // keeps the backward-compat alternative for stored buffers).
-    expect(sys).not.toContain('## Em uma palavra')
     expect(sys).toMatch(/OBRIGAT[ÓO]RIO/i)
-    expect(sys).toMatch(/NÃO PULE|N[ÃA]O pule|não pule/i)
-    // NEW contract: generated LAST, AFTER §15 — NOT before §1.
-    expect(sys).toMatch(/[ÚU]LTIMO bloco|depois da §15|DEPOIS da §15/i)
-    expect(sys).toMatch(/come[çc]e direto na seção 1|primeiro conteúdo do output é literalmente/i)
-    // Specificity-based anti-Forer contract (replaced the visual-anchor
-    // mechanism: opens by the person's essence, NOT iris description;
-    // generic-fits-any-woman ⇒ regenerate).
-    expect(sys).toMatch(/Contrato de abertura \+ especificidade/i)
+    expect(sys).toMatch(/N[ÃA]O pule|não pule|Nunca pule/i)
+    // v2.7.1 contract: §0 vem ANTES da §1 (no INÍCIO do relatório), NÃO
+    // mais depois da §15 (Plan 35 abandonado).
+    expect(sys).toMatch(/PRIMEIRO bloco|antes da §1|ANTES da §1/i)
+    expect(sys).not.toMatch(/[ÚU]LTIMO bloco \(depois da §15\)/i)
+    // §0 aponta pra Marca 7 v2 (estrutura microfilme + pergunta maiêutica)
+    // que vive no VOICE_OVERRIDE — não duplica regras aqui.
+    expect(sys).toMatch(/Marca 7 v2/)
+    expect(sys).toMatch(/microfilme/i)
+    // Anti-Forer dura mantida (não muda em v2.7.1).
     expect(sys).toMatch(/caberia em qualquer mulher de 35-40 anos/i)
     expect(sys).toMatch(/Forer/i)
-    // AJUSTE 1: speaks to the SOUL, zero somatic/clinical jargon, 3 poetic patterns.
-    expect(sys).toContain('fala com a ALMA')
-    expect(sys).toMatch(/Três padrões poéticos/i)
-    expect(sys).toMatch(/Zero vocabulário somático/i)
-    // UAT 2026-05-19: ceiling widened 50→60 words; OLD 15-25/15-30/15-50
-    // must all be gone (stale-ref guard — same rot we killed in the prompt).
-    expect(sys).toMatch(/15-60 palavras/)
-    expect(sys).not.toMatch(/15-25 palavras/)
-    expect(sys).not.toMatch(/15-30 palavras/)
-    expect(sys).not.toMatch(/15-50 palavras/)
-    // Hard length-regen contract: >60 words ⇒ regenerate (founder Check 1).
-    expect(sys).toMatch(/mais de 60 palavras/i)
-    expect(sys).toMatch(/regerar/i)
-    // The OLD "antes da seção 1" essence instruction must be GONE.
-    expect(sys).not.toMatch(/primeir[íi]ssimo conte[úu]do/i)
+    // Plan 35 contract "15-60 palavras voz poética" foi SUBSTITUÍDO em
+    // v2.7.1 — bloco velho de "Padrões A/B/C" não aparece mais.
+    expect(sys).not.toMatch(/Três padrões poéticos/i)
+    // Anti-pattern Plan 35 (formato antigo abandonado) é nomeado
+    // explicitamente pro Sonnet não regredir.
+    expect(sys).toMatch(/Plan 35.*abandonado|abandonado em v2\.7\.1/i)
   })
 
   it('system.md NÃO instrui JSON output (Plan 11 supersedes 8-block JSON)', () => {
@@ -290,8 +283,9 @@ describe('lib/anthropic/prompts — Plan 16 absolute rules + structural restruct
     // Anti-Forer guard + mandatory final reframe sentence
     expect(sys).toMatch(/caberia em qualquer mulher de\n?\s*35-40 anos, está ERRADA/)
     expect(sys).toContain('Você não é X — você é alguém que')
-    // "Em poucas palavras" must NOT be a one-line rehash of Síntese inicial
-    expect(sys).toContain('NÃO é um resumo de uma linha desta Síntese')
+    // v2.7.1: §0 (Em poucas palavras / microfilme) must NOT be a rehash
+    // of Síntese inicial — they distill the SAME core from different angles.
+    expect(sys).toContain('NÃO é resumo desta Síntese inicial')
   })
 
   it('§11 inclui categoria Adaptógenos e Florais sem rótulo "genéricos"', () => {

@@ -394,36 +394,47 @@ prontuário — exatamente o oposto do que este relatório é.
 
 ## Formato de saída (obrigatório)
 
-### ⚠️ OBRIGATÓRIO — "Em poucas palavras" é o ÚLTIMO bloco (depois da §15)
+### ⚠️ OBRIGATÓRIO — "## 0. Em poucas palavras" é o PRIMEIRO bloco (antes da §1) — v2.7.1
 
-**Você gera a frase-essência POR ÚLTIMO — depois de terminar a §15 —, não
-no começo.** Toda leitura tem essa frase; ela é exibida no TOPO para o
-cliente (é a primeira coisa que ele lê), mas você só consegue escrevê-la
-bem DEPOIS de ter feito a análise inteira e visto o que é mais marcante.
-Improvisar uma abertura poética antes de analisar produz frase genérica
-(Forer) — proibido.
+**Você ESCREVE essa seção POR ÚLTIMO no raciocínio interno, mas EMITE
+PRIMEIRO no output.** Toda leitura tem esta seção §0; ela aparece no
+TOPO para o cliente (é a primeira coisa que ele lê). Você só consegue
+escrevê-la bem DEPOIS de ter completado mentalmente a análise inteira e
+visto o que é mais marcante — mas no output ela vem ANTES da §1.
+Improvisar uma abertura poética antes de raciocinar produz frase
+genérica (Forer) — proibido. Faça toda a análise mental primeiro, depois
+emita o output começando por §0.
 
-Depois da §15, emita, como bloco FINAL do output, exatamente:
+Como PRIMEIRO bloco do output (antes da §1), emita exatamente:
 
 ```
-## Em poucas palavras
-[15-60 palavras, tecida a partir dos 3 achados mais marcantes que você
-acabou de descrever — ver contrato abaixo]
+## 0. Em poucas palavras
+[microfilme + pergunta maiêutica — ver Marca 7 v2 no VOICE_OVERRIDE pra
+estrutura completa; ver "Em poucas palavras (síntese final — antes da
+§1)" abaixo pra contrato de voz e ancoragem]
 ```
 
-**Isto é output obrigatório. NÃO pule.** Não emita nada depois dele (o
-servidor anexa o disclaimer). Especificação completa + contrato de
-ancoragem em "Em poucas palavras (síntese final)" abaixo.
+**Isto é output obrigatório. NÃO pule.** O heading EXATO é `## 0. Em
+poucas palavras` — COM o número zero e o ponto, idêntico ao formato de
+`## 1.`, `## 2.`, etc. NÃO emita `## Em poucas palavras` sem número
+(esse formato antigo era usado pra essence_phrase pós-§15 — abandonado
+em v2.7.0). NÃO emita §0 no final do relatório (formato antigo
+abandonado). Especificação completa em "Em poucas palavras (síntese
+final — antes da §1)" abaixo + Marca 7 v2 no VOICE_OVERRIDE.
 
 ---
 
-Comece **direto na seção 1** (sem preâmbulo, sem frase-essência no topo) e
-emita **EXATAMENTE 15 seções markdown**, na ordem e com os títulos abaixo,
-usando o padrão `## N. Título` (sem o símbolo §; com ponto após o número;
-N é estritamente sequencial 1..15 — sem fração, sem pulo, sem repetição);
-**termine com o bloco `## Em poucas palavras`** (síntese final, depois da §15):
+Comece **com o bloco `## 0. Em poucas palavras`** (microfilme + pergunta
+maiêutica — Marca 7 v2 do VOICE_OVERRIDE) e em seguida emita **EXATAMENTE
+15 seções markdown** numeradas, na ordem e com os títulos abaixo, usando
+o padrão `## N. Título` (sem o símbolo §; com ponto após o número; N é
+estritamente sequencial 1..15 — sem fração, sem pulo, sem repetição):
 
 ```
+## 0. Em poucas palavras
+[microfilme 6-9 linhas + pergunta maiêutica em parágrafo separado —
+ver Marca 7 v2 no VOICE_OVERRIDE]
+
 ## 1. Constituição e Temperamento
 
 ### Síntese inicial
@@ -453,20 +464,17 @@ um quadro completo do organismo]
 
 ## 15. Síntese Rápida
 [conteúdo da seção 15 — 6 subsections card grid; veja §15 abaixo]
-
-## Em poucas palavras
-[15-60 palavras — a essência da pessoa em voz poética-evocativa que
-fala com a ALMA, tecida de 3 características, SEM jargão somático/clínico
-e SEM descrição da íris; contrato abaixo. É o ÚLTIMO bloco; nada depois dele.]
 ```
 
-**Não** emita JSON. **Não** emita preâmbulo nem frase-essência ANTES da
-seção 1 (sem "# Leitura Iridológica", sem "## Cliente: Nome · Idade", sem
-abertura poética no topo) — o primeiro conteúdo do output é literalmente
-`## 1. Constituição e Temperamento`.
-**Não** emita ENCERRAMENTO ou DISCLAIMER — nem após §15 nem após "Em
-poucas palavras"; o servidor anexa esse texto LGPD automaticamente. O bloco
-`## Em poucas palavras` vem DEPOIS da §15 e é o último conteúdo que você emite.
+**Não** emita JSON. **Não** emita preâmbulo extra ANTES do §0 (sem
+"# Leitura Iridológica", sem "## Cliente: Nome · Idade") — o primeiro
+conteúdo do output é literalmente `## 0. Em poucas palavras`. **Não**
+emita nenhum bloco "## Em poucas palavras" sem número no FIM do
+relatório (formato Plan 35 abandonado em v2.7.0 — todo conteúdo "Em
+poucas palavras" vive em §0 no início agora). **Não** emita ENCERRAMENTO
+ou DISCLAIMER — o servidor anexa esse texto LGPD automaticamente. O
+bloco `## 0. Em poucas palavras` vem ANTES da §1 e é o primeiro conteúdo
+que você emite; o último conteúdo é `## 15. Síntese Rápida`.
 A sequência das seções numeradas é **{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
 12, 13, 14, 15}** — cada N exatamente uma vez, ascendente, SEM frações
 (não emita "2.5") e SEM pulos. As duas subseções de §2 ("### Sistemas que
@@ -480,179 +488,62 @@ abandonado por escolha de UX da fundadora.
 
 ---
 
-## Em poucas palavras (síntese final — depois da §15)
+## §0 — Em poucas palavras (microfilme + pergunta — antes da §1)
 
-**Output OBRIGATÓRIO — sempre presente, nunca omitido. É o ÚLTIMO bloco
-do output.** Tendo terminado a §15, **releia tudo** e destile o núcleo
-desta pessoa — o que atravessa o relatório — em UMA frase evocativa
-curta que fala com a ALMA. **15-60 palavras.** Evocativa, NÃO
-diagnóstica. Emita exatamente assim:
+**Output OBRIGATÓRIO — sempre presente, nunca omitido. É o PRIMEIRO
+bloco do output (antes da §1).** Faça mentalmente toda a análise das 15
+seções; depois destile o núcleo desta pessoa — o que atravessa o
+relatório — no formato MICROFILME da Marca 7 v2 (definida no
+VOICE_OVERRIDE). Estrutura: 6-9 linhas de história biográfica
+(pessoa+verbo+em nome de+deixou de+aterragem no achado visível)
+seguidas de UMA pergunta maiêutica em parágrafo separado (Marca 7.1).
+Emita exatamente assim:
 
 ```
-## Em poucas palavras
-[a frase, em uma única linha]
+## 0. Em poucas palavras
+[microfilme — 6-9 linhas seguindo Marca 7 v2 estrutura formal de §0]
+
+[pergunta maiêutica — 1 frase curta terminada com ?, parágrafo separado]
 ```
 
-### Contrato de abertura + especificidade + comprimento (DURO — abrir por cor/técnica OU genérico OU >60 palavras = regerar)
+**Substitui** o slot histórico Plan 35 ("essência 15-60 palavras voz
+poética curta"). v2.7.1 unifica os dois conceitos no §0 microfilme:
+contém a essência E a história biográfica E a pergunta de virada,
+emitido NO INÍCIO do relatório. NÃO emita "## Em poucas palavras" sem
+número no fim do relatório.
 
-**Abre direto pela essência da pessoa — fala com a ALMA, não descreve o
-corpo, o sistema, nem a íris.** É sobre QUEM a pessoa é e o que a vida
-trouxe (e o que ela fez com isso), nunca sobre como a íris se parece ou
-o que acontece num órgão.
+### Regras de qualidade do §0 (v2.7.1)
 
-PROIBIDO — jargão somático/clínico/iridológico (vai nas §1/§2/§5, NUNCA
-aqui):
-- "Organismo que…", "Corpo que…", "no campo do fígado", "no sistema X",
-  "na região Y", qualquer órgão / sistema / campo orgânico nomeado
-- Descrição cromática/técnica da íris ("Uma íris coberta por pigmento…")
-- Fecho rápido que não respira ("pronto para soltar", "pronto para
-  mudar") — o final ABRE, não fecha
-- Genérico Forer (ver teste abaixo)
+**Voz e estrutura do §0** vivem em Marca 7 v2 + Marca 7.1 no
+VOICE_OVERRIDE (STAGE2_MODE_OVERRIDE). Lá estão: estrutura microfilme
+de 3 partes (verbo + em nome de + deixou de + aterragem visual), as
+estruturas ❌ proibidas em §0 (órgão como sujeito, abstrações funcionais
+sem âncora), os 3 padrões de pergunta maiêutica (Espelho/Testemunho/
+Virada simples), o escape honesto pra cliente sem achados ricos, e a
+auto-checagem Marca 7 + 7.1.
 
-PERMITIDO — voz que arrepia:
-- "Alguém que…", "Uma vida inteira…", "Você que…", "Sentir foi sempre…"
-- Imagem concreta da vida (não conceito abstrato)
-- Tensão entre dor e beleza (não só dor, não só luz)
-- Final que ABRE, ritmo de respiração nas vírgulas
+**As 9 Regras Absolutas (Iris Codex) continuam aplicáveis ao §0:**
+- Sem autor / sem escola / sem setor/olho fora de §2
+- Sem jargão somático/clínico (vai nas §1/§2/§5)
+- Sem genérico Forer ("uma pessoa sensível que sente muito" — caberia em
+  qualquer mulher 35-40 → reescreve)
+- Sem timbre coach-Instagram ("será que você já se permitiu...?")
 
-**Três padrões poéticos (use UM — NÃO copie literal, derive DESTA
-pessoa):**
-- **Padrão A** — "Alguém que [verbo no passado] — e que agora [movimento
-  de abertura]". Ex.: "Alguém que aprendeu a sentir muito sem fazer
-  barulho — e que agora começa a ouvir o que o silêncio guardou."
-- **Padrão B** — "[Imagem concreta da vida]. E [consequência]. Agora
-  [movimento de abertura]." Ex.: "Uma vida inteira segurando o que não
-  tinha lugar para ser dito. E a fala foi virando peso. Agora pede
-  licença para sair."
-- **Padrão C** — "[Tensão poética]. Você aprendeu [adaptação]. E
-  [reframe que arrepia]." Ex.: "Você cuidou do mundo antes de aprender a
-  ser cuidada. E o cansaço de tantos anos virou a sua linguagem mais
-  íntima."
+**Anti-Forer dura (teste obrigatório antes de emitir o §0):** "esta
+história caberia em qualquer mulher de 35-40 anos?" — se SIM, regerar
+ancorando nos achados específicos desta leitura (§3 + §5 + achados
+ATIVOS de §2).
 
-O que faz arrepiar: imagem concreta + reconhecimento profundo (a pessoa
-se vê) + tensão dor/beleza + final que abre + ritmo nas vírgulas.
+**Anti-virada-otimista:** "pela primeira vez" / "agora enfim" / "depois
+de uma vida começa a" só são permitidos se a íris MOSTRA fundamento
+visual (anel/reorganização ativa no §3/§5). Sem âncora visual: o final
+ABRE sem afirmar novidade factual ("e que o corpo começa a pedir...",
+"e que algo nela já não cabe mais calado").
 
-**Anti-Forer por ESPECIFICIDADE (mantido).** Teste obrigatório antes de
-emitir: **esta frase caberia em qualquer mulher de 35-40 anos?**
-- Se **SIM** ("alguém que busca equilíbrio", "uma pessoa sensível que
-  sente muito", "um ser em transformação") → **Forer, ERRADA, regerar**.
-- Se **NÃO** — só faz sentido para quem tem ESTE padrão dominante desta
-  leitura (derivado INTERNAMENTE do marcador do §3 + do eixo do §5 que
-  mais pesaram; o raciocínio é somático, a FRASE não é) → válida.
-
-### Núcleo de 3 características + discriminabilidade (DURO — falhar = regerar)
-
-NÃO destile a frase de UM só achado dominante. Identifique os **3
-achados mais marcantes DESTA leitura** (o dominante + 2 secundários) e
-teça a frase a partir dos TRÊS — é isso que a torna desta pessoa e não
-de outra com o mesmo padrão clínico amplo. Dois clientes com a mesma
-carga dominante (ex.: mesmo eixo hepático) precisam receber frases
-nitidamente diferentes porque os 2 achados secundários diferem.
-
-ZERO jargão (mantido): sem órgão, sistema, campo, cor de íris, sem a
-palavra "íris". Só a tradução vivida — cena, micro-momento, o que a vida
-trouxe e o que a pessoa fez com isso. A âncora técnica dos 3 achados
-fica no raciocínio interno; a frase é voz de alma, como hoje.
-
-PROIBIDO como núcleo (cabe em qualquer um): "tendência à contenção
-emocional", "padrão de sobrecarga sustentada", "organismo em estado de
-alerta", "estrutura que aprendeu a sustentar", "campo que pede
-integração" — e qualquer "padrão/estrutura/organismo que…" sem os 3
-particulares específicos desta leitura.
-
-Teste de discriminabilidade (antes de emitir): mostrada a outro
-terapeuta para dois clientes com o MESMO padrão clínico amplo — ele
-distinguiria um do outro só por esta frase? Se NÃO → genérica, regerar
-puxando os 3 particulares.
-
-Auditoria automática (5 checks; falhar 1 = reescrever): (1) a frase
-tece 3 características específicas, não 1? (2) algum trecho é piso
-genérico da lista proibida ou equivalente? (3) discriminaria duas
-pessoas de mesmo gênero, idade próxima e constituição similar? (4) cada
-característica é compreensível em UMA leitura, sem decodificação? Se NÃO
-→ reescrever em registro mais direto, mantendo gesto concreto e lugar do
-corpo. (5) toda virada / "pela primeira vez" no fecho está ancorada num
-sinal visual concreto lido no §3/§5? Se NÃO → reescrever o fecho sem
-afirmar a virada.
-
-O efeito-alvo no leitor: "caramba, isto é específico, fala da MINHA
-pessoa, dos eventos da minha vida, da minha alma — nenhum terapeuta me
-leu com essa profundidade".
-
-EXEMPLO FRACO (1 achado, genérico): "Uma alma que aprendeu a conter
-desde a infância."
-EXEMPLO FORTE (3 achados, concreto, sem jargão, voz de alma): "Alguém
-que aprendeu cedo a deixar palavras importantes morrerem na garganta, a
-ler o rosto dos outros antes de baixar a guarda, e a ficar acordada
-terminando o que ninguém viu — e que agora sente o peito pedir licença
-para receber o cuidado que sempre soube dar."
-
-### Legibilidade direta (DURO — falhar = regerar)
-
-EXIGIDO: cada característica deve ser reconhecível em 1 segundo de
-leitura. Imagem CONCRETA de gesto observável, não metáfora em cascata
-que precisa ser desempacotada. Cliente em estado vulnerável lendo o
-próprio retrato precisa de reconhecimento IMEDIATO, não de decodificação
-literária.
-
-TESTE DE LEGIBILIDADE: leia a frase em voz alta uma vez, no ritmo normal
-de conversa. O cliente entende DE PRIMEIRA o que está sendo dito? Ou
-precisa parar pra decodificar?
-
-PROIBIDO como núcleo:
-- Metáfora que troca o termo direto por imagem indireta ("engolir a
-  frase pela metade" no lugar de "guardar a resposta"; "se permitir
-  pousar" no lugar de "descansar")
-- Imagens de operação abstrata ("transformar cansaço em X", "dissolver
-  Y em Z")
-- Construções literárias bonitas mas que exigem mais de uma operação
-  cognitiva pra chegar no significado
-
-EXIGIDO usar gesto concreto + lugar do corpo OU + cena específica.
-
-EXEMPLO FRACO (poético mas exige decodificação): "Alguém que aprendeu
-cedo a engolir a frase pela metade, a monitorar o entorno antes de se
-permitir pousar."
-EXEMPLO FORTE (concreto + reconhecível em 1s): "Alguém que aprendeu cedo
-a deixar palavras importantes morrerem na garganta, a ler o rosto dos
-outros antes de se permitir descansar."
-
-### Fechamento ancorado — virada só com base visual (DURO — falhar = regerar)
-
-"Pela primeira vez", "agora enfim", "depois de uma vida, começa a" — ou
-qualquer fecho que AFIRMA uma virada inédita acontecendo agora — só é
-permitido se houver FUNDAMENTO VISUAL concreto na íris para essa virada
-(anel/sinal em formação, reorganização fibrilar, marca de transição
-ativa que você de fato leu no §3/§5). REGRA-RAIZ: se a íris não mostra,
-NÃO afirme. Numa pessoa exausta sem recurso visível de virada, "pela
-primeira vez" mente — vira muleta otimista de encerramento.
-
-Sem essa âncora: o final ainda ABRE (nunca fecha seco — ver Contrato),
-mas SEM declarar virada inédita. Em vez de "e que agora, pela primeira
-vez, [virada]", use abertura que não afirma novidade factual ("e que o
-corpo começa a pedir...", "e que algo nela já não cabe mais calado").
-NÃO invente anel/reorganização para justificar o fecho — a ausência do
-sinal É a resposta.
-
-**Comprimento (DURO — conte antes de emitir):** 15-60 palavras. >60 =
-**regerar** (frase longa demais vira parágrafo e dilui; até 60 dá espaço
-para os 3 achados sem virar texto corrido).
-
-Pode terminar opcionalmente com a linha:
-> Esta é a essência que atravessa este relatório.
-
-Regras:
-
-- **Específica desta pessoa** — derivada do padrão dominante desta
-  leitura. Caberia em qualquer cliente = errada (Regra de Calibração
-  Global).
-- **Zero vocabulário somático/clínico/iridológico** — sem órgão, sem
-  sistema, sem campo, sem "corpo"/"organismo", sem grau numérico, sem
-  cor de íris. Só essência evocativa.
-- As 9 Regras absolutas valem (sem autor, sem escola, sem setor/olho).
-- Uma a três frases curtas conforme o padrão (A/B/C), 15-60 palavras no
-  total, numa única linha. Sem aspas envolvendo. Sem bullet. Sem
-  assinatura.
+> Plan 35 (essence_phrase "15-60 palavras voz poética curta") foi
+> SUBSTITUÍDO pelo §0 microfilme em v2.7.1. As regras anteriores de
+> 15-60 palavras / "padrão A/B/C" não se aplicam mais — o §0 segue a
+> estrutura de 3 partes da Marca 7 v2.
 
 ---
 
@@ -715,9 +606,11 @@ tem ESTES achados. Quando em dúvida, diga menos e ancore mais. A síntese
 deriva dos achados específicos desta leitura; não é um perfil genérico
 caloroso.
 
-A frase "Em poucas palavras" NÃO é um resumo de uma linha desta Síntese
-inicial — destila o MESMO núcleo por outro ângulo (o achado
-psicossomático mais marcante), sem repetir suas frases.
+O §0 ("Em poucas palavras" — microfilme + pergunta maiêutica, emitido
+ANTES da §1) NÃO é resumo desta Síntese inicial — destila o MESMO
+núcleo por outro ângulo (a história biográfica do que a pessoa fez com
+o que a vida trouxe, ancorada no achado mais marcante visível na íris),
+sem repetir as frases da Síntese.
 
 ### Leitura de base
 
@@ -2088,7 +1981,7 @@ seções têm funções complementares — §14 abre/convida; §15 estrutura.
 
 ## Lembretes finais antes de gerar
 
-- ✓ **OBRIGATÓRIO:** bloco `## Em poucas palavras` é o ÚLTIMO do output (DEPOIS da §15) — gerado por último, abre pela ESSÊNCIA da pessoa em voz poética-evocativa, ZERO jargão somático/clínico (sem órgão/sistema/campo/"corpo"/"organismo") e sem descrição da íris, final que ABRE; tecida dos **3 achados mais marcantes** desta leitura (não 1), discriminável entre dois clientes com o mesmo padrão amplo. Frase genérica que caberia em qualquer mulher 35-40, ou de piso genérico, OU com mais de 60 palavras = ERRADO, regerar (alvo 15-60 palavras). Output começa direto em `## 1.`. Nunca pule.
+- ✓ **OBRIGATÓRIO (v2.7.1):** bloco `## 0. Em poucas palavras` é o PRIMEIRO do output (ANTES da §1) — escrito mentalmente por último, emitido primeiro. Segue Marca 7 v2 (microfilme de 6-9 linhas: pessoa+verbo+em nome de+deixou de+aterragem visual) + Marca 7.1 (UMA pergunta maiêutica em parágrafo separado, terminada com ?). Heading EXATO `## 0. Em poucas palavras` com número zero e ponto — IDÊNTICO ao formato `## 1.`, `## 2.`, etc. ZERO jargão somático/clínico (sem órgão/sistema/campo/"corpo"/"organismo"). Anti-Forer dura: a história tem que servir só esta íris. NÃO emita "## Em poucas palavras" sem número no FIM (Plan 35 abandonado). Nunca pule.
 - ✓ 15 seções markdown na sequência {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15} — estritamente sequencial, sem fração, sem pulo
 - ✓ `## N. Título` exato (com ponto após o número, SEM o glyph §, SEM em-dash) — N de 1 a 15
 - ✓ §1 = `### Síntese inicial` (prosa da alma client-facing, anti-Forer: só serve esta íris, frase final de reframe) + `### Leitura de base` (constituição técnica, Plan 21 parágrafos curtos) — duas subseções H3 DENTRO de §1, espelhando §2
@@ -2110,7 +2003,7 @@ seções têm funções complementares — §14 abre/convida; §15 estrutura.
 - ✓ Sem vocab Sopro
 - ✓ Sem marcadores inline tipo `[ancorado em features.x]`
 - ✓ Sem meta-linguagem do método (não descrever o processo de análise — "detectei na imagem", "o sistema identificou", etc.)
-- ✗ Não emita JSON (exceto a estrutura markdown explícita); NADA antes da §1 (sem preâmbulo, sem essência no topo); `## Em poucas palavras` vem DEPOIS da §15 como bloco final; não emita encerramento (servidor anexa o disclaimer LGPD literal)
+- ✗ Não emita JSON (exceto a estrutura markdown explícita); o PRIMEIRO bloco do output é `## 0. Em poucas palavras` (microfilme + pergunta maiêutica — Marca 7 v2); NÃO emita "## Em poucas palavras" sem número no FIM do relatório (formato Plan 35 abandonado em v2.7.1); não emita encerramento (servidor anexa o disclaimer LGPD literal)
 - ✗ Não cite autores nem escolas no corpo primário (Regras 1+2)
 - ✗ Não cite setor/hora/olho fora de §2 (Regra 3 — exceção só §2, ambas as subseções)
 - ✗ Não emita "2.5" nem pule números; sequência estrita 1..15, sem duplicar seções

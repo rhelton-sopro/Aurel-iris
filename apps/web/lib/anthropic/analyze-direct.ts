@@ -1946,7 +1946,37 @@ export const STAGE2_METHOD = 'sonnet_2x' as const
 // NÃO mexido: motivo_indeterminacao schema (956c177 OK), Caso 2/3 do
 // ANCHORING, §3, §6, §9, §12, §14, §15, todas as Marcas 1-7 do VOICE
 // (exceto heading do §0 e regra de posição).
-export const STAGE2_VERSION = '0.5.0' as const
+// v2.7.1 (2026-05-25): bump PATCH 0.5.0 → 0.5.1 — reforço do §0 no system.md.
+//
+// Empírico (Evanilce regen=2 v2.7.0): Sonnet ignorou a instrução Marca 7 v2
+// de emitir "## 0. Em poucas palavras" no INÍCIO e voltou a emitir
+// "## Em poucas palavras" (sem número) no FIM, seguindo as 15+ ocorrências
+// históricas Plan 35 que ainda viviam no system.md. Como extractZeroSection
+// exige heading numerado, NADA capturou o microfilme — pior que antes.
+//
+// Fix v2.7.1: system.md reescrito pra alinhar com Marca 7 v2:
+//   - bloco "## Formato de saída" (linhas ~395-475): §0 vira PRIMEIRO bloco
+//     antes da §1; Plan 35 "depois da §15" → "antes da §1".
+//   - bloco "## §0 — Em poucas palavras" (linhas ~489-513): substitui o
+//     antigo "## Em poucas palavras (síntese final — depois da §15)".
+//   - bloco "Regras de qualidade do §0" (linha ~515): substitui as 170 linhas
+//     de contrato Plan 35 (15-60 palavras voz poética curta + padrão A/B/C +
+//     legibilidade direta + fechamento ancorado) por nota apontando pra
+//     Marca 7 v2 (que vive aqui no VOICE_OVERRIDE) + 9 Regras Absolutas.
+//   - linha ~609 referência §1: §0 vira "microfilme + pergunta" não "frase
+//     em uma linha".
+//   - linha ~2006 final reminder: inverte "DEPOIS da §15" → "ANTES da §1".
+//   - linha ~1984 lembretes finais: bloco "OBRIGATÓRIO" reescrito pra §0
+//     com Marca 7 v2 estrutura.
+//
+// NÃO mexido: ANCHORING_PRINCIPLE_V2_5 (v2.7.0 intocado), §2 A.5 (v2.7.0
+// intocado), §8/§10 cobertura A.5 (v2.7.0 removidas), pupila demoção
+// (v2.7.0 intocada), Stage 1 (intocado).
+//
+// Essence_phrase fica conceitualmente desativada — Sonnet não recebe
+// instrução pra emitir "## Em uma palavra"; o slot continua no schema mas
+// vira sempre null em gerações novas. UI/PDF já fazem skip via .trim() check.
+export const STAGE2_VERSION = '0.5.1' as const
 
 /**
  * Etapa 2 do pipeline Sonnet 2x — composição streaming ancorada no JSON
