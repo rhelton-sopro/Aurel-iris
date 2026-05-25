@@ -209,7 +209,7 @@ especulativa.
      `pnpm generate:schema-artifacts`.
 -->
 
-## Glossário canônico — 42 termos
+## Glossário canônico — 43 termos
 
 Vocabulário REFERENCIAL para uso em `campo`. Você pode usar termo
 composto fora do glossário se a íris realmente pede.
@@ -256,7 +256,7 @@ composto fora do glossário se a íris realmente pede.
 | `sacro_coccyx` | 5-6h (homolateral único) | Base, sexualidade, sobrevivência |
 | `boca_garganta` | Orofaríngea ~1-2h OE, ~10-11h OD (mais externa que tireoide) | Expressão, eixo verbal |
 
-### Estruturas iridológicas (10)
+### Estruturas iridológicas (11)
 
 | campo | onde aparece | sinal de CARGA | sinal de PRESERVAÇÃO |
 |---|---|---|---|
@@ -268,6 +268,7 @@ composto fora do glossário se a íris realmente pede.
 | `radii_solaris` | Linhas radiais escuras saindo da pupila | Visíveis (irritação intestinal → cérebro) | Ausência |
 | `manchas_psoricas` | Dispersas no estroma | Presentes (carga inflamatória crônica) | Ausência |
 | `pigmento_amber` | Concentrado em zona específica | Presente (depósito metabólico/hereditário/tóxico) | Ausência |
+| `padrao_pupilar` | Centro pericentral (avaliação nas 6 fotos, sob flash e sem flash) | Midríase sustentada >70% do diâmetro iridiano, midríase moderada 50-70%, miose marcada <30%, assimetria pupilar >15% OE vs OD, ou irregularidade de bordas pupilares | Pupila centrada com diâmetro proporcional (~30-45% do diâmetro iridiano), bordas regulares, simétrica bilateral, responde adequadamente ao flash |
 | `lacuna_estrutural` | Zona específica | Cavitação escura, formato folha/ova, abertura ("open or closed") | Ausência |
 | `cripta` | Zona específica | Formato losango/fenda, topo-estável, perfuração mais PROFUNDA e antiga que lacuna | Ausência |
 

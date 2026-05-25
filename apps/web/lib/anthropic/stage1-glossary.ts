@@ -309,6 +309,23 @@ export const GLOSSARY: readonly GlossaryEntry[] = [
     sinal_preservacao: 'Ausência',
   },
   {
+    // v2.6.0 (2026-05-25): padrao_pupilar como achado de primeira classe.
+    // Stage 1 emite quando a pupila for clinicamente significativa — midríase
+    // sustentada >70%, miose marcada <30%, assimetria pupilar >15% OE vs OD,
+    // ou irregularidade de borda. Não emite em toda leitura — só quando o
+    // padrão é achado expressivo. O estado específico (midriase_sustentada,
+    // midriase_moderada, miose_sustentada, assimetria_pupilar,
+    // irregularidade_borda) vai em descricao_visual via texto livre.
+    // Importância integrativa: midríase sustentada = ativação simpática
+    // crônica (escola alemã Deck/Angerer). Eixo pituitário-adrenal indet
+    // por midríase NÃO é silêncio — a midríase em si é leitura clínica.
+    group: 'estrutura_iridologica', campo: 'padrao_pupilar',
+    zona: 'Centro pericentral (avaliação nas 6 fotos, sob flash e sem flash)',
+    sinal_carga: 'Midríase sustentada >70% do diâmetro iridiano, midríase moderada 50-70%, miose marcada <30%, assimetria pupilar >15% OE vs OD, ou irregularidade de bordas pupilares',
+    sinal_preservacao: 'Pupila centrada com diâmetro proporcional (~30-45% do diâmetro iridiano), bordas regulares, simétrica bilateral, responde adequadamente ao flash',
+    bibliografia: 'Deck / Angerer — escola alemã: midríase sustentada = ativação simpática crônica',
+  },
+  {
     group: 'estrutura_iridologica', campo: 'lacuna_estrutural',
     zona: 'Zona específica',
     sinal_carga: 'Cavitação escura, formato folha/ova, abertura ("open or closed")',
