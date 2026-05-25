@@ -95,6 +95,21 @@ export const BORDAS_PUPILARES = [
 // pra aceitar runtime array (KNOWN_CAMPOS_LIST é readonly string[]).
 const CAMPO_ENUM = [...KNOWN_CAMPOS_LIST] as [string, ...string[]]
 
+// v2.6.0: enum pra qualificar QUAL é a causa quando natureza='indeterminada'.
+// 'obscurecimento_estrutural' = causa tem leitura iridológica própria
+// (midríase obscurece collarete; opacidade obscurece zona; etc) — o eixo
+// específico não pode ser confirmado MAS a estrutura obscurecedora EM SI
+// é achado clínico (registrado separadamente como achado ATIVO).
+// 'limitacao_tecnica' = foto desfocada, mal iluminada, olho fechado —
+// nem o eixo nem causa estrutural podem ser lidos.
+// Routing pro Stage 2: obscurecimento_estrutural → §2 Categoria A.5;
+// limitacao_tecnica → §2 Categoria C (mantém ANCHORING — bloqueado de
+// §5/§7/§8/§10/§11/§13).
+export const MOTIVO_INDETERMINACAO = [
+  'obscurecimento_estrutural',
+  'limitacao_tecnica',
+] as const
+
 const AchadoSchema = z.object({
   campo: z.enum(CAMPO_ENUM),
   intensidade: z.number().int().min(1).max(5),
@@ -109,6 +124,11 @@ const AchadoSchema = z.object({
   // marca pro Stage 2 ver e contextualizar. NÃO vem do LLM —
   // popula-se em validateExameIridologico após o parse.
   coherence_warning: z.string().nullable().optional(),
+  // v2.6.0: motivo da indeterminação. Só preencher quando
+  // natureza_da_carga='indeterminada'. Quando preenchido, Stage 2 roteia:
+  // 'obscurecimento_estrutural' → §2 Categoria A.5 (com leitura clínica
+  // ancorada); 'limitacao_tecnica' → §2 Categoria C (sem leitura clínica).
+  motivo_indeterminacao: z.enum(MOTIVO_INDETERMINACAO).nullable().optional(),
 })
 
 const SistemaPreservadoSchema = z.object({
@@ -213,6 +233,16 @@ export const REGISTRAR_EXAME_TOOL: Anthropic.Tool = {
             lateralidade: { type: 'string', enum: LATERALIDADE as unknown as string[] },
             descricao_visual: { type: 'string', minLength: 15 },
             observacao_qualifying: { type: ['string', 'null'] },
+            motivo_indeterminacao: {
+              type: ['string', 'null'],
+              enum: [...MOTIVO_INDETERMINACAO, null],
+              description:
+                "Quando natureza_da_carga='indeterminada': qualifica a causa. " +
+                "'obscurecimento_estrutural' = midríase/opacidade obscureceu o eixo " +
+                '(estrutura obscurecedora é achado ATIVO em outro campo). ' +
+                "'limitacao_tecnica' = foto desfocada/mal iluminada, sem leitura. " +
+                'NULL quando natureza não é indeterminada.',
+            },
           },
         },
       },
@@ -428,6 +458,80 @@ function describesEye(text: string, eye: 'OD' | 'OE'): boolean {
   return EYE_TOKENS[eye].test(text)
 }
 
+// ============================================================
+// OBSCURECIMENTO ESTRUTURAL CHECK (v2.6.0 — modo warning)
+// ============================================================
+
+/**
+ * Mapa: eixo obscurecido → estruturas obscurecedoras que devem estar
+ * registradas como achado ATIVO quando o eixo é indeterminada com
+ * motivo='obscurecimento_estrutural'. Mantém coerência entre Stage 1
+ * (observação) e ANCHORING (composição Stage 2).
+ *
+ * Mapa não é exaustivo — cobre o caso principal (midríase obscurece
+ * collarete/anel interno/zona pericentral) que motivou v2.6.0. Outros
+ * padrões estruturais (opacidade periférica obscurecendo zonas
+ * externas, manchas obscurecendo setores específicos) podem ser
+ * adicionados aqui conforme observação empírica.
+ */
+const OBSCURECIMENTO_MAP: ReadonlyMap<string, ReadonlyArray<string>> = new Map([
+  ['eixo_pituitario_adrenal', ['padrao_pupilar']],
+  ['pineal_hipotalamica', ['padrao_pupilar']],
+  ['sistema_nervoso_autonomico', ['padrao_pupilar']],
+  ['anel_interno', ['padrao_pupilar']],
+  ['coroa_simpatica', ['padrao_pupilar']],
+  ['estomago', ['padrao_pupilar']],
+])
+
+/**
+ * v2.6.0: quando achado é indeterminada com motivo='obscurecimento_estrutural',
+ * a estrutura obscurecedora correspondente DEVE estar registrada como achado
+ * ATIVO no exame. Modo warning (não rejeita) — popula coherence_warning +
+ * loga estruturado. Stage 2 vê via JSON e contextualiza.
+ *
+ * Permite que Sonnet declare "indeterminada por obscurecimento estrutural"
+ * de forma honesta E exige que o estrutural correspondente apareça como
+ * achado ativo — fechando o loop entre observação parcial e leitura clínica
+ * da causa.
+ */
+function checkObscurecimentoStrutural(
+  achados: ReadonlyArray<{
+    campo: string
+    natureza_da_carga: string
+    motivo_indeterminacao?: string | null
+    coherence_warning?: string | null
+  }>,
+): Array<{ index: number; warning: string }> {
+  const warnings: Array<{ index: number; warning: string }> = []
+  const ativos = new Set(
+    achados
+      .filter((a) => a.natureza_da_carga !== 'indeterminada')
+      .map((a) => a.campo),
+  )
+  for (let i = 0; i < achados.length; i++) {
+    const a = achados[i]!
+    if (a.natureza_da_carga !== 'indeterminada') continue
+    if (a.motivo_indeterminacao !== 'obscurecimento_estrutural') continue
+
+    const required = OBSCURECIMENTO_MAP.get(a.campo)
+    if (!required || required.length === 0) continue
+
+    const present = required.some((r) => ativos.has(r))
+    if (!present) {
+      warnings.push({
+        index: i,
+        warning:
+          `v2.6.0 obscurecimento_estrutural: '${a.campo}' marcado indeterminada ` +
+          `por obscurecimento estrutural, mas estrutura(s) obscurecedora(s) ` +
+          `correspondente(s) [${required.join(', ')}] não estão presentes ` +
+          `como achado ATIVO no exame. Stage 2: A.5 só roteia este achado ` +
+          `se houver estrutura obscurecedora ativa pareada.`,
+      })
+    }
+  }
+  return warnings
+}
+
 /**
  * TODO F5 (v2.5.3 hipótese, revisita pós-UAT Carol/Evanilce):
  * Se pigmento_amber órfão se repetir em 2+ leituras pós-v2.5.3
@@ -612,6 +716,22 @@ export function validateExameIridologico(input: unknown): ValidationOutcome {
       event: 'stage1_f4_pigmento_amber_orfao',
       campo: a.campo,
       warning: pw.warning,
+    })
+  }
+  // v2.6.0: obscurecimento estrutural — quando achado é indeterminada com
+  // motivo='obscurecimento_estrutural', a estrutura obscurecedora deve estar
+  // como achado ATIVO. Warning + log se não estiver. Modo warning não rejeita.
+  const obscWarnings = checkObscurecimentoStrutural(exame.achados_de_atencao)
+  for (const ow of obscWarnings) {
+    const a = exame.achados_de_atencao[ow.index]!
+    a.coherence_warning = a.coherence_warning
+      ? `${a.coherence_warning} | ${ow.warning}`
+      : ow.warning
+    coherenceWarnings++
+    console.info({
+      event: 'stage1_v260_obscurecimento_estrutural_sem_ativo',
+      campo: a.campo,
+      warning: ow.warning,
     })
   }
   if (coherenceWarnings > 0) {
