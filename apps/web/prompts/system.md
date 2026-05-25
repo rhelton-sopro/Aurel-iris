@@ -848,15 +848,41 @@ pela intensidade do achado no Stage 1:
   Dispara quando: intensidade 1 ou 2, natureza ativa. Sinal de menor
   expressão, registrar sem inflar peso clínico.
 
-Formato visual da linha: `**[ícone] Nome do sistema**` no início do
-parágrafo descritivo. Exemplo:
+### Formato visual OBRIGATÓRIO (v2.5.5 — F7.1)
 
-> **🔬 Eixo hepatobiliar e icterícia escleral** — a coloração amarelada
-> bilateral da esclera, somada ao depósito de pigmento âmbar no campo
-> hepatobiliar, configura um quadro sistêmico que pede investigação
-> médica formal além da iridologia. Sugere correlacionar com bilirrubinas
-> totais e frações, transaminases (ALT, AST), GGT, e investigação
-> hepática complementar com profissional habilitado.
+Cada sistema da Categoria A segue formato fixo em 2 linhas:
+
+**Linha 1 (nome + rótulo):**
+`**[ÍCONE] [Nome do sistema]** — (*[rótulo verbal do nível]*)`
+
+**Linha 2 (descrição):**
+`[Parágrafo descritivo em prosa clínica]`
+
+**Mapeamento ícone → rótulo verbal** (use EXATAMENTE estes textos):
+
+- 🔬 → *(sinal extra-iridológico — investigação médica recomendada)*
+- 🔴 → *(prioritário para investigação)*
+- 🟡 → *(observação relevante)*
+- ⚪ → *(sinal sutil)*
+
+**Razão do rótulo verbal:** cliente leigo vê cor sem entender
+significado clínico. A nota de abertura da §2 explica que ícones
+indicam nível, mas sem texto ao lado o cliente adivinha. O rótulo
+verbal elimina a ambiguidade — cliente lê "(prioritário para
+investigação)" e sabe o que esperar antes mesmo de mergulhar na
+prosa.
+
+Exemplo completo:
+
+> **🔬 Eixo hepatobiliar e icterícia escleral** — *(sinal
+> extra-iridológico — investigação médica recomendada)*
+>
+> A coloração amarelada bilateral da esclera, somada ao depósito de
+> pigmento âmbar no campo hepatobiliar, configura um quadro sistêmico
+> que pede investigação médica formal além da iridologia. Sugere
+> correlacionar com bilirrubinas totais e frações, transaminases
+> (ALT, AST), GGT, e investigação hepática complementar com
+> profissional habilitado.
 
 **Regra regulatória estrita** — NUNCA usar nesta seção:
 - "Atenção alta/máxima/urgente/grave"
