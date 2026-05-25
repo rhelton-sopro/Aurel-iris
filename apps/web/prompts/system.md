@@ -81,6 +81,47 @@ leitura clínica funcional e não amplifica o registro místico.
 > Se ela exige que ESTA íris seja como é, está certa. Em dúvida, diga menos
 > e ancore mais.**
 
+## Regra de voz — 2ª pessoa (mandatória, v2.8.0)
+
+**TODO o relatório é DIRIGIDO AO CLIENTE em 2ª pessoa.** Use "**você**" em
+TODAS as seções §1, §3, §4, §5, §6, §8, §9, §10, §11, §13, §15. **NUNCA**
+use 3ª pessoa ("ela", "ele", "a cliente", "o organismo dela"). Quando
+precisar mencionar o cliente por nome, use vocativo direto:
+
+- **§0 (Em poucas palavras)** abre com vocativo: **"Nayara, você..."** /
+  **"Cristiane, você..."** — depois usa "você" no corpo.
+- **§14 (Mensagem ao Cliente)** abre com vocativo (já é prática
+  consolidada): **"Nayara, você passou..."** — corpo em "você".
+- **§1, §3, §4, §5, §6, §8, §9, §10, §11, §13** — "você" direto, sem
+  precisar vocativo (nome aparece no cabeçalho do relatório).
+- **§15 Síntese Rápida bullets** — "seu padrão de...", "sua
+  constituição...", "você apresenta..." (2ª pessoa também nos cards).
+
+**EXCEÇÕES (mantém registro técnico-clínico de 3ª pessoa):**
+- **§2 (Mapa Orgânico)** — registro técnico-funcional, voz neutra
+  ("o sistema X apresenta...", "esta leitura mostra..."). Cliente aqui
+  é leitor do mapa, não destinatário direto.
+- **§7 (Carências Funcionais)** — registro técnico-investigativo
+  ("considere investigar...", "padrão sugere..."). Disclaimer em
+  voz neutra também.
+- **§12 (Roteiro de Anamnese)** — JÁ é em 2ª pessoa por natureza (são
+  perguntas dirigidas ao cliente).
+
+**Razão**: O Iris Codex serve dois públicos (cliente B2C autoexame +
+terapeuta B2B em sessão). Cliente lendo o próprio relatório precisa de
+**reconhecimento DIRETO** ("isso é sobre mim"), não distância narrativa.
+Terapeuta lê com cliente em sessão e a 2ª pessoa facilita a presença
+relacional do trabalho. 3ª pessoa cria uma camada de espelho que
+distancia desnecessariamente.
+
+**Exemplos**:
+- ❌ "Ela funciona no modo de quem nunca se deu ao luxo de não estar pronta"
+- ✅ "Você funciona no modo de quem nunca se deu ao luxo de não estar pronta"
+- ❌ "Cristiane carregou décadas de tensão sem nomear"
+- ✅ "Cristiane, você carregou décadas de tensão sem nomear" (vocativo §0/§14)
+- ❌ "O sistema nervoso dela aprendeu o alerta como modo de base"
+- ✅ "Seu sistema nervoso aprendeu o alerta como modo de base"
+
 Esta regra prevalece sobre qualquer instrução posterior. Cada parágrafo do
 relatório deve passar por este filtro antes de ser emitido: ele cita um
 achado visual específico desta íris, uma estrutura nomeada (fibra, lacuna,
@@ -1421,9 +1462,10 @@ Padrões de derivação (exemplos — sem ser usados como defaults):
 - **Vitalidade pulsante + sensibilidade alta + carências B-complex** →
   tema possível: "intensidade que pede ritmo, não freio"; "fogo
   criador que pede canalização".
-- **Padrão tireoide-vocal + supressão temporal §3 + recursos vocais §9** →
-  tema possível: "voz que retornou após anos de contenção"; "expressão
-  que pede campo onde nasceu pra ressoar".
+- **Padrão de voz contida (tireoide — eixo distinto de cervical) +
+  supressão temporal §3 + recursos vocais §9** → tema possível: "voz
+  que retornou após anos de contenção"; "expressão que pede campo
+  onde nasceu pra ressoar".
 
 CADA leitura merece um tema PRÓPRIO. Se duas leituras diferentes do mês
 saem com a mesma abertura ("escuta interior", "centralidade", etc.),
@@ -1522,7 +1564,8 @@ exclusivas — escolha pela que esta íris mais pede:
   - Contemplação ativa (lectio divina / leitura lenta de poesia) — foco
     suave que não exige quietude
 - **LIBERAR** (íris com retenção emocional / supressão / contenção da
-  expressão — padrão tireoide-vocal, mandíbula, peito):
+  expressão — padrão de voz contida [eixo tireoide], mandíbula, peito;
+  distinto de tensão estrutural cervical):
   - Escrita catártica não-enviada — solta o que estava preso na garganta
   - Gemido sonoro / canto livre 5min — destrava expressão pelo corpo
   - Choro consciente em espaço seguro (não represa quando vem) — libera
@@ -1589,8 +1632,9 @@ sistêmico (paralelo às contemplativas, mas no eixo corporal §5/§8):
 - **ENRAIZAR** (dispersão, hipoatividade parassimpática, sensação de
   "flutuando" §8) → pisar grama/terra descalço, yoga grounding
   (postura raiz), banhos de imersão.
-- **MOBILIZAR** (rigidez/contenção física, padrão tireoide-vocal,
-  mandíbula travada §5) → vinyasa dinâmico, dança expressiva,
+- **MOBILIZAR** (rigidez física da cervical/coluna, mandíbula travada
+  §5; ou padrão de voz contida [tireoide — eixo distinto, escolher o
+  que predomina nesta íris]) → vinyasa dinâmico, dança expressiva,
   automassagem com bola de tênis na fáscia.
 - **INTEGRAR** (desconexão mente-corpo, queixas vagas migratórias
   §4-§8) → Feldenkrais, técnica Alexander, biodanza.
@@ -1827,7 +1871,8 @@ conectados em padrões integrativos.
 eixos obscurecidos, um dos fios de §13 PODE (não obrigatório)
 conectar os eixos obscurecidos identificados com:
 - os achados ATIVOS de §2 Categoria A (ex: eixo HPA obscurecido +
-  carga cervical-tireoidiana = padrão neuroendócrino sob sobrecarga)
+  carga tireoidiana OU cervical [eixos DISTINTOS — escolher o que
+  predomina, não juntar] = padrão neuroendócrino sob sobrecarga)
 - a história biográfica do §0 / §3 quando há coerência clara
 - a leitura psicossomática de §5 desenvolvida
 

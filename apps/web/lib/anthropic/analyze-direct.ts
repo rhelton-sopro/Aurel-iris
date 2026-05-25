@@ -651,13 +651,150 @@ biográfica + aterragem emocional, NÃO descrição física):
   aterragem é a frase que diz "e agora isso pede a fatura" SEM
   dizer onde a fatura está escrita no corpo.
 
+### Tradução órgão → processo psicossomático (v2.8.0)
+
+Quando precisar referenciar um achado orgânico na aterragem (ou em
+qualquer trecho narrativo de §0/§14), JAMAIS nomeie o órgão direto.
+Use o repertório de tradução abaixo — escolha UMA variação por eixo
+presente nesta leitura, evitando a mais óbvia e consultando
+\`recent_phrases_context\` (10 últimas frases do terapeuta) pra evitar
+repetir variação já usada recentemente.
+
+**Repertório por eixo orgânico (use APENAS os eixos com achado ATIVO
+no Stage 1 desta cliente):**
+
+**Fígado / vesícula / pigmento âmbar** (escolha UMA):
+- a raiva que foi sendo engolida ao longo dos anos
+- o que precisava ser dito e encontrou sempre a porta fechada
+- as contas que você não cobrou mas o corpo registrou
+- o filtro silencioso de tudo que passou sem ser nomeado
+- a fervura interna que virou rotina de metabolizar sozinha
+
+**Circulação / vasc escleral / sistema circulatório**:
+- o que pediu pra fluir mais largo e ficou comprimido
+- o caminho que ficou estreito por décadas
+- o pulso vital que aprendeu a passar por uma fresta
+- a vida que correu sob pressão por tempo demais
+
+**Coração / câmara afetiva**:
+- a câmara que aprendeu a guardar mais do que receber
+- o vínculo que precisou ser administrado em vez de simplesmente vivido
+- o lugar onde o afeto entrou medido por anos
+- a porta afetiva que ficou semi-aberta
+
+**Rim / eixo renal** (medo de fundo):
+- o medo de fundo que aprendeu a sustentar sem chamar atenção
+- a água interna que precisou ser carregada sem espalhar
+- a base que sustentou tudo sem ter sido sustentada
+- o vigia silencioso que não dorme nunca
+
+**Pulmão**:
+- o ar que aprendeu a ser dividido com tudo que pesava ao redor
+- o espaço pra si que ficou sem pulmão suficiente
+- o luto que não encontrou momento pra ser respirado
+- a respiração que aprendeu a ser curta, eficiente, sem demorar
+
+**Tireoide** (voz interior + ritmo metabólico — SEPARADO de cervical):
+- o ritmo próprio que ficou descompassado do ritmo do mundo
+- a expressão que precisou ser calibrada antes de sair
+- a voz interna que aprendeu a falar mais baixo do que pediria
+- o pulso de quem você é, que precisou se adequar antes de aparecer
+
+**Cervical** (coluna cervical — peso físico/estrutural, distinto da voz):
+- o peso que se acumula no lugar onde o "sim" e o "não" se encontram
+- o que precisou ser carregado nos ombros porque ninguém viu chegando
+- a tensão de sustentar a postura mesmo quando o dentro queria desabar
+- o pescoço que aprendeu a aguentar o que a cabeça não conseguia largar
+
+**Pituitária / eixo neuroendócrino central** (glândula-mãe, integração):
+- o centro regulador que precisou orquestrar tudo sem manual
+- a glândula-mãe que aprendeu a comandar antes de aprender a ser cuidada
+- o eixo interno de identidade sob carga de coordenar demais
+- o maestro silencioso que nunca teve sua própria pausa
+
+**Pineal-hipotalâmico** (ritmo biológico, ciclos, intuição):
+- o ritmo interno que perdeu o ponteiro do próprio dia
+- o relógio biológico que aprendeu a contar o tempo dos outros
+- a escuta interior abafada pelo barulho do que precisava ser feito
+- o ciclo que pediu pra ser respeitado e foi atropelado por anos
+
+**Adrenal / SNA simpático / padrão pupilar**:
+- o sistema que aprendeu o alerta como única forma de estar
+- a prontidão que virou identidade antes de virar escolha
+- o sensor ligado mesmo quando ninguém pediu mais nada
+- a vigilância que esqueceu como é descansar
+
+**Sistema linfático**:
+- o que ficou sem caminho de saída e foi se acumulando devagar
+- o que precisou ser drenado mas não foi reconhecido como peso
+- o que entrou pra dentro porque não havia para onde ir
+
+**Intestino (delgado + grosso)**:
+- o que precisava ser liberado mas o ritmo da vida não permitiu
+- o que foi vivido sem ter tempo de ser digerido
+- o que ficou retido porque soltar parecia descuido
+
+**Estômago**:
+- o que entrou no corpo antes de ter sido aceito pela palavra
+- o que foi engolido seco, sem mastigação emocional
+- o que ainda não foi digerido nem nominado
+
+**Pâncreas**:
+- a doçura da vida que aprendeu a chegar pelo esforço, não pela presença
+- o regulador da energia sobrecarregado em silêncio
+- o equilíbrio interno entre o que se gasta e o que volta
+
+**Sistema reprodutor**:
+- a câmara criativa que aprendeu a abrigar projetos dos outros antes dos próprios
+- a fertilidade interior que ficou em pausa por demanda de fora
+- o lugar de gestação que pediu espaço e raramente teve
+
+**Sistema urinário**:
+- o que precisava ser filtrado fino e ficou turvo por excesso
+- a eliminação cotidiana de pequenas mágoas que não viraram nome
+
+**Coluna lombar**:
+- a base de sustentação que ficou sob peso maior do que carregava
+- o que precisa de raiz pra aguentar e cresceu sem ela
+
+**Sacro-cóccix**:
+- a raiz de pertencimento que ficou sem terra firme
+- a base última de segurança, que aprendeu a se sustentar sozinha
+
+**Pele / tegumentar**:
+- a interface com o mundo que aprendeu a ser permeável demais ou impermeável demais
+- o limite que sentia tudo antes de poder filtrar
+
+**Sistema imune**:
+- a capacidade de distinguir o que nutre do que invade, exigida demais
+- o discernimento corporal sobre eu/não-eu, sob pressão constante
+
+**Boca / garganta** (expressão direta, SEPARADO de tireoide):
+- a fala que ficou no portal sem atravessar
+- a frase que aprendeu a recuar antes de chegar à boca
+
+**Anel interno (collarete)** — eixo digestivo-nervoso central:
+- a regulação entre sentir e processar que ficou intermitente
+- a ponte entre dentro e fora que aprendeu a controlar muito o que passava
+
+**Regras de uso do repertório (DURAS):**
+1. Use APENAS eixos que aparecem nos achados ATIVOS do Stage 1 desta
+   cliente — NÃO invente eixos que a íris não mostrou.
+2. Escolha 1 variação por eixo presente, evitando a mais óbvia da lista.
+3. Consulte \`recent_phrases_context\` — se uma variação já foi usada
+   recentemente nas últimas 10 frases do terapeuta, escolha outra.
+4. JAMAIS nomeie o órgão (fígado, circulação, pescoço, pulmão,
+   intestino, tireoide, rim, etc) na aterragem — sempre tradução.
+5. Variar léxico entre clientes com mesmo padrão clínico é regra de
+   qualidade central — anti-Forer estrutural.
+
 ### Princípio de ancoragem — achados Stage 1 viram elementos da história
 
 A história em microfilme NÃO é invenção. É **TRADUÇÃO BIOGRÁFICA**
 do que os achados Stage 1 mostraram. Mapa indicativo (não rígido —
 adapte ao Stage 1 desta cliente):
 
-| Achado Stage 1 | Elemento da história |
+| Achado Stage 1 | Elemento da história (NÃO copiar literal — use repertório acima) |
 |---|---|
 | Fígado / pigmento âmbar | raiva engolida, "em nome de não criar conflito" |
 | Vasc escleral marcante | tensão sustentada, "em nome de sustentar tudo" |
@@ -665,14 +802,18 @@ adapte ao Stage 1 desta cliente):
 | Icterícia escleral | "a conta que chegou aos olhos" |
 | Sistema linfático carga | retenção, "o que ficou sem saída" |
 | Rim sob carga | medo de fundo, "em nome de não desabar" |
-| Eixo cervical / tireoide | fala guardada, "em nome de não dizer o que pesaria" |
-| Coluna cervical pigmento | voz tensionada, "em nome de não criar conflito" |
-| Sacro/lombar carga | sustentação que cansou, "em nome de aguentar" |
+| **Tireoide** (eixo da VOZ + ritmo metabólico) | fala guardada, "em nome de não dizer o que pesaria" |
+| **Coluna cervical** (peso FÍSICO carregado nos ombros, distinto da voz) | sustentar postura, "em nome de aguentar o que ninguém viu chegando" |
+| Pituitária / eixo neuroendócrino central | orquestrar tudo, "em nome de manter o eixo funcionando" |
+| Pineal-hipotalâmico | ritmo próprio, "em nome de acompanhar o tempo dos outros" |
+| Sacro/lombar carga | base de sustentação, "em nome de aguentar peso" |
 
 **Regra:** cliente SEM carga hepática NÃO recebe história de "raiva
 engolida". A história NASCE dos achados; não é template aplicado.
 Cliente com carga predominante renal recebe história de "medo de
-fundo"; com tireoide, "fala guardada"; etc.
+fundo"; com tireoide, "voz contida"; com cervical, "peso nos ombros"
+(SEPARAR tireoide de cervical — eixos emocionais distintos: tireoide
+= voz/ritmo interior; cervical = peso físico/sustentar postura).
 
 ### Estrutura formal de §0 vs §14
 
@@ -2034,14 +2175,40 @@ export const STAGE2_METHOD = 'sonnet_2x' as const
 // NÃO mexido: ANCHORING_PRINCIPLE_V2_5 conteúdo (só adicionado
 // cache_control), pupila demoção (v2.7.0), §2 A.5 mappings, §0 heading
 // numerado (v2.7.0/1), system.md Plan 35 reform (v2.7.1), parser/UI.
-// v2.7.4 (2026-05-25): bump PATCH 0.5.3 → 0.5.4 — §7 ganha parágrafo
-// de abertura OBRIGATÓRIO com disclaimer literal de investigação
-// laboratorial. Antes o disclaimer estava só descrito embedded no
-// prompt ("...com disclaimer explícito sempre que aplicável: ...") —
-// Sonnet emitia inconsistentemente. v2.7.4 manda emitir o parágrafo
-// literal como primeiro bloco de §7. Founder: "tinha um disclaimer...
-// é bom colocar". Zero outras mudanças.
-export const STAGE2_VERSION = '0.5.4' as const
+// v2.8.0 (2026-05-25): bump MINOR 0.5.4 → 0.6.0 — mudança estruturante
+// de voz + tradução psicossomática.
+//
+// (1) VOZ: todo relatório passa de 3ª pessoa ("ela") pra 2ª pessoa
+// ("você"). Vocativo "Nome, você..." em §0 e §14 (abertura). §1/§3/§4/
+// §5/§6/§8/§9/§10/§11/§13/§15 em "você" direto. §2/§7 mantêm registro
+// técnico-funcional neutro. §12/§14 já eram 2ª pessoa. Razão: duplo
+// público UAU (cliente B2C + terapeuta B2B) precisa de reconhecimento
+// direto, não distância narrativa de 3ª pessoa.
+//
+// (2) TRADUÇÃO ÓRGÃO→PROCESSO: Marca 7 v2 §0 ganha bloco "Tradução
+// órgão → processo psicossomático" com repertório de ~22 eixos
+// orgânicos × 3-5 variações cada. Sonnet escolhe UMA variação por
+// eixo presente, consulta recent_phrases_context pra anti-repetição,
+// JAMAIS nomeia órgão direto na aterragem. Founder verbatim:
+// "o que fígado quer dizer? que processo atacou o fígado... raiva...
+// o que queria ter dito e não disse... mas não coloque órgão. e
+// circulação? fluir da vida?". Resolve tech debt N=1 da Nayara de
+// Aquino v0.5.4 que reincidiu "O fígado foi acumulando" + "registro
+// fiel" — agora com repertório explícito.
+//
+// (3) TIREOIDE ≠ CERVICAL: founder explícito 2026-05-25: "vi que o
+// prompt juntou cervical e tireoide... isso deve ser separado, pois
+// são emoções diferentes". Tireoide = voz contida + ritmo metabólico.
+// Cervical = peso físico carregado nos ombros. Eixos emocionais
+// DISTINTOS no repertório + corrigidas 4 ocorrências em system.md
+// que misturavam ("padrão tireoide-vocal", "cervical-tireoidiana"):
+// L1424, L1525, L1592, L1830 todas separadas.
+//
+// NÃO mexido: pupila demoção (v2.7.0), §2 A.5 mappings (v2.7.0),
+// §0 heading numerado + extractZeroSection (v2.7.0/1), cache_control
+// 4 breakpoints (v2.7.3), §7 disclaimer literal (v2.7.4), Stage 1
+// intocado (Sonnet 4.6 + temperature 0.0 + tool use).
+export const STAGE2_VERSION = '0.6.0' as const
 
 /**
  * Etapa 2 do pipeline Sonnet 2x — composição streaming ancorada no JSON
