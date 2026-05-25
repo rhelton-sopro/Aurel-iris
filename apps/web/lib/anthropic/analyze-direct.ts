@@ -622,14 +622,34 @@ em série de 2-3 cláusulas paralelas):
   em nome de não dar trabalho
 
 **Parte (III) — O QUE ELA DEIXOU DE FAZER POR SI** (consequência
-biográfica + ancoragem no achado visível):
+biográfica + aterragem emocional, NÃO descrição física):
 - e foi, ano após ano, deixando de olhar pra si / deixou de pedir o
   que precisava / parou de perguntar o que queria / desaprendeu o
   caminho de volta pra si — até que [consequência específica]
-- aterragem final: NOMEIA o achado visível como conclusão da história
-  ("e agora o amarelo nos olhos conta a conta que ela nunca pediu
-  pra ninguém pagar com ela" / "e agora o pigmento âmbar bilateral
-  é o registro fiel de quanto ela filtrou sozinha" / etc.)
+- aterragem final (v2.7.2): TRADUZ O SIGNIFICADO EMOCIONAL do que ela
+  carrega — SEM nomear cor / lateralidade / pigmento / vaso / órgão
+  / tecido. A aterragem é a ponte entre o que o organismo guarda e o
+  que isso significou pra ela viver desse jeito. O achado físico JÁ
+  está nomeado em §2 (mapa orgânico); aqui ele aparece como
+  CONSEQUÊNCIA INTERNA, não como descrição.
+
+  ❌ "agora o pigmento âmbar bilateral é o registro fiel de quanto
+    ela filtrou sozinha" (cor + lateralidade + tecido + fórmula "é
+    o registro fiel" — vazada em N relatórios)
+  ❌ "o amarelo nos olhos conta a conta" (nomeia cor)
+  ❌ "os vasos esclerais contam o que ela engoliu" (nomeia
+    estrutura técnica)
+  ❌ "o pigmento que os olhos agora carregam, dourado e bilateral"
+    (cor + lateralidade — descritivo frio quando deveria ser
+    significado emocional)
+  ❌ qualquer frase contendo "é o registro fiel" — fórmula
+    universal vazada
+
+  PRINCÍPIO (em vez de exemplos ✅ literais que vazam): use verbo de
+  cobrança / devolução / lembrança / pedido ligado ao SACRIFÍCIO
+  biográfico da Parte II e à CONSEQUÊNCIA INTERNA da Parte III. A
+  aterragem é a frase que diz "e agora isso pede a fatura" SEM
+  dizer onde a fatura está escrita no corpo.
 
 ### Princípio de ancoragem — achados Stage 1 viram elementos da história
 
@@ -668,7 +688,8 @@ fundo"; com tireoide, "fala guardada"; etc.
   após o cabeçalho/contexto. NÃO emita §0 no fim do documento.
 - 6-9 linhas total
 - 3 partes do microfilme (verbo + em nome de + deixou de + aterragem
-  no achado visível)
+  emocional — ver Parte (III) acima; v2.7.2 PROÍBE aterragem que
+  descreva cor/lateralidade/tecido da íris)
 - **NÃO termina em reframe Tipo B declarativo** (reframe fica pra §14)
 - **TERMINA com Marca 7.1** — pergunta maiêutica em parágrafo separado
   (regra detalhada na seção Marca 7.1 abaixo)
@@ -683,30 +704,39 @@ fundo"; com tireoide, "fala guardada"; etc.
   redirecionada pra cliente em moeda nova)
 - **NÃO usa pergunta maiêutica** (§14 fecha declarativamente)
 
-### Exemplo integrado — Evanilce §0 v2.5.6
+### Estrutura analítica de um §0 bem-construído (v2.7.2 — sem exemplo ✅ literal)
 
-> "Ela disse sim quando o corpo pediu não — em nome da paz na mesa,
-> em nome de não carregar o conflito do outro, em nome de continuar
-> sendo a que segura tudo. Engoliu a raiva em nome da família
-> intacta, em nome do trabalho continuando, em nome de não desabar.
-> E foi, ano após ano, deixando de olhar pra si — até que olhar
-> pra si começou a parecer luxo que ela não podia se dar. Agora o
-> amarelo nos olhos conta a conta que ela nunca pediu pra ninguém
-> pagar com ela.
->
-> E se essa conta, finalmente, pudesse ser dividida?"
+NÃO incluímos exemplo completo aqui por design — v2.7.2 removeu o
+exemplo integrado anterior porque sua "aterragem visual" ("o amarelo
+nos olhos conta a conta") vazou verbatim pro output em N relatórios
+e violava as regras anti-cromatismo do §0 (memory:
+feedback_prompt_examples_leak_to_output).
 
-Análise:
-- Parte I: "disse sim quando o corpo pediu não" + "engoliu a raiva"
-- Parte II: "em nome da paz na mesa, em nome de não carregar o
-  conflito, em nome de continuar sendo a que segura tudo" (3 cláusulas)
-  + "em nome da família intacta, em nome do trabalho continuando,
-  em nome de não desabar" (3 cláusulas — densidade)
-- Parte III: "deixando de olhar pra si — até que olhar pra si
-  começou a parecer luxo que ela não podia se dar" + aterragem
-  visual: "o amarelo nos olhos conta a conta"
-- Marca 7.1: pergunta maiêutica família Espelho ("E se essa
-  conta...")
+Decomposição do que um §0 bem-construído contém:
+
+- **Parte I — verbo de sacrifício**: 1-2 verbos de ação biográfica
+  que NOMEIAM o que ela fez (engoliu / disse sim / segurou / antecipou /
+  filtrou). Derivado do achado psicossomático dominante desta cliente.
+
+- **Parte II — em nome de + 2-3 cláusulas paralelas**: causalidade
+  interna do sacrifício. Cada cláusula é o nome do valor pelo qual
+  ela pagou (paz na mesa / trabalho continuando / família intacta /
+  não desabar / não criar conflito). Densidade dá ritmo.
+
+- **Parte III — deixou de + aterragem emocional**: a consequência
+  biográfica (o que ela parou de fazer por si) seguida da aterragem
+  emocional que TRADUZ O SIGNIFICADO interno do que ela carrega —
+  SEM nomear cor / lateralidade / pigmento / vaso / órgão (regras
+  v2.7.2 acima).
+
+- **Marca 7.1**: pergunta maiêutica família Espelho / Testemunho /
+  Virada simples — parágrafo separado, 1 frase curta terminada
+  com ponto de interrogação simples.
+
+Diretriz: cada §0 emergiu DESTA cliente específica, dos achados
+ATIVOS desta leitura. Se outro §0 desta semana se parece com este,
+é porque os achados clínicos coincidem — não porque você está
+seguindo template.
 
 ### Estruturas ❌ PROIBIDAS em §0 e §14
 
@@ -1976,7 +2006,35 @@ export const STAGE2_METHOD = 'sonnet_2x' as const
 // Essence_phrase fica conceitualmente desativada — Sonnet não recebe
 // instrução pra emitir "## Em uma palavra"; o slot continua no schema mas
 // vira sempre null em gerações novas. UI/PDF já fazem skip via .trim() check.
-export const STAGE2_VERSION = '0.5.1' as const
+// v2.7.2 (2026-05-25): bump PATCH 0.5.1 → 0.5.2 — 2 fixes acoplados.
+//
+// (1) Vazamento de tokens: maio 2026 cache_read=0% em 70 rows (Stage 1
+// + Stage 2). Diagnóstico — apenas 1 dos 6 system blocks (system.md)
+// tinha cache_control; os 5 overrides (STAGE2_MODE, VOICE, STRUCTURAL,
+// ANCHORING, ANTI_FORER) eram regravados sem reuso. Custo estimado:
+// ~50% do gasto Stage 2 maio desperdiçado em cache_creation premium
+// ($8 dos $13.48). Fix v2.7.2: cache_control: DEFAULT_SYSTEM_CACHE_CONTROL
+// nos 6 blocks (todos constantes, estáveis há dias). TTL 5min preservado
+// — ttl='1h' (extended cache Anthropic) adiado pra release futura quando
+// overrides estiverem 100% estabilizados.
+//
+// (2) Aterragem visual Marca 7 v2 vazou verbatim: Evanilce regen=3
+// emitiu "O pigmento que os olhos agora carregam, dourado e bilateral,
+// é o registro fiel do que foi filtrado sem testemunha" — cópia quase
+// literal do exemplo ✅ da Marca 7 v2 ("pigmento âmbar bilateral é o
+// registro fiel"). Founder verbatim: "aqui não colocamos frieza... como
+// pigmento dos olhos... colocamos o que significa". Memory:
+// feedback_prompt_examples_leak_to_output. Fix: substituir 2 exemplos ✅
+// literais por descrição semântica + 4 ❌ (cor/lateralidade/tecido/
+// fórmula "é o registro fiel") + princípio (verbo de cobrança ligado
+// ao sacrifício biográfico, não ao achado físico). Também removido o
+// "Exemplo integrado Evanilce §0 v2.5.6" inteiro porque sua aterragem
+// "o amarelo nos olhos conta a conta" era a fórmula original que vazou.
+//
+// NÃO mexido: ANCHORING_PRINCIPLE_V2_5 conteúdo (só adicionado
+// cache_control), pupila demoção (v2.7.0), §2 A.5 mappings, §0 heading
+// numerado (v2.7.0/1), system.md Plan 35 reform (v2.7.1), parser/UI.
+export const STAGE2_VERSION = '0.5.2' as const
 
 /**
  * Etapa 2 do pipeline Sonnet 2x — composição streaming ancorada no JSON
@@ -2004,36 +2062,57 @@ export async function analyzeReadingComposeStage2(
       model: MODEL,
       max_tokens: MAX_OUTPUT_TOKENS,
       system: [
+        // v2.7.2 (2026-05-25): TODOS os 6 system blocks agora têm
+        // cache_control. Diagnóstico empírico: maio 2026 cache_read=0%
+        // em 70 rows (Stage 1 + Stage 2) — apenas o primeiro block
+        // (system.md) tinha cache_control; os 5 overrides eram regravados
+        // a cada request sem reuso. Resultado: ~50% de custo Stage 2
+        // desperdiçado em cache_creation premium. v2.7.2 fix: cache_control
+        // em todos os blocks (todos constantes, estáveis há dias). TTL 5min
+        // padrão preservado — UAT ainda ativo, ttl='1h' adiado pra release
+        // futura quando overrides estiverem totalmente estabilizados.
         {
           type: 'text',
           text: systemPrompt,
           cache_control: DEFAULT_SYSTEM_CACHE_CONTROL,
         },
-        { type: 'text', text: STAGE2_MODE_OVERRIDE },
-        // v2.4 (2026-05-23): voz visceral/observador. SEM cache_control
-        // — bloco curto e potencialmente iterado rápido durante UAT;
-        // cache na primeira pesa, sobrescrever invalida. Após estabilizar
-        // pós-UAT, candidate a virar cached.
-        { type: 'text', text: VOICE_OVERRIDE_V2_4 },
-        // v2.4.2 (2026-05-24): calibração estrutural §3/§7/§11.
-        // Separado do VOICE pra responsabilidade clara: VOICE = como
-        // (registro/cadência); STRUCTURAL = o quê (ordem/formato/
-        // anti-fórmula). Mesmo motivo de SEM cache_control — em UAT
-        // ainda, sujeito a iteração rápida.
-        { type: 'text', text: STRUCTURAL_OVERRIDE_V2_4_2 },
-        // v2.5.0 (2026-05-24): princípio de ancoragem total. Stage 1 =
-        // fonte única de verdade; achados com natureza='indeterminada'
-        // viram skip global; §2 é gate cross-section. Mesmo motivo de
-        // SEM cache_control — UAT ativo, mudança arquitetural sujeita a
-        // calibração nas primeiras leituras pós-deploy.
-        { type: 'text', text: ANCHORING_PRINCIPLE_V2_5 },
-        // v2.5.4 (2026-05-24): última camada de defesa contra fórmula
-        // Forer estrutural. Marca 3.0 do VOICE (camada interna) já
-        // proíbe; este bloco é redundante porque UAT mostrou taxa
-        // ~67% de violação (Carol regen=3 + Evanilce regen=6).
-        // Banimento BINÁRIO + regex de validação textual interna +
-        // §1 marcada como crítica. Sem cache_control — UAT ativo.
-        { type: 'text', text: ANTI_FORER_HARDLINE_V2_5_4 },
+        {
+          type: 'text',
+          text: STAGE2_MODE_OVERRIDE,
+          cache_control: DEFAULT_SYSTEM_CACHE_CONTROL,
+        },
+        // v2.4 voz visceral/observador. CACHED em v2.7.2 (estável desde
+        // 2026-05-23). Última edição: v2.7.2 aterragem visual Marca 7 v2
+        // (substituiu 2 exemplos ✅ literais por descrição semântica +
+        // 4 ❌). Cada edição neste bloco invalida o cache uma vez.
+        {
+          type: 'text',
+          text: VOICE_OVERRIDE_V2_4,
+          cache_control: DEFAULT_SYSTEM_CACHE_CONTROL,
+        },
+        // v2.4.2 calibração estrutural §3/§7/§11. CACHED em v2.7.2
+        // (estável desde 2026-05-24).
+        {
+          type: 'text',
+          text: STRUCTURAL_OVERRIDE_V2_4_2,
+          cache_control: DEFAULT_SYSTEM_CACHE_CONTROL,
+        },
+        // v2.5.0 princípio de ancoragem total. Stage 1 = fonte única de
+        // verdade; achados com natureza='indeterminada' roteados via
+        // motivo_indeterminacao; §2 é gate cross-section. CACHED em v2.7.2
+        // (última edição substantiva foi v2.7.0 Caso 1 reescrita).
+        {
+          type: 'text',
+          text: ANCHORING_PRINCIPLE_V2_5,
+          cache_control: DEFAULT_SYSTEM_CACHE_CONTROL,
+        },
+        // v2.5.4 anti-Forer hardline. CACHED em v2.7.2 (estável desde
+        // 2026-05-24).
+        {
+          type: 'text',
+          text: ANTI_FORER_HARDLINE_V2_5_4,
+          cache_control: DEFAULT_SYSTEM_CACHE_CONTROL,
+        },
       ],
       messages: [{ role: 'user', content: userContent }],
     },
