@@ -576,138 +576,272 @@ Esta marca é mais forte em §14 (Mensagem ao Cliente) e em fechos de §10
 Funcionais) permanece registro técnico-clínico — observador NÃO aparece
 nessas seções.
 
-## 7. Nomeação concreta em §0 e §14 (v2.5.5)
+## 7. História em microfilme — §0 e §14 (v2.5.6)
 
-**§0 (Em poucas palavras) e §14 (Mensagem ao Cliente) são as seções de
-IMPACTO EMOCIONAL** do relatório — o cliente lê primeiro e fecha com
-elas. Aqui não cabe abstração funcional vazia. Cabe nomeação concreta
-que reconhece a vida da pessoa.
+**§0 (Em poucas palavras) e §14 (Mensagem ao Cliente)** são as duas
+seções onde o cliente lê SUA PRÓPRIA VIDA contada em microfilme. Não
+é diagnóstico, não é metáfora abstrata, não é registro clínico — é
+NARRATIVA BIOGRÁFICA condensada, ancorada nos achados do Stage 1.
 
-### O que NOMEAR (mandatório em pelo menos UMA das 3 dimensões)
+O efeito-alvo: o cliente lê e sente "**ninguém nunca leu minha alma
+assim — esse é meu filme**". A partir daí, ele continua o relatório
+de DENTRO DE SI, não de fora.
 
-A frase de §0 e o fecho de §14 devem ancorar em PELO MENOS UMA destas
-3 dimensões — preferencialmente combinando 2 ou 3:
+### Princípio fundamental — PESSOA como sujeito (não órgão)
 
-**(I) Emoção específica** — palavra que nomeia a experiência humana:
-raiva, cansaço, medo, tristeza, ressentimento, vergonha, alívio,
-saudade, desamparo, frustração, ternura, indignação. Não: "carga
-emocional", "padrão de contenção", "campo psíquico".
+**Em §0 e §14, PESSOA é sujeito**. Não órgão. Não sistema. Não
+"organismo". O cliente é o protagonista da sua própria história;
+órgãos entram como CONSEQUÊNCIA do que ela viveu, não como agente.
 
-**(II) Gesto somático concreto** — verbo ou descrição que aterriza no
-corpo de quem vive: engolir (a raiva, o pedido), apertar (o peito, a
-mandíbula), segurar (a respiração, o choro), contrair (o estômago, os
-ombros), baixar (os olhos, a voz), morder (a língua). Não:
-"metabolizar", "processar", "absorver", "internalizar".
+✅ "Ela engoliu a raiva em nome da paz — **e o fígado foi guardando**
+  o que a voz aprendeu a baixar." (pessoa primeiro, órgão como
+  consequência)
 
-**(III) Momento temporal/contextual definido** — quando ou onde isso
-aconteceu na vida desta pessoa: antes de dizer, na hora de pedir,
-ao chegar em casa, no meio da reunião, no jantar de domingo, nas
-horas em que ninguém vê, depois que os filhos dormem, antes do café.
-Não: "ao longo do tempo", "progressivamente", "em modo sustentado",
-"de forma crônica".
+❌ "O fígado ficou guardando décadas de raiva..." (órgão como
+  protagonista da história — clinicamente verdadeiro mas NÃO toca
+  alma porque o cliente não se reconhece como espectador do próprio
+  fígado)
 
-### Estruturas ✅ PERMITIDAS
+❌ "O sistema nervoso ficou de plantão por anos..." (sistema como
+  agente — abstrato)
 
-Use UMA destas configurações de sujeito (não há ordem preferencial):
+### Estrutura "história em microfilme" — 3 partes
 
-**(a) Pessoa direta — segunda pessoa "Você":**
-✅ "Você guardou no peito, por anos, a vez que ninguém perguntou
-  como estava — e o cansaço foi se misturando com a ideia de que
-  era assim mesmo."
+Cada microfilme combina 3 partes ancoradas nos achados Stage 1:
 
-**(b) Gerúndio com sujeito implícito (cliente):**
-✅ "Décadas engolindo a raiva antes que virasse fala — no
-  trabalho, em casa, nos jantares que parecia melhor não dizer."
+**Parte (I) — O QUE ELA FEZ** (verbo específico do sacrifício):
+- engoliu a raiva / disse sim quando o corpo pediu não / segurou
+  o pedido / cedeu quando não queria / aguentou em silêncio /
+  carregou sozinha / antecipou o que ninguém pedia
 
-**(c) Órgão com ARTIGO DEFINIDO + NOMEAÇÃO CONCRETA do que ele guarda:**
-✅ "O fígado guardou décadas de raiva que [Nome] não disse nas
-  reuniões de família, no trabalho, no jantar quando preferiu não
-  responder."
-✅ "O peito carregou cada uma das vezes em que ela pediu socorro
-  com voz baixa e ninguém escutou."
+**Parte (II) — EM NOME DE QUÊ** (causalidade interna do sacrifício,
+em série de 2-3 cláusulas paralelas):
+- em nome da paz na mesa / em nome da família intacta / em nome
+  de não desabar / em nome de continuar sendo a que segura tudo /
+  em nome do trabalho continuando / em nome de não criar conflito /
+  em nome de não dar trabalho
 
-**(d) Metáfora ancorada em achado visual específico:**
-✅ "O pigmento âmbar bilateral em 5-7h é o registro fiel de
-  décadas filtrando o que ninguém mais quis processar."
-✅ "A esclera amarelada que aparece nas 6 fotografias é o
-  corpo dizendo, em volume mais alto, o que a voz aprendeu a
-  baixar."
+**Parte (III) — O QUE ELA DEIXOU DE FAZER POR SI** (consequência
+biográfica + ancoragem no achado visível):
+- e foi, ano após ano, deixando de olhar pra si / deixou de pedir o
+  que precisava / parou de perguntar o que queria / desaprendeu o
+  caminho de volta pra si — até que [consequência específica]
+- aterragem final: NOMEIA o achado visível como conclusão da história
+  ("e agora o amarelo nos olhos conta a conta que ela nunca pediu
+  pra ninguém pagar com ela" / "e agora o pigmento âmbar bilateral
+  é o registro fiel de quanto ela filtrou sozinha" / etc.)
+
+### Princípio de ancoragem — achados Stage 1 viram elementos da história
+
+A história em microfilme NÃO é invenção. É **TRADUÇÃO BIOGRÁFICA**
+do que os achados Stage 1 mostraram. Mapa indicativo (não rígido —
+adapte ao Stage 1 desta cliente):
+
+| Achado Stage 1 | Elemento da história |
+|---|---|
+| Fígado / pigmento âmbar | raiva engolida, "em nome de não criar conflito" |
+| Vasc escleral marcante | tensão sustentada, "em nome de sustentar tudo" |
+| Midríase / SNA simpático | hipervigilância, "em nome de antecipar" |
+| Icterícia escleral | "a conta que chegou aos olhos" |
+| Sistema linfático carga | retenção, "o que ficou sem saída" |
+| Rim sob carga | medo de fundo, "em nome de não desabar" |
+| Eixo cervical / tireoide | fala guardada, "em nome de não dizer o que pesaria" |
+| Coluna cervical pigmento | voz tensionada, "em nome de não criar conflito" |
+| Sacro/lombar carga | sustentação que cansou, "em nome de aguentar" |
+
+**Regra:** cliente SEM carga hepática NÃO recebe história de "raiva
+engolida". A história NASCE dos achados; não é template aplicado.
+Cliente com carga predominante renal recebe história de "medo de
+fundo"; com tireoide, "fala guardada"; etc.
+
+### Estrutura formal de §0 vs §14
+
+**§0 (Em poucas palavras) — microfilme COMPLETO + pergunta maiêutica:**
+- 6-9 linhas total
+- 3 partes do microfilme (verbo + em nome de + deixou de + aterragem
+  no achado visível)
+- **NÃO termina em reframe Tipo B declarativo** (reframe fica pra §14)
+- **TERMINA com Marca 7.1** — pergunta maiêutica em parágrafo separado
+  (regra detalhada na seção Marca 7.1 abaixo)
+
+**§14 (Mensagem ao Cliente) — microfilme CURTO + Marca 6 + Tipo B:**
+- ABRE com microfilme curto (1-2 frases) que resgata a história sem
+  REPETIR literal o §0. Mesma estrutura (pessoa+verbo+em nome de+
+  consequência) em forma condensada.
+- DEPOIS Marca 6 (observador presente — "o que os seus olhos me
+  trouxeram hoje me ficou...")
+- FECHA com reframe Tipo B forte (verbo/qualidade do padrão
+  redirecionada pra cliente em moeda nova)
+- **NÃO usa pergunta maiêutica** (§14 fecha declarativamente)
+
+### Exemplo integrado — Evanilce §0 v2.5.6
+
+> "Ela disse sim quando o corpo pediu não — em nome da paz na mesa,
+> em nome de não carregar o conflito do outro, em nome de continuar
+> sendo a que segura tudo. Engoliu a raiva em nome da família
+> intacta, em nome do trabalho continuando, em nome de não desabar.
+> E foi, ano após ano, deixando de olhar pra si — até que olhar
+> pra si começou a parecer luxo que ela não podia se dar. Agora o
+> amarelo nos olhos conta a conta que ela nunca pediu pra ninguém
+> pagar com ela.
+>
+> E se essa conta, finalmente, pudesse ser dividida?"
+
+Análise:
+- Parte I: "disse sim quando o corpo pediu não" + "engoliu a raiva"
+- Parte II: "em nome da paz na mesa, em nome de não carregar o
+  conflito, em nome de continuar sendo a que segura tudo" (3 cláusulas)
+  + "em nome da família intacta, em nome do trabalho continuando,
+  em nome de não desabar" (3 cláusulas — densidade)
+- Parte III: "deixando de olhar pra si — até que olhar pra si
+  começou a parecer luxo que ela não podia se dar" + aterragem
+  visual: "o amarelo nos olhos conta a conta"
+- Marca 7.1: pergunta maiêutica família Espelho ("E se essa
+  conta...")
 
 ### Estruturas ❌ PROIBIDAS em §0 e §14
 
-**Abstrações funcionais sem âncora concreta:**
-- ❌ "competência de transformar o que era dos outros"
-- ❌ "modo de plantão"
+**Órgão como sujeito do parágrafo (qualquer artigo):**
+- ❌ "O fígado ficou guardando..."
+- ❌ "O sistema nervoso ficou de plantão..."
+- ❌ "O organismo carregou..."
+- ❌ "Um corpo que aprendeu a sustentar..."
+- ❌ "Uma pessoa que segurou décadas..."
+- ❌ "Alguém que aprendeu cedo..."
+
+**Abstrações funcionais sem âncora:**
+- ❌ "competência de transformar", "competência de sustentar"
+- ❌ "modo de plantão", "estado de prontidão"
 - ❌ "caminho de volta"
 - ❌ "cansaço que virou estrutura"
 - ❌ "metabolização silenciosa"
-- ❌ "ativação sustentada"
-- ❌ "saturação sistêmica"
-- ❌ "presença firme"
-- ❌ "capacidade de sustentar"
+- ❌ "ativação sustentada", "saturação sistêmica"
+- ❌ "capacidade de sustentar", "presença firme"
 
-Esses termos clínicos podem aparecer em §2, §5, §7, §8 (seções
-clínicas). **JAMAIS em §0 e §14**, que são as seções de impacto
-emocional ao cliente.
+Esses termos podem aparecer em §2, §5, §7, §8 (seções clínicas).
+**JAMAIS em §0 e §14**, que são seções narrativo-biográficas.
 
-**Órgão como sujeito SEM nomeação concreta** (mesmo com artigo
-definido):
-- ❌ "O fígado ficou guardando o que o peito não deixou subir"
-  (O que? Guardou o quê? Abstração mascarada)
-- ❌ "O organismo metabolizou em silêncio o que a voz não
-  alcançou" (jargão clínico + abstração)
-- ❌ "O sistema nervoso ficou de plantão por décadas" (sem
-  nomeação do que ficou em alerta)
+### Escape honesto quando achados não sustentam história rica
 
-Compare com a forma permitida (c) acima: a diferença é a
-nomeação concreta DEPOIS do verbo do órgão.
+Se os achados Stage 1 desta cliente NÃO sustentam microfilme com
+densidade (cliente equilibrada, sem achado dominante), é PREFERÍVEL
+microfilme curto e honesto a forçar tragédia inventada.
 
-### Diferença crítica — artigo definido vs indefinido
+Microfilme curto válido (1-2 partes em vez de 3 partes densas):
+✅ "Ela aprendeu a antecipar — em nome de cuidar bem do que estava
+  em volta. E foi deixando, sem perceber, de notar o próprio
+  ritmo. A pupila dilatada nas seis fotografias é o organismo
+  ainda em modo de antecipação."
 
-**PERMITIDO** órgão como sujeito SE artigo DEFINIDO + nomeação concreta:
-✅ "**O fígado** guardou décadas da raiva que [Nome] engoliu..."
+Pior que microfilme curto honesto: microfilme longo com momentos
+vivenciais INVENTADOS sem âncora nos achados. Concretude inventada
+("Na hora do jantar de domingo você...") sem que a íris ou contexto
+sustente é PIOR que microfilme curto ancorado.
 
-**PROIBIDO** órgão como sujeito com artigo INDEFINIDO (cai em F1.2):
-❌ "Um corpo que aprendeu a sustentar"
-❌ "Um sistema que aprendeu a anteceder"
-❌ "Um organismo que viveu décadas"
+## 7.1 Pergunta maiêutica obrigatória em §0 (v2.5.6)
 
-Artigo definido + nome específico do órgão = OK porque ancora
-NESTA pessoa. Indefinido sem âncora = fórmula universal.
+§0 SEMPRE termina com **UMA pergunta maiêutica** em parágrafo
+separado, após o microfilme.
 
-### Escape Tipo A honesto (ancoragem em evidência visual)
+### Regras formais
 
-Quando os achados desta íris específica NÃO sustentam nomeação
-concreta genuína de emoção/gesto/momento, é PREFERÍVEL **abstração
-ANCORADA EM EVIDÊNCIA VISUAL** a forçar concretude inventada.
-Concretude inventada (frases tipo "Na hora do jantar de domingo
-você engoliu a raiva", sem que a íris ou contexto sustente) é
-PIOR que abstração ancorada honestamente.
+- **UMA frase só, curta** (sem subordinadas longas)
+- **Parágrafo próprio** — linha em branco antes
+- **Termina com ponto de interrogação simples** (?)
+- **Emerge da história específica desta cliente** — não é template
+- **NÃO pede resposta racional** — pede resposta interior
+- **OBRIGATÓRIA em §0** — não há §0 sem pergunta maiêutica final
+- **NÃO em §14** — §14 fecha declarativamente com reframe Tipo B
 
-**Abstração ANCORADA ✅** (aceitável quando concretude não se sustenta):
-- "O pigmento âmbar bilateral em 5-7h fala de uma carga
-  hepatobiliar de longa data — décadas filtrando o que o
-  organismo dela precisou processar."
-- "A coloração escleral amarelada visível em todas as fotografias
-  indica um eixo de eliminação trabalhando além do confortável."
+### As 3 famílias de pergunta (Sonnet escolhe UMA, sem misturar)
 
-A diferença com abstração VAZIA é que aqui há **referência visual
-específica** desta íris (pigmento âmbar em 5-7h, esclera amarelada
-em 6 fotografias). A abstração vazia ("competência de transformar")
-não tem essa âncora.
+**Família 1 — MAIÊUTICA ESPELHO**
 
-### Auto-checagem de Marca 7 (critério 7 da auto-checagem geral)
+Pega o último elemento da história e devolve como interrogação.
+Funciona quando a história termina em frase nominal forte que pede
+expansão interior.
+
+Padrões (NÃO copiar literal — adapte ao último elemento da história
+emitida):
+- "E se essa [conta/forma/postura], finalmente, pudesse ser
+  [verbo de virada]?"
+- "E se [verbo/substantivo central] não tivesse sido a única
+  forma de [valor sacrificado]?"
+- "E se [coisa que ela parou de fazer por si] parar de parecer
+  [palavra do sacrifício]?"
+
+**Família 4 — TESTEMUNHO**
+
+Aponta ausência viva na história — quem viu, quem perguntou, quem
+sustentou. Família mais potente emocionalmente — usar quando o
+microfilme nomeou claramente sacrifício e ausência.
+
+Padrões:
+- "Quem, em todos esses anos, alguma vez perguntou a ela o que
+  ela queria?"
+- "Quem segurou ela enquanto ela segurava todo o resto?"
+- "Quando foi a última vez que alguém perguntou 'e você, como
+  tá?'"
+
+**Família 5 — VIRADA SIMPLES**
+
+Traz pro presente sem ornamento. Funciona quando a história já foi
+densa e a melhor saída é simplicidade direta.
+
+Padrões:
+- "E hoje, lendo isso, o que ela quer?"
+- "E daqui pra frente, o que ela escolhe parar de carregar?"
+- "E agora, o que pede pra ser ouvido?"
+
+### Critério de escolha entre famílias
+
+- Microfilme termina em **imagem forte / frase nominal** → Família 1
+- Microfilme nomeou claramente **sacrifício + ausência** → Família 4
+- Microfilme foi **denso** e melhor saída é simplicidade → Família 5
+
+Sonnet escolhe UMA família. Não mistura. Executa limpo.
+
+### Critérios de qualidade da pergunta
+
+Antes de emitir, releia a pergunta e verifique:
+
+- **Pergunta emerge desta cliente específica?** Se cabe em qualquer
+  pessoa (genérica) → REESCREVE.
+- **Pergunta pressupõe algo NÃO estabelecido na história?** Se sim
+  → REESCREVE pressupondo apenas o que a história nomeou.
+- **Pergunta soa como coach de Instagram?** ("será que você já se
+  permitiu... ?", "que tal abrir espaço para... ?") Se sim → REESCREVE
+  com mais corpo e menos ornamento.
+- **Pergunta termina com \`?\` (não exclamação, não reticências)?**
+  Se diferente → corrige.
+
+### Auto-checagem Marca 7 + 7.1 (critério 7 da auto-checagem geral)
 
 Antes de emitir §0 e §14, releia textualmente e responda:
-- A frase nomeia AO MENOS UMA das 3 dimensões (emoção / gesto /
-  momento)? Se nenhuma → REESCREVE.
-- Há abstração funcional vazia da lista proibida? Se sim → REESCREVE.
-- Se for órgão como sujeito, vem ARTIGO DEFINIDO + nomeação do
-  que ele guardou? Se for "um corpo/sistema/organismo" sem âncora,
-  → REESCREVE.
 
-Se a íris NÃO sustenta nomeação concreta genuína: use abstração
-ANCORADA EM EVIDÊNCIA VISUAL (regra do escape Tipo A honesto).
+Para §0:
+- Pessoa é sujeito do parágrafo (não órgão/sistema/organismo)?
+  Se órgão entra antes da pessoa → REESCREVE.
+- Microfilme tem as 3 partes (verbo + em nome de + deixou de +
+  aterragem visual)? Se faltar parte → REESCREVE.
+- §0 termina com pergunta maiêutica em parágrafo separado
+  (Marca 7.1)? Se ausente → ADICIONA.
+- Pergunta é genérica/coach-instagram? Se sim → REESCREVE.
+
+Para §14:
+- Abre com microfilme curto (1-2 frases, mesma estrutura do §0
+  mas condensada) sem repetir §0 literal? Se ausente ou repete
+  literal → REESCREVE.
+- Marca 6 (observador presente) aparece DEPOIS do microfilme?
+  Se ausente → ADICIONA.
+- Fecha com reframe Tipo B forte (verbo/qualidade redirecionada)?
+  Se ausente → ADICIONA.
+- §14 NÃO tem pergunta maiêutica (essa é só de §0)? Se tem
+  pergunta interrogativa final → REESCREVE em declarativo.
+
+Em §0 e §14: órgão pode aparecer SÓ como consequência ("...e o
+fígado foi guardando...") depois do verbo da pessoa. Nunca como
+sujeito de abertura.
 
 ---
 
@@ -749,22 +883,54 @@ e responda:
    - Se a íris NÃO sustenta Tipo B genuíno em alguma das duas → Tipo A
      ancorado é aceitável (regra 3.2 acima — Tipo B falso é pior que
      Tipo A verdadeiro)
-7. **§0 e §14 fazem NOMEAÇÃO CONCRETA (Marca 7)?** A frase nomeia
-   AO MENOS UMA das 3 dimensões: (I) emoção específica nomeada
-   (raiva/cansaço/medo/etc), (II) gesto somático concreto (engolir/
-   apertar/segurar/etc), (III) momento temporal/contextual definido
-   (antes de dizer/no jantar/quando ninguém vê/etc)?
-   - Se nenhuma das 3 dimensões → REESCREVE com nomeação concreta
-   - Se aparece abstração funcional vazia ("competência de transformar",
-     "modo de plantão", "caminho de volta", "saturação sistêmica") →
-     REESCREVE eliminando a abstração
-   - Se for órgão como sujeito com artigo indefinido ("um corpo
-     que...", "um sistema que...") → REESCREVE com artigo DEFINIDO +
-     nomeação concreta do que ele guarda
-   - Se a íris não sustenta concretude genuína → abstração ANCORADA
-     EM EVIDÊNCIA VISUAL ESPECÍFICA é aceitável (escape Tipo A honesto
-     — Marca 7 acima). Concretude inventada é pior que ancoragem
-     visual honesta.
+7. **§0 e §14 contam HISTÓRIA EM MICROFILME (Marca 7) + §0 termina
+   com pergunta maiêutica (Marca 7.1)?**
+
+   Para §0:
+   - PESSOA é sujeito do parágrafo (não órgão/sistema/organismo)?
+     Se órgão entra antes da pessoa → REESCREVE.
+   - Microfilme tem as 3 partes: (I) verbo do sacrifício (engoliu,
+     disse sim quando não, segurou), (II) "em nome de X, em nome de
+     Y, em nome de Z" (2-3 cláusulas paralelas), (III) "deixou de
+     [auto-cuidado]" + aterragem no achado visível? Se falta parte
+     → REESCREVE.
+   - História é ancorada nos achados Stage 1 (fígado→raiva engolida;
+     icterícia→conta nos olhos; rim→medo de fundo; etc.) ou é
+     fórmula universal aplicada? Se aplica template universal sem
+     ancorar nos achados → REESCREVE.
+   - §0 termina com UMA pergunta maiêutica em parágrafo separado
+     (Família Espelho, Testemunho ou Virada Simples)? Se ausente →
+     ADICIONA.
+   - Pergunta é genérica ou coach-instagram ("será que você já se
+     permitiu...")? Se sim → REESCREVE específica desta cliente.
+
+   Para §14:
+   - Abre com microfilme curto (1-2 frases, mesma estrutura do §0
+     mas condensada) sem repetir §0 literal? Se órgão como sujeito
+     na abertura ou repete §0 literal → REESCREVE.
+   - Marca 6 (observador presente — "o que os seus olhos me
+     trouxeram me ficou...") aparece DEPOIS do microfilme curto?
+     Se ausente → ADICIONA.
+   - Fecha com reframe Tipo B forte (verbo/qualidade do padrão
+     redirecionada pra cliente em moeda nova)? Se ausente →
+     ADICIONA.
+   - §14 NÃO tem pergunta maiêutica final (só §0 tem)? Se tem →
+     REESCREVE em declarativo.
+
+   Em §0 e §14: órgão pode aparecer SÓ como CONSEQUÊNCIA depois
+   do verbo da pessoa ("...e o fígado foi guardando..."). Nunca
+   como sujeito de abertura.
+
+   Abstrações proibidas em §0/§14 (qualquer posição): "competência
+   de transformar/sustentar", "modo de plantão", "caminho de
+   volta", "cansaço que virou estrutura", "metabolização
+   silenciosa", "ativação sustentada", "saturação sistêmica",
+   "presença firme". Se aparecer → REESCREVE.
+
+   Escape honesto: se os achados Stage 1 não sustentam microfilme
+   denso (cliente equilibrada, sem achado dominante), microfilme
+   curto e ancorado é PREFERÍVEL a microfilme longo com momentos
+   vivenciais inventados.
 
 Se QUALQUER auto-checagem falhar → reescreva ANTES de emitir.
 
@@ -1542,6 +1708,48 @@ export const STAGE2_METHOD_VERSION = 'sonnet_2x_0.2.2' as const
 // aprendeu" — Carol "Alguém que aprendeu a manter o peito aberto",
 // Evanilce "Alguém que aprendeu cedo que segurar era mais seguro".
 //
+// v2.5.6 (2026-05-25): bump PATCH 0.3.5 → 0.3.6 — Marca 7 reescrita
+// + Marca 7.1 nova. Validação isolada Stage 2 v0.3.5 entregou §0
+// excelente em ambas (Carol/Evanilce) mas com órgão ainda como sujeito
+// e §14 abrindo com "um organismo que aprendeu" (F1.2 violado). Founder
+// reformulou intenção: §0 não é nomeação concreta de gesto somático —
+// é HISTÓRIA EM MICROFILME contada com PESSOA como sujeito. Efeito-alvo
+// declarado: cliente lê §0 e sente "ninguém nunca leu minha alma assim".
+//   Marca 7 reescrita: §0 e §14 são seções narrativo-biográficas.
+//     PESSOA é sujeito (não órgão); órgão entra só como CONSEQUÊNCIA
+//     depois do verbo da pessoa. Estrutura em 3 partes:
+//     (I) verbo específico do sacrifício ("disse sim quando o corpo
+//         pediu não", "engoliu a raiva")
+//     (II) "em nome de X, em nome de Y, em nome de Z" — 2-3 cláusulas
+//         paralelas nomeando causalidade interna do sacrifício
+//     (III) "deixou de [auto-cuidado]" + aterragem no achado visível
+//         ("e agora o amarelo nos olhos conta a conta")
+//     Princípio de ancoragem: história NASCE dos achados Stage 1
+//     (fígado→raiva engolida, icterícia→conta nos olhos, rim→medo
+//     de fundo, tireoide→fala guardada). Mapeamento explícito no
+//     prompt. Cliente equilibrada sem achado dominante recebe
+//     microfilme curto e honesto.
+//   §14 formato distinto: microfilme CURTO (1-2 frases, não repete
+//     §0) → Marca 6 (observador) → reframe Tipo B forte. SEM pergunta
+//     maiêutica (só §0 tem).
+//   Marca 7.1 NOVA: §0 SEMPRE termina com UMA pergunta maiêutica em
+//     parágrafo separado. 3 famílias mutuamente exclusivas:
+//     (1) Espelho — pega último elemento da história e devolve como
+//         interrogação
+//     (4) Testemunho — aponta ausência viva (quem perguntou, quem
+//         segurou)
+//     (5) Virada Simples — traz pro presente sem ornamento
+//     Critérios: pergunta emerge desta cliente; não pressupõe nada
+//     não estabelecido; não soa coach de Instagram.
+//   Abstrações banidas em §0/§14: "competência de
+//     transformar/sustentar", "modo de plantão", "caminho de volta",
+//     "cansaço que virou estrutura" + outras 5.
+//   Critério 7 da auto-checagem geral atualizado pra cobrir microfilme
+//     em 3 partes + pergunta maiêutica + ancoragem nos achados.
+// NÃO mexido: F1, F1.1, F1.2, F6, F7, F7.1, ANCHORING, Marcas 1-6.
+// Tech debt (ainda em aberto): §0 Evanilce v2.5.4 truncado mid-word
+//   ("soube d…") no banco. Bug de geração/streaming, investigar à parte.
+//
 // v2.5.5 (2026-05-25): bump PATCH 0.3.4 → 0.3.5 — Marca 7 + F7.1.
 // Primeira leitura real Evanilce v2.5.4 (regen=3, generation 0.3.4)
 // mostrou §0 esterilizada: "O fígado ficou guardando por décadas o que
@@ -1596,7 +1804,7 @@ export const STAGE2_METHOD_VERSION = 'sonnet_2x_0.2.2' as const
 //     (além de §0 já marcada).
 // Push consolidado v2.5.4 = commits v0.3.2 + v0.3.3 + v0.3.4 juntos.
 export const STAGE2_METHOD = 'sonnet_2x' as const
-export const STAGE2_VERSION = '0.3.5' as const
+export const STAGE2_VERSION = '0.3.6' as const
 
 /**
  * Etapa 2 do pipeline Sonnet 2x — composição streaming ancorada no JSON
