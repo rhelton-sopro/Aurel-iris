@@ -2034,7 +2034,10 @@ export const STAGE2_METHOD = 'sonnet_2x' as const
 // NÃO mexido: ANCHORING_PRINCIPLE_V2_5 conteúdo (só adicionado
 // cache_control), pupila demoção (v2.7.0), §2 A.5 mappings, §0 heading
 // numerado (v2.7.0/1), system.md Plan 35 reform (v2.7.1), parser/UI.
-export const STAGE2_VERSION = '0.5.2' as const
+// v2.7.3 (2026-05-25): HOTFIX bump PATCH 0.5.2 → 0.5.3 — fix erro 400
+// Anthropic causado por v2.7.2. Detalhes completos no comentário do
+// system: [...] acima. Stage 2 falhava silenciosamente desde deploy v2.7.2.
+export const STAGE2_VERSION = '0.5.3' as const
 
 /**
  * Etapa 2 do pipeline Sonnet 2x — composição streaming ancorada no JSON
@@ -2062,15 +2065,16 @@ export async function analyzeReadingComposeStage2(
       model: MODEL,
       max_tokens: MAX_OUTPUT_TOKENS,
       system: [
-        // v2.7.2 (2026-05-25): TODOS os 6 system blocks agora têm
-        // cache_control. Diagnóstico empírico: maio 2026 cache_read=0%
-        // em 70 rows (Stage 1 + Stage 2) — apenas o primeiro block
-        // (system.md) tinha cache_control; os 5 overrides eram regravados
-        // a cada request sem reuso. Resultado: ~50% de custo Stage 2
-        // desperdiçado em cache_creation premium. v2.7.2 fix: cache_control
-        // em todos os blocks (todos constantes, estáveis há dias). TTL 5min
-        // padrão preservado — UAT ainda ativo, ttl='1h' adiado pra release
-        // futura quando overrides estiverem totalmente estabilizados.
+        // v2.7.3 (2026-05-25): HOTFIX do v2.7.2. Anthropic API limita
+        // MÁXIMO 4 blocks com cache_control. v2.7.2 colocou em todos os 6
+        // → erro 400 "A maximum of 4 blocks with cache_control may be
+        // provided. Found 6." Todas regens v2.7.2 falhavam silenciosamente.
+        // Fix v2.7.3: 4 breakpoints estratégicos (blocks 1, 2, 3, 6).
+        // ANCHORING (5) e STRUCTURAL (4) ficam sem marker próprio MAS
+        // continuam cacheados como parte do prefix do block 6
+        // (ANTI_FORER, último) — Anthropic acumula tudo ANTES de cada
+        // breakpoint. Mesma economia de cache que v2.7.2 pretendia, dentro
+        // do limite da API.
         {
           type: 'text',
           text: systemPrompt,
@@ -2081,33 +2085,24 @@ export async function analyzeReadingComposeStage2(
           text: STAGE2_MODE_OVERRIDE,
           cache_control: DEFAULT_SYSTEM_CACHE_CONTROL,
         },
-        // v2.4 voz visceral/observador. CACHED em v2.7.2 (estável desde
-        // 2026-05-23). Última edição: v2.7.2 aterragem visual Marca 7 v2
-        // (substituiu 2 exemplos ✅ literais por descrição semântica +
-        // 4 ❌). Cada edição neste bloco invalida o cache uma vez.
+        // v2.4 voz visceral/observador. CACHED breakpoint #3 (v2.7.3).
+        // Última edição: v2.7.2 aterragem visual Marca 7 v2.
         {
           type: 'text',
           text: VOICE_OVERRIDE_V2_4,
           cache_control: DEFAULT_SYSTEM_CACHE_CONTROL,
         },
-        // v2.4.2 calibração estrutural §3/§7/§11. CACHED em v2.7.2
-        // (estável desde 2026-05-24).
-        {
-          type: 'text',
-          text: STRUCTURAL_OVERRIDE_V2_4_2,
-          cache_control: DEFAULT_SYSTEM_CACHE_CONTROL,
-        },
-        // v2.5.0 princípio de ancoragem total. Stage 1 = fonte única de
-        // verdade; achados com natureza='indeterminada' roteados via
-        // motivo_indeterminacao; §2 é gate cross-section. CACHED em v2.7.2
-        // (última edição substantiva foi v2.7.0 Caso 1 reescrita).
-        {
-          type: 'text',
-          text: ANCHORING_PRINCIPLE_V2_5,
-          cache_control: DEFAULT_SYSTEM_CACHE_CONTROL,
-        },
-        // v2.5.4 anti-Forer hardline. CACHED em v2.7.2 (estável desde
-        // 2026-05-24).
+        // v2.4.2 calibração estrutural §3/§7/§11. SEM cache_control próprio
+        // em v2.7.3 (limit 4) — mas cacheado como parte do prefix do block
+        // 6 (ANTI_FORER) abaixo.
+        { type: 'text', text: STRUCTURAL_OVERRIDE_V2_4_2 },
+        // v2.5.0 princípio de ancoragem total. SEM cache_control próprio
+        // em v2.7.3 — cacheado via prefix do block 6 abaixo.
+        { type: 'text', text: ANCHORING_PRINCIPLE_V2_5 },
+        // v2.5.4 anti-Forer hardline. CACHED breakpoint #4 (v2.7.3) —
+        // este marker FINAL cacheia todo o stack acumulado (system.md +
+        // STAGE2_MODE + VOICE + STRUCTURAL + ANCHORING + ANTI_FORER) como
+        // um prefix cumulativo único pra reuso pelos próximos requests.
         {
           type: 'text',
           text: ANTI_FORER_HARDLINE_V2_5_4,
