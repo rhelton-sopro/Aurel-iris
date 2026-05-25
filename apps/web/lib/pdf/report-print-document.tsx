@@ -249,6 +249,33 @@ const PRINT_CSS = `
     margin: 20px 0 0;
   }
 
+  /* ---- §0 — "Em poucas palavras" microfilme page (Marca 7 v2 — v2.7.0) ---- */
+  /* §0 is the narrative opener: 6-9 lines of microfilme + maieutic question
+     paragraph. Sits between essence_phrase (short) and the Índice page block.
+     Uses larger italic body type but is left-aligned (vs. essence's center). */
+  section.zero-section {
+    background: var(--white);
+    padding: 48px 0;
+    break-after: page;
+    page-break-after: always;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  section.zero-section .essence-label {
+    margin-bottom: 18px;
+  }
+  section.zero-section .zero-body {
+    font-family: ${REPORT_FONTS.serif};
+    font-size: 14pt;
+    color: var(--ink);
+    font-style: italic;
+    line-height: 1.65;
+    max-width: 620px;
+    margin: 0 auto;
+  }
+  section.zero-section .zero-body p { margin: 0 0 1em; }
+  section.zero-section .zero-body p:last-child { margin-bottom: 0; }
+
   /* ---- Content pages ---- */
   .content { padding: 0; background: var(--white); }
   section.report-section { break-inside: auto; }
@@ -416,6 +443,7 @@ export async function renderBodyHtml(
   const { sections, clientName } = props
   const encerramento = sections['encerramento_disclaimer']
   const essence = sections['essence_phrase']?.trim()
+  const zeroSection = sections['0_em_poucas_palavras']?.trim()
   const present = NUMBERED_SECTION_HEADINGS.filter((h) => {
     const raw = sections[SECTION_KEY_BY_NUMBER[h]]
     return raw && raw.trim().length > 0
@@ -439,16 +467,26 @@ export async function renderBodyHtml(
         ))}
       </div>
 
-      {/* Em poucas palavras */}
+      {/* Em uma palavra (essence_phrase — frase curta sintética, Plan 28) */}
       {essence && (
         <div className="essence-page">
-          <p className="essence-label">Em poucas palavras</p>
+          <p className="essence-label">Em uma palavra</p>
           <p className="essence-phrase">{essence}</p>
           <div className="essence-divider" />
           <p className="essence-foot">
             Esta é a essência que atravessa este relatório.
           </p>
         </div>
+      )}
+
+      {/* §0 — Em poucas palavras (Marca 7 v2 microfilme + pergunta maiêutica) */}
+      {zeroSection && (
+        <section id="sec-0" className="report-section zero-section">
+          <p className="essence-label">Em poucas palavras</p>
+          <div className="zero-body">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{zeroSection}</ReactMarkdown>
+          </div>
+        </section>
       )}
 
       {/* Sections */}

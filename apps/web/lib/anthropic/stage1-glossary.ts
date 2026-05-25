@@ -309,16 +309,21 @@ export const GLOSSARY: readonly GlossaryEntry[] = [
     sinal_preservacao: 'Ausência',
   },
   {
-    // v2.6.0 (2026-05-25): padrao_pupilar como achado de primeira classe.
-    // Stage 1 emite quando a pupila for clinicamente significativa — midríase
-    // sustentada >70%, miose marcada <30%, assimetria pupilar >15% OE vs OD,
-    // ou irregularidade de borda. Não emite em toda leitura — só quando o
-    // padrão é achado expressivo. O estado específico (midriase_sustentada,
-    // midriase_moderada, miose_sustentada, assimetria_pupilar,
-    // irregularidade_borda) vai em descricao_visual via texto livre.
-    // Importância integrativa: midríase sustentada = ativação simpática
-    // crônica (escola alemã Deck/Angerer). Eixo pituitário-adrenal indet
-    // por midríase NÃO é silêncio — a midríase em si é leitura clínica.
+    // v2.7.0 (2026-05-25): padrao_pupilar como achado SECUNDÁRIO com cap.
+    // Stage 1 PODE emitir quando a pupila for clinicamente significativa
+    // (midríase sustentada >70%, miose marcada <30%, assimetria >15%,
+    // irregularidade de borda), MAS com 2 hard constraints:
+    //   1. Intensidade MÁXIMA 3 (jamais 4 ou 5).
+    //   2. JAMAIS ser o achado de maior intensidade da leitura — se
+    //      nenhum outro achado tem intensidade ≥3, NÃO emite (pupila
+    //      vai pra constituicao_base.pupila apenas, como pré-v2.6.0).
+    // Razão empírica: N=2 (Cristiane regen=8 + Evanilce regen=1 em v2.6.0)
+    // mostrou pupila como primária dominando narrativa de todo relatório.
+    // Decisão founder 2026-05-25: mantém campo (não silencia midríase
+    // real) mas demove de primário. Os 3 eixos pericentrais obscurecidos
+    // seguem como achados ricos em §2 Categoria A.5 (motivo=
+    // 'obscurecimento_estrutural') — protagonista é o eixo obscurecido,
+    // não a pupila que obscurece.
     group: 'estrutura_iridologica', campo: 'padrao_pupilar',
     zona: 'Centro pericentral (avaliação nas 6 fotos, sob flash e sem flash)',
     sinal_carga: 'Midríase sustentada >70% do diâmetro iridiano, midríase moderada 50-70%, miose marcada <30%, assimetria pupilar >15% OE vs OD, ou irregularidade de bordas pupilares',

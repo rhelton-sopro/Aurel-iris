@@ -31,6 +31,7 @@ import type { Database } from '@/types/database'
 import type { ReportSection } from '@/lib/rag/types'
 
 export type ReportSectionKey =
+  | '0_em_poucas_palavras'
   | '1_constituicao_temperamento'
   | '2_mapa_organico'
   | '3_linha_tempo_emocional'
@@ -52,17 +53,29 @@ export type ReportSectionKey =
 /** Numeric-prefixed keys only ('1'..'15'). Used by section-boundary parser. */
 export type NumberedSectionKey = Exclude<
   ReportSectionKey,
-  'encerramento_disclaimer' | 'essence_phrase'
+  'encerramento_disclaimer' | 'essence_phrase' | '0_em_poucas_palavras'
 >
 
 /**
- * Marker heading the LLM emits ONCE, AFTER §15 (07.4-35 contract), carrying
- * the "essence phrase" — the "Em poucas palavras" page. It is intentionally
- * NOT a numbered boundary (no digit), so `findAllBoundaries` ignores it and
- * monotonicity is unaffected; `extractEssencePhrase` pulls it separately.
- * Legacy buffers used "Em uma palavra"; the parser marker still matches both.
+ * §0 — "Em poucas palavras" microfilme (Marca 7 v2 — added in v2.5.5, made
+ * a proper numbered section in v2.7.0). 6-9 linhas + Marca 7.1 maieutic
+ * question. PRECEDES §1 in emission order. Parser extracts it via
+ * `extractZeroSection(buffer)` — it's a numbered boundary (`## 0. ...`) but
+ * kept OUT of NUMBERED_SECTION_HEADINGS to preserve §1..§15 monotonicity.
  */
-export const ESSENCE_PHRASE_HEADING = 'Em poucas palavras'
+export const ZERO_SECTION_KEY = '0_em_poucas_palavras' as const
+export const ZERO_SECTION_TITLE = 'Em poucas palavras' as const
+
+/**
+ * Marker heading the LLM emits ONCE, AFTER §15 (07.4-35 contract), carrying
+ * the "essence phrase" — a SHORT 15-30 word phrase. Plan 28 naming
+ * "Em uma palavra" restored in v2.7.0 (Plan 35 "Em poucas palavras" naming
+ * collided with §0 Marca 7 microfilme — split resolved by giving §0 its own
+ * numbered heading + reverting essence to original name).
+ * NOT a numbered boundary, so `findAllBoundaries` ignores it; only
+ * `extractEssencePhrase` pulls it (post-§15 region).
+ */
+export const ESSENCE_PHRASE_HEADING = 'Em uma palavra'
 
 /**
  * Ordered heading-number strings for the 15 numbered sections, in canonical

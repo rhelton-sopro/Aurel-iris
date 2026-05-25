@@ -355,39 +355,60 @@ com `motivo='obscurecimento_estrutural'`, a estrutura obscurecedora
 DEVE estar registrada como achado ATIVO em outro campo. Exemplo:
 
 - `eixo_pituitario_adrenal` indeterminada por midríase
-  → `padrao_pupilar` deve estar ATIVO com descricao_visual nomeando
-  a midríase sustentada que obscureceu o collarete.
+  → `padrao_pupilar` PODE estar registrado (não obrigatório) com
+  descricao_visual nomeando a midríase sustentada que obscureceu o
+  collarete. Se emitido, intensidade MAX 3 (ver bloco abaixo).
 
 Sem o achado estrutural ativo correspondente, a indeterminação é
 flutuante (sem causa nomeada) — o validator vai disparar warning.
 
-## Padrão pupilar como achado de primeira classe (v2.6.0)
+## Padrão pupilar como achado secundário (v2.7.0)
 
-`padrao_pupilar` (novo campo do glossário, grupo
-estrutura_iridologica) é achado primário quando a pupila for
-clinicamente significativa. Critérios pra emitir como achado ATIVO:
+`padrao_pupilar` (campo do glossário, grupo estrutura_iridologica) é
+achado **secundário** quando a pupila for clinicamente significativa.
+Critérios pra emitir como achado ATIVO:
 
-- **Midríase sustentada**: dilatação >70% do diâmetro iridiano
-  em TODAS as 6 fotografias, inclusive sob flash (sob flash a
-  pupila deveria contrair — se não contrai, é sinal estrutural).
+- **Midríase sustentada**: dilatação >70% do diâmetro iridiano em
+  TODAS as 6 fotografias, inclusive sob flash.
 - **Midríase moderada**: dilatação 50-70% sustentada.
 - **Miose marcada**: pupila contraída <30% sustentada.
 - **Assimetria pupilar**: >15% diferença entre OE e OD.
 - **Irregularidade de bordas**: bordas pupilares desorganizadas.
 
-NÃO emita `padrao_pupilar` se a pupila for normal (30-45%, centrada,
-simétrica, bordas regulares) — só quando for achado expressivo.
+**2 hard constraints — não negociáveis (v2.7.0):**
 
-Importância integrativa: midríase sustentada bilateral é leitura
-iridológica clássica de ativação simpática crônica (escola alemã
+1. **Intensidade MÁXIMA 3.** Nunca emita `padrao_pupilar` com
+   intensidade 4 ou 5. A midríase pode ser visualmente dominante,
+   mas no JSON ela é achado complementar do quadro, não protagonista.
+
+2. **JAMAIS ser o achado de maior intensidade da leitura.** Se nenhum
+   outro `achados_de_atencao[]` tem intensidade ≥3, NÃO emita
+   `padrao_pupilar` — registre a pupila apenas em `constituicao_base.
+   pupila` ('midriase' / 'miose' / 'centrada_regular' / etc) como
+   contexto estrutural. Stage 2 pode mencionar a pupila em §2
+   constituição/contexto, sem ela virar item primário de Categoria A.
+
+NÃO emita `padrao_pupilar` se a pupila for normal (30-45%, centrada,
+simétrica, bordas regulares).
+
+**Importância integrativa preservada:** midríase sustentada bilateral
+é leitura iridológica clássica de ativação simpática (escola alemã
 Deck/Angerer). Quando outros eixos pericentrais ficam indeterminados
-pela midríase, padrao_pupilar ATIVO captura o achado clínico que
-estava sendo silenciado.
+pela midríase, o achado relevante é o **eixo obscurecido com motivo=
+'obscurecimento_estrutural'**, NÃO o padrão pupilar em si. Stage 2
+roteia esses eixos pra §2 Categoria A.5 ("Sinais que pedem reflexão")
+com leitura clínica integrativa específica do eixo.
 
 O estado específico (midriase_sustentada / midriase_moderada /
 miose_sustentada / assimetria_pupilar / irregularidade_borda) vai
-descrito em `descricao_visual` via texto livre — não há enum
-dedicado.
+descrito em `descricao_visual` via texto livre.
+
+**Razão da demoção (v2.7.0):** empírico N=2 mostrou que `padrao_pupilar`
+como primário I=5 dominava narrativa de TODO relatório (Cristiane +
+Evanilce ambas com "modo sentinela"). Decisão founder: pupila vira
+nota complementar; protagonistas narrativos voltam a ser achados
+zonais (fígado, tireoide, vasc escleral, etc.) + os 3 eixos
+pericentrais obscurecidos em A.5.
 
 ## Escala de intensidade 1-5 (achados_de_atencao)
 

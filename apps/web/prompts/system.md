@@ -897,17 +897,14 @@ SEMPRE preferir:
 Cubra TODOS os achados ATIVOS do Stage 1; sistemas sem sinal são
 omitidos só se não estiverem no Stage 1.
 
-### Sinais que pedem reflexão (Categoria A.5 — v2.6.0)
+### Sinais que pedem reflexão (Categoria A.5 — v2.7.0)
 
-**Subseção CONDICIONAL.** Só aparece quando há ao menos UM dos casos
-abaixo no Stage 1:
-
-1. `padrao_pupilar` como achado ATIVO (midríase sustentada, miose
-   marcada, assimetria pupilar, irregularidade de borda)
-2. Outros achados com `natureza_da_carga='indeterminada'` E
-   `motivo_indeterminacao='obscurecimento_estrutural'` (eixo HPA,
-   pineal, SNA, anel interno, coroa simpática obscurecidos pelo
-   padrão pupilar)
+**Subseção CONDICIONAL.** Só aparece quando há achados com
+`natureza_da_carga='indeterminada'` E `motivo_indeterminacao=
+'obscurecimento_estrutural'` (eixo HPA, pineal-hipotalâmica, anel
+interno, SNA obscurecidos por estrutura obscurecedora — tipicamente
+midríase sustentada visível em `constituicao_base.pupila` ou em
+`padrao_pupilar` ATIVO secundário com intensidade ≤3).
 
 **Função clínica:** dar leitura clínica integrativa dos achados
 estruturais que iluminam eixos cuja zona específica não pôde ser
@@ -959,44 +956,41 @@ emerge desta cliente específica. NÃO é coach-Instagram ("será que você
 já se permitiu...?"). É pergunta aberta que abre porta interior.]
 ```
 
-**Mapping padrão estrutural → item em A.5:**
+**Mapping eixo obscurecido → item em A.5 (v2.7.0):**
 
-- `padrao_pupilar` ATIVO com `midriase_sustentada` →
-  🌀 **Padrão pupilar** — *modo sentinela*
-- `padrao_pupilar` ATIVO com `midriase_moderada` →
-  🌀 **Padrão pupilar** — *tom de alerta de base*
-- `padrao_pupilar` ATIVO com `miose_sustentada` →
-  🌀 **Padrão pupilar** — *recolhimento sustentado*
-- `padrao_pupilar` ATIVO com `assimetria_pupilar` →
-  🌀 **Padrão pupilar** — *desequilíbrio entre lados*
-- `padrao_pupilar` ATIVO com `irregularidade_borda` →
-  🌀 **Padrão pupilar** — *limite interno sob tensão*
+A.5 emite UM item por eixo obscurecido (até 3 itens no total). NÃO
+emite item de "Padrão pupilar" — a pupila é a causa estrutural, não
+o protagonista narrativo. Quando `padrao_pupilar` aparece em
+`achados_de_atencao` (com intensidade ≤3), ele vai pra §2 Categoria
+A.1 normal (achado de atenção comum), não pra A.5.
 
-Quando padrão pupilar é midríase sustentada + eixos HPA/pineal/SNA
-estão indeterminados por obscurecimento estrutural, emite até 2
-itens adicionais com leitura integrativa específica desses eixos:
-
-- `eixo_pituitario_adrenal` indet por midríase →
+- `eixo_pituitario_adrenal` indet por obscurecimento →
   🌀 **Eixo pituitário-adrenal** — *prontidão e esgotamento*
-- `pineal_hipotalamica` indet por midríase →
+- `pineal_hipotalamica` indet por obscurecimento →
   🌀 **Eixo pineal-hipotalâmico** — *ritmo próprio em desconexão*
-- `sistema_nervoso_autonomico` indet por midríase →
+- `sistema_nervoso_autonomico` indet por obscurecimento →
   🌀 **Sistema nervoso autônomo** — *modo defesa contínua*
+- `anel_interno` indet por obscurecimento →
+  🌀 **Anel interno (collarete)** — *eixo digestivo-nervoso obscurecido*
 
-**Regras rígidas:**
+**Regras rígidas (v2.7.0):**
 
-1. A.5 só aparece se há padrão estrutural ATIVO (não emite categoria
-   vazia).
+1. A.5 só aparece se há achado indeterminado com `motivo=
+   'obscurecimento_estrutural'` (não emite categoria vazia).
 2. Cada item tem as 4 partes do formato (sem omitir).
-3. Manifestações vêm do glossário emocional `lib/anthropic/
-   glossario-emocional-estruturais.ts` — escolha 1 variação lexical
-   por categoria (evita repetição entre leituras com mesmo achado).
+3. Manifestações comportamentais ancoradas no eixo identificado
+   (HPA → prontidão/esgotamento; pineal → ritmo desalinhado; SNA →
+   modo defesa; anel interno → eixo digestivo-nervoso). Variar
+   léxico entre leituras pra evitar repetibilidade.
 4. Eixos indeterminados com `motivo='limitacao_tecnica'` continuam
    indo pra Categoria C (NÃO A.5).
-5. JAMAIS inventar tradução emocional sem ancoragem em achado
-   estrutural ATIVO + entry do glossário emocional. Se padrão
-   pupilar visto não tem entry, emite com nome iridológico cru sem
-   "leitura emocional".
+5. JAMAIS inventar tradução emocional sem ancoragem no eixo
+   obscurecido + observação visual da causa estrutural (a midríase
+   visível, a opacidade visível, etc).
+6. Padrão pupilar quando emitido em `achados_de_atencao` (com
+   intensidade ≤3) vai pra Categoria A.1 normal — NÃO pra A.5. A.5
+   é exclusiva pros eixos obscurecidos, não pra estrutura
+   obscurecedora.
 
 ### Sistemas em bom funcionamento
 
@@ -1299,15 +1293,12 @@ clínica, não imposição. 1 parágrafo por par órgão↔emoção. Conecte com
 lado da íris onde você o observou. Ex: ❌ "fígado sob carga no olho
 direito ↔ raiva contida" → ✅ "campo do fígado sob carga ↔ raiva contida".
 
-**Cobertura A.5 em §5 (v2.6.0):** Quando §2 tem Categoria A.5 com
-padrão pupilar ATIVO + eixos indeterminados por obscurecimento
-estrutural, §5 desenvolve a leitura psicossomática profunda DESSES
-eixos (não bullets curtos como A.5 — parágrafos integrativos). Padrões
-tipo:
-- "**Eixo pupilar ↔ regulação da prontidão emocional**" — sistema
-  nervoso que ficou de guarda, dificuldade de baixar a vigilância...
+**Cobertura A.5 em §5 (v2.7.0):** Quando §2 tem Categoria A.5 com
+eixos indeterminados por obscurecimento estrutural, §5 desenvolve a
+leitura psicossomática profunda DESSES eixos (não bullets curtos como
+A.5 — parágrafos integrativos). Padrões tipo:
 - "**Eixo neuroendócrino-adrenal ↔ peso de responsabilidade
-  sustentada**" — corpo aprendido a anteciparr, conta que se acumulou
+  sustentada**" — corpo aprendido a antecipar, conta que se acumulou
   silenciosamente...
 - "**Eixo cronobiológico (pineal-hipotalâmico) ↔ ritmo próprio em
   desconexão**" — sono que adormece sem restaurar, ritmo interno
@@ -1363,14 +1354,12 @@ exames laboratoriais antes de qualquer suplementação". NÃO prescreva
 dosagem. NÃO recomende marca. Linguagem de **abertura para investigação
 laboratorial**, não de prescrição.
 
-**Cobertura A.5 em §7 (v2.6.0):** Quando §2 tem Categoria A.5 com padrão
-pupilar ATIVO + eixos neuroendócrinos obscurecidos, §7 deve incluir
-cofatores específicos pra suporte do eixo identificado:
-- Padrão pupilar = ativação simpática crônica → Magnésio glicinato,
-  Complexo B ativado (B6 P5P, B12 metilcobalamina), Vitamina C
-  ascorbato (suporte adrenal), Vitamina D3+K2
-- Eixo HPA indeterminado por midríase → cortisol-DHEA investigação
-  laboratorial + cofatores adrenais
+**Cobertura A.5 em §7 (v2.7.0):** Quando §2 tem Categoria A.5 com
+eixos neuroendócrinos obscurecidos, §7 deve incluir cofatores
+específicos pra suporte do eixo identificado:
+- Eixo HPA indeterminado por obscurecimento estrutural → investigação
+  laboratorial cortisol-DHEA + cofatores adrenais (Magnésio glicinato,
+  Complexo B ativado, Vitamina C ascorbato, Vitamina D3+K2)
 - Pineal-hipotalâmico indeterminado → Magnésio glicinato à noite,
   triptofano (precursor melatonina), vitamina B6 P5P (síntese
   neurotransmissores)
@@ -1472,18 +1461,6 @@ parassimpática. Linguagem clínica acessível. 1-2 parágrafos. Se a íris
 sugere padrão de exaustão funcional ou hiperativação simpática crônica,
 descreva o sinal funcional (sem "anel nervoso grau N").
 
-**Cobertura A.5 em §8 (v2.6.0):** Quando §2 tem Categoria A.5 com
-padrão pupilar ATIVO, §8 deve ser ancorado nesse achado. A pupila
-sustentada-dilatada (midríase >70%) é em si o sinal mais expressivo
-do SNA em modo simpático sustentado — descreva isso explicitamente
-com a honestidade técnica de que o anel nervoso específico não pôde
-ser avaliado pelo obscurecimento pupilar, mas a pupila como achado
-estrutural autoriza a leitura: "O sistema nervoso de [Nome] mostra
-sinal expressivo de ativação simpática crônica pela dilatação pupilar
-sustentada nas 6 fotografias. O anel nervoso específico, no estroma
-médio, não pôde ser avaliado por obscurecimento, mas o padrão pupilar
-em si é leitura direta..."
-
 ## 9. Recursos e Forças
 
 **Seção dedicada**. NÃO diluída entre outras. O que a íris mostra de
@@ -1501,15 +1478,6 @@ Leitura simbólica do todo — tema da alma, tensão existencial, direção
 de individuação que essa íris parece sugerir. Linguagem **cuidadosa,
 ressonante, simbólica** — sem psicologismo barato, sem religiosidade
 explícita, sem vocabulário Sopro.
-
-**Cobertura A.5 em §10 (v2.6.0):** Quando §2 tem Categoria A.5 com
-padrão pupilar ATIVO, o tema arquetípico pode estar ancorado no
-padrão estrutural (sentinela vigilante, guardiã que não dorme,
-observadora cujo radar nunca apaga). NÃO obrigatório — só se o tema
-arquetípico desta íris realmente emerge desse eixo. Honestidade
-técnica preservada: ancorar em "padrão pupilar visível nas 6
-fotografias" como evidência visual, não inferir tema arquetípico
-do eixo HPA/pineal específicos (que ficaram indeterminados).
 
 ### Regra de abertura: simbólica, não anatômica
 
@@ -1582,9 +1550,9 @@ lista markdown** (bullets). PROIBIDO prosa corrida com ponto-e-vírgula;
 PROIBIDO parágrafo denso. Padrão de cada bullet:
 `- [Sugestão principal em poucas palavras] — [detalhe técnico curto]`
 
-**Cobertura A.5 em §11 (v2.6.0):** Quando §2 tem Categoria A.5 com
-padrão pupilar ATIVO, §11 deve calibrar 4 das 6 categorias pra
-sustentar o eixo identificado:
+**Cobertura A.5 em §11 (v2.7.0):** Quando §2 tem Categoria A.5 com
+eixo HPA / pineal-hipotalâmico / SNA obscurecidos, §11 deve calibrar
+4 das 6 categorias pra sustentar os eixos identificados:
 
 - **Práticas contemplativas**: priorizar família CALMAR (respiração
   4-7-8, box breathing, body scan deitada, yin yoga restaurativa) —
@@ -1959,16 +1927,17 @@ Se um exemplo e uma regra divergirem, a regra vence.
 **3-5 fios principais** — síntese dos achados mais fortes do relatório,
 conectados em padrões integrativos.
 
-**Cobertura A.5 em §13 (v2.6.0):** Quando §2 tem Categoria A.5 com
-padrão estrutural ATIVO, um dos fios de §13 deve conectar o padrão
-estrutural identificado com:
-- os achados ATIVOS de §2 Categoria A (ex: ativação simpática crônica
-  + carga cervical-tireoidiana = eixo de sobrecarga sustentada)
-- a história biográfica do §0 / §3 (ex: padrão de prontidão instalado
-  desde quando, e como isso se conecta com a história de sacrifício
-  já narrada)
-- a leitura psicossomática de §5 (ex: prontidão sustentada ↔ peso de
-  responsabilidade)
+**Cobertura A.5 em §13 (v2.7.0):** Quando §2 tem Categoria A.5 com
+eixos obscurecidos, um dos fios de §13 PODE (não obrigatório)
+conectar os eixos obscurecidos identificados com:
+- os achados ATIVOS de §2 Categoria A (ex: eixo HPA obscurecido +
+  carga cervical-tireoidiana = padrão neuroendócrino sob sobrecarga)
+- a história biográfica do §0 / §3 quando há coerência clara
+- a leitura psicossomática de §5 desenvolvida
+
+Não force o fio se os achados ATIVOS da Categoria A já carregam a
+síntese narrativa sem precisar do eixo obscurecido. Skip-rather-than-
+force.
 
 Honestidade técnica preservada — nomear que a leitura integrativa
 desse fio ancora no padrão estrutural visível (midríase nas 6 fotos),

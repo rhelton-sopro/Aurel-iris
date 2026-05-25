@@ -146,6 +146,7 @@ export function ReportReadView({
 }: ReportReadViewProps) {
   const encerramento = sections['encerramento_disclaimer']
   const essence = sections['essence_phrase']?.trim()
+  const zeroSection = sections['0_em_poucas_palavras']?.trim()
   const present = NUMBERED_SECTION_HEADINGS.filter((h) => {
     const raw = sections[SECTION_KEY_BY_NUMBER[h]]
     return raw && raw.trim().length > 0
@@ -219,7 +220,7 @@ export function ReportReadView({
             className="text-xs uppercase"
             style={{ color: C.teal, letterSpacing: '0.25em' }}
           >
-            Em poucas palavras
+            Em uma palavra
           </p>
           <p
             className="mt-6 max-w-md text-2xl italic"
@@ -234,6 +235,32 @@ export function ReportReadView({
           <p className="mt-5 text-sm italic" style={{ color: C.mist }}>
             Esta é a essência que atravessa este relatório.
           </p>
+        </section>
+      )}
+
+      {zeroSection && (
+        <section
+          data-testid="report-read-view-zero"
+          id="sec-0"
+          className="scroll-mt-6 px-2 py-6 print:break-inside-avoid"
+        >
+          <p
+            className="mb-4 text-xs uppercase"
+            style={{ color: C.teal, letterSpacing: '0.25em' }}
+          >
+            Em poucas palavras
+          </p>
+          <div
+            className="text-lg italic leading-relaxed"
+            style={{ ...SERIF, color: C.ink }}
+          >
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={markdownComponents('body')}
+            >
+              {zeroSection}
+            </ReactMarkdown>
+          </div>
         </section>
       )}
 

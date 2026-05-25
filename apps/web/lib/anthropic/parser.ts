@@ -93,20 +93,30 @@ export function findAllBoundaries(buffer: string): BoundaryMatch[] {
 // separator), then the phrase — same line (`## …: …` / `— …`) OR following
 // lines.
 //
-// 07.4-36 (founder): the heading is now "Em poucas palavras" (the phrase is
-// 15-30 words — "uma palavra" was a misnomer). The legacy alternative
-// "em uma palavra" is STILL matched so stored/legacy raw buffers (and any
-// re-parse path) keep extracting — the storage key `essence_phrase` is
-// unchanged, so this is purely the heading text.
+// v2.7.0 (2026-05-25): regex narrowed to ONLY "em uma palavra" (Plan 28
+// naming). Plan 35 had widened to "em poucas palavras" but that collided
+// with the Marca 7 v2 §0 microfilme (same heading), causing the parser to
+// capture the 600+ char microfilme as essence_phrase + truncate to 400 chars
+// + drop the maieutic question. Diagnóstico Evanilce reading
+// e8976f11-f404-4e34-8fa3-3f2047d0e4ea. Fix: §0 microfilme has its own
+// numbered heading (`## 0. Em poucas palavras` — extracted by
+// extractZeroSection) and essence_phrase reverts to original "Em uma palavra"
+// short form.
 //
-// Phase 7.4-35 (founder): the essence is now generated LAST — emitted
-// AFTER §15 (synthesised from the completed analysis, anchored on a
-// visible structure), not improvised before §1. Extraction therefore
-// prefers the post-§15 tail; it falls back to the pre-§1 region so
-// legacy buffers (essence emitted upfront) keep parsing. The marker is
-// line-anchored (`^|\n`) so it won't fire on prose like "…em poucas palavras:".
+// Phase 7.4-35: the essence is generated LAST — emitted AFTER §15. The
+// marker is line-anchored (`^|\n`) so it won't fire on prose like
+// "…em uma palavra…".
 const ESSENCE_MARKER_RE =
-  /(?:^|\n)[ \t]*(?:#{1,4}[ \t]+)?\*{0,2}[ \t]*em (?:poucas palavras|uma palavra)[ \t]*\*{0,2}[ \t]*(?:[:—–-][ \t]*)?/iu
+  /(?:^|\n)[ \t]*(?:#{1,4}[ \t]+)?\*{0,2}[ \t]*em uma palavra[ \t]*\*{0,2}[ \t]*(?:[:—–-][ \t]*)?/iu
+
+// §0 marker. Marca 7 v2 (§0 — Em poucas palavras) emits as the FIRST
+// numbered heading of the report, with format `## 0. Em poucas palavras`
+// (or `### 0. ...`, `## §0 — ...`, etc — same shape as §1..§15 boundaries).
+// We extract §0 SEPARATELY from findAllBoundaries so '0' doesn't enter
+// NUMBERED_SECTION_HEADINGS monotonicity (which would break if Sonnet ever
+// emitted §1 without §0). The slice spans from §0 heading to either the §1
+// boundary or end-of-buffer.
+const ZERO_BOUNDARY_RE = /^[ \t]*#{2,3}[ \t]+§?[ \t]*0[ \t]*[\p{Pd}.][ \t]*/mu
 
 /**
  * Absolute buffer index of the essence-marker line, searching only from
@@ -148,6 +158,46 @@ export function extractEssencePhrase(buffer: string): string | null {
     .trim()
   if (cleaned.length === 0) return null
   return cleaned.length > 400 ? `${cleaned.slice(0, 399)}…` : cleaned
+}
+
+/**
+ * Extract §0 (Marca 7 v2 — Em poucas palavras) microfilme. Looks for
+ * `## 0. ...` heading (or `### 0. ...`, etc) anywhere in the buffer, then
+ * slices content from that heading down to the §1 boundary (or end of
+ * buffer if §1 absent).
+ *
+ * v2.7.0 (2026-05-25): introduced to fix the §0/essence_phrase collision
+ * — Marca 7 v2 was emitting `## Em poucas palavras` without number,
+ * colliding with essence_phrase and getting truncated to 400 chars.
+ * §0 now has its own numbered heading and is extracted separately, OUT of
+ * NUMBERED_SECTION_HEADINGS (so '0' doesn't enter monotonicity — Sonnet
+ * sometimes skips §0, and that should still let §1..§15 parse normally).
+ *
+ * Returns the trimmed §0 body (heading stripped) or null when absent.
+ * No length cap — §0 is a 6-9 line microfilme with a separated maieutic
+ * question paragraph. The full content goes to report_generated as
+ * `0_em_poucas_palavras`.
+ */
+export function extractZeroSection(buffer: string): string | null {
+  const m = ZERO_BOUNDARY_RE.exec(buffer)
+  if (!m) return null
+  const headingStartIdx = m.index
+  const matchEnd = headingStartIdx + m[0].length
+  // End of the heading line (where the title text continues — we don't
+  // include it in the body, but we need to start the body AFTER the line
+  // break that follows the heading).
+  const headingLineEnd = buffer.indexOf('\n', matchEnd)
+  const bodyStart = headingLineEnd === -1 ? matchEnd : headingLineEnd + 1
+  // §0 body ends at §1 boundary (first numbered heading after §0). If §1
+  // is absent (incomplete buffer), slice to end of buffer.
+  const boundaries = findAllBoundaries(buffer)
+  const firstNumbered = boundaries[0]?.startIdx
+  const bodyEnd =
+    firstNumbered !== undefined && firstNumbered > bodyStart
+      ? firstNumbered
+      : buffer.length
+  const body = buffer.slice(bodyStart, bodyEnd).trim()
+  return body.length === 0 ? null : body
 }
 
 export interface ClosedSection {

@@ -157,7 +157,7 @@ Bar.`
   // 4.6 v2.3.0.1 com ## N. (H2, sem § glyph), findAllBoundaries DEVE
   // retornar exatamente 15 boundaries e extractEssencePhrase DEVE retornar
   // a frase final. Se isso quebrar no futuro, regredimos o fix.
-  it('regression e8976f11 — buffer real v2.3.0.1 (## N. H2 + Em poucas palavras pós-§15) retorna 15 boundaries + essence', () => {
+  it('regression e8976f11 — buffer real v2.3.0.1 (## N. H2 + Em uma palavra pós-§15) retorna 15 boundaries + essence', () => {
     const buf = `## 1. Constituição e Temperamento
 
 ### Síntese inicial
@@ -261,7 +261,7 @@ Introversão funcional com alta carga vital.
 ### 🌱 Aptidões
 Sensibilidade e profundidade.
 
-## Em poucas palavras
+## Em uma palavra
 
 Uma vida inteira sendo o chão firme que os outros pisaram sem perceber o quanto aquilo custava.`
 
@@ -408,14 +408,14 @@ describe('lib/anthropic/parser — extractEssencePhrase (Plan 28 CHANGE 5)', () 
 
   it('strips blockquote, emphasis and wrapping quotes; collapses whitespace', () => {
     const buf =
-      '### Em poucas palavras\n> *"Há aqui a força de quem carrega\n> e a sabedoria que começa a perceber o peso."*\n\n## 1. X\nY'
+      '### Em uma palavra\n> *"Há aqui a força de quem carrega\n> e a sabedoria que começa a perceber o peso."*\n\n## 1. X\nY'
     expect(extractEssencePhrase(buf)).toBe(
       'Há aqui a força de quem carrega e a sabedoria que começa a perceber o peso.',
     )
   })
 
   it('tolerates a colon and **bold** marker form', () => {
-    const buf = '**Em poucas palavras:**\nA vida desta íris se organiza em torno de uma pergunta.\n## 1. X\nY'
+    const buf = '**Em uma palavra:**\nA vida desta íris se organiza em torno de uma pergunta.\n## 1. X\nY'
     expect(extractEssencePhrase(buf)).toBe(
       'A vida desta íris se organiza em torno de uma pergunta.',
     )
@@ -428,7 +428,7 @@ describe('lib/anthropic/parser — extractEssencePhrase (Plan 28 CHANGE 5)', () 
 
   it('is NOT picked up as a numbered boundary (monotonicity intact)', () => {
     const buf =
-      '## Em poucas palavras\nFrase.\n\n## 1. Constituição\nA\n\n## 2. Mapa\nB'
+      '## Em uma palavra\nFrase.\n\n## 1. Constituição\nA\n\n## 2. Mapa\nB'
     const b = findAllBoundaries(buf)
     expect(b).toHaveLength(2)
     expect(b[0].headingNumber).toBe('1')
@@ -438,23 +438,34 @@ describe('lib/anthropic/parser — extractEssencePhrase (Plan 28 CHANGE 5)', () 
   // same-line phrase, and ALL-CAPS heading.
   it('survives a preamble before the marker (pre-§1 region search)', () => {
     const buf =
-      '# Leitura Iridológica\n\n## Em poucas palavras\nFrase essência aqui.\n\n## 1. Constituição\nCorpo.'
+      '# Leitura Iridológica\n\n## Em uma palavra\nFrase essência aqui.\n\n## 1. Constituição\nCorpo.'
     expect(extractEssencePhrase(buf)).toBe('Frase essência aqui.')
   })
 
   it('extracts a same-line phrase after an em-dash separator', () => {
-    const buf = '## Em poucas palavras — A frase na mesma linha.\n\n## 1. X\nCorpo.'
+    const buf = '## Em uma palavra — A frase na mesma linha.\n\n## 1. X\nCorpo.'
     expect(extractEssencePhrase(buf)).toBe('A frase na mesma linha.')
   })
 
   it('tolerates an ALL-CAPS heading', () => {
-    const buf = '## EM POUCAS PALAVRAS\nFrase em caixa alta de cabeçalho.\n## 1. X\nY'
+    const buf = '## EM UMA PALAVRA\nFrase em caixa alta de cabeçalho.\n## 1. X\nY'
     expect(extractEssencePhrase(buf)).toBe('Frase em caixa alta de cabeçalho.')
   })
 
-  it('does not false-match prose "em poucas palavras:" inside §1 body', () => {
+  it('does not false-match prose "em uma palavra:" inside §1 body', () => {
     const buf =
-      '## 1. Constituição\nResumindo em poucas palavras: equilíbrio.\n\n## 2. Mapa\nB'
+      '## 1. Constituição\nResumindo em uma palavra: equilíbrio.\n\n## 2. Mapa\nB'
+    expect(extractEssencePhrase(buf)).toBeNull()
+  })
+
+  // v2.7.0: "Em poucas palavras" (heading do §0 Marca 7 microfilme) NÃO deve
+  // mais ser capturado por extractEssencePhrase — desde a separação dos slots,
+  // ESSENCE_MARKER_RE só casa "em uma palavra". Sem esse decoupling, o §0
+  // microfilme inteiro viria como essence_phrase truncada em 400 chars
+  // (regressão da Evanilce reading e8976f11).
+  it('does NOT match "Em poucas palavras" — that heading belongs to §0 now', () => {
+    const buf =
+      '## Em poucas palavras\nMicrofilme inteiro que pertence ao §0, não ao essence.\n\n## 1. X\nCorpo.'
     expect(extractEssencePhrase(buf)).toBeNull()
   })
 
@@ -462,7 +473,7 @@ describe('lib/anthropic/parser — extractEssencePhrase (Plan 28 CHANGE 5)', () 
   // then §1..§15. The essence phrase must surface intact.
   it('extracts the essence from a realistic full-report stream', () => {
     const buf = [
-      '## Em poucas palavras',
+      '## Em uma palavra',
       'Um corpo que aprendeu a se proteger contendo, e que agora começa a perguntar o que aconteceria se confiasse.',
       '',
       '## 1. Constituição e Temperamento',
@@ -484,7 +495,7 @@ describe('lib/anthropic/parser — extractEssencePhrase (Plan 28 CHANGE 5)', () 
     // And it must NOT have polluted §1's content.
     const closed = closeSections(findAllBoundaries(buf), buf)
     const sec1 = closed.find((c) => c.key === '1_constituicao_temperamento')
-    expect(sec1?.content).not.toContain('Em poucas palavras')
+    expect(sec1?.content).not.toContain('Em uma palavra')
     expect(sec1?.content).toContain('Fibras compactas')
   })
 
@@ -497,18 +508,18 @@ describe('lib/anthropic/parser — extractEssencePhrase (Plan 28 CHANGE 5)', () 
     ).join('\n\n')
     const phrase =
       'Uma íris de fundo claro e fibras finas e tensas — um organismo que processa rápido e ainda não achou o freio.'
-    const buf = `${secs}\n\n## Em poucas palavras\n${phrase}`
+    const buf = `${secs}\n\n## Em uma palavra\n${phrase}`
     expect(extractEssencePhrase(buf)).toBe(phrase)
     const closed = closeSections(findAllBoundaries(buf), buf)
     const sec15 = closed.find((c) => c.key === '15_sintese_rapida')
-    expect(sec15?.content).not.toContain('Em poucas palavras')
+    expect(sec15?.content).not.toContain('Em uma palavra')
     expect(sec15?.content).toContain('Conteúdo da seção 15')
   })
 
-  // 07.4-36 — heading renamed to "Em poucas palavras"; the parser keeps the
-  // legacy "Em uma palavra" alternative so already-stored raw buffers (and
-  // any re-parse path) still surface their essence in the post-§15 position.
-  it('LEGACY backward-compat: a post-§15 "## Em uma palavra" block still extracts', () => {
+  // v2.7.0 — naming canonical restaurado pra "Em uma palavra" (Plan 28).
+  // Plan 35 havia widened a regex pra incluir "em poucas palavras", mas
+  // isso colidiu com o heading do §0 Marca 7. v2.7.0 separa os slots.
+  it('canonical v2.7.0: a post-§15 "## Em uma palavra" block extracts', () => {
     const secs = Array.from(
       { length: 15 },
       (_, i) => `## ${i + 1}. Seção ${i + 1}\nConteúdo da seção ${i + 1}.`,

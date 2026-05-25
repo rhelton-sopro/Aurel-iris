@@ -165,7 +165,12 @@ const STAGE1_PROMPT_FILENAME = 'stage1-scan.md'
 //      estrutura obscurecedora (via OBSCURECIMENTO_MAP) deve estar
 //      registrada como achado ATIVO. Modo warning não rejeita —
 //      coherence_warning + log.
-const STAGE1_METHOD_VERSION = 'sonnet_2x_0.3.0' as const
+// v2.7.0 (2026-05-25): bump MINOR 0.3.0 → 0.4.0 — padrao_pupilar demovido
+// de primário pra secundário (cap I=3 + proibido ser maior intensidade).
+// Razão empírica N=2 (Cristiane regen=8 + Evanilce regen=1). Ver bloco
+// "Padrão pupilar como achado secundário (v2.7.0)" em stage1-scan.md +
+// comentário em stage1-glossary.ts entry padrao_pupilar.
+const STAGE1_METHOD_VERSION = 'sonnet_2x_0.4.0' as const
 
 let _stage1PromptCache: string | null = null
 let _stage1ShaCache: string | null = null

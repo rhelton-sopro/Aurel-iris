@@ -43,6 +43,7 @@ import {
   findAllBoundaries,
   closeSections,
   extractEssencePhrase,
+  extractZeroSection,
 } from '@/lib/anthropic/parser'
 import { runAudit } from '@/lib/anthropic/audit'
 import { MODEL } from '@/lib/anthropic/client'
@@ -352,6 +353,11 @@ export async function POST(
 
         const essence = extractEssencePhrase(buffer)
         if (essence) completedSections.essence_phrase = essence
+        // v2.7.0: §0 (Marca 7 v2 microfilme) é extraído separadamente —
+        // fica OUT de NUMBERED_SECTION_HEADINGS pra preservar monotonicidade
+        // §1..§15 caso Sonnet pule §0. Ver parser.ts extractZeroSection.
+        const zeroSection = extractZeroSection(buffer)
+        if (zeroSection) completedSections['0_em_poucas_palavras'] = zeroSection
         completedSections.encerramento_disclaimer = ENCERRAMENTO_LITERAL
 
         if (sectionKeysBeforeEncerramento.length === 0) {
@@ -490,6 +496,8 @@ export async function POST(
           if (Object.keys(completedSections).length > 0 || buffer.length > 0) {
             const partialEssence = extractEssencePhrase(buffer)
             if (partialEssence) completedSections.essence_phrase = partialEssence
+            const partialZero = extractZeroSection(buffer)
+            if (partialZero) completedSections['0_em_poucas_palavras'] = partialZero
             await supabase
               .from('readings')
               .update({

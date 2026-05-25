@@ -657,6 +657,15 @@ fundo"; com tireoide, "fala guardada"; etc.
 ### Estrutura formal de §0 vs §14
 
 **§0 (Em poucas palavras) — microfilme COMPLETO + pergunta maiêutica:**
+
+- **Heading EXATO**: \`## 0. Em poucas palavras\` (com o número 0 e o
+  ponto — IDÊNTICO ao formato dos demais headings §1..§15). Esse
+  heading numerado é o que o parser reconhece como boundary de seção.
+  NÃO use \`## Em poucas palavras\` sem número — esse formato é
+  reservado pra outro slot (essence_phrase) e seria capturado errado.
+- **Posição**: PRIMEIRA seção do relatório. É emitida ANTES de
+  \`## 1. Constituição e Temperamento\`. O relatório abre com §0 logo
+  após o cabeçalho/contexto. NÃO emita §0 no fim do documento.
 - 6-9 linhas total
 - 3 partes do microfilme (verbo + em nome de + deixou de + aterragem
   no achado visível)
@@ -1129,7 +1138,7 @@ JSON do Stage 1 e organize os campos em **três grupos**:
 
 Este roll call não aparece no output — é raciocínio interno.
 
-## Tratamento de natureza='indeterminada' (regra crítica — v2.6.0)
+## Tratamento de natureza='indeterminada' (regra crítica — v2.7.0)
 
 Quando o Stage 1 marca um achado como \`natureza_da_carga='indeterminada'\`,
 verifique o atributo \`motivo_indeterminacao\` pra rotear corretamente:
@@ -1137,27 +1146,38 @@ verifique o atributo \`motivo_indeterminacao\` pra rotear corretamente:
 ### Caso 1 — \`motivo_indeterminacao='obscurecimento_estrutural'\`
 
 A causa do obscurecimento tem leitura clínica iridológica própria
-(midríase sustentada, opacidade obscurecedora). A ESTRUTURA
-OBSCURECEDORA é achado ATIVO em outro campo (geralmente
-\`padrao_pupilar\` ATIVO).
+(midríase sustentada, opacidade obscurecedora). A estrutura
+obscurecedora PODE estar registrada como achado SECUNDÁRIO em outro
+campo (\`padrao_pupilar\` com intensidade MAX 3) — mas o protagonista
+da leitura é o EIXO OBSCURECIDO, não a causa.
 
 **PERMITIDO (e ESPERADO):** o achado indeterminado VAI pra §2
 **Categoria A.5 (Sinais que pedem reflexão)** com leitura clínica
-integrativa ancorada na causa estrutural. NÃO é Forer porque a
-descrição clínica está ancorada em achado real mensurável
-(padrão pupilar visível nas 6 fotografias).
+integrativa específica do eixo. NÃO é Forer porque a descrição
+clínica está ancorada na constatação real de que o eixo específico
+(HPA, pineal-hipotalâmico, anel interno, SNA) ficou indeterminado
+pela estrutura obscurecedora visível.
 
-**CASCATA cross-section:** §5, §7, §8, §10, §11, §13 PODEM e DEVEM
-referenciar os achados de A.5 com honestidade técnica preservada
-(nomear o eixo estrutural visível + reconhecer que o eixo
-específico não foi conclusivamente avaliado). Mapeamento detalhado
-no system.md §2 e em cada seção destino.
+**CASCATA cross-section (v2.7.0):** §5, §7, §11, §13 PODEM e DEVEM
+referenciar os achados de A.5 (eixos obscurecidos) com honestidade
+técnica preservada — nomear o eixo obscurecido + reconhecer que a
+zona específica não foi conclusivamente avaliada, mas existe leitura
+integrativa do eixo identificado em A.5.
 
-**Por quê:** v2.5.4 silenciava esses achados em §2 Categoria C
-(lista fria sem leitura). Empiricamente (Cristiane regen=7 com
-midríase ~75%), os 3 eixos obscurecidos pela pupila são o achado
-EMOCIONALMENTE MAIS RICO da leitura — silenciar criava gap de
-produto vertical IA (vira coaching genérico desidratado).
+**§8 e §10 NÃO recebem cobertura A.5 (v2.7.0):** §8 (estado mental
+e nervoso) descreve SNA com achados disponíveis (vasc escleral,
+contexto biográfico, padrão pupilar quando presente em A.1) sem
+ancorar exclusivamente em pupila. §10 (dimensão arquetípica) emerge
+do conjunto de achados ATIVOS desta cliente — sem default a
+"sentinela vigilante" / "guardiã que não dorme".
+
+**Por quê v2.7.0 (demoção pupila):** v2.6.0 promoveu \`padrao_pupilar\`
+a primário I=5 + cascata cross-section. Empírico N=2 (Cristiane regen=8
++ Evanilce regen=1) mostrou que isso fez TODO relatório virar pupila-
+cêntrico — "modo sentinela" como tema universal. v2.7.0 rebalança:
+pupila vira nota complementar (A.1 max I=3); os 3 eixos pericentrais
+obscurecidos seguem em A.5 (achado emocionalmente rico preservado);
+§8/§10/§0 voltam a emergir do conjunto de achados zonais ATIVOS.
 
 ### Caso 2 — \`motivo_indeterminacao='limitacao_tecnica'\`
 
@@ -1189,12 +1209,12 @@ obscurecimento estrutural sem o atributo explícito do Stage 1.
 - **v2.5.0**: skip global — indeterminados sumiam do relatório.
 - **v2.5.4**: Categoria C nomeada — silêncio virou transparência via
   lista fria.
-- **v2.6.0**: Categoria A.5 nova com leitura clínica integrativa pros
-  indeterminados causados por obscurecimento estrutural. Categoria C
-  reservada exclusivamente pra limitação técnica. Motivo empírico:
-  Cristiane regen=7 com midríase ~75% — 3 eixos invisíveis na
-  Categoria C eram o achado emocionalmente mais rico, sendo
-  silenciados como ruído quando deveriam ser narrados como sinal.
+- **v2.6.0**: Categoria A.5 nova + padrao_pupilar promovido a primário
+  + cascata cross-section pra §5/§7/§8/§10/§11/§13.
+- **v2.7.0**: pupila demovida (max I=3, nunca dominante); A.5 mantida
+  exclusiva pros eixos pericentrais obscurecidos; §8/§10 cobertura A.5
+  removida (voltam ao pré-v2.6.0). Razão: empírico N=2 mostrou pupila
+  dominando narrativa.
 
 ## Cross-section coherence (§2 é o gate)
 
@@ -1763,7 +1783,7 @@ export const STAGE2_METHOD_VERSION = 'sonnet_2x_0.2.2' as const
 //      'limitacao_tecnica' continuam em Categoria C.
 //   4. Glossário emocional novo: lib/anthropic/glossario-emocional-estruturais.ts
 //      com 5 padrões pupilares + 3 variações lexicais por categoria de
-//      manifestação (reduz repetibilidade percebida entre clientes).
+//      manifestação. DELETADO em v2.7.0 — ficou órfão sem A.5 pupila.
 //   5. ANCHORING_PRINCIPLE_V2_5 atualizado pra roteamento condicional
 //      por motivo_indeterminacao. Caso 1 (obscurecimento_estrutural) →
 //      A.5 + cascata pra §5/§7/§8/§10/§11/§13 com honestidade técnica.
@@ -1878,7 +1898,55 @@ export const STAGE2_METHOD_VERSION = 'sonnet_2x_0.2.2' as const
 //     (além de §0 já marcada).
 // Push consolidado v2.5.4 = commits v0.3.2 + v0.3.3 + v0.3.4 juntos.
 export const STAGE2_METHOD = 'sonnet_2x' as const
-export const STAGE2_VERSION = '0.4.0' as const
+// v2.7.0 (2026-05-25): bump MINOR 0.4.0 → 0.5.0 — rollback parcial v2.6.0
+// + fix §0/essence_phrase.
+//
+// Empírico N=2 (Cristiane regen=8 + Evanilce regen=1) mostrou que
+// padrao_pupilar promovido a primário I=5 + cascata cross-section fez
+// todo relatório virar pupila-cêntrico ("modo sentinela" universal).
+// Decisão founder 2026-05-25: rebalancear.
+//
+// Diagnóstico bug §0 (Evanilce e8976f11): Marca 7 v2 (v2.5.5) introduziu
+// §0 microfilme usando heading "## Em poucas palavras" — colidiu com o
+// slot essence_phrase (Plan 35) que usa o mesmo heading post-§15. Parser
+// capturava o microfilme como essence_phrase + truncava em 400 chars +
+// pergunta maiêutica caía fora. Fix: §0 ganha número (## 0. ...) +
+// parser extrai como seção separada (extractZeroSection) + essence_phrase
+// volta ao naming "Em uma palavra" (Plan 28).
+//
+// MUDANÇAS v2.7.0:
+//   1. Stage 1 glossário (stage1-glossary.ts): padrao_pupilar mantido
+//      como campo MAS cap intensidade MAX 3 + JAMAIS ser maior intensidade.
+//   2. Stage 1 prompt (stage1-scan.md): bloco "primeira classe" reescrito
+//      pra "achado secundário" com 2 hard constraints.
+//   3. STAGE1_METHOD_VERSION: sonnet_2x_0.3.0 → sonnet_2x_0.4.0.
+//   4. ANCHORING Caso 1 reescrito: A.5 protagonista = eixos obscurecidos,
+//      não a estrutura obscurecedora. Pupila vai pra A.1 normal.
+//   5. system.md §2 A.5: removidos 5 mappings padrao_pupilar → 🌀
+//      Padrão pupilar (modo sentinela / tom de alerta / etc). Mantidos
+//      3 mappings dos eixos obscurecidos (HPA / pineal / SNA) +
+//      adicionado anel_interno.
+//   6. system.md cobertura A.5 em §5: removido "Eixo pupilar"; mantidos
+//      eixo neuroendócrino-adrenal + cronobiológico.
+//   7. system.md cobertura A.5 em §7: removida linha "Padrão pupilar
+//      → Mg glicinato"; mantidos cofatores HPA + pineal-hipotalâmico.
+//   8. system.md cobertura A.5 em §8: REMOVIDA. §8 volta ao pré-v2.6.0.
+//   9. system.md cobertura A.5 em §10: REMOVIDA. §10 volta ao pré-v2.6.0.
+//   10. system.md cobertura A.5 em §11/§13: gatilho ajustado (sem
+//       "padrão pupilar ATIVO"), conteúdo mantido.
+//   11. Marca 7 v2 §0: heading muda pra "## 0. Em poucas palavras"
+//       (com número) + posição EXPLÍCITA no INÍCIO do relatório.
+//   12. parser.ts: extractZeroSection() nova função; ESSENCE_MARKER_RE
+//       passa a casar só "em uma palavra" (não "poucas palavras").
+//   13. types.ts: ReportSectionKey ganha '0_em_poucas_palavras'.
+//   14. UI/PDF: render do §0 como primeira seção (antes de §1).
+//   15. lib/anthropic/glossario-emocional-estruturais.ts DELETADO
+//       (órfão sem A.5 alimentada por pupila).
+//
+// NÃO mexido: motivo_indeterminacao schema (956c177 OK), Caso 2/3 do
+// ANCHORING, §3, §6, §9, §12, §14, §15, todas as Marcas 1-7 do VOICE
+// (exceto heading do §0 e regra de posição).
+export const STAGE2_VERSION = '0.5.0' as const
 
 /**
  * Etapa 2 do pipeline Sonnet 2x — composição streaming ancorada no JSON
