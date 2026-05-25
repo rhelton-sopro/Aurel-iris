@@ -2264,7 +2264,26 @@ export const STAGE2_METHOD = 'sonnet_2x' as const
 // não-determinística (memory project_stage1_variability_tech_debt).
 // Stage 1 intocado desde v2.7.0 — variabilidade é do modelo, não
 // de mudanças nossas. Mitigação prio #1 (top_p: 0) adiada.
-export const STAGE2_VERSION = '0.6.2' as const
+// v2.8.3 (2026-05-25): bump PATCH 0.6.2 → 0.6.3 — anti-fusão LITERAL.
+//
+// v2.8.2 fechou anti-invenção (0 itens fantasmas) mas Cristiane
+// regen=1 v0.6.2 ainda fundiu 2 achados ATIVOS num único item:
+// pigmento_amber (I=4) + boca_garganta (I=3) viraram "Pigmento âmbar
+// — zona da voz e região cervical" (1 item composto). 5 itens
+// emitidos vs 6 esperados (6 achados ATIVOS no Stage 1).
+//
+// Fix v2.8.3: regras §2 reorganizadas com QUANTIDADE EXATA como
+// regra #1 (era #2 em v2.8.2), regra anti-fusão tornada explícita
+// com exemplo concreto da violação observada na Cristiane v0.6.2,
+// auto-checagem reescrita com contagem explícita "N = count(achados
+// ATIVOS Stage 1), emita exatamente N itens". Princípio raiz expandido
+// pra incluir explicitamente "NÃO pode FUNDIR 2 achados num só".
+//
+// NÃO mexido: anti-invenção (v2.8.1+v2.8.2), observacao_qualifying
+// vinculante (v2.8.1), anti-manifestações inventadas (v2.8.1), voz
+// 2ª pessoa (v2.8.0+v2.8.1), repertório órgão→processo (v2.8.0),
+// tireoide≠cervical (v2.8.0), Stage 1 (intocado desde v2.7.0).
+export const STAGE2_VERSION = '0.6.3' as const
 
 /**
  * Etapa 2 do pipeline Sonnet 2x — composição streaming ancorada no JSON

@@ -746,63 +746,82 @@ aguda_recente, em_reorganizacao_ativa, herdada_constitucional) viram
 linha aqui — **sem omissão**. Ordem: prioridade visual, o mais
 expressivo primeiro.
 
-**REGRAS RÍGIDAS v2.8.2 — anti-fusão / anti-invenção / fidelidade EXATA (5):**
+**REGRAS RÍGIDAS v2.8.3 — fidelidade EXATA ao Stage 1 (6):**
 
-> **Princípio raiz (v2.8.2)**: `achados_de_atencao` do Stage 1 é a
-> ÚNICA fonte. §2 Categoria A **NÃO pode emitir itens além do que
-> está no Stage 1**, NÃO pode omitir itens que estão no Stage 1, NÃO
-> pode reclassificar zonas, NÃO pode renomear campos pra sistemas
-> clínicos "esperados". Se Stage 1 não tem `figado_vesicula`, §2 NÃO
-> pode ter "Campo do fígado e vesícula". Se Stage 1 não tem `adrenal`,
-> §2 NÃO pode ter "Eixo adrenal". Mesmo que clinicamente faça sentido
-> "esperar" esses sistemas dado o quadro, **se Stage 1 não viu, §2 não
-> emite**. Sonnet NÃO usa conhecimento clínico próprio pra "completar
-> o quadro" — Stage 1 é o que existe nesta leitura.
+> **Princípio raiz**: `achados_de_atencao` do Stage 1 é a ÚNICA fonte.
+> §2 Categoria A NÃO pode emitir itens além do que está no Stage 1,
+> NÃO pode omitir, NÃO pode reclassificar, NÃO pode FUNDIR 2 achados
+> num só, NÃO pode renomear pra sistemas "esperados". Sonnet NÃO usa
+> conhecimento clínico próprio pra "completar" nem "consolidar" o
+> quadro — Stage 1 é o que EXISTE nesta leitura. Cada `campo` emitido
+> em `achados_de_atencao` vira EXATAMENTE 1 item próprio em §2 Cat A.
 
-1. **Um achado ATIVO = um item separado, sem fusão**. Se Stage 1
-   emitiu 5 achados ATIVOS distintos, §2 Categoria A emite **5 itens
-   separados** — proibido fundir 2 ou mais num único.
+1. **QUANTIDADE EXATA — N itens = N achados ATIVOS** (regra de
+   topo). §2 Categoria A emite **EXATAMENTE N itens** onde N =
+   `count(achados_de_atencao com natureza != 'indeterminada')`. Não
+   N-1, não N+1. Antes de emitir o §2, conte os achados ATIVOS do
+   Stage 1 e emita exatamente esse número de bullets — nem um a mais,
+   nem um a menos.
 
-2. **Quantidade EXATA**. §2 Categoria A emite EXATAMENTE N itens onde
-   N = `count(achados_de_atencao com natureza != 'indeterminada')`.
-   Nem mais, nem menos. Achados indeterminados vão pra A.5, não A.
+2. **PROIBIDO FUSÃO — mesmo entre achados correlatos**. Se Stage 1
+   emitiu `pigmento_amber` E `boca_garganta` (achados próximos no eixo
+   cervical-expressão), §2 emite **2 itens separados** — UM pro
+   pigmento, UM pra boca_garganta — NÃO um item composto tipo
+   "Pigmento âmbar — zona da voz e região cervical". Mesmo que o
+   conteúdo se sobreponha clinicamente, cada `campo` Stage 1 = 1
+   item Stage 2.
 
-3. **Nome do item reflete o `campo` do Stage 1**. Cada item de §2
-   Categoria A tem nome derivado literal do `campo` correspondente
-   do Stage 1. Tradução léxica permitida (ex: `vascularizacao_escleral`
-   → "Vascularização escleral / sistema vascular periférico"), MAS
-   sem reclassificar pra sistema diferente (`pigmento_amber` em zona
-   estômago/diafragma NÃO vira "Campo do fígado"; `boca_garganta`
-   NÃO vira "Eixo cervical-tireoidiano"). O `campo` Stage 1 + a
-   `observacao_qualifying` definem qual sistema.
+   **Exemplo de VIOLAÇÃO observada empiricamente (Cristiane v0.6.2):**
+   - Stage 1 emitiu: `pigmento_amber I=4` + `boca_garganta I=3` (2 achados)
+   - §2 emitiu: 🟡 "Pigmento âmbar — zona da voz e região cervical"
+     (1 item composto) ❌ violação
+   - Correto: 2 itens separados:
+     • 🔴 "Pigmento âmbar" (intensidade 4)
+     • 🟡 "Campo da boca-garganta" (intensidade 3)
+
+3. **Nome do item reflete o `campo` Stage 1 LITERAL**. Tradução léxica
+   permitida (ex: `vascularizacao_escleral` → "Vascularização escleral
+   / sistema vascular periférico"). Composição de 2 campos num único
+   nome é **proibida** (ex: "Pigmento âmbar **e** região cervical"
+   junta 2 achados num só nome — proibido).
 
 4. **`observacao_qualifying` é VINCULANTE**. Quando Stage 1 escreve
    "Pigmento em 1-2h OD = setor estômago/diafragma, NÃO hepática" —
-   §2 NÃO classifica como hepático. Quando Stage 1 escreve "NÃO
-   classificado como figado_vesicula" — §2 NÃO emite item de fígado.
-   `observacao_qualifying` carrega a interpretação clínica PRECISA
-   do Stage 1, é anti-distorção.
+   §2 NÃO classifica como hepático. `observacao_qualifying` é
+   anti-distorção; respeite literal.
 
-5. **PROIBIDO inventar manifestações sintomáticas sem âncora**. Se
-   Stage 1 não menciona "pele alterada" / "bile espessa" / "intolerância
-   a álcool", §2 NÃO pode incluir. Manifestações só são citáveis
-   quando: (a) achado Stage 1 sustenta diretamente, (b) `observacao_qualifying`
-   nomeia, (c) hipótese investigativa generalizada SEM nome de sintoma
-   ("vale correlacionar com hábito de sono" ≠ "tendência a insônia").
-   Sintomas específicos inventados viram **Forer sintomático** —
-   proibido.
+5. **PROIBIDO inventar manifestações sintomáticas sem âncora**.
+   Manifestações só são citáveis quando: (a) achado Stage 1 sustenta
+   diretamente, (b) `observacao_qualifying` nomeia, (c) hipótese
+   investigativa generalizada SEM nome de sintoma. Sintomas
+   específicos inventados ("pele alterada", "bile espessa") viram
+   Forer sintomático — proibido.
 
-**Auto-checagem antes de emitir §2 Categoria A (v2.8.2 — obrigatória):**
+6. **Achados INDETERMINADOS vão pra A.5, não pra Categoria A**.
+   Achados com `natureza_da_carga='indeterminada'` E
+   `motivo_indeterminacao='obscurecimento_estrutural'` vão pra A.5
+   ("Sinais que pedem reflexão"), nunca pra Cat A. Achados com
+   `motivo_indeterminacao='limitacao_tecnica'` vão pra Categoria C.
 
-Antes de emitir cada item de §2 Categoria A, verifique:
-- O `campo` deste item EXISTE em `achados_de_atencao` ATIVOS do
-  Stage 1? Se NÃO → REMOVA o item.
-- O número de itens emitidos = número de achados ATIVOS no Stage 1?
-  Se DIFERENTE → AJUSTE (remova inventados / adicione omitidos).
-- Algum item RENOMEIA o sistema de forma a contradizer `observacao_qualifying`?
-  Se SIM → CORRIJA usando o nome do `campo` literal do Stage 1.
-- Alguma manifestação clínica citada NÃO tem âncora direta em
-  `descricao_visual` ou `observacao_qualifying`? Se SIM → REMOVA.
+**Auto-checagem OBRIGATÓRIA antes de emitir §2 Cat A (v2.8.3):**
+
+Conte ANTES de escrever §2:
+- N = quantos achados ATIVOS (natureza != 'indeterminada') estão
+  em `achados_de_atencao` do Stage 1?
+- N_indeterminados_obscurecimento = quantos com motivo='obscurecimento_estrutural'?
+
+Emita:
+- §2 Categoria A: EXATAMENTE N itens (sem fusão, sem omissão, sem invenção)
+- §2 A.5: até N_indeterminados_obscurecimento itens
+
+Depois de escrever, releia:
+- Cada item de Cat A corresponde 1:1 a um `campo` distinto em
+  `achados_de_atencao` ATIVOS? Se ALGUM item junta 2 campos no
+  nome ou no conteúdo → SEPARA em 2 itens.
+- Sobrou achado ATIVO sem item correspondente em Cat A? → ADICIONA item.
+- Existe item Cat A que não tem `campo` correspondente em Stage 1?
+  → REMOVE.
+- Alguma manifestação clínica sem âncora? → REMOVE.
 
 Linguagem direta tipo "fígado sob carga", "tireoide pede investigação",
 "sistema digestivo com tendência a sobrecarga inflamatória", "rim com
