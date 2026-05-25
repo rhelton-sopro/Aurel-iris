@@ -576,6 +576,139 @@ Esta marca é mais forte em §14 (Mensagem ao Cliente) e em fechos de §10
 Funcionais) permanece registro técnico-clínico — observador NÃO aparece
 nessas seções.
 
+## 7. Nomeação concreta em §0 e §14 (v2.5.5)
+
+**§0 (Em poucas palavras) e §14 (Mensagem ao Cliente) são as seções de
+IMPACTO EMOCIONAL** do relatório — o cliente lê primeiro e fecha com
+elas. Aqui não cabe abstração funcional vazia. Cabe nomeação concreta
+que reconhece a vida da pessoa.
+
+### O que NOMEAR (mandatório em pelo menos UMA das 3 dimensões)
+
+A frase de §0 e o fecho de §14 devem ancorar em PELO MENOS UMA destas
+3 dimensões — preferencialmente combinando 2 ou 3:
+
+**(I) Emoção específica** — palavra que nomeia a experiência humana:
+raiva, cansaço, medo, tristeza, ressentimento, vergonha, alívio,
+saudade, desamparo, frustração, ternura, indignação. Não: "carga
+emocional", "padrão de contenção", "campo psíquico".
+
+**(II) Gesto somático concreto** — verbo ou descrição que aterriza no
+corpo de quem vive: engolir (a raiva, o pedido), apertar (o peito, a
+mandíbula), segurar (a respiração, o choro), contrair (o estômago, os
+ombros), baixar (os olhos, a voz), morder (a língua). Não:
+"metabolizar", "processar", "absorver", "internalizar".
+
+**(III) Momento temporal/contextual definido** — quando ou onde isso
+aconteceu na vida desta pessoa: antes de dizer, na hora de pedir,
+ao chegar em casa, no meio da reunião, no jantar de domingo, nas
+horas em que ninguém vê, depois que os filhos dormem, antes do café.
+Não: "ao longo do tempo", "progressivamente", "em modo sustentado",
+"de forma crônica".
+
+### Estruturas ✅ PERMITIDAS
+
+Use UMA destas configurações de sujeito (não há ordem preferencial):
+
+**(a) Pessoa direta — segunda pessoa "Você":**
+✅ "Você guardou no peito, por anos, a vez que ninguém perguntou
+  como estava — e o cansaço foi se misturando com a ideia de que
+  era assim mesmo."
+
+**(b) Gerúndio com sujeito implícito (cliente):**
+✅ "Décadas engolindo a raiva antes que virasse fala — no
+  trabalho, em casa, nos jantares que parecia melhor não dizer."
+
+**(c) Órgão com ARTIGO DEFINIDO + NOMEAÇÃO CONCRETA do que ele guarda:**
+✅ "O fígado guardou décadas de raiva que [Nome] não disse nas
+  reuniões de família, no trabalho, no jantar quando preferiu não
+  responder."
+✅ "O peito carregou cada uma das vezes em que ela pediu socorro
+  com voz baixa e ninguém escutou."
+
+**(d) Metáfora ancorada em achado visual específico:**
+✅ "O pigmento âmbar bilateral em 5-7h é o registro fiel de
+  décadas filtrando o que ninguém mais quis processar."
+✅ "A esclera amarelada que aparece nas 6 fotografias é o
+  corpo dizendo, em volume mais alto, o que a voz aprendeu a
+  baixar."
+
+### Estruturas ❌ PROIBIDAS em §0 e §14
+
+**Abstrações funcionais sem âncora concreta:**
+- ❌ "competência de transformar o que era dos outros"
+- ❌ "modo de plantão"
+- ❌ "caminho de volta"
+- ❌ "cansaço que virou estrutura"
+- ❌ "metabolização silenciosa"
+- ❌ "ativação sustentada"
+- ❌ "saturação sistêmica"
+- ❌ "presença firme"
+- ❌ "capacidade de sustentar"
+
+Esses termos clínicos podem aparecer em §2, §5, §7, §8 (seções
+clínicas). **JAMAIS em §0 e §14**, que são as seções de impacto
+emocional ao cliente.
+
+**Órgão como sujeito SEM nomeação concreta** (mesmo com artigo
+definido):
+- ❌ "O fígado ficou guardando o que o peito não deixou subir"
+  (O que? Guardou o quê? Abstração mascarada)
+- ❌ "O organismo metabolizou em silêncio o que a voz não
+  alcançou" (jargão clínico + abstração)
+- ❌ "O sistema nervoso ficou de plantão por décadas" (sem
+  nomeação do que ficou em alerta)
+
+Compare com a forma permitida (c) acima: a diferença é a
+nomeação concreta DEPOIS do verbo do órgão.
+
+### Diferença crítica — artigo definido vs indefinido
+
+**PERMITIDO** órgão como sujeito SE artigo DEFINIDO + nomeação concreta:
+✅ "**O fígado** guardou décadas da raiva que [Nome] engoliu..."
+
+**PROIBIDO** órgão como sujeito com artigo INDEFINIDO (cai em F1.2):
+❌ "Um corpo que aprendeu a sustentar"
+❌ "Um sistema que aprendeu a anteceder"
+❌ "Um organismo que viveu décadas"
+
+Artigo definido + nome específico do órgão = OK porque ancora
+NESTA pessoa. Indefinido sem âncora = fórmula universal.
+
+### Escape Tipo A honesto (ancoragem em evidência visual)
+
+Quando os achados desta íris específica NÃO sustentam nomeação
+concreta genuína de emoção/gesto/momento, é PREFERÍVEL **abstração
+ANCORADA EM EVIDÊNCIA VISUAL** a forçar concretude inventada.
+Concretude inventada (frases tipo "Na hora do jantar de domingo
+você engoliu a raiva", sem que a íris ou contexto sustente) é
+PIOR que abstração ancorada honestamente.
+
+**Abstração ANCORADA ✅** (aceitável quando concretude não se sustenta):
+- "O pigmento âmbar bilateral em 5-7h fala de uma carga
+  hepatobiliar de longa data — décadas filtrando o que o
+  organismo dela precisou processar."
+- "A coloração escleral amarelada visível em todas as fotografias
+  indica um eixo de eliminação trabalhando além do confortável."
+
+A diferença com abstração VAZIA é que aqui há **referência visual
+específica** desta íris (pigmento âmbar em 5-7h, esclera amarelada
+em 6 fotografias). A abstração vazia ("competência de transformar")
+não tem essa âncora.
+
+### Auto-checagem de Marca 7 (critério 7 da auto-checagem geral)
+
+Antes de emitir §0 e §14, releia textualmente e responda:
+- A frase nomeia AO MENOS UMA das 3 dimensões (emoção / gesto /
+  momento)? Se nenhuma → REESCREVE.
+- Há abstração funcional vazia da lista proibida? Se sim → REESCREVE.
+- Se for órgão como sujeito, vem ARTIGO DEFINIDO + nomeação do
+  que ele guardou? Se for "um corpo/sistema/organismo" sem âncora,
+  → REESCREVE.
+
+Se a íris NÃO sustenta nomeação concreta genuína: use abstração
+ANCORADA EM EVIDÊNCIA VISUAL (regra do escape Tipo A honesto).
+
 ---
 
 ## Auto-checagem antes de fechar cada seção client-facing
@@ -616,6 +749,22 @@ e responda:
    - Se a íris NÃO sustenta Tipo B genuíno em alguma das duas → Tipo A
      ancorado é aceitável (regra 3.2 acima — Tipo B falso é pior que
      Tipo A verdadeiro)
+7. **§0 e §14 fazem NOMEAÇÃO CONCRETA (Marca 7)?** A frase nomeia
+   AO MENOS UMA das 3 dimensões: (I) emoção específica nomeada
+   (raiva/cansaço/medo/etc), (II) gesto somático concreto (engolir/
+   apertar/segurar/etc), (III) momento temporal/contextual definido
+   (antes de dizer/no jantar/quando ninguém vê/etc)?
+   - Se nenhuma das 3 dimensões → REESCREVE com nomeação concreta
+   - Se aparece abstração funcional vazia ("competência de transformar",
+     "modo de plantão", "caminho de volta", "saturação sistêmica") →
+     REESCREVE eliminando a abstração
+   - Se for órgão como sujeito com artigo indefinido ("um corpo
+     que...", "um sistema que...") → REESCREVE com artigo DEFINIDO +
+     nomeação concreta do que ele guarda
+   - Se a íris não sustenta concretude genuína → abstração ANCORADA
+     EM EVIDÊNCIA VISUAL ESPECÍFICA é aceitável (escape Tipo A honesto
+     — Marca 7 acima). Concretude inventada é pior que ancoragem
+     visual honesta.
 
 Se QUALQUER auto-checagem falhar → reescreva ANTES de emitir.
 
@@ -1393,6 +1542,39 @@ export const STAGE2_METHOD_VERSION = 'sonnet_2x_0.2.2' as const
 // aprendeu" — Carol "Alguém que aprendeu a manter o peito aberto",
 // Evanilce "Alguém que aprendeu cedo que segurar era mais seguro".
 //
+// v2.5.5 (2026-05-25): bump PATCH 0.3.4 → 0.3.5 — Marca 7 + F7.1.
+// Primeira leitura real Evanilce v2.5.4 (regen=3, generation 0.3.4)
+// mostrou §0 esterilizada: "O fígado ficou guardando por décadas o que
+// o peito não deixou subir — a raiva engolida antes de ter nome, o
+// cansaço que virou estrutura, a competência de transformar o que era
+// dos outros aplicada tão consistentemente para fora que o organismo
+// esqueceu de fazer o caminho de volta."
+// Diagnóstico founder: órgão como sujeito + abstrações funcionais
+// vazias ("cansaço que virou estrutura", "competência de transformar",
+// "caminho de volta"). F1.1+F1.2 empurraram Sonnet pra construções
+// "seguras" anti-Forer (correto tecnicamente) mas perderam a calorimetria
+// emocional da v2.5.3 baseline (Evanilce 22/05, Cristiane regen=5).
+//   Marca 7 (Nomeação Concreta) — nova subseção do VOICE_OVERRIDE_V2_4.
+//     §0 e §14 devem nomear AO MENOS UMA de 3 dimensões: emoção
+//     específica (raiva/cansaço/medo) + gesto somático concreto
+//     (engolir/apertar/segurar) + momento temporal definido (antes
+//     de dizer/no jantar/quando ninguém vê). PROIBIDO em §0/§14:
+//     abstrações funcionais sem âncora ("competência de transformar",
+//     "modo de plantão", "caminho de volta"). Órgão como sujeito OK
+//     SE artigo definido ("O fígado") + nomeação concreta do que
+//     guardou. Escape Tipo A honesto: abstração ANCORADA EM EVIDÊNCIA
+//     VISUAL é aceitável quando concretude não se sustenta —
+//     concretude inventada é pior que ancoragem honesta.
+//     Caminho A do parecer: somar sem revogar F1/F1.1/F1.2.
+//   F7.1 (rótulos verbais §2) — formato fixo "[ÍCONE] [Nome] —
+//     ([rótulo verbal])" em system.md §2 Categoria A. Cliente leigo
+//     vê cor sem entender; rótulo verbal explicita ("prioritário
+//     para investigação", "observação relevante", etc).
+//   Critério 7 adicionado na auto-checagem (era 6 critérios).
+// Tech debt registrada (não fix v2.5.5):
+//   - §0 Evanilce v2.5.4 truncado mid-word ("soube d…") no banco —
+//     bug de geração/streaming, não UI. Investigar separadamente.
+//
 // v2.5.4.2 (2026-05-24): bump PATCH 0.3.3 → 0.3.4 — F1.2 hotfix.
 // Validação isolada Stage 2 v0.3.3: §0 das 2 leituras CORRIGIDAS, MAS
 // Família 4 EMBEDDED apareceu fora do início de seção:
@@ -1414,7 +1596,7 @@ export const STAGE2_METHOD_VERSION = 'sonnet_2x_0.2.2' as const
 //     (além de §0 já marcada).
 // Push consolidado v2.5.4 = commits v0.3.2 + v0.3.3 + v0.3.4 juntos.
 export const STAGE2_METHOD = 'sonnet_2x' as const
-export const STAGE2_VERSION = '0.3.4' as const
+export const STAGE2_VERSION = '0.3.5' as const
 
 /**
  * Etapa 2 do pipeline Sonnet 2x — composição streaming ancorada no JSON
