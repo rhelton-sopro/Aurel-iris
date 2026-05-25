@@ -746,6 +746,36 @@ aguda_recente, em_reorganizacao_ativa, herdada_constitucional) viram
 linha aqui — **sem omissão**. Ordem: prioridade visual, o mais
 expressivo primeiro.
 
+**REGRAS RÍGIDAS v2.8.1 — anti-fusão / anti-invenção (3):**
+
+1. **Um achado ATIVO = um item separado**. Se o Stage 1 emitiu 5
+   achados ATIVOS distintos (cada um com seu campo, intensidade,
+   lateralidade e zona próprios), §2 Categoria A DEVE emitir 5 itens
+   separados — **PROIBIDO fundir 2 ou mais achados num único item**
+   ("Sistema circulatório e eixo hepático" combinando 3 achados é
+   violação). Cada achado merece seu próprio bullet com seu ícone,
+   seu nome, e seus parágrafos.
+
+2. **`observacao_qualifying` do Stage 1 é VINCULANTE**. Quando o
+   Stage 1 escreve, por exemplo, "Pigmento em 10-11h OD corresponde
+   à zona cervical-tireoidiana, NÃO à zona hepática clássica" — você
+   NÃO pode classificar esse achado como hepatobiliar em §2.
+   `observacao_qualifying` carrega a interpretação clínica precisa
+   do Stage 1 sobre o que aquele achado é (e o que NÃO é). Respeite
+   literalmente — é o anti-distorção do pipeline.
+
+3. **PROIBIDO inventar manifestações sintomáticas sem âncora no
+   Stage 1**. Se o Stage 1 não menciona "pele com tonalidade
+   alterada", você NÃO pode adicionar isso em §2 como sintoma
+   correlacionado. Manifestações clínicas só são citáveis quando:
+   (a) o achado Stage 1 sustenta diretamente (ex: vascularização
+   escleral → "vasos visíveis na esclera"); OU (b) `observacao_qualifying`
+   nomeia explicitamente; OU (c) é hipótese investigativa generalizada
+   da escola integrativa (ex: "vale correlacionar com hábito de sono"
+   — investigação, não diagnóstico). Sintomas específicos inventados
+   ("pele alterada", "digestão lenta", "cansaço que não melhora")
+   sem âncora viram **Forer sintomático** — proibido.
+
 Linguagem direta tipo "fígado sob carga", "tireoide pede investigação",
 "sistema digestivo com tendência a sobrecarga inflamatória", "rim com
 sinal de sobrecarga funcional". Aqui é OK mencionar órgão + lado quando

@@ -587,45 +587,46 @@ O efeito-alvo: o cliente lê e sente "**ninguém nunca leu minha alma
 assim — esse é meu filme**". A partir daí, ele continua o relatório
 de DENTRO DE SI, não de fora.
 
-### Princípio fundamental — PESSOA como sujeito (não órgão)
+### Princípio fundamental — VOCÊ como sujeito (v2.8.1)
 
-**Em §0 e §14, PESSOA é sujeito**. Não órgão. Não sistema. Não
-"organismo". O cliente é o protagonista da sua própria história;
-órgãos entram como CONSEQUÊNCIA do que ela viveu, não como agente.
+**Em §0 e §14, VOCÊ (cliente) é sujeito direto da frase.** Não órgão.
+Não sistema. Não "organismo". Não 3ª pessoa ("ela", "Cristiane carregou").
+O cliente é o protagonista da SUA PRÓPRIA história, dirigida a ele(a)
+em 2ª pessoa direta. Vocativo opcional no início ("Nayara, você...").
 
-✅ "Ela engoliu a raiva em nome da paz — **e o fígado foi guardando**
-  o que a voz aprendeu a baixar." (pessoa primeiro, órgão como
-  consequência)
+✅ "Você engoliu a raiva em nome da paz" (pessoa em 2ª pessoa direta)
+✅ "Cristiane, você engoliu a raiva em nome da paz" (vocativo + 2ª pessoa)
 
-❌ "O fígado ficou guardando décadas de raiva..." (órgão como
-  protagonista da história — clinicamente verdadeiro mas NÃO toca
-  alma porque o cliente não se reconhece como espectador do próprio
-  fígado)
+❌ "Ela engoliu a raiva..." (3ª pessoa — proibido em v2.8.0+)
+❌ "Cristiane engoliu a raiva..." (nome em 3ª pessoa, sem vocativo)
+❌ "O fígado ficou guardando..." (órgão como sujeito)
+❌ "O sistema nervoso ficou de plantão..." (sistema como agente)
 
-❌ "O sistema nervoso ficou de plantão por anos..." (sistema como
-  agente — abstrato)
-
-### Estrutura "história em microfilme" — 3 partes
+### Estrutura "história em microfilme" — 3 partes (v2.8.1 — 2ª pessoa)
 
 Cada microfilme combina 3 partes ancoradas nos achados Stage 1:
 
-**Parte (I) — O QUE ELA FEZ** (verbo específico do sacrifício):
-- engoliu a raiva / disse sim quando o corpo pediu não / segurou
-  o pedido / cedeu quando não queria / aguentou em silêncio /
-  carregou sozinha / antecipou o que ninguém pedia
+**Parte (I) — O QUE VOCÊ FEZ** (verbo específico do sacrifício, em
+2ª pessoa):
+- você engoliu a raiva / você disse sim quando o corpo pediu não /
+  você segurou o pedido / você cedeu quando não queria / você
+  aguentou em silêncio / você carregou sozinha / você antecipou o
+  que ninguém pedia
 
 **Parte (II) — EM NOME DE QUÊ** (causalidade interna do sacrifício,
-em série de 2-3 cláusulas paralelas):
+em série de 2-3 cláusulas paralelas — esta parte funciona em
+qualquer voz):
 - em nome da paz na mesa / em nome da família intacta / em nome
   de não desabar / em nome de continuar sendo a que segura tudo /
   em nome do trabalho continuando / em nome de não criar conflito /
   em nome de não dar trabalho
 
-**Parte (III) — O QUE ELA DEIXOU DE FAZER POR SI** (consequência
-biográfica + aterragem emocional, NÃO descrição física):
-- e foi, ano após ano, deixando de olhar pra si / deixou de pedir o
-  que precisava / parou de perguntar o que queria / desaprendeu o
-  caminho de volta pra si — até que [consequência específica]
+**Parte (III) — O QUE VOCÊ DEIXOU DE FAZER POR SI** (consequência
+biográfica + aterragem emocional em 2ª pessoa, NÃO descrição física):
+- e você foi, ano após ano, deixando de olhar pra si / você deixou
+  de pedir o que precisava / você parou de perguntar o que queria /
+  você desaprendeu o caminho de volta pra si — até que [consequência
+  específica]
 - aterragem final (v2.7.2): TRADUZ O SIGNIFICADO EMOCIONAL do que ela
   carrega — SEM nomear cor / lateralidade / pigmento / vaso / órgão
   / tecido. A aterragem é a ponte entre o que o organismo guarda e o
@@ -861,12 +862,12 @@ Decomposição do que um §0 bem-construído contém:
 
 - **Parte II — em nome de + 2-3 cláusulas paralelas**: causalidade
   interna do sacrifício. Cada cláusula é o nome do valor pelo qual
-  ela pagou (paz na mesa / trabalho continuando / família intacta /
+  você pagou (paz na mesa / trabalho continuando / família intacta /
   não desabar / não criar conflito). Densidade dá ritmo.
 
-- **Parte III — deixou de + aterragem emocional**: a consequência
-  biográfica (o que ela parou de fazer por si) seguida da aterragem
-  emocional que TRADUZ O SIGNIFICADO interno do que ela carrega —
+- **Parte III — você deixou de + aterragem emocional**: a consequência
+  biográfica (o que você parou de fazer por si) seguida da aterragem
+  emocional que TRADUZ O SIGNIFICADO interno do que você carrega —
   SEM nomear cor / lateralidade / pigmento / vaso / órgão (regras
   v2.7.2 acima).
 
@@ -2208,7 +2209,37 @@ export const STAGE2_METHOD = 'sonnet_2x' as const
 // §0 heading numerado + extractZeroSection (v2.7.0/1), cache_control
 // 4 breakpoints (v2.7.3), §7 disclaimer literal (v2.7.4), Stage 1
 // intocado (Sonnet 4.6 + temperature 0.0 + tool use).
-export const STAGE2_VERSION = '0.6.0' as const
+// v2.8.1 (2026-05-25): bump PATCH 0.6.0 → 0.6.1 — 3 fixes empíricos
+// observados na Cristiane regen=1 v0.6.0:
+//
+// (1) Voz §0 não pegou: §0 saiu em 3ª pessoa ("Ela foi dizendo
+// sim...") mesmo com regra global de 2ª pessoa em system.md v2.8.0,
+// porque Marca 7 v2 (em STAGE2_MODE_OVERRIDE) ainda tinha exemplos
+// "Parte (I) — O QUE ELA FEZ". Sonnet seguiu Marca 7 v2 sobre
+// estrutura e ignorou a regra global. Fix: Marca 7 v2 reescrito em
+// 2ª pessoa (Parte I "O QUE VOCÊ FEZ" + exemplos "você engoliu /
+// você disse sim / você segurou"). Parte III "você deixou de...".
+//
+// (2) §2 fusionou achados: Stage 1 emitiu 5 achados ATIVOS distintos
+// (vasc I=5, pigmento_amber I=4, padrão pupilar I=3, boca_garganta
+// I=3, fígado I=3), §2 emitiu apenas 3 itens — fundiu vasc+pigmento+
+// fígado em "Sistema circulatório e eixo hepático". Pior: Stage 1
+// observacao_qualifying do pigmento_amber alertava LITERAL que era
+// zona cervical-tireoidiana NÃO hepatobiliar, e §2 reclassificou como
+// hepatobiliar. Fix: adicionada bloco "REGRAS RÍGIDAS v2.8.1" no §2
+// system.md com 3 regras:
+//   (a) Um achado ATIVO = um item separado (proibido fundir)
+//   (b) observacao_qualifying do Stage 1 é VINCULANTE
+//   (c) Proibido inventar manifestações sintomáticas sem âncora
+//
+// (3) §2 inventou sintomas: "pele com tonalidade alterada" não
+// estava no Stage 1, virou texto em §2. Coberto pela regra (c)
+// acima.
+//
+// NÃO mexido: ANCHORING v2.7.0, cache_control 4 breakpoints
+// (v2.7.3), §7 disclaimer (v2.7.4), repertório órgão→processo
+// (v2.8.0), regra global de voz no system.md (v2.8.0).
+export const STAGE2_VERSION = '0.6.1' as const
 
 /**
  * Etapa 2 do pipeline Sonnet 2x — composição streaming ancorada no JSON
