@@ -64,7 +64,7 @@ export async function fetchDogfoodingProgress(
 
   const weeksElapsed = Math.max(
     0,
-    Math.ceil((today.getTime() - startDateObj.getTime()) / (7 * 24 * 60 * 60 * 1000)),
+    Math.floor((today.getTime() - startDateObj.getTime()) / (7 * 24 * 60 * 60 * 1000)),
   )
 
   // Leituras do founder desde a data de início, JOIN com clients pra obter is_self.
