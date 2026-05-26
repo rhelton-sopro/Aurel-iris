@@ -18,6 +18,7 @@ function chain(resolved: Resolved): Record<string, unknown> {
   c.update = vi.fn(() => c)
   c.delete = vi.fn(() => c)
   c.eq = vi.fn(() => c)
+  c.in = vi.fn(() => c)
   c.maybeSingle = vi.fn(() =>
     Promise.resolve(resolved.maybeSingle ?? { data: null, error: null }),
   )
@@ -56,13 +57,28 @@ beforeEach(() => {
 })
 afterEach(() => vi.restoreAllMocks())
 
-function wireOwned(ownerFound: boolean) {
+function wireOwned(ownerFound: boolean, deleteError: string | null = null) {
+  // deleteClientsAction faz 2 calls .from('clients') seqüenciais:
+  //   1ª = ownership SELECT .in() → array
+  //   2ª = final DELETE .in()    → error/count
+  let clientsCallCount = 0
   userFrom.mockImplementation((t: string) => {
-    if (t === 'clients')
+    if (t === 'clients') {
+      clientsCallCount++
+      if (clientsCallCount === 1) {
+        return chain({
+          terminal: {
+            data: ownerFound ? [{ id: CLIENT }] : [],
+            error: null,
+          },
+        })
+      }
       return chain({
-        maybeSingle: { data: ownerFound ? { id: CLIENT } : null, error: null },
-        terminal: { error: null },
+        terminal: deleteError
+          ? { error: { message: deleteError } }
+          : { count: 1, error: null },
       })
+    }
     if (t === 'readings')
       return chain({
         terminal: {
@@ -90,7 +106,7 @@ describe('deleteClientAction — eliminação LGPD-completa (6 passos)', () => {
   it('aborta se não for dono (RLS nulo) — nenhuma op service-role/storage', async () => {
     wireOwned(false)
     const res = await deleteClientAction(CLIENT)
-    expect(res.error).toBe('Cliente não encontrado.')
+    expect(res.error).toBe('Nenhum cliente encontrado.')
     expect(remove).not.toHaveBeenCalled()
     expect(serviceFrom).not.toHaveBeenCalled()
   })
@@ -126,17 +142,7 @@ describe('deleteClientAction — eliminação LGPD-completa (6 passos)', () => {
   })
 
   it('delete final falha → retorna erro', async () => {
-    userFrom.mockImplementation((t: string) => {
-      if (t === 'clients')
-        return chain({
-          maybeSingle: { data: { id: CLIENT }, error: null },
-          terminal: { error: { message: 'delete boom' } },
-        })
-      if (t === 'readings')
-        return chain({ terminal: { data: [], error: null } })
-      return chain({})
-    })
-    serviceFrom.mockImplementation(() => chain({ terminal: { error: null } }))
+    wireOwned(true, 'delete boom')
     const res = await deleteClientAction(CLIENT)
     expect(res.error).toBe('delete boom')
   })

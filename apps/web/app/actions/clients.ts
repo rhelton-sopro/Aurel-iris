@@ -121,9 +121,18 @@ export async function updateClientAction(
  *      reading_images; client_consents.client_id → NULL (FK SET NULL 0020)
  *      preserva a prova jurídica anonimizada (art. 16).
  */
-export async function deleteClientAction(
-  clientId: string,
-): Promise<{ error?: string }> {
+/**
+ * Versão em lote — fonte ÚNICA da lógica de delete de clientes (LGPD).
+ * Reproduz toda a anonimização + storage cleanup do delete único, mas
+ * aplica via `.in('id', clientIds)` quando possível.
+ *
+ * Ownership: RLS no SELECT + DELETE garante que terapeuta só apaga os
+ * próprios. IDs que não são dele caem silenciosamente fora (não conta
+ * como erro — comportamento equivalente ao discardReadingsAction).
+ */
+export async function deleteClientsAction(
+  clientIds: string[],
+): Promise<{ error?: string; deleted?: number }> {
   const supabase = await createClient()
   const {
     data: { user },
@@ -133,20 +142,24 @@ export async function deleteClientAction(
     redirect('/login')
   }
 
-  // (1) Ownership provado com o client do usuário (RLS) ANTES de service-role.
+  if (!Array.isArray(clientIds) || clientIds.length === 0) {
+    return { error: 'Nenhum cliente selecionado.' }
+  }
+
+  // (1) Ownership filter via RLS — descobre quais IDs são do terapeuta.
   const { data: owned, error: ownErr } = await supabase
     .from('clients')
     .select('id')
-    .eq('id', clientId)
-    .maybeSingle()
+    .in('id', clientIds)
   if (ownErr) return { error: ownErr.message }
-  if (!owned) return { error: 'Cliente não encontrado.' }
+  const ownedIds = (owned ?? []).map((c) => c.id as string)
+  if (ownedIds.length === 0) return { error: 'Nenhum cliente encontrado.' }
 
-  // (2) storage_path + canonical_storage_path de todas as imagens (RLS filtra).
+  // (2) Storage paths — todas as fotos dos readings dos clientes (RLS filtra).
   const { data: readingsRows } = await supabase
     .from('readings')
     .select('id, reading_images(storage_path, canonical_storage_path)')
-    .eq('client_id', clientId)
+    .in('client_id', ownedIds)
 
   const paths: string[] = []
   for (const r of Array.isArray(readingsRows) ? readingsRows : []) {
@@ -161,46 +174,59 @@ export async function deleteClientAction(
     }
   }
 
-  // (3) Remove blobs biométricos (best-effort — não bloqueia a eliminação).
+  // (3) Remove blobs biométricos (best-effort).
   if (paths.length > 0) {
     const { error: rmErr } = await supabase.storage
       .from('iris-captures')
       .remove(paths)
     if (rmErr) {
       console.error(
-        `[deleteClient] storage remove falhou client=${clientId} n=${paths.length}: ${rmErr.message}`,
+        `[deleteClients] storage remove falhou n=${paths.length} clients=${ownedIds.length}: ${rmErr.message}`,
       )
     }
   }
 
-  // (4)+(5) Anonimização — service-role (RLS bloqueia p/ terapeuta).
-  // Best-effort: FK ON DELETE SET NULL é a rede de segurança do desvínculo.
+  // (4)+(5) Anonimização — service-role.
   const service = createServiceClient()
 
   const { error: consentErr } = await service
     .from('client_consents')
     .update({ ip: null, user_agent: null })
-    .eq('client_id', clientId)
+    .in('client_id', ownedIds)
   if (consentErr) {
     console.error(
-      `[deleteClient] anon client_consents falhou client=${clientId}: ${consentErr.message}`,
+      `[deleteClients] anon client_consents falhou n=${ownedIds.length}: ${consentErr.message}`,
     )
   }
 
   const { error: genErr } = await service
     .from('report_generations')
     .update({ client_id: null })
-    .eq('client_id', clientId)
+    .in('client_id', ownedIds)
   if (genErr) {
     console.error(
-      `[deleteClient] report_generations.client_id null falhou client=${clientId}: ${genErr.message}`,
+      `[deleteClients] report_generations.client_id null falhou n=${ownedIds.length}: ${genErr.message}`,
     )
   }
 
-  // (6) Delete (RLS reforça ownership) → cascade readings + reading_images.
-  const { error } = await supabase.from('clients').delete().eq('id', clientId)
-  if (error) return { error: error.message }
+  // (6) Delete (RLS) → cascade readings + reading_images.
+  const { error: delErr, count } = await supabase
+    .from('clients')
+    .delete({ count: 'exact' })
+    .in('id', ownedIds)
+  if (delErr) return { error: delErr.message }
 
   revalidatePath('/clientes')
-  return {}
+  return { deleted: count ?? ownedIds.length }
+}
+
+/**
+ * Exclui um único cliente. Mantida por compat de assinatura (`{ error? }`) —
+ * delega pra `deleteClientsAction` (fonte única da lógica LGPD).
+ */
+export async function deleteClientAction(
+  clientId: string,
+): Promise<{ error?: string }> {
+  const { error } = await deleteClientsAction([clientId])
+  return error ? { error } : {}
 }

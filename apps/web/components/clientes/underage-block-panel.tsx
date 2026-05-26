@@ -38,7 +38,8 @@ export function UnderageBlockPanel({
       </div>
 
       <DeleteClientDialog
-        client={{ id: clientId, full_name: fullName }}
+        clientIds={[clientId]}
+        singleClientName={fullName}
         open={open}
         onOpenChange={setOpen}
         onDeleted={() => router.push('/clientes')}
