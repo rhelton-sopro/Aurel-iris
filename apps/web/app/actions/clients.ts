@@ -108,7 +108,16 @@ export async function updateClientAction(
     .update(parsed.data)
     .eq('id', clientId)
 
-  if (error) return { error: error.message }
+  if (error) {
+    // Trata violation da constraint clients_therapist_email_unique (mesmo tratamento do createClientAction)
+    if (
+      error.code === '23505' &&
+      error.message.includes('clients_therapist_email_unique')
+    ) {
+      return { error: 'Cliente com este e-mail já cadastrado em sua lista.' }
+    }
+    return { error: error.message }
+  }
 
   revalidatePath('/clientes')
   revalidatePath(`/clientes/${clientId}`)
