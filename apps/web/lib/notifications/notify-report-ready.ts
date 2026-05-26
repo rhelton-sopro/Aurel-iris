@@ -57,7 +57,7 @@ export async function notifyTherapistReportReady(
   const clientName =
     (reading.client as { full_name?: string } | null)?.full_name ?? 'seu cliente'
   const therapistName = (profile as { full_name?: string } | null)?.full_name ?? ''
-  const greeting = therapistName ? `Olá, ${therapistName}` : 'Olá'
+  const greeting = therapistName ? `Olá, ${escapeHtml(therapistName)}` : 'Olá'
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://iriscodex.com'
   const readingUrl = `${baseUrl}/leituras/${readingId}`
