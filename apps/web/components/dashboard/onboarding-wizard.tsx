@@ -5,6 +5,13 @@ import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { dismissOnboardingAction } from '@/app/actions/onboarding'
 
+// Wrapper void pra satisfazer o tipo de form action do React/Next.js
+// (form action espera (formData: FormData) => void | Promise<void>)
+async function handleDismiss(): Promise<void> {
+  'use server'
+  await dismissOnboardingAction()
+}
+
 // 'use server' file rule: este componente NÃO tem 'use client'.
 // O <form action={dismissOnboardingAction}> funciona como Server Action via Next.js.
 // Interface fica inline (sem export — sem RPC stub).
@@ -64,7 +71,7 @@ export function OnboardingWizard({
             Três passos pra você gerar a primeira leitura iridológica.
           </p>
         </div>
-        <form action={dismissOnboardingAction}>
+        <form action={handleDismiss}>
           <Button
             type="submit"
             variant="ghost"

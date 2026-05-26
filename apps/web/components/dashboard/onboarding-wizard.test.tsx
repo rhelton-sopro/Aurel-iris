@@ -39,7 +39,7 @@ describe('OnboardingWizard', () => {
   })
 
   it('Test 2: 1 de 3 → mostra "Vamos começar (1 de 3)" + checkmark no step 1 + CTAs nos steps 2/3', () => {
-    const { container } = render(
+    render(
       <OnboardingWizard
         step1Complete={true}
         step2Complete={false}
@@ -114,7 +114,7 @@ describe('OnboardingWizard', () => {
   })
 
   it('Test 7: botão Pular tem data-testid="onboarding-dismiss-btn" e está dentro de um <form>', () => {
-    const { container } = render(
+    render(
       <OnboardingWizard
         step1Complete={false}
         step2Complete={false}
