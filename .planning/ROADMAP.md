@@ -606,6 +606,6 @@ Fases v1 executam em ordem numérica: 1 → 2 → 4 → 5 → 6 → 7 → 7.1 �
 | 8. Pagamento + LGPD | 0/TBD | 📅 Backlog (não-bloqueador pra B2B v1 — founder decisão 2026-05-18) | — |
 | 9. Polish + dogfooding + beta | 0/TBD | 🔄 In-progress implícito (founder usa daily); ONBOARD-04 ainda não fechado formalmente | — |
 | 10. Sistema de Aprendizagem Clínica | 0/TBD | 📅 Backlog longo prazo | — |
-| **11. Launch readiness B2B** | **0/3** | **▶️ Next-up — 3 launch gates pra primeiro terapeuta externo** | **—** |
+| **11. Launch readiness B2B** | **3/4** | **🔄 Quase fechada — falta 11-04 (smoke E2E founder action)** | **—** |
 
 \* **Fase 3 nota**: Plans 03-01 a 03-07 executados normalmente. Plan 03-08 (RecoveryBanner D-12, PWAInstallBanner D-14, listagem rascunhos) teve scope reduzido durante UAT — finalizeReadingAction foi absorvida em fixes pós-execução. RecoveryBanner e PWAInstallBanner deferidos para Fase 9 (polish pré-beta). Captura mobile principal funcional pós-UAT 03 (20 rounds de calibração do gate VLM Claude Haiku 4.5). Único issue conhecido: PWA standalone Android Chrome (instala mas abre com URL bar). Não bloqueia Estágio 1 (dogfood iPhone Safari).
