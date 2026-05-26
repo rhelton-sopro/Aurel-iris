@@ -108,6 +108,7 @@ export async function inviteTherapistAction(
     at: new Date().toISOString(),
   })
 
+  revalidatePath('/admin/terapeutas')
   return {
     ok: true,
     actionLink,
