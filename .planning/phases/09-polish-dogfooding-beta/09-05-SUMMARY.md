@@ -157,8 +157,22 @@ Este SUMMARY não cria a memory — só registra que está fora do escopo do pla
 | Task | Hash      | Message |
 |------|-----------|---------|
 | 1    | `7ac14e9` | `docs(09-05): criar 09-VERIFICATION.md — smoke checklist manual 3 cenários E2E` |
-| 3    | [final]   | `docs(09-05): close Fase 9 — VERIFICATION cenário 3 PASS, 1+2 PENDING aguarda Fase 11.1` |
+| 3    | `9bd7cf8` | `docs(09-05): close Fase 9 — VERIFICATION cenário 3 PASS, 1+2 PENDING aguarda Fase 11.1` |
 
-## Self-Check
+## Self-Check: PASSED
 
-Realizado pós-write deste SUMMARY.md — ver bloco final do arquivo.
+**Files exist:**
+- `.planning/phases/09-polish-dogfooding-beta/09-VERIFICATION.md` — FOUND
+- `.planning/phases/09-polish-dogfooding-beta/09-05-SUMMARY.md` — FOUND
+- `.planning/ROADMAP.md` (modified) — FOUND
+- `.planning/REQUIREMENTS.md` (modified) — FOUND
+
+**Commits exist:**
+- `7ac14e9` — FOUND (Task 1: VERIFICATION.md)
+- `9bd7cf8` — FOUND (Task 3: close-out + SUMMARY)
+
+**Verification gates GREEN:**
+- VERIFICATION.md grep checks: 6/6 PASSED (Cenário 1/2/3, Idempotência, Backward-compat, Non-founder gate)
+- ROADMAP/REQUIREMENTS grep checks: 11/11 PASSED (5 ONBOARD requirements + Fase 9 DELIVERED + 5 plans listed)
+- Founder decisão de defer registrada honest (não fingiu PASS cenários 1+2)
+- Fase 11.1 blocker documentado como dependência externa
