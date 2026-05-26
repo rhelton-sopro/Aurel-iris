@@ -134,7 +134,9 @@ describe('fetchDogfoodingProgress', () => {
     expect(weekOf25).toBeDefined()
     expect(weekOf25!.self_count).toBe(4)
     expect(weekOf25!.real_count).toBe(2)
-    expect(weekOf25!.qualifies).toBe(false) // 2 < WEEKLY_THRESHOLD=3
+    // 2 reais < WEEKLY_THRESHOLD=3 → não qualifica
+    expect(weekOf25!.real_count).toBeLessThan(WEEKLY_THRESHOLD)
+    expect(weekOf25!.qualifies).toBe(false)
   })
 
   // ── Test 5 ──────────────────────────────────────────────────────────────────

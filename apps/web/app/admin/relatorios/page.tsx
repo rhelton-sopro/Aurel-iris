@@ -14,6 +14,11 @@ import {
   resolveRange,
   type RangePreset,
 } from '@/lib/admin/reports'
+import {
+  fetchDogfoodingProgress,
+  CONSECUTIVE_WEEKS_REQUIRED,
+  WEEKLY_THRESHOLD,
+} from '@/lib/admin/dogfooding'
 
 // Cache off — relatório precisa refletir capturas/leituras do minuto.
 export const dynamic = 'force-dynamic'
@@ -53,12 +58,13 @@ export default async function RelatoriosAdminPage({
 
   // Fetch tudo em paralelo. fetchThroughput precisa do mapa de terapeutas.
   const therapistsMap = await fetchTherapistsMap()
-  const [funnel, quality, cost, throughput, devices] = await Promise.all([
+  const [funnel, quality, cost, throughput, devices, dogfooding] = await Promise.all([
     fetchFunnel(range),
     fetchQuality(range),
     fetchCost(range),
     fetchThroughput(range, therapistsMap),
     fetchDeviceBreakdown(range),
+    fetchDogfoodingProgress(user.id),
   ])
 
   return (
@@ -445,6 +451,54 @@ export default async function RelatoriosAdminPage({
             )}
           </div>
         )}
+      </Block>
+
+      {/* Bloco 6: Dogfooding gate (Fase 9 / ONBOARD-04) */}
+      <Block title="Dogfooding gate — ONBOARD-04 (Fase 9)">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <SimpleTable
+            headers={['Métrica', 'Valor']}
+            rows={[
+              ['Data de início', new Date(dogfooding.startDate + 'T00:00:00Z').toLocaleDateString('pt-BR')],
+              ['Semanas decorridas', dogfooding.weeksElapsed.toString()],
+              [
+                `Semanas consecutivas qualifying (≥${WEEKLY_THRESHOLD} reais/sem)`,
+                `${dogfooding.consecutiveQualifyingWeeks} / ${CONSECUTIVE_WEEKS_REQUIRED}`,
+              ],
+              [
+                'Status do gate',
+                dogfooding.gateClosedAt
+                  ? `FECHADO em ${new Date(dogfooding.gateClosedAt + 'T00:00:00Z').toLocaleDateString('pt-BR')}`
+                  : 'ABERTO',
+              ],
+            ]}
+          />
+          <div className="space-y-2">
+            <h4 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Historico semanal
+            </h4>
+            <SimpleTable
+              headers={['Semana', 'Reais', 'Autoexame', 'Total', 'Qualifica?']}
+              rows={
+                dogfooding.weeklyRows.length === 0
+                  ? [['—', '0', '0', '0', '—']]
+                  : dogfooding.weeklyRows.map((w) => [
+                      w.week_label,
+                      w.real_count.toString(),
+                      w.self_count.toString(),
+                      (w.real_count + w.self_count).toString(),
+                      w.qualifies ? 'sim' : '—',
+                    ])
+              }
+            />
+          </div>
+        </div>
+        <p className="mt-4 text-xs text-muted-foreground">
+          Criterio (D-05): {CONSECUTIVE_WEEKS_REQUIRED} semanas consecutivas com{' '}
+          {WEEKLY_THRESHOLD}+ leituras em clientes reais (is_self=false), sem notas paralelas.
+          Founder declara passa/nao-passa via memory{' '}
+          <span className="font-mono">project_dogfooding_gate_status</span>.
+        </p>
       </Block>
     </div>
   )
