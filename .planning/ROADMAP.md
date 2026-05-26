@@ -535,7 +535,7 @@ See `.planning/phases/07.1.6-canonical-capture-pipeline/07.1.6-UAT-FINDINGS.md` 
 **Plans:** 5 plans em 3 waves
 - [x] 09-01-PLAN.md — [BLOCKING] Migration 0032 (readings.notification_sent_at + profiles.onboarding_dismissed_at) + supabase db push --linked + apps/web/types/database.ts regen (Wave 1)
 - [x] 09-02-PLAN.md — Onboarding wizard inline na dashboard 3-step (ONBOARD-01) — Perfil → 1º cliente → 1ª leitura, skipable via Pular, state-derived backward-compat (Wave 2)
-- [ ] 09-03-PLAN.md — E-mail leitura pronta automático + idempotente via notification_sent_at flag (ONBOARD-02) — hook em /api/readings/[id]/analyze pós-stream (Wave 2)
+- [x] 09-03-PLAN.md — E-mail leitura pronta automático + idempotente via notification_sent_at flag (ONBOARD-02) — hook em /api/readings/[id]/analyze pós-stream (Wave 2)
 - [x] 09-04-PLAN.md — Dogfooding gate instrumentation em /admin/relatorios (ONBOARD-04) — bloco com semanas consecutivas qualifying + status aberto/fechado (Wave 1, independente de 09-01)
 - [ ] 09-05-PLAN.md — Verification smoke + ROADMAP/REQUIREMENTS close (Wave 3)
 **UI hint**: yes
