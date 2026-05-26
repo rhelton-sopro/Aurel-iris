@@ -1,14 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 // vi.hoisted: mocks declarados antes de qualquer import do módulo testado
-const { mockFrom, mockMaybeSingle, mockGetUserById, mockSelect, mockEq } = vi.hoisted(() => {
+const { mockFrom, mockMaybeSingle, mockGetUserById } = vi.hoisted(() => {
   const mockMaybeSingle = vi.fn()
   const mockEq = vi.fn(() => ({ maybeSingle: mockMaybeSingle }))
   const mockSelect = vi.fn(() => ({ eq: mockEq }))
   const mockFrom = vi.fn(() => ({ select: mockSelect }))
   const mockGetUserById = vi.fn()
 
-  return { mockFrom, mockMaybeSingle, mockGetUserById, mockSelect, mockEq }
+  return { mockFrom, mockMaybeSingle, mockGetUserById }
 })
 
 vi.mock('@/lib/supabase/service', () => ({
@@ -61,11 +61,7 @@ beforeEach(() => {
 
   // Default supabase responses: reading + profile + auth all return valid data
   // Promise.all order: reading, profile, authResult
-  mockFrom.mockImplementation((table: string) => {
-    if (table === 'readings') return { select: mockSelect }
-    if (table === 'profiles') return { select: mockSelect }
-    return { select: mockSelect }
-  })
+  // mockFrom always returns { select: mockSelect } — set in vi.hoisted factory
 
   // by default, maybeSingle returns reading or profile based on mock order
   // We configure per-test when needed

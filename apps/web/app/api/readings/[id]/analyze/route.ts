@@ -28,6 +28,7 @@ import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { logReportGeneration } from '@/lib/calibration/log-generation'
+import { notifyTherapistReportReady } from '@/lib/notifications/notify-report-ready'
 import {
   analyzeReadingComposeStage2,
   STAGE2_METHOD,
@@ -85,7 +86,7 @@ export async function POST(
   const { data: reading, error: readingError } = await supabase
     .from('readings')
     .select(
-      'id, therapist_id, status, report_delivered, regeneration_count, regeneration_log, client_id, canonical_metadata, client:clients(full_name, birth_date)',
+      'id, therapist_id, status, report_delivered, regeneration_count, regeneration_log, client_id, canonical_metadata, notification_sent_at, client:clients(full_name, birth_date)',
     )
     .eq('id', readingId)
     .maybeSingle()
@@ -405,6 +406,32 @@ export async function POST(
             report_raw_text: buffer as unknown as never,
           })
           .eq('id', readingId)
+
+        // D-04: e-mail "leitura pronta" idempotente. Só dispara se essa é a 1ª
+        // vez que report_generated foi populado (notification_sent_at IS NULL).
+        // Regen NÃO re-envia. Falha best-effort: { sent: false } NÃO seta o flag,
+        // então próximo run tenta de novo (se houver). Erro NÃO joga exception
+        // — try/catch defensivo mantém o stream-handler vivo até finally.
+        if (reading.notification_sent_at == null) {
+          try {
+            const notifyResult = await notifyTherapistReportReady(readingId, user.id)
+            if (notifyResult.sent) {
+              await service
+                .from('readings')
+                .update({ notification_sent_at: new Date().toISOString() })
+                .eq('id', readingId)
+            } else {
+              console.warn(
+                `[analyze] notify-report-ready skipped: ${notifyResult.reason ?? 'unknown'}`,
+              )
+            }
+          } catch (err) {
+            console.error(
+              '[analyze] notify-report-ready threw (non-fatal):',
+              err instanceof Error ? err.message : err,
+            )
+          }
+        }
 
         // ===== v2.3.0 Extração de frases-chave + persistência da memória =====
         // Roda DEPOIS do stream fechar e DEPOIS do report_generated estar
