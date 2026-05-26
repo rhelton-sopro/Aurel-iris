@@ -533,7 +533,7 @@ See `.planning/phases/07.1.6-canonical-capture-pipeline/07.1.6-UAT-FINDINGS.md` 
   4. **Gate de Estágio 1 (dogfooding):** o fundador, terapeuta iridologista em exercício, usou Aurel Iris **semanalmente em pelo menos 3 clientes reais por 3 semanas consecutivas** sem recorrer a notas manuais paralelas; o backlog de ajustes de prompt/UX foi alimentado por essa experiência e os bloqueadores foram resolvidos antes do gate.
   5. **Gate de Estágio 2 (beta externo, só após Estágio 1 fechado):** 5 terapeutas internos completaram pelo menos 1 leitura real cada e deram feedback estruturado; rollout para 10–20 terapeutas selecionados está agendado com checklist de revisão jurídica de healthtech (~R$ 2–4k) executado.
 **Plans:** 5 plans em 3 waves
-- [ ] 09-01-PLAN.md — [BLOCKING] Migration 0032 (readings.notification_sent_at + profiles.onboarding_dismissed_at) + supabase db push --linked + apps/web/types/database.ts regen (Wave 1)
+- [x] 09-01-PLAN.md — [BLOCKING] Migration 0032 (readings.notification_sent_at + profiles.onboarding_dismissed_at) + supabase db push --linked + apps/web/types/database.ts regen (Wave 1)
 - [ ] 09-02-PLAN.md — Onboarding wizard inline na dashboard 3-step (ONBOARD-01) — Perfil → 1º cliente → 1ª leitura, skipable via Pular, state-derived backward-compat (Wave 2)
 - [ ] 09-03-PLAN.md — E-mail leitura pronta automático + idempotente via notification_sent_at flag (ONBOARD-02) — hook em /api/readings/[id]/analyze pós-stream (Wave 2)
 - [ ] 09-04-PLAN.md — Dogfooding gate instrumentation em /admin/relatorios (ONBOARD-04) — bloco com semanas consecutivas qualifying + status aberto/fechado (Wave 1, independente de 09-01)
