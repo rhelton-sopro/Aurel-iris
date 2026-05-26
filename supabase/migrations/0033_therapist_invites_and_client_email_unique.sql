@@ -14,8 +14,11 @@
 -- Mudanças (strictly additive):
 --
 --   1. CREATE TABLE therapist_invites — tokens de convite para terapeutas.
---      D-DUPE: token uuid PK + email citext; inviteTherapistAction checa auth.users
---      antes de gerar token (bloqueia se email já cadastrado).
+--      D-DUPE: token uuid PK + email text (lowercase normalizado no app);
+--      inviteTherapistAction checa auth.users antes de gerar token (bloqueia se
+--      email já cadastrado). NOTE: usamos text em vez de citext porque a extensão
+--      citext não está habilitada no Supabase Postgres por default. Normalização
+--      case-insensitive feita no application code via email.trim().toLowerCase().
 --      D-TTL: expires_at = created_at + interval '7 days' (default); GET
 --      em /convite-terapeuta/[token] checa expires_at > now() — 404 se expirado.
 --      RLS habilitada: bloqueio total pra authenticated/anon; service role bypass
@@ -33,7 +36,7 @@
 -- ── 1. Tabela therapist_invites ───────────────────────────────────────────────
 create table if not exists public.therapist_invites (
   token            uuid        primary key default gen_random_uuid(),
-  email            citext      not null,
+  email            text        not null,
   invited_by       uuid        not null references public.profiles(id) on delete cascade,
   created_at       timestamptz not null default now(),
   expires_at       timestamptz not null default (now() + interval '7 days'),
@@ -72,7 +75,7 @@ comment on column public.therapist_invites.token is
   'uuid PK gerado pelo DB (gen_random_uuid). Forma da URL: /convite-terapeuta/{token}. uuid v4: brute-force inviável em janela de 7 dias (T-11.1-01-01).';
 
 comment on column public.therapist_invites.email is
-  'citext (case-insensitive) — email do terapeuta convidado. D-DUPE: inviteTherapistAction pré-checa auth.users antes de INSERT; bloqueia se email já cadastrado. Não há DB constraint cross-schema (auth é schema separado).';
+  'text — email do terapeuta convidado, normalizado lowercase + trim no app (citext indisponível por default no Supabase). D-DUPE: inviteTherapistAction pré-checa auth.users antes de INSERT; bloqueia se email já cadastrado. Não há DB constraint cross-schema (auth é schema separado).';
 
 comment on column public.therapist_invites.invited_by is
   'profiles.id do founder que gerou o convite. ON DELETE CASCADE — se founder deletado, convites somem junto. isFounderEmail check garante que só founder chame inviteTherapistAction.';
