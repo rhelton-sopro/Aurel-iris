@@ -5,7 +5,7 @@ vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }))
 // ─── vi.hoisted: factories para mocks ────────────────────────────────────────
 const {
   mockGetUser,
-  mockGetUserByEmail,
+  mockListUsers,
   mockInsert,
   mockSingle,
   mockFrom,
@@ -14,12 +14,12 @@ const {
   const mockSelect = vi.fn(() => ({ single: mockSingle }))
   const mockInsert = vi.fn(() => ({ select: mockSelect }))
   const mockFrom = vi.fn(() => ({ insert: mockInsert }))
-  const mockGetUserByEmail = vi.fn()
+  const mockListUsers = vi.fn()
   const mockGetUser = vi.fn()
 
   return {
     mockGetUser,
-    mockGetUserByEmail,
+    mockListUsers,
     mockInsert,
     mockSelect,
     mockSingle,
@@ -40,7 +40,7 @@ vi.mock('@/lib/supabase/service', () => ({
     from: mockFrom,
     auth: {
       admin: {
-        getUserByEmail: mockGetUserByEmail,
+        listUsers: mockListUsers,
       },
     },
   })),
@@ -78,10 +78,10 @@ function setupFounderSession() {
   })
 }
 
-function setupGetUserByEmailNotFound() {
-  mockGetUserByEmail.mockResolvedValue({
-    data: { user: null },
-    error: { status: 404, message: 'User not found' },
+function setupListUsersEmpty() {
+  mockListUsers.mockResolvedValue({
+    data: { users: [], total: 0, nextPage: null, lastPage: 1 },
+    error: null,
   })
 }
 
@@ -130,9 +130,16 @@ describe('inviteTherapistAction', () => {
 
   it('Test 4: email já em auth.users → { ok:false, error:"E-mail já cadastrado como terapeuta neste sistema." } e NÃO chama insert()', async () => {
     setupFounderSession()
-    // Simula auth.users contendo o email alvo (getUserByEmail retorna user)
-    mockGetUserByEmail.mockResolvedValue({
-      data: { user: { id: 'existing-uuid', email: newTherapistEmail } },
+    // Simula auth.users contendo o email alvo
+    mockListUsers.mockResolvedValue({
+      data: {
+        users: [
+          { id: 'existing-uuid', email: newTherapistEmail },
+        ],
+        total: 1,
+        nextPage: null,
+        lastPage: 1,
+      },
       error: null,
     })
 
@@ -148,7 +155,7 @@ describe('inviteTherapistAction', () => {
 
   it('Test 5: email novo + INSERT OK → { ok:true, actionLink, userStatus:"new_invited", email }', async () => {
     setupFounderSession()
-    setupGetUserByEmailNotFound()
+    setupListUsersEmpty()
     setupInsertOk()
 
     const result = await inviteTherapistAction(newTherapistEmail)
@@ -171,7 +178,7 @@ describe('inviteTherapistAction', () => {
 
   it('Test 6: email novo + INSERT falha → { ok:false, error:"Falha ao criar convite: ..." }', async () => {
     setupFounderSession()
-    setupGetUserByEmailNotFound()
+    setupListUsersEmpty()
     mockSingle.mockResolvedValue({
       data: null,
       error: { message: 'db constraint violation' },
@@ -185,21 +192,52 @@ describe('inviteTherapistAction', () => {
     })
   })
 
-  it('Test 7: getUserByEmail bloqueia email existente (input normalizado para lowercase antes da busca)', async () => {
+  it('Test 7: listUsers faz matching case-insensitive (uppercase email no auth.users deve bloquear lowercase no input)', async () => {
     setupFounderSession()
-    // getUserByEmail é chamado com email em lowercase (normalizado na action)
-    // e retorna o user existente — bloqueando o convite
-    mockGetUserByEmail.mockResolvedValue({
-      data: { user: { id: 'existing-uuid', email: 'newtherapist@example.com' } },
+    // auth.users contém email com maiúsculas
+    mockListUsers.mockResolvedValue({
+      data: {
+        users: [
+          { id: 'existing-uuid', email: 'NewTherapist@Example.COM' },
+        ],
+        total: 1,
+        nextPage: null,
+        lastPage: 1,
+      },
       error: null,
     })
 
-    // Input em lowercase deve ser bloqueado pelo D-DUPE
+    // Input em lowercase deve ser bloqueado pelo D-DUPE (compare case-insensitive)
     const result = await inviteTherapistAction('newtherapist@example.com')
 
     expect(result).toEqual({
       ok: false,
       error: 'E-mail já cadastrado como terapeuta neste sistema.',
+    })
+    expect(mockInsert).not.toHaveBeenCalled()
+  })
+
+  it('Test 8: lista truncada (total > 1000) retorna erro explícito em vez de falso-negativo silencioso', async () => {
+    setupFounderSession()
+    // Simula > 1000 usuários: total=1001 mas users[] tem só 1000 itens — não contém o email
+    mockListUsers.mockResolvedValue({
+      data: {
+        users: Array.from({ length: 1000 }, (_, i) => ({
+          id: `uuid-${i}`,
+          email: `user${i}@example.com`,
+        })),
+        total: 1001,
+        nextPage: 2,
+        lastPage: 2,
+      },
+      error: null,
+    })
+
+    const result = await inviteTherapistAction(newTherapistEmail)
+
+    expect(result).toEqual({
+      ok: false,
+      error: 'Não foi possível validar o e-mail: base de usuários muito grande. Contate o suporte.',
     })
     expect(mockInsert).not.toHaveBeenCalled()
   })

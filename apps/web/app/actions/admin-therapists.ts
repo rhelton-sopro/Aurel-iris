@@ -61,17 +61,30 @@ export async function inviteTherapistAction(
   const service = createServiceClient()
 
   // D-DUPE: bloqueia se email já em auth.users.
-  // getUserByEmail (SDK >= 2.38) busca exatamente por email — sem paginação,
-  // sem truncamento silencioso em 1000+ registros.
-  const { data: existingUser, error: getUserErr } =
-    await service.auth.admin.getUserByEmail(email)
-  if (getUserErr && getUserErr.status !== 404) {
+  // listUsers com perPage:1000 + verificação de total — aborta explicitamente
+  // se houver mais de 1000 usuários para evitar falso-negativo silencioso.
+  const { data: usersList, error: listErr } =
+    await service.auth.admin.listUsers({ perPage: 1000 })
+  if (listErr) {
     return {
       ok: false,
-      error: `Falha ao validar e-mail: ${getUserErr.message}`,
+      error: `Falha ao validar e-mail: ${listErr.message}`,
     }
   }
-  if (existingUser?.user) {
+  if ((usersList as { total?: number }).total !== undefined &&
+      (usersList as { total?: number }).total! > 1000) {
+    // Segurança: se auth.users ultrapassou 1000 registros, a lista está
+    // truncada e o D-DUPE não pode ser confiável. Aborta com erro explícito
+    // em vez de continuar com verificação incompleta.
+    return {
+      ok: false,
+      error: 'Não foi possível validar o e-mail: base de usuários muito grande. Contate o suporte.',
+    }
+  }
+  const exists = (usersList?.users ?? []).some(
+    (u) => (u.email ?? '').toLowerCase() === email,
+  )
+  if (exists) {
     return {
       ok: false,
       error: 'E-mail já cadastrado como terapeuta neste sistema.',
