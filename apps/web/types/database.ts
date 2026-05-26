@@ -434,6 +434,7 @@ export type Database = {
           created_at: string | null
           full_name: string
           id: string
+          onboarding_dismissed_at: string | null
           phone: string | null
           professional_id: string | null
           specialties: string[] | null
@@ -451,6 +452,7 @@ export type Database = {
           created_at?: string | null
           full_name: string
           id: string
+          onboarding_dismissed_at?: string | null
           phone?: string | null
           professional_id?: string | null
           specialties?: string[] | null
@@ -468,6 +470,7 @@ export type Database = {
           created_at?: string | null
           full_name?: string
           id?: string
+          onboarding_dismissed_at?: string | null
           phone?: string | null
           professional_id?: string | null
           specialties?: string[] | null
@@ -589,6 +592,7 @@ export type Database = {
           id: string
           iris_map: string | null
           is_delivered: boolean | null
+          notification_sent_at: string | null
           processed_at: string | null
           regeneration_count: number | null
           regeneration_log: Json | null
@@ -635,6 +639,7 @@ export type Database = {
           id?: string
           iris_map?: string | null
           is_delivered?: boolean | null
+          notification_sent_at?: string | null
           processed_at?: string | null
           regeneration_count?: number | null
           regeneration_log?: Json | null
@@ -681,6 +686,7 @@ export type Database = {
           id?: string
           iris_map?: string | null
           is_delivered?: boolean | null
+          notification_sent_at?: string | null
           processed_at?: string | null
           regeneration_count?: number | null
           regeneration_log?: Json | null
@@ -729,6 +735,8 @@ export type Database = {
       }
       report_findings: {
         Row: {
+          cache_creation_input_tokens: number | null
+          cache_read_input_tokens: number | null
           cost_usd: number | null
           exame_json: Json
           generated_at: string
@@ -747,6 +755,8 @@ export type Database = {
           validation_status: string
         }
         Insert: {
+          cache_creation_input_tokens?: number | null
+          cache_read_input_tokens?: number | null
           cost_usd?: number | null
           exame_json: Json
           generated_at?: string
@@ -765,6 +775,8 @@ export type Database = {
           validation_status: string
         }
         Update: {
+          cache_creation_input_tokens?: number | null
+          cache_read_input_tokens?: number | null
           cost_usd?: number | null
           exame_json?: Json
           generated_at?: string
@@ -789,6 +801,8 @@ export type Database = {
           audit_summary: Json | null
           bbox_cost_usd: number | null
           bbox_latency_ms: number | null
+          cache_creation_input_tokens: number | null
+          cache_read_input_tokens: number | null
           canonical_fallback_count: number | null
           client_id: string | null
           cost_usd: number | null
@@ -797,6 +811,7 @@ export type Database = {
           id: string
           latency_ms: number | null
           method: string
+          method_version: string | null
           model_version: string | null
           prompt_version: string | null
           reading_id: string
@@ -808,6 +823,8 @@ export type Database = {
           audit_summary?: Json | null
           bbox_cost_usd?: number | null
           bbox_latency_ms?: number | null
+          cache_creation_input_tokens?: number | null
+          cache_read_input_tokens?: number | null
           canonical_fallback_count?: number | null
           client_id?: string | null
           cost_usd?: number | null
@@ -816,6 +833,7 @@ export type Database = {
           id?: string
           latency_ms?: number | null
           method: string
+          method_version?: string | null
           model_version?: string | null
           prompt_version?: string | null
           reading_id: string
@@ -827,6 +845,8 @@ export type Database = {
           audit_summary?: Json | null
           bbox_cost_usd?: number | null
           bbox_latency_ms?: number | null
+          cache_creation_input_tokens?: number | null
+          cache_read_input_tokens?: number | null
           canonical_fallback_count?: number | null
           client_id?: string | null
           cost_usd?: number | null
@@ -835,6 +855,7 @@ export type Database = {
           id?: string
           latency_ms?: number | null
           method?: string
+          method_version?: string | null
           model_version?: string | null
           prompt_version?: string | null
           reading_id?: string
@@ -949,6 +970,8 @@ export type Database = {
       }
       persist_report_findings_versioned: {
         Args: {
+          p_cache_creation_input_tokens?: number
+          p_cache_read_input_tokens?: number
           p_cost_usd: number
           p_exame_json: Json
           p_latency_ms: number
