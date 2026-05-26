@@ -40,11 +40,15 @@ export async function notifyTherapistReportReady(
   const svc = createServiceClient()
 
   // Fetch reading + therapist email + therapist name em paralelo.
-  const [{ data: reading }, { data: profile }, authResult] = await Promise.all([
+  const [{ data: reading }, { data: profile, error: profileErr }, authResult] = await Promise.all([
     svc.from('readings').select('client:clients(full_name)').eq('id', readingId).maybeSingle(),
     svc.from('profiles').select('full_name').eq('id', therapistId).maybeSingle(),
     svc.auth.admin.getUserById(therapistId),
   ])
+
+  if (profileErr) {
+    console.warn(`[notify-report] erro ao buscar profile ${therapistId}:`, profileErr.message)
+  }
 
   if (!reading) return { sent: false, reason: 'reading_not_found' }
 
