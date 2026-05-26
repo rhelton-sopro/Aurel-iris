@@ -99,10 +99,9 @@ describe('evaluateProfileCompleteness', () => {
     ).toBe('incomplete')
   })
 
-  // ── Beta 2026-05-20: MIN_AGE=0 libera menores. Os 3 casos abaixo eram
-  // blocked_underage; agora caem em incomplete/ok. Restaurar p/ blocked
-  // quando MIN_AGE voltar a 18 antes do GA. ─────────────────────────────
-  it('beta: birth_date 2019-03-05 + outros nulos → incomplete (NÃO blocked)', () => {
+  // Precedência: blocked_underage VENCE incomplete quando birth_date está
+  // presente e idade < MIN_AGE — mesmo se outros campos também faltarem.
+  it('birth_date 2019-03-05 (menor) + outros nulos → blocked_underage (vence incomplete)', () => {
     expect(
       evaluateProfileCompleteness(
         {
@@ -115,8 +114,9 @@ describe('evaluateProfileCompleteness', () => {
         NOW,
       ),
     ).toEqual({
-      status: 'incomplete',
-      missing: ['full_name', 'biological_sex', 'email', 'phone'],
+      status: 'blocked_underage',
+      age: 7,
+      birthDate: '2019-03-05',
     })
   })
 
@@ -126,10 +126,14 @@ describe('evaluateProfileCompleteness', () => {
     ).toEqual({ status: 'ok' })
   })
 
-  it('beta: 17 anos 364 dias + perfil completo → ok (NÃO blocked)', () => {
+  it('fronteira: 17 anos 364 dias + perfil completo → blocked_underage', () => {
     expect(
       evaluateProfileCompleteness({ ...COMPLETE, birth_date: '2008-05-18' }, NOW),
-    ).toEqual({ status: 'ok' })
+    ).toEqual({
+      status: 'blocked_underage',
+      age: 17,
+      birthDate: '2008-05-18',
+    })
   })
 
   it('3 clientes reais do banco (now 2026-05-17)', () => {
@@ -149,7 +153,7 @@ describe('evaluateProfileCompleteness', () => {
       missing: ['biological_sex', 'email', 'phone'],
     })
 
-    // Beta MIN_AGE=0: mamae (7yo) sai de blocked → incomplete.
+    // mamae (7yo) → blocked_underage vence incomplete.
     expect(
       evaluateProfileCompleteness(
         {
@@ -162,8 +166,9 @@ describe('evaluateProfileCompleteness', () => {
         NOW,
       ),
     ).toEqual({
-      status: 'incomplete',
-      missing: ['biological_sex', 'email', 'phone'],
+      status: 'blocked_underage',
+      age: 7,
+      birthDate: '2019-03-05',
     })
 
     expect(

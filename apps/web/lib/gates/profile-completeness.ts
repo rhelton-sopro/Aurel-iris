@@ -2,11 +2,12 @@
 // Importado pelo Zod (app/actions/clients.ts) E pelo gate — zero drift.
 // Pura, sem side-effects, sem 'use server' — unit-testável isolada.
 
-// Beta de testes 2026-05-20: cadastro de menores liberado p/ permitir
-// crianças (founder). RESTAURAR p/ 18 antes do GA — fonte única; flip
-// cascateia em Zod (actions/clients.ts, actions/profile.ts), client-form
-// gate inline e evaluateProfileCompleteness.
-export const MIN_AGE = 0 as const
+// Flip cascateia em Zod (actions/clients.ts, actions/profile.ts, actions/
+// invites.ts), client-form gate inline (components/clientes/client-form.tsx)
+// e evaluateProfileCompleteness. Histórico: 18 → 0 em 2026-05-20 (beta
+// liberou menores p/ founder testar) → 18 restaurado em 2026-05-26 (Fase 11
+// launch-readiness-b2b, gate pré-convite externo).
+export const MIN_AGE = 18 as const
 
 export type ProfileGap =
   | 'full_name'
