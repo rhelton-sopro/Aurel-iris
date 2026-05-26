@@ -475,51 +475,20 @@ Arquitetura proposta (decisões finais em `/gsd-discuss-phase 7.5`):
 See `.planning/phases/07.5-tendency-mapping-engine/07.5-CONTEXT.md` (a criar via `/gsd-discuss-phase 7.5`) para decisões de implementação.
 
 ### Fase 8: Pagamento + LGPD
-**Origem:** Closure do 07.1.6 UAT clínico (founder + Gemini cross-validation pass 2026-05-12) revelou três pain points de dogfooding diário: (1) report abre com 3 seções expandidas e 10 colapsadas — founder quer todas colapsadas para inspecionar uma de cada vez sem scroll noise; (2) prompt atual mistura voz clínica direta com vocabulário acadêmico (citações Jensen/Lo Rito/Moraga, "ancorado em features.x", "the pipeline detected", "according to the German school") — terapeutas leitores precisam camada clínica limpa primeiro; (3) §11 affirmations entrega texto motivacional como bloco obrigatório do report, mas só faz sentido quando terapeuta vai usar com cliente (default off, opt-in por leitura). Migrado de 7.2-A (findings hierarchy) porque três itens reescrevem o mesmo arquivo (`apps/web/prompts/system.md`) — um pass de prompt-eng, não dois.
-**Goal**: Cada leitura produz DUAS camadas de relatório em uma única chamada Sonnet 4.6 (cost-neutral): (A) **PRIMARY layer** — voz clínica direta de iridologista sênior pra colega terapeuta, foco em órgãos com predisposição + emoções/padrões psicológicos + traumas potenciais sugeridos por topografia, hedge só quando genuinamente incerto, **ZERO citações de autor/escola**, **ZERO ancoragem `[ancorado em features.x]`**, **ZERO meta-pipeline** ("the pipeline detected"); (B) **TECHNICAL layer** — vocabulário iridológico completo, citações Jensen/Lo Rito/Moraga, feature anchors, pipeline output refs, renderizado em tab "Ver análise técnica completa" abaixo do primary. UI: todas 13 seções colapsadas por default. §11 affirmations vira toggle per-reading (`readings.affirmations_enabled` default false; toggle em `/leituras/[id]/editar`). §13 Mensagem Final sempre no primary layer (founder vai refinar tom depois separadamente). **Absorve 7.2-A** (findings-hierarchy por visual prominence — incorporado ao prompt rewrite do primary layer).
-**Depends on**: Fase 7.1.6 (canonical capture entrega `vision_features` confiáveis — sem isso o primary layer seria honesto-mas-errado). Fase 7 LLM (pipeline existente é base — esta fase reescreve o prompt e adiciona parser layer-split, não troca o LLM). NÃO depende de 7.2 (corpus/threshold é vision-side; 7.3 é authorship/rendering). **Pode rodar em paralelo com 7.2** — surface disjunta (web/prompt/parser/schema vs Modal/Python).
-**Requirements**: nenhum formal novo (refina entrega de relatório já especificada). Backlog Phase 9 RESP-01..03 ainda válido.
-**Success Criteria** (o que deve ser verdade):
-  1. `apps/web/prompts/system.md` reescrito: gera as 13 seções com estrutura `## §N — Title \n [primary text] \n ### Detalhamento técnico \n [technical text]` (ou equivalente decidido em discuss-phase). **Single LLM call** — cost ≤105% do baseline atual ($0.024/reading).
-  2. Parser (`apps/web/lib/parser/`) splita cada seção em `primary_text` + `technical_text` incrementalmente durante stream (não requer report completo). §13 stays primary-only (technical_text NULL). §11 stays primary-only (single layer affirmations — toggle controla render, não authorship).
-  3. Schema (migration `0013_dual_layer`): `readings.report_generated` JSON shape estendido com per-section `{ primary, technical?: string }` OU nova coluna `readings.report_generated_technical` (decisão em discuss-phase). `readings.affirmations_enabled boolean DEFAULT false NOT NULL` adicionada.
-  4. UI report `/leituras/[id]/page.tsx`: todas 13 seções iniciam **COLLAPSED** (state default `{}` em vez de `{1: true, 2: true, 3: true}`). Tab/disclosure "Ver análise técnica completa" abre o technical layer abaixo do primary, render lazy. §11 só renderiza quando `affirmations_enabled === true`.
-  5. UI editar `/leituras/[id]/editar`: toggle visível "Incluir afirmações de integração (§11)" controla `affirmations_enabled`. Founder dogfooding rhythm: default OFF pra leituras clínicas, ON quando vai entregar ao cliente.
-  6. **Voice gate (primary layer)**: zero ocorrências em primary_text de: nomes de autores (Jensen, Lo Rito, Moraga, allowlist via `audit-vocabulary` extension), "according to/segundo a escola", `[ancorado em`, "the pipeline/o pipeline detected/detectou", "Modal output", `features\.`. Sample N=3 readings (Nailli + 2 outras) confirma compliance via `pnpm audit:report-voice` (novo script).
-  7. **Voice gate (technical layer)**: citações autorais OK + feature anchors OK + pipeline refs OK — não precisa ser academic-maxed mas confirma que conteúdo técnico está presente (smoke test: `technical_text.length > 50` per seção, except §11 e §13).
-  8. **Streaming UX preservado**: sections renderizam progressivamente durante stream; parser handles partial primary + partial technical sem flash de half-render. **Phase 10 telemetry** (13-section structure) intocada — `report_generated` mantém 13 keys.
-  9. **Findings hierarchy applied** (migrated 7.2-A): primary layer ordena findings por visual prominence — exemplos founder-confirmed via Gemini cross-val: "heterocromia central pigmentada" > "sectoral lacunas grau 1"; "dense pigmented halo around pupil with heterocromia=true + multi-pigment array" → lead finding em §3 + §9.
-  10. **Founder UAT**: reprocess Nailli (sucessor de `f4408c23`) + ler primary-only sem expandir technical → founder reporta "yes, isso é o que eu queria ler primeiro" OU route to refinement cycle.
-**Plans**: TBD via `/gsd-discuss-phase 7.3` (esperado: 3-5 plans cobrindo prompt rewrite + parser dual-split + schema migration 0013 + UI tabs/collapsed-default + §11 toggle em editar + voice-gate audit script).
-
-**Cross-cutting constraints:**
-- **Single LLM call mandatory**: estratégia two-call duplica cost e quebra streaming coherence; discuss-phase confirma estrutura de prompt que mantém single call.
-- **Phase 10 telemetry preservation**: `report_generated` mantém 13-section JSON key structure; technical layer é ADICIONADO em campo separado per seção, não substitui primary. Capture diff entre `relatório_gerado` vs `relatório_entregue` é o que Phase 10 vai usar.
-- **Streaming preservation**: parser não pode requerer report completo antes de splitar — incremental split per seção conforme tokens chegam (regex `^### Detalhamento técnico` como sentinel).
-- **§13 Mensagem Final**: founder vai refinar tom depois separadamente; nesta fase §13 fica como está (primary-only, sem technical layer).
-- **§11 toggle authorship**: prompt SEMPRE gera §11 (single-layer affirmations); render condiciona em `affirmations_enabled`. Cost não muda com toggle off (já está no envelope).
-- **Backfill decision**: discuss-phase decide se readings existentes (~25) recebem reanalysis vs ficam com `technical_text=NULL` (legacy compatibility). Reanalysis cost: ~$0.60 total a $0.024/reading.
-
-**UI hint**: yes (collapsed default em /leituras/[id] + tabs primary/technical + toggle §11 em /editar).
-
-**Migrated from 7.2:**
-- **7.3-A** (formerly 7.2-A): Findings hierarchy by visual prominence — incorporated into primary-layer prompt rewrite (Success Criterion 9).
-
-See `.planning/phases/07.1.6-canonical-capture-pipeline/07.1.6-UAT-FINDINGS.md` for clinical UAT findings driving this phase.
-
-### Fase 8: Pagamento + LGPD
 **Mapeamento SPEC:** Fase 7 — Pagamento + LGPD (3–4 dias).
-**Goal**: Terapeuta pode contratar um plano em BRL/PIX após o trial e cumpre os deveres LGPD (termo de consentimento por cliente, exclusão cascateada, logs de acesso, copy obrigatória, vocabulário auditado).
-**Depends on**: Fase 7 (faz sentido cobrar quando o produto entrega análise).
+**Provider DECIDIDO 2026-05-26:** Asaas (memory `project_fase_8_payment_provider_asaas`). Modelo híbrido (assinatura + add-ons), ticket alvo R$50-R$150/mês. Decisões granulares (estrutura híbrida exata, trial duration, LGPD scope, NF/CNPJ, webhook contract, dunning) serão locked via `/gsd-discuss-phase 8`.
+**Goal**: Terapeuta pode contratar plano em BRL/PIX/cartão via Asaas após trial e cumpre deveres LGPD (termo de consentimento por cliente, exclusão cascateada, logs de acesso, copy obrigatória, vocabulário auditado).
+**Depends on**: Fase 7 (faz sentido cobrar quando o produto entrega análise) — ✅ shipped via Sonnet 2x v2.3.0+.
 **Requirements**: BILLING-01, BILLING-02, BILLING-03, LGPD-01, LGPD-02, LGPD-03, LGPD-04, LGPD-05, LGPD-06
-**Success Criteria** (o que deve ser verdade):
-  1. Em `/assinatura`, terapeuta escolhe um dos três tiers (Starter R$ 89, Profissional R$ 189, Escola R$ 490) e completa checkout Stripe BR via cartão **ou** PIX; webhook atualiza `profiles.subscription_status` e `subscriptions` em ≤ 1 min.
+**Success Criteria** (o que deve ser verdade — refinar via discuss-phase):
+  1. Em `/assinatura`, terapeuta escolhe um plano (estrutura híbrida tbd em discuss-phase) e completa checkout Asaas via cartão **ou** PIX **ou** boleto; webhook atualiza `profiles.subscription_status` e `subscriptions` em ≤ 1 min.
   2. Após `trial_ends_at` vencer sem assinatura, middleware bloqueia disparo de novas análises (`POST /api/readings/[id]/process` retorna 402/403 com link para `/assinatura`); leituras já geradas continuam visíveis.
-  3. Tentativa de criar leitura para cliente sem `consent_signed_at` é bloqueada na UI; fluxo "gerar termo" produz PDF assinável (DocuSeal/Clicksign), e após assinatura `consent_document_url` e `consent_signed_at` são preenchidos.
-  4. Botão "deletar dados" na página do cliente, após confirmação explícita, apaga em cascata o cliente, suas leituras, suas imagens (Storage incluso) e o termo de consentimento; auditoria sql confirma 0 órfãos.
+  3. Tentativa de criar leitura para cliente sem `consent_signed_at` é bloqueada na UI; fluxo "gerar termo" produz PDF assinável (DocuSeal/Clicksign — TBD em discuss-phase), e após assinatura `consent_document_url` e `consent_signed_at` são preenchidos.
+  4. Botão "deletar dados" na página do cliente, após confirmação explícita, apaga em cascata o cliente, suas leituras, suas imagens (Storage incluso) e o termo de consentimento; auditoria SQL confirma 0 órfãos.
   5. Cada GET de imagem em Storage por terapeuta gera linha de log de auditoria; spot-check confirma `reading_image.id`, `therapist_id` e timestamp registrados.
   6. Auditoria de vocabulário (script + revisão manual) confirma ausência de "diagnóstico", "tratamento", "cura" nas superfícies do produto (UI, prompts, relatórios), com exceção de páginas de política que as citam para negá-las; copy obrigatória "ferramenta de apoio à anamnese terapêutica integrativa, não substitui avaliação médica" aparece em landing, cabeçalho do relatório e rodapé legal.
-**Plans**: TBD
+  7. Add-ons opcionais (PDF brandado, white-label, leituras extras — tbd em discuss-phase) cobrados via cobranças avulsas Asaas, com webhook idempotente atualizando `add_on_purchases`.
+**Plans**: TBD via `/gsd-discuss-phase 8`
 **UI hint**: yes
 
 ### Fase 9: Polish + dogfooding + beta
