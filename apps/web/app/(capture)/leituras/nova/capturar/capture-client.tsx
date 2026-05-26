@@ -17,6 +17,8 @@ import { uploadWithRetry } from '@/lib/capture/upload'
 import { uploadInvite, finalizeInvite } from '@/lib/capture/upload-invite'
 import { createClient } from '@/lib/supabase/client'
 import {
+  ANGLE_LABEL,
+  EYE_LABEL,
   SEQUENCE,
   getResumeSlotIndex,
   getSlotProgressLabel,
@@ -240,9 +242,16 @@ export function CaptureClient({
           'detail:',
           (err as Error)?.message ?? String(err),
         )
-        toast.error(`Falha ao salvar imagem ${currentSlotIdx + 1}/6. Tente refazer.`, {
+        // Label humano em vez de "imagem N/6" — slot numérico do toast tardio
+        // entrava em conflito com o slot atual da UI (advancement otimista).
+        // Duração 8s (era Infinity) — toast some sozinho se cliente avança;
+        // verify-on-finalize (useEffect 'finalizing') dispensa em bulk se
+        // server confirma count=6 (falso positivo de response, não de upload).
+        const failedSlot = SEQUENCE[currentSlotIdx]
+        const slotLabel = `olho ${EYE_LABEL[failedSlot.eye]} · ${ANGLE_LABEL[failedSlot.angle]}`
+        toast.error(`Falha ao salvar foto (${slotLabel}). Tente refazer.`, {
           id: toastId,
-          duration: Infinity,
+          duration: 8000,
         })
       })
 
@@ -299,18 +308,41 @@ export function CaptureClient({
         // atingiu count=6 (auto-finalize em /api/convite/[token]/upload).
         // Este finalize aqui é segundo caminho redundante — bom-de-ter pra
         // queimar token via path único histórico, mas NÃO é load-bearing.
-        // Por isso a UX da falha pode ser honesta (não mentir "o terapeuta
-        // vai receber") — o caminho do servidor já cobre o caso normal.
+        //
+        // 2026-05-26 (caso Moacir Domingues): verify-on-finalize — antes de
+        // disparar finalizeInvite (que retorna 410 se auto-finalize já
+        // queimou token e gera toast falso de "problema na confirmação"),
+        // consultamos /status pra confirmar count=6 no banco. Se sim, todos
+        // os toasts de erro pendentes (falsos positivos por network blip no
+        // response do upload) são dispensados antes do redirect, e o
+        // finalizeInvite é skippado (server já fechou o ciclo).
+        let serverCount = 0
         try {
-          await finalizeInvite(inviteToken, readingId, clientId)
-        } catch (err) {
-          console.error('[capture-client] finalizeInvite error:', err)
-          toast.error(
-            'Tivemos um problema na confirmação final. Se algo parecer faltando, recarregue esta página.',
-            { duration: 6000 },
+          const res = await fetch(
+            `/api/convite/${encodeURIComponent(inviteToken)}/status?reading_id=${encodeURIComponent(readingId)}`,
           )
-          // Não bloqueia redirect — auto-finalize do servidor já fechou o
-          // ciclo no caso normal.
+          if (res.ok) {
+            const data = (await res.json()) as { count?: number }
+            serverCount = data.count ?? 0
+          }
+        } catch (err) {
+          console.error('[capture-client] status check failed (non-fatal):', err)
+        }
+
+        if (serverCount >= SEQUENCE.length) {
+          // Server tem todas as 6 fotos + auto-finalize já rodou. Erros de
+          // upload exibidos foram falsos positivos (response failure após
+          // server-side commit). Dispensa toasts antes do redirect pra /obrigada.
+          toast.dismiss()
+        } else {
+          // Fallback: count<6. Tenta finalize manual (path histórico). Falhas
+          // não viram toast — auto-finalize cobre caso normal; se count<6
+          // permanece, terapeuta tem "Reprocessar" em /leituras/[id].
+          try {
+            await finalizeInvite(inviteToken, readingId, clientId)
+          } catch (err) {
+            console.error('[capture-client] finalizeInvite error (non-fatal):', err)
+          }
         }
         router.push(finalizeRedirect ?? `/convite/${inviteToken}/obrigada`)
         return
