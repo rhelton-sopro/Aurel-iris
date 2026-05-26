@@ -60,7 +60,17 @@ export async function createClientAction(
     .from('clients')
     .insert({ ...parsed.data, therapist_id: user.id })
 
-  if (error) return { error: error.message }
+  if (error) {
+    // Trata violation da constraint clients_therapist_email_unique (D-CLIENT, 11.1-01)
+    // PostgreSQL error code 23505 = unique_violation
+    if (
+      error.code === '23505' &&
+      error.message.includes('clients_therapist_email_unique')
+    ) {
+      return { error: 'Cliente com este e-mail já cadastrado em sua lista.' }
+    }
+    return { error: error.message }
+  }
 
   revalidatePath('/clientes')
   redirect('/clientes')
