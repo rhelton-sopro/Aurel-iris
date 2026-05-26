@@ -83,7 +83,7 @@ Requisitos para o release inicial. Cada um mapeia para exatamente uma fase do ro
 - [x] **ONBOARD-01**: Onboarding em 3 passos para terapeuta novo (perfil → primeiro cliente → primeira leitura demo) com instrumentação que indica conclusão.
 - [x] **ONBOARD-02**: E-mail transacional via Resend para confirmação de signup, recibo de pagamento, "leitura pronta" e exportações.
 - [ ] **ONBOARD-03**: Página pública de apresentação do produto com posicionamento LGPD-compliant.
-- [ ] **ONBOARD-04**: Fundador (terapeuta em exercício) usa Aurel Iris **semanalmente em clientes reais** por pelo menos 3 semanas consecutivas sem recorrer a notas manuais paralelas; ajustes em prompt, UX e features dirigidos por esse uso real.
+- [x] **ONBOARD-04**: Fundador (terapeuta em exercício) usa Aurel Iris **semanalmente em clientes reais** por pelo menos 3 semanas consecutivas sem recorrer a notas manuais paralelas; ajustes em prompt, UX e features dirigidos por esse uso real.
 - [ ] **ONBOARD-05**: Após gate de dogfooding fechado, beta privado com 5 terapeutas internos seguido de 10–20 terapeutas selecionados (SPEC §7 Fase 8).
 
 ## Requisitos v2
