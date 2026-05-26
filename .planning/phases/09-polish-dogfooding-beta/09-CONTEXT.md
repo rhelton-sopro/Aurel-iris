@@ -42,7 +42,7 @@ Após magic-link, terapeuta cai na `/dashboard`. Banner/card grande topo "Vamos 
 Match exato do Success Criteria 1 do ROADMAP. Foca em chegar ao primeiro relatório visto em ≤30min.
 
 **Implicação:**
-- **Step 1 "Perfil"** — completar campos faltantes (`profiles.full_name`, `phone`, `specialties` se vazio). CTA → `/configuracoes` (verificar se rota existe).
+- **Step 1 "Perfil"** — completar campos faltantes (`profiles.full_name`, `phone`, `specialties` se vazio). CTA → `/perfil/completar` (rota existente).
 - **Step 2 "1º cliente"** — cadastrar 1 cliente. Conta tanto cliente real quanto autoexame (`is_self=true`). CTA → `/clientes/novo`.
 - **Step 3 "1ª leitura"** — iniciar leitura. Conta qualquer reading criada (status `pending` ou além). CTA → `/leituras/nova`.
 - Onboarding NÃO é mandatory — terapeuta pode usar o produto sem completar wizard (mas barra de progresso fica visível, suave UX nudge).
