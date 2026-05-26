@@ -13,7 +13,7 @@ const ADMIN_PREFIX = '/admin'
 // nem no profile gate. Auth real é validação do token (service-role) no
 // path. Inclui /api/convite/* (uploads/finalize) e /api/capture/validate
 // (Haiku gate aceita Authorization: Bearer <token> em vez de sessão).
-const PUBLIC_INVITE_PREFIXES = ['/convite/', '/api/convite/']
+const PUBLIC_INVITE_PREFIXES = ['/convite/', '/api/convite/', '/convite-terapeuta/']
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
