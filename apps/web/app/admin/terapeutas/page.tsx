@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { isFounderEmail } from '@/lib/auth/founder'
 import { DeleteTherapistDialog } from './DeleteTherapistDialog'
+import { InviteTherapistForm } from './InviteTherapistForm'
 
 // Cache off — listagem reflete deletes imediatamente após revalidatePath.
 export const dynamic = 'force-dynamic'
@@ -77,6 +78,8 @@ export default async function TerapeutasAdminPage() {
           /admin/calibration →
         </Link>
       </div>
+
+      <InviteTherapistForm />
 
       {rows.length === 0 ? (
         <p className="text-sm text-muted-foreground">

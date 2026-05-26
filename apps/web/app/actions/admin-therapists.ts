@@ -11,6 +11,114 @@ export interface DeleteTherapistResult {
   error?: string
 }
 
+export interface InviteTherapistResult {
+  ok: boolean
+  error?: string
+  /** URL pra copiar e enviar via WhatsApp. Presente quando ok=true. */
+  actionLink?: string
+  /** new_invited = terapeuta nunca existiu; existing_magiclink = e-mail já cadastrado, link de re-entry. */
+  userStatus?: 'new_invited' | 'existing_magiclink'
+  /** E-mail normalizado (lowercase + trim) pra confirmar pro founder. */
+  email?: string
+}
+
+/**
+ * Gera link de cadastro/login pro founder copiar e enviar via WhatsApp.
+ * Hand-held protocol da Fase 11 (D3): founder controla quando e como o
+ * terapeuta recebe — sistema NÃO envia e-mail automático.
+ *
+ * - Tenta `type='invite'` primeiro (cria user + retorna URL).
+ * - Se e-mail já existe, fallback pra `type='magiclink'` (login de 1× uso).
+ *
+ * `redirectTo` aponta pro /dashboard (NEXT_PUBLIC_SITE_URL/dashboard).
+ */
+export async function inviteTherapistAction(
+  emailRaw: string,
+): Promise<InviteTherapistResult> {
+  // Founder gate (defense-in-depth — middleware + layout já bloqueiam).
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user || !isFounderEmail(user.email)) {
+    return { ok: false, error: 'Não autorizado.' }
+  }
+
+  const email = emailRaw.trim().toLowerCase()
+  if (!email || !/.+@.+\..+/.test(email)) {
+    return { ok: false, error: 'E-mail inválido.' }
+  }
+  if (isFounderEmail(email)) {
+    return { ok: false, error: 'Não dá pra convidar o founder a si mesmo.' }
+  }
+
+  const service = createServiceClient()
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ?? 'https://iriscodex.com'
+  const redirectTo = `${siteUrl}/dashboard`
+
+  // 1ª tentativa: invite (novo user).
+  const inviteRes = await service.auth.admin.generateLink({
+    type: 'invite',
+    email,
+    options: { redirectTo },
+  })
+
+  if (!inviteRes.error && inviteRes.data?.properties?.action_link) {
+    const actionLink = inviteRes.data.properties.action_link
+    console.log('[admin-therapists] INVITE_LINK_GENERATED', {
+      targetEmail: email,
+      userStatus: 'new_invited',
+      by: user.email,
+      at: new Date().toISOString(),
+    })
+    return {
+      ok: true,
+      actionLink,
+      userStatus: 'new_invited',
+      email,
+    }
+  }
+
+  // 2ª tentativa: magiclink (user já existe).
+  const errMsg = (inviteRes.error?.message ?? '').toLowerCase()
+  const userExists =
+    errMsg.includes('exists') ||
+    errMsg.includes('already') ||
+    errMsg.includes('registered')
+
+  if (userExists) {
+    const magicRes = await service.auth.admin.generateLink({
+      type: 'magiclink',
+      email,
+      options: { redirectTo },
+    })
+    if (magicRes.error || !magicRes.data?.properties?.action_link) {
+      return {
+        ok: false,
+        error: `Falha ao gerar magic link: ${magicRes.error?.message ?? 'sem URL'}`,
+      }
+    }
+    console.log('[admin-therapists] MAGIC_LINK_GENERATED', {
+      targetEmail: email,
+      userStatus: 'existing_magiclink',
+      by: user.email,
+      at: new Date().toISOString(),
+    })
+    return {
+      ok: true,
+      actionLink: magicRes.data.properties.action_link,
+      userStatus: 'existing_magiclink',
+      email,
+    }
+  }
+
+  return {
+    ok: false,
+    error: `Falha ao gerar invite: ${inviteRes.error?.message ?? 'erro desconhecido'}`,
+  }
+}
+
 // Hard-delete de um terapeuta. Cascade do schema (0001) cuida de profiles →
 // clients → readings → reading_images → reading_addons; consent log fica
 // anonimizado (client_id → SET NULL). Storage `iris_captures/{therapist_id}/`
