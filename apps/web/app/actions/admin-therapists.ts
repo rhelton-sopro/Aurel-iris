@@ -16,21 +16,27 @@ export interface InviteTherapistResult {
   error?: string
   /** URL pra copiar e enviar via WhatsApp. Presente quando ok=true. */
   actionLink?: string
-  /** new_invited = terapeuta nunca existiu; existing_magiclink = e-mail já cadastrado, link de re-entry. */
-  userStatus?: 'new_invited' | 'existing_magiclink'
+  /** new_invited = token gerado em therapist_invites. */
+  userStatus?: 'new_invited'
   /** E-mail normalizado (lowercase + trim) pra confirmar pro founder. */
   email?: string
 }
 
 /**
- * Gera link de cadastro/login pro founder copiar e enviar via WhatsApp.
- * Hand-held protocol da Fase 11 (D3): founder controla quando e como o
- * terapeuta recebe — sistema NÃO envia e-mail automático.
+ * Gera link de cadastro pro founder copiar e enviar via WhatsApp.
+ * Hand-held protocol da Fase 11 + signup fix da Fase 11.1 (2026-05-26).
  *
- * - Tenta `type='invite'` primeiro (cria user + retorna URL).
- * - Se e-mail já existe, fallback pra `type='magiclink'` (login de 1× uso).
+ * Fluxo:
+ * 1. Founder gate via isFounderEmail.
+ * 2. Email normalize + validate.
+ * 3. D-DUPE: check auth.users — bloqueia se já existe.
+ * 4. INSERT em therapist_invites (token gerado pelo DB, expires_at default 7d).
+ * 5. Retorna actionLink = ${siteUrl}/convite-terapeuta/${token}.
  *
- * `redirectTo` aponta pro /dashboard (NEXT_PUBLIC_SITE_URL/dashboard).
+ * Diferente da Fase 11 11-01: NÃO usa supabase.auth.admin.generateLink (que
+ * causava bug PKCE com /dashboard como redirectTo). O novo flow vai pra
+ * /convite-terapeuta/[token] que renderiza signup form com email
+ * pré-preenchido + OTP no submit.
  */
 export async function inviteTherapistAction(
   emailRaw: string,
@@ -53,69 +59,64 @@ export async function inviteTherapistAction(
   }
 
   const service = createServiceClient()
-  const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ?? 'https://iriscodex.com'
-  const redirectTo = `${siteUrl}/dashboard`
 
-  // 1ª tentativa: invite (novo user).
-  const inviteRes = await service.auth.admin.generateLink({
-    type: 'invite',
-    email,
-    options: { redirectTo },
+  // D-DUPE: bloqueia se email já em auth.users.
+  // service.auth.admin.listUsers retorna paginado; usamos perPage:1000 e
+  // filtramos client-side (não há filter param oficial por email no SDK v2).
+  // Se prod crescer pra 1000+ users, paginar adequadamente.
+  const { data: usersList, error: listErr } =
+    await service.auth.admin.listUsers({ perPage: 1000 })
+  if (listErr) {
+    return {
+      ok: false,
+      error: `Falha ao validar e-mail: ${listErr.message}`,
+    }
+  }
+  const exists = (usersList?.users ?? []).some(
+    (u) => (u.email ?? '').toLowerCase() === email,
+  )
+  if (exists) {
+    return {
+      ok: false,
+      error: 'E-mail já cadastrado como terapeuta neste sistema.',
+    }
+  }
+
+  // INSERT em therapist_invites — token gerado pelo DB.
+  const { data: invite, error: insertErr } = await service
+    .from('therapist_invites')
+    .insert({
+      email,
+      invited_by: user.id,
+    })
+    .select('token')
+    .single()
+
+  if (insertErr || !invite) {
+    return {
+      ok: false,
+      error: `Falha ao criar convite: ${insertErr?.message ?? 'sem token'}`,
+    }
+  }
+
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ??
+    'https://iriscodex.com'
+  const actionLink = `${siteUrl}/convite-terapeuta/${invite.token}`
+
+  console.log('[admin-therapists] INVITE_TOKEN_GENERATED', {
+    targetEmail: email,
+    token: invite.token,
+    userStatus: 'new_invited',
+    by: user.email,
+    at: new Date().toISOString(),
   })
 
-  if (!inviteRes.error && inviteRes.data?.properties?.action_link) {
-    const actionLink = inviteRes.data.properties.action_link
-    console.log('[admin-therapists] INVITE_LINK_GENERATED', {
-      targetEmail: email,
-      userStatus: 'new_invited',
-      by: user.email,
-      at: new Date().toISOString(),
-    })
-    return {
-      ok: true,
-      actionLink,
-      userStatus: 'new_invited',
-      email,
-    }
-  }
-
-  // 2ª tentativa: magiclink (user já existe).
-  const errMsg = (inviteRes.error?.message ?? '').toLowerCase()
-  const userExists =
-    errMsg.includes('exists') ||
-    errMsg.includes('already') ||
-    errMsg.includes('registered')
-
-  if (userExists) {
-    const magicRes = await service.auth.admin.generateLink({
-      type: 'magiclink',
-      email,
-      options: { redirectTo },
-    })
-    if (magicRes.error || !magicRes.data?.properties?.action_link) {
-      return {
-        ok: false,
-        error: `Falha ao gerar magic link: ${magicRes.error?.message ?? 'sem URL'}`,
-      }
-    }
-    console.log('[admin-therapists] MAGIC_LINK_GENERATED', {
-      targetEmail: email,
-      userStatus: 'existing_magiclink',
-      by: user.email,
-      at: new Date().toISOString(),
-    })
-    return {
-      ok: true,
-      actionLink: magicRes.data.properties.action_link,
-      userStatus: 'existing_magiclink',
-      email,
-    }
-  }
-
   return {
-    ok: false,
-    error: `Falha ao gerar invite: ${inviteRes.error?.message ?? 'erro desconhecido'}`,
+    ok: true,
+    actionLink,
+    userStatus: 'new_invited',
+    email,
   }
 }
 
