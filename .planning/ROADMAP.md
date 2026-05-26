@@ -31,7 +31,7 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
 - [x] **Fase 7.4 (INSERTED): Iris Codex — Relatório funcional adaptativo + rebrand — DELIVERED 2026-05-15..25** — Rebrand "Aurel → Iris Codex" aplicado em PROJECT.md + UI copy + voice rules. Arquitetura Sonnet 2x v2.3.0+ entrega o relatório em 15 seções (não 13) com structured output via Stage 1 JSON → Stage 2 composição streaming. 17 plans formais (00..08+07b) shipados até 2026-05-15, depois 11+ iterações de prompt (v2.4.x..v2.8.4) rodaram fora do GSD com calibração empírica em N=4 clientes pilotos. Tech debts de calibração rastreados em memory.
 - [ ] **Fase 7.5 (INSERTED): Iris Codex — Tendency mapping engine (sinais → tendências)** — V1.1 backlog. **IP central** futuro: substituir o Stage 1 LLM atual por mapping engine determinístico baseado em regras + RAG multi-escola. Sem urgência enquanto Stage 1 LLM atende o produto B2B v1.
 - [ ] **Fase 8: Pagamento + LGPD** — Backlog explícito. **Não-bloqueador pra B2B v1** (founder decisão 2026-05-18 — launch v1 = terapeutas pagos por convite/manual). Reabrir quando crescer pra GA público.
-- [ ] **Fase 9: Polish + dogfooding + beta** — In-progress implícito (founder usa diariamente desde 2026-05-15). ONBOARD-04 (3 semanas consecutivas sem notas paralelas) ainda não fechado formalmente.
+- [~] **Fase 9: Polish + dogfooding + beta — DELIVERED (ONBOARD-01/02/04) 2026-05-26+** — Wizard onboarding 3-step inline (Plan 09-02), e-mail "leitura pronta" idempotente (Plan 09-03), dogfooding gate instrumentation em /admin/relatorios (Plan 09-04). Smoke cenários 1+2 PENDING aguardando Fase 11.1 (invite-fix); cenário 3 PASS. ONBOARD-03/05 deferred V1.1+.
 - [ ] **Fase 10: Sistema de Aprendizagem Clínica** *(planejada — backlog longo prazo)* — Captura de diff entre relatório gerado e entregue → heurísticas emergentes. Pré-requisitos de captura de dados embutidos no schema atual (`readings.report_generated` + `readings.report_edited`).
 - [ ] **Fase 11 (INSERTED, NEW 2026-05-25): Launch readiness B2B** — 3 gates pra liberar uso real por terapeutas externos: (a) Resend domain verification + Supabase sender swap pra `@iriscodex.com`; (b) MIN_AGE revert 0→18 em `apps/web/lib/gates/profile-completeness.ts` (memory: `project_min_age_beta_revert_before_ga`); (c) Consent term v1 → legal review trigger (memory: `project_consent_term_legal_review_debt`). Pequena, atômica, finaliza o launch v1 B2B-only.
 
@@ -537,7 +537,7 @@ See `.planning/phases/07.1.6-canonical-capture-pipeline/07.1.6-UAT-FINDINGS.md` 
 - [x] 09-02-PLAN.md — Onboarding wizard inline na dashboard 3-step (ONBOARD-01) — Perfil → 1º cliente → 1ª leitura, skipable via Pular, state-derived backward-compat (Wave 2)
 - [x] 09-03-PLAN.md — E-mail leitura pronta automático + idempotente via notification_sent_at flag (ONBOARD-02) — hook em /api/readings/[id]/analyze pós-stream (Wave 2)
 - [x] 09-04-PLAN.md — Dogfooding gate instrumentation em /admin/relatorios (ONBOARD-04) — bloco com semanas consecutivas qualifying + status aberto/fechado (Wave 1, independente de 09-01)
-- [ ] 09-05-PLAN.md — Verification smoke + ROADMAP/REQUIREMENTS close (Wave 3)
+- [x] 09-05-PLAN.md — Verification smoke + ROADMAP/REQUIREMENTS close (Wave 3) — VERIFICATION.md criado (cenário 3 PASS por inspeção; cenários 1+2 PENDING aguardando Fase 11.1 invite-fix). Ver `.planning/phases/09-polish-dogfooding-beta/09-VERIFICATION.md`.
 **UI hint**: yes
 
 ### Fase 10: Sistema de Aprendizagem Clínica *(planejada — pós-Fase 9)*
@@ -609,7 +609,7 @@ Fases v1 executam em ordem numérica: 1 → 2 → 4 → 5 → 6 → 7 → 7.1 �
 | 7.4. Iris Codex report | 17/17+ | ✅ Concluída — rebrand + structured output + Sonnet 2x arch LIVE em prod | 2026-05-15+ |
 | 7.5. Tendency mapping engine | 0/TBD | 📅 Backlog V1.1 (substituir Stage 1 LLM por mapping engine determinístico) | — |
 | 8. Pagamento + LGPD | 0/TBD | 📅 Backlog (não-bloqueador pra B2B v1 — founder decisão 2026-05-18) | — |
-| 9. Polish + dogfooding + beta | 0/TBD | 🔄 In-progress implícito (founder usa daily); ONBOARD-04 ainda não fechado formalmente | — |
+| 9. Polish + dogfooding + beta | 5/5 | 🔄 DELIVERED (ONBOARD-01/02/04); smoke 1+2 PENDING Fase 11.1 invite-fix; cenário 3 PASS; ONBOARD-04 gate fecha por uso continuado | 2026-05-26 (delivered) |
 | 10. Sistema de Aprendizagem Clínica | 0/TBD | 📅 Backlog longo prazo | — |
 | **11. Launch readiness B2B** | **3/4** | **🔄 Quase fechada — falta 11-04 (smoke E2E founder action)** | **—** |
 

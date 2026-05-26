@@ -1,6 +1,6 @@
 # Fase 9 — Verification
 
-**Data:** [founder preencher quando rodar o smoke]
+**Data:** 2026-05-26 (close parcial — smoke cenários 1+2 deferred aguardando Fase 11.1)
 **Modo:** Founder manual smoke + Claude assist (verificação de artefatos via grep)
 
 ## Plans entregues
@@ -9,7 +9,7 @@
 - [x] 09-02 — Onboarding wizard inline (ONBOARD-01)
 - [x] 09-03 — E-mail "leitura pronta" (ONBOARD-02)
 - [x] 09-04 — Dogfooding gate instrumentation (ONBOARD-04)
-- [ ] 09-05 — Verification + close (este plan)
+- [x] 09-05 — Verification + close (este plan — smoke cenário 3 PASS, 1+2 PENDING)
 
 ## Cenário 1 — Onboarding wizard (ONBOARD-01)
 
@@ -38,7 +38,7 @@
 14. Loga como founder (já tem ≥1 reading + clientes + perfil completo).
 15. **EXPECTED:** Banner NÃO aparece (componente retorna null via short-circuit completedCount===3).
 
-**Status:** [ ] PASS / [ ] FAIL / [ ] PENDING — _founder preenche pós-smoke_
+**Status:** [ ] PASS / [ ] FAIL / [x] PENDING — aguarda Fase 11.1 (invite-fix bloqueia signup terapeuta novo via /convite/[token] → /dashboard)
 
 ## Cenário 2 — E-mail "leitura pronta" (ONBOARD-02)
 
@@ -69,7 +69,7 @@
 12. **EXPECTED:** Pipeline NÃO trava. Vercel logs mostram "[notify-report] RESEND_API_KEY ausente — pulando email". report_generated salvo. notification_sent_at NULL.
 13. Reset env var.
 
-**Status:** [ ] PASS / [ ] FAIL / [ ] PENDING
+**Status:** [ ] PASS / [ ] FAIL / [x] PENDING — aguarda Fase 11.1 (sem terapeuta-teste com inbox real via invite, smoke e-mail inviável agora)
 
 ## Cenário 3 — Dogfooding gate visibility (ONBOARD-04)
 
@@ -96,14 +96,20 @@
 7. Navegar pra /admin/relatorios.
 8. **EXPECTED:** 404 Not Found (notFound() via isFounderEmail check linha 42-44).
 
-**Status:** [ ] PASS / [ ] FAIL / [ ] PENDING
+**Status:** [x] PASS / [ ] FAIL / [ ] PENDING — confirmado por inspeção founder 2026-05-26: bloco visível em /admin/relatorios, 4 KPIs renderizam, dados coerentes com uso founder desde 2026-05-15
 
 ## Aceitação geral
 
-- [ ] Cenário 1 PASS
-- [ ] Cenário 2 PASS
-- [ ] Cenário 3 PASS
+- [ ] Cenário 1 PASS (PENDING — aguarda Fase 11.1)
+- [ ] Cenário 2 PASS (PENDING — aguarda Fase 11.1)
+- [x] Cenário 3 PASS (confirmado por inspeção 2026-05-26)
 - [ ] Founder declarou dogfooding gate status em `~/.claude/projects/.../memory/project_dogfooding_gate_status.md` (fora deste plan)
+
+## Nota de defer (2026-05-26)
+
+Cenários 1+2 ficam **PENDING** aguardando entrega da **Fase 11.1 (invite-fix)**. Durante o smoke gate, founder descobriu bug bloqueador no fluxo `/convite/[token]` → terapeuta novo cai em `/login` em vez de `/dashboard` direto (PKCE code não trocado pela rota). Sem invite funcional, não é possível criar terapeuta-teste alt gmail account para rodar Cenários 1 (wizard novo) e 2 (e-mail leitura pronta na inbox alt). Cenário 3 confirmado por inspeção direta como founder logado.
+
+Smoke real (1+2) será rodado pelo founder após Fase 11.1 closed.
 
 ## Commits Fase 9
 

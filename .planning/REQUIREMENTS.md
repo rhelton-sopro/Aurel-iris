@@ -83,7 +83,7 @@ Requisitos para o release inicial. Cada um mapeia para exatamente uma fase do ro
 - [x] **ONBOARD-01**: Onboarding em 3 passos para terapeuta novo (perfil → primeiro cliente → primeira leitura demo) com instrumentação que indica conclusão.
 - [x] **ONBOARD-02**: E-mail transacional via Resend para confirmação de signup, recibo de pagamento, "leitura pronta" e exportações.
 - [ ] **ONBOARD-03**: Página pública de apresentação do produto com posicionamento LGPD-compliant.
-- [x] **ONBOARD-04**: Fundador (terapeuta em exercício) usa Aurel Iris **semanalmente em clientes reais** por pelo menos 3 semanas consecutivas sem recorrer a notas manuais paralelas; ajustes em prompt, UX e features dirigidos por esse uso real.
+- [~] **ONBOARD-04**: Fundador (terapeuta em exercício) usa Aurel Iris **semanalmente em clientes reais** por pelo menos 3 semanas consecutivas sem recorrer a notas manuais paralelas; ajustes em prompt, UX e features dirigidos por esse uso real.
 - [ ] **ONBOARD-05**: Após gate de dogfooding fechado, beta privado com 5 terapeutas internos seguido de 10–20 terapeutas selecionados (SPEC §7 Fase 8).
 
 ## Requisitos v2
@@ -163,11 +163,11 @@ Excluídos explicitamente. Documentado para evitar reintrodução.
 | LGPD-04 | Fase 8 | Pendente |
 | LGPD-05 | Fase 8 | Pendente |
 | LGPD-06 | Fase 8 | Pendente |
-| ONBOARD-01 | Fase 9 | Pendente |
-| ONBOARD-02 | Fase 9 | Pendente |
-| ONBOARD-03 | Fase 9 | Pendente |
-| ONBOARD-04 | Fase 9 | Pendente |
-| ONBOARD-05 | Fase 9 | Pendente |
+| ONBOARD-01 | Fase 9 | ✅ Completo (Plan 09-02, 2026-05-26) — wizard inline na dashboard com 3 steps + skipable + state-derived; smoke E2E pending Fase 11.1 (invite-fix bloqueia terapeuta-teste novo) |
+| ONBOARD-02 | Fase 9 | ✅ Completo (Plans 09-03 + Fase 11 11-01, 2026-05-26) — magic-link auth (11-01) + e-mail "leitura pronta" idempotente (09-03); smoke E2E pending Fase 11.1 |
+| ONBOARD-03 | Fase 9 | ⏸️ Deferred V1.1+ (decisão founder 2026-05-26, ref 09-CONTEXT.md D-01) — landing page pública sem necessidade enquanto launch v1 = B2B convite |
+| ONBOARD-04 | Fase 9 | 🚧 In progress (Plan 09-04, instrumentation entregue) — founder usa diariamente desde 2026-05-15; gate fecha quando 3 semanas consecutivas ≥3 leituras/sem em clientes reais; declaração final em memory `project_dogfooding_gate_status` |
+| ONBOARD-05 | Fase 9 | ⏸️ Deferred V1.1+ (decisão founder 2026-05-26) — beta 10-20 depende de Fase 8 Stripe + ONBOARD-03 landing |
 
 **Cobertura:**
 - Requisitos v1 totais: 43
