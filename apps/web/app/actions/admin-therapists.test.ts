@@ -7,7 +7,6 @@ const {
   mockGetUser,
   mockListUsers,
   mockInsert,
-  mockSelect,
   mockSingle,
   mockFrom,
 } = vi.hoisted(() => {
