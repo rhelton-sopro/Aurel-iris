@@ -163,8 +163,8 @@ Excluídos explicitamente. Documentado para evitar reintrodução.
 | LGPD-04 | Fase 8 | Pendente |
 | LGPD-05 | Fase 8 | Pendente |
 | LGPD-06 | Fase 8 | Pendente |
-| ONBOARD-01 | Fase 9 | ✅ Completo (Plan 09-02, 2026-05-26) — wizard inline na dashboard com 3 steps + skipable + state-derived; smoke E2E pending Fase 11.1 (invite-fix bloqueia terapeuta-teste novo) |
-| ONBOARD-02 | Fase 9 | ✅ Completo (Plans 09-03 + Fase 11 11-01, 2026-05-26) — magic-link auth (11-01) + e-mail "leitura pronta" idempotente (09-03); smoke E2E pending Fase 11.1 |
+| ONBOARD-01 | Fase 9 | ✅ Completo (Plan 09-02, 2026-05-26) — wizard inline na dashboard com 3 steps + skipable + state-derived; smoke E2E honor-system PASS pós-Fase 11.1 LIVE (13 vitest GREEN); smoke real diferido pra Fase 11 11-04 (1ª terapeuta convidada) |
+| ONBOARD-02 | Fase 9 | ✅ Completo (Plans 09-03 + Fase 11 11-01, 2026-05-26) — magic-link auth (11-01) + e-mail "leitura pronta" idempotente (09-03); smoke E2E honor-system PASS pós-Fase 11.1 LIVE (12 vitest GREEN + LGPD audit + idempotência DB); smoke real diferido pra Fase 11 11-04 |
 | ONBOARD-03 | Fase 9 | ⏸️ Deferred V1.1+ (decisão founder 2026-05-26, ref 09-CONTEXT.md D-01) — landing page pública sem necessidade enquanto launch v1 = B2B convite |
 | ONBOARD-04 | Fase 9 | 🚧 In progress (Plan 09-04, instrumentation entregue) — founder usa diariamente desde 2026-05-15; gate fecha quando 3 semanas consecutivas ≥3 leituras/sem em clientes reais; declaração final em memory `project_dogfooding_gate_status` |
 | ONBOARD-05 | Fase 9 | ⏸️ Deferred V1.1+ (decisão founder 2026-05-26) — beta 10-20 depende de Fase 8 Stripe + ONBOARD-03 landing |
