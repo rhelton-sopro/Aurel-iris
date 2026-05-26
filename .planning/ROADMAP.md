@@ -14,22 +14,26 @@ A métrica de sucesso primária do MVP **não é** o lançamento beta com 10–2
 
 A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção da ferramenta de planejamento. O mapeamento Fase v1 ↔ Fase SPEC está explícito em cada bloco.
 
+> **Re-sync 2026-05-25** — após audit (`v1.0-MILESTONE-AUDIT.md`), as marcas abaixo foram alinhadas com o estado real em produção. Trabalho de 2026-05-15..25 (v2.3.0→v2.8.4, 11+ iterações Sonnet 2x + admin cost fix + captura calibration) ficou fora do GSD; é rastreado em git+memory. Fases 7 e 7.4 foram fechadas marcando arquitetura entregue, com tech debts contínuos de calibração de prompt rastreados em memory como observações (não plans). Fase 11 nova captura o trabalho REAL pendente: launch readiness B2B.
+
 - [x] **Fase 1: Setup** — Infraestrutura (contas, env vars, Next.js init, migration do schema).
-- [x] **Fase 2: Auth + Dashboard básico** — Magic-link auth e CRUD de clientes do terapeuta.
-- [x] **Fase 3: Captura mobile (PWA)** — App instalável com captura via câmera nativa + validação Claude Haiku 4.5 VLM. Concluída 2026-05-03.
+- [x] **Fase 2: Auth + Dashboard básico** — Magic-link auth + e-mail OTP fallback (2026-05-18) + CRUD de clientes do terapeuta.
+- [~] **Fase 3: Captura mobile (PWA) — PARCIAL/ABANDONED** — Gate Haiku 4.5 VLM pré-upload está LIVE e calibrado (2026-05-22 round 3). PWA-instalável + fluxo guiado nativo de 6 capturas foram descontinuados durante o pivot B2B v1 (foco em upload desktop). Trigger pra reabrir: usuário B2C ativo (memory: `project_b2c_registration_future_phase`).
 - [x] **Fase 4: Upload desktop** — Dropzone desktop produzindo a mesma estrutura de leitura. Concluída 2026-05-03 (UAT founder + gsd-verifier passed).
-- [ ] **Fase 5: Pipeline de visão (Modal)** — Serviço Modal `analyze_iris` produzindo o JSON canônico de features.
+- [x] **Fase 5: Pipeline de visão (Modal) — MVP DELIVERED 2026-05-12** — `vision-service` Modal app live com heurística MVP (Hough + HSV crude). Não atende VISION-04 (HMAC webhook) — Next.js chama Modal direto via `triggerVisionPipeline`. Memory: `project_vision_pipeline_reality` documenta o gap; FIX 13 (breaking JSON contract) parked. Anti-Forer §3 gated behind clean vision JSON — não regredir sem dados.
 - [x] **Fase 6: RAG — Ingestão da base de conhecimento** — Corpus iridológico chunked, embedded e indexado em pgvector. Concluída 2026-05-06 (UAT 5/5 PASS + secure-phase 16/16 threats closed).
-- [ ] **Fase 7: Análise LLM** — Relatório iridológico em pt-BR gerado por Claude Sonnet 4.6 ancorado em features + RAG.
-- [x] **Fase 7.1 (INSERTED): Dogfooding fixes** — 3 plans entregues 2026-05-09..11: audit regex polish (C1+C2) + vision pipeline calibration (P0.1-P0.4) + admin calibration page. Status: human_needed (24/25 truths; T5 empirical Nailli convergence deferred para 7.2).
-- [ ] **Fase 7.1.5 (INSERTED): Detect/segment robustness para close-up iris photos** — Empirical investigation durante `/gsd-discuss-phase 07.2` 2026-05-11 revelou que MediaPipe falha em close-ups (no face context) → Hough fallback escolhe círculos errados → segment centers de 3 ângulos da mesma íris ficam 600-1500 px distantes → compose mistura polar-unwraps de regiões diferentes → features são lixo (`castanho/hematogenea/[]`). Bloqueia 7.2: anotação + threshold tuning sobre pixel-soup não-íris não resolve nada. Goal: detect+segment produz iris circles geometricamente consistentes (centros ≤50 px de variação) entre 3 ângulos do mesmo olho.
-- [ ] **Fase 7.2 (INSERTED): Wave C — corpus expansion + threshold tuning** — Founder annotation sprint (N≥3 fixtures por iris-color category) + re-run `recalibrate-centroids.mjs` + tune `detect_sectoral_pigments` thresholds contra real-photo LAB-delta distributions. Goal: Nailli reprocess converge para `iris_color ∈ {verde-mosaico, misto}` + `constitution ∈ {mista_biliar, biliar, mista}` + `sectoral_pigments` não-vazio (closes 07.1-HUMAN-UAT items 1-3). **BLOQUEADO em 7.1.5** (sem polar unwrap correto, threshold tuning não converge).
-- [~] **Fase 7.3 (INSERTED, ABANDONED 2026-05-13): Dual-layer report authorship** — Escopo original (primary clínico + technical acadêmico na mesma chamada Sonnet + §11 toggle + collapsed default) **descartado durante discuss-phase 2026-05-13** após pivot arquitetural de produto. Founder concluiu que público-alvo V1 (terapeutas integrativos não-iridologistas + clientes finais + curiosos) não consome nomenclatura iridológica formal no padrão. Decisão: **relatório único funcional adaptativo** (sem jargão) + análise iridológica técnica vira **módulo add-on pago** (V1.1). Substituída por Fase 7.4 (nova arquitetura) + Fase 7.5 (mapping engine). 7.2-A migrou pra 7.5.
-- [ ] **Fase 7.4 (INSERTED): Iris Codex — Relatório funcional adaptativo + add-on placeholder** — Pivot arquitetural 2026-05-13: descarta o template fixo de 13 seções e dual-layer. Sonnet 4.6 emite **um único relatório clínico-funcional adaptativo** via structured output JSON: executive_summary + constitutional_pattern + systems_with_tendency[] (priorizado por grade 1-5, sistemas sem achados omitidos) + integrative_axes + bilateral_findings + therapeutic_synthesis + priority_focus + clinical_note. Cada system com tendency tem: nome, grade 1-5 + label + barra visual, clinical_description (prosa funcional sem jargão iridológico), associated_manifestations[], investigation_points[], therapeutic_direction. Vocabulário: linguagem clínica funcional ("sobrecarga hepática", "tendência inflamatória"), **proibido jargão iridológico no padrão** (constituição linfática, anel nervoso, hN codes) + **proibido Sopro da Origem vocab** (centelha divina, atravessar) + diagnóstico médico. Botão "Análise Iridológica Aprofundada (1 crédito)" como placeholder UI (DB schema via nova tabela `reading_addons` extensível pra família V1.1+). Streaming progressivo + zod/pydantic validation + retry com prompt corretivo. Mapping placeholder/manual em 7.4; Fase 7.5 endurece. **Rebrand "Aurel → Iris Codex"** (PROJECT.md + UI copy + voice rules). **HIGH priority — executar antes de 7.2**.
-- [ ] **Fase 7.5 (INSERTED): Iris Codex — Tendency mapping engine (sinais → tendências)** — Camada de mapeamento entre `vision_features` (output do pipeline Modal Fase 5) e o input estruturado pro prompt-mestre da Fase 7.4. **IP central do Iris Codex**: regras de combinação de achados iridológicos + RAG multi-escola (Jensen, Lo Rito, Battello, Deck, Lindemann) que produzem `tendencies[]` com `{ system_id, grade 1-5, contributing_signs[], confidence, school_attribution[] }`. Absorve **7.2-A** (findings hierarchy by visual prominence — inerente à função do mapping engine, já que priority ordering é o que ele decide). Substitui placeholder/manual mapping de 7.4 quando lands. Threshold tuning empírico baseado em corpus Wave C de 7.2. Pode rodar em paralelo com 7.4 (7.4 ships placeholder; 7.5 swap-in incremental).
-- [ ] **Fase 8: Pagamento + LGPD** — Stripe BR (BRL+PIX) com trial 14d e termo de consentimento + direitos LGPD.
-- [ ] **Fase 9: Polish + dogfooding + beta** — Onboarding, e-mail transacional, uso semanal real pelo fundador, depois beta com 10–20 terapeutas.
-- [ ] **Fase 10: Sistema de Aprendizagem Clínica** *(planejada — backlog de longo prazo, executar depois da Fase 9 fechar)* — Captura de diff entre relatório gerado e entregue → descoberta de heurísticas emergentes + scoring clínico próprio + sugestões pré-preenchidas. Transforma o produto de "software de iridologia" em "sistema proprietário de análise iridológica" intransponível. **Pré-requisito de captura de dados embutido na Fase 7** (relatório_gerado, relatório_entregue, zonas_editadas, tipo_edição). Ver `.planning/phases/10-aprendizagem-clinica/10-CONTEXT.md`.
+- [x] **Fase 7: Análise LLM — DELIVERED via Sonnet 2x arch (v2.3.0..v2.8.4)** — Pipeline Sonnet 4.6 (Stage 1 tool use → JSON estruturado, Stage 2 composição streaming) ancorado em features + RAG, validado empiricamente em 4+ clientes (Cristiane, Celiane, Nayara, Evanilce). 11+ prompt iterations entre 2026-05-15..25, todas rastreadas em git history + memory (não em plans). Tech debts de calibração contínua (Stage 1 variability, §2 anti-fusão, §0 vocativo) ficam como observações em memory com triggers definidos.
+- [x] **Fase 7.1 (INSERTED): Dogfooding fixes** — 3 plans entregues 2026-05-09..11: audit regex polish (C1+C2) + vision pipeline calibration (P0.1-P0.4) + admin calibration page. Status: human_needed (24/25 truths; T5 empirical Nailli convergence deferred — depois absorvido pela arquitetura v2.3.0+).
+- [~] **Fase 7.1.5 (INSERTED, ABANDONED 2026-05-15+): Detect/segment robustness** — Scope original (resolver MediaPipe close-up failure pra produzir iris circles consistentes) descontinuado quando a arquitetura Sonnet 2x v2.3.0 removeu a dependência crítica do polar unwrap canonical. Vision pipeline continua com MVP heurística + Stage 1 LLM compensa via leitura direta das fotos (não via features pré-processadas precisas). Memory: `project_vision_pipeline_reality`.
+- [x] **Fase 7.1.6 (INSERTED): Canonical capture pipeline** — Concluída 2026-05-12.
+- [~] **Fase 7.2 (INSERTED, ABANDONED 2026-05-15+): Wave C — corpus expansion + threshold tuning** — Bloqueado em 7.1.5 (descontinuado). Substituído arquiteturalmente pelo Sonnet 2x (Stage 1 LLM faz o tendency mapping inline em vez de threshold-tuned heuristics).
+- [~] **Fase 7.3 (INSERTED, ABANDONED 2026-05-13): Dual-layer report authorship** — Descartada durante discuss-phase 2026-05-13 após pivot arquitetural. Substituída por 7.4. (Histórico preservado pra contexto da decisão.)
+- [x] **Fase 7.4 (INSERTED): Iris Codex — Relatório funcional adaptativo + rebrand — DELIVERED 2026-05-15..25** — Rebrand "Aurel → Iris Codex" aplicado em PROJECT.md + UI copy + voice rules. Arquitetura Sonnet 2x v2.3.0+ entrega o relatório em 15 seções (não 13) com structured output via Stage 1 JSON → Stage 2 composição streaming. 17 plans formais (00..08+07b) shipados até 2026-05-15, depois 11+ iterações de prompt (v2.4.x..v2.8.4) rodaram fora do GSD com calibração empírica em N=4 clientes pilotos. Tech debts de calibração rastreados em memory.
+- [ ] **Fase 7.5 (INSERTED): Iris Codex — Tendency mapping engine (sinais → tendências)** — V1.1 backlog. **IP central** futuro: substituir o Stage 1 LLM atual por mapping engine determinístico baseado em regras + RAG multi-escola. Sem urgência enquanto Stage 1 LLM atende o produto B2B v1.
+- [ ] **Fase 8: Pagamento + LGPD** — Backlog explícito. **Não-bloqueador pra B2B v1** (founder decisão 2026-05-18 — launch v1 = terapeutas pagos por convite/manual). Reabrir quando crescer pra GA público.
+- [ ] **Fase 9: Polish + dogfooding + beta** — In-progress implícito (founder usa diariamente desde 2026-05-15). ONBOARD-04 (3 semanas consecutivas sem notas paralelas) ainda não fechado formalmente.
+- [ ] **Fase 10: Sistema de Aprendizagem Clínica** *(planejada — backlog longo prazo)* — Captura de diff entre relatório gerado e entregue → heurísticas emergentes. Pré-requisitos de captura de dados embutidos no schema atual (`readings.report_generated` + `readings.report_edited`).
+- [ ] **Fase 11 (INSERTED, NEW 2026-05-25): Launch readiness B2B** — 3 gates pra liberar uso real por terapeutas externos: (a) Resend domain verification + Supabase sender swap pra `@iriscodex.com`; (b) MIN_AGE revert 0→18 em `apps/web/lib/gates/profile-completeness.ts` (memory: `project_min_age_beta_revert_before_ga`); (c) Consent term v1 → legal review trigger (memory: `project_consent_term_legal_review_debt`). Pequena, atômica, finaliza o launch v1 B2B-only.
 
 ## Detalhes das fases
 
@@ -550,22 +554,58 @@ See `.planning/phases/07.1.6-canonical-capture-pipeline/07.1.6-UAT-FINDINGS.md` 
 **Contexto detalhado**: ver `.planning/phases/10-aprendizagem-clinica/10-CONTEXT.md` (criado 2026-05-04 a partir de input do fundador).
 **Meta de longo prazo**: primeiro sistema de iridologia baseado em evidências computacionais de câmera de celular em população brasileira contemporânea — divergindo do Jensen onde os dados mostrarem padrões diferentes da teoria clássica.
 
+### Fase 11 (INSERTED 2026-05-25): Launch readiness B2B
+**Origem:** Audit de milestone v1.0 em 2026-05-25 (`v1.0-MILESTONE-AUDIT.md`) revelou que o produto está em produção há 3 semanas com calibração contínua via memory+git, mas 3 launch gates ainda bloqueiam o uso real por terapeutas externos não-founder. Memory tracking: `project_resend_domain_unverified_launch_gate`, `project_min_age_beta_revert_before_ga`, `project_consent_term_legal_review_debt`.
+
+**Goal**: Produto pode ser entregue a um primeiro terapeuta externo (não-founder) com confiança operacional: e-mail transacional sai do domínio `@iriscodex.com` autenticado (sem fallback ao `onboarding@resend.dev`), `MIN_AGE` aplica gate normal (18+), e o termo de consentimento v1 passou por revisão jurídica (ou foi liberado consciente para o nº pequeno do early-access).
+
+**Depends on**: Nada técnico — todas as fases base shipped. Bloqueia apenas o convite formal do primeiro terapeuta externo.
+
+**Requirements**: nenhum formal (não cria capability nova; é remediação de tracking + compliance). Memory triggers ativos rastreiam cada gate.
+
+**Success Criteria** (o que deve ser verdade):
+  1. **Resend gate fechado**: domínio `iriscodex.com` mostra Verified no Resend dashboard, Supabase Auth sender configurado pra `@iriscodex.com` (não `onboarding@resend.dev`), e um signup test em e-mail não-founder recebe magic-link / OTP corretamente. (Memory: `project_resend_domain_unverified_launch_gate` — DNS já validado, só 3 passos de dashboard restantes.)
+  2. **MIN_AGE revertido**: `apps/web/lib/gates/profile-completeness.ts` `MIN_AGE = 18` (era `0` em beta). Zod schema + gate + form cascateiam de volta a rejeitar menores de 18 com mensagem clara. (Memory: `project_min_age_beta_revert_before_ga`.)
+  3. **Consent term v1**: ou (a) revisado por advogado e versionado em `legal/term-v2.md` com changelog, OU (b) decisão explícita do founder de liberar o term-v1 AI-drafted pra ≤10 paying clients enquanto agenda revisão. (Memory: `project_consent_term_legal_review_debt`.)
+  4. **Smoke test E2E**: founder convida 1 terapeuta externo (real ou um e-mail-teste alternativo), terapeuta completa signup → cria primeiro cliente → captura/upload 6 fotos → recebe relatório por e-mail. Sem regressão visível em nenhuma etapa.
+  5. **GSD STATE.md atualizada** com Fase 11 marcada DONE + memory `project_v284_start_here` substituída por um pointer "launch-v1-done" ou similar.
+
+**Plans**: TBD via `/gsd-discuss-phase 11`. Esqueleto provável (1-3 plans pequenos):
+  - 11-01: Resend domain verification dashboard walkthrough + Supabase sender swap + signup smoke a e-mail externo (não-Claude-doable: founder no Resend/Supabase dashboards; Claude assiste com queries de verificação).
+  - 11-02: MIN_AGE revert 0→18 + grep all occurrences + Zod schema sync + test que rejeita menor (memory: `feedback_calibration_grep_all_occurrences`).
+  - 11-03: Consent term — decisão (a) advogado OR (b) founder libera com data-limite. Se (a), criar agenda + pointer; se (b), criar memory de trigger pós-N clientes.
+
+**Cross-cutting constraints:**
+- Nenhum item técnico bloqueia, mas (1) e (3) podem precisar agendas externas (Resend support / advogado) — não dá pra forçar timing.
+- Se founder decidir adiar (3) por mais 2-4 semanas (até N>1 cliente), aceitar o trade-off e documentar trigger explícito.
+- Vault explícito: este NÃO inclui Stripe (Fase 8) nem LGPD-LGPD-01..06 completos — esses são V1.1+ porque launch v1 = B2B convite, sem cobrança automatizada.
+
+**UI hint**: no (gates são server-side + config + docs; sem UI nova).
+
 ## Progresso
 
 **Ordem de execução:**
-Fases v1 executam em ordem numérica: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9. Fase 10 (Aprendizagem Clínica) é **post-MVP** — só inicia após Fase 9 fechar com dogfooding consolidado.
+Fases v1 executam em ordem numérica: 1 → 2 → 4 → 5 → 6 → 7 → 7.1 → 7.1.6 → 7.4 (todas ✅) → **11** (next-up). Fases 3/7.1.5/7.2/7.3 abandoned. Fase 7.5/8/9/10 = backlog explícito. Fase 11 nova captura launch readiness B2B.
 
 | Fase | Plans concluídos | Status | Concluída em |
 |-------|------------------|--------|--------------|
-| 1. Setup | 6/6 | ✅ Concluída | — |
-| 2. Auth + Dashboard básico | 4/4 | ✅ Concluída | — |
-| 3. Captura mobile (PWA) | 8/8* | ✅ Concluída via UAT | 2026-05-03 |
+| 1. Setup | 6/6 | ✅ Concluída | — (pré-beta) |
+| 2. Auth + Dashboard básico | 4/4 | ✅ Concluída (+ email-OTP fallback 2026-05-18) | — |
+| 3. Captura mobile (PWA) | 8/8* | ⏸️ Gate Haiku live; PWA-instalável abandoned (B2B v1 foco upload desktop) | 2026-05-03 (parcial) |
 | 4. Upload desktop | 7/7 | ✅ Concluída via UAT + gsd-verifier | 2026-05-03 |
-| 5. Pipeline de visão (Modal) | 17/17 | Código-completa; aguardando verify-work + founder smoke | — |
+| 5. Pipeline de visão (Modal) | 17/17 | ✅ MVP delivered (heurística crua, sem VISION-04 HMAC webhook — Next.js chama Modal direto) | 2026-05-12 (efetivo) |
 | 6. RAG — Ingestão | 14/14 | ✅ Concluída via UAT (5/5 PASS) + secure-phase (16/16 threats closed) | 2026-05-06 |
-| 7. Análise LLM | 0/11 | Plans criados (11 plans, 6 waves) — aguardando execute-phase | — |
-| 8. Pagamento + LGPD | 0/TBD | Não iniciada | — |
-| 9. Polish + dogfooding + beta | 0/TBD | Não iniciada | — |
-| 10. Sistema de Aprendizagem Clínica | 0/TBD | **Backlog (planejada — pós-Fase 9)** | — |
+| 7. Análise LLM | 12/12 | ✅ Arquitetura Sonnet 2x LIVE (v2.3.0..v2.8.4); 11+ iterações de prompt 2026-05-15..25 em git+memory | 2026-05-15+ |
+| 7.1. Dogfooding fixes | 3/3 | ✅ Concluída | 2026-05-11 |
+| 7.1.5. Detect/segment | 1/2 | 🚫 ABANDONED — substituído arquiteturalmente por Sonnet 2x (Stage 1 LLM) | — |
+| 7.1.6. Canonical capture | 7/7 | ✅ Concluída via UAT clinical inspection | 2026-05-12 |
+| 7.2. Wave C corpus | 0/0 | 🚫 ABANDONED — substituído por Sonnet 2x Stage 1 inline mapping | — |
+| 7.3. Dual-layer | 0/0 | 🚫 ABANDONED 2026-05-13 — substituído por 7.4 | — |
+| 7.4. Iris Codex report | 17/17+ | ✅ Concluída — rebrand + structured output + Sonnet 2x arch LIVE em prod | 2026-05-15+ |
+| 7.5. Tendency mapping engine | 0/TBD | 📅 Backlog V1.1 (substituir Stage 1 LLM por mapping engine determinístico) | — |
+| 8. Pagamento + LGPD | 0/TBD | 📅 Backlog (não-bloqueador pra B2B v1 — founder decisão 2026-05-18) | — |
+| 9. Polish + dogfooding + beta | 0/TBD | 🔄 In-progress implícito (founder usa daily); ONBOARD-04 ainda não fechado formalmente | — |
+| 10. Sistema de Aprendizagem Clínica | 0/TBD | 📅 Backlog longo prazo | — |
+| **11. Launch readiness B2B** | **0/3** | **▶️ Next-up — 3 launch gates pra primeiro terapeuta externo** | **—** |
 
 \* **Fase 3 nota**: Plans 03-01 a 03-07 executados normalmente. Plan 03-08 (RecoveryBanner D-12, PWAInstallBanner D-14, listagem rascunhos) teve scope reduzido durante UAT — finalizeReadingAction foi absorvida em fixes pós-execução. RecoveryBanner e PWAInstallBanner deferidos para Fase 9 (polish pré-beta). Captura mobile principal funcional pós-UAT 03 (20 rounds de calibração do gate VLM Claude Haiku 4.5). Único issue conhecido: PWA standalone Android Chrome (instala mas abre com URL bar). Não bloqueia Estágio 1 (dogfood iPhone Safari).
