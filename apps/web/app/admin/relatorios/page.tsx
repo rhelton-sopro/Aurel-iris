@@ -468,7 +468,7 @@ export default async function RelatoriosAdminPage({
               [
                 'Status do gate',
                 dogfooding.gateClosedAt
-                  ? `FECHADO em ${new Date(dogfooding.gateClosedAt + 'T00:00:00Z').toLocaleDateString('pt-BR')}`
+                  ? `FECHADO em ${new Date(dogfooding.gateClosedAt + 'T00:00:00Z').toLocaleDateString('pt-BR')} (semana de início)`
                   : 'ABERTO',
               ],
             ]}

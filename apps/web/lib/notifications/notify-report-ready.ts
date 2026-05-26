@@ -33,7 +33,7 @@ export async function notifyTherapistReportReady(
 ): Promise<{ sent: boolean; reason?: string }> {
   const apiKey = process.env.RESEND_API_KEY
   if (!apiKey) {
-    console.log('[notify-report] RESEND_API_KEY ausente — pulando email')
+    console.warn('[notify-report] RESEND_API_KEY ausente — pulando email')
     return { sent: false, reason: 'no_api_key' }
   }
 

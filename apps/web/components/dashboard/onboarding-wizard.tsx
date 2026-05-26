@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { Check, Circle, User, Users, FileText } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { buttonVariants } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { dismissOnboardingAction } from '@/app/actions/onboarding'
 
