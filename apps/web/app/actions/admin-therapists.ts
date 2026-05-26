@@ -106,7 +106,7 @@ export async function inviteTherapistAction(
 
   console.log('[admin-therapists] INVITE_TOKEN_GENERATED', {
     targetEmail: email,
-    token: invite.token,
+    tokenPrefix: invite.token.slice(0, 8), // debug correlation only — never full token
     userStatus: 'new_invited',
     by: user.email,
     at: new Date().toISOString(),
