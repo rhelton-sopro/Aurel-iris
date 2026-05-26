@@ -266,8 +266,9 @@ export default async function RelatoriosAdminPage({
             headers={['Componente', 'USD']}
             rows={[
               ['Total no período', `$${cost.total_usd.toFixed(4)}`],
-              ['Report (Sonnet)', `$${cost.report_usd.toFixed(4)}`],
-              ['Canonicalization (bbox)', `$${cost.bbox_usd.toFixed(4)}`],
+              ['Stage 1 — Sonnet tool use (achados)', `$${cost.stage1_usd.toFixed(4)}`],
+              ['Stage 2 — Sonnet composição (relatório)', `$${cost.stage2_usd.toFixed(4)}`],
+              ['Canonicalization (bbox legado)', `$${cost.bbox_usd.toFixed(4)}`],
               [
                 'Gate Haiku (validate)',
                 cost.haiku_validate_usd != null
@@ -291,10 +292,16 @@ export default async function RelatoriosAdminPage({
                   ? `$${cost.cost_per_reading_p90.toFixed(4)}`
                   : '—',
               ],
-              ['Tokens in', cost.tokens_in.toLocaleString('pt-BR')],
-              ['Tokens out', cost.tokens_out.toLocaleString('pt-BR')],
+              ['Tokens in (S1+S2)', cost.tokens_in.toLocaleString('pt-BR')],
+              ['Tokens out (S1+S2)', cost.tokens_out.toLocaleString('pt-BR')],
               [
-                'Latência média report',
+                'Cache hit rate',
+                cost.cache_hit_rate_pct != null
+                  ? `${cost.cache_hit_rate_pct.toFixed(1)}% (read ${cost.cache_read_total.toLocaleString('pt-BR')} / creation ${cost.cache_creation_total.toLocaleString('pt-BR')})`
+                  : '—',
+              ],
+              [
+                'Latência média Stage 2',
                 cost.avg_latency_ms != null
                   ? `${(cost.avg_latency_ms / 1000).toFixed(2)}s`
                   : '—',

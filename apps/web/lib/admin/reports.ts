@@ -228,15 +228,19 @@ export async function fetchQuality(range: DateRange): Promise<QualityStats> {
 // ── 3. CUSTO AI ────────────────────────────────────────────────────────
 
 export interface CostStats {
-  total_usd: number              // soma TUDO (report + bbox + haiku validate)
-  report_usd: number             // só report_generations.cost_usd
+  total_usd: number              // soma TUDO (stage 1 + stage 2 + bbox + haiku validate)
+  stage1_usd: number             // report_findings.cost_usd (Sonnet tool use, pipeline v2.3.0+)
+  stage2_usd: number             // report_generations.cost_usd (Sonnet composição)
   bbox_usd: number               // só report_generations.bbox_cost_usd
   haiku_validate_usd: number | null // capture_attempts.cost_estimate_usd
-  by_method: Record<string, number> // vigente/sam/sonnet_direct
-  tokens_in: number
-  tokens_out: number
-  avg_latency_ms: number | null
-  // Per-reading: divide soma de report_usd+bbox_usd pelo COUNT(distinct reading_id)
+  by_method: Record<string, number> // vigente/sam/sonnet_direct/sonnet_2x_X.Y.Z (Stage 1)
+  tokens_in: number              // Stage 1 + Stage 2 somados
+  tokens_out: number             // Stage 1 + Stage 2 somados
+  cache_creation_total: number   // Stage 1 + Stage 2 somados — tokens gravados no cache
+  cache_read_total: number       // Stage 1 + Stage 2 somados — tokens lidos do cache (hit)
+  cache_hit_rate_pct: number | null // cache_read / (cache_read + cache_creation + tokens_in) * 100
+  avg_latency_ms: number | null  // só Stage 2 (latência percebida pelo usuário)
+  // Per-reading: divide soma de stage1+stage2+bbox pelo COUNT(distinct reading_id)
   cost_per_reading_avg: number | null
   cost_per_reading_p90: number | null
 }
@@ -244,31 +248,89 @@ export interface CostStats {
 export async function fetchCost(range: DateRange): Promise<CostStats> {
   const service = createServiceClient()
 
-  const { data: gens } = await service
-    .from('report_generations')
-    .select('reading_id, method, cost_usd, bbox_cost_usd, tokens_in, tokens_out, latency_ms')
-    .gte('created_at', range.from)
-    .lte('created_at', range.to)
+  // Pipeline Sonnet 2x v2.3.0+ tem 2 chamadas LLM por leitura:
+  //   - Stage 1: report_findings (Sonnet tool use → JSON estruturado)
+  //   - Stage 2: report_generations (Sonnet composição streaming)
+  // Antes de v2.3.0 só havia report_generations. Pra cobrir ambas as eras
+  // somamos os dois agregados.
+  // Colunas cache_*_input_tokens vieram em migration 0031 mas types/database.ts
+  // ainda não foi regenerado — `as never` aqui segue mesmo padrão usado em
+  // capture_attempts. Remover quando rodar `supabase gen types`.
+  const [gensRes, findingsRes] = await Promise.all([
+    service
+      .from('report_generations' as never)
+      .select(
+        'reading_id, method, cost_usd, bbox_cost_usd, tokens_in, tokens_out, latency_ms, cache_creation_input_tokens, cache_read_input_tokens',
+      )
+      .gte('created_at', range.from)
+      .lte('created_at', range.to),
+    service
+      .from('report_findings' as never)
+      .select(
+        'reading_id, method_version, cost_usd, tokens_in, tokens_out, cache_creation_input_tokens, cache_read_input_tokens, generated_at',
+      )
+      .gte('generated_at', range.from)
+      .lte('generated_at', range.to),
+  ])
 
-  let report_usd = 0
+  interface GenRow {
+    reading_id: string | null
+    method: string | null
+    cost_usd: number | null
+    bbox_cost_usd: number | null
+    tokens_in: number | null
+    tokens_out: number | null
+    latency_ms: number | null
+    cache_creation_input_tokens: number | null
+    cache_read_input_tokens: number | null
+  }
+  interface FindingRow {
+    reading_id: string | null
+    method_version: string | null
+    cost_usd: number | null
+    tokens_in: number | null
+    tokens_out: number | null
+    cache_creation_input_tokens: number | null
+    cache_read_input_tokens: number | null
+  }
+  const gens = (gensRes.data ?? []) as unknown as GenRow[]
+  const findings = (findingsRes.data ?? []) as unknown as FindingRow[]
+
+  let stage2_usd = 0
   let bbox_usd = 0
   let tokens_in = 0
   let tokens_out = 0
+  let cache_creation_total = 0
+  let cache_read_total = 0
   const by_method: Record<string, number> = {}
   const latencies: number[] = []
   const per_reading_cost = new Map<string, number>()
-  for (const g of gens ?? []) {
+  for (const g of gens) {
     const cost = numOrZero(g.cost_usd)
     const bbox = numOrZero(g.bbox_cost_usd)
-    const method = (g.method as string | null) ?? 'desconhecido'
-    report_usd += cost
+    const method = g.method ?? 'desconhecido'
+    stage2_usd += cost
     bbox_usd += bbox
     tokens_in += numOrZero(g.tokens_in)
     tokens_out += numOrZero(g.tokens_out)
+    cache_creation_total += numOrZero(g.cache_creation_input_tokens)
+    cache_read_total += numOrZero(g.cache_read_input_tokens)
     by_method[method] = (by_method[method] ?? 0) + cost
     if (typeof g.latency_ms === 'number') latencies.push(g.latency_ms)
-    const rid = g.reading_id as string | null
-    if (rid) per_reading_cost.set(rid, (per_reading_cost.get(rid) ?? 0) + cost + bbox)
+    if (g.reading_id) per_reading_cost.set(g.reading_id, (per_reading_cost.get(g.reading_id) ?? 0) + cost + bbox)
+  }
+
+  let stage1_usd = 0
+  for (const f of findings) {
+    const cost = numOrZero(f.cost_usd)
+    const methodVersion = f.method_version ?? 'stage1_desconhecido'
+    stage1_usd += cost
+    tokens_in += numOrZero(f.tokens_in)
+    tokens_out += numOrZero(f.tokens_out)
+    cache_creation_total += numOrZero(f.cache_creation_input_tokens)
+    cache_read_total += numOrZero(f.cache_read_input_tokens)
+    by_method[methodVersion] = (by_method[methodVersion] ?? 0) + cost
+    if (f.reading_id) per_reading_cost.set(f.reading_id, (per_reading_cost.get(f.reading_id) ?? 0) + cost)
   }
 
   // Haiku validate via capture_attempts (pode não existir).
@@ -298,14 +360,25 @@ export async function fetchCost(range: DateRange): Promise<CostStats> {
       ? perReadingArr[Math.min(perReadingArr.length - 1, Math.floor(perReadingArr.length * 0.9))]
       : null
 
+  // Cache hit rate = read / (read + creation + sem-cache). 0% até ter
+  // 2 chamadas dentro do TTL Anthropic (~5min) com prompt estável.
+  // Mede o fix v2.7.3 (4 cache_control breakpoints) empiricamente.
+  const cache_denominator = cache_read_total + cache_creation_total + tokens_in
+  const cache_hit_rate_pct =
+    cache_denominator > 0 ? (cache_read_total / cache_denominator) * 100 : null
+
   return {
-    total_usd: report_usd + bbox_usd + (haiku_validate_usd ?? 0),
-    report_usd,
+    total_usd: stage1_usd + stage2_usd + bbox_usd + (haiku_validate_usd ?? 0),
+    stage1_usd,
+    stage2_usd,
     bbox_usd,
     haiku_validate_usd,
     by_method,
     tokens_in,
     tokens_out,
+    cache_creation_total,
+    cache_read_total,
+    cache_hit_rate_pct,
     avg_latency_ms:
       latencies.length > 0
         ? latencies.reduce((a, b) => a + b, 0) / latencies.length
