@@ -5,7 +5,7 @@ vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }))
 // ─── vi.hoisted: factories para mocks ────────────────────────────────────────
 const {
   mockGetUser,
-  mockListUsers,
+  mockGetUserByEmail,
   mockInsert,
   mockSingle,
   mockFrom,
@@ -14,12 +14,12 @@ const {
   const mockSelect = vi.fn(() => ({ single: mockSingle }))
   const mockInsert = vi.fn(() => ({ select: mockSelect }))
   const mockFrom = vi.fn(() => ({ insert: mockInsert }))
-  const mockListUsers = vi.fn()
+  const mockGetUserByEmail = vi.fn()
   const mockGetUser = vi.fn()
 
   return {
     mockGetUser,
-    mockListUsers,
+    mockGetUserByEmail,
     mockInsert,
     mockSelect,
     mockSingle,
@@ -40,7 +40,7 @@ vi.mock('@/lib/supabase/service', () => ({
     from: mockFrom,
     auth: {
       admin: {
-        listUsers: mockListUsers,
+        getUserByEmail: mockGetUserByEmail,
       },
     },
   })),
@@ -78,10 +78,10 @@ function setupFounderSession() {
   })
 }
 
-function setupListUsersEmpty() {
-  mockListUsers.mockResolvedValue({
-    data: { users: [] },
-    error: null,
+function setupGetUserByEmailNotFound() {
+  mockGetUserByEmail.mockResolvedValue({
+    data: { user: null },
+    error: { status: 404, message: 'User not found' },
   })
 }
 
@@ -130,13 +130,9 @@ describe('inviteTherapistAction', () => {
 
   it('Test 4: email já em auth.users → { ok:false, error:"E-mail já cadastrado como terapeuta neste sistema." } e NÃO chama insert()', async () => {
     setupFounderSession()
-    // Simula auth.users contendo o email alvo
-    mockListUsers.mockResolvedValue({
-      data: {
-        users: [
-          { id: 'existing-uuid', email: newTherapistEmail },
-        ],
-      },
+    // Simula auth.users contendo o email alvo (getUserByEmail retorna user)
+    mockGetUserByEmail.mockResolvedValue({
+      data: { user: { id: 'existing-uuid', email: newTherapistEmail } },
       error: null,
     })
 
@@ -152,7 +148,7 @@ describe('inviteTherapistAction', () => {
 
   it('Test 5: email novo + INSERT OK → { ok:true, actionLink, userStatus:"new_invited", email }', async () => {
     setupFounderSession()
-    setupListUsersEmpty()
+    setupGetUserByEmailNotFound()
     setupInsertOk()
 
     const result = await inviteTherapistAction(newTherapistEmail)
@@ -175,7 +171,7 @@ describe('inviteTherapistAction', () => {
 
   it('Test 6: email novo + INSERT falha → { ok:false, error:"Falha ao criar convite: ..." }', async () => {
     setupFounderSession()
-    setupListUsersEmpty()
+    setupGetUserByEmailNotFound()
     mockSingle.mockResolvedValue({
       data: null,
       error: { message: 'db constraint violation' },
@@ -189,15 +185,12 @@ describe('inviteTherapistAction', () => {
     })
   })
 
-  it('Test 7: listUsers faz matching case-insensitive (uppercase email no auth.users deve bloquear lowercase no input)', async () => {
+  it('Test 7: getUserByEmail bloqueia email existente (input normalizado para lowercase antes da busca)', async () => {
     setupFounderSession()
-    // auth.users contém email com maiúsculas
-    mockListUsers.mockResolvedValue({
-      data: {
-        users: [
-          { id: 'existing-uuid', email: 'NewTherapist@Example.COM' },
-        ],
-      },
+    // getUserByEmail é chamado com email em lowercase (normalizado na action)
+    // e retorna o user existente — bloqueando o convite
+    mockGetUserByEmail.mockResolvedValue({
+      data: { user: { id: 'existing-uuid', email: 'newtherapist@example.com' } },
       error: null,
     })
 

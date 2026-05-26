@@ -61,21 +61,17 @@ export async function inviteTherapistAction(
   const service = createServiceClient()
 
   // D-DUPE: bloqueia se email já em auth.users.
-  // service.auth.admin.listUsers retorna paginado; usamos perPage:1000 e
-  // filtramos client-side (não há filter param oficial por email no SDK v2).
-  // Se prod crescer pra 1000+ users, paginar adequadamente.
-  const { data: usersList, error: listErr } =
-    await service.auth.admin.listUsers({ perPage: 1000 })
-  if (listErr) {
+  // getUserByEmail (SDK >= 2.38) busca exatamente por email — sem paginação,
+  // sem truncamento silencioso em 1000+ registros.
+  const { data: existingUser, error: getUserErr } =
+    await service.auth.admin.getUserByEmail(email)
+  if (getUserErr && getUserErr.status !== 404) {
     return {
       ok: false,
-      error: `Falha ao validar e-mail: ${listErr.message}`,
+      error: `Falha ao validar e-mail: ${getUserErr.message}`,
     }
   }
-  const exists = (usersList?.users ?? []).some(
-    (u) => (u.email ?? '').toLowerCase() === email,
-  )
-  if (exists) {
+  if (existingUser?.user) {
     return {
       ok: false,
       error: 'E-mail já cadastrado como terapeuta neste sistema.',
