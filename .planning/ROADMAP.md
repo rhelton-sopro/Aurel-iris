@@ -33,7 +33,7 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
 - [ ] **Fase 8: Pagamento + LGPD** — Backlog explícito. **Não-bloqueador pra B2B v1** (founder decisão 2026-05-18 — launch v1 = terapeutas pagos por convite/manual). Reabrir quando crescer pra GA público.
 - [x] **Fase 9: Polish + dogfooding + beta — DELIVERED + CLOSED 2026-05-26** — Wizard onboarding 3-step inline (Plan 09-02), e-mail "leitura pronta" idempotente (Plan 09-03), dogfooding gate instrumentation em /admin/relatorios (Plan 09-04). Cenários 1+2 honor-system PASS pós-Fase 11.1 LIVE (27 vitest GREEN + LGPD audit + idempotência DB-level; smoke E2E real diferido pra Fase 11 11-04 com 1ª terapeuta convidada). Cenário 3 PASS por inspeção. ONBOARD-03/05 deferred V1.1+. ONBOARD-04 fechado por uso continuado (gate target ~2026-06-05 se ritmo mantém).
 - [ ] **Fase 10: Sistema de Aprendizagem Clínica** *(planejada — backlog longo prazo)* — Captura de diff entre relatório gerado e entregue → heurísticas emergentes. Pré-requisitos de captura de dados embutidos no schema atual (`readings.report_generated` + `readings.report_edited`).
-- [ ] **Fase 11 (INSERTED, NEW 2026-05-25): Launch readiness B2B** — 3 gates pra liberar uso real por terapeutas externos: (a) Resend domain verification + Supabase sender swap pra `@iriscodex.com`; (b) MIN_AGE revert 0→18 em `apps/web/lib/gates/profile-completeness.ts` (memory: `project_min_age_beta_revert_before_ga`); (c) Consent term v1 → legal review trigger (memory: `project_consent_term_legal_review_debt`). Pequena, atômica, finaliza o launch v1 B2B-only.
+- [~] **Fase 11 (INSERTED, NEW 2026-05-25): Launch readiness B2B — 3/4 DELIVERED 2026-05-26; smoke E2E (11-04) deferido pra exercício orgânico** — Gates entregues via execução direta sem `/gsd-plan-phase 11` (rastreio em git+memory, não em PLAN files): (a) **11-01** Resend domain verification + sender `noreply@iriscodex.com` autenticado via DMARC pass em smoke externo (memory `project_resend_domain_unverified_launch_gate` RESOLVED); (b) **11-02** MIN_AGE revert 0→18 em `apps/web/lib/gates/profile-completeness.ts` commit `55d54ea` + tests revertidos 16/16 GREEN (memory `project_min_age_beta_revert_before_ga` RESOLVED); (c) **11-03** Consent term Path B liberado consciente pra ≤5 terapeutas externos com trigger ATIVO (memory `project_consent_term_legal_review_debt`). (d) **11-04** smoke E2E hand-held com 1ª terapeuta convidada — pendente, acontece organicamente quando founder dispara primeiro convite real via `/admin/terapeutas`.
 - [x] **Fase 11.1 (INSERTED, NEW 2026-05-26): Invite terapeuta via signup form — DELIVERED + LIVE 2026-05-26** — Bug descoberto durante smoke Fase 9 (09-05): `inviteTherapistAction` usava `supabase.auth.admin.generateLink({type:'invite', redirectTo:/dashboard})` mas `/dashboard` não trocava PKCE code por sessão → terapeuta caía em `/login`. Fix entregue: tabela `therapist_invites(token uuid, email, expires_at 7d, used_at)` + rewrite `inviteTherapistAction` (D-DUPE bloqueia email já cadastrado em auth.users) + rota `/convite-terapeuta/[token]` (RSC lookup + form com email read-only + OTP 8 dígitos obrigatório) + middleware update (PUBLIC_INVITE_PREFIXES). Inclui também `UNIQUE(therapist_id, email) ON clients` resolvendo memory tech debt `project_clients_unique_email_tech_debt` (cleanup empírico de 11 rows duplicadas em prod: 6 grupos, 5 shells-vazios + 1 caso real família Nailli/Luiz). 3 plans + 15 commits + 27 vitest GREEN. Deploy LIVE (`iriscodex.com` HTTP 200, alias `aurel-iris-fgu7e66tu-sopro-da-origem.vercel.app`).
 
 ## Detalhes das fases
@@ -576,10 +576,11 @@ See `.planning/phases/07.1.6-canonical-capture-pipeline/07.1.6-UAT-FINDINGS.md` 
   4. **Smoke test E2E**: founder convida 1 terapeuta externo (real ou um e-mail-teste alternativo), terapeuta completa signup → cria primeiro cliente → captura/upload 6 fotos → recebe relatório por e-mail. Sem regressão visível em nenhuma etapa.
   5. **GSD STATE.md atualizada** com Fase 11 marcada DONE + memory `project_v284_start_here` substituída por um pointer "launch-v1-done" ou similar.
 
-**Plans**: TBD via `/gsd-discuss-phase 11`. Esqueleto provável (1-3 plans pequenos):
-  - 11-01: Resend domain verification dashboard walkthrough + Supabase sender swap + signup smoke a e-mail externo (não-Claude-doable: founder no Resend/Supabase dashboards; Claude assiste com queries de verificação).
-  - 11-02: MIN_AGE revert 0→18 + grep all occurrences + Zod schema sync + test que rejeita menor (memory: `feedback_calibration_grep_all_occurrences`).
-  - 11-03: Consent term — decisão (a) advogado OR (b) founder libera com data-limite. Se (a), criar agenda + pointer; se (b), criar memory de trigger pós-N clientes.
+**Plans**: Nunca formalizados via `/gsd-plan-phase 11` (discuss-phase produziu CONTEXT + DISCUSSION-LOG só). Execução direta 2026-05-26 rastreada em git+memory:
+  - **11-01** ✅ Resend domain verification + sender `noreply@iriscodex.com` — smoke externo recebeu OTP 8 dígitos com DMARC pass, não foi pra spam (memory `project_resend_domain_unverified_launch_gate` RESOLVED).
+  - **11-02** ✅ MIN_AGE revert 0→18 — commit `55d54ea`: `apps/web/lib/gates/profile-completeness.ts` revertido + 16/16 tests GREEN; clientes existentes <18 preservados (Naillí 7yo etc.), só criação nova bloqueada (memory `project_min_age_beta_revert_before_ga` RESOLVED).
+  - **11-03** ✅ Consent term Path B — founder liberou consciente term-v1 AI-drafted pra ≤5 terapeutas externos; trigger ATIVO ('N=5 paying clients OR ANPD reclamação OR 60d do primeiro convite externo') registrado em memory `project_consent_term_legal_review_debt`.
+  - **11-04** 🔲 Smoke E2E hand-held — deferido pra exercício orgânico. Acontece quando founder dispara primeiro convite real via `/admin/terapeutas` (fluxo `/convite-terapeuta/[token]` LIVE pós-Fase 11.1).
 
 **Cross-cutting constraints:**
 - Nenhum item técnico bloqueia, mas (1) e (3) podem precisar agendas externas (Resend support / advogado) — não dá pra forçar timing.
@@ -591,7 +592,7 @@ See `.planning/phases/07.1.6-canonical-capture-pipeline/07.1.6-UAT-FINDINGS.md` 
 ## Progresso
 
 **Ordem de execução:**
-Fases v1 executam em ordem numérica: 1 → 2 → 4 → 5 → 6 → 7 → 7.1 → 7.1.6 → 7.4 (todas ✅) → **11** (next-up). Fases 3/7.1.5/7.2/7.3 abandoned. Fase 7.5/8/9/10 = backlog explícito. Fase 11 nova captura launch readiness B2B.
+Fases v1 executam em ordem numérica: 1 → 2 → 4 → 5 → 6 → 7 → 7.1 → 7.1.6 → 7.4 → 9 → 11.1 → 11 (3/4) — todas LIVE. Fase 11 fecha quando 11-04 (smoke E2E real) acontecer organicamente. Fases 3/7.1.5/7.2/7.3 abandoned. Fase 7.5/8/10 = backlog explícito.
 
 | Fase | Plans concluídos | Status | Concluída em |
 |-------|------------------|--------|--------------|
@@ -610,8 +611,9 @@ Fases v1 executam em ordem numérica: 1 → 2 → 4 → 5 → 6 → 7 → 7.1 �
 | 7.4. Iris Codex report | 17/17+ | ✅ Concluída — rebrand + structured output + Sonnet 2x arch LIVE em prod | 2026-05-15+ |
 | 7.5. Tendency mapping engine | 0/TBD | 📅 Backlog V1.1 (substituir Stage 1 LLM por mapping engine determinístico) | — |
 | 8. Pagamento + LGPD | 0/TBD | 📅 Backlog (não-bloqueador pra B2B v1 — founder decisão 2026-05-18) | — |
-| 9. Polish + dogfooding + beta | 5/5 | 🔄 DELIVERED (ONBOARD-01/02/04); smoke 1+2 PENDING Fase 11.1 invite-fix; cenário 3 PASS; ONBOARD-04 gate fecha por uso continuado | 2026-05-26 (delivered) |
+| 9. Polish + dogfooding + beta | 5/5 | ✅ DELIVERED + LIVE — cenários 1+2 honor-system PASS pós-Fase 11.1; cenário 3 PASS por inspeção; ONBOARD-04 gate fecha por uso continuado (~2026-06-05) | 2026-05-26 |
 | 10. Sistema de Aprendizagem Clínica | 0/TBD | 📅 Backlog longo prazo | — |
-| **11. Launch readiness B2B** | **3/4** | **🔄 Quase fechada — falta 11-04 (smoke E2E founder action)** | **—** |
+| 11. Launch readiness B2B | 3/4 | 🔄 11-01/02/03 DELIVERED + LIVE (sem plans formais — execução direta rastreada em git+memory). 11-04 (smoke E2E) deferido pra exercício orgânico. | 2026-05-26 (parcial) |
+| 11.1. Invite terapeuta via signup form | 3/3 | ✅ DELIVERED + LIVE — bug bloqueador descoberto durante smoke Fase 9 fixado via migration 0033 + rota `/convite-terapeuta/[token]` + signup form (27 vitest GREEN + 2 CRITICAL security fixes pós-review) | 2026-05-26 |
 
 \* **Fase 3 nota**: Plans 03-01 a 03-07 executados normalmente. Plan 03-08 (RecoveryBanner D-12, PWAInstallBanner D-14, listagem rascunhos) teve scope reduzido durante UAT — finalizeReadingAction foi absorvida em fixes pós-execução. RecoveryBanner e PWAInstallBanner deferidos para Fase 9 (polish pré-beta). Captura mobile principal funcional pós-UAT 03 (20 rounds de calibração do gate VLM Claude Haiku 4.5). Único issue conhecido: PWA standalone Android Chrome (instala mas abre com URL bar). Não bloqueia Estágio 1 (dogfood iPhone Safari).
