@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: "Fase 9 + Fase 11.1 DELIVERED + LIVE em prod (HEAD b932333). Fase 11 3/4 entregues via execução direta (sem plans formais)."
-stopped_at: Aguardando 11-04 smoke E2E orgânico com 1ª terapeuta convidada
-last_updated: "2026-05-26T20:00:00.000Z"
+status: "Wave 3 entregou 9 commits atômicos em paralelo via 3 worktrees disjuntos:"
+stopped_at: Phase 8 context gathered — pacote pré-pago + LGPD core locked
+last_updated: "2026-05-26T22:04:29.602Z"
 progress:
   total_phases: 16
-  completed_phases: 13
-  total_plans: 117
-  completed_plans: 115
+  completed_phases: 11
+  total_plans: 109
+  completed_plans: 107
   percent: 98
 ---
 
@@ -221,9 +221,9 @@ Nenhum ainda.
 
 Sessão anterior: 2026-05-09 noite + supplement (mesma sessão estendida) — **PLAN 07.1-03 ENTREGUE + iterative calibration loop adicionado em cima**. Total 14 commits (7 do PLAN original + 7 supplement), 32 testes vitest verdes, 3 bugs descobertos em produção e corrigidos durante a sessão (safeArray defensivo, 'use server' export hygiene, RLS broken auth.users subquery). Founder smoke confirmado: AnnotationForm + CalibrationDiagnosisForm ambos funcionais em produção; primeiro diagnóstico salvo pra Nailli. Ver `.planning/phases/07.1-dogfooding-fixes/07.1-03-admin-calibration-page-SUMMARY.md` (seção "Post-PLAN supplement").
 
-Stopped at: Phase 11 context gathered — 4 decisions locked via discuss-phase
+Stopped at: Phase 8 context gathered — pacote pré-pago + LGPD core locked
 
-Resume file: None
+Resume file: .planning/phases/08-pagamento-lgpd/08-CONTEXT.md
 
 **Estado das tabelas:**
 
