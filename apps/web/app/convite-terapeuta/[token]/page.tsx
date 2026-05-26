@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation'
 import { createServiceClient } from '@/lib/supabase/service'
 import { TherapistInviteSignupForm } from './TherapistInviteSignupForm'
-import { Card, CardHeader, CardDescription } from '@/components/ui/card'
 
 export default async function ConviteTerapeutaPage({
   params,
@@ -22,37 +21,10 @@ export default async function ConviteTerapeutaPage({
     .eq('token', token)
     .maybeSingle()
 
-  if (error || !invite) {
+  // Colapsa todos os estados inválidos em 404 para não vazar informação sobre
+  // tokens históricos (security: não distinguir "usado" vs "expirado" vs "inexistente").
+  if (error || !invite || invite.used_at || new Date(invite.expires_at) < new Date()) {
     notFound()
-  }
-
-  // Token usado → mensagem específica (não notFound() opaco).
-  if (invite.used_at) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardDescription>
-            Este convite já foi usado. Acesse{' '}
-            <a href="/login" className="underline">
-              /login
-            </a>
-            .
-          </CardDescription>
-        </CardHeader>
-      </Card>
-    )
-  }
-
-  if (new Date(invite.expires_at) < new Date()) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardDescription>
-            Convite expirado. Peça um novo ao administrador.
-          </CardDescription>
-        </CardHeader>
-      </Card>
-    )
   }
 
   return <TherapistInviteSignupForm tokenEmail={invite.email} tokenId={invite.token} />
