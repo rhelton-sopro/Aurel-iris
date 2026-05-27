@@ -45,6 +45,10 @@ export function InviteLinkDialog({
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [isPending, startTransition] = useTransition()
+  // v2.9.0: toggle "avisar por email quando cliente terminar as fotos".
+  // Default true (comportamento prévio). Persistido por TOKEN no banco
+  // (migration 0034 — notify_on_capture_complete).
+  const [notifyOnCapture, setNotifyOnCapture] = useState(true)
 
   function handleClose() {
     if (isPending) return
@@ -53,6 +57,7 @@ export function InviteLinkDialog({
     setCopied(false)
     setMode(initialMode)
     setSelectedClientId(client?.id ?? '')
+    setNotifyOnCapture(true)
     onOpenChange(false)
   }
 
@@ -65,7 +70,7 @@ export function InviteLinkDialog({
       return
     }
     startTransition(async () => {
-      const res = await createInviteTokenAction(targetClientId)
+      const res = await createInviteTokenAction(targetClientId, notifyOnCapture)
       if (res.error || !res.url) {
         setErrorMsg(res.error ?? 'Falha ao gerar convite.')
         return
@@ -172,6 +177,26 @@ export function InviteLinkDialog({
                 )}
               </div>
             )}
+
+            <div className="space-y-2 rounded-md border border-border bg-muted/20 px-3 py-2.5">
+              <label className="flex cursor-pointer items-start gap-2.5 text-sm">
+                <input
+                  type="checkbox"
+                  checked={notifyOnCapture}
+                  onChange={(e) => setNotifyOnCapture(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-teal-dark"
+                  data-testid="invite-notify-on-capture"
+                />
+                <span className="font-medium leading-snug">
+                  Avisar por e-mail quando o cliente terminar as 6 fotos
+                </span>
+              </label>
+              <p className="pl-6.5 text-xs leading-relaxed text-muted-foreground">
+                {notifyOnCapture
+                  ? 'Você receberá um e-mail quando a captura chegar. Útil quando o cliente vai fotografar em outro momento — você fica sabendo na hora e pode acompanhar o relatório sendo gerado.'
+                  : 'Sem aviso por e-mail. Boa opção quando a captura é feita em consultório presente, ou quando você prefere conferir no app sem notificações.'}
+              </p>
+            </div>
 
             {errorMsg && (
               <div className="rounded-md border border-destructive bg-destructive/10 px-3 py-2 text-sm text-destructive">

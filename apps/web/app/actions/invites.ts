@@ -27,6 +27,11 @@ export interface CreateInviteResult {
  *   - uuid → cliente JÁ CADASTRADO (skip cadastro, vai direto pra captura
  *     com re-consent 'reconfirm_device' + channel 'remote_link')
  *
+ * notifyOnCapture (v2.9.0): se true (default), terapeuta recebe email
+ * quando cliente completar as 6 fotos. Persistido na coluna
+ * notify_on_capture_complete do token (migration 0034) — lido pelo
+ * notify-therapist-capture-complete.ts pra decidir disparo.
+ *
  * Validações server-side:
  *   - sessão obrigatória (auth.uid())
  *   - se clientId preenchido: RLS valida ownership do cliente
@@ -34,6 +39,7 @@ export interface CreateInviteResult {
  */
 export async function createInviteTokenAction(
   clientId: string | null,
+  notifyOnCapture: boolean = true,
 ): Promise<CreateInviteResult> {
   const supabase = await createClient()
   const {
@@ -68,6 +74,7 @@ export async function createInviteTokenAction(
       token,
       therapist_id: user.id,
       client_id: clientId,
+      notify_on_capture_complete: notifyOnCapture,
     } as never)
     .select('expires_at')
     .single()

@@ -45,14 +45,28 @@ export async function notifyTherapistCaptureComplete(readingId: string): Promise
 
   // 1. Filtro de origem: leitura veio de invite?
   // types/database.ts ainda não tem client_invite_tokens — cast 'as never'.
+  // v2.9.0 (2026-05-27): adicionado notify_on_capture_complete pra respeitar
+  // a preferência do terapeuta (toggle no InviteLinkDialog, migration 0034).
   const { data: token } = await svc
     .from('client_invite_tokens' as never)
-    .select('therapist_id')
+    .select('therapist_id, notify_on_capture_complete')
     .eq('used_by_reading_id' as never, readingId)
-    .maybeSingle<{ therapist_id: string }>()
+    .maybeSingle<{ therapist_id: string; notify_on_capture_complete: boolean | null }>()
 
   if (!token?.therapist_id) {
     // Não é leitura via convite — terapeuta capturou ele mesmo, já sabe.
+    return
+  }
+
+  // v2.9.0: terapeuta desmarcou "avisar por email" ao gerar o link.
+  // Coluna tem default TRUE no banco, então tokens pré-migration vêm com
+  // true (comportamento prévio preservado). false só quando explicitamente
+  // desmarcado. NULL trata como true (defensive — migration aplicada mas
+  // INSERT antigo sem o campo).
+  if (token.notify_on_capture_complete === false) {
+    console.log(
+      `[notify] capture-complete suprimido por preferência do terapeuta (token de ${readingId})`,
+    )
     return
   }
 
