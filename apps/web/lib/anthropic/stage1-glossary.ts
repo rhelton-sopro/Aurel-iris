@@ -79,10 +79,16 @@ export type GlossaryEntry =
 export const GLOSSARY: readonly GlossaryEntry[] = [
   // === Sistemas e órgãos (19) ===
   {
+    // v2.9.0 (2026-05-27): sinal_carga reescrito pra subir piso clínico.
+    // Audit das últimas 10 leituras mostrou figado_vesicula em 90%/100% das
+    // leituras — viés sistemático. Causa: "pigmento âmbar, manchas escuras,
+    // lacunas" era amplo demais — pigmento âmbar DIFUSO em íris castanha é
+    // constitutional, não achado clínico. Novo piso exige sinal CONCENTRADO
+    // em zona 5-7h específica (não difuso periférico) + densidade evidente.
     group: 'sistema_orgao', campo: 'figado_vesicula',
     zona: 'Temporal inferior OE+OD (5-7h)',
-    sinal_carga: 'Pigmento âmbar, manchas escuras, lacunas hepatobiliares',
-    sinal_preservacao: 'Zona limpa, sem pigmento, fibras regulares',
+    sinal_carga: 'Pigmento âmbar DENSO e CONCENTRADO na zona 5-7h (não difuso periférico), lacuna hepatobiliar com contorno definido, OU mancha escura bem delimitada. Pigmento âmbar difuso disperso na íris inteira NÃO qualifica (é constitutional em íris castanha).',
+    sinal_preservacao: 'Zona 5-7h limpa, sem pigmento concentrado, sem lacuna definida; pigmento difuso global é base constitucional, não carga hepática.',
   },
   {
     group: 'sistema_orgao', campo: 'rim',
@@ -98,10 +104,17 @@ export const GLOSSARY: readonly GlossaryEntry[] = [
     bibliografia: 'Jackson p.36',
   },
   {
+    // v2.9.0 (2026-05-27): sinal_carga reescrito pra subir piso clínico.
+    // Audit das últimas 10 leituras mostrou eixo_pituitario_adrenal em 100%
+    // das leituras — viés sistemático. Causa: "entradas do collarete" e
+    // "surcos radiais" são MICRO-irregularidades de collarete adulto
+    // presentes em quase qualquer adulto > 30 — qualquer textura qualifica.
+    // Novo piso exige ≥2 estruturas pareadas (não apenas micro-textura) E
+    // localização específica na zona 12:30h (não collarete em geral).
     group: 'sistema_orgao', campo: 'eixo_pituitario_adrenal',
     zona: 'Collarete a 12:30h, ambos os iris',
-    sinal_carga: 'Lacunas, criptas, entradas do collarete, surcos radiais na zona específica',
-    sinal_preservacao: 'Collarete íntegro nessa região',
+    sinal_carga: 'Achado MÚLTIPLO/DOMINANTE na zona 12:30h: ≥2 estruturas pareadas (lacuna DEFINIDA + cripta, OU lacuna + surcos radiais em ≥2 direções, OU descontinuidade marcada de collarete + pigmento concentrado). Micro-irregularidade isolada de collarete (presente em qualquer adulto > 30) NÃO qualifica.',
+    sinal_preservacao: 'Collarete em 12:30h regular, sem lacuna definida pareada com outra estrutura — micro-textura própria de collarete adulto é normal, não preservação especial.',
     bibliografia: 'Manual ES Moraga p.62',
   },
   {
@@ -261,10 +274,17 @@ export const GLOSSARY: readonly GlossaryEntry[] = [
 
   // === Estruturas iridológicas (10) ===
   {
+    // v2.9.0 (2026-05-27): sinal_carga reescrito pra subir piso clínico.
+    // Audit das últimas 10 leituras mostrou anel_interno em 90% das
+    // leituras — viés sistemático. Causa: "irregular, ondulado, espessado"
+    // qualifica qualquer collarete adulto (collarete geometricamente
+    // perfeito é raríssimo após 30). Novo piso exige ondulação DOMINANTE
+    // que se destaca do padrão de fundo, OU fragmentação em ≥2 setores
+    // distintos. Ondulação suave bilateral simétrica é base, não carga.
     group: 'estrutura_iridologica', campo: 'anel_interno',
-    zona: 'Anel periférico à pupila (colarete)',
-    sinal_carga: 'Irregular, ondulado, espessado, fragmentado',
-    sinal_preservacao: 'Bem definido, regular',
+    zona: 'Anel periférico à pupila (collarete)',
+    sinal_carga: 'Ondulação DOMINANTE que se destaca do padrão de fundo (não micro-irregularidade), OU fragmentação real em ≥2 setores distintos, OU espessamento setorial não-simétrico. Ondulação suave bilateral simétrica é base constitucional, não achado clínico.',
+    sinal_preservacao: 'Collarete com contorno proporcional, sem fragmentação setorial — micro-ondulação fisiológica é base, não preservação especial.',
   },
   {
     group: 'estrutura_iridologica', campo: 'anel_nervoso',
@@ -369,9 +389,16 @@ export const GLOSSARY: readonly GlossaryEntry[] = [
 
   // === Periféricos (1) ===
   {
+    // v2.9.0 (2026-05-27): sinal_carga reescrito pra subir piso clínico.
+    // Audit das últimas 10 leituras mostrou vascularizacao_escleral em
+    // 90%-100% das leituras — viés sistemático. Causa: "vasos dilatados"
+    // qualifica qualquer adulto cansado/sol/álcool/tela — esclera com
+    // alguns vasos visíveis é normal. Novo piso exige extensão (≥3
+    // quadrantes da esclera) OU tortuosidade marcada OU injeção bilateral
+    // densa. Vasos finos isolados em 1-2 pontos é base, não carga.
     group: 'periferico', campo: 'vascularizacao_escleral',
     zona: 'Branco do olho (esclera, fora da íris)',
-    sinal_carga: 'Vasos dilatados, vascularização periférica acentuada (sinal hepático/circulatório)',
+    sinal_carga: 'Vascularização EXTENSA (≥3 quadrantes da esclera), OU vasos TORTUOSOS bem definidos, OU injeção bilateral densa visível nas 6 fotografias. Vasos finos isolados em 1-2 quadrantes são normais (cansaço/sol/álcool/tela), NÃO qualificam como achado hepático/circulatório.',
   },
 ]
 

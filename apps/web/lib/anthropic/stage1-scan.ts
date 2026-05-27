@@ -170,7 +170,29 @@ const STAGE1_PROMPT_FILENAME = 'stage1-scan.md'
 // Razão empírica N=2 (Cristiane regen=8 + Evanilce regen=1). Ver bloco
 // "Padrão pupilar como achado secundário (v2.7.0)" em stage1-scan.md +
 // comentário em stage1-glossary.ts entry padrao_pupilar.
-const STAGE1_METHOD_VERSION = 'sonnet_2x_0.4.0' as const
+//
+// v2.9.0 (2026-05-27): bump MINOR 0.4.0 → 0.5.0 — calibração anti-viés
+// pós-audit das últimas 10 leituras (audit-repetition-last10):
+//   1. stage1-glossary.ts: subido piso clínico nos 4 campos enviesados
+//      (figado_vesicula 90%, eixo_pituitario_adrenal 100%, anel_interno
+//      90%, vascularizacao_escleral 90%). sinal_carga agora exige
+//      evidência DOMINANTE ou CONCENTRADA (não micro-textura ou difuso
+//      constitutional). Micro-irregularidade de collarete adulto e
+//      pigmento difuso bilateral em íris castanha não qualificam mais.
+//   2. stage1-schema.ts: descricao_visual min 15→40 chars; sinal_visual_
+//      positivo min 15→30 chars. Força descrição com estrutura nomeada +
+//      posição + qualificador clínico (concentrado/dominante/tortuoso/etc).
+//   3. top_p: 0 adicionado no requestBody (junto com temperature=0). Memory
+//      project_stage1_variability_tech_debt: reforça determinismo
+//      eliminando variabilidade residual entre regens.
+// Validação planejada pós-deploy: founder regenera Nailli/Nara/Nayara +
+// 2 novas. Re-roda audit-repetition-last10. Critério de sucesso:
+//   - vascularizacao_escleral ≤ 6/10 leituras
+//   - eixo_pituitario_adrenal ≤ 7/10
+//   - anel_interno ≤ 7/10
+//   - figado_vesicula ≤ 8/10 (carga hepática é prevalente em BR adulto;
+//     piso menor de redução)
+const STAGE1_METHOD_VERSION = 'sonnet_2x_0.5.0' as const
 
 let _stage1PromptCache: string | null = null
 let _stage1ShaCache: string | null = null
@@ -333,6 +355,12 @@ async function callSonnetWithTool(
     // output bit-a-bit). Conservador: pode aumentar risco de loop em
     // edge cases, mas Stage 1 tem retry+fallback embutidos.
     temperature: 0.0,
+    // v2.9.0 (2026-05-27): top_p: 0 reforça determinismo mesmo com
+    // temperature=0. Memory project_stage1_variability_tech_debt: N=1
+    // Cristiane regen=8 v2.6.0 mostrou 5/5 achados ATIVOS diferentes
+    // mesmo com temperature=0. top_p=0 força nucleus sampling pra
+    // 1 token (mais provável), eliminando variabilidade residual.
+    top_p: 0,
     system: [
       {
         type: 'text' as const,

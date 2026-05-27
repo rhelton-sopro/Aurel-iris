@@ -115,7 +115,13 @@ const AchadoSchema = z.object({
   intensidade: z.number().int().min(1).max(5),
   natureza_da_carga: z.enum(NATUREZA_DA_CARGA),
   lateralidade: z.enum(LATERALIDADE),
-  descricao_visual: z.string().min(15),
+  // v2.9.0 (2026-05-27): min 15→40 chars. Audit das últimas 10 leituras
+  // mostrou Sonnet qualificando achados com descrição muito breve
+  // ("vasos dilatados visíveis bilateral" ~33 chars) que mascara viés
+  // de detecção. Piso de 40 chars força descrição com estrutura nomeada
+  // + posição/hora canônica + qualificador clínico (concentrado/difuso/
+  // dominante/etc), reduzindo detecção de achados banais por default.
+  descricao_visual: z.string().min(40),
   observacao_qualifying: z.string().nullable(),
   // v2.5.1 (Fix 3): meta-flag populado pelo validator quando as horas
   // mencionadas em descricao_visual não batem com a zona canônica do
@@ -134,7 +140,11 @@ const AchadoSchema = z.object({
 const SistemaPreservadoSchema = z.object({
   campo: z.enum(CAMPO_ENUM),
   polaridade_funcional: z.enum(POLARIDADE_FUNCIONAL),
-  sinal_visual_positivo: z.string().min(15),
+  // v2.9.0: min 15→30 chars. Sistema preservado precisa de ancoragem
+  // visual concreta — descrição vaga ("zona limpa") não permite Stage 2
+  // construir leitura clínica. 30 chars (vs 40 de achado) reconhece que
+  // ausência de carga é descrita com menos vocabulário que presença.
+  sinal_visual_positivo: z.string().min(30),
   implicacao_funcional: z.string().min(15),
   observacao_qualifying: z.string().nullable(),
 })
@@ -231,7 +241,9 @@ export const REGISTRAR_EXAME_TOOL: Anthropic.Tool = {
             intensidade: { type: 'integer', minimum: 1, maximum: 5 },
             natureza_da_carga: { type: 'string', enum: NATUREZA_DA_CARGA as unknown as string[] },
             lateralidade: { type: 'string', enum: LATERALIDADE as unknown as string[] },
-            descricao_visual: { type: 'string', minLength: 15 },
+            // v2.9.0: minLength 15→40 — força descrição com estrutura
+            // nomeada + posição/hora + qualificador clínico.
+            descricao_visual: { type: 'string', minLength: 40 },
             observacao_qualifying: { type: ['string', 'null'] },
             motivo_indeterminacao: {
               type: ['string', 'null'],
@@ -257,7 +269,8 @@ export const REGISTRAR_EXAME_TOOL: Anthropic.Tool = {
           properties: {
             campo: { type: 'string', enum: CAMPO_ENUM },
             polaridade_funcional: { type: 'string', enum: POLARIDADE_FUNCIONAL as unknown as string[] },
-            sinal_visual_positivo: { type: 'string', minLength: 15 },
+            // v2.9.0: minLength 15→30 pra sinal_visual_positivo.
+            sinal_visual_positivo: { type: 'string', minLength: 30 },
             implicacao_funcional: { type: 'string', minLength: 15 },
             observacao_qualifying: { type: ['string', 'null'] },
           },

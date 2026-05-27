@@ -218,10 +218,10 @@ composto fora do glossário se a íris realmente pede.
 
 | campo | zona iridológica | sinal de CARGA | sinal de PRESERVAÇÃO |
 |---|---|---|---|
-| `figado_vesicula` | Temporal inferior OE+OD (5-7h) | Pigmento âmbar, manchas escuras, lacunas hepatobiliares | Zona limpa, sem pigmento, fibras regulares |
+| `figado_vesicula` | Temporal inferior OE+OD (5-7h) | Pigmento âmbar DENSO e CONCENTRADO na zona 5-7h (não difuso periférico), lacuna hepatobiliar com contorno definido, OU mancha escura bem delimitada. Pigmento âmbar difuso disperso na íris inteira NÃO qualifica (é constitutional em íris castanha). | Zona 5-7h limpa, sem pigmento concentrado, sem lacuna definida; pigmento difuso global é base constitucional, não carga hepática. |
 | `rim` | Inferior (6h) ambos | Lacunas profundas, manchas escuras, opacidade | Zona íntegra, fibras compactas |
 | `adrenal` | Sobre o rim (5:30-6h) — mapeamento anatômico | Opacidade difusa, sombreamento no setor adrenal | Zona clara, sem sombreamento |
-| `eixo_pituitario_adrenal` | Collarete a 12:30h, ambos os iris | Lacunas, criptas, entradas do collarete, surcos radiais na zona específica | Collarete íntegro nessa região |
+| `eixo_pituitario_adrenal` | Collarete a 12:30h, ambos os iris | Achado MÚLTIPLO/DOMINANTE na zona 12:30h: ≥2 estruturas pareadas (lacuna DEFINIDA + cripta, OU lacuna + surcos radiais em ≥2 direções, OU descontinuidade marcada de collarete + pigmento concentrado). Micro-irregularidade isolada de collarete (presente em qualquer adulto > 30) NÃO qualifica. | Collarete em 12:30h regular, sem lacuna definida pareada com outra estrutura — micro-textura própria de collarete adulto é normal, não preservação especial. |
 | `coracao` | Superior esquerda OE (~2-3h) | Lacunas, manchas, anel circular | Zona limpa, pupila centrada |
 | `pulmoes` | Temporal superior (~3h OE, ~9h OD) | Lacunas, manchas pulmonares, opacidade | Zona clara, fibras regulares |
 | `estomago` | Pericentral, anel interno | Irregularidade/ondulação no anel interno | Anel interno regular, bem definido |
@@ -260,7 +260,7 @@ composto fora do glossário se a íris realmente pede.
 
 | campo | onde aparece | sinal de CARGA | sinal de PRESERVAÇÃO |
 |---|---|---|---|
-| `anel_interno` | Anel periférico à pupila (colarete) | Irregular, ondulado, espessado, fragmentado | Bem definido, regular |
+| `anel_interno` | Anel periférico à pupila (collarete) | Ondulação DOMINANTE que se destaca do padrão de fundo (não micro-irregularidade), OU fragmentação real em ≥2 setores distintos, OU espessamento setorial não-simétrico. Ondulação suave bilateral simétrica é base constitucional, não achado clínico. | Collarete com contorno proporcional, sem fragmentação setorial — micro-ondulação fisiológica é base, não preservação especial. |
 | `anel_nervoso` | Anel concêntrico no estroma médio | Visível (tensão nervosa sustentada) | Ausente |
 | `anel_sodico` | Periferia da íris | Anel branco/azulado visível | Ausente |
 | `coroa_simpatica` | Fronteira zona ciliar/zona periférica | Espessada, irregular | Coroa regular, fina, ordenada |
@@ -285,7 +285,7 @@ composto fora do glossário se a íris realmente pede.
 
 | campo | onde | sinal de CARGA |
 |---|---|---|
-| `vascularizacao_escleral` | Branco do olho (esclera, fora da íris) | Vasos dilatados, vascularização periférica acentuada (sinal hepático/circulatório) |
+| `vascularizacao_escleral` | Branco do olho (esclera, fora da íris) | Vascularização EXTENSA (≥3 quadrantes da esclera), OU vasos TORTUOSOS bem definidos, OU injeção bilateral densa visível nas 6 fotografias. Vasos finos isolados em 1-2 quadrantes são normais (cansaço/sol/álcool/tela), NÃO qualificam como achado hepático/circulatório. |
 
 <!-- GLOSSARY-END -->
 
