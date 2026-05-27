@@ -24,9 +24,10 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
-import { Pencil, Send, RefreshCw } from 'lucide-react'
+import { Pencil, Send, RefreshCw, Loader2 } from 'lucide-react'
 
 import { Button, buttonVariants } from '@/components/ui/button'
+import { Progress } from '@/components/ui/progress'
 import {
   Tooltip,
   TooltipContent,
@@ -38,7 +39,6 @@ import { cn } from '@/lib/utils'
 import { DeliverDialog } from './DeliverDialog'
 import { ExportPdfButton } from './ExportPdfButton'
 import { markReadingDelivered } from '@/app/actions/analise'
-import { AnalysisStream } from './AnalysisStream'
 
 // Mirrors AnaliseClient / parser.ts BOUNDARY_RE — best-effort UI counter
 // for the regenerate progress card; the server parser stays authoritative.
@@ -162,6 +162,12 @@ export function ReadingModeActions({
     if (regenPending) return // double-click guard (mirror analise-client.tsx:67)
     setRegenPending(true)
     setSectionsReceived(0)
+    // Toast imediato — feedback instantâneo no canto inferior direito (não
+    // depende de re-render do componente). Memory: usuário relatou clicar
+    // sem feedback visual perceptível na estratégia anterior (substituir
+    // botões por AnalysisStream); 3 sinais simultâneos agora: toast aqui +
+    // botão disabled+spinner + banner sticky no topo (renderizado abaixo).
+    toast.info('Regeneração iniciada — costuma levar 2-3 minutos.')
     try {
       const res = await fetch(`/api/readings/${readingId}/analyze`, { method: 'POST' })
       if (!res.ok) {
@@ -171,7 +177,7 @@ export function ReadingModeActions({
         return
       }
       // Consume the stream and count `## N.` boundaries for the progress
-      // card (mirrors AnaliseClient). The body continues server-side; the
+      // banner (mirrors AnaliseClient). The body continues server-side; the
       // route persists report_generated; router.refresh() re-reads it.
       const reader = res.body?.getReader()
       if (reader) {
@@ -194,9 +200,32 @@ export function ReadingModeActions({
     }
   }
 
-  if (regenPending) {
-    return <AnalysisStream sectionsReceived={sectionsReceived} />
-  }
+  // v2.9.0 (2026-05-27): banner sticky visível DURANTE regen — substitui
+  // a estratégia anterior (early-return que trocava botões por
+  // AnalysisStream). Razão: founder relatou clicar e não ver feedback —
+  // provável que o card de progresso renderizava no slot dos botões (topo
+  // direito da página) mas founder estava lendo §0 mais embaixo. Banner
+  // fixed top funciona qualquer scroll position.
+  const regenBanner = regenPending ? (
+    <div
+      className="fixed inset-x-0 top-0 z-[60] border-b border-teal-dark bg-teal-dark px-4 py-2.5 text-white shadow-md"
+      role="status"
+      aria-live="polite"
+    >
+      <div className="mx-auto flex max-w-7xl items-center gap-3">
+        <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden />
+        <span className="shrink-0 text-sm font-medium">
+          Regenerando análise — {sectionsReceived}/15 seções
+        </span>
+        <Progress
+          value={Math.round((Math.min(15, sectionsReceived) / 15) * 100)}
+          aria-label="Progresso da regeneração"
+          className="h-1 flex-1 bg-white/20 [&>*]:bg-white"
+        />
+        <span className="shrink-0 text-xs opacity-90">~2-3 min</span>
+      </div>
+    </div>
+  ) : null
 
   const regenButton = (
     <Button
@@ -215,12 +244,19 @@ export function ReadingModeActions({
 
   return (
     <>
+      {regenBanner}
+
       <ExportPdfButton readingId={readingId} />
 
       <Link
         href={`/leituras/${readingId}/editar`}
         className={cn(buttonVariants({ variant: 'outline' }), 'gap-2')}
         data-testid="reading-mode-edit"
+        aria-disabled={regenPending}
+        tabIndex={regenPending ? -1 : undefined}
+        onClick={(e) => {
+          if (regenPending) e.preventDefault()
+        }}
       >
         <Pencil className="h-4 w-4" aria-hidden />
         Editar análise
@@ -230,6 +266,7 @@ export function ReadingModeActions({
         <Button
           type="button"
           onClick={() => setDeliverOpen(true)}
+          disabled={regenPending}
           className="gap-2"
           data-testid="reading-mode-deliver"
         >
