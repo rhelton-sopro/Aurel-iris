@@ -407,31 +407,26 @@ export async function POST(
           })
           .eq('id', readingId)
 
-        // D-04: e-mail "leitura pronta" idempotente. Só dispara se essa é a 1ª
-        // vez que report_generated foi populado (notification_sent_at IS NULL).
-        // Regen NÃO re-envia. Falha best-effort: { sent: false } NÃO seta o flag,
-        // então próximo run tenta de novo (se houver). Erro NÃO joga exception
-        // — try/catch defensivo mantém o stream-handler vivo até finally.
-        if (reading.notification_sent_at == null) {
-          try {
-            const notifyResult = await notifyTherapistReportReady(readingId, user.id)
-            if (notifyResult.sent) {
-              await service
-                .from('readings')
-                .update({ notification_sent_at: new Date().toISOString() })
-                .eq('id', readingId)
-            } else {
-              console.warn(
-                `[analyze] notify-report-ready skipped: ${notifyResult.reason ?? 'unknown'}`,
-              )
-            }
-          } catch (err) {
-            console.error(
-              '[analyze] notify-report-ready threw (non-fatal):',
-              err instanceof Error ? err.message : err,
-            )
-          }
-        }
+        // v2.9.0 (2026-05-27): "leitura pronta" e-mail DESATIVADO globalmente.
+        // Founder verbatim: "Estou recebendo emails de leituras geradas...
+        // não precisa... só mesmo das fotos tiradas". Beta B2B com poucos
+        // terapeutas + founder gera leituras em sessão acompanhada do
+        // pipeline em tempo real → email redundante. notify-therapist-
+        // capture-complete (fotos chegando do cliente via convite) segue
+        // ATIVO em convite/[token]/upload e finalize.
+        //
+        // Implementação lib/notifications/notify-report-ready.ts preservada
+        // — se reativação for necessária (multi-terapeuta GA, preferência
+        // por perfil), reabrir este bloco e considerar adicionar coluna
+        // profiles.notify_report_ready boolean OU env var NOTIFY_REPORT_
+        // READY_ENABLED. notification_sent_at fica nullable; não bloqueia
+        // future reativação (idempotência continua trabalhando).
+        //
+        // Originalmente em D-04: e-mail idempotente disparado quando
+        // report_generated foi populado pela 1ª vez. Regen NÃO re-enviava.
+        void notifyTherapistReportReady // referência preservada — re-ativar
+        // chamada removida intencionalmente; comentário acima documenta
+        // como reativar.
 
         // ===== v2.3.0 Extração de frases-chave + persistência da memória =====
         // Roda DEPOIS do stream fechar e DEPOIS do report_generated estar
