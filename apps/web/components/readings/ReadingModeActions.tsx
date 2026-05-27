@@ -20,7 +20,7 @@
  *
  * Phase 7.4 | Plan 07.4-18 | UAT-3 UX flip
  */
-import { useState, useTransition } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
@@ -69,7 +69,12 @@ export function ReadingModeActions({
   const router = useRouter()
   const [deliverOpen, setDeliverOpen] = useState(false)
   const [deliverPending, setDeliverPending] = useState(false)
-  const [regenPending, startRegenTransition] = useTransition()
+  // v2.9.0 (2026-05-27): trocado useTransition por useState pra regen
+  // pending. useTransition + async/await na stream fetch (2-3min) deixa
+  // isPending=false durante o await em React 19 — UI nunca renderizava o
+  // AnalysisStream. Pattern de useState explícito é o mesmo já provado em
+  // analise-client.tsx:62 (handleTrigger usa setStreaming + try/finally).
+  const [regenPending, setRegenPending] = useState(false)
   const [sectionsReceived, setSectionsReceived] = useState(0)
 
   if (isDelivered) {
@@ -153,38 +158,40 @@ export function ReadingModeActions({
     }
   }
 
-  function onRegenerate() {
-    startRegenTransition(async () => {
-      setSectionsReceived(0)
-      try {
-        const res = await fetch(`/api/readings/${readingId}/analyze`, { method: 'POST' })
-        if (!res.ok) {
-          const detail = await res.text().catch(() => '')
-          const msg = detail.slice(0, 200) || `HTTP ${res.status}`
-          toast.error(`Falha ao regenerar análise: ${msg}`)
-          return
-        }
-        // Consume the stream and count `## N.` boundaries for the progress
-        // card (mirrors AnaliseClient). The body continues server-side; the
-        // route persists report_generated; router.refresh() re-reads it.
-        const reader = res.body?.getReader()
-        if (reader) {
-          const decoder = new TextDecoder()
-          let acc = ''
-          for (;;) {
-            const { value, done } = await reader.read()
-            if (done) break
-            acc += decoder.decode(value, { stream: true })
-            setSectionsReceived((acc.match(BOUNDARY_RE) ?? []).length)
-          }
-        }
-        toast.success('Análise regenerada. Atualizando…')
-        router.refresh()
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : 'desconhecido'
-        toast.error(`Falha ao regenerar: ${msg}`)
+  async function onRegenerate() {
+    if (regenPending) return // double-click guard (mirror analise-client.tsx:67)
+    setRegenPending(true)
+    setSectionsReceived(0)
+    try {
+      const res = await fetch(`/api/readings/${readingId}/analyze`, { method: 'POST' })
+      if (!res.ok) {
+        const detail = await res.text().catch(() => '')
+        const msg = detail.slice(0, 200) || `HTTP ${res.status}`
+        toast.error(`Falha ao regenerar análise: ${msg}`)
+        return
       }
-    })
+      // Consume the stream and count `## N.` boundaries for the progress
+      // card (mirrors AnaliseClient). The body continues server-side; the
+      // route persists report_generated; router.refresh() re-reads it.
+      const reader = res.body?.getReader()
+      if (reader) {
+        const decoder = new TextDecoder()
+        let acc = ''
+        for (;;) {
+          const { value, done } = await reader.read()
+          if (done) break
+          acc += decoder.decode(value, { stream: true })
+          setSectionsReceived((acc.match(BOUNDARY_RE) ?? []).length)
+        }
+      }
+      toast.success('Análise regenerada. Atualizando…')
+      router.refresh()
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'desconhecido'
+      toast.error(`Falha ao regenerar: ${msg}`)
+    } finally {
+      setRegenPending(false)
+    }
   }
 
   if (regenPending) {
