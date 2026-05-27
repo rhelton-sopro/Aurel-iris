@@ -157,6 +157,11 @@ export default async function LeituraDetailPage({
   if (isReadingMode) {
     return (
       <div className="space-y-6 -mx-7 px-4 py-8 sm:mx-0 sm:px-6">
+        {/* v2.9.0 (2026-05-27): auto-refresh + banner em reading mode
+            quando há regen rodando no servidor mas o cliente não tem
+            stream local (founder navegou pra fora e voltou). Antes só
+            existia no branch State A/B; reading mode ficava cego. */}
+        <AutoRefreshWhileProcessing active={isAnalysisInProgress} />
         <div className="flex items-center justify-between">
           <Link
             href="/leituras"
@@ -182,6 +187,7 @@ export default async function LeituraDetailPage({
               isSelfReading={isSelfReading}
               clientName={clientName}
               clientPhone={clientPhone}
+              isAnalysisInProgress={isAnalysisInProgress}
             />
           }
         />

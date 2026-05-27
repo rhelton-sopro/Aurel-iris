@@ -55,6 +55,15 @@ export interface ReadingModeActionsProps {
   clientName?: string
   /** Telefone do cliente (E.164 ou só dígitos) — opcional; sem ele, abre WhatsApp sem destinatário. */
   clientPhone?: string | null
+  /**
+   * v2.9.0: análise rodando no SERVIDOR neste momento (analysis_started_at
+   * dentro da janela de 5min sem analysis_completed_at). Server-side gate
+   * já bloqueia POST duplicado; este flag faz a UI refletir o estado quando
+   * o terapeuta navegou pra fora durante regen e voltou (state local
+   * regenPending=false mas regen continua rodando). Quando true: banner
+   * fica visível com progresso indeterminado, botões disabled.
+   */
+  isAnalysisInProgress?: boolean
 }
 
 export function ReadingModeActions({
@@ -65,6 +74,7 @@ export function ReadingModeActions({
   isSelfReading = false,
   clientName,
   clientPhone,
+  isAnalysisInProgress = false,
 }: ReadingModeActionsProps) {
   const router = useRouter()
   const [deliverOpen, setDeliverOpen] = useState(false)
@@ -100,7 +110,12 @@ export function ReadingModeActions({
     )
   }
 
-  const regenDisabled = regenerationCount >= 3 || regenPending
+  // v2.9.0: regenDisabled inclui isAnalysisInProgress (server-side regen
+  // detectada via RSC) pra evitar 409 quando founder volta numa página com
+  // regen rodando. busy = regenPending (stream local ativo) || server-side
+  // regen detectada. Banner+disable estados refletem ambos.
+  const regenServerOrLocal = regenPending || isAnalysisInProgress
+  const regenDisabled = regenerationCount >= 3 || regenServerOrLocal
   const regenTooltip =
     regenerationCount >= 3
       ? 'Limite de 3 regenerações atingido. Edite manualmente para ajustar o relatório.'
@@ -206,7 +221,15 @@ export function ReadingModeActions({
   // provável que o card de progresso renderizava no slot dos botões (topo
   // direito da página) mas founder estava lendo §0 mais embaixo. Banner
   // fixed top funciona qualquer scroll position.
-  const regenBanner = regenPending ? (
+  //
+  // Dois modos:
+  // 1. regenPending=true: founder clicou regen NESTA sessão de página,
+  //    stream local ativo → mostra contagem N/15 real.
+  // 2. !regenPending && isAnalysisInProgress=true: regen rodando server-
+  //    side mas founder navegou pra fora e voltou (sem stream local) →
+  //    mostra progresso INDETERMINADO ("aguarde 2-3 min"). RSC auto-
+  //    refresh polla a cada 4s e quando completar, recarrega o conteúdo.
+  const regenBanner = regenServerOrLocal ? (
     <div
       className="fixed inset-x-0 top-0 z-[60] border-b border-teal-dark bg-teal-dark px-4 py-2.5 text-white shadow-md"
       role="status"
@@ -214,15 +237,33 @@ export function ReadingModeActions({
     >
       <div className="mx-auto flex max-w-7xl items-center gap-3">
         <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden />
-        <span className="shrink-0 text-sm font-medium">
-          Regenerando análise — {sectionsReceived}/15 seções
-        </span>
-        <Progress
-          value={Math.round((Math.min(15, sectionsReceived) / 15) * 100)}
-          aria-label="Progresso da regeneração"
-          className="h-1 flex-1 bg-white/20 [&>*]:bg-white"
-        />
-        <span className="shrink-0 text-xs opacity-90">~2-3 min</span>
+        {regenPending ? (
+          <>
+            <span className="shrink-0 text-sm font-medium">
+              Regenerando análise — {sectionsReceived}/15 seções
+            </span>
+            <Progress
+              value={Math.round((Math.min(15, sectionsReceived) / 15) * 100)}
+              aria-label="Progresso da regeneração"
+              className="h-1 flex-1 bg-white/20 [&>*]:bg-white"
+            />
+            <span className="shrink-0 text-xs opacity-90">~2-3 min</span>
+          </>
+        ) : (
+          <>
+            <span className="shrink-0 text-sm font-medium">
+              Análise sendo regenerada no servidor
+            </span>
+            <Progress
+              value={null}
+              aria-label="Análise em andamento"
+              className="h-1 flex-1 animate-pulse bg-white/20 [&>*]:bg-white"
+            />
+            <span className="shrink-0 text-xs opacity-90">
+              Atualiza sozinho quando terminar
+            </span>
+          </>
+        )}
       </div>
     </div>
   ) : null
@@ -237,8 +278,8 @@ export function ReadingModeActions({
       data-testid="reading-mode-regenerate"
       aria-label={`Regenerar análise (${regenerationCount}/3)`}
     >
-      <RefreshCw className={cn('h-4 w-4', regenPending && 'animate-spin')} aria-hidden />
-      {regenPending ? 'Regenerando…' : `Regenerar análise (${regenerationCount}/3)`}
+      <RefreshCw className={cn('h-4 w-4', regenServerOrLocal && 'animate-spin')} aria-hidden />
+      {regenServerOrLocal ? 'Regenerando…' : `Regenerar análise (${regenerationCount}/3)`}
     </Button>
   )
 
@@ -252,10 +293,10 @@ export function ReadingModeActions({
         href={`/leituras/${readingId}/editar`}
         className={cn(buttonVariants({ variant: 'outline' }), 'gap-2')}
         data-testid="reading-mode-edit"
-        aria-disabled={regenPending}
-        tabIndex={regenPending ? -1 : undefined}
+        aria-disabled={regenServerOrLocal}
+        tabIndex={regenServerOrLocal ? -1 : undefined}
         onClick={(e) => {
-          if (regenPending) e.preventDefault()
+          if (regenServerOrLocal) e.preventDefault()
         }}
       >
         <Pencil className="h-4 w-4" aria-hidden />
@@ -266,7 +307,7 @@ export function ReadingModeActions({
         <Button
           type="button"
           onClick={() => setDeliverOpen(true)}
-          disabled={regenPending}
+          disabled={regenServerOrLocal}
           className="gap-2"
           data-testid="reading-mode-deliver"
         >
