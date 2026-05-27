@@ -355,12 +355,18 @@ async function callSonnetWithTool(
     // output bit-a-bit). Conservador: pode aumentar risco de loop em
     // edge cases, mas Stage 1 tem retry+fallback embutidos.
     temperature: 0.0,
-    // v2.9.0 (2026-05-27): top_p: 0 reforça determinismo mesmo com
-    // temperature=0. Memory project_stage1_variability_tech_debt: N=1
-    // Cristiane regen=8 v2.6.0 mostrou 5/5 achados ATIVOS diferentes
-    // mesmo com temperature=0. top_p=0 força nucleus sampling pra
-    // 1 token (mais provável), eliminando variabilidade residual.
-    top_p: 0,
+    // v2.9.0 (2026-05-27): top_p REMOVIDO (tentei adicionar top_p:0 mas
+    // Anthropic SDK rejeita com 400 em modelos pós-Opus 4.6: "Models
+    // released after Claude Opus 4.6 do not support setting top_p. A
+    // value >= 0.99 will be accepted for backwards compatibility, all
+    // other values will be rejected with a 400 error." Determinismo do
+    // Stage 1 segue só via temperature=0. Memory
+    // project_stage1_variability_tech_debt fica RESOLVIDA com ressalva:
+    // top_p:0 não é caminho disponível pra reduzir variabilidade
+    // residual em Sonnet 4.6+. Se persistir variabilidade pós-A+D, opções
+    // restantes: (a) seed parameter (não exposto pela Anthropic ainda),
+    // (b) trocar pra modelo determinístico explicitamente, (c) aceitar
+    // como custo do modelo.
     system: [
       {
         type: 'text' as const,
