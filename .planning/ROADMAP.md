@@ -476,19 +476,35 @@ See `.planning/phases/07.5-tendency-mapping-engine/07.5-CONTEXT.md` (a criar via
 
 ### Fase 8: Pagamento + LGPD
 **Mapeamento SPEC:** Fase 7 — Pagamento + LGPD (3–4 dias).
-**Provider DECIDIDO 2026-05-26:** Asaas (memory `project_fase_8_payment_provider_asaas`). Modelo híbrido (assinatura + add-ons), ticket alvo R$50-R$150/mês. Decisões granulares (estrutura híbrida exata, trial duration, LGPD scope, NF/CNPJ, webhook contract, dunning) serão locked via `/gsd-discuss-phase 8`.
-**Goal**: Terapeuta pode contratar plano em BRL/PIX/cartão via Asaas após trial e cumpre deveres LGPD (termo de consentimento por cliente, exclusão cascateada, logs de acesso, copy obrigatória, vocabulário auditado).
+**Provider DECIDIDO 2026-05-26:** Asaas (memory `project_fase_8_payment_provider_asaas`). **Modelo CONTEXT.md 2026-05-26**: pacote pré-pago de créditos (NÃO subscription) com 4 SKUs locked + trial 3 leituras OR 60d + reserva 7d + validade 12m + arrependimento 7d.
+**Goal**: Terapeuta consegue (a) usar trial gratuito (3 leituras OR 60d), (b) comprar pacotes pré-pagos via Asaas (PIX/cartão/boleto, NF automática), (c) consumir créditos via FIFO + reservas 7d, (d) solicitar arrependimento 7d com refund proporcional, e o sistema cumpre LGPD core (termo biométrico nativo + privacidade pública + link de deleção via email + audit log básico + copy obrigatória + vocabulário auditado).
 **Depends on**: Fase 7 (faz sentido cobrar quando o produto entrega análise) — ✅ shipped via Sonnet 2x v2.3.0+.
 **Requirements**: BILLING-01, BILLING-02, BILLING-03, LGPD-01, LGPD-02, LGPD-03, LGPD-04, LGPD-05, LGPD-06
-**Success Criteria** (o que deve ser verdade — refinar via discuss-phase):
-  1. Em `/assinatura`, terapeuta escolhe um plano (estrutura híbrida tbd em discuss-phase) e completa checkout Asaas via cartão **ou** PIX **ou** boleto; webhook atualiza `profiles.subscription_status` e `subscriptions` em ≤ 1 min.
-  2. Após `trial_ends_at` vencer sem assinatura, middleware bloqueia disparo de novas análises (`POST /api/readings/[id]/process` retorna 402/403 com link para `/assinatura`); leituras já geradas continuam visíveis.
-  3. Tentativa de criar leitura para cliente sem `consent_signed_at` é bloqueada na UI; fluxo "gerar termo" produz PDF assinável (DocuSeal/Clicksign — TBD em discuss-phase), e após assinatura `consent_document_url` e `consent_signed_at` são preenchidos.
-  4. Botão "deletar dados" na página do cliente, após confirmação explícita, apaga em cascata o cliente, suas leituras, suas imagens (Storage incluso) e o termo de consentimento; auditoria SQL confirma 0 órfãos.
-  5. Cada GET de imagem em Storage por terapeuta gera linha de log de auditoria; spot-check confirma `reading_image.id`, `therapist_id` e timestamp registrados.
-  6. Auditoria de vocabulário (script + revisão manual) confirma ausência de "diagnóstico", "tratamento", "cura" nas superfícies do produto (UI, prompts, relatórios), com exceção de páginas de política que as citam para negá-las; copy obrigatória "ferramenta de apoio à anamnese terapêutica integrativa, não substitui avaliação médica" aparece em landing, cabeçalho do relatório e rodapé legal.
-  7. Add-ons opcionais (PDF brandado, white-label, leituras extras — tbd em discuss-phase) cobrados via cobranças avulsas Asaas, com webhook idempotente atualizando `add_on_purchases`.
-**Plans**: TBD via `/gsd-discuss-phase 8`
+**Success Criteria** (o que deve ser verdade):
+  1. Terapeuta novo cadastra com CPF + telefone (dedup via UNIQUE), recebe trial automático (3 leituras OR 60d first-wins), gera leituras consumindo trial_status.trial_readings_used.
+  2. Trial esgotado → bloqueia geração + redireciona pra /assinatura/comprar; histórico permanece visível.
+  3. /assinatura/comprar mostra 4 SKUs (Avulsa R$99,70 / Pequeno R$298,50 / Médio R$745,50 / Grande R$1.191) em 2 grupos visuais; click → Asaas hosted checkout (PIX/cartão/boleto).
+  4. Webhook Asaas PAYMENT_CONFIRMED (A1 decision em 08-01) ativa customer_credits row + email confirmação; idempotent via event.id PK.
+  5. Reserva 7d nos 3 momentos D-10 (link captura, captura consultório, gerar relatório); cron daily libera expiradas.
+  6. Termo biométrico LGPD-01 nativo: PDF gerado via Gotenberg + storage immutable + footer com IP/data/hash SHA256; assinatura via client_consents append-only.
+  7. Arrependimento 7d via /assinatura: refund integral se 0 consumidas; proporcional se ≥1; após 7d caso-a-caso.
+  8. Founder/admin internal_use=true bypassa todos os gates + não consome trial/credits + excluído de métricas.
+  9. /privacidade + /termos públicos LGPD-compliant; mailto: pra solicitação de exclusão; copy obrigatória em 3 surfaces; audit-vocabulary CI gate continua green.
+**Plans:** 14 plans em 6 waves
+- [ ] 08-01-PLAN.md — Migrations 0035-0038 (schema 8 tabelas + RLS + helper RPCs + seed 4 SKUs) + types regen (Wave 1)
+- [ ] 08-02-PLAN.md — lib/asaas/ client REST + webhook-auth timing-safe + zod types + idempotency helper (Wave 1)
+- [ ] 08-03-PLAN.md — lib/billing/config + lib/auth/cpf (módulo-11) + lib/audit/log+events (Wave 1)
+- [ ] 08-04-PLAN.md — POST /api/asaas/webhook handler + apply-payment state machine (Wave 2)
+- [ ] 08-05-PLAN.md — lib/billing/credits + trial + reservations + race test integration (Wave 2)
+- [ ] 08-06-PLAN.md — createChargeAction + refundPackageAction + refund-policy + signup CPF expand (Wave 3)
+- [ ] 08-07-PLAN.md — Wire reserve em createReadingAction/invites/analyze route + lib/gates/billing-gate (Wave 3)
+- [ ] 08-08-PLAN.md — LGPD-01 termo biométrico: seed + hydrate + Gotenberg PDF + signTermAction + TermoBiometricoStep (Wave 4)
+- [ ] 08-09-PLAN.md — /privacidade + /termos + DisclaimerCopy LGPD-05 em 3 surfaces + audit-vocab re-run (Wave 4)
+- [ ] 08-10-PLAN.md — /assinatura/comprar UI com 2 grupos + 4 PackageCard + TrialCard (Wave 5)
+- [ ] 08-11-PLAN.md — /assinatura UI saldo + ReservationsList cancelar + RefundPackageButton modal (Wave 5)
+- [ ] 08-12-PLAN.md — Emails Resend: purchase confirmada + expiring 30/7/0 + refund processado (Wave 5)
+- [ ] 08-13-PLAN.md — Cron daily 4 jobs + vercel.json schedule + CRON_SECRET + middleware /assinatura (Wave 6)
+- [ ] 08-14-PLAN.md — Smoke E2E 6 cenários + full test suite + VERIFICATION.md + cutover decision (Wave 6)
 **UI hint**: yes
 
 ### Fase 9: Polish + dogfooding + beta
