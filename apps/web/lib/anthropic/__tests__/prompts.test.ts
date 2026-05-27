@@ -339,9 +339,14 @@ describe('lib/anthropic/prompts — Plan 21 UAT-4 fixes (§ removal + §1 breath
   it('§12 UAU structure: bridge line + numbered list + 3 movements', () => {
     const sys = loadSystemPrompt()
     expect(sys).toContain('lista numerada markdown')
-    // Client-facing bridge line (containment for self-reading clients)
-    expect(sys).toContain('As perguntas abaixo foram pensadas para serem exploradas em sessão com')
-    expect(sys).toContain('Se algo tocar forte, respeite')
+    // v2.9.0: bridge line virou descrição dos 3 elementos a comunicar
+    // (audit 2026-05-27 mostrou que o blockquote canônico vazava
+    // verbatim em 9/9 leituras — memory feedback_prompt_examples_leak_to_output)
+    expect(sys).toContain('Linha-ponte de enquadramento')
+    expect(sys).toContain('3 elementos OBRIGATÓRIOS')
+    expect(sys).toContain('respeitar o tempo do corpo')
+    // v2.9.0 lista as 3 frases banidas explícitas
+    expect(sys).toContain('formulações BANIDAS')
     // 3 mandatory UAU movements
     expect(sys).toContain('Movimento 1 — Ancora no achado específico')
     expect(sys).toContain('Movimento 2 — Convida à sensação corporal AGORA')

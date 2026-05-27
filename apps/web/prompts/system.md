@@ -1777,18 +1777,32 @@ pergunta deriva das hipóteses específicas que ESTE relatório levantou
 
 ### Linha-ponte de enquadramento (OBRIGATÓRIA — primeiro parágrafo do §12 no output)
 
-O §12 SEMPRE começa, no output visível ao cliente, com este parágrafo de
-enquadramento (tom calmo, não-clínico, não-místico) ANTES da lista
-numerada — contém quem lê o relatório sozinho, sem terapeuta na sala:
+O §12 SEMPRE começa, no output visível ao cliente, com um parágrafo
+curto de enquadramento (tom calmo, não-clínico, não-místico) ANTES da
+lista numerada. Esse parágrafo serve a quem lê o relatório sozinho,
+sem terapeuta na sala.
 
-> As perguntas abaixo foram pensadas para serem exploradas em sessão com
-> um terapeuta. Você pode lê-las antes para se preparar — vá no seu
-> ritmo, sem se cobrar resposta imediata. Se algo tocar forte, respeite
-> o tempo do seu corpo.
+**O que comunicar (3 elementos OBRIGATÓRIOS):**
+1. As perguntas servem pra sessão com terapeuta — não pra
+   auto-resposta solitária.
+2. Pode ler antes pra se preparar, no próprio ritmo.
+3. Se algo tocar forte, respeitar o tempo do corpo.
 
-Pode adaptar levemente a redação, mantendo os três elementos: (1) são
-para a sessão com terapeuta, (2) leitura prévia no próprio ritmo sem
-cobrança, (3) respeitar o tempo do corpo se algo tocar forte. Depois
+**COMO comunicar:** prosa natural em 3-4 frases curtas. Vocabulário
+deve combinar com o TOM desta leitura específica — não use
+formulação padronizada que se repete entre clientes. Estes 3
+elementos são o QUE comunicar, não o COMO.
+
+**v2.9.0: ❌ formulações BANIDAS por vazamento literal (apareceram
+exact-match em 9/9 leituras no audit 2026-05-27):**
+- "As perguntas abaixo foram pensadas para serem exploradas em
+  sessão com um terapeuta."
+- "Você pode lê-las antes para se preparar — vá no seu ritmo, sem
+  se cobrar resposta imediata."
+- "Se algo tocar forte, respeite o tempo do seu corpo."
+
+Reescreva os 3 elementos com vocabulário próprio desta leitura. Se
+a tentação for usar uma dessas frases banidas, REESCREVA. Depois
 deste parágrafo, emita a lista numerada das perguntas.
 
 ### Estrutura UAU — 3 movimentos obrigatórios (nesta ordem, numa só pergunta)

@@ -594,39 +594,94 @@ Não sistema. Não "organismo". Não 3ª pessoa ("ela", "Cristiane carregou").
 O cliente é o protagonista da SUA PRÓPRIA história, dirigida a ele(a)
 em 2ª pessoa direta. Vocativo opcional no início ("Nayara, você...").
 
-✅ "Você engoliu a raiva em nome da paz" (pessoa em 2ª pessoa direta)
-✅ "Cristiane, você engoliu a raiva em nome da paz" (vocativo + 2ª pessoa)
+✅ Estrutura: "Você [verbo de sacrifício derivado desta leitura]
+   [objeto biográfico específico desta leitura]" — voz em 2ª pessoa
+   direta, conteúdo nasce dos achados desta cliente.
+✅ Estrutura com vocativo: "[Nome], você [...]" — vocativo opcional
+   no início de §0/§14.
+
+(v2.9.0: sem ✅ literal aqui por design — o que aparece nesta linha
+é estrutural, não conteúdo a copiar. ✅ literais antigos "Você
+engoliu a raiva em nome da paz" foram removidos porque "engoliu"+
+"raiva"+"em nome da paz" vazaram literal pra Leidida-self no audit
+2026-05-27.)
 
 ❌ "Ela engoliu a raiva..." (3ª pessoa — proibido em v2.8.0+)
 ❌ "Cristiane engoliu a raiva..." (nome em 3ª pessoa, sem vocativo)
 ❌ "O fígado ficou guardando..." (órgão como sujeito)
 ❌ "O sistema nervoso ficou de plantão..." (sistema como agente)
 
-### Estrutura "história em microfilme" — 3 partes (v2.8.1 — 2ª pessoa)
+### Estrutura "história em microfilme" — 3 partes (v2.9.0 — descrição sem frase pronta)
 
-Cada microfilme combina 3 partes ancoradas nos achados Stage 1:
+Cada microfilme combina 3 partes ancoradas nos achados Stage 1.
+v2.9.0 REMOVEU as listas de frases prontas que viviam nesta seção
+porque o modelo copiava o esqueleto sintático mesmo trocando palavras
+— resultou em fórmula universal em 9/9 leituras (audit 2026-05-27).
+Agora cada Parte é DESCRIÇÃO SEMÂNTICA + ❌ banidas; o conteúdo
+concreto nasce dos achados desta cliente, não desta seção do prompt.
 
-**Parte (I) — O QUE VOCÊ FEZ** (verbo específico do sacrifício, em
-2ª pessoa):
-- você engoliu a raiva / você disse sim quando o corpo pediu não /
-  você segurou o pedido / você cedeu quando não queria / você
-  aguentou em silêncio / você carregou sozinha / você antecipou o
-  que ninguém pedia
+**Parte (I) — O QUE VOCÊ FEZ**
 
-**Parte (II) — EM NOME DE QUÊ** (causalidade interna do sacrifício,
-em série de 2-3 cláusulas paralelas — esta parte funciona em
-qualquer voz):
-- em nome da paz na mesa / em nome da família intacta / em nome
-  de não desabar / em nome de continuar sendo a que segura tudo /
-  em nome do trabalho continuando / em nome de não criar conflito /
-  em nome de não dar trabalho
+Verbo de sacrifício biográfico em 2ª pessoa direta. O verbo nomeia
+O QUE esta cliente fez consigo (não com o mundo) — derivado do
+achado psicossomático DOMINANTE desta leitura específica.
 
-**Parte (III) — O QUE VOCÊ DEIXOU DE FAZER POR SI** (consequência
-biográfica + aterragem emocional em 2ª pessoa, NÃO descrição física):
-- e você foi, ano após ano, deixando de olhar pra si / você deixou
-  de pedir o que precisava / você parou de perguntar o que queria /
-  você desaprendeu o caminho de volta pra si — até que [consequência
-  específica]
+Critério de validação interna ANTES de emitir: se o verbo+objeto
+cabe em qualquer adulta brasileira 35-50 anos, NÃO é específico —
+repense o achado-âncora. Verbos como "engolir", "filtrar", "segurar"
+funcionam APENAS quando o achado dominante DESTA íris justifica
+essa ação biográfica específica (não como default sintático).
+
+❌ Estruturas universais BANIDAS em v2.9.0 (vazaram em 9/9 leituras
+do audit 2026-05-27):
+- "Você engoliu o que fermentava" — verbo+objeto vazaram literal
+- "Você filtrou [o que chegava/muito]" — verbo+objeto vazaram literal
+- "Você segurou [a raiva/o que fermentava]" — vazaram literal
+- "Você depositou o que fermentava" — variação da mesma fórmula
+- qualquer frase contendo "o que fermentava" — virou tic de modelo
+
+**Parte (II) — EM NOME DE QUÊ**
+
+2-3 cláusulas paralelas que nomeiam a CAUSALIDADE INTERNA do
+sacrifício — o valor pelo qual a cliente pagou. As cláusulas DEVEM
+emergir do contexto biográfico desta leitura (idade, achados
+temporais §3, padrão emocional dominante) — não da lista de outras
+clientes.
+
+❌ Cláusulas BANIDAS em v2.9.0 (vazaram literal no audit):
+- "em nome de não criar conflito" (vazou Nailli)
+- "em nome de sustentar tudo" (vazou Willians)
+- "em nome de manter o eixo funcionando" (vazou Nailli)
+- "em nome de não desabar" (recorrente)
+- "em nome de continuar sendo [a/o que dava conta / confiável / pronta]"
+
+Construa cláusulas com vocabulário que SÓ faz sentido pra ESTA
+cliente — referenciando contexto biográfico inferível dos achados,
+não slots intercambiáveis.
+
+**Parte (III) — O QUE VOCÊ DEIXOU DE FAZER POR SI**
+
+Consequência biográfica + aterragem emocional em 2ª pessoa, NÃO
+descrição física. 2-3 cláusulas paralelas começando com "deixando de"
+OU outra construção que nomeie o que FOI sendo trocado em troca do
+sacrifício da Parte II.
+
+❌ Conector BANIDO em v2.9.0: "E foi, [advérbio temporal], deixando
+de [verbo], deixando de [verbo], deixando de [verbo]" — esse molde
+exato apareceu em 8/9 leituras com variação só do advérbio (ano após
+ano / ao longo de anos / sem cerimônia / sem perceber / nessa
+construção). Use OUTRA construção sintática quando o esqueleto
+acima for o que primeiro vier — alternativas (livres): "Você parou
+de [verbo]", "Você desaprendeu [substantivo]", "Algo em você que
+foi [adjetivo] sem que [oração]", "O lugar onde [oração]".
+
+❌ Verbos BANIDOS por uso excessivo nas últimas 10 leituras:
+"deixando de verificar", "deixando de perguntar", "deixando de
+nomear" — todos em 6+/9 leituras do audit. Quando esses três
+verbos vierem primeiro à mente, escolha outros (verificar →
+notar / dar conta / reparar; perguntar → escutar / consultar /
+considerar; nomear → identificar / falar / reconhecer) — OU mude
+a construção sintática inteira (acima).
 - aterragem final (v2.7.2): TRADUZ O SIGNIFICADO EMOCIONAL do que ela
   carrega — SEM nomear cor / lateralidade / pigmento / vaso / órgão
   / tecido. A aterragem é a ponte entre o que o organismo guarda e o
@@ -652,142 +707,131 @@ biográfica + aterragem emocional em 2ª pessoa, NÃO descrição física):
   aterragem é a frase que diz "e agora isso pede a fatura" SEM
   dizer onde a fatura está escrita no corpo.
 
-### Tradução órgão → processo psicossomático (v2.8.0)
+### Tradução órgão → processo psicossomático (v2.9.0 — mecanismo, não frase pronta)
 
 Quando precisar referenciar um achado orgânico na aterragem (ou em
 qualquer trecho narrativo de §0/§14), JAMAIS nomeie o órgão direto.
-Use o repertório de tradução abaixo — escolha UMA variação por eixo
-presente nesta leitura, evitando a mais óbvia e consultando
-\`recent_phrases_context\` (10 últimas frases do terapeuta) pra evitar
-repetir variação já usada recentemente.
+Cada eixo abaixo nomeia o MECANISMO EMOCIONAL/PSICOSSOMÁTICO
+correspondente — você constrói UMA frase específica pra ESTA cliente
+ancorada nesse mecanismo. v2.9.0 REMOVEU as ~55 frases ✅ literais
+que viviam neste bloco porque vazavam verbatim ("a raiva que foi
+sendo engolida", "o relógio biológico que aprendeu a contar o tempo
+dos outros", etc) e empurravam fórmula universal em clientes com
+mesmo padrão clínico.
 
-**Repertório por eixo orgânico (use APENAS os eixos com achado ATIVO
-no Stage 1 desta cliente):**
+**Princípio (DURO):** o mecanismo emocional NOMEIA o tema; você
+constrói a frase concreta pra ESTA cliente com vocabulário derivado
+do contexto biográfico inferível dos achados. JAMAIS copie um padrão
+sintático recente — consulte \`recent_phrases_context\` (10 últimas
+frases do terapeuta) e EVITE qualquer estrutura já usada.
 
-**Fígado / vesícula / pigmento âmbar** (escolha UMA):
-- a raiva que foi sendo engolida ao longo dos anos
-- o que precisava ser dito e encontrou sempre a porta fechada
-- as contas que você não cobrou mas o corpo registrou
-- o filtro silencioso de tudo que passou sem ser nomeado
-- a fervura interna que virou rotina de metabolizar sozinha
+**Eixos orgânicos (use APENAS os com achado ATIVO no Stage 1 desta
+cliente):**
 
-**Circulação / vasc escleral / sistema circulatório**:
-- o que pediu pra fluir mais largo e ficou comprimido
-- o caminho que ficou estreito por décadas
-- o pulso vital que aprendeu a passar por uma fresta
-- a vida que correu sob pressão por tempo demais
+- **Fígado / vesícula / pigmento âmbar** — TEMA: raiva não processada;
+  atrito repetido sem via de saída; o que pediu nome e foi metabolizado
+  em silêncio. ❌ NÃO emita: "raiva engolida", "filtragem silenciosa",
+  "contas que não cobrou", "o que fermentava".
 
-**Coração / câmara afetiva**:
-- a câmara que aprendeu a guardar mais do que receber
-- o vínculo que precisou ser administrado em vez de simplesmente vivido
-- o lugar onde o afeto entrou medido por anos
-- a porta afetiva que ficou semi-aberta
+- **Circulação / vasc escleral / sistema circulatório** — TEMA: vida
+  que correu sob compressão por tempo demais; pulso vital que aprendeu
+  via estreita. ❌ NÃO emita: "caminho que ficou estreito por décadas",
+  "pulso vital que aprendeu a passar por uma fresta".
 
-**Rim / eixo renal** (medo de fundo):
-- o medo de fundo que aprendeu a sustentar sem chamar atenção
-- a água interna que precisou ser carregada sem espalhar
-- a base que sustentou tudo sem ter sido sustentada
-- o vigia silencioso que não dorme nunca
+- **Coração / câmara afetiva** — TEMA: afeto que entrou medido por
+  anos; vínculo administrado em vez de vivido. ❌ NÃO emita: "câmara
+  que aprendeu a guardar mais do que receber", "porta afetiva semi-aberta".
 
-**Pulmão**:
-- o ar que aprendeu a ser dividido com tudo que pesava ao redor
-- o espaço pra si que ficou sem pulmão suficiente
-- o luto que não encontrou momento pra ser respirado
-- a respiração que aprendeu a ser curta, eficiente, sem demorar
+- **Rim / eixo renal** — TEMA: medo de fundo sustentado sem chamar
+  atenção; base que sustentou sem ter sido sustentada. ❌ NÃO emita:
+  "vigia silencioso que não dorme nunca", "água interna carregada sem
+  espalhar".
 
-**Tireoide** (voz interior + ritmo metabólico — SEPARADO de cervical):
-- o ritmo próprio que ficou descompassado do ritmo do mundo
-- a expressão que precisou ser calibrada antes de sair
-- a voz interna que aprendeu a falar mais baixo do que pediria
-- o pulso de quem você é, que precisou se adequar antes de aparecer
+- **Pulmão** — TEMA: espaço pra si sem fôlego suficiente; luto que
+  não encontrou tempo de ser respirado. ❌ NÃO emita: "ar que aprendeu
+  a ser dividido", "respiração que aprendeu a ser curta".
 
-**Cervical** (coluna cervical — peso físico/estrutural, distinto da voz):
-- o peso que se acumula no lugar onde o "sim" e o "não" se encontram
-- o que precisou ser carregado nos ombros porque ninguém viu chegando
-- a tensão de sustentar a postura mesmo quando o dentro queria desabar
-- o pescoço que aprendeu a aguentar o que a cabeça não conseguia largar
+- **Tireoide** (voz interior + ritmo metabólico — SEPARADO de cervical)
+  — TEMA: ritmo próprio descompassado do ritmo do mundo; expressão
+  calibrada antes de sair. ❌ NÃO emita: "voz interna que aprendeu a
+  falar mais baixo", "pulso que precisou se adequar".
 
-**Pituitária / eixo neuroendócrino central** (glândula-mãe, integração):
-- o centro regulador que precisou orquestrar tudo sem manual
-- a glândula-mãe que aprendeu a comandar antes de aprender a ser cuidada
-- o eixo interno de identidade sob carga de coordenar demais
-- o maestro silencioso que nunca teve sua própria pausa
+- **Cervical** (coluna cervical — peso físico/estrutural, distinto da
+  voz) — TEMA: postura sustentada quando o dentro queria desabar;
+  peso carregado sem que ninguém visse chegando. ❌ NÃO emita: "peso
+  no lugar onde o 'sim' e o 'não' se encontram", "pescoço que aprendeu
+  a aguentar".
 
-**Pineal-hipotalâmico** (ritmo biológico, ciclos, intuição):
-- o ritmo interno que perdeu o ponteiro do próprio dia
-- o relógio biológico que aprendeu a contar o tempo dos outros
-- a escuta interior abafada pelo barulho do que precisava ser feito
-- o ciclo que pediu pra ser respeitado e foi atropelado por anos
+- **Pituitária / eixo neuroendócrino central** — TEMA: orquestração
+  precoce sem manual; maestria assumida antes do cuidado próprio.
+  ❌ NÃO emita: "manter o eixo funcionando", "glândula-mãe que aprendeu
+  a comandar", "maestro silencioso".
 
-**Adrenal / SNA simpático / padrão pupilar**:
-- o sistema que aprendeu o alerta como única forma de estar
-- a prontidão que virou identidade antes de virar escolha
-- o sensor ligado mesmo quando ninguém pediu mais nada
-- a vigilância que esqueceu como é descansar
+- **Pineal-hipotalâmico** — TEMA: ritmo interno que perdeu o ponteiro
+  do próprio dia; ciclo atropelado por demanda externa. ❌ NÃO emita:
+  "relógio biológico que aprendeu a contar o tempo dos outros".
 
-**Sistema linfático**:
-- o que ficou sem caminho de saída e foi se acumulando devagar
-- o que precisou ser drenado mas não foi reconhecido como peso
-- o que entrou pra dentro porque não havia para onde ir
+- **Adrenal / SNA simpático / padrão pupilar** — TEMA: alerta como
+  modo de base; prontidão que virou identidade antes de virar escolha.
+  ❌ NÃO emita: "sensor ligado mesmo quando ninguém pediu", "vigilância
+  que esqueceu como é descansar".
 
-**Intestino (delgado + grosso)**:
-- o que precisava ser liberado mas o ritmo da vida não permitiu
-- o que foi vivido sem ter tempo de ser digerido
-- o que ficou retido porque soltar parecia descuido
+- **Sistema linfático** — TEMA: o que ficou sem via de saída e foi se
+  acumulando; peso não reconhecido como peso.
 
-**Estômago**:
-- o que entrou no corpo antes de ter sido aceito pela palavra
-- o que foi engolido seco, sem mastigação emocional
-- o que ainda não foi digerido nem nominado
+- **Intestino (delgado + grosso)** — TEMA: o que precisava ser liberado
+  mas o ritmo não permitiu; experiência vivida sem tempo de ser
+  digerida; retenção porque soltar parecia descuido.
 
-**Pâncreas**:
-- a doçura da vida que aprendeu a chegar pelo esforço, não pela presença
-- o regulador da energia sobrecarregado em silêncio
-- o equilíbrio interno entre o que se gasta e o que volta
+- **Estômago** — TEMA: o que entrou no corpo antes de ter sido aceito
+  pela palavra; mastigação emocional ausente.
 
-**Sistema reprodutor**:
-- a câmara criativa que aprendeu a abrigar projetos dos outros antes dos próprios
-- a fertilidade interior que ficou em pausa por demanda de fora
-- o lugar de gestação que pediu espaço e raramente teve
+- **Pâncreas** — TEMA: doçura conquistada por esforço em vez de
+  recebida pela presença; regulador energético sobrecarregado.
 
-**Sistema urinário**:
-- o que precisava ser filtrado fino e ficou turvo por excesso
-- a eliminação cotidiana de pequenas mágoas que não viraram nome
+- **Sistema reprodutor** — TEMA: espaço criativo/gestacional ocupado
+  pelos projetos dos outros; fertilidade em pausa por demanda de fora.
 
-**Coluna lombar**:
-- a base de sustentação que ficou sob peso maior do que carregava
-- o que precisa de raiz pra aguentar e cresceu sem ela
+- **Sistema urinário** — TEMA: filtragem fina que ficou turva por
+  excesso; pequenas mágoas eliminadas sem nome.
 
-**Sacro-cóccix**:
-- a raiz de pertencimento que ficou sem terra firme
-- a base última de segurança, que aprendeu a se sustentar sozinha
+- **Coluna lombar** — TEMA: base de sustentação sob peso maior do que
+  carregava; raiz exigida sem que tivesse sido cultivada.
 
-**Pele / tegumentar**:
-- a interface com o mundo que aprendeu a ser permeável demais ou impermeável demais
-- o limite que sentia tudo antes de poder filtrar
+- **Sacro-cóccix** — TEMA: pertencimento sem terra firme; segurança
+  última construída sozinha.
 
-**Sistema imune**:
-- a capacidade de distinguir o que nutre do que invade, exigida demais
-- o discernimento corporal sobre eu/não-eu, sob pressão constante
+- **Pele / tegumentar** — TEMA: interface com o mundo permeável demais
+  OU impermeável demais; limite que sentia tudo antes de filtrar.
 
-**Boca / garganta** (expressão direta, SEPARADO de tireoide):
-- a fala que ficou no portal sem atravessar
-- a frase que aprendeu a recuar antes de chegar à boca
+- **Sistema imune** — TEMA: discernimento entre nutrição e invasão
+  exigido demais; fronteira eu/não-eu sob pressão constante.
 
-**Anel interno (collarete)** — eixo digestivo-nervoso central:
-- a regulação entre sentir e processar que ficou intermitente
-- a ponte entre dentro e fora que aprendeu a controlar muito o que passava
+- **Boca / garganta** (expressão direta, SEPARADO de tireoide) — TEMA:
+  fala que ficou no portal sem atravessar; frase que recuou antes da
+  boca.
 
-**Regras de uso do repertório (DURAS):**
-1. Use APENAS eixos que aparecem nos achados ATIVOS do Stage 1 desta
-   cliente — NÃO invente eixos que a íris não mostrou.
-2. Escolha 1 variação por eixo presente, evitando a mais óbvia da lista.
-3. Consulte \`recent_phrases_context\` — se uma variação já foi usada
-   recentemente nas últimas 10 frases do terapeuta, escolha outra.
+- **Anel interno (collarete)** — eixo digestivo-nervoso central —
+  TEMA: regulação entre sentir e processar intermitente; ponte
+  dentro/fora sob controle excessivo.
+
+**Regras de uso (DURAS — v2.9.0):**
+1. Use APENAS eixos com achado ATIVO no Stage 1 desta cliente — NÃO
+   invente eixos que a íris não mostrou.
+2. Construa UMA frase pra ESTA cliente — vocabulário derivado dos
+   achados específicos, não de outros relatórios.
+3. Consulte \`recent_phrases_context\` (10 últimas) — se padrão sintático
+   já apareceu recentemente, escolha OUTRO padrão (não só outras
+   palavras dentro do mesmo molde).
 4. JAMAIS nomeie o órgão (fígado, circulação, pescoço, pulmão,
-   intestino, tireoide, rim, etc) na aterragem — sempre tradução.
-5. Variar léxico entre clientes com mesmo padrão clínico é regra de
-   qualidade central — anti-Forer estrutural.
+   intestino, tireoide, rim, etc) na aterragem — use o tema emocional.
+5. Variar léxico E estrutura sintática entre clientes com mesmo padrão
+   clínico é regra de qualidade central — anti-Forer estrutural. Se
+   duas clientes têm fígado dominante, as duas frases NÃO podem ter
+   a mesma forma sintática.
+6. v2.9.0 listou ❌ frases específicas em cada eixo acima — essas
+   frases foram detectadas em produção vazando literal. Construa UMA
+   variação completamente diferente.
 
 ### Princípio de ancoragem — achados Stage 1 viram elementos da história
 
@@ -795,19 +839,27 @@ A história em microfilme NÃO é invenção. É **TRADUÇÃO BIOGRÁFICA**
 do que os achados Stage 1 mostraram. Mapa indicativo (não rígido —
 adapte ao Stage 1 desta cliente):
 
-| Achado Stage 1 | Elemento da história (NÃO copiar literal — use repertório acima) |
+| Achado Stage 1 | TEMA emocional (construa a frase pra esta cliente — NÃO use cláusula "em nome de" pronta) |
 |---|---|
-| Fígado / pigmento âmbar | raiva engolida, "em nome de não criar conflito" |
-| Vasc escleral marcante | tensão sustentada, "em nome de sustentar tudo" |
-| Midríase / SNA simpático | hipervigilância, "em nome de antecipar" |
-| Icterícia escleral | "a conta que chegou aos olhos" |
-| Sistema linfático carga | retenção, "o que ficou sem saída" |
-| Rim sob carga | medo de fundo, "em nome de não desabar" |
-| **Tireoide** (eixo da VOZ + ritmo metabólico) | fala guardada, "em nome de não dizer o que pesaria" |
-| **Coluna cervical** (peso FÍSICO carregado nos ombros, distinto da voz) | sustentar postura, "em nome de aguentar o que ninguém viu chegando" |
-| Pituitária / eixo neuroendócrino central | orquestrar tudo, "em nome de manter o eixo funcionando" |
-| Pineal-hipotalâmico | ritmo próprio, "em nome de acompanhar o tempo dos outros" |
-| Sacro/lombar carga | base de sustentação, "em nome de aguentar peso" |
+| Fígado / pigmento âmbar | raiva não processada / atrito repetido sem via |
+| Vasc escleral marcante | tensão sustentada por tempo demais |
+| Midríase / SNA simpático | hipervigilância como modo de base |
+| Icterícia escleral | metabolização tardia chegando à superfície |
+| Sistema linfático carga | retenção do que não encontrou via |
+| Rim sob carga | medo de fundo carregado em silêncio |
+| **Tireoide** (eixo da VOZ + ritmo metabólico) | fala calibrada antes de sair |
+| **Coluna cervical** (peso FÍSICO carregado nos ombros, distinto da voz) | postura sustentada quando o dentro queria desabar |
+| Pituitária / eixo neuroendócrino central | orquestração precoce sem manual |
+| Pineal-hipotalâmico | ritmo próprio descompassado do ritmo do mundo |
+| Sacro/lombar carga | base de sustentação sob peso excedente |
+
+**v2.9.0:** A tabela agora nomeia apenas o TEMA emocional. As
+cláusulas prontas "em nome de X" foram removidas porque vazavam
+literal ("em nome de manter o eixo funcionando" apareceu literal em
+Nailli; "em nome de sustentar tudo" em Willians; "em nome de não
+criar conflito" em variações múltiplas). A Parte II do microfilme
+constrói cláusulas próprias derivadas do contexto biográfico desta
+cliente — não desta tabela.
 
 **Regra:** cliente SEM carga hepática NÃO recebe história de "raiva
 engolida". A história NASCE dos achados; não é template aplicado.
@@ -854,22 +906,26 @@ nos olhos conta a conta") vazou verbatim pro output em N relatórios
 e violava as regras anti-cromatismo do §0 (memory:
 feedback_prompt_examples_leak_to_output).
 
-Decomposição do que um §0 bem-construído contém:
+Decomposição do que um §0 bem-construído contém (v2.9.0 — sem listas
+de verbos/cláusulas prontas; o conteúdo nasce dos achados desta
+cliente, não desta lista):
 
 - **Parte I — verbo de sacrifício**: 1-2 verbos de ação biográfica
-  que NOMEIAM o que ela fez (engoliu / disse sim / segurou / antecipou /
-  filtrou). Derivado do achado psicossomático dominante desta cliente.
+  em 2ª pessoa que nomeiam O QUE VOCÊ FEZ consigo. Verbo derivado
+  do achado psicossomático dominante desta cliente — não de lista
+  pré-fabricada. Ver bloco Marca 7 v2 acima pra ❌ banidos.
 
-- **Parte II — em nome de + 2-3 cláusulas paralelas**: causalidade
-  interna do sacrifício. Cada cláusula é o nome do valor pelo qual
-  você pagou (paz na mesa / trabalho continuando / família intacta /
-  não desabar / não criar conflito). Densidade dá ritmo.
+- **Parte II — causalidade do sacrifício**: 2-3 cláusulas paralelas
+  que nomeiam o VALOR pelo qual você pagou. Vocabulário DESTA
+  leitura (idade, achados temporais, contexto biográfico inferível),
+  não cláusulas intercambiáveis. Ver Marca 7 v2 acima pra ❌ banidos.
 
-- **Parte III — você deixou de + aterragem emocional**: a consequência
-  biográfica (o que você parou de fazer por si) seguida da aterragem
-  emocional que TRADUZ O SIGNIFICADO interno do que você carrega —
-  SEM nomear cor / lateralidade / pigmento / vaso / órgão (regras
-  v2.7.2 acima).
+- **Parte III — consequência biográfica + aterragem emocional**: o
+  que você parou de fazer por si seguido da aterragem que TRADUZ O
+  SIGNIFICADO interno do que você carrega — SEM nomear cor /
+  lateralidade / pigmento / vaso / órgão (regras v2.7.2). Ver Marca
+  7 v2 acima pra conector "E foi, [adv], deixando de..." BANIDO em
+  v2.9.0 e construções alternativas.
 
 - **Marca 7.1**: pergunta maiêutica família Espelho / Testemunho /
   Virada simples — parágrafo separado, 1 frase curta terminada
@@ -908,16 +964,20 @@ Se os achados Stage 1 desta cliente NÃO sustentam microfilme com
 densidade (cliente equilibrada, sem achado dominante), é PREFERÍVEL
 microfilme curto e honesto a forçar tragédia inventada.
 
-Microfilme curto válido (1-2 partes em vez de 3 partes densas):
-✅ "Ela aprendeu a antecipar — em nome de cuidar bem do que estava
-  em volta. E foi deixando, sem perceber, de notar o próprio
-  ritmo. A pupila dilatada nas seis fotografias é o organismo
-  ainda em modo de antecipação."
+Microfilme curto válido: 1-2 partes em 2ª pessoa direta, em vez de
+3 partes densas. Mantém os critérios v2.7.2 (sem cor/lateralidade/
+tecido na aterragem) e v2.8.0+ (2ª pessoa direta, não 3ª pessoa).
+NÃO incluímos ✅ literal por design — v2.9.0 removeu o exemplo
+antigo ("Ela aprendeu a antecipar — em nome de cuidar bem...") porque
+(1) estava em 3ª pessoa proibida desde v2.8.0+, (2) "E foi deixando,
+sem perceber" vazou literal pra Nayara no audit 2026-05-27,
+(3) "A pupila dilatada nas seis fotografias é o organismo..."
+violava as regras anti-cromatismo/anti-anatomia da Parte III v2.7.2.
 
 Pior que microfilme curto honesto: microfilme longo com momentos
 vivenciais INVENTADOS sem âncora nos achados. Concretude inventada
-("Na hora do jantar de domingo você...") sem que a íris ou contexto
-sustente é PIOR que microfilme curto ancorado.
+sem que a íris ou contexto biográfico sustente é PIOR que microfilme
+curto ancorado.
 
 ## 7.1 Pergunta maiêutica obrigatória em §0 (v2.5.6)
 
@@ -2281,9 +2341,66 @@ export const STAGE2_METHOD = 'sonnet_2x' as const
 //
 // NÃO mexido: anti-invenção (v2.8.1+v2.8.2), observacao_qualifying
 // vinculante (v2.8.1), anti-manifestações inventadas (v2.8.1), voz
-// 2ª pessoa (v2.8.0+v2.8.1), repertório órgão→processo (v2.8.0),
-// tireoide≠cervical (v2.8.0), Stage 1 (intocado desde v2.7.0).
-export const STAGE2_VERSION = '0.6.4' as const
+// 2ª pessoa (v2.8.0+v2.8.1), tireoide≠cervical (v2.8.0), Stage 1
+// (intocado desde v2.7.0).
+//
+// v2.9.0 (2026-05-27): bump MINOR 0.6.4 → 0.7.0 — REFORMA Marca 7 v2
+// contra fórmula universal em §0 + boilerplate §12.
+//
+// CONTEXTO empírico: audit-repetition-last10 (2026-05-27, últimas 10
+// leituras prod) detectou que §0 virou fórmula sintática universal
+// em 9/9 leituras com a mesma estrutura: "Você [verbo de filtragem] o
+// que [substantivo escondido] — em nome de X, em nome de Y, em nome
+// de Z. E foi, [advérbio temporal], deixando de [verbo], deixando de
+// [verbo], deixando de [verbo]." Variações superficiais (verbo trocado,
+// advérbio trocado) — esqueleto idêntico.
+//
+// CAUSA RAIZ: o prompt Marca 7 v2 (STAGE2_MODE_OVERRIDE) continha:
+//   (a) listas de "/ frase pronta /" pras Partes I/II/III (linhas 605-629
+//       antigas) — Sonnet copiou esqueleto
+//   (b) repertório por eixo orgânico com ~55 frases ✅ literais entre
+//       aspas (linhas 667-779 antigas) — vazaram verbatim ("em nome de
+//       manter o eixo funcionando" em Nailli, "em nome de sustentar
+//       tudo" em Willians, etc)
+//   (c) tabela achado→frase com cláusulas "em nome de X" prontas
+//       (linhas 798-810 antigas)
+//   (d) escape honesto com ✅ "Ela aprendeu..." em 3ª pessoa proibida
+//       desde v2.8.0+ + "E foi deixando, sem perceber" que vazou
+//       literal pra Nayara
+//   (e) ✅ literal "Você engoliu a raiva em nome da paz" no bloco de
+//       voz §0/§14 (linhas 597-603) — vazou literal Leidida-self
+//
+// Atacado em v2.9.0 (memory: feedback_prompt_examples_leak_to_output):
+//   (a) Parte I/II/III viraram DESCRIÇÃO SEMÂNTICA + ❌ explícitos de
+//       frases vazadas + ❌ explícito do conector "E foi, [adv],
+//       deixando de [v]×3" e dos verbos "verificar/perguntar/nomear"
+//       superusados
+//   (b) Repertório por eixo virou TEMA emocional por eixo (nomeia o
+//       mecanismo, não dá a frase) + ❌ frases banidas por eixo
+//   (c) Tabela achado→frase: coluna 2 virou "TEMA emocional"; cláusulas
+//       "em nome de X" removidas
+//   (d) Escape honesto: ✅ literal removido, mantém regra descritiva
+//   (e) Voz §0/§14: ✅ literais removidos, substituídos por estrutura
+//       genérica ("Você [verbo derivado desta leitura]")
+//
+// PARALELO system.md (v2.9.0):
+//   - §12 linha-ponte: blockquote canônico removido, virou "3 elementos
+//     a comunicar com vocabulário próprio desta leitura" + ❌ explícito
+//     das 3 frases que vazaram exact-match em 9/9.
+//
+// VALIDAÇÃO planejada: founder regenera 3-5 leituras existentes em
+// prod (Nailli, Cristiane, Nayara, +2). Re-roda audit-repetition-last10.
+// Critério de sucesso:
+//   - Verbo Parte I varia em ≥4 famílias semânticas (não só sinônimos)
+//   - "o que fermentava" aparece ≤1 vez em 5 leituras
+//   - Esqueleto "E foi, [adv], deixando de [v]×3" aparece ≤2 vezes
+//   - Aterragem metáfora-financeira ≤1 vez em 5
+//
+// NÃO mexido em v2.9.0: 9 Regras Absolutas, regra calibração global,
+// VOICE_OVERRIDE_V2_4 corpo principal, §0 heading "## 0. Em poucas
+// palavras", auto-checagem Marca 7 + 7.1, parser de seções, Stage 1
+// (intocado desde v2.7.0).
+export const STAGE2_VERSION = '0.7.0' as const
 
 /**
  * Etapa 2 do pipeline Sonnet 2x — composição streaming ancorada no JSON
