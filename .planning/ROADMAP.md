@@ -495,7 +495,7 @@ See `.planning/phases/07.5-tendency-mapping-engine/07.5-CONTEXT.md` (a criar via
 - [x] 08-02-PLAN.md — lib/asaas/ client REST + webhook-auth timing-safe + zod types + idempotency helper (Wave 1)
 - [x] 08-03-PLAN.md — lib/billing/config + lib/auth/cpf (módulo-11) + lib/audit/log+events (Wave 1)
 - [x] 08-04-PLAN.md — POST /api/asaas/webhook handler + apply-payment state machine (Wave 2)
-- [ ] 08-05-PLAN.md — lib/billing/credits + trial + reservations + race test integration (Wave 2)
+- [x] 08-05-PLAN.md — lib/billing/credits + trial + reservations + race test integration (Wave 2)
 - [ ] 08-06-PLAN.md — createChargeAction + refundPackageAction + refund-policy + signup CPF expand (Wave 3)
 - [ ] 08-07-PLAN.md — Wire reserve em createReadingAction/invites/analyze route + lib/gates/billing-gate (Wave 3)
 - [ ] 08-08-PLAN.md — LGPD-01 termo biométrico: seed + hydrate + Gotenberg PDF + signTermAction + TermoBiometricoStep (Wave 4)
