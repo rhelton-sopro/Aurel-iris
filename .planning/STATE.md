@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: "Wave 3 entregou 9 commits atômicos em paralelo via 3 worktrees disjuntos:"
-stopped_at: "08-01 COMPLETO — migrations 0035-0038 LIVE no remoto (founder), types regenerados (8f572fc), A1=confirmed + A6=ambos decididos. Wave 2 (08-02 termo, 08-03 trial-gate, 08-04 webhook) desbloqueada."
-last_updated: "2026-05-28T23:30:00.000Z"
+stopped_at: "08-02 COMPLETO — módulo lib/asaas/ (client REST + webhook-auth timing-safe + Zod schemas + idempotency), 11 testes vitest green, zero deps npm novas, eslint lib/asaas clean. 4 commits atômicos (1261494/e188cd1/53b51e4/e8c94f7). 1 Rule 1 fix (base URL call-time). Lint app-wide pré-existente deferido (deferred-items.md). Próximo: 08-03 / 08-04 / outros Wave 1-2."
+last_updated: "2026-05-28T22:20:13.697Z"
 progress:
   total_phases: 16
   completed_phases: 11
   total_plans: 124
-  completed_plans: 108
-  percent: 87
+  completed_plans: 109
+  percent: 88
 ---
 
 # Estado do projeto
