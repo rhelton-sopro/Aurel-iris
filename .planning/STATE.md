@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: "Wave 3 entregou 9 commits atômicos em paralelo via 3 worktrees disjuntos:"
-stopped_at: Phase 8 context gathered — pacote pré-pago + LGPD core locked
-last_updated: "2026-05-26T22:04:29.602Z"
+stopped_at: "08-01 CHECKPOINT Task 5 — founder deve aplicar supabase db push --linked, verificar 4 SKUs + 3 funções + RLS, decidir A1 (CONFIRMED vs RECEIVED) e A6 (canal termo biométrico)"
+last_updated: "2026-05-28T22:02:39.403Z"
 progress:
   total_phases: 16
   completed_phases: 11
-  total_plans: 109
-  completed_plans: 107
-  percent: 98
+  total_plans: 124
+  completed_plans: 108
+  percent: 87
 ---
 
 # Estado do projeto
@@ -223,7 +223,7 @@ Sessão anterior: 2026-05-09 noite + supplement (mesma sessão estendida) — **
 
 Stopped at: Phase 8 context gathered — pacote pré-pago + LGPD core locked
 
-Resume file: .planning/phases/08-pagamento-lgpd/08-CONTEXT.md
+Resume file: None
 
 **Estado das tabelas:**
 

@@ -491,7 +491,7 @@ See `.planning/phases/07.5-tendency-mapping-engine/07.5-CONTEXT.md` (a criar via
   8. Founder/admin internal_use=true bypassa todos os gates + não consome trial/credits + excluído de métricas.
   9. /privacidade + /termos públicos LGPD-compliant; mailto: pra solicitação de exclusão; copy obrigatória em 3 surfaces; audit-vocabulary CI gate continua green.
 **Plans:** 14 plans em 6 waves
-- [ ] 08-01-PLAN.md — Migrations 0035-0038 (schema 8 tabelas + RLS + helper RPCs + seed 4 SKUs) + types regen (Wave 1)
+- [x] 08-01-PLAN.md — Migrations 0035-0038 (schema 8 tabelas + RLS + helper RPCs + seed 4 SKUs) + types regen (Wave 1)
 - [ ] 08-02-PLAN.md — lib/asaas/ client REST + webhook-auth timing-safe + zod types + idempotency helper (Wave 1)
 - [ ] 08-03-PLAN.md — lib/billing/config + lib/auth/cpf (módulo-11) + lib/audit/log+events (Wave 1)
 - [ ] 08-04-PLAN.md — POST /api/asaas/webhook handler + apply-payment state machine (Wave 2)
@@ -595,7 +595,7 @@ Fases v1 executam em ordem numérica: 1 → 2 → 4 → 5 → 6 → 7 → 7.1 �
 | 7.3. Dual-layer | 0/0 | 🚫 ABANDONED 2026-05-13 — substituído por 7.4 | — |
 | 7.4. Iris Codex report | 17/17+ | ✅ Concluída — rebrand + structured output + Sonnet 2x arch LIVE em prod | 2026-05-15+ |
 | 7.5. Tendency mapping engine | 0/0 | 🚫 ABANDONED 2026-05-26 — Sonnet 2x venceu RAG/deterministic mapping na prática (memory `project_fase_7_5_abandoned_sonnet_won`) | — |
-| 8. Pagamento + LGPD | 0/TBD | 📅 Backlog (não-bloqueador pra B2B v1 — founder decisão 2026-05-18) | — |
+| 8. Pagamento + LGPD | 1/15 | In Progress|  |
 | 9. Polish + dogfooding + beta | 5/5 | ✅ DELIVERED + LIVE — cenários 1+2 honor-system PASS pós-Fase 11.1; cenário 3 PASS por inspeção; ONBOARD-04 gate fecha por uso continuado (~2026-06-05) | 2026-05-26 |
 | 10. Sistema de Aprendizagem Clínica | 0/TBD | 📅 Backlog longo prazo | — |
 | 11. Launch readiness B2B | 3/4 | 🔄 11-01/02/03 DELIVERED + LIVE (sem plans formais — execução direta rastreada em git+memory). 11-04 (smoke E2E) deferido pra exercício orgânico. | 2026-05-26 (parcial) |

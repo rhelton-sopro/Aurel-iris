@@ -65,16 +65,16 @@ Requisitos para o release inicial. Cada um mapeia para exatamente uma fase do ro
 
 ### Pagamento (Fase 8 — Pagamento + LGPD)
 
-- [ ] **BILLING-01**: Stripe Checkout BR com PIX habilitado, BRL, três tiers: Starter (R$ 89/mês, 20 análises), Profissional (R$ 189/mês, ilimitado), Escola (R$ 490/mês, white-label leve / contato).
-- [ ] **BILLING-02**: Trial de 14 dias automático no signup; webhook `app/api/stripe/webhook/route.ts` atualiza `profiles.subscription_status` e a tabela `subscriptions` (com `stripe_subscription_id` único, `plan`, `status`, `current_period_end`).
-- [ ] **BILLING-03**: Middleware bloqueia disparo de novas análises quando `trial_ends_at` venceu sem assinatura ativa; UX direciona para `/assinatura`.
+- [x] **BILLING-01**: Stripe Checkout BR com PIX habilitado, BRL, três tiers: Starter (R$ 89/mês, 20 análises), Profissional (R$ 189/mês, ilimitado), Escola (R$ 490/mês, white-label leve / contato).
+- [x] **BILLING-02**: Trial de 14 dias automático no signup; webhook `app/api/stripe/webhook/route.ts` atualiza `profiles.subscription_status` e a tabela `subscriptions` (com `stripe_subscription_id` único, `plan`, `status`, `current_period_end`).
+- [x] **BILLING-03**: Middleware bloqueia disparo de novas análises quando `trial_ends_at` venceu sem assinatura ativa; UX direciona para `/assinatura`.
 
 ### LGPD e conformidade (Fase 8 — Pagamento + LGPD)
 
-- [ ] **LGPD-01**: Geração de termo de consentimento em PDF por cliente (nome do cliente, terapeuta, escopo de uso, prazo de retenção); assinatura digital via DocuSeal ou Clicksign; URL persistida em `clients.consent_document_url` e timestamp em `clients.consent_signed_at`.
+- [x] **LGPD-01**: Geração de termo de consentimento em PDF por cliente (nome do cliente, terapeuta, escopo de uso, prazo de retenção); assinatura digital via DocuSeal ou Clicksign; URL persistida em `clients.consent_document_url` e timestamp em `clients.consent_signed_at`.
 - [ ] **LGPD-02**: Bloqueio de criação de leitura para clientes sem `consent_signed_at` preenchido.
 - [ ] **LGPD-03**: Botão "deletar dados" cascateia exclusão de todas as leituras, imagens e termos do cliente, com confirmação explícita.
-- [ ] **LGPD-04**: Logs de acesso a imagens (quem leu, quando, qual `reading_image.id`) persistidos para auditoria.
+- [x] **LGPD-04**: Logs de acesso a imagens (quem leu, quando, qual `reading_image.id`) persistidos para auditoria.
 - [ ] **LGPD-05**: Páginas públicas de privacidade, termos de uso e política de retenção publicadas; copy obrigatória "ferramenta de apoio à anamnese terapêutica integrativa, não substitui avaliação médica" presente em landing, cabeçalho do relatório e rodapé legal.
 - [ ] **LGPD-06**: Auditoria de vocabulário em UI, prompts e relatórios gerados confirma ausência das palavras proibidas "diagnóstico", "tratamento", "cura" em superfícies do produto (com exceção de páginas de política que as citam para negá-las).
 
