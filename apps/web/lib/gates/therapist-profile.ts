@@ -7,12 +7,15 @@
 // TERAPEUTA (usuário da plataforma). tos = aceite dos Termos/Privacidade do
 // terapeuta (profiles.tos_accepted_at), separado do consent do examinado.
 
-export type TherapistGap = 'phone' | 'specialties' | 'tos'
+import { isValidCpf } from '@/lib/auth/cpf'
+
+export type TherapistGap = 'phone' | 'specialties' | 'tos' | 'cpf'
 
 export interface TherapistProfileInput {
   phone: string | null
   specialties: string[] | null
   tos_accepted_at: string | null
+  cpf: string | null // Fase 8 (D-12): CPF anti-fraud trial obrigatório
 }
 
 export type TherapistGateResult =
@@ -36,6 +39,7 @@ export function evaluateTherapistProfile(
   if (!Array.isArray(p.specialties) || p.specialties.length < 1)
     missing.push('specialties')
   if (!nonEmpty(p.tos_accepted_at)) missing.push('tos')
+  if (!p.cpf || !isValidCpf(p.cpf)) missing.push('cpf') // Fase 8 D-12
 
   if (missing.length > 0) return { status: 'incomplete', missing }
   return { status: 'ok' }

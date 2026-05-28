@@ -10,6 +10,7 @@ import {
   MAX_SPECIALTIES,
   formatPhoneBR,
 } from '@/lib/profile/fields'
+import { formatCpfBR } from '@/lib/auth/cpf'
 import { completeProfileAction } from '@/app/actions/profile'
 
 const inputClass =
@@ -17,6 +18,7 @@ const inputClass =
 
 export function CompleteProfileForm() {
   const [phone, setPhone] = useState('')
+  const [cpf, setCpf] = useState('')
   const [selected, setSelected] = useState<string[]>([])
   const [otherText, setOtherText] = useState('')
   const [tosAccepted, setTosAccepted] = useState(false)
@@ -39,6 +41,7 @@ export function CompleteProfileForm() {
     setPending(true)
     const res = await completeProfileAction({
       phone,
+      cpf,
       specialties: selected,
       otherText,
       tosAccepted,
@@ -72,6 +75,25 @@ export function CompleteProfileForm() {
           value={phone}
           onChange={(e) => setPhone(formatPhoneBR(e.target.value))}
           placeholder="(11) 99999-9999"
+          className={inputClass}
+        />
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="cpf" className="text-sm font-medium">
+          CPF
+        </label>
+        <input
+          id="cpf"
+          name="cpf"
+          type="text"
+          inputMode="numeric"
+          autoComplete="off"
+          value={cpf}
+          onChange={(e) => setCpf(formatCpfBR(e.target.value))}
+          placeholder="000.000.000-00"
+          maxLength={14}
+          data-testid="profile-cpf"
           className={inputClass}
         />
       </div>

@@ -16,6 +16,7 @@ import {
   buildSpecialties,
 } from '@/lib/profile/fields'
 import { TOS_VERSION } from '@/lib/consent/tos'
+import { isValidCpf, cpfDigits, formatCpfBR } from '@/lib/auth/cpf'
 
 const inputClass =
   'h-11 w-full rounded-none border-0 border-b border-b-ink bg-transparent px-3 text-base outline-none transition-colors duration-[180ms] placeholder:text-mist focus-visible:border-b-teal'
@@ -27,6 +28,7 @@ export default function SignupPage() {
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
+  const [cpf, setCpf] = useState('')
   const [selected, setSelected] = useState<string[]>([])
   const [otherText, setOtherText] = useState('')
   const [tosAccepted, setTosAccepted] = useState(false)
@@ -50,6 +52,7 @@ export default function SignupPage() {
     return {
       full_name: fullName.trim(),
       phone,
+      cpf: cpfDigits(cpf), // dígitos only — propagado pro profiles via handle_new_user (0039)
       specialties: buildSpecialties(selected, otherText),
       tos_accepted_at: new Date().toISOString(),
       tos_version: TOS_VERSION,
@@ -63,6 +66,7 @@ export default function SignupPage() {
     if (!fullName.trim()) return setFormError('Informe seu nome completo.')
     if (!/.+@.+\..+/.test(email)) return setFormError('E-mail inválido.')
     if (!phoneIsValidBR(phone)) return setFormError('WhatsApp inválido (DDD + número).')
+    if (!isValidCpf(cpf)) return setFormError('CPF inválido (verifique os dígitos).')
     const specs = buildSpecialties(selected, otherText)
     if (specs.length < 1) return setFormError('Selecione ao menos 1 especialidade.')
     if (!tosAccepted)
@@ -91,6 +95,8 @@ export default function SignupPage() {
         setFormError('Muitas tentativas. Aguarde alguns minutos e tente novamente.')
       } else if (error.message.toLowerCase().includes('already registered') || error.message.toLowerCase().includes('user already')) {
         setFormError('Este e-mail já tem conta. Use a tela de login.')
+      } else if (error.message.toLowerCase().includes('cpf') || error.message.toLowerCase().includes('profiles_cpf_unique')) {
+        setFormError('Já existe cadastro com este CPF. Use a tela de login.')
       } else if (error.message.toLowerCase().includes('signups') && error.message.toLowerCase().includes('disabled')) {
         setFormError('Cadastros estão desabilitados no momento. Contate o administrador.')
       } else if (isNetworkError(error)) {
@@ -289,6 +295,25 @@ export default function SignupPage() {
               value={phone}
               onChange={(e) => setPhone(formatPhoneBR(e.target.value))}
               placeholder="(11) 99999-9999"
+              className={inputClass}
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="cpf" className="text-sm font-medium">
+              CPF
+            </label>
+            <input
+              id="cpf"
+              name="cpf"
+              type="text"
+              inputMode="numeric"
+              autoComplete="off"
+              value={cpf}
+              onChange={(e) => setCpf(formatCpfBR(e.target.value))}
+              placeholder="000.000.000-00"
+              maxLength={14}
+              data-testid="signup-cpf"
               className={inputClass}
             />
           </div>

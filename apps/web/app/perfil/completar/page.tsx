@@ -15,7 +15,7 @@ export default async function CompletarPerfilPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('phone, specialties, tos_accepted_at')
+    .select('phone, specialties, tos_accepted_at, cpf')
     .eq('id', user.id)
     .maybeSingle()
 
@@ -23,6 +23,7 @@ export default async function CompletarPerfilPage() {
     phone: profile?.phone ?? null,
     specialties: profile?.specialties ?? null,
     tos_accepted_at: profile?.tos_accepted_at ?? null,
+    cpf: profile?.cpf ?? null,
   })
   if (gate.status === 'ok') redirect('/dashboard')
 

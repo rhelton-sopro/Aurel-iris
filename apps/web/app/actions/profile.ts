@@ -7,11 +7,13 @@ import { z } from 'zod'
 import { buildSpecialties, phoneIsValidBR, MAX_SPECIALTIES } from '@/lib/profile/fields'
 import { TOS_VERSION } from '@/lib/consent/tos'
 import { MIN_AGE, isAdult } from '@/lib/gates/profile-completeness'
+import { isValidCpf, cpfDigits } from '@/lib/auth/cpf'
 
 // 'use server': SÓ funções async exportadas. Schema/tipos ficam internos
 // (export viraria stub RPC no bundle client — feedback use-server-export).
 export async function completeProfileAction(input: {
   phone: string
+  cpf: string
   specialties: string[]
   otherText: string
   tosAccepted: boolean
@@ -26,6 +28,7 @@ export async function completeProfileAction(input: {
 
   const schema = z.object({
     phone: z.string().refine(phoneIsValidBR, 'Telefone inválido (DDD + número)'),
+    cpf: z.string().refine((v) => isValidCpf(v), 'CPF inválido'),
     specialties: z
       .array(z.string())
       .min(1, 'Selecione ao menos 1 especialidade')
@@ -53,6 +56,7 @@ export async function completeProfileAction(input: {
     .from('profiles')
     .update({
       phone: parsed.data.phone,
+      cpf: cpfDigits(parsed.data.cpf), // sempre dígitos (D-12)
       specialties: finalSpecialties,
       tos_accepted_at: new Date().toISOString(),
       tos_version: TOS_VERSION,
@@ -60,6 +64,15 @@ export async function completeProfileAction(input: {
     .eq('id', user.id)
 
   if (error) {
+    // 23505 UNIQUE violation — CPF já cadastrado (anti-fraud trial D-12).
+    // Distingue CPF de outras colisões para mensagem humana.
+    if ((error as { code?: string }).code === '23505') {
+      const msg = error.message?.toLowerCase() ?? ''
+      if (msg.includes('cpf') || msg.includes('profiles_cpf_unique')) {
+        return { error: 'Já existe cadastro com este CPF. Faça login.' }
+      }
+      return { error: 'Dados duplicados detectados. Faça login se já possui conta.' }
+    }
     return { error: 'Não foi possível salvar agora. Tente novamente.' }
   }
 
