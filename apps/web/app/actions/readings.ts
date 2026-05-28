@@ -2,8 +2,8 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { resolveClientGate } from '@/lib/gates/client-gates'
-import { BETA_READING_CAP } from '@/lib/beta/config'
-import { isFounderEmail } from '@/lib/auth/founder'
+import { reserveCreditForReading } from '@/lib/billing/credits'
+import { logAuditEvent } from '@/lib/audit/log'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
@@ -55,33 +55,19 @@ export async function createReadingAction(
     redirect('/login')
   }
 
-  // Beta: cap de 2 leituras por terapeuta via contador monotônico do
-  // profiles (incrementado 1x por leitura na transição pending→ready em
-  // /api/readings/[id]/process; nunca decrementado → apagar/reprocessar
-  // leitura NÃO libera vaga). RLS de profiles permite o terapeuta ler a
-  // própria linha.
-  // Cap = fonte única em lib/beta/config (importado no topo).
-  //
-  // REGRA DE CAP — convites & founder (2026-05-20, founder UAT):
-  //  - Founder (isFounderEmail) BYPASSA o cap. Razão: ele está rodando
-  //    testes em volume com clientes reais via /convite/[token] — cap=2
-  //    inviabilizaria. Bypass é só pra ele.
-  //  - Terapeutas NÃO-founder: convite via /convite/[token] CONTA no
-  //    plano deles igual qualquer outra leitura. Não há quota separada
-  //    pra convite. Quando o produto sair do beta, isso vira parte do
-  //    plano comercial — ver [[invite-link-cap-rules]].
-  if (!isFounderEmail(user.email)) {
-    const { data: betaProfile } = await supabase
-      .from('profiles')
-      .select('beta_readings_used')
-      .eq('id', user.id)
-      .maybeSingle()
-    if ((betaProfile?.beta_readings_used ?? 0) >= BETA_READING_CAP) {
-      return {
-        error: `Limite do beta atingido: ${BETA_READING_CAP} leituras realizadas. Fale com o suporte para liberar mais.`,
-      }
-    }
-  }
+  // Fase 8 (D-10 #3 / D-11): o cap beta (BETA_READING_CAP via contador
+  // beta_readings_used) foi SUBSTITUÍDO pelo credit ledger reserve.
+  // Histórico:
+  //   - 2026-05-20 (Fase 11): BETA_READING_CAP enforced via count query;
+  //     founder (isFounderEmail) bypassava; convites contavam.
+  //   - 2026-05-27 (Fase 8): reserveCreditForReading + lib/billing/credits.
+  //     O bypass de founder agora é coberto por profiles.internal_use=true
+  //     (fifo_reserve_credit → source='internal', nunca debita). Convites
+  //     reservam no ponto de captura (convite/[token]/capturar/page.tsx).
+  // A reading row é criada PRIMEIRO; a reservation é atrelada via reading_id.
+  // Se reserve falha, faz rollback (delete) da reading — atomicidade soft.
+  // lib/beta/config.ts é mantido (memory: delete-consumers-first) — um plano
+  // V1.1 futuro o remove quando os legacy paths estiverem confirmadamente fora.
 
   // CONTEXT D-03: lê method do FormData. `formData.get` retorna null quando
   // ausente; passar `undefined` ativa o default do Zod (`.default('mobile_camera')`).
@@ -127,6 +113,39 @@ export async function createReadingAction(
 
   if (error) {
     return { error: error.message }
+  }
+
+  // Fase 8 D-10 #3 / D-11: reserva 1 crédito (ou trial, ou internal bypass)
+  // atrelado a esta reading. Único entry point de consumo (lib/billing/credits).
+  // A reading já foi criada acima — se reserve falha, rollback (delete) pra não
+  // poluir a base com reading órfã sem reservation.
+  const reserve = await reserveCreditForReading(user.id, reading.id)
+  if (!reserve.ok) {
+    await supabase
+      .from('readings')
+      .delete()
+      .eq('id', reading.id)
+      .eq('therapist_id', user.id)
+    if (reserve.reason === 'no_balance') {
+      return {
+        error:
+          'Sem saldo. Você esgotou o período de teste e não tem créditos ativos. Compre um pacote em /assinatura/comprar para continuar.',
+      }
+    }
+    return { error: 'Erro interno ao reservar crédito. Tente novamente.' }
+  }
+
+  // D-09 audit: registra uso de internal_use (founder/admin) pra exclusão de
+  // métricas de faturamento/produto. Best-effort (logAuditEvent nunca throwa).
+  if (reserve.source === 'internal') {
+    await logAuditEvent({
+      event_type: 'admin.internal_use_used',
+      actor_user_id: user.id,
+      actor_email: user.email,
+      target_type: 'reading',
+      target_id: reading.id,
+      metadata: { entry_point: 'create_reading', client_id: parsed.data.client_id },
+    })
   }
 
   revalidatePath('/leituras')
