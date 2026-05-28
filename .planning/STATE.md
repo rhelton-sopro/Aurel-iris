@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: "Wave 3 entregou 9 commits atômicos em paralelo via 3 worktrees disjuntos:"
-stopped_at: "08-03 COMPLETO — 3 utilities puras (lib/billing/config.ts 5 constants+5 helpers, lib/auth/cpf.ts validador módulo-11, lib/audit/log.ts+events.ts best-effort LGPD-04). 12 vitest green, zero deps npm novas, eslint scoped clean, tsc limpo. 5 commits atômicos (ea1f1af/d3347c1/f7125a0/95e2968/ec20a06) RED→GREEN TDD. 2 deviations: Rule 1 (fixture CPF leading-zeros corrigido p/ checksum válido) + Rule 3 (cast metadata->Json no insert boundary). Próximo: outros plans Wave 1-2 da Fase 8."
-last_updated: "2026-05-28T22:27:07.605Z"
+stopped_at: Phase 8 context gathered — pacote pré-pago + LGPD core locked
+last_updated: "2026-05-28T22:35:04.976Z"
 progress:
   total_phases: 16
   completed_phases: 11
   total_plans: 124
-  completed_plans: 110
-  percent: 89
+  completed_plans: 111
+  percent: 90
 ---
 
 # Estado do projeto
