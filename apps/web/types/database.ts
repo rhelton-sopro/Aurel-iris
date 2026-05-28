@@ -47,6 +47,69 @@ export type Database = {
         }
         Relationships: []
       }
+      asaas_webhook_events: {
+        Row: {
+          event_id: string
+          event_type: string
+          payload: Json
+          payment_id: string | null
+          processed_at: string | null
+          received_at: string
+          status: string
+        }
+        Insert: {
+          event_id: string
+          event_type: string
+          payload: Json
+          payment_id?: string | null
+          processed_at?: string | null
+          received_at?: string
+          status?: string
+        }
+        Update: {
+          event_id?: string
+          event_type?: string
+          payload?: Json
+          payment_id?: string | null
+          processed_at?: string | null
+          received_at?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      audit_events: {
+        Row: {
+          actor_email: string | null
+          actor_user_id: string | null
+          created_at: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          target_id: string | null
+          target_type: string | null
+        }
+        Insert: {
+          actor_email?: string | null
+          actor_user_id?: string | null
+          created_at?: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Update: {
+          actor_email?: string | null
+          actor_user_id?: string | null
+          created_at?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Relationships: []
+      }
       calibration_annotations: {
         Row: {
           annotated_at: string
@@ -245,6 +308,7 @@ export type Database = {
           created_at: string
           expires_at: string
           id: string
+          notify_on_capture_complete: boolean
           therapist_id: string
           token: string
           used_at: string | null
@@ -256,6 +320,7 @@ export type Database = {
           created_at?: string
           expires_at?: string
           id?: string
+          notify_on_capture_complete?: boolean
           therapist_id: string
           token: string
           used_at?: string | null
@@ -267,6 +332,7 @@ export type Database = {
           created_at?: string
           expires_at?: string
           id?: string
+          notify_on_capture_complete?: boolean
           therapist_id?: string
           token?: string
           used_at?: string | null
@@ -387,6 +453,204 @@ export type Database = {
         }
         Relationships: []
       }
+      credit_packages: {
+        Row: {
+          active: boolean
+          badge: string | null
+          created_at: string
+          display_order: number
+          id: string
+          leituras_count: number
+          name: string
+          price_brl: number
+          sku: string
+        }
+        Insert: {
+          active?: boolean
+          badge?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          leituras_count: number
+          name: string
+          price_brl: number
+          sku: string
+        }
+        Update: {
+          active?: boolean
+          badge?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          leituras_count?: number
+          name?: string
+          price_brl?: number
+          sku?: string
+        }
+        Relationships: []
+      }
+      credit_reservations: {
+        Row: {
+          created_at: string
+          credit_id: string | null
+          expires_at: string
+          id: string
+          reading_id: string
+          released_at: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          credit_id?: string | null
+          expires_at: string
+          id?: string
+          reading_id: string
+          released_at?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          credit_id?: string | null
+          expires_at?: string
+          id?: string
+          reading_id?: string
+          released_at?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_reservations_credit_id_fkey"
+            columns: ["credit_id"]
+            isOneToOne: false
+            referencedRelation: "customer_credits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "credit_reservations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      credit_transactions: {
+        Row: {
+          amount: number
+          asaas_payment_id: string | null
+          created_at: string
+          credit_id: string | null
+          id: string
+          notes: string | null
+          reading_id: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          asaas_payment_id?: string | null
+          created_at?: string
+          credit_id?: string | null
+          id?: string
+          notes?: string | null
+          reading_id?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          asaas_payment_id?: string | null
+          created_at?: string
+          credit_id?: string | null
+          id?: string
+          notes?: string | null
+          reading_id?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_transactions_credit_id_fkey"
+            columns: ["credit_id"]
+            isOneToOne: false
+            referencedRelation: "customer_credits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "credit_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_credits: {
+        Row: {
+          asaas_invoice_url: string | null
+          asaas_payment_id: string | null
+          asaas_payment_status: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          leituras_purchased: number
+          leituras_remaining: number
+          leituras_reserved: number
+          package_id: string
+          purchase_date: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          asaas_invoice_url?: string | null
+          asaas_payment_id?: string | null
+          asaas_payment_status?: string | null
+          created_at?: string
+          expires_at: string
+          id?: string
+          leituras_purchased: number
+          leituras_remaining: number
+          leituras_reserved?: number
+          package_id: string
+          purchase_date?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          asaas_invoice_url?: string | null
+          asaas_payment_id?: string | null
+          asaas_payment_status?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          leituras_purchased?: number
+          leituras_remaining?: number
+          leituras_reserved?: number
+          package_id?: string
+          purchase_date?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_credits_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "credit_packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_credits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       knowledge_chunks: {
         Row: {
           content: string
@@ -428,12 +692,15 @@ export type Database = {
       }
       profiles: {
         Row: {
+          asaas_customer_id: string | null
           beta_readings_used: number
           bio: string | null
           city: string | null
+          cpf: string | null
           created_at: string | null
           full_name: string
           id: string
+          internal_use: boolean
           onboarding_dismissed_at: string | null
           phone: string | null
           professional_id: string | null
@@ -446,12 +713,15 @@ export type Database = {
           trial_ends_at: string | null
         }
         Insert: {
+          asaas_customer_id?: string | null
           beta_readings_used?: number
           bio?: string | null
           city?: string | null
+          cpf?: string | null
           created_at?: string | null
           full_name: string
           id: string
+          internal_use?: boolean
           onboarding_dismissed_at?: string | null
           phone?: string | null
           professional_id?: string | null
@@ -464,12 +734,15 @@ export type Database = {
           trial_ends_at?: string | null
         }
         Update: {
+          asaas_customer_id?: string | null
           beta_readings_used?: number
           bio?: string | null
           city?: string | null
+          cpf?: string | null
           created_at?: string | null
           full_name?: string
           id?: string
+          internal_use?: boolean
           onboarding_dismissed_at?: string | null
           phone?: string | null
           professional_id?: string | null
@@ -980,15 +1253,62 @@ export type Database = {
           },
         ]
       }
+      trial_status: {
+        Row: {
+          ended_at: string | null
+          ended_reason: string | null
+          trial_expires_at: string
+          trial_readings_max: number
+          trial_readings_used: number
+          trial_started_at: string
+          user_id: string
+        }
+        Insert: {
+          ended_at?: string | null
+          ended_reason?: string | null
+          trial_expires_at?: string
+          trial_readings_max?: number
+          trial_readings_used?: number
+          trial_started_at?: string
+          user_id: string
+        }
+        Update: {
+          ended_at?: string | null
+          ended_reason?: string | null
+          trial_expires_at?: string
+          trial_readings_max?: number
+          trial_readings_used?: number
+          trial_started_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trial_status_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      fifo_reserve_credit: {
+        Args: { p_reading_id: string; p_user_id: string }
+        Returns: {
+          credit_id: string
+          reservation_id: string
+          source: string
+        }[]
+      }
       increment_beta_readings_used: {
         Args: { p_therapist: string }
         Returns: undefined
       }
+      is_in_trial: { Args: { p_user_id: string }; Returns: boolean }
       match_knowledge_chunks: {
         Args: {
           match_count?: number
@@ -1037,6 +1357,10 @@ export type Database = {
           p_therapist_id: string
         }
         Returns: string
+      }
+      release_reservation: {
+        Args: { p_reading_id: string; p_reason?: string }
+        Returns: boolean
       }
     }
     Enums: {
