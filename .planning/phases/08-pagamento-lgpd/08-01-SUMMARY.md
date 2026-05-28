@@ -39,13 +39,14 @@ key-files:
     - supabase/migrations/0036_phase_8_billing_lgpd_rls.sql
     - supabase/migrations/0037_phase_8_helper_functions.sql
     - supabase/migrations/0038_phase_8_seed_packages.sql
-  modified: []
+  modified:
+    - apps/web/types/database.ts
 
 key-decisions:
   - "tos_accepted_at e tos_version NÃO adicionados ao ALTER profiles (já existiam desde migration 0022)"
   - "credit_reservations.user_id adicionado explicitamente (necessário para release_reservation devolver ao trial correto)"
-  - "Task 4 (type regen) DIFERIDA: requer supabase db push --linked primeiro (ação do founder no checkpoint)"
-  - "A1 (PAYMENT_CONFIRMED vs PAYMENT_RECEIVED) e A6 (canal do termo biométrico): pendentes decisão founder no checkpoint"
+  - "A1 = confirmed: créditos liberados em PAYMENT_CONFIRMED (UX-first, aceita risco raro de chargeback) — usado em plano 08-04"
+  - "A6 = ambos: termo de consentimento biométrico suportado em remote_link E office_handoff via consent_channel — usado em plano 08-08"
 
 requirements-completed: [BILLING-01, BILLING-02, BILLING-03, LGPD-01, LGPD-04]
 
@@ -53,17 +54,17 @@ duration: ~35min
 completed: 2026-05-28
 ---
 
-# Phase 08 Plan 01: Billing + LGPD Schema — CHECKPOINT PENDENTE
+# Phase 08 Plan 01: Billing + LGPD Schema — COMPLETO
 
-**DDL foundation da Fase 8: 7 tabelas + ALTER profiles + 3 funções FIFO + 4 SKUs seedados em 4 migrations aditivas idempotentes — aguardando founder aplicar via `supabase db push --linked` e decidir A1/A6**
+**DDL foundation da Fase 8: 7 tabelas + ALTER profiles + 3 funções FIFO + 4 SKUs seedados em 4 migrations aditivas idempotentes — aplicadas LIVE pelo founder via `supabase db push --linked`, types regenerados, A1=confirmed + A6=ambos decididos**
 
 ## Performance
 
 - **Duration:** ~35 min
 - **Started:** 2026-05-28T21:55:00Z
-- **Completed:** 2026-05-28T22:30:00Z (parcial — checkpoint Task 5 pendente)
-- **Tasks:** 3/5 completas + Task 4 diferida (sem live remote)
-- **Files modified:** 4 criados, 0 modificados
+- **Completed:** 2026-05-28 (checkpoint resolvido pelo founder)
+- **Tasks:** 5/5 completas
+- **Files modified:** 4 criados, 1 modificado (types/database.ts)
 
 ## Accomplishments
 
@@ -78,8 +79,8 @@ completed: 2026-05-28
 1. **Task 1: Migration 0035 — schema (7 tabelas + ALTER profiles)** - `ccca3a5` (feat)
 2. **Task 2: Migration 0036 — RLS policies (7 tabelas, 16 policies)** - `2745e97` (feat)
 3. **Task 3: Migrations 0037+0038 — funções FIFO + seed 4 SKUs** - `c4711d1` (feat)
-4. **Task 4: Regen types/database.ts** — DIFERIDA (ver abaixo)
-5. **Task 5: Checkpoint human-verify** — AGUARDANDO (ver abaixo)
+4. **Task 4: Regen types/database.ts** - `8f572fc` (feat)
+5. **Task 5: Checkpoint human-verify** — RESOLVIDO pelo founder (migrations LIVE + A1/A6 decididos)
 
 ## Files Created
 
@@ -87,6 +88,10 @@ completed: 2026-05-28
 - `supabase/migrations/0036_phase_8_billing_lgpd_rls.sql` — 16 RLS policies em 7 tabelas (185 linhas)
 - `supabase/migrations/0037_phase_8_helper_functions.sql` — 3 funções SECURITY DEFINER (232 linhas)
 - `supabase/migrations/0038_phase_8_seed_packages.sql` — 4 SKUs pricing locked (36 linhas)
+
+## Files Modified
+
+- `apps/web/types/database.ts` — regenerado via `pnpm gen:types` após migrations LIVE; +324 linhas (7 tabelas + 3 colunas profiles + 3 funções), zero deleções
 
 ## Decisions Made
 
@@ -107,17 +112,17 @@ completed: 2026-05-28
 - **Arquivos:** 0035_phase_8_billing_lgpd_schema.sql
 - **Comprometimento:** ccca3a5 (Task 1 commit)
 
-**2. [Rule 3 - Blocking/Deferred] Task 4 (types/database.ts) não pôde ser executada**
+**2. [Rule 3 - Blocking/Resolvido] Task 4 (types/database.ts) sequenciada após checkpoint**
 
 - **Found during:** Task 4
-- **Issue:** `pnpm gen:types` requer `supabase gen types typescript --linked` que conecta ao Supabase remoto. As migrations 0035-0038 ainda não foram aplicadas ao linked remote (ação do founder no checkpoint Task 5). Docker local não está em execução.
-- **Fix:** Task 4 diferida para pós-checkpoint. Após o founder executar `supabase db push --linked` e aprovar o checkpoint, o próximo agente executará `pnpm gen:types` e commitará `apps/web/types/database.ts`.
-- **Impacto:** Sem bloqueio para o checkpoint — Waves 2-6 dependem das migrations aplicadas no DB, não do arquivo de types localmente.
+- **Issue:** `pnpm gen:types` requer `supabase gen types typescript --linked` que conecta ao Supabase remoto. As migrations 0035-0038 só foram aplicadas ao linked remote pelo founder no checkpoint Task 5.
+- **Fix:** Após o founder executar `supabase db push --linked` (4 migrations aplicadas sem erro) e rodar `pnpm gen:types`, o arquivo regenerado foi verificado (7 tabelas + 3 colunas profiles + 3 funções, +324 linhas, zero deleções) e commitado em `8f572fc`.
+- **Impacto:** Resolvido. Type regen era sequencialmente dependente de supabase db push, agora concluído.
 
 ---
 
-**Total deviations:** 2 (1 auto-fixed Rule 2, 1 deferred Rule 3)
-**Impact on plan:** Sem scope creep. user_id é coluna obrigatória para RLS e funções. Type regen é sequencialmente dependente de supabase db push.
+**Total deviations:** 2 (1 auto-fixed Rule 2, 1 sequencial Rule 3 — ambos resolvidos)
+**Impact on plan:** Sem scope creep. user_id é coluna obrigatória para RLS e funções. Type regen concluído pós-checkpoint.
 
 ## Validação Estática das Migrations (sem supabase db push --linked)
 
@@ -148,39 +153,35 @@ Novas superfícies de ataque introduzidas (verificadas contra o threat model do 
 
 Nenhum — migrations são DDL puro, sem stubs de dados ou UI.
 
-## Pending no Checkpoint Task 5
+## Checkpoint Task 5 — RESOLVIDO pelo founder
 
-Para o founder executar no Supabase dashboard:
+Founder aplicou as 4 migrations LIVE e verificou no Supabase remoto:
 
-```sql
--- 1. Verificar SKUs seedados (espera 4 rows com pricing exato D-02)
-select sku, leituras_count, price_brl, badge from public.credit_packages order by display_order;
+- **`supabase db push --linked`:** 4 migrations aplicadas sem erro (NOTICEs esperados de DROP IF EXISTS)
+- **credit_packages:** 4 rows com pricing exato D-02 (avulsa R$99,70 / pequeno R$298,50 / médio R$745,50 / grande R$1.191,00)
+- **RLS:** 7 tabelas com `rowsecurity = true`
+- **Funções:** 3 presentes (`fifo_reserve_credit`, `is_in_trial`, `release_reservation`)
+- **`pnpm gen:types`:** OK (só aviso cosmético de versão CLI) → `apps/web/types/database.ts` regenerado e commitado em `8f572fc`
 
--- 2. Verificar RLS habilitado em todas as 7 tabelas novas
-select tablename, rowsecurity from pg_tables
-where schemaname='public'
-  and tablename in ('credit_packages','customer_credits','credit_transactions',
-                    'credit_reservations','trial_status','asaas_webhook_events','audit_events');
+### Decisões do founder
 
--- 3. Verificar 3 funções existem
-select proname from pg_proc
-where proname in ('is_in_trial','fifo_reserve_credit','release_reservation');
-```
-
-Após aplicar: executar `pnpm gen:types` para regenerar `apps/web/types/database.ts`.
-
-Decisões pendentes:
-- **A1:** PAYMENT_CONFIRMED vs PAYMENT_RECEIVED como evento de "creditar"
-- **A6:** Canal do termo biométrico do cliente (ambos / só remote_link / só office_handoff)
+- **A1 = confirmed:** créditos liberados no evento `PAYMENT_CONFIRMED` (não `PAYMENT_RECEIVED`). UX-first; aceita risco raro de chargeback. → consumido pelo plano **08-04** (webhook Asaas).
+- **A6 = ambos:** termo de consentimento biométrico do cliente suportado em **ambos** os canais — `remote_link` (cliente em casa via convite) E `office_handoff` (terapeuta no consultório com tablet) via campo `consent_channel`. → consumido pelo plano **08-08**.
 
 ## Next Phase Readiness
 
-- Migrations 0035-0038 prontas para `supabase db push --linked` (ação founder)
-- Após aprovação no checkpoint + type regen: Waves 2-6 desbloqueadas
-- Plano 08-02 (termo de consentimento) independe de A1 mas depende de A6
-- Plano 08-04 (webhook Asaas) depende de A1
+- Migrations 0035-0038 LIVE no remoto + types regenerados → Waves 2-6 desbloqueadas
+- Plano 08-02 (termo de consentimento) pode rodar — A6=ambos resolvido
+- Plano 08-04 (webhook Asaas) pode rodar — A1=confirmed resolvido
+- Plano 08-08 (UI termo biométrico) usa A6=ambos via consent_channel
+
+## Self-Check: PASSED
+
+- 5 arquivos verificados em disco (4 migrations + types/database.ts) — todos FOUND
+- 4 commits verificados no git log (ccca3a5, 2745e97, c4711d1, 8f572fc) — todos FOUND
+- Zero deleções no commit Task 4 (8f572fc): +324 linhas, 0 removidas
 
 ---
 *Phase: 08-pagamento-lgpd*
-*Status: CHECKPOINT PENDENTE — Task 5 aguarda founder*
+*Status: COMPLETO — todas as 5 tasks concluídas, checkpoint resolvido pelo founder*
 *Completed: 2026-05-28*
