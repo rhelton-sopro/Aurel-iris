@@ -2,7 +2,8 @@
 phase: 08-pagamento-lgpd
 plan: 06
 subsystem: billing (server actions de compra/reembolso + signup CPF)
-tags: [billing, asaas, refund, cpf, signup, lgpd, trigger, tdd, checkpoint-pending]
+tags: [billing, asaas, refund, cpf, signup, lgpd, trigger, tdd, checkpoint-resolved]
+checkpoint_resolution: "Migration 0039 aplicada LIVE pelo founder (supabase db push --linked, 2026-05-28). Smoke test E2E (createChargeAction -> fatura Asaas + dedup CPF) DIFERIDO pro plano 08-14 (verificacao final E2E) — env ASAAS_WEBHOOK_TOKEN pendente ate webhook ter URL preview. Codigo do 08-06 completo: 23 testes green."
 requires:
   - phase: 08-01
     provides: "profiles.cpf + asaas_customer_id + UNIQUE idxs + tabelas billing (migration 0035)"
