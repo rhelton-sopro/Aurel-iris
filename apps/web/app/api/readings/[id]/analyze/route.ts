@@ -27,6 +27,7 @@ import { revalidatePath } from 'next/cache'
 
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
+import { convertReservationToConsume } from '@/lib/billing/credits'
 import { logReportGeneration } from '@/lib/calibration/log-generation'
 import { notifyTherapistReportReady } from '@/lib/notifications/notify-report-ready'
 import {
@@ -406,6 +407,27 @@ export async function POST(
             report_raw_text: buffer as unknown as never,
           })
           .eq('id', readingId)
+
+        // Fase 8 D-11 (08-07): relatório gerado com sucesso → converte a
+        // reservation 'active' → 'converted' (debita firmemente do saldo).
+        // Idempotente: regenerate, internal_use (sem reservation) e race
+        // perdida caem em not_found/already e são tratados como no-op.
+        // NUNCA bloqueia a entrega do relatório por falha de consume — o
+        // ledger é defensivo; o produto é o relatório. Audit de credit.consumed
+        // já é emitido dentro de convertReservationToConsume — não duplicar.
+        try {
+          const consume = await convertReservationToConsume(readingId)
+          if (!consume.ok && consume.reason !== 'not_found') {
+            console.warn(
+              `[analyze] convert reservation failed reading=${readingId}: ${consume.reason}`,
+            )
+          }
+        } catch (consumeErr) {
+          console.warn(
+            `[analyze] convert reservation threw reading=${readingId}:`,
+            consumeErr instanceof Error ? consumeErr.message : consumeErr,
+          )
+        }
 
         // v2.9.0 (2026-05-27): "leitura pronta" e-mail DESATIVADO globalmente.
         // Founder verbatim: "Estou recebendo emails de leituras geradas...
