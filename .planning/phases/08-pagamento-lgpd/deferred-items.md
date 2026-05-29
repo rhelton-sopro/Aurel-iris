@@ -76,3 +76,16 @@ DECISÃO necessária antes de tornar audit-vocabulary um CI gate hard de verdade
 allowlist marker / EXCLUDE_SUBPATHS aos arquivos legítimos (RAG metadata, test fixtures), ou
 (b) refinar os PATTERNS pra não pegar "jensen" como nome de escola em bibliografia. Trabalho
 próprio — não fold neste plano. Revisitar em plano de hardening LGPD-06 (Fase 8.1+).
+
+---
+
+## OPERATOR_EMAIL + vocab debt (checkpoint 08-09 Task 5 — resolvido 2026-05-28)
+
+Founder decidiu OPERATOR_EMAIL = suporte@iriscodex.com (copy legal aprovada). Ações pendentes do founder:
+- Criar caixa suporte@iriscodex.com
+- Setar NEXT_PUBLIC_OPERATOR_EMAIL=suporte@iriscodex.com no Vercel (fallback no código já aponta pra lá)
+
+LGPD-06 vocab debt (NÃO desta fase): audit-vocabulary.mjs já estava VERMELHO no baseline 5c4a80a —
+27 arquivos pré-existentes (Fases 3-7) com "tratamento/diagnóstico". As 3 superfícies do 08-09 têm
+marcador allowlist (0 hits novos). Memória "audit já passa" desatualizada. Decidir antes do GA:
+revisar os 27 OU expandir allowlist com justificativa por arquivo.
