@@ -13,6 +13,7 @@ import {
 import { computeRefundValue } from '@/lib/billing/refund-policy'
 import { creditExpiresAt } from '@/lib/billing/config'
 import { logAuditEvent } from '@/lib/audit/log'
+import { notifyRefundProcessed } from '@/lib/notifications/notify-refund-processed'
 import { cpfDigits } from '@/lib/auth/cpf'
 
 import {
@@ -183,7 +184,7 @@ export async function refundPackageAction(
   const { data: credit, error: selErr } = await supabase
     .from('customer_credits')
     .select(
-      'id, user_id, asaas_payment_id, purchase_date, leituras_purchased, leituras_remaining, leituras_reserved, status, credit_packages(price_brl)',
+      'id, user_id, asaas_payment_id, purchase_date, leituras_purchased, leituras_remaining, leituras_reserved, status, credit_packages(name, price_brl)',
     )
     .eq('id', parsed.data.credit_id)
     .maybeSingle()
@@ -266,6 +267,31 @@ export async function refundPackageAction(
   console.info(
     `[billing] REFUND_PROCESSED credit=${credit.id} kind=${policy.kind} value=${policy.value_brl}`,
   )
+
+  // Email recibo — BEST-EFFORT, fire-and-forget. Falha não bloqueia o retorno
+  // da action nem afeta o estado do refund (já aplicado acima).
+  void (async () => {
+    const { data: prof } = await service
+      .from('profiles')
+      .select('full_name')
+      .eq('id', user.id)
+      .maybeSingle()
+    await notifyRefundProcessed({
+      userEmail: user.email!,
+      userName: prof?.full_name ?? null,
+      packageName: (credit as unknown as { credit_packages: { name: string } })
+        .credit_packages.name,
+      refundValueBrl: policy.value_brl,
+      kind: policy.kind,
+      leiturasRefunded: policy.leituras_to_refund,
+    })
+  })().catch((err) =>
+    console.warn(
+      '[billing] notify refund failed (non-fatal):',
+      err instanceof Error ? err.message : err,
+    ),
+  )
+
   revalidatePath('/assinatura')
   return { ok: true, refunded_value_brl: policy.value_brl, kind: policy.kind }
 }

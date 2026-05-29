@@ -25,6 +25,7 @@ import 'server-only'
 import { createServiceClient } from '@/lib/supabase/service'
 import { creditExpiresAt } from '@/lib/billing/config'
 import { logAuditEvent } from '@/lib/audit/log'
+import { notifyCreditPurchaseConfirmed } from '@/lib/notifications/notify-credit-purchase-confirmed'
 import type { AsaasWebhookEnvelope } from '@/lib/asaas/types'
 
 export type ApplyPaymentResult =
@@ -120,6 +121,47 @@ export async function applyPaymentEvent(
     console.info(
       `[asaas-webhook] CREDIT_ACTIVATED credit=${credit.id} payment=${payment.id} leituras=${credit.leituras_purchased}`,
     )
+
+    // Email de confirmação — BEST-EFFORT, fire-and-forget. NUNCA bloquear o
+    // retorno do webhook (T-08-12-04): sem await, .catch absorve qualquer erro.
+    // Email vem de auth (profiles NÃO tem coluna email — pattern espelha
+    // notify-therapist-capture-complete.ts que usa auth.admin.getUserById).
+    void (async () => {
+      const [{ data: enriched }, authResult] = await Promise.all([
+        service
+          .from('customer_credits')
+          .select('expires_at, credit_packages(name, price_brl)')
+          .eq('id', credit.id)
+          .maybeSingle(),
+        service.auth.admin.getUserById(credit.user_id),
+      ])
+      const userEmail = authResult.data.user?.email
+      const pkg = (
+        enriched as unknown as {
+          credit_packages: { name: string; price_brl: number } | null
+        } | null
+      )?.credit_packages
+      if (!userEmail || !enriched || !pkg) return
+      const { data: prof } = await service
+        .from('profiles')
+        .select('full_name')
+        .eq('id', credit.user_id)
+        .maybeSingle()
+      await notifyCreditPurchaseConfirmed({
+        userEmail,
+        userName: prof?.full_name ?? null,
+        packageName: pkg.name,
+        leituras: credit.leituras_purchased,
+        valueBrl: pkg.price_brl,
+        expiresAt: enriched.expires_at,
+      })
+    })().catch((err) =>
+      console.warn(
+        '[apply-payment] notify purchase failed (non-fatal):',
+        err instanceof Error ? err.message : err,
+      ),
+    )
+
     return { applied: true, action: 'activated', credit_id: credit.id }
   }
 
