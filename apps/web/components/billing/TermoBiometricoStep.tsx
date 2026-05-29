@@ -7,7 +7,8 @@ import { signTermAction } from '@/app/actions/consent'
 
 interface Props {
   clientId: string
-  readingId: string
+  /** Opcional: consultório assina a nível de cliente, antes de existir leitura. */
+  readingId?: string
   clienteNome: string
   clienteCpf?: string | null
   consentChannel:

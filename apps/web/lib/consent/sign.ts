@@ -42,7 +42,8 @@ export function sanitizeInet(raw: string | null | undefined): string | null {
 
 export interface SignBiometricInput {
   client_id: string
-  reading_id: string
+  /** Nullable: consentimento a nível de cliente (consultório) não tem reading ainda. */
+  reading_id?: string | null
   consent_channel:
     | 'office_handoff'
     | 'office_qr'
@@ -72,7 +73,7 @@ export async function signBiometricTerm(
     .from('client_consents')
     .insert({
       client_id: input.client_id,
-      reading_id: input.reading_id,
+      reading_id: input.reading_id ?? null,
       term_version: currentTerm.version,
       event_type: 'initial',
       consent_channel: input.consent_channel,

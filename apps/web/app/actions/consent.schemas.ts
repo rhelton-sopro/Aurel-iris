@@ -9,7 +9,10 @@ import { z } from 'zod'
 
 export const signTermSchema = z.object({
   client_id: z.string().uuid(),
-  reading_id: z.string().uuid(),
+  // Opcional: no fluxo de consultório o termo é assinado a NÍVEL DE CLIENTE
+  // (antes de qualquer leitura existir — o gate em createReadingAction roda
+  // antes do INSERT reading). client_consents.reading_id é nullable (0020).
+  reading_id: z.string().uuid().optional(),
   consent_channel: z.enum([
     'office_handoff',
     'office_qr',

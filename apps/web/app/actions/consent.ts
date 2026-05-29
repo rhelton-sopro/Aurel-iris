@@ -8,6 +8,7 @@ import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { signBiometricTerm } from '@/lib/consent/sign'
+import { notifyClientConsentCopy } from '@/lib/notifications/notify-consent-copy'
 import { logAuditEvent } from '@/lib/audit/log'
 
 import {
@@ -120,6 +121,20 @@ export async function signTermAction(
       pdf_path,
     },
   })
+
+  // Cópia ao titular (LGPD art. 9 — transparência). Reforça o office_handoff,
+  // onde o cliente assina no aparelho do terapeuta: ele recebe no próprio
+  // e-mail a evidência do que aceitou. Best-effort — falha de email NÃO
+  // invalida o consentimento (trilha legal = client_consents append-only).
+  try {
+    await notifyClientConsentCopy(
+      parsed.data.client_id,
+      pdf_url,
+      sign.term_version,
+    )
+  } catch (err) {
+    console.error('[consent] envio de cópia ao cliente falhou (non-fatal):', err)
+  }
 
   revalidatePath(`/clientes/${parsed.data.client_id}`)
   return { ok: true, consent_id: sign.consent_id, pdf_url }

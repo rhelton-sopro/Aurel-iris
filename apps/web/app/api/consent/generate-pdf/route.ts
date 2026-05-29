@@ -41,7 +41,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     string,
     string | undefined
   >
-  if (!client_id || !reading_id || !cliente_nome) {
+  // reading_id é OPCIONAL: consultório assina a nível de cliente (sem leitura
+  // ainda). client_id + nome bastam pra hidratar + persistir o termo.
+  if (!client_id || !cliente_nome) {
     return NextResponse.json({ error: 'missing fields' }, { status: 400 })
   }
 
@@ -206,12 +208,19 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   // 5. Upload no Supabase Storage (bucket privado client-consents).
   //    Path per-therapist: <therapist_id>/<client_id>/<reading_id>.pdf
   //    upsert:false → immutable (T-08-08-01); re-aceite re-gera (já existe → ok).
-  const path = `${client.therapist_id}/${client_id}/${reading_id}.pdf`
+  //    reading-level: <therapist>/<client>/<reading>.pdf (imutável).
+  //    client-level (consultório, sem reading): <therapist>/<client>/consent.pdf.
+  const path = reading_id
+    ? `${client.therapist_id}/${client_id}/${reading_id}.pdf`
+    : `${client.therapist_id}/${client_id}/consent.pdf`
   const { error: upErr } = await service.storage
     .from('client-consents')
     .upload(path, pdfBuffer, {
       contentType: 'application/pdf',
-      upsert: false,
+      // reading-level = imutável (T-08-08-01); client-level sobrescreve pra
+      // refletir o re-aceite mais recente (PDF é cópia de conveniência; a
+      // trilha legal é client_consents append-only).
+      upsert: !reading_id,
     })
   if (upErr && !/already exists/i.test(upErr.message)) {
     console.error('[consent-pdf] upload failed:', upErr.message)
