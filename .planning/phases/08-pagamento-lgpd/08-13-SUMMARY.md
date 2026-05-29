@@ -3,7 +3,7 @@ phase: 08-pagamento-lgpd
 plan: 13
 subsystem: billing (cron temporal — fecha o loop de expiração/liberação)
 tags: [billing, cron, vercel-cron, reservations, expiry, trial, notifications, middleware]
-status: checkpoint-pending
+status: checkpoint-consolidated-08-14
 requires:
   - phase: 08-05
     provides: "release_reservation RPC wrapping + estado do credit ledger (reservations/credits/trial)"
