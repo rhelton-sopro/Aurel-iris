@@ -89,3 +89,13 @@ LGPD-06 vocab debt (NÃO desta fase): audit-vocabulary.mjs já estava VERMELHO n
 27 arquivos pré-existentes (Fases 3-7) com "tratamento/diagnóstico". As 3 superfícies do 08-09 têm
 marcador allowlist (0 hits novos). Memória "audit já passa" desatualizada. Decidir antes do GA:
 revisar os 27 OU expandir allowlist com justificativa por arquivo.
+
+---
+
+## Refinamentos de copy /assinatura/comprar (08-10 UAT, founder aprovou visual 2026-05-28)
+
+UAT visual APROVADO (desktop+mobile). Refinamentos não-bloqueantes pra rodada futura:
+- TYPO: "volladas" → "voltadas" no disclaimer (grep em components/billing/PackageGrid.tsx ou page.tsx)
+- Card trial "Não disponível" → copy mais convidativa
+- "vs Avulsa" → "Você economiza R$X"
+3 estados do trial (active/ended) + redirect Asaas real NÃO testados → smoke E2E 08-14.

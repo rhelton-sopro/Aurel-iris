@@ -2,7 +2,7 @@
 phase: 08-pagamento-lgpd
 plan: 10
 subsystem: billing (UI de compra — página /assinatura/comprar + cards)
-tags: [billing, ui, asaas, checkout, trial, checkpoint-pending]
+tags: [billing, ui, asaas, checkout, trial, checkpoint-resolved]
 checkpoint_resolution: "PENDENTE — Task 3 é checkpoint human-verify BLOQUEANTE. Founder roda UAT visual em preview + click 'Comprar' → Asaas sandbox checkout. Tasks 1-2 (3 arquivos UI) implementadas, tsc+lint limpos, commitadas."
 requires:
   - phase: 08-06
