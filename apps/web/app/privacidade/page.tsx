@@ -1,9 +1,39 @@
 import Link from 'next/link'
 import { TOS_VERSION, TOS_EFFECTIVE_DATE } from '@/lib/consent/tos'
+import { DisclaimerCopy } from '@/components/legal/DisclaimerCopy'
 
 export const metadata = {
   title: 'Política de Privacidade — Iris Codex',
 }
+
+// E-mail operacional de contato LGPD (exclusão / direitos do titular).
+// Configurável via NEXT_PUBLIC_OPERATOR_EMAIL no Vercel. O fallback abaixo é
+// um PLACEHOLDER — o founder decide o valor final no checkpoint (Task 5 do
+// plano 08-09): manter rhelton@gmail.com ou criar suporte@iriscodex.com.
+const OPERATOR_EMAIL =
+  process.env.NEXT_PUBLIC_OPERATOR_EMAIL ?? 'rhelton@gmail.com'
+
+const DELETION_SUBJECT = '[Iris Codex] Pedido de exclusão de dados (LGPD)'
+
+const DELETION_BODY = `Olá,
+
+Solicito a exclusão dos meus dados pessoais armazenados no Iris Codex, incluindo:
+- Meu cadastro (terapeuta)
+- Todos os relatórios e leituras gerados
+- Imagens de íris dos meus examinados
+- Demais registros associados à minha conta
+
+Nome completo: ___________________
+E-mail cadastrado: ________________
+CPF (para confirmação de identidade): ___________
+
+Aguardo confirmação por e-mail no prazo legal.
+
+Obrigado(a).`
+
+const DELETION_MAILTO = `mailto:${OPERATOR_EMAIL}?subject=${encodeURIComponent(
+  DELETION_SUBJECT,
+)}&body=${encodeURIComponent(DELETION_BODY)}`
 
 export default function PrivacidadePage() {
   return (
@@ -17,6 +47,10 @@ export default function PrivacidadePage() {
         Civil da Internet).
       </p>
 
+      <div className="mt-6 border-l-2 border-teal pl-4">
+        <DisclaimerCopy variant="inline" />
+      </div>
+
       <div className="mt-8 space-y-6 text-sm leading-relaxed text-ink">
         <section className="space-y-2">
           <h2 className="text-base font-medium">1. Controlador e contato</h2>
@@ -24,8 +58,8 @@ export default function PrivacidadePage() {
             O Iris Codex é o responsável pelo tratamento dos dados do terapeuta
             usuário. Para exercício de direitos e dúvidas sobre privacidade,
             contate o responsável pelo tratamento de dados pelo e-mail{' '}
-            <a href="mailto:rhelton@gmail.com" className="underline">
-              rhelton@gmail.com
+            <a href={`mailto:${OPERATOR_EMAIL}`} className="underline">
+              {OPERATOR_EMAIL}
             </a>
             . O Iris Codex encontra-se em fase beta restrita; a identificação
             registral completa do controlador será publicada nesta Política
@@ -160,6 +194,38 @@ export default function PrivacidadePage() {
             controlador de dados de examinados, encaminharemos a você, como
             operador, as solicitações de titulares recebidas diretamente, para
             que você as atenda.
+          </p>
+        </section>
+
+        <section id="deletar-dados" className="space-y-3 scroll-mt-24">
+          <h2 className="text-base font-medium">
+            Como solicitar exclusão dos seus dados
+          </h2>
+          <p>
+            Nos termos do art. 18 da LGPD, você pode solicitar a qualquer momento
+            a confirmação do tratamento, o acesso, a correção, a anonimização, a
+            portabilidade e a <strong>eliminação dos seus dados pessoais</strong>,
+            bem como revogar o consentimento.
+          </p>
+          <p>
+            Para solicitar a exclusão, envie um e-mail à nossa equipe usando o
+            link abaixo (já vem com assunto e modelo de mensagem preenchidos):
+          </p>
+          <a
+            href={DELETION_MAILTO}
+            className="inline-block border border-ink bg-teal-dark px-4 py-2 text-xs font-normal uppercase tracking-label text-white no-underline"
+          >
+            Solicitar exclusão por e-mail →
+          </a>
+          <p className="text-sm text-mist">
+            Responderemos à confirmação de existência de tratamento e ao acesso
+            em até <strong>15 (quinze) dias</strong> (art. 19, II da LGPD); as
+            demais solicitações no menor prazo possível. Você também pode
+            escrever diretamente para{' '}
+            <a href={`mailto:${OPERATOR_EMAIL}`} className="underline">
+              {OPERATOR_EMAIL}
+            </a>
+            .
           </p>
         </section>
 
