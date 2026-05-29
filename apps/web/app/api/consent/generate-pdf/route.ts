@@ -23,6 +23,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { hydrateTerm } from '@/lib/consent/hydrate-term'
+import { operatorIdentity } from '@/lib/consent/operator'
 import { renderTermoHtml } from '@/lib/consent/pdf-template'
 import { validateToken } from '@/lib/invite/tokens'
 
@@ -129,6 +130,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     client as { profiles: { full_name: string; cpf: string | null } }
   ).profiles
   const { hydrated, sha256 } = hydrateTerm(term.body, {
+    ...operatorIdentity(),
     TERAPEUTA_RESPONSAVEL: therapist.full_name,
     TERAPEUTA_CNPJ_CPF: therapist.cpf ?? '',
     TITULAR_NOME: cliente_nome,
