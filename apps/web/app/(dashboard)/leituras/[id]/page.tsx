@@ -58,9 +58,12 @@ export default async function LeituraDetailPage({
   // 'as never' isola o type-check; RLS authed garante isolation.
   const { data: progress } = await supabase
     .from('readings')
-    .select('analysis_started_at' as never)
+    .select('analysis_started_at, analysis_completed_at' as never)
     .eq('id', readingId)
-    .maybeSingle<{ analysis_started_at: string | null }>()
+    .maybeSingle<{
+      analysis_started_at: string | null
+      analysis_completed_at: string | null
+    }>()
 
   if (error || !reading) notFound()
 
@@ -134,10 +137,28 @@ export default async function LeituraDetailPage({
   // no finalize. Janela de 5min (após isso, considera handler morto
   // — UI libera retry). FIX founder UAT 2026-05-20.
   const analysisStartedAt = progress?.analysis_started_at ?? null
+  const analysisCompletedAt = progress?.analysis_completed_at ?? null
+  // Frescura dirigida pela CONCLUSÃO real (completed_at), não por timer curto.
+  // A geração (canonicalize lazy + Stage 1 + Stage 2) pode levar ~5-6min; o
+  // timer antigo de 5min parava o AutoRefresh ANTES de terminar → a página
+  // congelava no relatório velho até F5 manual (crítico em escala: terapeuta
+  // acha que falhou e regenera de novo, queimando custo). Agora: "em progresso"
+  // enquanto começou e ainda NÃO concluiu, com teto de segurança de 15min pra
+  // gerações travadas (started sem completed). O AutoRefresh para no instante em
+  // que completed_at é gravado (analyze route) e a página renderiza o relatório
+  // pronto — sem hard refresh.
   const isAnalysisInProgress = (() => {
     if (!analysisStartedAt) return false
-    const ageMs = Date.now() - new Date(analysisStartedAt).getTime()
-    return ageMs < 5 * 60 * 1000
+    const startedMs = new Date(analysisStartedAt).getTime()
+    if (Date.now() - startedMs > 15 * 60 * 1000) return false // teto de segurança
+    // Concluiu DEPOIS de começar → pronto, não está mais em progresso.
+    if (
+      analysisCompletedAt &&
+      new Date(analysisCompletedAt).getTime() >= startedMs
+    ) {
+      return false
+    }
+    return true
   })()
 
   // Phase 7.4 Sonnet-direct: signal (no hard block) when ≥1 photo was read
