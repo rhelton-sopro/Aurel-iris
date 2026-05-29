@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { validateToken } from '@/lib/invite/tokens'
 import { createServiceClient } from '@/lib/supabase/service'
 import { resolveClientGate } from '@/lib/gates/client-gates'
+import { assertClientTermoSigned } from '@/lib/gates/termo-gate'
 import { reserveCreditForReading } from '@/lib/billing/credits'
 import { logAuditEvent } from '@/lib/audit/log'
 import { InviteCaptureWrapper } from './InviteCaptureWrapper'
@@ -185,6 +186,15 @@ export default async function ConviteCapturarPage({
       .eq('id', validation.token.id)
   }
 
+  // BILLING-03 + LGPD-01 (D-19) — Decisão A+ (founder 2026-05-28). Verifica se o
+  // termo biométrico já foi assinado (current-pointer clients.consent_last_at).
+  // Se não, o wrapper renderiza InviteTermoStep BLOQUEANTE antes da captura.
+  // Em resume (capturedSlots > 0) o termo já estava assinado — assertClient...
+  // retorna ok e o passo é pulado. db_error/client_not_found → trata como NÃO
+  // assinado (fail-closed: melhor pedir o aceite de novo do que pular o gate).
+  const termo = await assertClientTermoSigned(client.id)
+  const termoSigned = termo.ok
+
   return (
     <InviteCaptureWrapper
       readingId={readingId}
@@ -194,6 +204,7 @@ export default async function ConviteCapturarPage({
       inviteToken={token}
       capturedSlots={capturedSlots}
       resumeMode={capturedSlots.length > 0}
+      termoSigned={termoSigned}
     />
   )
 }

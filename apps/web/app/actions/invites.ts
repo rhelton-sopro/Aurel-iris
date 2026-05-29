@@ -63,6 +63,22 @@ export async function createInviteTokenAction(
     }
   }
 
+  // TERMO_GATE_BYPASS — BILLING-03 + LGPD-01 (D-19) — Decisão A+ (founder 2026-05-28).
+  // O gate de termo biométrico NÃO é aplicado aqui (na criação do link de
+  // convite). Razão: o consentimento biométrico pertence ao CLIENTE e é
+  // assinado por ele NO PONTO DE CAPTURA do fluxo remote_link
+  // (/convite/[token]/capturar), via passo de termo que precede a captura das
+  // fotos (signInviteTermAction + consent_channel='remote_link'). Gatear na
+  // geração do link forçaria o terapeuta a assinar pelo cliente — errado.
+  // D-19 fala "antes de INICIAR captura", e a captura efetiva acontece no
+  // /convite/[token]/capturar, não na geração do link.
+  //
+  // Onde o gate de termo VIVE de fato:
+  //   - office_handoff: createReadingAction → assertClientTermoSigned (08-15 task 2)
+  //   - remote_link:    /convite/[token]/capturar → passo de termo bloqueante
+  //                     ANTES do CaptureClient (08-15 A+); cliente assina via
+  //                     signInviteTermAction (app/actions/invite-consent.ts).
+  //
   // Insert via session client (RLS policy aceita therapist_id = auth.uid()).
   // therapist_id é setado server-side a partir de user.id — não confia em
   // input do cliente.
