@@ -28,6 +28,7 @@ export default defineConfig({
       // rodam só via seus configs isolados, nunca na suíte normal.
       'scripts/smoke-consent-pdf.spec.ts',
       'scripts/smoke-asaas-webhook.spec.ts',
+      'scripts/recanonicalize-one.spec.ts',
     ],
   },
   resolve: {
