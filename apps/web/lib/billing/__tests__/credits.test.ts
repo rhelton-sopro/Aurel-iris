@@ -1,34 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // --- Mock service-role Supabase client ---------------------------------------
-// O query builder é chainável (select/update/eq retornam `this`) E awaitável no
-// fim de uma chain. Dois shapes terminais precisam de controle explícito:
-//   - `.maybeSingle()` (SELECT reservation, UPDATE...select, SELECT credit)
-//   - o UPDATE bare-awaited de customer_credits (sem maybeSingle) resolve via
-//     thenable do builder, consumindo `nextAwait`.
+// Tanto reserveCreditForReading quanto convertReservationToConsume (WR-07)
+// despacham via RPC SECURITY DEFINER — não há mais query-builders chaináveis
+// a mockar, apenas o rpc().
 const rpcMock = vi.fn()
-const selectMock = vi.fn()
-const updateMock = vi.fn()
-const insertMock = vi.fn()
-const eqMock = vi.fn()
-const maybeSingleMock = vi.fn()
-
-let nextAwait: Array<{ data: unknown; error: unknown }> = []
-
-const builder = {
-  select: selectMock,
-  update: updateMock,
-  insert: insertMock,
-  eq: eqMock,
-  maybeSingle: maybeSingleMock,
-  then(onFulfilled: (v: { data: unknown; error: unknown }) => unknown) {
-    const v = nextAwait.shift() ?? { data: null, error: null }
-    return Promise.resolve(v).then(onFulfilled)
-  },
-}
 
 vi.mock('@/lib/supabase/service', () => ({
-  createServiceClient: () => ({ rpc: rpcMock, from: () => builder }),
+  createServiceClient: () => ({ rpc: rpcMock }),
 }))
 vi.mock('@/lib/audit/log', () => ({
   logAuditEvent: vi.fn().mockResolvedValue(undefined),
