@@ -55,7 +55,7 @@ metrics:
   tasks_total: 5
   files_created: 10
 
-status: checkpoint-pending
+status: checkpoint-resolved-deferred
 ---
 
 # Phase 08 Plan 08: Termo de Consentimento Biométrico (LGPD-01) — CHECKPOINT-PENDING

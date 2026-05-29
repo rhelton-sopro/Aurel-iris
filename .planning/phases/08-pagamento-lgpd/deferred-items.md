@@ -38,3 +38,13 @@ Migration 0039 JÁ aplicada live (founder, 2026-05-28). O smoke test E2E foi mov
 - signup CPF duplicado → erro humano de dedup
 
 Pré-requisitos antes do 08-14: ASAAS_WEBHOOK_TOKEN no Vercel (após webhook ter URL preview, plano 08-13) + deploy preview.
+
+---
+
+## PDF smoke do termo biométrico (checkpoint 08-08 Task 5) — DIFERIDO pro 08-14
+
+Founder cria bucket privado `client-consents` + roda seed termo v1 (ações live em andamento).
+PDF smoke E2E movido pro 08-14 (precisa deploy preview + GOTENBERG_URL/GOTENBERG_BASIC_AUTH):
+- POST /api/consent/generate-pdf com client_id + reading_id existentes
+- abrir pdf_url → conferir corpo hidratado + footer (IP/data BRT/SHA-256)
+- confirmar A6 (consent_channel office_handoff E remote_link)
