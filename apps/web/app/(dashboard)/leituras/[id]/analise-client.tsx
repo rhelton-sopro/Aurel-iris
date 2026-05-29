@@ -25,6 +25,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
@@ -62,15 +63,27 @@ export function AnaliseClient({
   const [streaming, setStreaming] = useState(false)
   const [sectionsReceived, setSectionsReceived] = useState(0)
   const [error, setError] = useState<string | null>(null)
+  // Fase 8: gate de crédito na geração devolve 402 quando o terapeuta está sem
+  // saldo. Mostra CTA de compra (as fotos já estão salvas).
+  const [noBalance, setNoBalance] = useState(false)
 
   const handleTrigger = useCallback(async () => {
     if (streaming) return
     setStreaming(true)
     setSectionsReceived(0)
     setError(null)
+    setNoBalance(false)
     try {
       const res = await fetch(`/api/readings/${readingId}/analyze`, { method: 'POST' })
       if (!res.ok) {
+        // 402 = sem créditos (gate de crédito na geração). Não é erro de
+        // sistema — é estado de saldo; mostra CTA de compra.
+        if (res.status === 402) {
+          setNoBalance(true)
+          setStreaming(false)
+          toast.error('Sem créditos para gerar este relatório.')
+          return
+        }
         const detail = await res.text().catch(() => '')
         const msg = detail.slice(0, 200) || `HTTP ${res.status}`
         setError(msg)
@@ -156,6 +169,27 @@ export function AnaliseClient({
     return (
       <div className="rounded-md border border-border bg-card px-4 py-6 text-center text-sm text-muted-foreground">
         Aguardando análise terminar…
+      </div>
+    )
+  }
+
+  // Sem créditos (402 do gate de geração): as fotos estão salvas, falta saldo.
+  if (noBalance) {
+    return (
+      <div className="space-y-3 rounded-md border border-border bg-muted/30 px-4 py-5">
+        <p className="text-sm font-semibold">
+          Sem créditos para gerar este relatório
+        </p>
+        <p className="text-sm leading-relaxed text-muted-foreground">
+          As fotos estão salvas. Compre créditos e depois clique em
+          “Gerar análise” — a geração fica pendente até lá.
+        </p>
+        <Link
+          href="/assinatura/comprar"
+          className="inline-block rounded-md bg-teal-dark px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+        >
+          Comprar créditos
+        </Link>
       </div>
     )
   }

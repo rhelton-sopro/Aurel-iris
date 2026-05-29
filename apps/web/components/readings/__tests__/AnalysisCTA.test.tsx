@@ -17,7 +17,7 @@ describe('components/readings/AnalysisCTA — Surface 1 button group', () => {
     expect(screen.queryByText('Editar análise')).toBeNull()
   })
 
-  it('renderiza "Editar análise" + "Regenerar análise (n/3)" quando hasReport=true', () => {
+  it('renderiza "Editar análise" + "Regenerar análise (0/1)" quando hasReport=true (1 regen disponível)', () => {
     render(
       <AnalysisCTA
         readingId="r1"
@@ -28,19 +28,24 @@ describe('components/readings/AnalysisCTA — Surface 1 button group', () => {
       />,
     )
     expect(screen.getByText('Editar análise')).toBeDefined()
-    expect(screen.getByText(/Regenerar análise \(1\/3\)/)).toBeDefined()
+    // regenerationCount=1 = original gerada, 0 regens usados → "(0/1)", disponível.
+    expect(screen.getByText(/Regenerar análise \(0\/1\)/)).toBeDefined()
+    expect(
+      screen.getByTestId('analysis-cta-regenerate').hasAttribute('disabled'),
+    ).toBe(false)
   })
 
-  it('Regenerar fica disabled com tooltip quando regenerationCount=3 (cap atingido)', () => {
+  it('Regenerar fica disabled e mostra (1/1) quando regenerationCount=2 (cap = 1 regen atingido)', () => {
     render(
       <AnalysisCTA
         readingId="r1"
         hasReport={true}
-        regenerationCount={3}
+        regenerationCount={2}
         isDelivered={false}
         onTrigger={vi.fn()}
       />,
     )
+    expect(screen.getByText(/Regenerar análise \(1\/1\)/)).toBeDefined()
     const btn = screen.getByTestId('analysis-cta-regenerate')
     expect(btn.hasAttribute('disabled')).toBe(true)
   })
@@ -74,12 +79,12 @@ describe('components/readings/AnalysisCTA — Surface 1 button group', () => {
     expect(onTrigger).toHaveBeenCalledTimes(1)
   })
 
-  it('Tooltip wrapper presente (data-slot tooltip-trigger) quando regenerationCount=3 (cap atingido)', () => {
+  it('Tooltip wrapper presente (data-slot tooltip-trigger) quando regenerationCount=2 (cap atingido)', () => {
     const { container } = render(
       <AnalysisCTA
         readingId="r1"
         hasReport={true}
-        regenerationCount={3}
+        regenerationCount={2}
         isDelivered={false}
         onTrigger={vi.fn()}
       />,

@@ -5,10 +5,14 @@
  *
  * Renders 1 of 2 button configurations:
  *   - hasReport=false → single "Gerar análise" primary button
- *   - hasReport=true  → "Editar análise" link + "Regenerar análise (n/3)" outline
+ *   - hasReport=true  → "Editar análise" link + "Regenerar análise (n/1)" outline
+ *
+ * Regra (founder 2026-05-29): 1 geração original + 1 regen grátis. Como
+ * regeneration_count conta gerações totais (1 após a original), o contador
+ * exibe regens usados = count-1 (/1) e o cap é count >= 2.
  *
  * Disabled tooltips (D-S4):
- *   - regenerationCount >= 3 → "Limite de 3 regenerações atingido. Edite manualmente para ajustar o relatório."
+ *   - regenerationCount >= 2 → "Você já usou a regeneração desta leitura. Para um novo relatório, faça uma nova leitura (novas fotos)."
  *   - isDelivered=true       → "Esta leitura já foi entregue ao cliente. Para gerar nova versão, crie uma nova leitura."
  *
  * Phase 7 | Plan 07-09 | UI-SPEC §Surface 1 lines 100-118
@@ -35,10 +39,14 @@ export function AnalysisCTA({
   isDelivered,
   onTrigger,
 }: AnalysisCTAProps) {
-  const regenDisabled = regenerationCount >= 3 || isDelivered
+  // 1 geração original + 1 regen grátis (founder 2026-05-29). regenerationCount
+  // conta gerações TOTAIS (= 1 após a original), então regens usados = count-1
+  // e o cap é count >= 2 (espelha o gate (e) do analyze/route).
+  const regensUsed = Math.max(0, regenerationCount - 1)
+  const regenDisabled = regenerationCount >= 2 || isDelivered
   const regenTooltip =
-    regenerationCount >= 3
-      ? 'Limite de 3 regenerações atingido. Edite manualmente para ajustar o relatório.'
+    regenerationCount >= 2
+      ? 'Você já usou a regeneração desta leitura. Para um novo relatório, faça uma nova leitura (novas fotos).'
       : isDelivered
         ? 'Esta leitura já foi entregue ao cliente. Para gerar nova versão, crie uma nova leitura.'
         : null
@@ -60,10 +68,10 @@ export function AnalysisCTA({
       disabled={regenDisabled}
       className="gap-2"
       data-testid="analysis-cta-regenerate"
-      aria-label={`Regenerar análise (${regenerationCount}/3)`}
+      aria-label={`Regenerar análise (${regensUsed}/1)`}
     >
       <RefreshCw className="h-4 w-4" aria-hidden />
-      Regenerar análise ({regenerationCount}/3)
+      Regenerar análise ({regensUsed}/1)
     </Button>
   )
 

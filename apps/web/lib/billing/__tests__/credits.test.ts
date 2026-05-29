@@ -5,15 +5,29 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 // despacham via RPC SECURITY DEFINER — não há mais query-builders chaináveis
 // a mockar, apenas o rpc().
 const rpcMock = vi.fn()
+// readingHasReservation usa query-builder (.from().select().eq().in().limit()
+// .maybeSingle()), não rpc — builder chainável dedicado.
+const maybeSingleMock = vi.fn()
+const reservationBuilder = {
+  select: vi.fn(() => reservationBuilder),
+  eq: vi.fn(() => reservationBuilder),
+  in: vi.fn(() => reservationBuilder),
+  limit: vi.fn(() => reservationBuilder),
+  maybeSingle: maybeSingleMock,
+}
 
 vi.mock('@/lib/supabase/service', () => ({
-  createServiceClient: () => ({ rpc: rpcMock }),
+  createServiceClient: () => ({ rpc: rpcMock, from: () => reservationBuilder }),
 }))
 vi.mock('@/lib/audit/log', () => ({
   logAuditEvent: vi.fn().mockResolvedValue(undefined),
 }))
 
-import { convertReservationToConsume, reserveCreditForReading } from '../credits'
+import {
+  convertReservationToConsume,
+  reserveCreditForReading,
+  readingHasReservation,
+} from '../credits'
 
 describe('reserveCreditForReading', () => {
   beforeEach(() => {
@@ -137,5 +151,32 @@ describe('convertReservationToConsume (WR-07 atomic via RPC)', () => {
     const r = await convertReservationToConsume('r1')
     expect(r.ok).toBe(false)
     if (!r.ok) expect(r.reason).toBe('db_error')
+  })
+})
+
+// Guard money-critical do redesign consume-na-geração: a 1ª geração reserva
+// (gate), a regen reusa a reserva existente e NÃO cobra de novo. Sem ele,
+// fifo_reserve_credit (não-idempotente por reading) cobraria 2× na regen.
+describe('readingHasReservation (guard anti-double-charge)', () => {
+  beforeEach(() => {
+    maybeSingleMock.mockReset()
+  })
+
+  it('true quando existe reserva active/converted (regen reusa, não cobra)', async () => {
+    maybeSingleMock.mockResolvedValueOnce({ data: { id: 'res-1' }, error: null })
+    expect(await readingHasReservation('reading-1')).toBe(true)
+  })
+
+  it('false quando NÃO há reserva (1ª geração → reserve/gate roda)', async () => {
+    maybeSingleMock.mockResolvedValueOnce({ data: null, error: null })
+    expect(await readingHasReservation('reading-1')).toBe(false)
+  })
+
+  it('fail-safe: erro de query → true (nunca arrisca cobrança dupla)', async () => {
+    maybeSingleMock.mockResolvedValueOnce({
+      data: null,
+      error: { message: 'connection refused' },
+    })
+    expect(await readingHasReservation('reading-1')).toBe(true)
   })
 })

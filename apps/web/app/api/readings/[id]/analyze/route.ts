@@ -27,7 +27,12 @@ import { revalidatePath } from 'next/cache'
 
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
-import { convertReservationToConsume } from '@/lib/billing/credits'
+import {
+  convertReservationToConsume,
+  reserveCreditForReading,
+  readingHasReservation,
+} from '@/lib/billing/credits'
+import { logAuditEvent } from '@/lib/audit/log'
 import { logReportGeneration } from '@/lib/calibration/log-generation'
 import { notifyTherapistReportReady } from '@/lib/notifications/notify-report-ready'
 import {
@@ -129,12 +134,19 @@ export async function POST(
       { status: 409 },
     )
   }
-  // Gate (e): regen cap — 3/3 for therapists (D-S4), founder-bypassed.
+  // Gate (e): cap = 1 geração original + 1 regen grátis (founder 2026-05-29).
+  // regeneration_count conta GERAÇÕES totais (incrementa a cada geração,
+  // inclusive a original → 1 após a 1ª). "1 regen" = bloquear na 3ª geração:
+  //   original: count 0→1 | regen: count 1→2 | 3ª: count 2 → BLOQUEIA
+  // Logo o gate é `>= 2`, NÃO `>= 1` (isso mataria a regen). Founder bypassa.
   const currentCount = reading.regeneration_count ?? 0
   const isFounder = isFounderEmail(user.email)
-  if (currentCount >= 3 && !isFounder) {
+  if (currentCount >= 2 && !isFounder) {
     return NextResponse.json(
-      { error: 'Regeneration limit reached (3/3). Edit manually instead.' },
+      {
+        error:
+          'Você já usou a regeneração desta leitura. Para um novo relatório, faça uma nova leitura (novas fotos).',
+      },
       { status: 409 },
     )
   }
@@ -163,6 +175,54 @@ export async function POST(
       )
     }
     // started_at sem completed_at e age > 5min = handler stale, libera retry.
+  }
+
+  // ===== GATE DE CRÉDITO (Fase 8 redesign — consume-na-geração) =====
+  // A reserva saiu da CAPTURA (invite + consultório): captura é sempre livre,
+  // o cliente nunca é bloqueado. O crédito é gateado AQUI, no início da
+  // geração, ANTES de gastar Sonnet:
+  //   - 1ª geração (sem reserva ainda): reserve → no_balance? bloqueia 402
+  //     (fotos salvas, terapeuta compra e regenera); internal/trial/credit ok.
+  //   - regen (já tem reserva active/converted): reusa, NÃO cobra de novo
+  //     (fifo_reserve_credit não é idempotente por reading_id — ver
+  //     readingHasReservation). 1 leitura = 1 crédito.
+  // O débito firme (convert) segue no pós-stream. Founder bypassa via
+  // internal_use dentro do fifo_reserve_credit.
+  if (!(await readingHasReservation(readingId))) {
+    const reserve = await reserveCreditForReading(user.id, readingId)
+    if (!reserve.ok) {
+      if (reserve.reason === 'no_balance') {
+        return NextResponse.json(
+          {
+            error: 'no_balance',
+            message:
+              'Sem créditos para gerar este relatório. As fotos estão salvas — compre créditos para gerar.',
+            redirect_to: '/assinatura/comprar',
+          },
+          { status: 402 },
+        )
+      }
+      console.error(
+        `[analyze] reserve falhou reading=${readingId}: ${reserve.reason}`,
+      )
+      return NextResponse.json(
+        { error: 'Erro ao verificar créditos. Tente novamente.' },
+        { status: 500 },
+      )
+    }
+    // D-09: audit de internal_use (founder/admin) — migrado da captura pro gate
+    // de geração (chokepoint único). Sem isso, leituras do founder ficariam
+    // invisíveis pra exclusão de métricas de faturamento. Best-effort.
+    if (reserve.source === 'internal') {
+      await logAuditEvent({
+        event_type: 'admin.internal_use_used',
+        actor_user_id: user.id,
+        actor_email: user.email,
+        target_type: 'reading',
+        target_id: readingId,
+        metadata: { entry_point: 'generate', client_id: reading.client_id ?? null },
+      })
+    }
   }
 
   const clientName =

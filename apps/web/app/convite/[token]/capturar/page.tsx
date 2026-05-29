@@ -4,8 +4,6 @@ import { validateToken } from '@/lib/invite/tokens'
 import { createServiceClient } from '@/lib/supabase/service'
 import { resolveClientGate } from '@/lib/gates/client-gates'
 import { assertClientTermoSigned } from '@/lib/gates/termo-gate'
-import { reserveCreditForReading } from '@/lib/billing/credits'
-import { logAuditEvent } from '@/lib/audit/log'
 import { InviteCaptureWrapper } from './InviteCaptureWrapper'
 
 export const dynamic = 'force-dynamic'
@@ -119,63 +117,11 @@ export default async function ConviteCapturarPage({
     }
     readingId = created.id
 
-    // Fase 8 D-10 #2 / D-11: reserva 1 crédito do TERAPEUTA (dono do crédito,
-    // não o cliente que está aqui sem sessão) ANTES de iniciar a captura.
-    // Decisão de arquitetura (08-07): o convite NÃO cria reading em
-    // createInviteTokenAction — a reading nasce aqui, lazy, quando o cliente
-    // abre o link. Como reserveCreditForReading exige reading_id, este é o
-    // único ponto onde a reserva pode ser atrelada. Cobre tanto D-10 #1
-    // (saldo antes de usar link remoto) quanto D-10 #2 (antes de capturar):
-    // sem saldo do terapeuta, a captura é bloqueada com mensagem humana.
-    // Só reserva na criação NOVA — retomar reading pending (acima) já tem
-    // reservation; re-reservar duplicaria o débito.
-    const reserve = await reserveCreditForReading(
-      validation.token.therapist_id,
-      readingId,
-    )
-    if (!reserve.ok) {
-      // Rollback: remove a reading recém-criada pra não poluir a base.
-      await service.from('readings').delete().eq('id', readingId)
-      readingId = null
-      if (reserve.reason === 'no_balance') {
-        return (
-          <div className="mx-auto max-w-md px-4 py-12 space-y-2">
-            <h2 className="text-xl font-semibold">
-              Seu terapeuta precisa liberar esta leitura
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              No momento não há créditos disponíveis para iniciar sua leitura.
-              Avise o terapeuta que enviou este convite — ele poderá liberar e
-              reenviar o link.
-            </p>
-          </div>
-        )
-      }
-      return (
-        <div className="mx-auto max-w-md px-4 py-12 space-y-2">
-          <h2 className="text-xl font-semibold">
-            Não conseguimos iniciar sua leitura
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Tente recarregar a página. Se persistir, peça um novo link ao seu
-            terapeuta.
-          </p>
-        </div>
-      )
-    }
-
-    // D-09 audit: uso de internal_use (founder/admin) via convite — simétrico
-    // a createReadingAction (08-07 task 2). Sem isso, criações via link do
-    // founder ficariam invisíveis pra exclusão de métricas de faturamento.
-    if (reserve.source === 'internal') {
-      await logAuditEvent({
-        event_type: 'admin.internal_use_used',
-        actor_user_id: validation.token.therapist_id,
-        target_type: 'reading',
-        target_id: readingId,
-        metadata: { entry_point: 'invite_capture', client_id: client.id },
-      })
-    }
+    // Fase 8 redesign (consume-na-geração): a captura por convite NÃO reserva
+    // mais crédito. O cliente NUNCA é bloqueado por saldo — tira as fotos
+    // livremente. O crédito é gateado quando o TERAPEUTA gera o relatório
+    // (/api/readings/[id]/analyze) — chokepoint único dos 3 fluxos. Reading
+    // nasce 'pending'; o audit de internal_use migrou pro gate da geração.
 
     // Pre-vincula no token pra próxima reentrada do mesmo link reusar esta.
     // Cast 'as never' espelha markTokenUsed em lib/invite/tokens.ts (types

@@ -114,7 +114,7 @@ describe('createReadingAction — termo gate (BILLING-03 / LGPD-01 D-19)', () =>
     expect(reserveCreditForReading).not.toHaveBeenCalled()
   })
 
-  it('proceeds past gate when termo signed (chega ao credit gate)', async () => {
+  it('termo assinado → cria reading e redireciona pra captura, SEM reservar crédito (gate migrou pra geração)', async () => {
     vi.mocked(assertClientTermoSigned).mockResolvedValueOnce({
       ok: true,
       signed_at: '2026-05-27T10:00:00Z',
@@ -125,17 +125,13 @@ describe('createReadingAction — termo gate (BILLING-03 / LGPD-01 D-19)', () =>
       data: { id: 'reading-1' },
       error: null,
     })
-    // credit reserve falha (no_balance) só pra provar que o fluxo AVANÇOU além
-    // do termo gate — o importante é que reserveCreditForReading foi chamado.
-    vi.mocked(reserveCreditForReading).mockResolvedValueOnce({
-      ok: false,
-      reason: 'no_balance',
-    } as never)
 
-    const r = await createReadingAction({}, buildFormData())
-
-    expect(reserveCreditForReading).toHaveBeenCalledWith('therapist-1', 'reading-1')
-    expect(typeof r.error).toBe('string')
-    expect(r.error).toContain('saldo')
+    // Fase 8 redesign (consume-na-geração): createReadingAction NÃO reserva mais
+    // crédito. Termo OK → cria reading → redirect pra captura (o redirect mockado
+    // lança 'REDIRECT:<path>'). O gate de crédito vive no /analyze, não aqui.
+    await expect(createReadingAction({}, buildFormData())).rejects.toThrow(
+      /REDIRECT:\/leituras\/nova\/capturar\?reading=reading-1/,
+    )
+    expect(reserveCreditForReading).not.toHaveBeenCalled()
   })
 })

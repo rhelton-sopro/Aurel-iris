@@ -71,6 +71,37 @@ export async function reserveCreditForReading(
   return result
 }
 
+/**
+ * Já existe reserva (ativa OU convertida) pra esta leitura?
+ *
+ * Usado pelo GATE de geração (Fase 8 redesign — consume-na-geração): a 1ª
+ * geração reserva (gate de saldo); a REGEN reusa a reserva existente e NÃO
+ * cobra de novo. Crítico porque `fifo_reserve_credit` NÃO é idempotente por
+ * reading_id (sempre faz INSERT de nova reserva) — sem este guard, regenerar
+ * criaria uma 2ª reserva = COBRANÇA DUPLA. 1 leitura = 1 crédito, regen grátis.
+ *
+ * status 'released'/'expired' não contam (a reserva foi devolvida ao pool, a
+ * leitura pode reservar de novo).
+ *
+ * Fail-safe: em erro de query, retorna TRUE (assume que já tem reserva → NÃO
+ * re-reserva). Prefere perder uma cobrança rara a cobrar em dobro do cliente.
+ */
+export async function readingHasReservation(readingId: string): Promise<boolean> {
+  const service = createServiceClient()
+  const { data, error } = await service
+    .from('credit_reservations')
+    .select('id')
+    .eq('reading_id', readingId)
+    .in('status', ['active', 'converted'])
+    .limit(1)
+    .maybeSingle()
+  if (error) {
+    console.error('[billing] readingHasReservation query failed:', error.message)
+    return true // fail-safe: nunca arrisca double-charge
+  }
+  return Boolean(data)
+}
+
 export type ConsumeResult =
   | { ok: true; already: boolean }
   | { ok: false; reason: 'not_found' | 'db_error'; error?: string }

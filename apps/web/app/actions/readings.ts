@@ -3,8 +3,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { resolveClientGate } from '@/lib/gates/client-gates'
 import { assertClientTermoSigned } from '@/lib/gates/termo-gate'
-import { reserveCreditForReading } from '@/lib/billing/credits'
-import { logAuditEvent } from '@/lib/audit/log'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
@@ -141,38 +139,11 @@ export async function createReadingAction(
     return { error: error.message }
   }
 
-  // Fase 8 D-10 #3 / D-11: reserva 1 crédito (ou trial, ou internal bypass)
-  // atrelado a esta reading. Único entry point de consumo (lib/billing/credits).
-  // A reading já foi criada acima — se reserve falha, rollback (delete) pra não
-  // poluir a base com reading órfã sem reservation.
-  const reserve = await reserveCreditForReading(user.id, reading.id)
-  if (!reserve.ok) {
-    await supabase
-      .from('readings')
-      .delete()
-      .eq('id', reading.id)
-      .eq('therapist_id', user.id)
-    if (reserve.reason === 'no_balance') {
-      return {
-        error:
-          'Sem saldo. Você esgotou o período de teste e não tem créditos ativos. Compre um pacote em /assinatura/comprar para continuar.',
-      }
-    }
-    return { error: 'Erro interno ao reservar crédito. Tente novamente.' }
-  }
-
-  // D-09 audit: registra uso de internal_use (founder/admin) pra exclusão de
-  // métricas de faturamento/produto. Best-effort (logAuditEvent nunca throwa).
-  if (reserve.source === 'internal') {
-    await logAuditEvent({
-      event_type: 'admin.internal_use_used',
-      actor_user_id: user.id,
-      actor_email: user.email,
-      target_type: 'reading',
-      target_id: reading.id,
-      metadata: { entry_point: 'create_reading', client_id: parsed.data.client_id },
-    })
-  }
+  // Fase 8 redesign (consume-na-geração): a reserva NÃO acontece mais aqui na
+  // captura. A leitura é criada livre; o crédito é gateado no INÍCIO da geração
+  // (/api/readings/[id]/analyze) — chokepoint único dos 3 fluxos (consultório,
+  // convite, autoexame). Sem saldo, o gate bloqueia o TERAPEUTA ali (fotos já
+  // salvas), nunca o cliente. O audit de internal_use migrou pro mesmo gate.
 
   revalidatePath('/leituras')
   // CONTEXT D-03: routing por método. Desktop -> /upload, mobile (default) -> /capturar.
