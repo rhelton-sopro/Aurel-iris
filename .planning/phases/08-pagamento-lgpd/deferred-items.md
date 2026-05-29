@@ -101,3 +101,26 @@ UAT visual APROVADO (desktop+mobile). Refinamentos não-bloqueantes pra rodada f
 3 estados do trial (active/ended) + redirect Asaas real NÃO testados → smoke E2E 08-14.
 
 ## NOTA typo "volladas": está em components/legal/DisclaimerCopy.tsx (compartilhado) — fix único cobre TODAS as telas (08-09/08-10/08-11). 08-11 UAT estado-vazio aprovado; estados-com-dado → 08-14.
+
+---
+
+# 📋 Backlog Fase 8.1 — code review findings NÃO corrigidos (decisão founder: beta-OK se baixo impacto)
+
+Os 8 críticos (CR-01/02/03 + WR-01/02/03/05/07) JÁ corrigidos (commits 41315be→200899c, +21 testes, billing 128 green). Restam pra decisão futura:
+
+## Warnings (4)
+- **WR-04** — `expireOldCredits` grava `amount: 0` na expiração → ledger perde o saldo confiscado (auditoria incompleta). Impacto: relatório/auditoria, não saldo do usuário.
+- **WR-06** — `analyze/route.ts` converte a reserva só no happy path → geração abandonada/com-erro nunca debita, crédito fica preso reservado (até expirar a reserva). Impacto: UX/dinheiro médio — slot some temporariamente. Vale par com um job de release de reservas órfãs.
+- **WR-08** — `evaluateTrial`: `ended_at` explícito mascara motivo "exhausted-readings" como `manual`. Impacto: cosmético/telemetria.
+- **WR-09** — TTL de signed URL = 365 dias pro PDF de consentimento biométrico = excessivo (LGPD/segurança). Reduzir TTL + gerar on-demand. Vale rever pré-GA.
+
+## Infos (7)
+- **IN-01** — `verifyAsaasToken` branch de length-mismatch vaza tamanho do token (early return).
+- **IN-02** — `signBiometricTerm` seleciona `content_sha256` mas não usa.
+- **IN-03** — `clientAge` usa divisor fixo `31_557_600_000` ms/ano.
+- **IN-04** — comentário de `audit_events.event_type` lista vocabulário stale vs `events.ts`.
+- **IN-05** — `cleanupStaleEmptyReadingsAction` deleta readings mas não suas reservations (par com WR-06).
+- **IN-06** — `createChargeAction` compensation delete pode deixar customer Asaas sem credit row local em falha parcial.
+- **IN-07** — gate de perfil no `middleware.ts` roda query a cada request protegido (sem cache).
+
+Relatório completo: 08-REVIEW.md. Fixes aplicados: ver git log fix(08).
