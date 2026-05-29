@@ -12,6 +12,34 @@ import 'server-only'
 
 import { createServiceClient } from '@/lib/supabase/service'
 
+/**
+ * WR-02: client_consents.ip é Postgres `inet`. Um x-forwarded-for malformado
+ * (ex. 'unknown', IPv6 com zone id, artefato de vírgula) faria o INSERT falhar
+ * com 'invalid input syntax for type inet' e bloquearia TODA a assinatura do
+ * termo — path LGPD-crítico. Coerção a null em vez de hard-fail: o IP é
+ * evidência best-effort, não pode travar o consentimento legítimo.
+ *
+ * Aceita IPv4 (a.b.c.d com octetos 0-255) e IPv6 (heurística: contém ':' e só
+ * caracteres hex/':'/'.'; sem zone id '%'). Qualquer coisa fora disso → null.
+ */
+export function sanitizeInet(raw: string | null | undefined): string | null {
+  if (!raw) return null
+  const s = raw.trim()
+  if (!s) return null
+  // IPv4
+  const v4 = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(s)
+  if (v4) {
+    const ok = v4.slice(1).every((o) => {
+      const n = Number(o)
+      return n >= 0 && n <= 255 && String(n) === String(Number(o))
+    })
+    return ok ? s : null
+  }
+  // IPv6 (sem zone id): só hex, ':' e '.' (IPv4-mapped). Rejeita '%zone'.
+  if (s.includes(':') && /^[0-9a-fA-F:.]+$/.test(s)) return s
+  return null
+}
+
 export interface SignBiometricInput {
   client_id: string
   reading_id: string
@@ -48,7 +76,7 @@ export async function signBiometricTerm(
       term_version: currentTerm.version,
       event_type: 'initial',
       consent_channel: input.consent_channel,
-      ip: input.ip ?? null,
+      ip: sanitizeInet(input.ip), // WR-02: coerção segura (inet) — nunca trava
       user_agent: input.user_agent ?? null,
     })
     .select('id')
