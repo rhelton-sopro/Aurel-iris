@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { BirthDateInput } from '@/components/clientes/birth-date-input'
+import { formatPhoneBR } from '@/lib/profile/fields'
 import {
   completeInviteNewClientAction,
   type CompleteInviteFormState,
@@ -30,6 +31,7 @@ export function InviteRegistrationForm({ token }: { token: string }) {
     FormData
   >(boundAction, {})
   const [birthDate, setBirthDate] = useState('')
+  const [phone, setPhone] = useState('')
 
   const errors = typeof state.error === 'object' && state.error
     ? (state.error as Record<string, string[]>)
@@ -70,7 +72,15 @@ export function InviteRegistrationForm({ token }: { token: string }) {
       </Field>
 
       <Field label="Telefone / WhatsApp" error={errors?.phone?.[0]}>
-        <Input type="tel" name="phone" required placeholder="(11) 99999-9999" />
+        <Input
+          type="tel"
+          name="phone"
+          required
+          inputMode="numeric"
+          placeholder="(11) 99999-9999"
+          value={phone}
+          onChange={(e) => setPhone(formatPhoneBR(e.target.value))}
+        />
       </Field>
 
       <Field label="Observações (opcional)">
