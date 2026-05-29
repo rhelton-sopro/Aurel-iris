@@ -56,44 +56,59 @@ loadEnvLocal()
 const URL = process.env.ASAAS_WEBHOOK_SMOKE_URL
 const TOKEN = process.env.ASAAS_WEBHOOK_TOKEN
 
+/**
+ * Lê status + corpo (truncado) e detecta a página de SSO da Vercel
+ * (Deployment Protection), que devolve 401 com HTML — NÃO o 401 do nosso
+ * handler (JSON {"error":"unauthorized"}). Distinguir os dois é o erro de
+ * interpretação mais provável em deploys de preview.
+ */
+async function probe(headers: Record<string, string>, body: string) {
+  const res = await fetch(URL!, { method: 'POST', headers, body })
+  const text = await res.text().catch(() => '')
+  const vercelGate =
+    /Authentication Required|vercel\.com\/sso|_vercel_sso|<!doctype html/i.test(text)
+  return { status: res.status, snippet: text.slice(0, 120), vercelGate }
+}
+
 describe.skipIf(!URL || !TOKEN)('smoke: auth do webhook Asaas', () => {
   it('rejeita sem token → 401', async () => {
-    const res = await fetch(URL!, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ id: 'evt_smoke', event: 'PAYMENT_CONFIRMED' }),
-    })
-    console.log(`[smoke] sem token → ${res.status}`)
-    expect(res.status).toBe(401)
+    const r = await probe(
+      { 'content-type': 'application/json' },
+      JSON.stringify({ id: 'evt_smoke', event: 'PAYMENT_CONFIRMED' }),
+    )
+    console.log(`[smoke] sem token → ${r.status} ${r.snippet}`)
+    expect(r.vercelGate, 'Deployment Protection da Vercel está gateando — desligue no preview').toBe(false)
+    expect(r.status).toBe(401)
   })
 
   it('rejeita token errado → 401', async () => {
-    const res = await fetch(URL!, {
-      method: 'POST',
-      headers: {
+    const r = await probe(
+      {
         'content-type': 'application/json',
         'asaas-access-token': 'token-errado-de-proposito',
       },
-      body: JSON.stringify({ id: 'evt_smoke', event: 'PAYMENT_CONFIRMED' }),
-    })
-    console.log(`[smoke] token errado → ${res.status}`)
-    expect(res.status).toBe(401)
+      JSON.stringify({ id: 'evt_smoke', event: 'PAYMENT_CONFIRMED' }),
+    )
+    console.log(`[smoke] token errado → ${r.status} ${r.snippet}`)
+    expect(r.vercelGate, 'Deployment Protection da Vercel está gateando — desligue no preview').toBe(false)
+    expect(r.status).toBe(401)
   })
 
   it('aceita token correto e rejeita body inválido → 400 (auth OK, zero efeito no DB)', async () => {
-    const res = await fetch(URL!, {
-      method: 'POST',
-      headers: {
+    const r = await probe(
+      {
         'content-type': 'application/json',
         'asaas-access-token': TOKEN!,
       },
-      body: JSON.stringify({}), // envelope inválido: Zod falha DEPOIS da auth
-    })
-    console.log(
-      `[smoke] token correto + body inválido → ${res.status} (esperado 400 = auth passou)`,
+      JSON.stringify({}), // envelope inválido: Zod falha DEPOIS da auth
     )
-    // 400 prova que a auth passou (401 significaria token não casado).
-    expect(res.status).toBe(400)
+    console.log(
+      `[smoke] token correto + body inválido → ${r.status} ${r.snippet} (esperado 400 = auth passou)`,
+    )
+    // Se voltar 401 com vercelGate=true → é o SSO da Vercel, não o token.
+    expect(r.vercelGate, 'Deployment Protection da Vercel está gateando — desligue no preview').toBe(false)
+    // 400 prova que a auth passou (401 do nosso handler = token não casado).
+    expect(r.status).toBe(400)
   })
 })
 
