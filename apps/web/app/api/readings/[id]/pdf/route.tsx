@@ -49,6 +49,8 @@ import {
   renderFooterHtml,
   buildPdfFilename,
 } from '@/lib/pdf/report-print-document'
+// Surface 1 (LGPD-05) — fallback do rodapé do PDF ancorado na copy canônica.
+import { DISCLAIMER_COMPACT } from '@/components/legal/DisclaimerCopy'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -62,7 +64,7 @@ function disclaimerFooterLine(sections: Record<string, string>): string {
     .replace(/[#>*_`]/g, '')
     .replace(/\s+/g, ' ')
     .trim()
-  if (!flat) return 'Relatório de apoio à anamnese terapêutica integrativa.'
+  if (!flat) return DISCLAIMER_COMPACT
   const firstSentence = flat.split(/(?<=[.!?])\s/)[0] ?? flat
   return firstSentence.length > 160 ? `${firstSentence.slice(0, 157)}…` : firstSentence
 }

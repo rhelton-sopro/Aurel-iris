@@ -5,6 +5,7 @@ import { differenceInDays } from 'date-fns'
 import { LogOut } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { SidebarTrigger } from '@/components/ui/sidebar'
+import { DisclaimerCopy } from '@/components/legal/DisclaimerCopy'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
@@ -39,8 +40,13 @@ export function DashboardHeader({ fullName, trialEndsAt, subscriptionStatus }: D
 
   return (
     <header className="sticky top-0 z-10 flex h-[calc(4rem+env(safe-area-inset-top))] items-center justify-between border-b border-[#EAEAEA] bg-white px-6 pt-[env(safe-area-inset-top)]">
-      <div className="flex items-center gap-2">
+      <div className="flex min-w-0 items-center gap-3">
         <SidebarTrigger className="size-9 hover:bg-transparent hover:text-teal" />
+        {/* Surface 3 (LGPD-05) — reforço ATIVO (não rola pra ver). Oculto no
+            mobile pra não competir com o trigger no header de 4rem. */}
+        <div className="hidden min-w-0 truncate md:block">
+          <DisclaimerCopy variant="compact" />
+        </div>
       </div>
       <div className="flex items-center gap-4">
         {isTrial && daysLeft !== null && (

@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { AppSidebar } from '@/components/dashboard/app-sidebar'
 import { DashboardHeader } from '@/components/dashboard/dashboard-header'
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
+import { DisclaimerCopy } from '@/components/legal/DisclaimerCopy'
 
 export default async function DashboardLayout({
   children,
@@ -45,11 +46,11 @@ export default async function DashboardLayout({
         <main className="flex-1 px-7 py-6">
           {children}
         </main>
-        <footer className="px-7 pb-5">
-          <p className="text-[10.5px] uppercase tracking-label text-mist">
-            Ferramenta de apoio à anamnese terapêutica integrativa, não substitui avaliação médica.
-          </p>
-        </footer>
+        {/* Surface 2 (LGPD-05) — rodapé passivo de páginas autenticadas.
+            Single source of truth via DisclaimerCopy (DISCLAIMER_COMPACT). */}
+        <div className="px-7 pb-5">
+          <DisclaimerCopy variant="compact" />
+        </div>
       </SidebarInset>
     </SidebarProvider>
   )
