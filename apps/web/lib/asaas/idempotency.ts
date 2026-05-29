@@ -45,3 +45,30 @@ export async function markEventProcessed(eventId: string): Promise<void> {
     .update({ processed_at: new Date().toISOString(), status: 'processed' })
     .eq('event_id', eventId)
 }
+
+/**
+ * WR-05: remove a row de idempotência de um evento que falhou por erro
+ * TRANSIENTE de DB (a ativação do crédito NÃO foi aplicada). Sem isto, o
+ * event_id PK já gravado faria a re-entrega do Asaas cair em first_seen:false
+ * (200 no-op idempotente) e o crédito ficaria PERMANENTEMENTE perdido.
+ *
+ * Removendo a row, a re-entrega do Asaas volta como first_seen:true e
+ * reprocessa. Só é chamado no caminho de db_error (transiente) — eventos
+ * already-processed / invalid / no-op mantêm a row e retornam 200.
+ *
+ * Best-effort: se o DELETE em si falhar, o pior caso é o comportamento antigo
+ * (200 idempotente na re-entrega), nunca pior que isso.
+ */
+export async function unrecordWebhookEvent(eventId: string): Promise<void> {
+  const service = createServiceClient()
+  const { error } = await service
+    .from('asaas_webhook_events')
+    .delete()
+    .eq('event_id', eventId)
+  if (error) {
+    console.error(
+      '[asaas-idempotency] unrecord (rollback) failed:',
+      error.message,
+    )
+  }
+}

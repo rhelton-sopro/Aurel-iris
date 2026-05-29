@@ -31,7 +31,11 @@ import { NextResponse } from 'next/server'
 
 import { asaasWebhookEnvelopeSchema } from '@/lib/asaas/types'
 import { verifyAsaasToken } from '@/lib/asaas/webhook-auth'
-import { recordWebhookEvent, markEventProcessed } from '@/lib/asaas/idempotency'
+import {
+  recordWebhookEvent,
+  markEventProcessed,
+  unrecordWebhookEvent,
+} from '@/lib/asaas/idempotency'
 import { applyPaymentEvent } from '@/lib/billing/apply-payment'
 
 export const runtime = 'nodejs' // timingSafeEqual (node:crypto)
@@ -85,10 +89,27 @@ export async function POST(request: Request): Promise<NextResponse> {
   // 4. State machine dispatch
   const result = await applyPaymentEvent(envelope)
 
-  // 5. Mark processed (best-effort; falha aqui só deixa processed_at NULL)
+  // 5. WR-05: falha TRANSIENTE de DB (crédito NÃO ativado) → 5xx pra Asaas
+  //    reenviar. Remove a row de idempotência ANTES de responder pra que a
+  //    re-entrega volte como first_seen:true e reprocesse (senão cairia em
+  //    200 no-op idempotente e o crédito ficaria perdido). Distingue de:
+  //      - already-processed / wrong_state / no_op_event → 200 idempotente
+  //      - not_found (sem credit row) → 200 (poison-pill: não adianta retry)
+  if (!result.applied && result.reason === 'db_error') {
+    await unrecordWebhookEvent(envelope.id)
+    console.error(
+      `[asaas-webhook] DB_ERROR event=${envelope.id} type=${envelope.event} detail=${result.detail ?? ''} → 5xx (Asaas retry)`,
+    )
+    return NextResponse.json(
+      { ok: false, reason: 'db_error', retry: true },
+      { status: 503 },
+    )
+  }
+
+  // 6. Sucesso (ou no-op idempotente / not_found): marca processed.
   await markEventProcessed(envelope.id)
 
-  // 6. Cache invalidation
+  // 7. Cache invalidation
   revalidatePath('/assinatura')
 
   console.info(

@@ -37,7 +37,15 @@ export type ApplyPaymentResult =
     }
   | {
       applied: false
-      reason: 'not_found' | 'wrong_state' | 'no_op_event' | 'db_error'
+      // 'db_error' = falha TRANSIENTE (webhook retorna 5xx → Asaas reenvia).
+      // 'invalid_payload' = dados do payload ausentes/ruins (poison-pill →
+      // retry não resolve → webhook retorna 200, WR-05).
+      reason:
+        | 'not_found'
+        | 'wrong_state'
+        | 'no_op_event'
+        | 'db_error'
+        | 'invalid_payload'
       detail?: string
     }
 
@@ -277,7 +285,8 @@ export async function applyPaymentEvent(
       console.warn(
         `[apply-payment] partial refund without value payment=${payment.id} — payload missing refundedValue/netValue`,
       )
-      return { applied: false, reason: 'db_error', detail: 'missing_refund_value' }
+      // Poison-pill: payload sem valor de refund — retry não resolve (WR-05).
+      return { applied: false, reason: 'invalid_payload', detail: 'missing_refund_value' }
     }
 
     const pkg = (
@@ -289,7 +298,8 @@ export async function applyPaymentEvent(
       console.warn(
         `[apply-payment] partial refund without package data credit=${credit.id}`,
       )
-      return { applied: false, reason: 'db_error', detail: 'missing_package' }
+      // Poison-pill: dados do pacote ausentes — retry não resolve (WR-05).
+      return { applied: false, reason: 'invalid_payload', detail: 'missing_package' }
     }
     // CR-03: base ÚNICA compartilhada com refund-policy.ts (path manual).
     const unitPrice = unitPriceBrl(pkg.price_brl, pkg.leituras_count)
