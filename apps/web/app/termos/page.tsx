@@ -1,3 +1,6 @@
+// audit-vocabulary:allowlist — página legal cita vocab clínico (diagnóstico,
+// tratamento) apenas para NEGAR ("não realiza diagnóstico", "não substitui
+// tratamento médico") + "tratamento de dados" no sentido LGPD.
 import Link from 'next/link'
 import { TOS_VERSION, TOS_EFFECTIVE_DATE } from '@/lib/consent/tos'
 import { DisclaimerCopy } from '@/components/legal/DisclaimerCopy'

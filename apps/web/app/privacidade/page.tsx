@@ -1,3 +1,6 @@
+// audit-vocabulary:allowlist — página legal cita vocab clínico/regulatório
+// (tratamento de dados, diagnóstico) de forma lícita: "tratamento" no sentido
+// LGPD de processamento de dados, e termos clínicos apenas para negar/limitar.
 import Link from 'next/link'
 import { TOS_VERSION, TOS_EFFECTIVE_DATE } from '@/lib/consent/tos'
 import { DisclaimerCopy } from '@/components/legal/DisclaimerCopy'
