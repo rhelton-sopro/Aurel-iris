@@ -1,3 +1,5 @@
+import { timingSafeEqual } from 'node:crypto'
+
 import { NextResponse, type NextRequest } from 'next/server'
 
 import {
@@ -20,8 +22,21 @@ export const maxDuration = 60 // bem abaixo do limite PRO (800s); jobs são boun
  * job garante que falha de um NÃO aborta os demais (T-08-13-02).
  */
 export async function GET(request: NextRequest): Promise<NextResponse> {
-  const auth = request.headers.get('authorization')
-  if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
+  // CR-02: fail-CLOSED + constant-time. Espelha o padrão timing-safe de
+  // lib/asaas/webhook-auth.ts:
+  //   1. CRON_SECRET ausente/vazio → 401 (NUNCA aceitar "Bearer undefined").
+  //   2. Comparação via crypto.timingSafeEqual (sem short-circuit que vaza
+  //      length/prefix do secret).
+  const secret = process.env.CRON_SECRET
+  if (!secret) {
+    console.error('[cron-daily] AUTH_REJECTED — CRON_SECRET não configurado')
+    return NextResponse.json({ error: 'misconfigured' }, { status: 401 })
+  }
+  const provided =
+    request.headers.get('authorization')?.replace(/^Bearer\s+/, '') ?? ''
+  const a = Buffer.from(provided)
+  const b = Buffer.from(secret)
+  if (a.length !== b.length || !timingSafeEqual(a, b)) {
     console.warn('[cron-daily] AUTH_REJECTED')
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   }

@@ -33,6 +33,31 @@ describe('GET /api/cron/daily', () => {
     expect(res.status).toBe(401)
   })
 
+  it('CR-02: 401 fail-closed quando CRON_SECRET ausente (NÃO aceita "Bearer undefined")', async () => {
+    delete process.env.CRON_SECRET
+    // Ataque clássico fail-open: enviar literalmente "undefined" como secret.
+    const res = await GET(makeReq('undefined'))
+    expect(res.status).toBe(401)
+    const body = await res.json()
+    expect(body.error).toBe('misconfigured')
+    // Nenhum job deve rodar com env ausente.
+    expect(jobs.releaseExpiredReservations).not.toHaveBeenCalled()
+  })
+
+  it('CR-02: 401 fail-closed quando CRON_SECRET vazio', async () => {
+    process.env.CRON_SECRET = ''
+    const res = await GET(makeReq(''))
+    expect(res.status).toBe(401)
+    expect(jobs.releaseExpiredReservations).not.toHaveBeenCalled()
+  })
+
+  it('CR-02: 401 quando bearer tem comprimento diferente (constant-time path)', async () => {
+    // prefixo correto mas comprimento diferente — o branch length-mismatch
+    // do timing-safe compare deve rejeitar sem vazar.
+    const res = await GET(makeReq('cron_secret_x_extra'))
+    expect(res.status).toBe(401)
+  })
+
   it('200 roda os 4 jobs em sequência', async () => {
     vi.mocked(jobs.releaseExpiredReservations).mockResolvedValue({
       released: 2,
