@@ -10,11 +10,10 @@ export const metadata = {
 }
 
 // E-mail operacional de contato LGPD (exclusão / direitos do titular).
-// Configurável via NEXT_PUBLIC_OPERATOR_EMAIL no Vercel. O fallback abaixo é
-// um PLACEHOLDER — o founder decide o valor final no checkpoint (Task 5 do
-// plano 08-09): manter rhelton@gmail.com ou criar suporte@iriscodex.com.
+// Decidido no checkpoint 08-09 Task 5 (founder, 2026-05-28): suporte@iriscodex.com.
+// Override via NEXT_PUBLIC_OPERATOR_EMAIL no Vercel (founder cria a caixa + seta a env).
 const OPERATOR_EMAIL =
-  process.env.NEXT_PUBLIC_OPERATOR_EMAIL ?? 'rhelton@gmail.com'
+  process.env.NEXT_PUBLIC_OPERATOR_EMAIL ?? 'suporte@iriscodex.com'
 
 const DELETION_SUBJECT = '[Iris Codex] Pedido de exclusão de dados (LGPD)'
 

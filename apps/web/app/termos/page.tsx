@@ -10,9 +10,10 @@ export const metadata = {
 }
 
 // E-mail operacional de contato (mesma decisão de checkpoint que /privacidade).
-// Placeholder fallback — founder define o valor final no Task 5 do plano 08-09.
+// Decidido no checkpoint 08-09 Task 5 (founder, 2026-05-28): suporte@iriscodex.com.
+// Override via NEXT_PUBLIC_OPERATOR_EMAIL no Vercel.
 const OPERATOR_EMAIL =
-  process.env.NEXT_PUBLIC_OPERATOR_EMAIL ?? 'rhelton@gmail.com'
+  process.env.NEXT_PUBLIC_OPERATOR_EMAIL ?? 'suporte@iriscodex.com'
 
 export default function TermosPage() {
   return (
