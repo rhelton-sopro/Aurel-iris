@@ -24,9 +24,10 @@ export default defineConfig({
       '**/node_modules/**',
       '**/.next/**',
       'scripts/run-sonnet-direct.spec.ts',
-      // Smoke do PDF do termo (Fase 8) — faz fetch real (Supabase/Gotenberg);
-      // roda só via scripts/smoke-consent-pdf.config.ts, nunca na suíte normal.
+      // Smokes da Fase 8 — fazem fetch real (Supabase/Gotenberg/deploy);
+      // rodam só via seus configs isolados, nunca na suíte normal.
       'scripts/smoke-consent-pdf.spec.ts',
+      'scripts/smoke-asaas-webhook.spec.ts',
     ],
   },
   resolve: {
