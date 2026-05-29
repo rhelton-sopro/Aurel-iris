@@ -73,6 +73,31 @@ export default function SignupPage() {
       return setFormError('É necessário aceitar os Termos e a Política de Privacidade.')
 
     setSubmitting(true)
+
+    // Pre-check de CPF: o trigger handle_new_user (0039) tem UNIQUE em cpf, e a
+    // colisão estoura no trigger como o opaco "Database error saving new user"
+    // (Supabase mascara o erro — o branch de mensagem abaixo nunca casava).
+    // Checar ANTES do OTP dá "CPF já cadastrado" claro e não queima um e-mail.
+    // Fail-open: glitch na checagem não bloqueia cadastro (o trigger ainda
+    // garante a integridade).
+    try {
+      const r = await fetch('/api/auth/check-cpf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cpf }),
+      })
+      if (r.ok) {
+        const { exists } = (await r.json()) as { exists?: boolean }
+        if (exists) {
+          setFormError('Já existe cadastro com este CPF. Use a tela de login.')
+          setSubmitting(false)
+          return
+        }
+      }
+    } catch {
+      /* fail-open */
+    }
+
     const supabase = createClient()
     const { error } = await withNetworkRetry(() =>
       supabase.auth.signInWithOtp({
