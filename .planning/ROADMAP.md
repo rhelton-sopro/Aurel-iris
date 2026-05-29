@@ -502,7 +502,7 @@ See `.planning/phases/07.5-tendency-mapping-engine/07.5-CONTEXT.md` (a criar via
 - [x] 08-09-PLAN.md — /privacidade + /termos + DisclaimerCopy LGPD-05 em 3 surfaces + audit-vocab re-run (Wave 4)
 - [x] 08-10-PLAN.md — /assinatura/comprar UI com 2 grupos + 4 PackageCard + TrialCard (Wave 5)
 - [x] 08-11-PLAN.md — /assinatura UI saldo + ReservationsList cancelar + RefundPackageButton modal (Wave 5) — código completo, Task 4 Founder UAT pendente
-- [ ] 08-12-PLAN.md — Emails Resend: purchase confirmada + expiring 30/7/0 + refund processado (Wave 5)
+- [x] 08-12-PLAN.md — Emails Resend: purchase confirmada + expiring 30/7/0 + refund processado (Wave 5)
 - [ ] 08-13-PLAN.md — Cron daily 4 jobs + vercel.json schedule + CRON_SECRET + middleware /assinatura (Wave 6)
 - [ ] 08-14-PLAN.md — Smoke E2E 6 cenários + full test suite + VERIFICATION.md + cutover decision (Wave 6)
 **UI hint**: yes
