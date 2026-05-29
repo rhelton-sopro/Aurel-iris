@@ -198,23 +198,13 @@ export async function completeInviteNewClientAction(
     .eq('id', validation.token.id)
     .is('client_id', null)
 
-  // 3. Persiste consent — 'initial' + channel 'remote_link'. Termo vigente
-  //    vem de consent_terms.is_current=true (0020). Se ainda não houver
-  //    termo vigente (env não-semeado), o consent log entra sem term_version
-  //    e o gate de produção falha — aceita risco no beta.
-  const { data: currentTerm } = await service
-    .from('consent_terms' as never)
-    .select('version')
-    .eq('is_current', true)
-    .maybeSingle<{ version: string }>()
-  if (currentTerm?.version) {
-    await service.from('client_consents' as never).insert({
-      client_id: client.id,
-      term_version: currentTerm.version,
-      event_type: 'initial',
-      consent_channel: 'remote_link',
-    } as never)
-  }
+  // 3. WR-03: NÃO escreve consent aqui. O consentimento biométrico LGPD é
+  //    propriedade exclusiva de signInviteTermAction no momento da assinatura
+  //    (com PDF + IP + user-agent + atualização do current-pointer
+  //    clients.consent_last_at). Antes, inseríamos uma row 'initial' fantasma
+  //    sem IP/PDF/pointer — duplicata que corrompia a trilha de auditoria
+  //    jurídica (asseverava consentimento sem nenhum artefato de prova). O
+  //    checkbox do form de cadastro é UI acknowledgment, não o aceite biométrico.
 
   // 4. Redireciona pra captura (token segue na URL — auth pública).
   redirect(`/convite/${token}/capturar?client=${client.id}`)
