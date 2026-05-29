@@ -15,6 +15,7 @@ import { creditExpiresAt } from '@/lib/billing/config'
 import { logAuditEvent } from '@/lib/audit/log'
 import { notifyRefundProcessed } from '@/lib/notifications/notify-refund-processed'
 import { cpfDigits } from '@/lib/auth/cpf'
+import { phoneDigits } from '@/lib/auth/phone'
 
 import {
   createChargeSchema,
@@ -78,7 +79,10 @@ export async function createChargeAction(
       name: profile.full_name ?? user.email ?? 'Terapeuta',
       cpfCnpj: cpfDigits(profile.cpf),
       email: user.email ?? '',
-      mobilePhone: cpfDigits(profile.phone),
+      // CR-01: telefone tem sanitizador próprio (strip não-dígitos), NUNCA
+      // reusa cpfDigits — desacopla dois campos não relacionados (mudança futura
+      // em cpfDigits, ex. validar 11 dígitos de CPF, corromperia o telefone).
+      mobilePhone: phoneDigits(profile.phone),
       externalReference: profile.id,
     })
     if (!cust.ok) {
