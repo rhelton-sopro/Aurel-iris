@@ -6,6 +6,9 @@ import { NextResponse, type NextRequest } from 'next/server'
 // ATENÇÃO Next.js 15: arquivo se chama middleware.ts (não proxy.ts — isso é Next.js 16+)
 // export function se chama middleware (não proxy)
 
+// /assinatura cobre /assinatura/comprar (08-13): o prefixo gateia a compra de
+// créditos — sem sessão → /login. /api/cron/daily NÃO entra aqui (endpoint
+// público com bearer CRON_SECRET, chamado pelo Vercel Cron sem cookies).
 const PROTECTED_PATHS = ['/dashboard', '/clientes', '/leituras', '/assinatura']
 const ADMIN_PREFIX = '/admin'
 // Path público de convite — terapeuta gera link, cliente abre sem sessão
