@@ -39,6 +39,20 @@ function round2(n: number): number {
 }
 
 /**
+ * CR-03: base ÚNICA de preço unitário compartilhada pelos DOIS reconciliadores
+ * de refund (manual em billing.ts e webhook em apply-payment.ts). Antes cada
+ * path computava `price_brl / leituras` com nomes de coluna diferentes
+ * (leituras_purchased vs leituras_count) — usualmente iguais, mas não garantido.
+ * Centralizar aqui garante que ambos debitam sobre a MESMA base.
+ *
+ * Retorna 0 se leituras <= 0 (proteção contra divisão por zero).
+ */
+export function unitPriceBrl(priceBrl: number, leituras: number): number {
+  if (leituras <= 0) return 0
+  return priceBrl / leituras
+}
+
+/**
  * Calcula refund value per D-13. Pura: só depende de input + `now`.
  */
 export function computeRefundValue(
@@ -71,8 +85,9 @@ export function computeRefundValue(
     }
   }
 
-  // partial — proporcional ao saldo ainda não consumido
-  const unitPrice = credit.price_brl / credit.leituras_purchased
+  // partial — proporcional ao saldo ainda não consumido.
+  // CR-03: base ÚNICA compartilhada com apply-payment.ts (webhook).
+  const unitPrice = unitPriceBrl(credit.price_brl, credit.leituras_purchased)
   return {
     eligible: true,
     kind: 'partial',

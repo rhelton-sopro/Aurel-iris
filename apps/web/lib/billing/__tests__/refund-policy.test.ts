@@ -1,7 +1,18 @@
 import { describe, expect, it } from 'vitest'
-import { computeRefundValue } from '../refund-policy'
+import { computeRefundValue, unitPriceBrl } from '../refund-policy'
 
 const now = new Date('2026-05-27T12:00:00Z')
+
+describe('unitPriceBrl (CR-03 base única)', () => {
+  it('divide preço pelo nº de leituras', () => {
+    expect(unitPriceBrl(298.5, 5)).toBeCloseTo(59.7, 5)
+  })
+
+  it('retorna 0 quando leituras <= 0 (proteção div/0)', () => {
+    expect(unitPriceBrl(298.5, 0)).toBe(0)
+    expect(unitPriceBrl(298.5, -1)).toBe(0)
+  })
+})
 
 describe('computeRefundValue', () => {
   it('total refund when 0 consumed within 7d window', () => {

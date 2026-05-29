@@ -229,6 +229,37 @@ describe('applyPaymentEvent', () => {
     expect(updateMock).not.toHaveBeenCalled()
   })
 
+  it('CR-03: PAYMENT_PARTIALLY_REFUNDED no-op quando saldo já zerado (refund manual prévio)', async () => {
+    // O path manual (refundPackageAction parcial) já zerou leituras_remaining e
+    // inseriu o débito. Sem o guard, este webhook inseriria 2ª row negativa.
+    maybeSingleMock.mockResolvedValueOnce({
+      data: {
+        id: 'cred-1',
+        user_id: 'u-1',
+        leituras_purchased: 5,
+        leituras_remaining: 0, // já zerado pelo refund manual
+        status: 'active',
+        credit_packages: { price_brl: 298.5, leituras_count: 5 },
+      },
+      error: null,
+    })
+
+    const partialEnvelope = {
+      ...baseEnvelope,
+      event: 'PAYMENT_PARTIALLY_REFUNDED',
+      payment: { ...baseEnvelope.payment, value: 298.5, refundedValue: 179.1 },
+    }
+    const r = await applyPaymentEvent(partialEnvelope as Envelope)
+    expect(r.applied).toBe(false)
+    if (!r.applied) {
+      expect(r.reason).toBe('wrong_state')
+      expect(r.detail).toBe('already_refunded')
+    }
+    // NENHUMA 2ª row negativa no ledger.
+    expect(updateMock).not.toHaveBeenCalled()
+    expect(insertMock).not.toHaveBeenCalled()
+  })
+
   it('PAYMENT_PARTIALLY_REFUNDED no-op when payload missing refund value', async () => {
     maybeSingleMock.mockResolvedValueOnce({
       data: {

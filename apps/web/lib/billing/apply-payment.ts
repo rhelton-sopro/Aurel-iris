@@ -24,6 +24,7 @@ import 'server-only'
 
 import { createServiceClient } from '@/lib/supabase/service'
 import { creditExpiresAt } from '@/lib/billing/config'
+import { unitPriceBrl } from '@/lib/billing/refund-policy'
 import { logAuditEvent } from '@/lib/audit/log'
 import { notifyCreditPurchaseConfirmed } from '@/lib/notifications/notify-credit-purchase-confirmed'
 import type { AsaasWebhookEnvelope } from '@/lib/asaas/types'
@@ -250,6 +251,17 @@ export async function applyPaymentEvent(
       )
       return { applied: false, reason: 'wrong_state', detail: 'not_active' }
     }
+    // CR-03: guard contra 2º lançamento negativo num saldo já consumido/zerado.
+    // O path manual (refundPackageAction parcial) zera leituras_remaining e
+    // insere o débito. Se este webhook chegar depois, sem este guard ele
+    // inseriria OUTRA row type='refund' negativa contra um saldo já 0 —
+    // corrompendo o ledger (Σ amount por credit_id). Idempotente.
+    if (credit.leituras_remaining <= 0) {
+      console.info(
+        `[apply-payment] partial refund no-op credit=${credit.id} — saldo já zerado (provável refund manual prévio)`,
+      )
+      return { applied: false, reason: 'wrong_state', detail: 'already_refunded' }
+    }
 
     // Asaas payload: payment.refundedValue (acumulado total devolvido) OU
     // diff value-netValue. AsaasPayment .passthrough() não tipa refundedValue.
@@ -279,8 +291,9 @@ export async function applyPaymentEvent(
       )
       return { applied: false, reason: 'db_error', detail: 'missing_package' }
     }
-    const unitPriceBrl = pkg.price_brl / pkg.leituras_count
-    const leiturasDeviasDebitar = Math.round(totalRefundedBrl / unitPriceBrl)
+    // CR-03: base ÚNICA compartilhada com refund-policy.ts (path manual).
+    const unitPrice = unitPriceBrl(pkg.price_brl, pkg.leituras_count)
+    const leiturasDeviasDebitar = Math.round(totalRefundedBrl / unitPrice)
 
     // Quanto já foi debitado em refunds prévios? Soma absoluta dos amounts type='refund'.
     const { data: prevRefunds } = await service
