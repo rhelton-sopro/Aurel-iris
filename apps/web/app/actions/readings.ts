@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { resolveClientGate } from '@/lib/gates/client-gates'
+import { assertClientTermoSigned } from '@/lib/gates/termo-gate'
 import { reserveCreditForReading } from '@/lib/billing/credits'
 import { logAuditEvent } from '@/lib/audit/log'
 import { revalidatePath } from 'next/cache'
@@ -95,6 +96,31 @@ export async function createReadingAction(
   const gate = resolveClientGate(gateClient)
   if (gate.status === 'incomplete') redirect(gate.completionPath)
   if (gate.status === 'blocked_underage') redirect(gate.detailPath)
+
+  // BILLING-03 + LGPD-01 (D-19): o termo biométrico do cliente DEVE estar
+  // assinado ANTES de iniciar a captura. Gate ANTES do INSERT reading (e
+  // portanto antes do reserveCreditForReading) — sem termo, não cria reading
+  // row, então não há rollback necessário e nenhum crédito é reservado.
+  // consent_channel deste path = 'office_handoff' (terapeuta na sessão).
+  // Fonte de verdade: clients.consent_last_at (current-pointer LIVE).
+  const termo = await assertClientTermoSigned(parsed.data.client_id)
+  if (!termo.ok) {
+    if (termo.reason === 'termo_missing') {
+      // href semântico pra UI/CTA de assinatura. A página dedicada de termo
+      // (TermoBiometricoStep montado) é escopo de plano UI futuro; por ora o
+      // link aponta pro detalhe do cliente onde o passo de termo será exposto.
+      return {
+        error:
+          'O cliente precisa assinar o Termo de Consentimento Biométrico antes da leitura. ' +
+          `Assine em /clientes/${parsed.data.client_id}/termo`,
+      }
+    }
+    if (termo.reason === 'client_not_found') {
+      return { error: 'Cliente não encontrado.' }
+    }
+    // db_error
+    return { error: 'Erro ao verificar termo de consentimento. Tente novamente.' }
+  }
 
   // RLS de clients (Fase 1 D-12) impede inserir reading apontando para client de outro terapeuta:
   // o INSERT abaixo só sucede se o client_id pertencer ao auth.uid() — caso contrário, FK constraint
