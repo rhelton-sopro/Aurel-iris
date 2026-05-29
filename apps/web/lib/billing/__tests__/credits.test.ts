@@ -89,97 +89,74 @@ describe('reserveCreditForReading', () => {
   })
 })
 
-describe('convertReservationToConsume', () => {
+// WR-07: convertReservationToConsume agora despacha pra RPC SECURITY DEFINER
+// convert_reservation_to_consume (flip + debit + ledger atômicos). Os testes
+// passam a mockar o RPC, não os query-builders.
+describe('convertReservationToConsume (WR-07 atomic via RPC)', () => {
   beforeEach(() => {
-    selectMock.mockReset().mockReturnValue(builder)
-    updateMock.mockReset().mockReturnValue(builder)
-    eqMock.mockReset().mockReturnValue(builder)
-    insertMock.mockReset().mockResolvedValue({ error: null })
-    maybeSingleMock.mockReset()
-    nextAwait = []
+    rpcMock.mockReset()
   })
 
-  it('flips active reservation + decrements credit + inserts transaction', async () => {
-    maybeSingleMock
-      .mockResolvedValueOnce({
-        data: {
-          id: 'res-1',
+  it('consumed → ok:false:already=false on outcome=consumed', async () => {
+    rpcMock.mockResolvedValueOnce({
+      data: [
+        {
+          outcome: 'consumed',
+          reservation_id: 'res-1',
           user_id: 'u1',
           credit_id: 'c1',
-          status: 'active',
-          reading_id: 'r1',
         },
-        error: null,
-      }) // SELECT reservation
-      .mockResolvedValueOnce({ data: { id: 'res-1' }, error: null }) // UPDATE...select
-      .mockResolvedValueOnce({
-        data: { leituras_remaining: 5, leituras_reserved: 1 },
-        error: null,
-      }) // SELECT credit
-    // bare-awaited customer_credits UPDATE resolve via thenable
-    nextAwait.push({ data: null, error: null })
-
+      ],
+      error: null,
+    })
     const r = await convertReservationToConsume('r1')
     expect(r).toEqual({ ok: true, already: false })
-    expect(insertMock).toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'consume', amount: -1, reading_id: 'r1' }),
-    )
+    expect(rpcMock).toHaveBeenCalledWith('convert_reservation_to_consume', {
+      p_reading_id: 'r1',
+    })
   })
 
-  it('returns already=true when reservation status != active', async () => {
-    maybeSingleMock.mockResolvedValueOnce({
-      data: {
-        id: 'res-1',
-        user_id: 'u1',
-        credit_id: 'c1',
-        status: 'converted',
-        reading_id: 'r1',
-      },
+  it('trial/internal reservation (credit_id null) consumed atomically', async () => {
+    rpcMock.mockResolvedValueOnce({
+      data: [
+        {
+          outcome: 'consumed',
+          reservation_id: 'res-1',
+          user_id: 'u1',
+          credit_id: null,
+        },
+      ],
+      error: null,
+    })
+    const r = await convertReservationToConsume('r1')
+    expect(r).toEqual({ ok: true, already: false })
+  })
+
+  it('returns already=true when outcome=already (idempotent / race lost)', async () => {
+    rpcMock.mockResolvedValueOnce({
+      data: [{ outcome: 'already', reservation_id: null, user_id: null, credit_id: null }],
       error: null,
     })
     const r = await convertReservationToConsume('r1')
     expect(r).toEqual({ ok: true, already: true })
   })
 
-  it('returns already=true when concurrent writer won the flip', async () => {
-    maybeSingleMock
-      .mockResolvedValueOnce({
-        data: {
-          id: 'res-1',
-          user_id: 'u1',
-          credit_id: 'c1',
-          status: 'active',
-          reading_id: 'r1',
-        },
-        error: null,
-      })
-      .mockResolvedValueOnce({ data: null, error: null }) // UPDATE returned nothing (race lost)
-    const r = await convertReservationToConsume('r1')
-    expect(r).toEqual({ ok: true, already: true })
-  })
-
-  it('returns not_found when reservation missing', async () => {
-    maybeSingleMock.mockResolvedValueOnce({ data: null, error: null })
+  it('returns not_found when outcome=not_found', async () => {
+    rpcMock.mockResolvedValueOnce({
+      data: [{ outcome: 'not_found', reservation_id: null, user_id: null, credit_id: null }],
+      error: null,
+    })
     const r = await convertReservationToConsume('r1')
     expect(r).toEqual({ ok: false, reason: 'not_found' })
   })
 
-  it('handles trial reservation (credit_id=null) without credit update', async () => {
-    maybeSingleMock
-      .mockResolvedValueOnce({
-        data: {
-          id: 'res-1',
-          user_id: 'u1',
-          credit_id: null,
-          status: 'active',
-          reading_id: 'r1',
-        },
-        error: null,
-      }) // SELECT reservation
-      .mockResolvedValueOnce({ data: { id: 'res-1' }, error: null }) // UPDATE...select
+  it('returns db_error on RPC failure', async () => {
+    rpcMock.mockResolvedValueOnce({
+      data: null,
+      error: { message: 'connection refused' },
+    })
     const r = await convertReservationToConsume('r1')
-    expect(r).toEqual({ ok: true, already: false })
-    // Não deve consultar o crédito (só 2 maybeSingle, não 3)
-    expect(maybeSingleMock).toHaveBeenCalledTimes(2)
+    expect(r.ok).toBe(false)
+    if (!r.ok) expect(r.reason).toBe('db_error')
   })
 })
