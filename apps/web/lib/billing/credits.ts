@@ -94,9 +94,14 @@ export async function convertReservationToConsume(
 ): Promise<ConsumeResult> {
   const service = createServiceClient()
 
-  const { data, error } = await service.rpc('convert_reservation_to_consume', {
-    p_reading_id: readingId,
-  })
+  // RPC cast: types do DB ainda não regeneradas pós-migration 0040 (founder
+  // aplica db push). Mesmo padrão de cast usado pra tabelas novas no repo.
+  const { data, error } = await (
+    service.rpc as unknown as (
+      fn: string,
+      args: Record<string, unknown>,
+    ) => Promise<{ data: unknown; error: { message: string } | null }>
+  )('convert_reservation_to_consume', { p_reading_id: readingId })
   if (error) {
     console.error('[billing] convert RPC failed:', error.message)
     return { ok: false, reason: 'db_error', error: error.message }
