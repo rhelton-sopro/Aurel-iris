@@ -40,6 +40,7 @@ import { runStage1Scan } from '@/lib/anthropic/stage1-scan'
 import { buildRecentPhrasesContext } from '@/lib/anthropic/recent-phrases-context'
 import { extractPhrases } from '@/lib/anthropic/extract-phrases'
 import { prepareDirectImages } from '@/lib/anthropic/prepare-direct-images'
+import { canonicalizeReading } from '@/lib/canonicalize'
 import { isFounderEmail } from '@/lib/auth/founder'
 import {
   findAllBoundaries,
@@ -176,6 +177,32 @@ export async function POST(
   // Service client for storage signing (mirrors /process — avoids RLS tax);
   // ownership already enforced above with the user client.
   const service = createServiceClient()
+
+  // Lazy canonicalization (fix 07.4 — raiz da convergência cross-leitura):
+  // leituras capturadas via CONVITE não passam pelo finalizeReadingAction (que
+  // é quem dispara o canonicalize no fluxo do terapeuta), então chegam aqui com
+  // canonical_metadata NULL e a íris NUNCA foi centralizada. Sem isso o Sonnet
+  // lê a foto crua/larga (íris = fração do quadro) e só enxerga sinais grossos/
+  // periféricos (esclera, pigmento âmbar→fígado, tamanho de pupila), fazendo
+  // toda leitura convergir no mesmo padrão genérico (auditoria N=5, 2026-05-29).
+  //
+  // Roda 1× aqui, lazy, só quando faltou: o terapeuta já está autenticado + é
+  // owner (checado acima), maxDuration=800s acomoda os 6 bbox, e capturas
+  // abandonadas nunca pagam o custo (~$0.07). Best-effort (D-01): se falhar,
+  // prepareDirectImages cai no raw (comportamento atual) — NUNCA bloqueia a
+  // geração. Idempotente (D-05): re-rodar sobrescreve os crops.
+  if (!reading.canonical_metadata) {
+    try {
+      await canonicalizeReading(readingId, user.id)
+      console.info(`[analyze] lazy-canonicalize OK reading=${readingId}`)
+    } catch (err) {
+      console.error(
+        `[analyze] lazy-canonicalize falhou reading=${readingId} (segue com raw):`,
+        err instanceof Error ? err.message : err,
+      )
+    }
+  }
+
   const prep = await prepareDirectImages(service, readingId)
   if (!prep.ok) {
     const status = prep.reason === 'no_images' ? 404 : 502
