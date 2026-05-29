@@ -99,3 +99,5 @@ UAT visual APROVADO (desktop+mobile). Refinamentos não-bloqueantes pra rodada f
 - Card trial "Não disponível" → copy mais convidativa
 - "vs Avulsa" → "Você economiza R$X"
 3 estados do trial (active/ended) + redirect Asaas real NÃO testados → smoke E2E 08-14.
+
+## NOTA typo "volladas": está em components/legal/DisclaimerCopy.tsx (compartilhado) — fix único cobre TODAS as telas (08-09/08-10/08-11). 08-11 UAT estado-vazio aprovado; estados-com-dado → 08-14.

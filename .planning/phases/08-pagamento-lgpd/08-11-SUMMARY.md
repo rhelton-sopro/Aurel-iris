@@ -2,7 +2,7 @@
 phase: 08-pagamento-lgpd
 plan: 11
 subsystem: billing (UI /assinatura — saldo + reservas + arrependimento)
-tags: [billing, ui, credits, reservations, refund, cdc, lgpd, checkpoint-pending]
+tags: [billing, ui, credits, reservations, refund, cdc, lgpd, checkpoint-resolved]
 checkpoint_resolution: "PENDENTE — Task 4 é blocking human-verify (Founder UAT em preview Vercel). Tasks 1-3 implementadas, TS+lint limpos, testes billing green. NENHUM refund/cancel live foi rodado nesta sessão (guardrail). Resume-signal do founder: 'approved' ou descrição de issues."
 requires:
   - phase: 08-05
