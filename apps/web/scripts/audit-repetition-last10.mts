@@ -34,7 +34,7 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
 
 const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, { auth: { persistSession: false } })
 
-const LIMIT = 10
+const LIMIT = Number(process.env.AUDIT_LIMIT ?? 10)
 // STOPWORDS pra n-gram analysis — manter conteúdo, remover ruído.
 const STOPWORDS = new Set([
   'a','o','as','os','um','uma','uns','umas','de','do','da','dos','das','em','no','na','nos','nas',
@@ -329,6 +329,37 @@ async function main() {
     console.log(`   ${aber.replace(/\n/g, '\n   ')}`)
   })
 
+  // ─── PUPILA — presença no texto final (report_generated) ──────────────────
+  // Founder: "ainda sai muita pupila". Mede vocabulário pupilar na PROSA final
+  // (não só no campo S1 constituicao_base.pupila), por leitura e por seção.
+  const PUPIL_RE = /\b(pupil\w*|colarete\w*|gol[ií]lha\w*|neurovegetativ\w*|anel aut[oô]n\w*|borda pupilar|margem pupilar|mios\w*|midr[íi]\w*)\b/giu
+  type PupilStat = { name: string; total: number; perSection: Array<[string, number]> }
+  const pupilStats: PupilStat[] = rows.map(row => {
+    const rg = (row.report_generated && typeof row.report_generated === 'object')
+      ? row.report_generated as Record<string, unknown> : {}
+    const perSection: Array<[string, number]> = []
+    let total = 0
+    for (const [k, v] of Object.entries(rg)) {
+      if (typeof v !== 'string') continue
+      const m = v.match(PUPIL_RE)
+      const c = m ? m.length : 0
+      if (c > 0) { perSection.push([k, c]); total += c }
+    }
+    perSection.sort((a, b) => b[1] - a[1])
+    return { name: row.client_name, total, perSection }
+  })
+  const pupilSectionAgg = countMap(
+    pupilStats.flatMap(p => p.perSection.flatMap(([s, c]) => Array(c).fill(s.replace(/^\d+_/, '')) as string[])),
+  )
+  console.log('\n\n=== PUPILA — vocabulário pupilar na prosa final ===')
+  console.log('| # | Cliente | total | seções (top) |')
+  console.log('|---|---------|-------|--------------|')
+  pupilStats.forEach((p, i) => {
+    console.log(`| ${i + 1} | ${p.name.slice(0, 25)} | ${p.total} | ${p.perSection.slice(0, 6).map(([s, c]) => `${s.split('_')[0]}:${c}`).join(' ')} |`)
+  })
+  console.log('\n#### Pupila — em quais seções aparece (agregado)')
+  for (const [s, c] of topN(pupilSectionAgg, 20)) console.log(`  ${s}: ${c}`)
+
   // ─── DUMP em arquivo MD ────────────────────────────────────────────────────
   const outDir = path.join(process.cwd(), 'scripts', 'output')
   mkdirSync(outDir, { recursive: true })
@@ -442,6 +473,18 @@ async function main() {
     md.push(``)
     md.push(`> ${aber.split('\n').join('\n> ').slice(0, 1500)}`)
   })
+
+  md.push(`\n## PUPILA — vocabulário pupilar na prosa final (report_generated)\n`)
+  md.push(`Regex: pupil*, colarete, golilha, neurovegetativ*, anel autôn*, borda/margem pupilar, miose, midríase.\n`)
+  md.push(`| # | Cliente | total | seções (n:contagem) |`)
+  md.push(`|---|---------|-------|---------------------|`)
+  pupilStats.forEach((p, i) => {
+    md.push(`| ${i + 1} | ${p.name} | ${p.total} | ${p.perSection.map(([s, c]) => `${s.replace(/^\d+_/, '')}:${c}`).join(', ') || '—'} |`)
+  })
+  md.push(`\n### Pupila — seções onde aparece (agregado across leituras)\n`)
+  md.push(`| seção | ocorrências |`)
+  md.push(`|-------|-------------|`)
+  for (const [s, c] of topN(pupilSectionAgg, 25)) md.push(`| ${s} | ${c} |`)
 
   writeFileSync(outPath, md.join('\n'), 'utf-8')
   console.log(`\n\nMarkdown auditoria salvo em: ${outPath}`)

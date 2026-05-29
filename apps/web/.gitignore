@@ -43,6 +43,8 @@ next-env.d.ts
 
 # artefatos de smoke/diagnóstico locais (ex.: scripts/smoke-consent-pdf.spec.ts)
 tmp/
+# saída de auditorias (contém PII de clientes: nomes + texto clínico) — nunca commitar
+scripts/output/
 
 # serwist removed — public/sw.js is now a committed self-unregistering
 # kill-switch (Serwist precache served stale bundles, broke auth).
