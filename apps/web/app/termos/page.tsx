@@ -1,9 +1,15 @@
 import Link from 'next/link'
 import { TOS_VERSION, TOS_EFFECTIVE_DATE } from '@/lib/consent/tos'
+import { DisclaimerCopy } from '@/components/legal/DisclaimerCopy'
 
 export const metadata = {
   title: 'Termos de Uso — Iris Codex',
 }
+
+// E-mail operacional de contato (mesma decisão de checkpoint que /privacidade).
+// Placeholder fallback — founder define o valor final no Task 5 do plano 08-09.
+const OPERATOR_EMAIL =
+  process.env.NEXT_PUBLIC_OPERATOR_EMAIL ?? 'rhelton@gmail.com'
 
 export default function TermosPage() {
   return (
@@ -26,6 +32,67 @@ export default function TermosPage() {
             substitui avaliação, diagnóstico ou tratamento médico</strong> de
             qualquer natureza.
           </p>
+        </section>
+
+        {/* D-02 pricing + D-13/D-14 arrependimento — em destaque (D-14). */}
+        <section className="space-y-3 border-2 border-teal/30 bg-ivory/50 p-4">
+          <h2 className="text-base font-medium">Modelo de pagamento</h2>
+          <ul className="ml-5 list-disc space-y-1.5">
+            <li>
+              <strong>Avaliação gratuita:</strong> 3 leituras ou 60 dias (o que
+              ocorrer primeiro), sem necessidade de cartão de crédito.
+            </li>
+            <li>
+              <strong>Pacotes pré-pagos</strong> (créditos adquiridos
+              antecipadamente):
+              <ul className="ml-5 mt-1 list-disc space-y-1">
+                <li>Avulsa: R$ 99,70 (1 leitura)</li>
+                <li>Pacote Pequeno: R$ 298,50 (5 leituras — R$ 59,70 por leitura)</li>
+                <li>
+                  Pacote Médio: R$ 745,50 (15 leituras — R$ 49,70 por leitura)
+                  — <em>Mais escolhido</em>
+                </li>
+                <li>
+                  Pacote Grande: R$ 1.191,00 (30 leituras — R$ 39,70 por
+                  leitura) — <em>Melhor valor</em>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <strong>Validade dos créditos:</strong> 12 (doze) meses contados a
+              partir da confirmação do pagamento. Você pode manter múltiplos
+              pacotes ativos; o saldo é somado e consumido do mais antigo para o
+              mais recente.
+            </li>
+            <li>
+              Após o vencimento dos 12 meses, créditos não utilizados são
+              encerrados <strong>sem reembolso</strong> (salvo avaliação
+              caso-a-caso pelo suporte).
+            </li>
+          </ul>
+        </section>
+
+        <section className="space-y-3 border-2 border-teal/30 bg-ivory/50 p-4">
+          <h2 className="text-base font-medium">Direito de arrependimento</h2>
+          <p>
+            Nos termos do art. 49 do Código de Defesa do Consumidor, você dispõe
+            de <strong>7 dias corridos</strong> (sete dias) após a confirmação
+            do pagamento para solicitar o cancelamento da compra de créditos:
+          </p>
+          <ul className="ml-5 list-disc space-y-1">
+            <li>
+              Se nenhuma leitura do pacote foi consumida:{' '}
+              <strong>reembolso integral</strong>.
+            </li>
+            <li>
+              Se ao menos 1 leitura foi consumida:{' '}
+              <strong>reembolso proporcional</strong> sobre o saldo restante.
+            </li>
+            <li>
+              Após os 7 dias: sem reembolso de créditos não utilizados (avaliação
+              caso-a-caso via suporte).
+            </li>
+          </ul>
         </section>
 
         <section className="space-y-2">
@@ -162,15 +229,19 @@ export default function TermosPage() {
           <h2 className="text-base font-medium">11. Contato</h2>
           <p>
             Dúvidas sobre estes Termos:{' '}
-            <a href="mailto:rhelton@gmail.com" className="underline">
-              rhelton@gmail.com
+            <a href={`mailto:${OPERATOR_EMAIL}`} className="underline">
+              {OPERATOR_EMAIL}
             </a>
             .
           </p>
         </section>
       </div>
 
-      <div className="mt-12 border-t border-b-ink/20 pt-6 text-sm">
+      <div className="mt-10 border-t border-ink/15 pt-6">
+        <DisclaimerCopy variant="inline" />
+      </div>
+
+      <div className="mt-8 border-t border-b-ink/20 pt-6 text-sm">
         <Link href="/" className="underline">
           Voltar
         </Link>
