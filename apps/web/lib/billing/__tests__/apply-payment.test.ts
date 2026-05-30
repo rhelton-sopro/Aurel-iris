@@ -76,8 +76,9 @@ describe('applyPaymentEvent', () => {
       },
       error: null,
     })
-    // bare-awaited UPDATE resolves via thenable
-    nextAwait.push({ data: null, error: null })
+    // UPDATE...select('id') resolve via thenable. data com 1 linha = flipou
+    // (fix 2026-05-30: o branch agora checa rowCount do flip).
+    nextAwait.push({ data: [{ id: 'cred-1' }], error: null })
 
     const r = await applyPaymentEvent({
       ...baseEnvelope,
@@ -91,6 +92,52 @@ describe('applyPaymentEvent', () => {
     expect(insertMock).toHaveBeenCalledWith(
       expect.objectContaining({ type: 'purchase', amount: 5, credit_id: 'cred-1' }),
     )
+  })
+
+  it('activates pending credit on PAYMENT_RECEIVED (PIX/boleto — fix 2026-05-30)', async () => {
+    // PIX dispara PAYMENT_RECEIVED, não CONFIRMED. Antes do fix era no-op
+    // silencioso (dinheiro entrava, crédito ficava pending). Agora ativa.
+    maybeSingleMock.mockResolvedValueOnce({
+      data: {
+        id: 'cred-1',
+        user_id: 'u-1',
+        package_id: 'pkg-1',
+        leituras_purchased: 5,
+        status: 'pending',
+      },
+      error: null,
+    })
+    nextAwait.push({ data: [{ id: 'cred-1' }], error: null })
+
+    const r = await applyPaymentEvent({
+      ...baseEnvelope,
+      event: 'PAYMENT_RECEIVED',
+    } as Envelope)
+    expect(r).toEqual({ applied: true, action: 'activated', credit_id: 'cred-1' })
+  })
+
+  it('idempotente em race: UPDATE flipa 0 linhas → no-op sem ledger dup', async () => {
+    // SELECT lê pending, mas entre SELECT e UPDATE outro evento (CONFIRMED +
+    // RECEIVED do mesmo cartão) já ativou → UPDATE com status-guard afeta 0
+    // linhas. Sem o rowCount check, gravaria transação/email duplicados.
+    maybeSingleMock.mockResolvedValueOnce({
+      data: {
+        id: 'cred-1',
+        user_id: 'u-1',
+        package_id: 'pkg-1',
+        leituras_purchased: 5,
+        status: 'pending',
+      },
+      error: null,
+    })
+    nextAwait.push({ data: [], error: null }) // 0 linhas flipadas
+
+    const r = await applyPaymentEvent({
+      ...baseEnvelope,
+      event: 'PAYMENT_RECEIVED',
+    } as Envelope)
+    expect(r.applied).toBe(false)
+    expect(insertMock).not.toHaveBeenCalled() // sem ledger duplicado
   })
 
   it('no-op when credit already active (race / duplicate)', async () => {
