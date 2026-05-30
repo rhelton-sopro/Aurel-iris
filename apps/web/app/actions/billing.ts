@@ -129,17 +129,32 @@ export async function createChargeAction(
   const successUrl = parsed.data.reading_id
     ? `${siteUrl}/leituras/${parsed.data.reading_id}`
     : `${siteUrl}/assinatura`
-  const payment = await createAsaasPayment({
+  const paymentInput = {
     customer: asaasCustomerId,
-    billingType: 'UNDEFINED', // cliente escolhe (PIX/cartão/boleto) no checkout
+    billingType: 'UNDEFINED' as const, // cliente escolhe (PIX/cartão/boleto) no checkout
     value: pkg.price_brl,
     dueDate,
     description: `Iris Codex — ${pkg.name} (${pkg.leituras_count} ${
       pkg.leituras_count === 1 ? 'leitura' : 'leituras'
     })`,
     externalReference: pendingCredit.id,
+  }
+  // Tenta COM callback (auto-retorno pós-pagamento). O Asaas só aceita callback
+  // se o domínio do successUrl estiver cadastrado na conta (Configurações →
+  // Integrações). Sem isso, rejeita a cobrança INTEIRA com invalid_object
+  // ("nenhum domínio configurado"). Degradação graciosa: se rejeitar por
+  // domínio/callback, refaz SEM callback — a compra nunca trava por config
+  // externa; o auto-retorno religa sozinho quando o founder cadastrar o domínio.
+  let payment = await createAsaasPayment({
+    ...paymentInput,
     callback: { successUrl, autoRedirect: true },
   })
+  if (!payment.ok && /dom[íi]nio|domain|callback/i.test(payment.error)) {
+    console.warn(
+      `[billing] payment com callback rejeitado (${payment.error}); refazendo sem callback`,
+    )
+    payment = await createAsaasPayment(paymentInput)
+  }
   if (!payment.ok) {
     // Compensação: Asaas rejeitou → remove a row pendente órfã
     await service.from('customer_credits').delete().eq('id', pendingCredit.id)

@@ -16,9 +16,10 @@ import {
 
 interface DashboardHeaderProps {
   fullName: string
+  creditsRemaining: number
 }
 
-export function DashboardHeader({ fullName }: DashboardHeaderProps) {
+export function DashboardHeader({ fullName, creditsRemaining }: DashboardHeaderProps) {
   const router = useRouter()
   const initial = fullName ? fullName.charAt(0).toUpperCase() : 'T'
 
@@ -39,6 +40,19 @@ export function DashboardHeader({ fullName }: DashboardHeaderProps) {
         </div>
       </div>
       <div className="flex items-center gap-4">
+        {/* Saldo de créditos (onde antes ficavam os dias de trial). Clicável →
+            /assinatura. 0 créditos em destaque (vermelho) pra incentivar compra. */}
+        <Link
+          href="/assinatura"
+          aria-label={`${creditsRemaining} créditos de análise — ver saldo`}
+          className={`rounded-[2px] border px-2.5 py-1 text-[11px] font-normal uppercase tracking-label transition-colors ${
+            creditsRemaining === 0
+              ? 'border-destructive text-destructive hover:bg-destructive/5'
+              : 'border-ink/30 text-ink hover:border-teal hover:text-teal'
+          }`}
+        >
+          {creditsRemaining} {creditsRemaining === 1 ? 'crédito' : 'créditos'}
+        </Link>
         <DropdownMenu>
           <DropdownMenuTrigger
             className="cursor-pointer rounded-full"

@@ -19,15 +19,22 @@ export default async function DashboardLayout({
     redirect('/login')
   }
 
-  // Buscar perfil do terapeuta (RLS garante que só vê o próprio).
-  // Só o nome é usado no header (avatar + menu da conta).
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('full_name')
-    .eq('id', user.id)
-    .single()
+  // Perfil (nome p/ avatar) + saldo de créditos ativos (badge no header, onde
+  // antes ficavam os dias de trial — founder 2026-05-30).
+  const [{ data: profile }, { data: creditRows }] = await Promise.all([
+    supabase.from('profiles').select('full_name').eq('id', user.id).single(),
+    supabase
+      .from('customer_credits')
+      .select('leituras_remaining')
+      .eq('user_id', user.id)
+      .eq('status', 'active'),
+  ])
 
   const fullName = profile?.full_name ?? 'Terapeuta'
+  const creditsRemaining = (creditRows ?? []).reduce(
+    (s, r) => s + (r.leituras_remaining ?? 0),
+    0,
+  )
 
   return (
     <SidebarProvider
@@ -37,7 +44,7 @@ export default async function DashboardLayout({
     >
       <AppSidebar />
       <SidebarInset>
-        <DashboardHeader fullName={fullName} />
+        <DashboardHeader fullName={fullName} creditsRemaining={creditsRemaining} />
         <main className="flex-1 px-7 py-6">
           {children}
         </main>
