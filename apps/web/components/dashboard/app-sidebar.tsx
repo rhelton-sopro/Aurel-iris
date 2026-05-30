@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Users, Eye } from 'lucide-react'
+import { LayoutDashboard, Users, Eye, CreditCard } from 'lucide-react'
 import {
   Sidebar,
   SidebarContent,
@@ -19,6 +19,7 @@ const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/clientes', label: 'Clientes', icon: Users },
   { href: '/leituras', label: 'Leituras', icon: Eye },
+  { href: '/assinatura', label: 'Assinatura', icon: CreditCard },
 ]
 
 export function AppSidebar() {

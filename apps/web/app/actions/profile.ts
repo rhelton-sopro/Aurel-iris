@@ -79,6 +79,46 @@ export async function completeProfileAction(input: {
   redirect('/dashboard')
 }
 
+// Edição básica de perfil (founder 2026-05-30): terapeuta re-edita nome +
+// telefone via /perfil/editar (menu do avatar). CPF/especialidades NÃO entram
+// aqui — CPF já foi pro Asaas como customer (mudar dessincroniza), e o escopo
+// pedido foi o mínimo. Diferente de completeProfileAction (gate de onboarding).
+export async function updateProfileBasicAction(input: {
+  fullName: string
+  phone: string
+}): Promise<{ error?: string; ok?: true }> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+  if (!user || authError) redirect('/login')
+
+  const schema = z.object({
+    fullName: z.string().trim().min(2, 'Nome muito curto').max(120, 'Nome muito longo'),
+    phone: z.string().refine(phoneIsValidBR, 'Telefone inválido (DDD + número)'),
+  })
+
+  const parsed = schema.safeParse(input)
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? 'Dados inválidos.' }
+  }
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({
+      full_name: parsed.data.fullName,
+      phone: parsed.data.phone,
+    })
+    .eq('id', user.id)
+
+  if (error) {
+    return { error: 'Não foi possível salvar agora. Tente novamente.' }
+  }
+
+  return { ok: true }
+}
+
 // Autoexame (Cluster 2c): o terapeuta como examinado. Singleton por
 // terapeuta via find-or-create (clients.is_self=true) — sem migração extra.
 // Identidade vem do profile; pede só o mínimo clínico (DOB + sexo). Cai no

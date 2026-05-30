@@ -1,12 +1,11 @@
 'use client'
 
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { differenceInDays } from 'date-fns'
-import { LogOut } from 'lucide-react'
+import { LogOut, UserPen, CreditCard } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { DisclaimerCopy } from '@/components/legal/DisclaimerCopy'
-import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
   DropdownMenu,
@@ -17,20 +16,11 @@ import {
 
 interface DashboardHeaderProps {
   fullName: string
-  trialEndsAt: string | null
-  subscriptionStatus: string | null
 }
 
-export function DashboardHeader({ fullName, trialEndsAt, subscriptionStatus }: DashboardHeaderProps) {
+export function DashboardHeader({ fullName }: DashboardHeaderProps) {
   const router = useRouter()
   const initial = fullName ? fullName.charAt(0).toUpperCase() : 'T'
-
-  const daysLeft = trialEndsAt
-    ? differenceInDays(new Date(trialEndsAt), new Date())
-    : null
-
-  const isTrial = subscriptionStatus === 'trial'
-  const isTrialUrgent = daysLeft !== null && daysLeft <= 3
 
   async function handleLogout() {
     const supabase = createClient()
@@ -49,11 +39,6 @@ export function DashboardHeader({ fullName, trialEndsAt, subscriptionStatus }: D
         </div>
       </div>
       <div className="flex items-center gap-4">
-        {isTrial && daysLeft !== null && (
-          <Badge variant={isTrialUrgent ? 'destructive' : 'outline'}>
-            Trial: {daysLeft} dias
-          </Badge>
-        )}
         <DropdownMenu>
           <DropdownMenuTrigger
             className="cursor-pointer rounded-full"
@@ -65,7 +50,21 @@ export function DashboardHeader({ fullName, trialEndsAt, subscriptionStatus }: D
               </AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="min-w-40 rounded-none border border-ink p-0 shadow-none">
+          <DropdownMenuContent align="end" className="min-w-44 rounded-none border border-ink p-0 shadow-none">
+            <DropdownMenuItem
+              className="cursor-pointer rounded-none px-3.5 py-3 text-[11px] font-normal uppercase tracking-label focus:bg-ivory"
+              render={<Link href="/perfil/editar" />}
+            >
+              <UserPen className="mr-2 h-4 w-4" />
+              Editar perfil
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer rounded-none px-3.5 py-3 text-[11px] font-normal uppercase tracking-label focus:bg-ivory"
+              render={<Link href="/assinatura" />}
+            >
+              <CreditCard className="mr-2 h-4 w-4" />
+              Pagamento
+            </DropdownMenuItem>
             <DropdownMenuItem
               onClick={handleLogout}
               className="cursor-pointer rounded-none px-3.5 py-3 text-[11px] font-normal uppercase tracking-label focus:bg-ivory"

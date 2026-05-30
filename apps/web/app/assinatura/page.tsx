@@ -1,7 +1,7 @@
-// Página /assinatura (D-11): estado completo do terapeuta — saldo + trial +
-// reservados + processos em andamento + pacotes com botão arrependimento.
-// Server component: SSR de credits + trialState + reservations em paralelo,
-// agrega totais e delega a UI aos widgets (08-11 Task 2).
+// Página /assinatura (D-11): estado completo do terapeuta — saldo + reservados
+// + processos em andamento + pacotes com botão arrependimento.
+// Server component: SSR de credits + reservations em paralelo, agrega totais e
+// delega a UI aos widgets (08-11 Task 2). Trial removido da UI (founder 2026-05-30).
 //
 // Tokens semânticos NEUTROS + teal explícito; rounded-[2px]; sem prose-*.
 
@@ -9,7 +9,6 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
 import { createClient } from '@/lib/supabase/server'
-import { getTrialState } from '@/lib/billing/trial'
 import { listActiveReservations } from '@/lib/billing/reservations'
 import { CreditsBalanceWidget } from '@/components/billing/CreditsBalanceWidget'
 import { ReservationsList } from '@/components/billing/ReservationsList'
@@ -36,7 +35,7 @@ export default async function AssinaturaPage() {
   } = await supabase.auth.getUser()
   if (!user) redirect('/login?next=/assinatura')
 
-  const [{ data: credits }, trialState, reservations] = await Promise.all([
+  const [{ data: credits }, reservations] = await Promise.all([
     supabase
       .from('customer_credits')
       .select(
@@ -45,7 +44,6 @@ export default async function AssinaturaPage() {
       .eq('user_id', user.id)
       .in('status', ['active', 'pending'])
       .order('purchase_date', { ascending: true }),
-    getTrialState(user.id),
     listActiveReservations(user.id),
   ])
 
@@ -73,7 +71,6 @@ export default async function AssinaturaPage() {
       </header>
 
       <CreditsBalanceWidget
-        trialState={trialState}
         totalRemaining={totalRemaining}
         totalReserved={totalReserved}
         packagesCount={liveCredits.length}

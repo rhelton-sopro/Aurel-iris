@@ -19,16 +19,15 @@ export default async function DashboardLayout({
     redirect('/login')
   }
 
-  // Buscar perfil do terapeuta (RLS garante que só vê o próprio)
+  // Buscar perfil do terapeuta (RLS garante que só vê o próprio).
+  // Só o nome é usado no header (avatar + menu da conta).
   const { data: profile } = await supabase
     .from('profiles')
-    .select('full_name, subscription_status, trial_ends_at')
+    .select('full_name')
     .eq('id', user.id)
     .single()
 
   const fullName = profile?.full_name ?? 'Terapeuta'
-  const trialEndsAt = profile?.trial_ends_at ?? null
-  const subscriptionStatus = profile?.subscription_status ?? null
 
   return (
     <SidebarProvider
@@ -38,11 +37,7 @@ export default async function DashboardLayout({
     >
       <AppSidebar />
       <SidebarInset>
-        <DashboardHeader
-          fullName={fullName}
-          trialEndsAt={trialEndsAt}
-          subscriptionStatus={subscriptionStatus}
-        />
+        <DashboardHeader fullName={fullName} />
         <main className="flex-1 px-7 py-6">
           {children}
         </main>

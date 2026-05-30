@@ -19,19 +19,34 @@ export default async function DashboardPage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Paralelo: clientes + readings + perfil (onboarding state derivado de DB).
-  const [{ count: clientsCount }, { count: readingsCount }, { data: profile }] =
-    await Promise.all([
-      supabase.from('clients').select('*', { count: 'exact', head: true }),
-      supabase.from('readings').select('*', { count: 'exact', head: true }),
-      supabase
-        .from('profiles')
-        .select(
-          'subscription_status, trial_ends_at, beta_readings_used, phone, specialties, tos_accepted_at, onboarding_dismissed_at, cpf',
-        )
-        .eq('id', user?.id ?? '')
-        .single(),
-    ])
+  // Paralelo: clientes + readings + perfil (onboarding state derivado de DB) +
+  // saldo de créditos ativos (substitui o display de trial — founder 2026-05-30).
+  const [
+    { count: clientsCount },
+    { count: readingsCount },
+    { data: profile },
+    { data: creditRows },
+  ] = await Promise.all([
+    supabase.from('clients').select('*', { count: 'exact', head: true }),
+    supabase.from('readings').select('*', { count: 'exact', head: true }),
+    supabase
+      .from('profiles')
+      .select(
+        'phone, specialties, tos_accepted_at, onboarding_dismissed_at, cpf',
+      )
+      .eq('id', user?.id ?? '')
+      .single(),
+    supabase
+      .from('customer_credits')
+      .select('leituras_remaining')
+      .eq('user_id', user?.id ?? '')
+      .eq('status', 'active'),
+  ])
+
+  const creditsRemaining = (creditRows ?? []).reduce(
+    (s, r) => s + (r.leituras_remaining ?? 0),
+    0,
+  )
 
   // Onboarding state derivado de DB (D-02, D-03).
   const therapistGate = evaluateTherapistProfile({
@@ -72,9 +87,7 @@ export default async function DashboardPage() {
       <InviteReadingsSection />
       <SummaryCards
         clientsCount={clientsCount ?? 0}
-        trialEndsAt={profile?.trial_ends_at ?? null}
-        subscriptionStatus={profile?.subscription_status ?? null}
-        betaReadingsUsed={profile?.beta_readings_used ?? 0}
+        creditsRemaining={creditsRemaining}
       />
     </div>
   )

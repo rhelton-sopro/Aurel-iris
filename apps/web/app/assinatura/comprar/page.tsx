@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
 import { createClient } from '@/lib/supabase/server'
-import { getTrialState } from '@/lib/billing/trial'
 import { DisclaimerCopy } from '@/components/legal/DisclaimerCopy'
 import {
   PackageGrid,
@@ -11,21 +10,30 @@ import {
 
 export const metadata = { title: 'Comprar créditos — Iris Codex' }
 
-export default async function ComprarPage() {
+export default async function ComprarPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ reading?: string }>
+}) {
+  // reading: quando a compra vem do banner "sem créditos" de uma leitura.
+  // Propagado até o PackageCard → successUrl do checkout volta pra essa leitura.
+  const { reading: readingId } = await searchParams
   const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (!user) redirect('/login?next=/assinatura/comprar')
+  if (!user) {
+    const next = readingId
+      ? `/assinatura/comprar?reading=${readingId}`
+      : '/assinatura/comprar'
+    redirect(`/login?next=${encodeURIComponent(next)}`)
+  }
 
-  const [{ data: packages }, trialState] = await Promise.all([
-    supabase
-      .from('credit_packages')
-      .select('id, sku, name, leituras_count, price_brl, badge, display_order')
-      .eq('active', true)
-      .order('display_order'),
-    getTrialState(user.id),
-  ])
+  const { data: packages } = await supabase
+    .from('credit_packages')
+    .select('id, sku, name, leituras_count, price_brl, badge, display_order')
+    .eq('active', true)
+    .order('display_order')
 
   const list = (packages ?? []) as CreditPackage[]
 
@@ -40,7 +48,7 @@ export default async function ComprarPage() {
       </header>
 
       {list.length > 0 ? (
-        <PackageGrid packages={list} trialState={trialState} />
+        <PackageGrid packages={list} readingId={readingId} />
       ) : (
         <p className="text-center text-muted-foreground">
           Pacotes em atualização. Tente novamente em alguns instantes.
