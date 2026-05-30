@@ -104,13 +104,13 @@ export async function createReadingAction(
   const termo = await assertClientTermoSigned(parsed.data.client_id)
   if (!termo.ok) {
     if (termo.reason === 'termo_missing') {
-      // href semântico pra UI/CTA de assinatura. A página dedicada de termo
-      // (TermoBiometricoStep montado) é escopo de plano UI futuro; por ora o
-      // link aponta pro detalhe do cliente onde o passo de termo será exposto.
+      // Bloqueio de termo: devolve href estruturado pra UI montar o CTA
+      // clicável (TermoConsultorioClient em /clientes/[id]/termo). A mensagem
+      // não embute mais a URL crua — quem renderiza o link é o form.
       return {
         error:
-          'O cliente precisa assinar o Termo de Consentimento Biométrico antes da leitura. ' +
-          `Assine em /clientes/${parsed.data.client_id}/termo`,
+          'Antes da leitura, o cliente precisa assinar o Termo de Consentimento Biométrico.',
+        termoHref: `/clientes/${parsed.data.client_id}/termo`,
       }
     }
     if (termo.reason === 'client_not_found') {

@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import Link from 'next/link'
 import { useActionState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -93,8 +94,16 @@ export function NewReadingForm({ clients, preselectedClientId }: NewReadingFormP
   return (
     <div className="space-y-4">
       {typeof state.error === 'string' && (
-        <div className="bg-destructive/10 border border-destructive text-sm px-4 py-2 rounded text-destructive">
-          {state.error}
+        <div className="bg-destructive/10 border border-destructive text-sm px-4 py-2 rounded text-destructive space-y-3">
+          <p>{state.error}</p>
+          {state.termoHref && (
+            <Link
+              href={state.termoHref}
+              className="inline-block rounded-md bg-teal-dark px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+            >
+              Entregar para o cliente assinar
+            </Link>
+          )}
         </div>
       )}
 
