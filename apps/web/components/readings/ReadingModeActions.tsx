@@ -115,10 +115,15 @@ export function ReadingModeActions({
   // regen rodando. busy = regenPending (stream local ativo) || server-side
   // regen detectada. Banner+disable estados refletem ambos.
   const regenServerOrLocal = regenPending || isAnalysisInProgress
-  const regenDisabled = regenerationCount >= 3 || regenServerOrLocal
+  // Cap = 1 geração original + 1 regen grátis (founder 2026-05-29, commit 1de47fc).
+  // regeneration_count conta gerações TOTAIS (1 após a original), então o gate é
+  // count >= 2 — espelha o backend (analyze/route.ts) e o AnalysisCTA. Antes este
+  // componente divergia em >= 3 (mostrava n/3 mas o backend bloqueava em 2).
+  const regensUsed = Math.max(0, regenerationCount - 1)
+  const regenDisabled = regenerationCount >= 2 || regenServerOrLocal
   const regenTooltip =
-    regenerationCount >= 3
-      ? 'Limite de 3 regenerações atingido. Edite manualmente para ajustar o relatório.'
+    regenerationCount >= 2
+      ? 'Você já usou a regeneração desta leitura. Para um novo relatório, faça uma nova leitura (novas fotos).'
       : null
 
   async function onDeliverConfirm() {
@@ -276,10 +281,10 @@ export function ReadingModeActions({
       disabled={regenDisabled}
       className="gap-2"
       data-testid="reading-mode-regenerate"
-      aria-label={`Regenerar análise (${regenerationCount}/3)`}
+      aria-label={`Regenerar análise (${regensUsed}/1)`}
     >
       <RefreshCw className={cn('h-4 w-4', regenServerOrLocal && 'animate-spin')} aria-hidden />
-      {regenServerOrLocal ? 'Regenerando…' : `Regenerar análise (${regenerationCount}/3)`}
+      {regenServerOrLocal ? 'Regenerando…' : `Regenerar análise (${regensUsed}/1)`}
     </Button>
   )
 

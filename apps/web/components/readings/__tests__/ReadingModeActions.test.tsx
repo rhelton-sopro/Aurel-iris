@@ -68,7 +68,20 @@ describe('components/readings/ReadingModeActions (Plan 7.4-18 — UAT-3 reading-
     expect(editLink.getAttribute('href')).toBe('/leituras/reading-abc/editar')
   })
 
-  it('Regenerar análise shows {n}/3 counter', () => {
+  it('Regenerar análise shows {n}/1 counter (cap = 1 regen grátis)', () => {
+    render(
+      <ReadingModeActions
+        readingId="reading-123"
+        regenerationCount={1}
+        isDelivered={false}
+        deliveredAt={null}
+      />,
+    )
+    // count=1 (1 geração feita, 0 regen usado) → exibe (0/1)
+    expect(screen.getByText(/Regenerar análise \(0\/1\)/)).toBeDefined()
+  })
+
+  it('Regenerar disabled at 2/1 (1 regen usado) with tooltip explanation', () => {
     render(
       <ReadingModeActions
         readingId="reading-123"
@@ -77,21 +90,9 @@ describe('components/readings/ReadingModeActions (Plan 7.4-18 — UAT-3 reading-
         deliveredAt={null}
       />,
     )
-    expect(screen.getByText(/Regenerar análise \(2\/3\)/)).toBeDefined()
-  })
-
-  it('Regenerar disabled at 3/3 with tooltip explanation', () => {
-    render(
-      <ReadingModeActions
-        readingId="reading-123"
-        regenerationCount={3}
-        isDelivered={false}
-        deliveredAt={null}
-      />,
-    )
     const regen = screen.getByTestId('reading-mode-regenerate')
     expect(regen.hasAttribute('disabled')).toBe(true)
-    expect(regen.getAttribute('aria-label')).toContain('3/3')
+    expect(regen.getAttribute('aria-label')).toContain('1/1')
   })
 
   it('isDelivered=true hides edit/deliver/regenerate but KEEPS Exportar PDF visible (Plan 19)', () => {
