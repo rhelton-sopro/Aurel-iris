@@ -100,7 +100,7 @@ describe('createReadingAction — termo gate (BILLING-03 / LGPD-01 D-19)', () =>
     expect(r.error).toContain('Termo de Consentimento')
     // Contrato novo (fix CTA clicável): a URL não fica mais no texto do erro,
     // vem em termoHref pra UI montar o link "Entregar para o cliente assinar".
-    expect(r.termoHref).toBe('/clientes/c1/termo')
+    expect(r.termoHref).toBe(`/clientes/${CLIENT_ID}/termo`)
     // Gate ANTES do credit gate: reserveCreditForReading nunca é chamado.
     expect(reserveCreditForReading).not.toHaveBeenCalled()
   })
