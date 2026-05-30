@@ -185,7 +185,7 @@ export function AnaliseClient({
           “Gerar análise” — a geração fica pendente até lá.
         </p>
         <Link
-          href="/assinatura/comprar"
+          href={`/assinatura/comprar?reading=${readingId}`}
           className="inline-block rounded-md bg-teal-dark px-4 py-2 text-sm font-medium text-white hover:opacity-90"
         >
           Comprar créditos

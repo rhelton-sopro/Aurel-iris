@@ -7,6 +7,11 @@ import { z } from 'zod'
 
 export const createChargeSchema = z.object({
   sku: z.enum(['avulsa', 'pequeno', 'medio', 'grande']),
+  // Opcional: quando a compra é disparada pelo banner "sem créditos" de uma
+  // leitura (analise-client), carregamos o reading_id pra montar o successUrl
+  // do checkout Asaas → cliente volta pra ESSA leitura após pagar (autoRedirect).
+  // Ausente = compra avulsa pela tela /assinatura/comprar → volta pra /assinatura.
+  reading_id: z.string().uuid('reading_id inválido').optional(),
 })
 
 export const refundPackageSchema = z.object({

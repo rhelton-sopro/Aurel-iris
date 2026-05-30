@@ -81,6 +81,9 @@ export interface CreatePaymentInput {
   dueDate: string // ISO YYYY-MM-DD
   description: string
   externalReference: string // customer_credits.id UUID (pitfall #5 — UNIQUE app-level)
+  // Pós-pagamento: Asaas redireciona o cliente de volta ao Iris Codex. Sem isto,
+  // o cliente fica preso no checkout após pagar. autoRedirect=true devolve sozinho.
+  callback?: { successUrl: string; autoRedirect?: boolean }
 }
 
 export async function createAsaasPayment(

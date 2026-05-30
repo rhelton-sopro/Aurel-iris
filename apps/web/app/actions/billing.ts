@@ -119,6 +119,16 @@ export async function createChargeAction(
 
   // 6. Asaas payment
   const dueDate = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10)
+  // Retorno pós-pagamento (D-23): se a compra veio de uma leitura (banner "sem
+  // créditos"), o cliente volta pra ESSA leitura — pronta pra gerar. Senão, volta
+  // pra /assinatura (saldo). autoRedirect=true: Asaas devolve sozinho ao confirmar.
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://iriscodex.com').replace(
+    /\/$/,
+    '',
+  )
+  const successUrl = parsed.data.reading_id
+    ? `${siteUrl}/leituras/${parsed.data.reading_id}`
+    : `${siteUrl}/assinatura`
   const payment = await createAsaasPayment({
     customer: asaasCustomerId,
     billingType: 'UNDEFINED', // cliente escolhe (PIX/cartão/boleto) no checkout
@@ -128,6 +138,7 @@ export async function createChargeAction(
       pkg.leituras_count === 1 ? 'leitura' : 'leituras'
     })`,
     externalReference: pendingCredit.id,
+    callback: { successUrl, autoRedirect: true },
   })
   if (!payment.ok) {
     // Compensação: Asaas rejeitou → remove a row pendente órfã

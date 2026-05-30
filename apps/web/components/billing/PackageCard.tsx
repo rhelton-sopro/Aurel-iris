@@ -26,6 +26,9 @@ interface Props {
   /** Economia total em R$ vs comprar tudo como Avulsa. 0 pra avulsa. */
   savingsBrl: number
   badge?: 'mais_escolhido' | 'melhor_valor' | null
+  // Quando a compra veio de uma leitura (banner "sem créditos"): repassa pro
+  // createChargeAction montar o successUrl de volta pra essa leitura.
+  readingId?: string
 }
 
 const BADGE_LABELS: Record<NonNullable<Props['badge']>, string> = {
@@ -45,7 +48,10 @@ export function PackageCard(props: Props) {
 
   function handleBuy() {
     startTransition(async () => {
-      const r = await createChargeAction({ sku: props.sku })
+      const r = await createChargeAction({
+        sku: props.sku,
+        reading_id: props.readingId,
+      })
       if (!r.ok) {
         toast.error(r.error)
         return
