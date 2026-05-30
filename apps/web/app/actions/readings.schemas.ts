@@ -32,6 +32,10 @@ export type ReadingFormState = {
   error?: Record<string, string[]> | string | null
   readingId?: string
   warning?: string
+  // Bloqueio por termo biométrico ausente (office_handoff): href da página onde
+  // o cliente assina no aparelho do terapeuta. A UI renderiza um CTA clicável
+  // ("Entregar para o cliente assinar") em vez da URL crua no texto do erro.
+  termoHref?: string
 }
 
 export type DraftReading = {
