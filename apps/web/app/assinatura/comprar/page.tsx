@@ -39,6 +39,12 @@ export default async function ComprarPage({
 
   return (
     <div className="mx-auto max-w-5xl space-y-8 px-4 py-8">
+      <Link
+        href="/assinatura"
+        className="text-sm text-muted-foreground underline underline-offset-2 hover:text-ink"
+      >
+        ← Voltar
+      </Link>
       <header className="space-y-2 text-center">
         <h1 className="text-2xl font-bold text-ink">Comprar créditos</h1>
         <p className="text-sm text-muted-foreground">

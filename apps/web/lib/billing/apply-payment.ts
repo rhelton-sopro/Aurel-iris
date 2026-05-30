@@ -49,14 +49,16 @@ export type ApplyPaymentResult =
       detail?: string
     }
 
-// A1 = confirmed (08-01-SUMMARY): créditos liberados em PAYMENT_CONFIRMED.
-// Lido em call-time (não module-load const) pra suportar override por deploy/test
-// via ASAAS_CREDIT_EVENT sem rebuild (parity com lib/asaas/client.ts baseUrl()).
-function creditTriggerEvent(): 'PAYMENT_CONFIRMED' | 'PAYMENT_RECEIVED' {
-  return (process.env.ASAAS_CREDIT_EVENT ?? 'PAYMENT_CONFIRMED') as
-    | 'PAYMENT_CONFIRMED'
-    | 'PAYMENT_RECEIVED'
-}
+// Créditos liberados em PAYMENT_CONFIRMED **ou** PAYMENT_RECEIVED (fix 2026-05-30).
+// PIX e boleto disparam PAYMENT_RECEIVED; cartão dispara PAYMENT_CONFIRMED (e
+// depois RECEIVED). Antes só PAYMENT_CONFIRMED → toda compra PIX virava no-op
+// silencioso (dinheiro entrava, crédito ficava pending). Aceitar ambos cobre os
+// 3 métodos. Idempotência entre os 2 eventos: garantida pelo status-guard +
+// rowCount check no branch abaixo (a 2ª ativação não flipa nada nem grava ledger).
+const CREDIT_TRIGGER_EVENTS = new Set<string>([
+  'PAYMENT_CONFIRMED',
+  'PAYMENT_RECEIVED',
+])
 
 export async function applyPaymentEvent(
   envelope: AsaasWebhookEnvelope,
@@ -64,8 +66,8 @@ export async function applyPaymentEvent(
   const { event, payment } = envelope
   const service = createServiceClient()
 
-  // ---- Branch 1: CREDIT (PAYMENT_CONFIRMED per A1) ----
-  if (event === creditTriggerEvent()) {
+  // ---- Branch 1: CREDIT (PAYMENT_CONFIRMED OU PAYMENT_RECEIVED) ----
+  if (CREDIT_TRIGGER_EVENTS.has(event)) {
     const { data: credit, error: selErr } = await service
       .from('customer_credits')
       .select('id, user_id, package_id, leituras_purchased, status')
@@ -90,7 +92,7 @@ export async function applyPaymentEvent(
     }
 
     const expiresAt = creditExpiresAt(new Date()).toISOString()
-    const { error: updErr } = await service
+    const { data: flipped, error: updErr } = await service
       .from('customer_credits')
       .update({
         status: 'active',
@@ -101,9 +103,20 @@ export async function applyPaymentEvent(
       .eq('id', credit.id)
       .eq('user_id', credit.user_id) // DEFENSIVE — pitfall #9
       .eq('status', 'pending') // status guard — race-safe
+      .select('id') // rowCount check (fix 2026-05-30 — fecha ledger-dup em race)
     if (updErr) {
       console.error('[apply-payment] update failed:', updErr.message)
       return { applied: false, reason: 'db_error', detail: updErr.message }
+    }
+    // Se 0 linhas flipadas: entre o SELECT (status=pending) e este UPDATE, outro
+    // evento (ex: CONFIRMED e RECEIVED do mesmo cartão, quase simultâneos) já
+    // ativou. NÃO grava transação/audit/email duplicados — no-op idempotente.
+    // Cobre a race que o status-guard sozinho deixava passar pro ledger.
+    if (!flipped || flipped.length === 0) {
+      console.info(
+        `[apply-payment] credit ${credit.id} já ativado por evento concorrente; no-op (sem ledger dup)`,
+      )
+      return { applied: false, reason: 'wrong_state' }
     }
 
     await service.from('credit_transactions').insert({

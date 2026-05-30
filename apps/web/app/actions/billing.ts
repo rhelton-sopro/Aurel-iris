@@ -129,9 +129,14 @@ export async function createChargeAction(
   const successUrl = parsed.data.reading_id
     ? `${siteUrl}/leituras/${parsed.data.reading_id}`
     : `${siteUrl}/assinatura`
+
+  // ÚNICO PONTO pra reativar cartão/boleto no futuro: trocar 'PIX' por
+  // 'UNDEFINED' (cliente escolhe PIX/cartão/boleto no checkout). Founder
+  // 2026-05-30: por ora SÓ PIX (terapeuta paga PIX). O fix de crédito aceita
+  // CONFIRMED ou RECEIVED, então cartão/boleto já funcionariam ao reverter aqui.
   const paymentInput = {
     customer: asaasCustomerId,
-    billingType: 'UNDEFINED' as const, // cliente escolhe (PIX/cartão/boleto) no checkout
+    billingType: 'PIX' as const,
     value: pkg.price_brl,
     dueDate,
     description: `Iris Codex — ${pkg.name} (${pkg.leituras_count} ${
@@ -139,22 +144,20 @@ export async function createChargeAction(
     })`,
     externalReference: pendingCredit.id,
   }
-  // Tenta COM callback (auto-retorno pós-pagamento). O Asaas só aceita callback
-  // se o domínio do successUrl estiver cadastrado na conta (Configurações →
-  // Integrações). Sem isso, rejeita a cobrança INTEIRA com invalid_object
-  // ("nenhum domínio configurado"). Degradação graciosa: se rejeitar por
-  // domínio/callback, refaz SEM callback — a compra nunca trava por config
-  // externa; o auto-retorno religa sozinho quando o founder cadastrar o domínio.
-  let payment = await createAsaasPayment({
-    ...paymentInput,
-    callback: { successUrl, autoRedirect: true },
-  })
-  if (!payment.ok && /dom[íi]nio|domain|callback/i.test(payment.error)) {
-    console.warn(
-      `[billing] payment com callback rejeitado (${payment.error}); refazendo sem callback`,
-    )
-    payment = await createAsaasPayment(paymentInput)
-  }
+
+  // Callback de auto-retorno pós-pagamento (item 3): só é enviado se o domínio
+  // do successUrl estiver cadastrado na conta Asaas (Configurações → Integrações).
+  // Sem cadastro, o Asaas rejeita a cobrança INTEIRA com invalid_object ("nenhum
+  // domínio configurado"). Gated por ASAAS_CALLBACK_ENABLED (runtime, sem prefixo
+  // NEXT_PUBLIC — lê em call-time, liga sem rebuild): default OFF → 1 chamada só,
+  // sem callback, compra direta. Quando o founder cadastrar o domínio, seta a
+  // flag=true na Vercel e o auto-retorno liga (successUrl intacto, só destravado).
+  const callbackEnabled = process.env.ASAAS_CALLBACK_ENABLED === 'true'
+  const payment = await createAsaasPayment(
+    callbackEnabled
+      ? { ...paymentInput, callback: { successUrl, autoRedirect: true } }
+      : paymentInput,
+  )
   if (!payment.ok) {
     // Compensação: Asaas rejeitou → remove a row pendente órfã
     await service.from('customer_credits').delete().eq('id', pendingCredit.id)
