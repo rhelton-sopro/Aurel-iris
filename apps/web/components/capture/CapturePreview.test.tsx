@@ -106,10 +106,11 @@ describe('CapturePreview', () => {
     expect(screen.getByRole('button', { name: /Confirmar/ })).toBeDisabled()
   })
 
-  it('allows Confirmar with muito_longe — soft-warning desde 2026-05-19 (founder: distância não bloqueia)', () => {
-    // muito_longe saiu de BLOCKING_REASONS: fotos boas eram recusadas por
-    // distância. Continua mostrando a mensagem (header não-bloqueante),
-    // mas o terapeuta pode confirmar. Borrão/dois_olhos seguem hard-block.
+  it('blocks Confirmar with muito_longe — founder 2026-05-31 (bloqueia TODA foto ruim)', () => {
+    // 2026-05-31: founder mudou o gate — TODA foto quality='ruim' do VLM
+    // bloqueia (isVlmRejection), não só os BLOCKING_REASONS. muito_longe (que
+    // saiu dos blocking reasons em maio) voltava a vazar: terapeuta confirmava
+    // e ENVIAVA foto ruim ("erro grave"). Agora qualquer 'ruim' exige refazer.
     const analysis: PostCaptureAnalysis = {
       imageWidth: 3840,
       imageHeight: 2160,
@@ -128,8 +129,8 @@ describe('CapturePreview', () => {
       />
     )
     expect(screen.getByText(/Rosto\/olho muito distante/)).toBeInTheDocument()
-    expect(screen.getByText(/Qualidade abaixo do ideal/)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Confirmar/ })).not.toBeDisabled()
+    expect(screen.getByText(/Foto rejeitada — refaça/)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Confirmar/ })).toBeDisabled()
   })
 
   it('blocks Confirmar when VLM rejects with borrado (Phase 07.1.6 hard-block)', () => {

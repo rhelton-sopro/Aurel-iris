@@ -11,7 +11,7 @@ import {
   LEVEL_LABEL,
 } from '@/lib/capture/quality-scoring'
 import type { PostCaptureAnalysis } from '@/lib/capture/post-capture-analysis'
-import { isBlockingRejection } from '@/lib/capture/validate-image'
+import { isVlmRejection } from '@/lib/capture/validate-image'
 import type { CaptureMode } from '@/lib/capture/sequence'
 
 interface CapturePreviewProps {
@@ -76,13 +76,14 @@ export function CapturePreview({
     reasons.push('Reflexo parcial atrapalha a leitura da íris — tente mudar o ângulo da luz')
   }
 
-  // Bloqueio do Confirmar: ver BLOCKING_REASONS em validate-image.ts.
-  // Phase 07.1.6 prep (2026-05-11): borrado + reflexo_total promovidos de
-  // soft-warning a hard-block — fotos sem fibras contáveis OU com reflexo
-  // cobrindo a íris destroem análise iridológica downstream, então faz mais
-  // sentido pedir refazer do que deixar o terapeuta forçar a foto ruim.
+  // Bloqueio do Confirmar: TODA foto quality='ruim' do VLM bloqueia (founder
+  // 2026-05-31 — "bloquear toda foto ruim"). Antes só alguns reasons
+  // (BLOCKING_REASONS) bloqueavam e 'muito_longe' vazava (rebaixado em maio) →
+  // terapeuta confirmava e ENVIAVA foto ruim ("erro grave"). Agora qualquer
+  // 'ruim' (incl. muito_longe) exige refazer. Fallback (VLM falhou → quality
+  // 'boa') NÃO bloqueia — só rejeição real do VLM.
   const isBlocked = analysis?.vlmValidation
-    ? isBlockingRejection(analysis.vlmValidation)
+    ? isVlmRejection(analysis.vlmValidation)
     : false
 
   // Debug overlay escondido em prod por default. Suporte instrui o terapeuta
