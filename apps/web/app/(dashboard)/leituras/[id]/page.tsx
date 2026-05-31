@@ -27,6 +27,8 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/service'
+import { convertReservationToConsume } from '@/lib/billing/credits'
 import { LocalDateTime } from '@/components/ui/local-date-time'
 import { StatusBadge } from '@/components/readings/StatusBadge'
 import { AnalysisHero } from '@/components/readings/AnalysisHero'
@@ -96,6 +98,33 @@ export default async function LeituraDetailPage({
   const reportToShow = (reportDelivered ?? reportGenerated) as Record<string, string>
   const reportGeneratedAt =
     (reading as { report_generated_at?: string }).report_generated_at ?? null
+
+  // On-view consume reconcile (backstop IMEDIATO — founder 2026-05-31).
+  // GUARD: só age se a leitura JÁ tem relatório E ainda existe reserva ATIVA
+  // dela (= órfã: o consume inline não fechou, ex. plataforma matou a função
+  // antes da linha 506 numa geração longa). Leitura consumida normalmente tem
+  // reserva 'converted' → SELECT não acha ativa → nem chama a RPC → crédito
+  // INTOCADO. Usa a MESMA RPC do inline/cron (convert_reservation_to_consume,
+  // idempotente pela 0042): se inline/cron debitar entre o SELECT e a chamada,
+  // a RPC retorna 'already' (flip acha 0 ativas) → débito UMA vez só, nunca
+  // duplo. Service-role: não depende de RLS pra ler/escrever a reserva.
+  if (hasReport) {
+    const service = createServiceClient()
+    const { data: orphan } = await service
+      .from('credit_reservations')
+      .select('reading_id')
+      .eq('reading_id', readingId)
+      .eq('status', 'active')
+      .maybeSingle()
+    if (orphan) {
+      await convertReservationToConsume(readingId).catch((e) =>
+        console.warn(
+          `[reading] on-view reconcile falhou reading=${readingId}:`,
+          e instanceof Error ? e.message : e,
+        ),
+      )
+    }
+  }
 
   // Versão da análise (v2.4.4 — exibida ao lado de "Leitura realizada em";
   // v2.5.2 — agora mostra Stage 1 + Stage 2 separados).
