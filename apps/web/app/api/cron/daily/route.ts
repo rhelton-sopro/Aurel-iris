@@ -5,6 +5,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import {
   expireOldCredits,
   expireOldTrials,
+  reconcileOrphanedConsumes,
   releaseExpiredReservations,
   sendExpirationWarnings,
 } from '@/lib/billing/cron-jobs'
@@ -58,6 +59,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     warnings: await sendExpirationWarnings().catch((err) => ({
       sent: 0,
       skipped: 0,
+      error: String(err),
+    })),
+    orphan_consumes: await reconcileOrphanedConsumes().catch((err) => ({
+      consumed: 0,
+      errors: 1,
       error: String(err),
     })),
   }

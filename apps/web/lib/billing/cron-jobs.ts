@@ -56,6 +56,72 @@ export async function releaseExpiredReservations(): Promise<{
 }
 
 /**
+ * Cron job (backstop) — reconcilia consumes órfãos.
+ *
+ * O consume firme (convert_reservation_to_consume) roda no fim do /analyze. Se a
+ * função for terminada pela plataforma DEPOIS de salvar o relatório mas ANTES do
+ * consume (race rara em geração longa >300s com cliente desconectado), a reserva
+ * fica 'active' num reading que JÁ tem relatório → crédito não debitado. Este job
+ * pega essas: reserva 'active' + reading com report_generated → chama a RPC.
+ *
+ * Idempotente: a RPC só debita se a reserva ainda está 'active' (race-safe via
+ * WHERE+RETURNING). Re-rodar é no-op (outcome 'already'). Bounded pelo cap.
+ */
+export async function reconcileOrphanedConsumes(): Promise<{
+  consumed: number
+  errors: number
+}> {
+  const service = createServiceClient()
+  const { data: actives, error } = await service
+    .from('credit_reservations')
+    .select('reading_id')
+    .eq('status', 'active')
+    .limit(RELEASE_BATCH_CAP)
+  if (error) {
+    console.error('[cron] reconcileOrphanedConsumes select failed:', error.message)
+    return { consumed: 0, errors: 1 }
+  }
+  if (!actives?.length) return { consumed: 0, errors: 0 }
+
+  // Quais dessas readings JÁ completaram (têm relatório) → reserva órfã.
+  const readingIds = actives.map((r) => r.reading_id)
+  const { data: done, error: rErr } = await service
+    .from('readings')
+    .select('id')
+    .in('id', readingIds)
+    .not('report_generated', 'is', null)
+  if (rErr) {
+    console.error('[cron] reconcileOrphanedConsumes readings failed:', rErr.message)
+    return { consumed: 0, errors: 1 }
+  }
+
+  let consumed = 0
+  let errors = 0
+  for (const rd of done ?? []) {
+    const { data, error: rpcErr } = await (
+      service.rpc as unknown as (
+        fn: string,
+        args: Record<string, unknown>,
+      ) => Promise<{ data: unknown; error: { message: string } | null }>
+    )('convert_reservation_to_consume', { p_reading_id: rd.id })
+    if (rpcErr) {
+      console.error(
+        `[cron] reconcile convert failed reading=${rd.id}:`,
+        rpcErr.message,
+      )
+      errors++
+      continue
+    }
+    const row = (Array.isArray(data) ? data[0] : data) as { outcome?: string } | undefined
+    if (row?.outcome === 'consumed') {
+      consumed++
+      console.info(`[cron] reconcile CONSUMED órfão reading=${rd.id}`)
+    }
+  }
+  return { consumed, errors }
+}
+
+/**
  * Cron job — marca credits vencidos (12m+) como expired + zera saldo.
  *
  * Idempotente via WHERE status='active' AND expires_at < now — credits já

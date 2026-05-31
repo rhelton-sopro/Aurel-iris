@@ -84,10 +84,36 @@ export function AnaliseClient({
           toast.error('Sem créditos para gerar este relatório.')
           return
         }
-        const detail = await res.text().catch(() => '')
-        const msg = detail.slice(0, 200) || `HTTP ${res.status}`
+        // Distingue erro de APP (4xx com JSON: cap atingido, já entregue) do
+        // 500 da PLATAFORMA / "já em andamento". Numa geração longa (~5min) a
+        // plataforma corta a conexão em ~300s e devolve "internal server error"
+        // mesmo a geração rodando OK server-side (Fluid Compute continua). NÃO é
+        // falha real → reconcilia via refresh; a página decide pelo estado
+        // autoritativo (isAnalysisInProgress → "em andamento" + auto-refresh, OU
+        // CTA de retry se realmente não começou). Antes este path gritava
+        // "Falha ao iniciar análise: internal server error" (falso).
+        let appMsg: string | null = null
+        let inflight = false
+        try {
+          const j = (await res.clone().json()) as {
+            error?: string
+            message?: string
+            retry_after_seconds?: number
+          }
+          appMsg = j.message ?? j.error ?? null
+          if (j.retry_after_seconds != null) inflight = true // gate "already running"
+        } catch {
+          // corpo não-JSON (página 500 da plataforma) — trata como 5xx abaixo.
+        }
+        if (res.status >= 500 || inflight) {
+          toast.info('A análise está rodando no servidor — esta página atualiza sozinha quando terminar.')
+          setStreaming(false)
+          router.refresh()
+          return
+        }
+        const msg = appMsg ?? `HTTP ${res.status}`
         setError(msg)
-        toast.error(`Falha ao iniciar análise: ${msg}`)
+        toast.error(msg)
         setStreaming(false)
         return
       }
@@ -115,49 +141,17 @@ export function AnaliseClient({
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'desconhecido'
       console.error('[analise-client] stream error', msg)
-      // Camada 1 (v2.4.5): ANTES de gritar "Geração interrompida",
-      // verifica o estado real no banco. iOS bg-kill / aba fechada /
-      // network drop fazem o stream cair sem o backend ter falhado —
-      // a análise continua rodando server-side e provavelmente já
-      // completou. Sem este reconcile, terapeuta queima regen
-      // desnecessariamente.
-      try {
-        const statusRes = await fetch(`/api/readings/${readingId}/status`, {
-          cache: 'no-store',
-        })
-        if (statusRes.ok) {
-          const data = (await statusRes.json()) as {
-            status: string
-            has_report: boolean
-          }
-          if (data.status === 'ready' && data.has_report) {
-            // Backend completou enquanto o stream caía. Suprime o erro
-            // e mostra o relatório real via RSC refresh.
-            toast.success('Relatório pronto. Conexão tinha caído, mas o servidor terminou.')
-            router.refresh()
-            setStreaming(false)
-            return
-          }
-          if (data.status === 'analyzing' || data.status === 'pending') {
-            // Backend ainda gerando. Mostra mensagem honesta + poll.
-            toast.info('Conexão caiu — análise continua rodando no servidor. Aguarde.', {
-              duration: 5000,
-            })
-            // Sai do streaming state — page.tsx vai mostrar
-            // "Aguardando análise terminar..." via isAnalysisInProgress.
-            // O AutoRefresh server-side recarrega quando finalizar.
-            setStreaming(false)
-            router.refresh()
-            return
-          }
-          // status='failed' ou outro → erro real
-        }
-      } catch (recErr) {
-        console.error('[analise-client] reconcile error', recErr)
-        // cai pro toast.error padrão abaixo
-      }
-      setError(msg)
-      toast.error(`Geração interrompida: ${msg}`)
+      // O stream caiu (iOS bg-kill, aba fechada, network drop, OU a plataforma
+      // cortou a conexão longa em ~300s numa geração de ~5min). A geração
+      // CONTINUA server-side (Fluid Compute). NÃO é falha real → reconcilia via
+      // refresh: a página decide pelo estado AUTORITATIVO (page.tsx
+      // isAnalysisInProgress, baseado em analysis_started/completed_at + teto
+      // 15min → mostra "em andamento" com auto-refresh, OU o relatório se já
+      // completou). Antes o reconcile via /status checava status='analyzing'
+      // que NUNCA casa (readings.status fica 'ready' durante a geração) → caía
+      // no "Geração interrompida" falso e o terapeuta queimava regen.
+      toast.info('Conexão do stream caiu — a análise continua no servidor. Atualizando…')
+      router.refresh()
     } finally {
       setStreaming(false)
     }
