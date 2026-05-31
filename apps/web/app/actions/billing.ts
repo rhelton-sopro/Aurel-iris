@@ -193,7 +193,11 @@ export async function createChargeAction(
   console.info(
     `[billing] CHARGE_CREATED user=${profile.id} sku=${pkg.sku} payment=${payment.data.id}`,
   )
-  revalidatePath('/assinatura')
+  // NÃO revalidar /assinatura aqui: o crédito ainda é 'pending' (nada muda no
+  // saldo) e o cliente é redirecionado JÁ pro checkout Asaas. revalidatePath
+  // forçava um re-render da rota atual que corria com o window.location.href
+  // (hard nav) → exceção client transiente ("Application error" pisca antes do
+  // Asaas). Quem revalida o saldo é o webhook PAYMENT_CONFIRMED (pós-pagamento).
   return {
     ok: true,
     credit_id: pendingCredit.id,
