@@ -92,6 +92,12 @@ const REQUEST_TIMEOUT_MS = 8000
 //   explícita que rosto enquadrado em selfie NÃO é 'muito_longe'. boa
 //   threshold também movido pra 1/8 pra consistência. Tiebreaker banda
 //   de dúvida 1/6-1/3 → 1/8-1/3.
+// 2026-05-31 (founder UAT — foto borrada classificada 'boa'): o proxy de
+// contagem de fibras vazou — Haiku "achou" 30 linhas numa íris desfocada e
+// liberou. Founder: "não é fibras, é nitidez DA ÍRIS (não da imagem)". Fix:
+// JULGAMENTO DIRETO DE FOCO adicionado no topo da Regra 1 (holístico, ANTES de
+// contar) — íris globalmente mole/lavada/sem-definição = 'borrado' direto, não
+// conta fibras. Imagem nítida + íris fora de foco ainda = 'borrado'.
 const SYSTEM_PROMPT = `Avalie a foto para análise iridológica. Retorne APENAS JSON, sem markdown:
 {"quality":"<ruim|regular|boa|excelente>","reason":"<reason>"}
 
@@ -116,7 +122,7 @@ caso contrário, reason "olho_detectado" e:
 - regular: SOMENTE quando há um REFLEXO VERDADEIRO (ponto brilhante específico de luz da câmera com BORDAS DEFINIDAS — releia a distinção blur vs reflexo acima) cobrindo 30-70% da íris E a íris EM SI (fora da área do reflexo) tem ≥30 fibras radiais nítidas contáveis. Se você está marcando 'regular' por causa de "área um pouco mais clara" ou "mancha suave" SEM brilho específico de luz definido, isso É BLUR → use 'borrado', NUNCA 'regular'. Reflexo + íris borrada/suave = 'borrado', NUNCA 'regular'.
 
 REGRAS DE PRECEDÊNCIA (ORDEM OBRIGATÓRIA — avalie nesta sequência, NÃO pule etapas):
-1. **PRIMEIRO teste: BORRADO.** Olhe SOMENTE pra região circular colorida da íris. Conta 30 fibras radiais distintas, NÍTIDAS, com bordas definidas? Se NÃO → é 'borrado'. PARE aqui. Não importa se há reflexo, não importa se a foto no geral é bonita, não importa se a íris parece OK à primeira vista. Falha no teste de 30 fibras = 'borrado', SEMPRE. Esta regra tem precedência ABSOLUTA sobre reflexo/regular. Um smartphone moderno em foco mostra 40-60+ fibras facilmente; se só conta ~25-30, é borrado, não regular. ANTES DE chamar 'regular', faça o teste de blur-vs-reflexo: se a "mancha" não tem brilho específico definido, é blur (borrado), NÃO reflexo (regular).
+1. **PRIMEIRO teste: BORRADO.** Olhe SOMENTE pra região circular colorida da íris. **JULGAMENTO DIRETO DE FOCO — FAÇA ISTO ANTES DE CONTAR QUALQUER COISA:** a íris COMO UM TODO está em foco nítido (as estruturas internas — fibras, criptas, anéis, relevo — têm bordas DEFINIDAS e separadas) ou está MOLE / LAVADA / SUAVE / FUNDIDA / SEM-DEFINIÇÃO (parece "amaciada", as estruturas escorrem umas nas outras)? Se a íris parece GLOBALMENTE fora de foco / molenga / sem definição de relevo — mesmo que você ache que "dá pra contar algumas linhas" — é 'borrado' DIRETO. NÃO tente contar fibras pra justificar 'boa': contar fibras numa íris desfocada é o ERRO Nº 1 do gate (o modelo "acha" 30 linhas numa mancha e libera foto borrada). A nitidez é da ÍRIS, não da imagem: a foto pode ter cílios/pele/borda do olho perfeitamente nítidos e AINDA assim a íris estar fora de foco → 'borrado'. SÓ prossiga pra contagem se a íris JÁ passou nítida nesse julgamento direto. Então: conta 30 fibras radiais distintas, NÍTIDAS, com bordas definidas? Se NÃO → é 'borrado'. PARE aqui. Não importa se há reflexo, não importa se a foto no geral é bonita, não importa se a íris parece OK à primeira vista. Falha no teste de 30 fibras = 'borrado', SEMPRE. Esta regra tem precedência ABSOLUTA sobre reflexo/regular. Um smartphone moderno em foco mostra 40-60+ fibras facilmente; se só conta ~25-30, é borrado, não regular. ANTES DE chamar 'regular', faça o teste de blur-vs-reflexo: se a "mancha" não tem brilho específico definido, é blur (borrado), NÃO reflexo (regular).
 2. **SEGUNDO teste: olho_fechado.** Você consegue ver o disco circular colorido da íris? Se NÃO (pálpebra fechada/semi-cerrada cobrindo a íris) → 'olho_fechado'. Dedos sobre as pálpebras com íris visível NÃO contam.
 3. **TERCEIRO teste: reflexo_total.** Reflexo cobre >70% da íris? → 'reflexo_total'.
 4. **QUARTO teste: dois_olhos.** DUAS íris circulares completas e nítidas, ocupando regiões distintas? → 'dois_olhos'.
