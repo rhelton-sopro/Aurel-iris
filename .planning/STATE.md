@@ -4,16 +4,34 @@ milestone: v1.0
 milestone_name: milestone
 status: "Wave 3 entregou 9 commits atômicos em paralelo via 3 worktrees disjuntos:"
 stopped_at: Phase 8 context gathered — pacote pré-pago + LGPD core locked
-last_updated: "2026-05-29T09:08:18.979Z"
+last_updated: "2026-05-31"
 progress:
   total_phases: 16
-  completed_phases: 11
+  completed_phases: 12
   total_plans: 124
   completed_plans: 120
-  percent: 97
+  percent: 98
 ---
 
 # Estado do projeto
+
+## Foco atual (2026-05-31) — re-sync pós-go-live
+
+**Fonte de verdade canônica:** memória `project_session_2026_05_31_handoff`. STATE/ROADMAP são secundários — em divergência confie em git + memória. Status honesto por fase em `v1.0-MILESTONE-AUDIT.md`.
+
+- **HEAD `9d71c95`** — tudo pushado em `origin/main`. Produto LIVE em `iriscodex.com`.
+- **Fase 8 (Pagamento & LGPD):** código completo (15/15), verificado code-level (9/9 SC wired), deployado. **Asaas LIVE go-live 2026-05-30.** Verifier = `human_needed` (faltam só smokes E2E do founder).
+- **Sessão 05-31:** 15 commits sobre o go-live `87a8dc7` — cartão habilitado, reembolso (humanize + parcial D+1), bug billing 0042 (crédito comprado não debitava), geração híbrida (sem erro falso >300s), gate de captura endurecido, onboarding (trial órfã religada + welcome + autoexame com consentimento).
+
+**Pendências ativas (detalhe na memória de handoff):**
+1. Estorno parcial — testar D+1 (01/06) com IRIS CODEX, crédito `cf40c129`.
+2. Geração >5min sem erro falso + captura (ruim bloqueia / borrada→borrado).
+3. Callback auto-retorno E2E (flag `ASAAS_CALLBACK_ENABLED` + domínio no Asaas).
+4. Reverter pricing de teste (4 SKUs a R$5 → originais) antes do GA.
+5. Onboarding Cluster 2b (8.1): reorder checklist, comprar-só-no-fim, CPF no convite, trial na /assinatura.
+6. Backlog 8.1 (LGPD-03/04 completos, hardening LGPD-06, code review).
+
+> Conteúdo abaixo é histórico (execução das fases 7.4 etc.), preservado para contexto. Atualizado no re-sync de 2026-05-31.
 
 ## Referência ao projeto
 
