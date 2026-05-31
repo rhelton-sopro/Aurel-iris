@@ -17,6 +17,7 @@ import {
 } from '@/lib/profile/fields'
 import { TOS_VERSION } from '@/lib/consent/tos'
 import { markTherapistInviteUsedAction } from '@/app/actions/therapist-invites'
+import { ensureTrialStartedAction } from '@/app/actions/onboarding'
 
 const inputClass =
   'h-11 w-full rounded-none border-0 border-b border-b-ink bg-transparent px-3 text-base outline-none transition-colors duration-[180ms] placeholder:text-mist focus-visible:border-b-teal'
@@ -147,6 +148,9 @@ export function TherapistInviteSignupForm({ tokenEmail, tokenId }: Props) {
     if (!markResult.ok) {
       console.warn('[therapist-invite] markTherapistInviteUsedAction failed:', markResult.error)
     }
+
+    // Religa a trial de boas-vindas (idempotente). Mesma trilha do self-signup.
+    await ensureTrialStartedAction()
 
     // Hard navigation: middleware lê o cookie de sessão recém-gravado.
     window.location.assign('/dashboard')

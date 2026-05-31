@@ -17,6 +17,7 @@ import {
 } from '@/lib/profile/fields'
 import { TOS_VERSION } from '@/lib/consent/tos'
 import { isValidCpf, cpfDigits, formatCpfBR } from '@/lib/auth/cpf'
+import { ensureTrialStartedAction } from '@/app/actions/onboarding'
 
 const inputClass =
   'h-11 w-full rounded-none border-0 border-b border-b-ink bg-transparent px-3 text-base outline-none transition-colors duration-[180ms] placeholder:text-mist focus-visible:border-b-teal'
@@ -171,6 +172,10 @@ export default function SignupPage() {
       setVerifying(false)
       return
     }
+
+    // Religa a trial de boas-vindas (idempotente). Nice-to-have: se falhar, a
+    // sessão já está ativa e o gate/cron pode recriar; não bloqueia a entrada.
+    await ensureTrialStartedAction()
 
     // Hard navigation: middleware lê o cookie de sessão recém-gravado.
     window.location.assign('/dashboard')
