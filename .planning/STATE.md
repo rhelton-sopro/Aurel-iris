@@ -19,9 +19,18 @@ progress:
 
 **Fonte de verdade canônica:** memória `project_session_2026_05_31_handoff`. STATE/ROADMAP são secundários — em divergência confie em git + memória. Status honesto por fase em `v1.0-MILESTONE-AUDIT.md`.
 
-- **HEAD `9d71c95`** — tudo pushado em `origin/main`. Produto LIVE em `iriscodex.com`.
+- **HEAD `922dd12`** — tudo pushado em `origin/main`. Produto LIVE em `iriscodex.com`.
 - **Fase 8 (Pagamento & LGPD):** código completo (15/15), verificado code-level (9/9 SC wired), deployado. **Asaas LIVE go-live 2026-05-30.** Verifier = `human_needed` (faltam só smokes E2E do founder).
-- **Sessão 05-31:** 15 commits sobre o go-live `87a8dc7` — cartão habilitado, reembolso (humanize + parcial D+1), bug billing 0042 (crédito comprado não debitava), geração híbrida (sem erro falso >300s), gate de captura endurecido, onboarding (trial órfã religada + welcome + autoexame com consentimento).
+- **Sessão 05-31:** 15 commits sobre o go-live `87a8dc7` (cartão, reembolso, bug 0042, geração híbrida, gate captura, onboarding) + `d8d895d` (fix #1 do pente-fino: backstop cobrava relatório parcial) + `922dd12` (este re-sync).
+
+## ⛔ GATE PRÉ-GA — checkout segue FECHADO ao público até concluir
+
+O checkout NÃO abre pro público geral até TODOS os itens abaixo:
+1. **#3 captura fail-open** corrigido (`capture/validate/route.ts` — foto ruim vaza por variante "ruim."). Ver [[project_pente_fino_backlog_2026_05_31]].
+2. **#6 trial frágil** corrigido (trial_status só criada client-side best-effort → paywall pré-aha).
+3. **Reverter pricing de teste**: 4 SKUs R$5 → reais (99,70/298,50/745,50/1191). Ver [[project_prod_avulsa_test_pricing_pending_revert]].
+
+Recomendados antes do GA (não-bloqueantes): #2 refund swallow (1 linha), #5 toast 502. Higiene pós-GA: #4/#7/#8/#9.
 
 **Pendências ativas (detalhe na memória de handoff):**
 1. Estorno parcial — testar D+1 (01/06) com IRIS CODEX, crédito `cf40c129`.
