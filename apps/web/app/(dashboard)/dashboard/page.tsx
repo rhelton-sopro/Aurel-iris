@@ -4,7 +4,9 @@ import { SummaryCards } from '@/components/dashboard/summary-cards'
 import { InviteReadingsSection } from '@/components/dashboard/invite-readings-section'
 import { AutoRefreshWhileProcessing } from '@/components/readings/AutoRefreshWhileProcessing'
 import { OnboardingWizard } from '@/components/dashboard/onboarding-wizard'
+import { WelcomeAutoexame } from '@/components/dashboard/welcome-autoexame'
 import { evaluateTherapistProfile } from '@/lib/gates/therapist-profile'
+import { getTrialState } from '@/lib/billing/trial'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -26,6 +28,7 @@ export default async function DashboardPage() {
     { count: readingsCount },
     { data: profile },
     { data: creditRows },
+    trial,
   ] = await Promise.all([
     supabase.from('clients').select('*', { count: 'exact', head: true }),
     supabase.from('readings').select('*', { count: 'exact', head: true }),
@@ -41,6 +44,7 @@ export default async function DashboardPage() {
       .select('leituras_remaining')
       .eq('user_id', user?.id ?? '')
       .eq('status', 'active'),
+    getTrialState(user?.id ?? ''),
   ])
 
   const creditsRemaining = (creditRows ?? []).reduce(
@@ -62,7 +66,14 @@ export default async function DashboardPage() {
   // Banner some quando dismiss explícito. Componente garante null-return quando
   // todos 3 completos (backward-compat terapeutas existentes com dados).
   const dismissed = profile?.onboarding_dismissed_at != null
-  const showWizard = !dismissed
+
+  // Terapeuta NOVO (0 leituras) + trial ativo → tela de boas-vindas focada no
+  // AHA (autoexame), substitui o wizard. Pós-1ª-leitura → o checklist assume.
+  const showWelcome =
+    !step3Complete && trial.status === 'active' && !dismissed
+  const showWizard = !dismissed && !showWelcome
+  const trialReadingsRemaining =
+    trial.status === 'active' ? trial.readings_remaining : 0
 
   return (
     <div className="space-y-6">
@@ -77,6 +88,9 @@ export default async function DashboardPage() {
           Fazer meu próprio exame
         </Link>
       </div>
+      {showWelcome && (
+        <WelcomeAutoexame readingsRemaining={trialReadingsRemaining} />
+      )}
       {showWizard && (
         <OnboardingWizard
           step1Complete={step1Complete}

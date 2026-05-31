@@ -18,6 +18,7 @@ export function AutoexameForm(p: {
 }) {
   const [birth, setBirth] = useState(p.birthDate)
   const [sex, setSex] = useState<'feminino' | 'masculino' | ''>(p.biologicalSex)
+  const [consent, setConsent] = useState(false)
   const [pending, setPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -27,10 +28,13 @@ export function AutoexameForm(p: {
     if (!birth) return setError('Informe sua data de nascimento.')
     if (sex !== 'feminino' && sex !== 'masculino')
       return setError('Selecione o sexo biológico.')
+    if (!consent)
+      return setError('Autorize a captura da sua íris para continuar.')
     setPending(true)
     const res = await startSelfExamAction({
       birth_date: birth,
       biological_sex: sex,
+      consent_accepted: consent,
     })
     // Sucesso → a action redireciona p/ /leituras/nova?cliente=<id>.
     if (res?.error) {
@@ -82,6 +86,22 @@ export function AutoexameForm(p: {
           <option value="masculino">Masculino</option>
         </select>
       </div>
+
+      {/* LGPD-01: consentimento biométrico EXPLÍCITO e destacado (não diluído no
+          ToS). Finalidade específica + deixa claro que é o PRÓPRIO dado. */}
+      <label className="flex items-start gap-2.5 rounded-none border border-b-ink/20 p-3 text-sm cursor-pointer">
+        <input
+          type="checkbox"
+          checked={consent}
+          onChange={(e) => setConsent(e.target.checked)}
+          className="mt-0.5 h-4 w-4 shrink-0 accent-teal"
+          aria-label="Autorizo a captura da minha íris"
+        />
+        <span className="text-muted-foreground">
+          Autorizo a captura e o processamento da imagem da minha íris para fins
+          de análise iridológica.
+        </span>
+      </label>
 
       <Button
         type="submit"

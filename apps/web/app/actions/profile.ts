@@ -1,13 +1,17 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/service'
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { z } from 'zod'
 
 import { buildSpecialties, phoneIsValidBR, MAX_SPECIALTIES } from '@/lib/profile/fields'
 import { TOS_VERSION } from '@/lib/consent/tos'
 import { MIN_AGE, isAdult } from '@/lib/gates/profile-completeness'
 import { isValidCpf, cpfDigits } from '@/lib/auth/cpf'
+import { signBiometricTerm } from '@/lib/consent/sign'
+import { logAuditEvent } from '@/lib/audit/log'
 
 // 'use server': SÓ funções async exportadas. Schema/tipos ficam internos
 // (export viraria stub RPC no bundle client — feedback use-server-export).
@@ -126,6 +130,9 @@ export async function updateProfileBasicAction(input: {
 export async function startSelfExamAction(input: {
   birth_date: string
   biological_sex: 'feminino' | 'masculino'
+  /** LGPD-01: aceite EXPLÍCITO e destacado da captura biométrica da PRÓPRIA íris.
+   *  Consentimento específico (não diluído no ToS do signup) — founder 2026-05-31. */
+  consent_accepted: boolean
 }): Promise<{ error?: string } | void> {
   const supabase = await createClient()
   const {
@@ -138,6 +145,9 @@ export async function startSelfExamAction(input: {
     .object({
       birth_date: z.string().min(1, 'Data de nascimento é obrigatória'),
       biological_sex: z.enum(['feminino', 'masculino']),
+      consent_accepted: z.boolean().refine((v) => v === true, {
+        message: 'É necessário autorizar a captura da sua íris para continuar.',
+      }),
     })
     .refine((d) => isAdult(d.birth_date) === true, {
       path: ['birth_date'],
@@ -195,6 +205,57 @@ export async function startSelfExamAction(input: {
     if (error || !ins) return { error: 'Não foi possível criar. Tente novamente.' }
     clientId = ins.id
   }
+
+  // LGPD-01: registra o consentimento biométrico EXPLÍCITO do titular (o próprio
+  // terapeuta). Mesma trilha do termo de cliente — INSERT append-only em
+  // client_consents + current-pointer em clients + logAuditEvent — pelo canal
+  // 'therapist_created'. Sem PDF Gotenberg: a linha de aceite destacada na UI +
+  // IP/UA/timestamp na trilha são a evidência (titular consentindo do próprio
+  // dado). Isso faz assertClientTermoSigned aprovar a self-client na criação da
+  // leitura (senão o autoexame travaria no termo-gate).
+  const h = await headers()
+  const ip =
+    h.get('x-forwarded-for')?.split(',')[0]?.trim() ?? h.get('x-real-ip') ?? null
+  const ua = h.get('user-agent') ?? null
+
+  const sign = await signBiometricTerm({
+    client_id: clientId,
+    reading_id: null,
+    consent_channel: 'therapist_created',
+    ip,
+    user_agent: ua,
+  })
+  if (!sign.ok) {
+    return {
+      error: 'Não foi possível registrar a autorização. Tente novamente.',
+    }
+  }
+
+  const service = createServiceClient()
+  await service
+    .from('clients')
+    .update({
+      consent_current_version: sign.term_version,
+      consent_last_at: new Date().toISOString(),
+    })
+    .eq('id', clientId)
+    .eq('therapist_id', user.id) // defensivo
+
+  await logAuditEvent({
+    event_type: 'consent.term_signed',
+    actor_user_id: user.id,
+    actor_email: user.email,
+    target_type: 'consent',
+    target_id: sign.consent_id,
+    metadata: {
+      client_id: clientId,
+      reading_id: null,
+      term_version: sign.term_version,
+      consent_channel: 'therapist_created',
+      ip,
+      is_self: true,
+    },
+  })
 
   redirect(`/leituras/nova?cliente=${clientId}`)
 }
