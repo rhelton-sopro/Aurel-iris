@@ -4,6 +4,7 @@ import { AppSidebar } from '@/components/dashboard/app-sidebar'
 import { DashboardHeader } from '@/components/dashboard/dashboard-header'
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 import { DisclaimerCopy } from '@/components/legal/DisclaimerCopy'
+import { getTrialState } from '@/lib/billing/trial'
 
 export default async function DashboardLayout({
   children,
@@ -19,15 +20,17 @@ export default async function DashboardLayout({
     redirect('/login')
   }
 
-  // Perfil (nome p/ avatar) + saldo de créditos ativos (badge no header, onde
-  // antes ficavam os dias de trial — founder 2026-05-30).
-  const [{ data: profile }, { data: creditRows }] = await Promise.all([
+  // Perfil (nome p/ avatar) + saldo de créditos COMPRADOS + estado da trial.
+  // Trial e créditos são saldos SEPARADOS (gasta trial primeiro, créditos
+  // intactos) → dois selos no header ao lado da inicial (founder 2026-05-31).
+  const [{ data: profile }, { data: creditRows }, trial] = await Promise.all([
     supabase.from('profiles').select('full_name').eq('id', user.id).single(),
     supabase
       .from('customer_credits')
       .select('leituras_remaining')
       .eq('user_id', user.id)
       .eq('status', 'active'),
+    getTrialState(user.id),
   ])
 
   const fullName = profile?.full_name ?? 'Terapeuta'
@@ -35,6 +38,10 @@ export default async function DashboardLayout({
     (s, r) => s + (r.leituras_remaining ?? 0),
     0,
   )
+  // > 0 só quando a trial está ativa com leituras restantes (trial esgotado/
+  // expirado → evaluateTrial retorna 'ended', então cai em 0 = sem selo grátis).
+  const trialReadingsRemaining =
+    trial.status === 'active' ? trial.readings_remaining : 0
 
   return (
     <SidebarProvider
@@ -44,7 +51,11 @@ export default async function DashboardLayout({
     >
       <AppSidebar />
       <SidebarInset>
-        <DashboardHeader fullName={fullName} creditsRemaining={creditsRemaining} />
+        <DashboardHeader
+          fullName={fullName}
+          creditsRemaining={creditsRemaining}
+          trialReadingsRemaining={trialReadingsRemaining}
+        />
         <main className="flex-1 px-7 py-6">
           {children}
         </main>

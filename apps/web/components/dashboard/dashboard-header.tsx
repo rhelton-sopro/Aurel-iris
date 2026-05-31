@@ -17,11 +17,23 @@ import {
 interface DashboardHeaderProps {
   fullName: string
   creditsRemaining: number
+  /** Leituras de trial restantes (0 quando trial inativa/esgotada). */
+  trialReadingsRemaining: number
 }
 
-export function DashboardHeader({ fullName, creditsRemaining }: DashboardHeaderProps) {
+export function DashboardHeader({
+  fullName,
+  creditsRemaining,
+  trialReadingsRemaining,
+}: DashboardHeaderProps) {
   const router = useRouter()
   const initial = fullName ? fullName.charAt(0).toUpperCase() : 'T'
+
+  // Dois saldos SEPARADOS (founder 2026-05-31). Selo "grátis" some quando a
+  // trial acaba; selo de créditos some durante a trial se ainda não comprou
+  // nada (sem "0 créditos" vermelho enquanto a trial cobre as leituras).
+  const showTrial = trialReadingsRemaining > 0
+  const showCredits = creditsRemaining > 0 || trialReadingsRemaining === 0
 
   async function handleLogout() {
     const supabase = createClient()
@@ -39,20 +51,33 @@ export function DashboardHeader({ fullName, creditsRemaining }: DashboardHeaderP
           <DisclaimerCopy variant="compact" />
         </div>
       </div>
-      <div className="flex items-center gap-4">
-        {/* Saldo de créditos (onde antes ficavam os dias de trial). Clicável →
-            /assinatura. 0 créditos em destaque (vermelho) pra incentivar compra. */}
-        <Link
-          href="/assinatura"
-          aria-label={`${creditsRemaining} créditos de análise — ver saldo`}
-          className={`rounded-[2px] border px-2.5 py-1 text-[11px] font-normal uppercase tracking-label transition-colors ${
-            creditsRemaining === 0
-              ? 'border-destructive text-destructive hover:bg-destructive/5'
-              : 'border-ink/30 text-ink hover:border-teal hover:text-teal'
-          }`}
-        >
-          {creditsRemaining} {creditsRemaining === 1 ? 'crédito' : 'créditos'}
-        </Link>
+      <div className="flex items-center gap-2.5">
+        {/* Selo da TRIAL — leituras grátis (teal, positivo). Clicável →
+            /assinatura pra ver o saldo. Some quando a trial acaba. */}
+        {showTrial && (
+          <Link
+            href="/assinatura"
+            aria-label={`${trialReadingsRemaining} leituras grátis do período de teste`}
+            className="rounded-[2px] border border-teal px-2.5 py-1 text-[11px] font-normal uppercase tracking-label text-teal transition-colors hover:bg-teal/5"
+          >
+            {trialReadingsRemaining} {trialReadingsRemaining === 1 ? 'grátis' : 'grátis'}
+          </Link>
+        )}
+        {/* Selo de CRÉDITOS comprados (separado da trial). 0 créditos em
+            vermelho só quando aparece (= trial já acabou). */}
+        {showCredits && (
+          <Link
+            href="/assinatura"
+            aria-label={`${creditsRemaining} créditos de análise — ver saldo`}
+            className={`rounded-[2px] border px-2.5 py-1 text-[11px] font-normal uppercase tracking-label transition-colors ${
+              creditsRemaining === 0
+                ? 'border-destructive text-destructive hover:bg-destructive/5'
+                : 'border-ink/30 text-ink hover:border-teal hover:text-teal'
+            }`}
+          >
+            {creditsRemaining} {creditsRemaining === 1 ? 'crédito' : 'créditos'}
+          </Link>
+        )}
         <DropdownMenu>
           <DropdownMenuTrigger
             className="cursor-pointer rounded-full"
