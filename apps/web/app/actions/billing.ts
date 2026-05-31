@@ -130,13 +130,15 @@ export async function createChargeAction(
     ? `${siteUrl}/leituras/${parsed.data.reading_id}`
     : `${siteUrl}/assinatura`
 
-  // ÚNICO PONTO pra reativar cartão/boleto no futuro: trocar 'PIX' por
-  // 'UNDEFINED' (cliente escolhe PIX/cartão/boleto no checkout). Founder
-  // 2026-05-30: por ora SÓ PIX (terapeuta paga PIX). O fix de crédito aceita
-  // CONFIRMED ou RECEIVED, então cartão/boleto já funcionariam ao reverter aqui.
+  // UNDEFINED → o cliente escolhe o método no checkout Asaas entre os HABILITADOS
+  // na conta (Configurações → Formas de cobrança). Founder 2026-05-31: PIX +
+  // cartão de crédito. O webhook credita em PAYMENT_CONFIRMED **ou**
+  // PAYMENT_RECEIVED, então o cartão (confirma na autorização, instantâneo) já
+  // credita na hora — sem mudança no webhook. Boleto só aparece se estiver
+  // habilitado na conta; desabilitar lá se não quiser.
   const paymentInput = {
     customer: asaasCustomerId,
-    billingType: 'PIX' as const,
+    billingType: 'UNDEFINED' as const,
     value: pkg.price_brl,
     dueDate,
     description: `Iris Codex — ${pkg.name} (${pkg.leituras_count} ${
