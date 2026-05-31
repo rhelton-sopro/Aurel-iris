@@ -10,7 +10,11 @@ import {
   createAsaasPayment,
   refundAsaasPayment,
 } from '@/lib/asaas/client'
-import { computeRefundValue } from '@/lib/billing/refund-policy'
+import {
+  computeRefundValue,
+  isPartialRefundBlockedToday,
+} from '@/lib/billing/refund-policy'
+import { humanizeAsaasError } from '@/lib/asaas/humanize-error'
 import { creditExpiresAt } from '@/lib/billing/config'
 import { logAuditEvent } from '@/lib/audit/log'
 import { notifyRefundProcessed } from '@/lib/notifications/notify-refund-processed'
@@ -87,7 +91,7 @@ export async function createChargeAction(
     })
     if (!cust.ok) {
       console.error('[billing] createAsaasCustomer failed:', cust.error)
-      return { ok: false, error: 'Falha ao criar cliente Asaas: ' + cust.error }
+      return { ok: false, error: humanizeAsaasError(cust.error) }
     }
     asaasCustomerId = cust.data.id
     await service
@@ -167,7 +171,7 @@ export async function createChargeAction(
   if (!payment.ok) {
     // Compensação: Asaas rejeitou → remove a row pendente órfã
     await service.from('customer_credits').delete().eq('id', pendingCredit.id)
-    return { ok: false, error: 'Falha ao criar cobrança: ' + payment.error }
+    return { ok: false, error: humanizeAsaasError(payment.error) }
   }
 
   // 7. Liga o payment à row (asaas_payment_id UNIQUE — idempotência webhook)
@@ -253,6 +257,19 @@ export async function refundPackageAction(
     return { ok: false, error: msg }
   }
 
+  // 2b. Asaas: estorno PARCIAL só a partir do dia SEGUINTE ao pagamento
+  // (confirmado empiricamente — 'invalid_action: só pode ser estornada
+  // parcialmente no próximo dia'). Bloqueia ANTES de chamar o Asaas (evita o
+  // round-trip + o erro cru). TOTAL é aceito no mesmo dia. Defense-in-depth: o
+  // UI também esconde o parcial hoje, mas o gate de verdade é aqui (server).
+  if (policy.kind === 'partial' && isPartialRefundBlockedToday(credit.purchase_date)) {
+    return {
+      ok: false,
+      error:
+        'Reembolsos parciais só podem ser processados a partir do dia seguinte ao pagamento. Tente novamente amanhã.',
+    }
+  }
+
   // 3. Asaas refund — body undefined = total, com value = parcial (D-13)
   if (!credit.asaas_payment_id) {
     return { ok: false, error: 'Pagamento Asaas não associado.' }
@@ -265,7 +282,7 @@ export async function refundPackageAction(
           description: `Iris Codex — arrependimento 7d (${policy.leituras_to_refund} leituras restantes)`,
         }
   const refund = await refundAsaasPayment(credit.asaas_payment_id, refundBody)
-  if (!refund.ok) return { ok: false, error: 'Falha no Asaas: ' + refund.error }
+  if (!refund.ok) return { ok: false, error: humanizeAsaasError(refund.error) }
 
   // 4. Estado local — webhook PAYMENT_REFUNDED/PARTIALLY_REFUNDED também
   //    reconcilia (08-04); aqui é proativo. .eq('user_id') defensive.

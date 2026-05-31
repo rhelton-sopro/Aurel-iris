@@ -39,6 +39,24 @@ function round2(n: number): number {
 }
 
 /**
+ * Regra do Asaas (confirmada empiricamente 2026-05-31): estorno PARCIAL de PIX
+ * só é aceito A PARTIR DO DIA SEGUINTE ao pagamento ('invalid_action: só pode
+ * ser estornada parcialmente no próximo dia'). Estorno TOTAL é aceito no mesmo
+ * dia. Esta função diz se o parcial está BLOQUEADO hoje (mesmo dia-calendário
+ * BRT da compra). Usada no UI (mostra "disponível amanhã") E na action
+ * (bloqueia antes de chamar o Asaas, evitando o erro). Comparação por
+ * dia-calendário em America/Sao_Paulo (Asaas opera em BRT).
+ */
+export function isPartialRefundBlockedToday(
+  purchaseDateISO: string,
+  now: Date = new Date(),
+): boolean {
+  const dayBRT = (d: Date) =>
+    d.toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' })
+  return dayBRT(new Date(purchaseDateISO)) === dayBRT(now)
+}
+
+/**
  * CR-03: base ÚNICA de preço unitário compartilhada pelos DOIS reconciliadores
  * de refund (manual em billing.ts e webhook em apply-payment.ts). Antes cada
  * path computava `price_brl / leituras` com nomes de coluna diferentes

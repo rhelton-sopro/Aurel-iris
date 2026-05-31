@@ -13,7 +13,10 @@ import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { refundPackageAction } from '@/app/actions/billing'
-import { computeRefundValue } from '@/lib/billing/refund-policy'
+import {
+  computeRefundValue,
+  isPartialRefundBlockedToday,
+} from '@/lib/billing/refund-policy'
 
 interface Props {
   creditId: string
@@ -46,6 +49,13 @@ export function RefundPackageButton(props: Props) {
   })
 
   if (!policy.eligible) return null // botão só aparece se elegível
+
+  // Asaas só aceita estorno PARCIAL a partir do dia seguinte ao pagamento.
+  // No mesmo dia, parcial fica indisponível (total continua OK). Mostra aviso
+  // claro em vez de deixar o terapeuta bater no erro do provedor.
+  const blockedPartialToday =
+    policy.kind === 'partial' &&
+    isPartialRefundBlockedToday(props.purchaseDate)
 
   function handleConfirm() {
     startTransition(async () => {
@@ -81,49 +91,78 @@ export function RefundPackageButton(props: Props) {
             <h3 className="text-lg font-semibold text-ink">
               Solicitar reembolso
             </h3>
-            <p className="text-sm text-foreground">
-              {policy.kind === 'total' ? (
-                <>
-                  Você terá um reembolso{' '}
-                  <strong>integral de R$ {formatBrl(policy.value_brl)}</strong>{' '}
-                  via o método original (mesmo trajeto da compra).
-                </>
-              ) : (
-                <>
-                  Você terá um reembolso{' '}
-                  <strong>
-                    proporcional de R$ {formatBrl(policy.value_brl)}
-                  </strong>{' '}
-                  ({policy.leituras_to_refund} leituras restantes × R${' '}
-                  {formatBrl(policy.unit_price_brl)}).
-                </>
-              )}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              O crédito será zerado imediatamente. O valor cai na sua conta
-              original em até 5 dias úteis (PIX ≤ 1d; cartão 5d).
-            </p>
-            <div className="flex justify-end gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => setOpen(false)}
-                disabled={isPending}
-              >
-                Cancelar
-              </Button>
-              <Button
-                type="button"
-                variant="destructive"
-                size="sm"
-                onClick={handleConfirm}
-                disabled={isPending}
-                aria-busy={isPending}
-              >
-                {isPending ? 'Processando…' : 'Confirmar reembolso'}
-              </Button>
-            </div>
+            {blockedPartialToday ? (
+              <>
+                <p className="text-sm text-foreground">
+                  Reembolso <strong>parcial</strong> só pode ser processado{' '}
+                  <strong>a partir do dia seguinte</strong> ao pagamento (regra
+                  do provedor de pagamento para PIX).
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Volte amanhã para solicitar o estorno proporcional de R${' '}
+                  {formatBrl(policy.value_brl)} ({policy.leituras_to_refund}{' '}
+                  leituras restantes). Seu crédito permanece intacto até lá.
+                </p>
+                <div className="flex justify-end">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setOpen(false)}
+                  >
+                    Entendi
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-foreground">
+                  {policy.kind === 'total' ? (
+                    <>
+                      Você terá um reembolso{' '}
+                      <strong>
+                        integral de R$ {formatBrl(policy.value_brl)}
+                      </strong>{' '}
+                      via o método original (mesmo trajeto da compra).
+                    </>
+                  ) : (
+                    <>
+                      Você terá um reembolso{' '}
+                      <strong>
+                        proporcional de R$ {formatBrl(policy.value_brl)}
+                      </strong>{' '}
+                      ({policy.leituras_to_refund} leituras restantes × R${' '}
+                      {formatBrl(policy.unit_price_brl)}).
+                    </>
+                  )}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  O crédito será zerado imediatamente. O valor cai na sua conta
+                  original em até 5 dias úteis (PIX ≤ 1d; cartão 5d).
+                </p>
+                <div className="flex justify-end gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setOpen(false)}
+                    disabled={isPending}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={handleConfirm}
+                    disabled={isPending}
+                    aria-busy={isPending}
+                  >
+                    {isPending ? 'Processando…' : 'Confirmar reembolso'}
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       ) : null}
