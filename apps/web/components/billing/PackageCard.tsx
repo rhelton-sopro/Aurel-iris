@@ -9,7 +9,7 @@
 // Cantos quase-quadrados (rounded-[2px]) e botão via <Button> do projeto pra
 // herdar o idioma uppercase tracking-label da marca.
 
-import { useTransition } from 'react'
+import { useState, useTransition } from 'react'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -45,11 +45,15 @@ function formatBrl(n: number): string {
 
 export function PackageCard(props: Props) {
   const [isPending, startTransition] = useTransition()
+  // B-lite: cliente escolhe PIX ou cartão AQUI; passamos o billingType específico
+  // pra cobrança Asaas → checkout hospedado mostra só esse método (boleto nunca).
+  const [method, setMethod] = useState<'PIX' | 'CREDIT_CARD'>('PIX')
 
   function handleBuy() {
     startTransition(async () => {
       const r = await createChargeAction({
         sku: props.sku,
+        billingType: method,
         reading_id: props.readingId,
       })
       if (!r.ok) {
@@ -57,10 +61,15 @@ export function PackageCard(props: Props) {
         return
       }
       toast.success('Cobrança criada — redirecionando…')
-      // Redirect pro hosted checkout do Asaas (PIX / cartão / boleto).
+      // Redirect pro checkout hospedado do Asaas (só o método escolhido).
       window.location.href = r.invoice_url
     })
   }
+
+  const methods = [
+    { value: 'PIX' as const, label: 'PIX' },
+    { value: 'CREDIT_CARD' as const, label: 'Cartão' },
+  ]
 
   const highlighted = !!props.badge
 
@@ -104,6 +113,36 @@ export function PackageCard(props: Props) {
       <p className="mb-4 text-xs text-muted-foreground">
         Validade: 12 meses após a confirmação do pagamento
       </p>
+
+      {/* Seletor de método (B-lite). Só PIX / Cartão — boleto nunca é oferecido. */}
+      <div
+        role="radiogroup"
+        aria-label="Forma de pagamento"
+        className="mb-2 grid grid-cols-2 gap-1"
+      >
+        {methods.map((m) => {
+          const active = method === m.value
+          return (
+            <button
+              key={m.value}
+              type="button"
+              role="radio"
+              aria-checked={active}
+              disabled={isPending}
+              onClick={() => setMethod(m.value)}
+              className={cn(
+                'rounded-[2px] border px-2 py-1.5 text-[11px] font-medium uppercase tracking-label transition-colors',
+                active
+                  ? 'border-teal-dark bg-teal-dark/5 text-teal-dark'
+                  : 'border-border text-muted-foreground hover:border-teal-dark/40',
+              )}
+              data-testid={`method-${m.value}-${props.sku}`}
+            >
+              {m.label}
+            </button>
+          )
+        })}
+      </div>
 
       <Button
         type="button"

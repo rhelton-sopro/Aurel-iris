@@ -57,12 +57,12 @@ describe('createChargeAction', () => {
 
   it('rejects when not authenticated', async () => {
     getUserMock.mockResolvedValue({ data: { user: null } })
-    const r = await createChargeAction({ sku: 'medio' })
+    const r = await createChargeAction({ sku: 'medio', billingType: 'PIX' })
     expect(r).toEqual({ ok: false, error: 'Não autenticado.' })
   })
 
   it('rejects invalid SKU at zod', async () => {
-    const r = await createChargeAction({ sku: 'garbage' as 'medio' })
+    const r = await createChargeAction({ sku: 'garbage' as 'medio', billingType: 'PIX' })
     expect(r.ok).toBe(false)
   })
 
@@ -74,7 +74,7 @@ describe('createChargeAction', () => {
       .mockResolvedValueOnce({
         data: { id: 'u1', cpf: null, phone: null, full_name: 'X', asaas_customer_id: null },
       })
-    const r = await createChargeAction({ sku: 'medio' })
+    const r = await createChargeAction({ sku: 'medio', billingType: 'PIX' })
     expect(r.ok).toBe(false)
     if (!r.ok) expect(r.error).toContain('Complete CPF')
   })
@@ -103,7 +103,7 @@ describe('createChargeAction', () => {
       data: { id: 'pay_1', invoiceUrl: 'https://asaas/i/x', status: 'PENDING' } as never,
     })
 
-    const r = await createChargeAction({ sku: 'medio' })
+    const r = await createChargeAction({ sku: 'medio', billingType: 'PIX' })
     expect(r.ok).toBe(true)
     if (r.ok) {
       expect(r.invoice_url).toBe('https://asaas/i/x')
@@ -127,7 +127,7 @@ describe('createChargeAction', () => {
       error: 'invalid customer',
     })
 
-    const r = await createChargeAction({ sku: 'medio' })
+    const r = await createChargeAction({ sku: 'medio', billingType: 'PIX' })
     expect(r.ok).toBe(false)
     expect(deleteChain.eq).toHaveBeenCalledWith('id', 'credit-x')
   })
@@ -146,7 +146,7 @@ describe('createChargeAction', () => {
       error: 'cpfCnpj inválido',
     })
 
-    const r = await createChargeAction({ sku: 'medio' })
+    const r = await createChargeAction({ sku: 'medio', billingType: 'PIX' })
     expect(r.ok).toBe(false)
     expect(insertChain.single).not.toHaveBeenCalled()
   })

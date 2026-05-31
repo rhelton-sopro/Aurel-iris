@@ -130,15 +130,15 @@ export async function createChargeAction(
     ? `${siteUrl}/leituras/${parsed.data.reading_id}`
     : `${siteUrl}/assinatura`
 
-  // UNDEFINED → o cliente escolhe o método no checkout Asaas entre os HABILITADOS
-  // na conta (Configurações → Formas de cobrança). Founder 2026-05-31: PIX +
-  // cartão de crédito. O webhook credita em PAYMENT_CONFIRMED **ou**
-  // PAYMENT_RECEIVED, então o cartão (confirma na autorização, instantâneo) já
-  // credita na hora — sem mudança no webhook. Boleto só aparece se estiver
-  // habilitado na conta; desabilitar lá se não quiser.
+  // B-lite (founder 2026-05-31): o cliente escolheu PIX ou cartão na NOSSA tela;
+  // passamos o billingType específico. Boleto NUNCA é oferecido (não existe
+  // billingType "PIX+cartão", e o painel Asaas não tem toggle p/ conta de API —
+  // pesquisa 2026-05-31). O checkout hospedado mostra só o método escolhido. O
+  // webhook credita em PAYMENT_CONFIRMED **ou** PAYMENT_RECEIVED, então cartão
+  // (confirma na autorização, instantâneo) credita na hora — sem mudar o webhook.
   const paymentInput = {
     customer: asaasCustomerId,
-    billingType: 'UNDEFINED' as const,
+    billingType: parsed.data.billingType,
     value: pkg.price_brl,
     dueDate,
     description: `Iris Codex — ${pkg.name} (${pkg.leituras_count} ${

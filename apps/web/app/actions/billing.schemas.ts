@@ -7,6 +7,12 @@ import { z } from 'zod'
 
 export const createChargeSchema = z.object({
   sku: z.enum(['avulsa', 'pequeno', 'medio', 'grande']),
+  // Método escolhido pelo cliente na NOSSA tela (B-lite, founder 2026-05-31):
+  // SÓ PIX ou cartão — NUNCA UNDEFINED/BOLETO. O /payments aceita 1 billingType
+  // por cobrança e não existe valor "PIX+cartão" (doc Asaas criar-nova-cobranca),
+  // então a escolha é nossa: o checkout hospedado mostra só o método escolhido →
+  // boleto nunca aparece.
+  billingType: z.enum(['PIX', 'CREDIT_CARD']),
   // Opcional: quando a compra é disparada pelo banner "sem créditos" de uma
   // leitura (analise-client), carregamos o reading_id pra montar o successUrl
   // do checkout Asaas → cliente volta pra ESSA leitura após pagar (autoRedirect).
