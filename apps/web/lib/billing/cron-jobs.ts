@@ -90,6 +90,12 @@ export async function reconcileOrphanedConsumes(): Promise<{
     .select('id')
     .in('id', readingIds)
     .not('report_generated', 'is', null)
+    // FIX bug#1: report_generated_at só é setado no caminho de SUCESSO
+    // (analyze/route.ts:490). O catch de erro grava report_generated PARCIAL
+    // SEM _at. Filtrar por _at NOT NULL cobra só órfãos LEGÍTIMOS (sucesso cujo
+    // consume inline morreu na race >300s), nunca o relatório falho/parcial que
+    // o inline DELIBERADAMENTE não cobrou. Mesma regra do on-view (page.tsx).
+    .not('report_generated_at', 'is', null)
   if (rErr) {
     console.error('[cron] reconcileOrphanedConsumes readings failed:', rErr.message)
     return { consumed: 0, errors: 1 }

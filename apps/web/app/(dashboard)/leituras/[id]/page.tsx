@@ -50,7 +50,7 @@ export default async function LeituraDetailPage({
   const { data: reading, error } = await supabase
     .from('readings')
     .select(
-      'id, status, created_at, report_generated, report_delivered, audit_metadata, regeneration_count, is_delivered, delivered_at, vision_features, client:clients(id, full_name, birth_date, phone, is_self)',
+      'id, status, created_at, report_generated, report_generated_at, report_delivered, audit_metadata, regeneration_count, is_delivered, delivered_at, vision_features, client:clients(id, full_name, birth_date, phone, is_self)',
     )
     .eq('id', readingId)
     .maybeSingle()
@@ -108,7 +108,12 @@ export default async function LeituraDetailPage({
   // idempotente pela 0042): se inline/cron debitar entre o SELECT e a chamada,
   // a RPC retorna 'already' (flip acha 0 ativas) → débito UMA vez só, nunca
   // duplo. Service-role: não depende de RLS pra ler/escrever a reserva.
-  if (hasReport) {
+  //
+  // FIX bug#1: exige report_generated_at != null (setado SÓ no caminho de
+  // sucesso, analyze/route.ts:490). O catch de erro grava report_generated
+  // PARCIAL sem _at — o inline decidiu NÃO cobrar nesse caso, então o backstop
+  // também não pode. Mesma regra do cron (reconcileOrphanedConsumes).
+  if (hasReport && reportGeneratedAt != null) {
     const service = createServiceClient()
     const { data: orphan } = await service
       .from('credit_reservations')
