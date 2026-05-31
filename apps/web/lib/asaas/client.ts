@@ -67,7 +67,15 @@ export interface CreateCustomerInput {
 export async function createAsaasCustomer(
   input: CreateCustomerInput,
 ): Promise<AsaasResult<AsaasCustomer>> {
-  const r = await asaasRequest('/customers', { method: 'POST', body: JSON.stringify(input) })
+  // notificationDisabled: true → desliga as notificações Asaas→cliente (e-mail/SMS
+  // de cobrança), que é o que gera a taxa de mensageria (R$0,99/venda). É flag DE
+  // CLIENTE (não da cobrança): nasce sem notificação → zero taxa em qualquer
+  // cobrança dele. NÃO afeta o webhook Asaas→Iris Codex (que credita) — esse é
+  // configurado à parte na conta e independe das notificações ao cliente.
+  const r = await asaasRequest('/customers', {
+    method: 'POST',
+    body: JSON.stringify({ ...input, notificationDisabled: true }),
+  })
   if (!r.ok) return r
   const parsed = asaasCustomerSchema.safeParse(r.data)
   if (!parsed.success) return { ok: false, status: 502, error: 'asaas response shape invalid' }
