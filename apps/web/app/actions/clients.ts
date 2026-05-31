@@ -8,6 +8,7 @@ import { redirect } from 'next/navigation'
 import { z } from 'zod'
 
 import { MIN_AGE, isAdult } from '@/lib/gates/profile-completeness'
+import { phoneDigits } from '@/lib/auth/phone'
 
 // Zod v4: .min(1, msg). Regra de obrigatórios + maioridade vem da FONTE
 // ÚNICA (lib/gates/profile-completeness) — Zod e o gate não divergem.
@@ -20,7 +21,9 @@ const clientSchema = z
       .string()
       .min(1, 'E-mail é obrigatório')
       .refine((v) => /.+@.+\..+/.test(v), 'E-mail inválido'),
-    phone: z.string().min(1, 'Telefone é obrigatório'),
+    // Normaliza pra dígitos (igual ao terapeuta): a UI envia a máscara
+    // "(11) 99999-9999"; gravamos só dígitos. .min(1) roda no valor cru.
+    phone: z.string().min(1, 'Telefone é obrigatório').transform((v) => phoneDigits(v)),
     notes: z.string().max(2000).optional().nullable(),
   })
   .refine((d) => isAdult(d.birth_date) === true, {

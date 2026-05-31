@@ -30,6 +30,7 @@ import { cn } from '@/lib/utils'
 import type { ClientFormState } from '@/app/actions/clients'
 import type { Database } from '@/types/database'
 import { MIN_AGE, isAdult } from '@/lib/gates/profile-completeness'
+import { formatPhoneBR } from '@/lib/profile/fields'
 
 type Client = Database['public']['Tables']['clients']['Row']
 
@@ -69,7 +70,7 @@ export function ClientForm({ mode, client, action }: ClientFormProps) {
       biological_sex:
         (client?.biological_sex as ClientFormValues['biological_sex']) ?? undefined,
       email: client?.email ?? '',
-      phone: client?.phone ?? '',
+      phone: client?.phone ? formatPhoneBR(client.phone) : '',
       notes: client?.notes ?? '',
     },
   })
@@ -183,8 +184,10 @@ export function ClientForm({ mode, client, action }: ClientFormProps) {
                 <FormControl>
                   <Input
                     type="tel"
+                    inputMode="tel"
                     placeholder="(11) 99999-9999"
                     {...field}
+                    onChange={(e) => field.onChange(formatPhoneBR(e.target.value))}
                   />
                 </FormControl>
                 <FormMessage />
