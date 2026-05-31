@@ -293,15 +293,27 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  // Clamp pra valores conhecidos. Claude às vezes retorna variantes ('boa.' com
-  // ponto, ou tradução sutil); fallback pra 'regular' garante shape estável
-  // pra UI sem quebrar pipeline.
-  const quality = (VALID_QUALITY_VALUES as readonly string[]).includes(parsed.quality)
-    ? (parsed.quality as (typeof VALID_QUALITY_VALUES)[number])
-    : 'regular'
-  const reason = (VALID_REASON_VALUES as readonly string[]).includes(parsed.reason)
-    ? (parsed.reason as (typeof VALID_REASON_VALUES)[number])
-    : 'olho_detectado'
+  // Normaliza variantes cosméticas do VLM (pontuação/caixa/espaço: 'Boa', 'boa.',
+  // ' ruim ') de volta pro valor canônico ANTES de comparar. Claude às vezes
+  // formata o enum assim — o comentário antigo já documentava 'boa.'.
+  const normalizeEnum = (raw: string, valid: readonly string[]): string | null => {
+    const cleaned = raw.trim().toLowerCase().replace(/[.!,;:]+$/, '')
+    return valid.includes(cleaned) ? cleaned : null
+  }
+
+  // FIX bug#3 (fail-SAFE): quality desconhecida/irreconhecível → 'ruim' (BLOQUEIA),
+  // nunca 'regular' (o fallback antigo deixava passar — 'ruim.' virava 'regular' →
+  // Confirmar habilitado → foto ruim VAZAVA). Variantes cosméticas de boa/excelente
+  // são recuperadas pelo normalizeEnum, então foto BOA não trava — só o que o
+  // servidor genuinamente não entende vira 'ruim'. Filosofia do gate: prefere
+  // false-positive (pede refazer) a false-negative (envia foto-lixo, gasta crédito).
+  const normalizedQuality = normalizeEnum(parsed.quality, VALID_QUALITY_VALUES)
+  const quality = (normalizedQuality ?? 'ruim') as (typeof VALID_QUALITY_VALUES)[number]
+  // reason: fallback 'olho_detectado' (neutro, dentro do check constraint 0023).
+  // O bloqueio chaveia em quality==='ruim' (isVlmRejection), não no reason —
+  // quality já clampada a 'ruim' bloqueia mesmo com reason neutro.
+  const normalizedReason = normalizeEnum(parsed.reason, VALID_REASON_VALUES)
+  const reason = (normalizedReason ?? 'olho_detectado') as (typeof VALID_REASON_VALUES)[number]
 
   // Log best-effort em capture_attempts (migration 0023+0024) — alimenta
   // o /admin/relatorios (taxa de aproveitamento, custo Haiku, top reasons
