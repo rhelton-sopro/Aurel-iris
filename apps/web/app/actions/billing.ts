@@ -122,7 +122,11 @@ export async function createChargeAction(
   // Retorno pós-pagamento (D-23): se a compra veio de uma leitura (banner "sem
   // créditos"), o cliente volta pra ESSA leitura — pronta pra gerar. Senão, volta
   // pra /assinatura (saldo). autoRedirect=true: Asaas devolve sozinho ao confirmar.
-  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://iriscodex.com').replace(
+  // `||` (não `??`): env vazio ('') TAMBÉM cai no fallback apex. `??` só pega
+  // null/undefined → um NEXT_PUBLIC_SITE_URL='' geraria successUrl sem host e o
+  // Asaas rejeitaria o callback (flash "an error"). Garante host mesmo com env
+  // ilegível/ausente. Domínio a cadastrar no Asaas = iriscodex.com (apex).
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://iriscodex.com').replace(
     /\/$/,
     '',
   )
