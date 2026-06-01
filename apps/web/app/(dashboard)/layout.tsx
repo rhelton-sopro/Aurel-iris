@@ -4,6 +4,7 @@ import { AppSidebar } from '@/components/dashboard/app-sidebar'
 import { DashboardHeader } from '@/components/dashboard/dashboard-header'
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 import { DisclaimerCopy } from '@/components/legal/DisclaimerCopy'
+import { LowCreditsBanner } from '@/components/billing/LowCreditsBanner'
 import { getTrialState } from '@/lib/billing/trial'
 
 export default async function DashboardLayout({
@@ -57,6 +58,11 @@ export default async function DashboardLayout({
           trialReadingsRemaining={trialReadingsRemaining}
         />
         <main className="flex-1 px-7 py-6">
+          {/* Nudge de recompra quando o saldo COMPRADO total está baixo (≤3).
+              Client component: esconde sozinho em /assinatura e quando saldo
+              não é baixo. Cobre dashboard + criação/geração de leitura (todas
+              sob este layout). */}
+          <LowCreditsBanner creditsRemaining={creditsRemaining} />
           {children}
         </main>
         {/* Surface 2 (LGPD-05) — rodapé passivo de páginas autenticadas.
