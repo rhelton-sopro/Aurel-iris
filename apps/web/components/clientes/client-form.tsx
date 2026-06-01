@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -79,6 +79,25 @@ export function ClientForm({ mode, client, action }: ClientFormProps) {
   // incompleta/inválida (não bloqueia enquanto digita).
   const birthDate = form.watch('birth_date')
   const isUnderage = birthDate ? isAdult(birthDate) === false : false
+
+  // O submit é o Server Action direto (sem form.handleSubmit), então a validação
+  // client-side do RHF não roda — quem valida é o server, que devolve fieldErrors
+  // em shape de OBJETO ({ email: ['E-mail inválido'] }). O banner abaixo só
+  // renderiza state.error quando é STRING, então erros por-campo (ex.: e-mail
+  // 'com@com') caíam silenciosos: form não avançava e nada aparecia. Aqui os
+  // fieldErrors do server são injetados no campo via setError → FormMessage inline.
+  useEffect(() => {
+    if (state.error && typeof state.error === 'object') {
+      for (const [fieldName, messages] of Object.entries(state.error)) {
+        if (Array.isArray(messages) && messages[0]) {
+          form.setError(fieldName as keyof ClientFormValues, {
+            type: 'server',
+            message: messages[0],
+          })
+        }
+      }
+    }
+  }, [state.error, form])
 
   const title = mode === 'create' ? 'Novo cliente' : 'Editar cliente'
   const submitLabel = mode === 'create' ? 'Salvar cliente' : 'Atualizar cliente'
