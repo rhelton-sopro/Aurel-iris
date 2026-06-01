@@ -286,21 +286,21 @@ export async function refundPackageAction(
 
   // 4. Estado local — webhook PAYMENT_REFUNDED/PARTIALLY_REFUNDED também
   //    reconcilia (08-04); aqui é proativo. .eq('user_id') defensive.
+  //
+  // Total E parcial marcam status='refunded' + zeram saldo. No path MANUAL
+  // (arrependimento CDC 7d) o "parcial" reembolsa TODAS as leituras não usadas
+  // (remaining+reserved → 0): nada sobra, o pacote está liquidado e NÃO pode
+  // seguir como "ativo". Sem o status, /assinatura (filtra status active/pending)
+  // mostrava "Ativo · 0/N disponíveis" = pacote ativo FANTASMA. Difere do webhook
+  // PARTIALLY_REFUNDED genérico (apply-payment.ts:347), que pode deixar
+  // remaining>0 e mantém active — lá faz sentido; aqui não. O webhook posterior
+  // é no-op: jaDebitado já cobre o delta (apply-payment.ts:333), não toca status.
   const service = createServiceClient()
-  if (policy.kind === 'total') {
-    await service
-      .from('customer_credits')
-      .update({ status: 'refunded', leituras_remaining: 0, leituras_reserved: 0 })
-      .eq('id', credit.id)
-      .eq('user_id', user.id)
-  } else {
-    // Parcial: zera o saldo (terapeuta perde direito ao restante)
-    await service
-      .from('customer_credits')
-      .update({ leituras_remaining: 0, leituras_reserved: 0 })
-      .eq('id', credit.id)
-      .eq('user_id', user.id)
-  }
+  await service
+    .from('customer_credits')
+    .update({ status: 'refunded', leituras_remaining: 0, leituras_reserved: 0 })
+    .eq('id', credit.id)
+    .eq('user_id', user.id)
   await service.from('credit_transactions').insert({
     user_id: user.id,
     credit_id: credit.id,

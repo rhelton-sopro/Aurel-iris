@@ -10,6 +10,8 @@ const selectChain = {
 const insertChain = { select: vi.fn().mockReturnThis(), single: vi.fn() }
 const updateChain = { eq: vi.fn().mockReturnThis() }
 const deleteChain = { eq: vi.fn().mockReturnThis() }
+// Spy no update do service-role pra capturar o payload (assert do status no refund).
+const serviceUpdateMock = vi.fn(() => updateChain)
 
 vi.mock('@/lib/supabase/server', () => ({
   createClient: async () => ({
@@ -27,7 +29,7 @@ vi.mock('@/lib/supabase/service', () => ({
     from: () => ({
       select: () => selectChain,
       insert: () => insertChain,
-      update: () => updateChain,
+      update: serviceUpdateMock,
       delete: () => deleteChain,
     }),
   }),
@@ -251,6 +253,14 @@ describe('refundPackageAction', () => {
       const call = vi.mocked(refundAsaasPayment).mock.calls[0]
       expect(call?.[0]).toBe('pay_1')
       expect((call?.[1] as { value: number }).value).toBe(179.1)
+      // Fix pacote-fantasma: parcial manual também marca refunded (sai de "ativo").
+      expect(serviceUpdateMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: 'refunded',
+          leituras_remaining: 0,
+          leituras_reserved: 0,
+        }),
+      )
     }
   })
 })
