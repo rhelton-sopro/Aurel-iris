@@ -22,6 +22,11 @@ vi.mock('@/lib/supabase/service', () => ({
 vi.mock('@/lib/audit/log', () => ({
   logAuditEvent: vi.fn().mockResolvedValue(undefined),
 }))
+// Backstop #6: reserveCreditForReading chama startTrial idempotente no no_balance.
+const startTrialMock = vi.fn()
+vi.mock('../trial', () => ({
+  startTrial: (...args: unknown[]) => startTrialMock(...args),
+}))
 
 import {
   convertReservationToConsume,
@@ -32,6 +37,9 @@ import {
 describe('reserveCreditForReading', () => {
   beforeEach(() => {
     rpcMock.mockReset()
+    startTrialMock.mockReset()
+    // Default: trial já existe → backstop não retenta (não polui happy path nem no_balance real).
+    startTrialMock.mockResolvedValue({ ok: true, created: false })
   })
 
   it('returns ok with credit source on RPC success', async () => {
@@ -79,6 +87,43 @@ describe('reserveCreditForReading', () => {
     const r = await reserveCreditForReading('u1', 'reading-1')
     expect(r.ok).toBe(false)
     if (!r.ok) expect(r.reason).toBe('db_error')
+  })
+
+  // Backstop #6: trial frágil. no_balance + trial genuinamente ausente →
+  // startTrial cria a row → retry reserva → terapeuta destrava na 1ª leitura.
+  it('backstop: no_balance → startTrial cria trial → retry reserva com sucesso (trial)', async () => {
+    rpcMock
+      .mockResolvedValueOnce({ data: null, error: { code: 'P0001', message: 'no_balance' } })
+      .mockResolvedValueOnce({
+        data: [{ reservation_id: 'r-trial', credit_id: null, source: 'trial' }],
+        error: null,
+      })
+    startTrialMock.mockResolvedValueOnce({ ok: true, created: true })
+
+    const r = await reserveCreditForReading('u-novo', 'reading-1')
+    expect(r).toEqual({
+      ok: true,
+      source: 'trial',
+      reservation_id: 'r-trial',
+      credit_id: null,
+    })
+    expect(startTrialMock).toHaveBeenCalledWith('u-novo')
+    expect(rpcMock).toHaveBeenCalledTimes(2) // reserva inicial + retry
+  })
+
+  // Backstop NÃO re-concede: trial esgotado/encerrado (row já existe) →
+  // startTrial created=false → sem retry → no_balance REAL preservado.
+  it('backstop: no_balance + trial já existia (created=false) → não retenta, no_balance real', async () => {
+    rpcMock.mockResolvedValueOnce({
+      data: null,
+      error: { code: 'P0001', message: 'no_balance' },
+    })
+    startTrialMock.mockResolvedValueOnce({ ok: true, created: false })
+
+    const r = await reserveCreditForReading('u-esgotado', 'reading-1')
+    expect(r).toEqual({ ok: false, reason: 'no_balance' })
+    expect(startTrialMock).toHaveBeenCalledWith('u-esgotado')
+    expect(rpcMock).toHaveBeenCalledTimes(1) // sem retry
   })
 })
 

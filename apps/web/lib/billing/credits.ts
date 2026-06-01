@@ -3,6 +3,8 @@ import 'server-only'
 import { logAuditEvent } from '@/lib/audit/log'
 import { createServiceClient } from '@/lib/supabase/service'
 
+import { startTrial } from './trial'
+
 export type ReserveResult =
   | {
       ok: true
@@ -24,6 +26,35 @@ export type ReserveResult =
  * 5 reserves concorrentes pra trial=3 → exatamente 3 ok, 2 'no_balance'.
  */
 export async function reserveCreditForReading(
+  userId: string,
+  readingId: string,
+): Promise<ReserveResult> {
+  let result = await reserveOnce(userId, readingId)
+
+  // Backstop #6 (trial frágil): a trial_status só nasce client-side pós-verifyOtp
+  // (best-effort, .ok ignorado) e o trigger handle_new_user NÃO a cria. Se aquela
+  // janela falhou (aba fecha / rede cai / action lança), o terapeuta chega aqui
+  // SEM trial row e leva no_balance ANTES da 1ª leitura grátis — matando o
+  // onboarding. startTrial é idempotente: se CRIOU a row (trial genuinamente
+  // ausente = o bug), reservamos de novo e ele destrava; se a row já existia
+  // (trial esgotado/encerrado manual), created=false → não retenta, devolve o
+  // no_balance REAL. Custo (INSERT extra) só no caminho de falha; happy path
+  // intocado. Ver [[project_pente_fino_backlog_2026_05_31]] #6.
+  if (!result.ok && result.reason === 'no_balance') {
+    const trial = await startTrial(userId)
+    if (trial.created) {
+      console.info(
+        `[billing] trial backstop criou trial p/ user=${userId} — retry reserve`,
+      )
+      result = await reserveOnce(userId, readingId)
+    }
+  }
+
+  return result
+}
+
+/** Uma tentativa de reserva via RPC + mapeamento de erro + audit no sucesso. */
+async function reserveOnce(
   userId: string,
   readingId: string,
 ): Promise<ReserveResult> {
