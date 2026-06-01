@@ -579,7 +579,7 @@ See `.planning/phases/07.5-tendency-mapping-engine/07.5-CONTEXT.md` (a criar via
 ## Progresso
 
 **Ordem de execução:**
-Fases v1 executam em ordem numérica: 1 → 2 → 4 → 5 → 6 → 7 → 7.1 → 7.1.6 → 7.4 → 9 → 11.1 → 11 (3/4) — todas LIVE. Fase 11 fecha quando 11-04 (smoke E2E real) acontecer organicamente. Fases 3/7.1.5/7.2/7.3 abandoned. Fase 7.5/8/10 = backlog explícito.
+Fases v1 executam em ordem numérica: 1 → 2 → 4 → 5 → 6 → 7 → 7.1 → 7.1.6 → 7.4 → 9 → 11.1 → 11 (3/4) → 8 — todas LIVE (Fase 8 Asaas go-live 2026-05-30; só falta 08-14 smoke/VERIFICATION + reverter pricing de teste pra abrir checkout ao público). Fase 11 fecha quando 11-04 (smoke E2E real) acontecer organicamente. Fases 3/7.1.5/7.2/7.3 abandoned. Fase 7.5/10 = backlog explícito.
 
 | Fase | Plans concluídos | Status | Concluída em |
 |-------|------------------|--------|--------------|
@@ -597,7 +597,7 @@ Fases v1 executam em ordem numérica: 1 → 2 → 4 → 5 → 6 → 7 → 7.1 �
 | 7.3. Dual-layer | 0/0 | 🚫 ABANDONED 2026-05-13 — substituído por 7.4 | — |
 | 7.4. Iris Codex report | 17/17+ | ✅ Concluída — rebrand + structured output + Sonnet 2x arch LIVE em prod | 2026-05-15+ |
 | 7.5. Tendency mapping engine | 0/0 | 🚫 ABANDONED 2026-05-26 — Sonnet 2x venceu RAG/deterministic mapping na prática (memory `project_fase_7_5_abandoned_sonnet_won`) | — |
-| 8. Pagamento + LGPD | 1/15 | In Progress|  |
+| 8. Pagamento + LGPD | 13/14 | 🔄 Código completo + Asaas **LIVE** (30/05); só 08-14 (smoke E2E + VERIFICATION) aberto — verifier `human_needed`. 3 fixes billing 01/06 (`18cd68a`+`9876286`+`3047b00`). | 2026-05-30 (live) |
 | 9. Polish + dogfooding + beta | 5/5 | ✅ DELIVERED + LIVE — cenários 1+2 honor-system PASS pós-Fase 11.1; cenário 3 PASS por inspeção; ONBOARD-04 gate fecha por uso continuado (~2026-06-05) | 2026-05-26 |
 | 10. Sistema de Aprendizagem Clínica | 0/TBD | 📅 Backlog longo prazo | — |
 | 11. Launch readiness B2B | 3/4 | 🔄 11-01/02/03 DELIVERED + LIVE (sem plans formais — execução direta rastreada em git+memory). 11-04 (smoke E2E) deferido pra exercício orgânico. | 2026-05-26 (parcial) |
