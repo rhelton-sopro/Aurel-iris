@@ -62,10 +62,14 @@ export function CapturePreview({
     const messages: Record<string, string> = {
       sem_olho: 'Foto não contém um olho — refaça apontando para o olho do cliente',
       dois_olhos: 'Apenas um olho por foto — refaça com close de um único olho',
-      muito_longe: 'Rosto/olho muito distante — aproxime a câmera para um close apenas do olho',
+      muito_longe: 'Rosto/olho um pouco distante — se possível aproxime a câmera, mas você pode confirmar mesmo assim',
       borrado: 'Foto borrada — as fibras da íris não estão visíveis. Segure firme e tente novamente.',
       reflexo_total: 'Reflexo cobre a íris inteira — mude o ângulo ou a iluminação e tente novamente.',
       olho_fechado: 'Olho fechado ou coberto — abra o olho completamente',
+      // Clamp fail-safe (route.ts): o VLM devolveu formato inesperado → quality
+      // foi forçada a 'ruim' com reason neutro 'olho_detectado'. Sem esta entrada,
+      // a UI mostrava o cru "Foto rejeitada: olho_detectado" (founder: "que erro é esse?").
+      olho_detectado: 'Não foi possível avaliar a nitidez da íris com clareza — tente novamente.',
     }
     reasons.push(messages[r] ?? `Foto rejeitada: ${r}`)
   }
@@ -76,14 +80,16 @@ export function CapturePreview({
     reasons.push('Reflexo parcial atrapalha a leitura da íris — tente mudar o ângulo da luz')
   }
 
-  // Bloqueio do Confirmar: TODA foto quality='ruim' do VLM bloqueia (founder
-  // 2026-05-31 — "bloquear toda foto ruim"). Antes só alguns reasons
-  // (BLOCKING_REASONS) bloqueavam e 'muito_longe' vazava (rebaixado em maio) →
-  // terapeuta confirmava e ENVIAVA foto ruim ("erro grave"). Agora qualquer
-  // 'ruim' (incl. muito_longe) exige refazer. Fallback (VLM falhou → quality
-  // 'boa') NÃO bloqueia — só rejeição real do VLM.
+  // Bloqueio do Confirmar: foto quality='ruim' do VLM bloqueia, COM UMA EXCEÇÃO —
+  // 'muito_longe' rebaixado a soft-warning (founder 2026-06-01): mostra "aproxime
+  // a câmera" mas deixa CONFIRMAR habilitado (distância não destrói a análise como
+  // blur/reflexo; o terapeuta decide se a íris dá). Os demais 'ruim' (borrado,
+  // reflexo_total, sem_olho, dois_olhos, olho_fechado, e o clamp olho_detectado)
+  // seguem bloqueando — refazer é melhor que processar foto-lixo. Fallback (VLM
+  // falhou → quality 'boa') NÃO bloqueia — só rejeição real do VLM.
   const isBlocked = analysis?.vlmValidation
-    ? isVlmRejection(analysis.vlmValidation)
+    ? isVlmRejection(analysis.vlmValidation) &&
+      analysis.vlmValidation.reason !== 'muito_longe'
     : false
 
   // Debug overlay escondido em prod por default. Suporte instrui o terapeuta
@@ -158,10 +164,10 @@ export function CapturePreview({
 
           {/* Dois botões de mesmo tamanho.
               "Refazer" secundário (reabre câmera). "Confirmar" primário (avança).
-              Confirmar é DESABILITADO quando VLM retornou qualquer
-              BLOCKING_REASONS (sem_olho, dois_olhos, olho_fechado, muito_longe,
-              borrado, reflexo_total) — fotos rejeitadas nessas condições não
-              produzem análise iridológica útil, melhor pedir refazer. */}
+              Confirmar é DESABILITADO quando VLM rejeitou (quality='ruim'),
+              EXCETO 'muito_longe' (soft-warning — terapeuta confirma se quiser).
+              As demais rejeições (borrado, reflexo_total, sem_olho, dois_olhos,
+              olho_fechado) não produzem análise iridológica útil → refazer. */}
           <div className="flex gap-2">
             <Button
               onClick={onRedo}
