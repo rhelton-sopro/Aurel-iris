@@ -191,9 +191,36 @@ export function ReadingModeActions({
     try {
       const res = await fetch(`/api/readings/${readingId}/analyze`, { method: 'POST' })
       if (!res.ok) {
-        const detail = await res.text().catch(() => '')
-        const msg = detail.slice(0, 200) || `HTTP ${res.status}`
-        toast.error(`Falha ao regenerar análise: ${msg}`)
+        // 402 = sem créditos. Estado de saldo, não erro de sistema.
+        if (res.status === 402) {
+          toast.error('Sem créditos para regenerar este relatório.')
+          return
+        }
+        // Distingue 5xx da PLATAFORMA / "já em andamento" de erro real de app.
+        // Regen longa (~2-3min): a plataforma corta a conexão em ~300s e devolve
+        // 5xx mesmo rodando OK server-side (Fluid Compute continua). NÃO é falha
+        // → reconcilia via refresh; o RSC decide pelo estado autoritativo
+        // (isAnalysisInProgress → banner "regenerando" + auto-refresh). Espelha
+        // analise-client.tsx:87-113 (mesma lógica do handleTrigger da geração).
+        let appMsg: string | null = null
+        let inflight = false
+        try {
+          const j = (await res.clone().json()) as {
+            error?: string
+            message?: string
+            retry_after_seconds?: number
+          }
+          appMsg = j.message ?? j.error ?? null
+          if (j.retry_after_seconds != null) inflight = true // gate "already running"
+        } catch {
+          // corpo não-JSON (página 5xx da plataforma) — trata como 5xx abaixo.
+        }
+        if (res.status >= 500 || inflight) {
+          toast.info('A regeneração está rodando no servidor — esta página atualiza sozinha quando terminar.')
+          router.refresh()
+          return
+        }
+        toast.error(`Falha ao regenerar análise: ${appMsg ?? `HTTP ${res.status}`}`)
         return
       }
       // Consume the stream and count `## N.` boundaries for the progress
@@ -213,8 +240,17 @@ export function ReadingModeActions({
       toast.success('Análise regenerada. Atualizando…')
       router.refresh()
     } catch (err) {
+      // O stream caiu (iOS bg-kill ao trocar de app — ex.: abrir o WhatsApp e
+      // voltar —, aba fechada, network drop, OU a plataforma cortou a conexão
+      // longa). A regeneração CONTINUA server-side (Fluid Compute). NÃO é falha
+      // real → reconcilia via refresh; o RSC decide pelo estado autoritativo
+      // (isAnalysisInProgress → banner "regenerando" + auto-refresh, OU o
+      // relatório novo se já completou). Antes gritava "Falha ao regenerar"
+      // (falso) — exatamente o caso iPhone → WhatsApp → volta.
       const msg = err instanceof Error ? err.message : 'desconhecido'
-      toast.error(`Falha ao regenerar: ${msg}`)
+      console.error('[regen] stream error', msg)
+      toast.info('Conexão do stream caiu — a regeneração continua no servidor. Atualizando…')
+      router.refresh()
     } finally {
       setRegenPending(false)
     }
