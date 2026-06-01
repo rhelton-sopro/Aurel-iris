@@ -68,6 +68,10 @@ export function RefundPackageButton(props: Props) {
         `Reembolso solicitado — R$ ${formatBrl(r.refunded_value_brl)} (${
           r.kind === 'total' ? 'integral' : 'proporcional'
         })`,
+        {
+          description:
+            'O valor retorna ao método original: PIX em até 1 dia útil, cartão na próxima fatura.',
+        },
       )
       setOpen(false)
     })
@@ -137,8 +141,10 @@ export function RefundPackageButton(props: Props) {
                   )}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  O crédito será zerado imediatamente. O valor cai na sua conta
-                  original em até 5 dias úteis (PIX ≤ 1d; cartão 5d).
+                  O crédito será zerado imediatamente. O valor retorna ao método
+                  original: <strong>PIX em até 1 dia útil</strong>;{' '}
+                  <strong>cartão na próxima fatura</strong> (pode levar 1–2
+                  ciclos, conforme o banco emissor).
                 </p>
                 <div className="flex justify-end gap-2">
                   <Button
