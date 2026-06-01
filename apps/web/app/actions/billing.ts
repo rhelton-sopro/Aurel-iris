@@ -10,10 +10,7 @@ import {
   createAsaasPayment,
   refundAsaasPayment,
 } from '@/lib/asaas/client'
-import {
-  computeRefundValue,
-  isPartialRefundBlockedToday,
-} from '@/lib/billing/refund-policy'
+import { computeRefundValue } from '@/lib/billing/refund-policy'
 import { humanizeAsaasError } from '@/lib/asaas/humanize-error'
 import { creditExpiresAt } from '@/lib/billing/config'
 import { logAuditEvent } from '@/lib/audit/log'
@@ -257,18 +254,15 @@ export async function refundPackageAction(
     return { ok: false, error: msg }
   }
 
-  // 2b. Asaas: estorno PARCIAL só a partir do dia SEGUINTE ao pagamento
-  // (confirmado empiricamente — 'invalid_action: só pode ser estornada
-  // parcialmente no próximo dia'). Bloqueia ANTES de chamar o Asaas (evita o
-  // round-trip + o erro cru). TOTAL é aceito no mesmo dia. Defense-in-depth: o
-  // UI também esconde o parcial hoje, mas o gate de verdade é aqui (server).
-  if (policy.kind === 'partial' && isPartialRefundBlockedToday(credit.purchase_date)) {
-    return {
-      ok: false,
-      error:
-        'Reembolsos parciais só podem ser processados a partir do dia seguinte ao pagamento. Tente novamente amanhã.',
-    }
-  }
+  // 2b. Estorno PARCIAL: NÃO pré-bloqueamos mais por dia-calendário (founder
+  // 2026-06-01). O gate REAL do Asaas é SALDO LIQUIDADO — o PIX recebido precisa
+  // cair no saldo disponível antes de poder ser estornado, e isso segue DIA ÚTIL
+  // (liquidação), não calendário. Em vez de adivinhar dia útil/feriado aqui,
+  // deixamos o Asaas ser o juiz: tentamos o estorno e, se ele recusar por saldo
+  // ou "próximo dia", humanizeAsaasError já devolve a mensagem clara (ramos
+  // 'parcial…próximo dia' e /saldo/ em lib/asaas/humanize-error.ts). Num dia útil
+  // com o valor liquidado, o parcial passa. (isPartialRefundBlockedToday segue
+  // exportada+testada documentando o fato empírico do Asaas, mas fora do fluxo.)
 
   // 3. Asaas refund — body undefined = total, com value = parcial (D-13)
   if (!credit.asaas_payment_id) {
