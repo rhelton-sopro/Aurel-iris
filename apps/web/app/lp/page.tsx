@@ -48,6 +48,7 @@ const FAQ = [
   { q: 'É texto genérico?', a: 'Não — cada relatório é único, escrito para aquela pessoa. Sem horóscopo, sem texto-modelo.', open: false },
   { q: 'Meus dados são seguros?', a: 'Sim — você é o controlador dos dados, em conformidade com a LGPD. As imagens não treinam nenhuma IA.', open: false },
   { q: 'Preciso saber iridologia?', a: 'Não precisa. Uma IA própria, treinada na tradição iridológica, faz a leitura por você. Você revisa, conduz e dá a palavra final — a interpretação e a relação com o cliente são suas.', open: false },
+  { q: 'E se eu não souber conduzir a devolutiva?', a: 'A gente te orienta. Além da leitura pronta — que já vem com as perguntas certas — você recebe um guia de como conduzir a devolutiva, presencial ou online. Você nunca está sozinho diante do relatório.', open: false },
 ] as const
 
 export default function LandingEspelho() {
@@ -129,11 +130,11 @@ export default function LandingEspelho() {
             E se ele chegasse à sessão{' '}<em style={{ color: 'var(--teal-dark)' }}>já se sentindo visto?</em>
           </h2>
           <p className="body-copy lp-reveal mx-auto mt-7" data-d="2" style={{ color: '#3a3a3a', fontSize: '1.08rem' }}>
-            Com o Iris Codex, a leitura começa antes da sua primeira pergunta. Você abre o relatório com o
-            cliente na sala e lê com ele — e ali, frase após frase, ele se reconhece. Tem gente que se cala.
-            Tem gente que chora. Não porque o texto adivinhou um destino, mas porque alguém finalmente pôs
-            em palavras o que ele sentia e nunca soube nomear.{' '}
-            <strong style={{ color: '#0d0d0d', fontWeight: 600 }}>Ler a leitura, junto, já é a primeira sessão.</strong>
+            Com o Iris Codex, a leitura começa antes da sua primeira pergunta. Você faz a devolutiva —
+            lado a lado ou pela tela — e lê o relatório com o cliente. E ali, frase após frase, ele se
+            reconhece. Tem gente que se cala. Tem gente que chora. Não porque o texto adivinhou um destino,
+            mas porque alguém finalmente pôs em palavras o que ele sentia e nunca soube nomear.{' '}
+            <strong style={{ color: '#0d0d0d', fontWeight: 600 }}>Essa devolutiva já é a primeira sessão.</strong>
           </p>
           <p className="body-copy lp-reveal mx-auto mt-6" data-d="2" style={{ color: '#3a3a3a', fontSize: '1.08rem' }}>
             A largada que levava três sessões acontece no primeiro minuto. O muro de “será que posso confiar
