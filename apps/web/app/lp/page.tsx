@@ -68,7 +68,12 @@ export default function LandingEspelho() {
       {/* ════════ HERO — texto no topo + faixa horizontal do olho (mobile-safe) ════════ */}
       <section className="relative overflow-hidden bg-black pt-32 pb-16 md:pb-24 md:pt-36">
         <div className="mx-auto w-full max-w-[1280px] px-6 md:px-10">
-          <div className="max-w-3xl">
+          <div className="lp-reveal" data-d="1">
+            <div className="lp-hero-strip">
+              <Image src="/lp/iris-hero.png" alt="Olho humano em macro — o detalhe que o Iris Codex lê" fill priority sizes="(max-width:1280px) 92vw, 1216px" className="object-cover object-center" />
+            </div>
+          </div>
+          <div className="mt-12 max-w-3xl md:mt-14">
             <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-light)' }}>Para o terapeuta integrativo</p>
             <h1 className="display lp-reveal mt-6" data-d="1" style={{ fontSize: 'clamp(2.5rem,6vw,5rem)' }}>
               Em minutos, você lê a alma do seu cliente.<br />
@@ -89,11 +94,6 @@ export default function LandingEspelho() {
             <p className="lp-reveal mt-8 text-xs leading-relaxed" data-d="3" style={{ color: 'rgba(242,237,228,.58)', letterSpacing: '.04em', maxWidth: '48ch' }}>
               Sem cartão · 3 leituras ou 15 dias · Apoio à anamnese, não substitui avaliação médica.
             </p>
-          </div>
-          <div className="lp-reveal mt-12 md:mt-16" data-d="3">
-            <div className="lp-hero-strip">
-              <Image src="/lp/iris-hero.png" alt="Olho humano em macro — o detalhe que o Iris Codex lê" fill priority sizes="(max-width:1280px) 92vw, 1216px" className="object-cover object-center" />
-            </div>
           </div>
         </div>
       </section>
