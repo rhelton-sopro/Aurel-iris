@@ -190,6 +190,25 @@ export default function LandingEspelho() {
         </div>
       </section>
 
+      {/* ════════ ANTI-FORER (resposta ao "isso serve pra qualquer um") ════════ */}
+      <section className="bg-ivory text-black">
+        <div className="mx-auto max-w-[820px] px-6 py-16 text-center md:px-10 md:py-20">
+          <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-dark)' }}>A pergunta que você acabou de fazer</p>
+          <h2 className="display lp-reveal mt-5" data-d="1" style={{ fontSize: 'clamp(1.6rem,3.6vw,2.4rem)', color: '#0d0d0d' }}>
+            “Isso não serviria pra qualquer pessoa?”
+          </h2>
+          <p className="body-copy lp-reveal mx-auto mt-6" data-d="2" style={{ color: '#3a3a3a', fontSize: '1.05rem' }}>
+            Existe um truque velho: escrever vago o bastante pra todo mundo se ver — e chamar de leitura.
+            Horóscopo faz isso. Iridologia genérica faz isso. O Iris Codex foi construído contra isso: cada
+            leitura nasce daquela íris, e duas pessoas nunca recebem o mesmo texto. Troque a pessoa, e não
+            muda um adjetivo — muda tudo.
+          </p>
+          <p className="body-copy lp-reveal mx-auto mt-6" data-d="3" style={{ color: '#3a3a3a', fontSize: '1.05rem' }}>
+            <strong style={{ color: '#0d0d0d', fontWeight: 600 }}>Não acredite na nossa palavra.</strong> Use uma das 3 leituras grátis na íris de um cliente que você conhece de cor — e julgue você mesmo se bate.
+          </p>
+        </div>
+      </section>
+
       {/* ════════ A PROFUNDIDADE (o que a leitura abre — prova de vastidão) ════════ */}
       <section className="bg-white text-black">
         <div className="mx-auto max-w-[1080px] px-6 py-20 md:px-10 md:py-24">
@@ -321,9 +340,16 @@ export default function LandingEspelho() {
           <div className="lp-reveal mt-10" data-d="2">
             <Link href="/signup" className="btn btn-primary">Começar com 3 leituras grátis</Link>
           </div>
+          <p className="body-copy lp-reveal mx-auto mt-7" data-d="3" style={{ color: 'var(--mist)', fontSize: '.98rem', maxWidth: '56ch' }}>
+            Depois das 3, você segue no seu ritmo: uma leitura avulsa quando precisar, sem pacote e sem
+            mensalidade. Os pacotes são pra quando o volume crescer — não um degrau pra subir agora.
+          </p>
 
           <div className="lp-reveal mx-auto mt-12 max-w-[760px]" data-d="2">
-            <p className="eyebrow" style={{ color: 'var(--mist)', marginBottom: '1.5rem' }}>Pacotes, sem pressão</p>
+            <p className="eyebrow" style={{ color: 'var(--mist)' }}>Pacotes, sem pressão</p>
+            <p className="lp-reveal mx-auto mb-6 mt-2 text-sm" style={{ color: 'var(--mist)', maxWidth: '50ch' }}>
+              Sem mínimo, sem volume obrigatório. A avulsa fica sempre disponível; o pacote é economia pra quando fizer sentido.
+            </p>
             <div className="grid gap-px sm:grid-cols-2" style={{ background: '#ddd2c0', border: '1px solid #ddd2c0' }}>
               {PACOTES.map((p) => (
                 <div key={p.nome} className="bg-ivory p-7 text-left" style={p.selo ? { boxShadow: `inset 3px 0 0 ${p.selo === 'Mais escolhido' ? 'var(--teal)' : 'var(--teal-dark)'}`, position: 'relative' } : undefined}>
