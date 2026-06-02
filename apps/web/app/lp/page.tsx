@@ -65,35 +65,32 @@ export default function LandingEspelho() {
       <RevealInit />
       <TopBar />
 
-      {/* ════════ HERO ════════ */}
-      <section className="relative flex min-h-screen items-center overflow-hidden bg-black">
-        <div className="mx-auto grid w-full max-w-[1280px] grid-cols-1 items-center gap-12 px-6 pb-20 pt-28 md:px-10 lg:grid-cols-[1fr_0.82fr] lg:gap-16">
-          <div className="order-2 lg:order-1">
+      {/* ════════ HERO — olho full-bleed (encara o visitante) ════════ */}
+      <section className="relative flex min-h-screen items-end overflow-hidden bg-black">
+        <Image src="/lp/iris-hero.png" alt="Olho humano em macro — o detalhe que o Iris Codex lê" fill priority sizes="100vw" className="object-cover object-center" />
+        <div className="lp-hero-scrim" aria-hidden="true" />
+        <div className="relative z-10 mx-auto w-full max-w-[1280px] px-6 pb-20 pt-32 md:px-10 md:pb-28">
+          <div className="max-w-2xl">
             <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-light)' }}>Para o terapeuta integrativo</p>
-            <h1 className="display lp-reveal mt-7" data-d="1" style={{ fontSize: 'clamp(2.9rem,6.4vw,5.4rem)' }}>
+            <h1 className="display lp-reveal mt-6" data-d="1" style={{ fontSize: 'clamp(2.9rem,6.6vw,5.6rem)' }}>
               Seu cliente vai dizer:<br />
               <em style={{ color: 'var(--teal-light)' }}>“é exatamente isso”.</em>
             </h1>
-            <p className="body-copy lg lp-reveal mt-8" data-d="2" style={{ color: 'rgba(242,237,228,.78)' }}>
-              O Iris Codex transforma a foto da íris do seu cliente numa leitura terapêutica profunda e
-              única — focada em padrões emocionais, comportamentais e de estilo de vida. Você lê a íris;
-              a gente escreve o relatório que encanta.
+            <p className="body-copy lg lp-reveal mt-7" data-d="2" style={{ color: 'rgba(242,237,228,.88)' }}>
+              Da foto da íris do seu cliente nasce uma leitura que ele reconhece já nas primeiras linhas.
+              A sessão começa por um momento que ele não esquece — e a sua anamnese nunca mais é a mesma.
+              Você lê a íris; nós escrevemos o relatório.
             </p>
-            <div className="lp-reveal mt-10 flex flex-wrap items-center gap-x-7 gap-y-4" data-d="3">
+            <div className="lp-reveal mt-9 flex flex-wrap items-center gap-x-7 gap-y-4" data-d="3">
               <Link href="/signup" className="btn btn-primary">Começar grátis — 3 leituras</Link>
               <Link href="/login" className="link-quiet text-sm">Já tenho conta · Entrar</Link>
             </div>
-            <p className="lp-reveal mt-9 text-xs leading-relaxed" data-d="3" style={{ color: 'var(--mist)', letterSpacing: '.04em', maxWidth: '46ch' }}>
+            <p className="lp-reveal mt-8 text-xs leading-relaxed" data-d="3" style={{ color: 'rgba(242,237,228,.62)', letterSpacing: '.04em', maxWidth: '46ch' }}>
               Sem cartão · 3 leituras ou 15 dias · Apoio à anamnese, não substitui avaliação médica.
             </p>
           </div>
-          <div className="order-1 flex justify-center lg:order-2">
-            <div className="lp-hero-photo lp-reveal" data-d="1" style={{ width: 'min(80vw,460px)' }}>
-              <Image src="/lp/iris-hero.png" alt="Olho humano em macro — o detalhe que o Iris Codex lê" fill priority sizes="(max-width:1024px) 80vw, 460px" className="object-cover" />
-            </div>
-          </div>
         </div>
-        <div className="eyebrow absolute bottom-7 left-1/2 -translate-x-1/2" style={{ color: 'rgba(242,237,228,.32)', fontSize: '.6rem' }}>Role</div>
+        <div className="eyebrow absolute bottom-7 left-1/2 -translate-x-1/2" style={{ color: 'rgba(242,237,228,.5)', fontSize: '.6rem' }}>Role</div>
       </section>
 
       {/* ════════ PROVA ════════ */}
@@ -399,8 +396,8 @@ html:has(.lp-root){ scroll-behavior:smooth; }
 .lp-iris-photo { position:relative; aspect-ratio:1; border-radius:50%; overflow:hidden; box-shadow:0 0 70px -10px rgba(91,191,176,.35), inset 0 0 0 1px rgba(91,191,176,.25); }
 .lp-iris-photo--light { box-shadow:0 25px 70px -35px rgba(0,0,0,.45), inset 0 0 0 1px rgba(30,107,97,.22); }
 
-/* hero — olho humano retangular (não círculo) */
-.lp-hero-photo { position:relative; aspect-ratio:4/5; border-radius:2px; overflow:hidden; box-shadow:0 40px 100px -45px rgba(0,0,0,.7), inset 0 0 0 1px rgba(91,191,176,.15); }
+/* hero — olho full-bleed: scrim pra legibilidade (escuro topo p/ nav + base p/ texto, olho visível no meio) */
+.lp-hero-scrim { position:absolute; inset:0; z-index:1; pointer-events:none; background:linear-gradient(to bottom, rgba(0,0,0,.62) 0%, rgba(0,0,0,.14) 30%, rgba(0,0,0,.40) 58%, rgba(0,0,0,.92) 100%); }
 
 /* íris procedural (5 cores + fallback) */
 .iris { --c-core:#0e4d46; --c-mid:#1E6B61; --c-rim:#072420; --c-glow:#3D9B8C; --fiber:#5BBFB0; position:relative; aspect-ratio:1; border-radius:50%; isolation:isolate;
