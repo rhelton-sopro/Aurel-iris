@@ -189,6 +189,34 @@ export default function LandingEspelho() {
         </div>
       </section>
 
+      {/* ════════ A PROFUNDIDADE (o que a leitura abre — prova de vastidão) ════════ */}
+      <section className="bg-white text-black">
+        <div className="mx-auto max-w-[1080px] px-6 py-20 md:px-10 md:py-24">
+          <div className="lp-reveal text-center">
+            <p className="eyebrow" style={{ color: 'var(--teal-dark)' }}>O que uma leitura abre</p>
+            <h2 className="display mx-auto mt-6" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)', color: '#0d0d0d', maxWidth: '26ch' }}>
+              Não é um retrato. <em style={{ color: 'var(--teal-dark)' }}>É a pessoa inteira — em camadas que ela mesma não sabia nomear.</em>
+            </h2>
+          </div>
+          <div className="mt-14 grid gap-x-12 gap-y-9 md:grid-cols-2">
+            {[
+              { t: 'O jeito de processar a vida', d: 'O temperamento de base — a maneira de sentir o mundo que ele sempre teve, e nunca soube que tinha nome.' },
+              { t: 'Onde tudo começou', d: 'A linha do tempo emocional: quando o padrão se formou, e o que o manteve de pé desde então.' },
+              { t: 'O que se repete', d: 'Aquilo que ele refaz de novo e de novo, sem perceber que escolhe.' },
+              { t: 'As forças que ele subestima', d: 'O que nele já é potência — esperando ser usado de propósito, não por acaso.' },
+              { t: 'O que pede cuidado agora', d: 'Onde a vida vem cobrando — em linguagem de emoção e comportamento, nunca de exame.' },
+              { t: 'O que ele protege', d: 'A ferida que aprendeu a esconder cedo — e a defesa que montou em volta dela.' },
+              { t: 'O caminho pra sessão', d: 'As perguntas certas e a direção, já na sua mão quando ele sentar.' },
+            ].map((item, i) => (
+              <div key={item.t} className="lp-reveal" data-d={String((i % 2) + 1)} style={{ borderLeft: '2px solid var(--teal)', paddingLeft: '1.4rem' }}>
+                <h3 className="display" style={{ fontSize: '1.25rem', color: '#0d0d0d' }}>{item.t}</h3>
+                <p className="body-copy mt-2" style={{ color: '#4a4a4a', fontSize: '1rem' }}>{item.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ════════ PERGUNTAS DEMO (exemplo ilustrativo — substitui Sessão de Apoio) ════════ */}
       <section className="bg-white text-black">
         <div className="mx-auto max-w-[1080px] px-6 py-20 md:px-10 md:py-24">
@@ -221,69 +249,54 @@ export default function LandingEspelho() {
         </div>
       </section>
 
-      {/* ════════ MECANISMO ════════ */}
-      <section className="bg-ivory text-black">
-        <div className="mx-auto grid max-w-[1280px] items-center gap-14 px-6 py-20 md:px-10 md:py-24 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
-          <div className="order-2 flex justify-center lg:order-1">
-            <div className="lp-iris-photo lp-iris-photo--light lp-reveal" style={{ width: 'min(70vw,380px)' }}>
-              <Image src="/lp/iris-marfim.png" alt="Íris humana detalhada sobre fundo claro" fill sizes="(max-width:1024px) 70vw, 380px" className="object-cover" />
-            </div>
-          </div>
-          <div className="order-1 lg:order-2">
-            <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-dark)' }}>O método</p>
-            <h2 className="display lp-reveal mt-6" data-d="1" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)', color: '#0d0d0d' }}>
-              Tradição como base.<br /><em style={{ color: 'var(--teal-dark)' }}>Método como diferença.</em>
-            </h2>
-            <div className="mt-12 space-y-7">
-              {[
-                { n: '01', t: 'Sobre ombros sérios', d: 'Tradição clássica (Jensen, Johnson, Battello, Lindemann), não palpite.' },
-                { n: '02', t: 'IA de ponta, com método', d: 'Uma IA própria, treinada na tradição iridológica, gera cada leitura única para aquela pessoa. Sem texto-modelo, sem horóscopo.' },
-                { n: '03', t: 'O enfoque certo', d: 'Padrões emocionais, comportamentais e de estilo de vida — não diagnóstico, não laudo.' },
-              ].map((m, i) => (
-                <div key={m.n}>
-                  {i > 0 && <hr className="mb-9" style={{ border: 0, borderTop: '1px solid #ddd2c0' }} />}
-                  <div className="lp-reveal flex gap-6" data-d={String(i + 1)}>
-                    <span className="display shrink-0" style={{ fontSize: '1.6rem', color: 'var(--teal)', width: '2.4rem' }}>{m.n}</span>
-                    <div>
-                      <h3 className="eyebrow" style={{ color: '#0d0d0d', letterSpacing: '.16em', fontSize: '.8rem' }}>{m.t}</h3>
-                      <p className="body-copy mt-2" style={{ color: '#4a4a4a' }}>{m.d}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <p className="display lp-reveal mt-12" data-d="3" style={{ fontStyle: 'italic', fontSize: '1.5rem', color: 'var(--teal-dark)' }}>
-              Espiritualidade encarnada, com ciência e método.
-            </p>
-          </div>
+      {/* ════════ BATIDA ESCURA (transição — reaquece antes do método) ════════ */}
+      <section className="relative overflow-hidden bg-black">
+        <Image src="/lp/olho-espelho.png" alt="" fill sizes="100vw" className="object-cover opacity-40" />
+        <div className="vignette" aria-hidden="true" />
+        <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,.5)' }} aria-hidden="true" />
+        <div className="relative z-10 mx-auto max-w-[820px] px-6 py-20 text-center md:px-10 md:py-28">
+          <p className="display lp-reveal" style={{ fontSize: 'clamp(1.8rem,4.5vw,3.2rem)' }}>
+            Tudo isso — <em style={{ color: 'var(--teal-light)' }}>de uma foto da íris.</em>
+          </p>
         </div>
       </section>
 
-      {/* ════════ COMO FUNCIONA ════════ */}
-      <section className="bg-white text-black">
-        <div className="mx-auto max-w-[1280px] px-6 py-20 md:px-10 md:py-24">
-          <div className="lp-reveal text-center">
-            <p className="eyebrow" style={{ color: 'var(--teal-dark)' }}>Como funciona</p>
-            <h2 className="display mx-auto mt-6" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)', color: '#0d0d0d', maxWidth: '18ch' }}>
-              Três passos entre a foto e o <em>uau.</em>
-            </h2>
-          </div>
+      {/* ════════ MÉTODO (faixa compacta — selo de credibilidade) ════════ */}
+      <section className="bg-ivory text-black">
+        <div className="mx-auto max-w-[1100px] px-6 py-20 text-center md:px-10 md:py-24">
+          <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-dark)' }}>O método</p>
+          <h2 className="display lp-reveal mx-auto mt-6" data-d="1" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)', color: '#0d0d0d', maxWidth: '20ch' }}>
+            Tradição como base. <em style={{ color: 'var(--teal-dark)' }}>Método como diferença.</em>
+          </h2>
           <div className="mt-12 grid gap-px md:grid-cols-3" style={{ background: '#e8e0d2' }}>
             {[
-              { n: '1', t: 'Capture a íris', d: 'A foto do olho do seu cliente, direto pelo app.' },
-              { n: '2', t: 'Receba a leitura', d: 'Em minutos, o relatório completo chega pronto.' },
-              { n: '3', t: 'Revise e entregue', d: 'Você ajusta, assina e entrega das suas mãos.' },
-            ].map((s, i) => (
-              <div key={s.n} className="lp-reveal bg-white p-10 md:p-12" data-d={String(i + 1)}>
-                <span className="display" style={{ fontSize: '2rem', color: 'var(--teal)' }}>{s.n}</span>
-                <h3 className="eyebrow mt-5" style={{ color: '#0d0d0d', letterSpacing: '.16em', fontSize: '.82rem' }}>{s.t}</h3>
-                <p className="body-copy mt-3 text-sm" style={{ color: '#5a5a5a' }}>{s.d}</p>
+              { n: '01', t: 'Sobre ombros sérios', d: 'A tradição clássica como base: Jensen, Johnson, Battello, Lindemann. Não palpite.' },
+              { n: '02', t: 'IA própria, com método', d: 'Treinada na tradição iridológica, ela escreve cada leitura única — sem texto-modelo, sem horóscopo.' },
+              { n: '03', t: 'O enfoque certo', d: 'Padrões emocionais e comportamentais. Não diagnóstico, não laudo.' },
+            ].map((m, i) => (
+              <div key={m.n} className="lp-reveal bg-ivory p-8 text-left md:p-9" data-d={String(i + 1)}>
+                <span className="display" style={{ fontSize: '1.5rem', color: 'var(--teal)' }}>{m.n}</span>
+                <h3 className="eyebrow mt-4" style={{ color: '#0d0d0d', letterSpacing: '.16em', fontSize: '.78rem' }}>{m.t}</h3>
+                <p className="body-copy mt-2 text-sm" style={{ color: '#4a4a4a' }}>{m.d}</p>
               </div>
             ))}
           </div>
-          <div className="lp-reveal mt-12 flex items-center justify-center gap-4 text-center" data-d="2">
+          <p className="display lp-reveal mt-12" data-d="3" style={{ fontStyle: 'italic', fontSize: '1.5rem', color: 'var(--teal-dark)' }}>
+            Espiritualidade encarnada, com ciência e método.
+          </p>
+        </div>
+      </section>
+
+      {/* ════════ COMO FUNCIONA (faixa enxuta — 3 micro-passos) ════════ */}
+      <section className="bg-white text-black">
+        <div className="mx-auto max-w-[900px] px-6 py-16 text-center md:px-10 md:py-20">
+          <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-dark)' }}>Como funciona</p>
+          <p className="display lp-reveal mt-6" data-d="1" style={{ fontSize: 'clamp(1.4rem,3.2vw,2rem)', color: '#0d0d0d' }}>
+            Capture a íris <span style={{ color: 'var(--teal)' }}>·</span> Receba em minutos <span style={{ color: 'var(--teal)' }}>·</span> Revise e entregue
+          </p>
+          <div className="lp-reveal mt-7 flex items-center justify-center gap-4" data-d="2">
             <hr className="hairline" style={{ width: 32 }} />
-            <p className="body-copy" style={{ color: 'var(--teal-dark)', fontStyle: 'italic', fontFamily: 'var(--font-cormorant),serif', fontSize: '1.2rem' }}>
+            <p className="body-copy" style={{ color: 'var(--teal-dark)', fontStyle: 'italic', fontFamily: 'var(--font-cormorant),serif', fontSize: '1.15rem' }}>
               Você no controle — a interpretação e a conduta são sempre suas.
             </p>
             <hr className="hairline" style={{ width: 32 }} />
@@ -295,14 +308,17 @@ export default function LandingEspelho() {
       <section id="oferta" className="bg-ivory text-black">
         <div className="mx-auto max-w-[1080px] px-6 py-20 text-center md:px-10 md:py-24">
           <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-dark)' }}>A oferta</p>
-          <h2 className="display lp-reveal mx-auto mt-6" data-d="1" style={{ fontSize: 'clamp(2.2rem,4.8vw,3.8rem)', color: '#0d0d0d', maxWidth: '18ch' }}>
-            Sinta o <em style={{ color: 'var(--teal-dark)' }}>uau</em> na sua própria íris. De graça.
+          <p className="lp-reveal mx-auto mt-5" data-d="1" style={{ color: 'var(--teal-dark)', fontStyle: 'italic', fontFamily: 'var(--font-cormorant),serif', fontSize: '1.3rem', maxWidth: '36ch' }}>
+            Você já viu o que ele vai ler na sua frente.
+          </p>
+          <h2 className="display lp-reveal mx-auto mt-4" data-d="1" style={{ fontSize: 'clamp(2.2rem,4.8vw,3.8rem)', color: '#0d0d0d', maxWidth: '20ch' }}>
+            Agora sinta o <em style={{ color: 'var(--teal-dark)' }}>uau</em> na sua própria íris. De graça.
           </h2>
           <p className="body-copy lp-reveal mx-auto mt-7" data-d="2" style={{ color: '#4a4a4a', fontSize: '1.08rem' }}>
             Crie sua conta e faça 3 leituras grátis (ou 15 dias) — sem cartão.
           </p>
           <div className="lp-reveal mt-10" data-d="2">
-            <Link href="/signup" className="btn btn-primary">Quero minhas 3 leituras grátis</Link>
+            <Link href="/signup" className="btn btn-primary">Começar com 3 leituras grátis</Link>
           </div>
 
           <div className="lp-reveal mx-auto mt-12 max-w-[760px]" data-d="2">
@@ -355,7 +371,7 @@ export default function LandingEspelho() {
             Seu próximo cliente<br />merece <em style={{ color: 'var(--teal-light)' }}>se sentir lido.</em>
           </h2>
           <div className="lp-reveal mt-12" data-d="1">
-            <Link href="/signup" className="btn btn-primary">Criar conta e começar grátis</Link>
+            <Link href="/signup" className="btn btn-primary">Começar grátis</Link>
           </div>
           <p className="lp-reveal mt-8 text-xs" data-d="1" style={{ color: 'var(--mist)', letterSpacing: '.06em' }}>
             Sem cartão · 3 leituras · sem assinatura.
