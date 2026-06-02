@@ -58,7 +58,7 @@ export default function LandingEspelho() {
       <TopBar />
 
       {/* ════════ HERO — texto no topo + faixa horizontal do olho (mobile-safe) ════════ */}
-      <section className="relative overflow-hidden bg-black pt-32 pb-16 md:pb-24 md:pt-36">
+      <section className="relative overflow-hidden bg-black pt-28 pb-12 md:pb-16 md:pt-32">
         <div className="mx-auto w-full max-w-[1280px] px-6 md:px-10">
           <div className="lp-reveal" data-d="1">
             <div className="lp-hero-strip">
@@ -95,7 +95,7 @@ export default function LandingEspelho() {
         <Image src="/lp/dor.png" alt="Cliente de braços cruzados, fechado, numa sessão de terapia" fill sizes="100vw" className="object-cover object-center" />
         <div className="vignette" aria-hidden="true" />
         <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,.55)' }} aria-hidden="true" />
-        <div className="relative z-10 mx-auto max-w-[920px] px-6 py-40 text-center md:px-10 md:py-56">
+        <div className="relative z-10 mx-auto max-w-[920px] px-6 py-24 text-center md:px-10 md:py-32">
           <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-light)' }}>A verdade do consultório</p>
           <h2 className="display lp-reveal mt-6" style={{ fontSize: 'clamp(2rem,4.6vw,3.7rem)' }}>
             O mais difícil nunca foi a íris.<br /><em style={{ color: 'var(--teal-light)' }}>É o cliente que senta na sua frente e não se abre.</em>
@@ -112,8 +112,8 @@ export default function LandingEspelho() {
 
       {/* ════════ A VIRADA (funde prova + leitura-já-é-terapia; foto de ler junto) ════════ */}
       <section className="bg-white text-black">
-        <div className="mx-auto max-w-[1100px] px-6 py-32 md:px-10 md:py-44">
-          <div className="lp-reveal mx-auto mb-16 max-w-[940px]">
+        <div className="mx-auto max-w-[1100px] px-6 py-20 md:px-10 md:py-24">
+          <div className="lp-reveal mx-auto mb-10 max-w-[940px]">
             <div className="lp-hero-strip" style={{ aspectRatio: '16 / 9' }}>
               <Image src="/lp/virada.png" alt="Terapeuta e cliente leem o relatório juntos; o cliente, emocionado, se reconhece" fill sizes="(max-width:1100px) 92vw, 940px" className="object-cover object-center" />
             </div>
@@ -145,7 +145,7 @@ export default function LandingEspelho() {
 
       {/* ════════ PREVIEW DEMO (exemplo ilustrativo — substitui o mock) ════════ */}
       <section className="bg-ivory text-black">
-        <div className="mx-auto grid max-w-[1280px] items-center gap-14 px-6 py-32 md:px-10 md:py-44 lg:grid-cols-2 lg:gap-20">
+        <div className="mx-auto grid max-w-[1280px] items-center gap-14 px-6 py-20 md:px-10 md:py-24 lg:grid-cols-2 lg:gap-16">
           <div className="lp-reveal">
             <p className="eyebrow" style={{ color: 'var(--teal-dark)' }}>Veja com seus olhos</p>
             <h2 className="display mt-6" style={{ fontSize: 'clamp(2.2rem,4.4vw,3.6rem)', color: '#0d0d0d' }}>
@@ -186,7 +186,7 @@ export default function LandingEspelho() {
 
       {/* ════════ PERGUNTAS DEMO (exemplo ilustrativo — substitui Sessão de Apoio) ════════ */}
       <section className="bg-white text-black">
-        <div className="mx-auto max-w-[1080px] px-6 py-32 md:px-10 md:py-44">
+        <div className="mx-auto max-w-[1080px] px-6 py-20 md:px-10 md:py-24">
           <div className="lp-reveal text-center">
             <p className="eyebrow" style={{ color: 'var(--teal-dark)' }}>Além do relatório</p>
             <h2 className="display mx-auto mt-6" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)', color: '#0d0d0d', maxWidth: '24ch' }}>
@@ -218,7 +218,7 @@ export default function LandingEspelho() {
 
       {/* ════════ MECANISMO ════════ */}
       <section className="bg-ivory text-black">
-        <div className="mx-auto grid max-w-[1280px] items-center gap-14 px-6 py-32 md:px-10 md:py-44 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
+        <div className="mx-auto grid max-w-[1280px] items-center gap-14 px-6 py-20 md:px-10 md:py-24 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
           <div className="order-2 flex justify-center lg:order-1">
             <div className="lp-iris-photo lp-iris-photo--light lp-reveal" style={{ width: 'min(70vw,380px)' }}>
               <Image src="/lp/iris-marfim.png" alt="Íris humana detalhada sobre fundo claro" fill sizes="(max-width:1024px) 70vw, 380px" className="object-cover" />
@@ -229,7 +229,7 @@ export default function LandingEspelho() {
             <h2 className="display lp-reveal mt-6" data-d="1" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)', color: '#0d0d0d' }}>
               Tradição como base.<br /><em style={{ color: 'var(--teal-dark)' }}>Método como diferença.</em>
             </h2>
-            <div className="mt-12 space-y-9">
+            <div className="mt-12 space-y-7">
               {[
                 { n: '01', t: 'Sobre ombros sérios', d: 'Tradição clássica (Jensen, Johnson, Battello, Lindemann), não palpite.' },
                 { n: '02', t: 'IA de ponta, com método', d: 'Uma IA própria, treinada na tradição iridológica, gera cada leitura única para aquela pessoa. Sem texto-modelo, sem horóscopo.' },
@@ -256,14 +256,14 @@ export default function LandingEspelho() {
 
       {/* ════════ COMO FUNCIONA ════════ */}
       <section className="bg-white text-black">
-        <div className="mx-auto max-w-[1280px] px-6 py-32 md:px-10 md:py-44">
+        <div className="mx-auto max-w-[1280px] px-6 py-20 md:px-10 md:py-24">
           <div className="lp-reveal text-center">
             <p className="eyebrow" style={{ color: 'var(--teal-dark)' }}>Como funciona</p>
             <h2 className="display mx-auto mt-6" style={{ fontSize: 'clamp(2.1rem,4.2vw,3.3rem)', color: '#0d0d0d', maxWidth: '18ch' }}>
               Três passos entre a foto e o <em>uau.</em>
             </h2>
           </div>
-          <div className="mt-20 grid gap-px md:grid-cols-3" style={{ background: '#e8e0d2' }}>
+          <div className="mt-12 grid gap-px md:grid-cols-3" style={{ background: '#e8e0d2' }}>
             {[
               { n: '1', t: 'Capture a íris', d: 'A foto do olho do seu cliente, direto pelo app.' },
               { n: '2', t: 'Receba a leitura', d: 'Em minutos, o relatório completo chega pronto.' },
@@ -288,7 +288,7 @@ export default function LandingEspelho() {
 
       {/* ════════ OFERTA ════════ */}
       <section id="oferta" className="bg-ivory text-black">
-        <div className="mx-auto max-w-[1080px] px-6 py-32 text-center md:px-10 md:py-44">
+        <div className="mx-auto max-w-[1080px] px-6 py-20 text-center md:px-10 md:py-24">
           <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-dark)' }}>A oferta</p>
           <h2 className="display lp-reveal mx-auto mt-6" data-d="1" style={{ fontSize: 'clamp(2.2rem,4.8vw,3.8rem)', color: '#0d0d0d', maxWidth: '18ch' }}>
             Sinta o <em style={{ color: 'var(--teal-dark)' }}>uau</em> na sua própria íris. De graça.
@@ -300,7 +300,7 @@ export default function LandingEspelho() {
             <Link href="/signup" className="btn btn-primary">Quero minhas 3 leituras grátis</Link>
           </div>
 
-          <div className="lp-reveal mx-auto mt-20 max-w-[760px]" data-d="2">
+          <div className="lp-reveal mx-auto mt-12 max-w-[760px]" data-d="2">
             <p className="eyebrow" style={{ color: 'var(--mist)', marginBottom: '1.5rem' }}>Pacotes, sem pressão</p>
             <div className="grid gap-px sm:grid-cols-2" style={{ background: '#ddd2c0', border: '1px solid #ddd2c0' }}>
               {PACOTES.map((p) => (
@@ -321,8 +321,8 @@ export default function LandingEspelho() {
 
       {/* ════════ FAQ ════════ */}
       <section className="bg-white text-black">
-        <div className="mx-auto max-w-[820px] px-6 py-32 md:px-10 md:py-44">
-          <div className="lp-reveal mb-16 text-center">
+        <div className="mx-auto max-w-[820px] px-6 py-20 md:px-10 md:py-24">
+          <div className="lp-reveal mb-10 text-center">
             <p className="eyebrow" style={{ color: 'var(--teal-dark)' }}>Perguntas</p>
             <h2 className="display mt-6" style={{ fontSize: 'clamp(2rem,4vw,3rem)', color: '#0d0d0d' }}>Antes de começar.</h2>
           </div>
@@ -345,7 +345,7 @@ export default function LandingEspelho() {
         <Image src="/lp/iris-hero.png" alt="" fill sizes="100vw" className="object-cover opacity-30" />
         <div className="vignette" aria-hidden="true" />
         <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,.55)' }} aria-hidden="true" />
-        <div className="relative z-10 mx-auto max-w-[900px] px-6 py-40 text-center md:px-10 md:py-56">
+        <div className="relative z-10 mx-auto max-w-[900px] px-6 py-24 text-center md:px-10 md:py-32">
           <h2 className="display lp-reveal" style={{ fontSize: 'clamp(2.3rem,5.2vw,4.2rem)' }}>
             Seu próximo cliente<br />merece <em style={{ color: 'var(--teal-light)' }}>se sentir lido.</em>
           </h2>
