@@ -69,12 +69,12 @@ export default function LandingEspelho() {
           <div className="mt-12 max-w-3xl md:mt-14">
             <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-light)' }}>Para o terapeuta integrativo</p>
             <h1 className="display lp-reveal mt-6" data-d="1" style={{ fontSize: 'clamp(2.5rem,6vw,5rem)' }}>
-              Você lê a alma do seu cliente —{' '}
+              Você vê o que seu cliente nunca soube dizer —{' '}
               <em style={{ color: 'var(--teal-light)' }}>e conduz a sessão mais profunda da vida dele.</em>
             </h1>
             <p className="body-copy lg lp-reveal mt-7" data-d="2" style={{ color: 'rgba(242,237,228,.82)' }}>
               Em minutos... O Iris Codex faz a leitura pela íris — a história que seu cliente carrega e
-              nunca soube nomear. Ele se reconhece, se emociona, e enfim se sente entendido. Ler a análise
+              raramente põe em palavras. Ele se reconhece, se emociona, e enfim se sente entendido. Ler a análise
               com ele já é a primeira sessão: você recebe as perguntas certas e o direcionamento da terapia.
             </p>
             <p className="eyebrow lp-reveal mt-5" data-d="2" style={{ color: 'var(--teal-light)', letterSpacing: '.22em' }}>
