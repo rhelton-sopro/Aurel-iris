@@ -237,6 +237,57 @@ export default function LandingEspelho() {
         </div>
       </section>
 
+      {/* ════════ ESPIAR DENTRO ("o que cabe numa leitura" — escala + curiosidade) ════════ */}
+      <section className="bg-ivory text-black">
+        <div className="mx-auto max-w-[1080px] px-6 py-20 md:px-10 md:py-24">
+          <div className="lp-reveal text-center">
+            <p className="eyebrow" style={{ color: 'var(--teal-dark)' }}>Por dentro de uma leitura</p>
+            <h2 className="display mx-auto mt-6" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)', color: '#0d0d0d', maxWidth: '22ch' }}>
+              Uma frase te parou. <em style={{ color: 'var(--teal-dark)' }}>Agora imagine a leitura inteira.</em>
+            </h2>
+            <p className="body-copy mx-auto mt-6" style={{ color: '#3a3a3a', fontSize: '1.08rem', maxWidth: '60ch' }}>
+              Não é uma página. São mais de uma dúzia de frentes que se conversam — do temperamento ao que
+              pede cuidado, da história que formou o cliente ao roteiro pra conduzir a devolutiva.
+            </p>
+            <p className="mt-5 text-xs" style={{ color: 'var(--mist)', letterSpacing: '.04em', fontStyle: 'italic' }}>
+              Tópicos e trechos ilustrativos — sem dados reais de cliente.
+            </p>
+          </div>
+
+          {/* mock de páginas empilhadas — peso físico do documento */}
+          <div className="lp-reveal relative mx-auto mt-14 max-w-[620px]" data-d="1">
+            <div className="paper" style={{ position: 'absolute', inset: 0, transform: 'rotate(-3deg) translateY(-14px)', opacity: 0.4 }} aria-hidden="true" />
+            <div className="paper" style={{ position: 'absolute', inset: 0, transform: 'rotate(1.8deg) translateY(-7px)', opacity: 0.65 }} aria-hidden="true" />
+            <div className="paper relative p-9 md:p-11" style={{ zIndex: 1 }}>
+              {[
+                { h: 'Em poucas palavras', f: '“Alguém que aprendeu a temperatura do ambiente antes de entrar nele—”' },
+                { h: 'Linha do tempo emocional', f: '“Entre os 4 e os 7 anos, algo pediu que ela aprendesse a—”' },
+                { h: 'Forças e recursos', f: '“Lê o não-dito com uma precisão que ela nem reconhece como—”' },
+              ].map((row, i) => (
+                <div key={row.h} style={i > 0 ? { marginTop: '1.6rem' } : undefined}>
+                  <p style={{ fontSize: '.62rem', letterSpacing: '.24em', textTransform: 'uppercase', color: 'var(--teal)', fontFamily: 'var(--font-raleway),sans-serif' }}>{row.h}</p>
+                  <p className="mt-2" style={{ fontStyle: 'italic', fontFamily: 'var(--font-cormorant),serif', fontSize: '1.18rem', lineHeight: 1.5, color: '#15110b' }}>{row.f}</p>
+                </div>
+              ))}
+              <hr className="rule" style={{ margin: '1.8rem 0 1.2rem' }} />
+              <p style={{ fontSize: '.95rem', color: 'var(--mist)', fontFamily: 'var(--font-cormorant),serif', fontStyle: 'italic', lineHeight: 1.6 }}>
+                + Temperamento · Padrões que se repetem · O que pede cuidado agora · Roteiro pra devolutiva · Síntese final <span style={{ color: 'var(--teal-dark)' }}>…e mais.</span>
+              </p>
+            </div>
+          </div>
+
+          {/* fecho de curiosidade */}
+          <div className="lp-reveal mt-12 text-center" data-d="2">
+            <p className="display mx-auto" style={{ fontStyle: 'italic', fontSize: 'clamp(1.3rem,3vw,1.7rem)', color: 'var(--teal-dark)', maxWidth: '42ch', lineHeight: 1.45 }}>
+              Isto é a borda de uma leitura. A do seu cliente vai dizer o nome dele — e coisas que nem você esperava.
+            </p>
+            <Link href="/signup" className="link-quiet mt-6 inline-block" style={{ color: 'var(--teal-dark)', fontFamily: 'var(--font-raleway),sans-serif', fontSize: '.82rem', letterSpacing: '.14em', textTransform: 'uppercase' }}>
+              Ver a primeira leitura grátis →
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ════════ PERGUNTAS DEMO (exemplo ilustrativo — substitui Sessão de Apoio) ════════ */}
       <section className="bg-white text-black">
         <div className="mx-auto max-w-[1080px] px-6 py-20 md:px-10 md:py-24">
