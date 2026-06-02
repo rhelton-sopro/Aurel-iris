@@ -62,7 +62,7 @@ export default function LandingEspelho() {
         <div className="mx-auto w-full max-w-[1280px] px-6 md:px-10">
           <div className="lp-reveal" data-d="1">
             <div className="lp-hero-strip">
-              <Image src="/lp/iris-hero.png" alt="Olho humano em macro — o detalhe que o Iris Codex lê" fill priority sizes="(max-width:1280px) 92vw, 1216px" className="object-cover object-center" />
+              <Image src="/lp/hero-captura.png" alt="Terapeuta fotografando a íris do cliente em sessão" fill priority sizes="(max-width:1280px) 92vw, 1216px" className="object-cover object-center" />
             </div>
           </div>
           <div className="mt-12 max-w-3xl md:mt-14">
@@ -90,11 +90,11 @@ export default function LandingEspelho() {
         </div>
       </section>
 
-      {/* ════════ A DOR (full-bleed fibras) ════════ */}
+      {/* ════════ A DOR (full-bleed — foto do cliente fechado) ════════ */}
       <section className="relative overflow-hidden bg-black">
-        <Image src="/lp/fibras-wide.png" alt="" fill sizes="100vw" className="object-cover opacity-65" />
+        <Image src="/lp/dor.png" alt="Cliente de braços cruzados, fechado, numa sessão de terapia" fill sizes="100vw" className="object-cover object-center" />
         <div className="vignette" aria-hidden="true" />
-        <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,.42)' }} aria-hidden="true" />
+        <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,.55)' }} aria-hidden="true" />
         <div className="relative z-10 mx-auto max-w-[920px] px-6 py-40 text-center md:px-10 md:py-56">
           <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-light)' }}>A verdade do consultório</p>
           <h2 className="display lp-reveal mt-6" style={{ fontSize: 'clamp(2rem,4.6vw,3.7rem)' }}>
@@ -110,9 +110,15 @@ export default function LandingEspelho() {
         </div>
       </section>
 
-      {/* ════════ A VIRADA (funde prova + leitura-já-é-terapia) ════════ */}
+      {/* ════════ A VIRADA (funde prova + leitura-já-é-terapia; foto de ler junto) ════════ */}
       <section className="bg-white text-black">
-        <div className="mx-auto max-w-[900px] px-6 py-32 text-center md:px-10 md:py-44">
+        <div className="mx-auto max-w-[1100px] px-6 py-32 md:px-10 md:py-44">
+          <div className="lp-reveal mx-auto mb-16 max-w-[940px]">
+            <div className="lp-hero-strip" style={{ aspectRatio: '16 / 9' }}>
+              <Image src="/lp/virada.png" alt="Terapeuta e cliente leem o relatório juntos; o cliente, emocionado, se reconhece" fill sizes="(max-width:1100px) 92vw, 940px" className="object-cover object-center" />
+            </div>
+          </div>
+          <div className="mx-auto max-w-[900px] text-center">
           <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-dark)' }}>O que muda</p>
           <h2 className="display lp-reveal mt-6" data-d="1" style={{ fontSize: 'clamp(2rem,4.6vw,3.6rem)', color: '#0d0d0d' }}>
             E se ele chegasse à sessão <em style={{ color: 'var(--teal-dark)' }}>já se sentindo visto?</em>
@@ -133,6 +139,7 @@ export default function LandingEspelho() {
             o cliente chegar mais aberto. A relação continua sendo sua, construída sessão a sessão. O que
             muda é por onde você começa: não da página em branco, mas já lá no fundo.
           </p>
+          </div>
         </div>
       </section>
 
