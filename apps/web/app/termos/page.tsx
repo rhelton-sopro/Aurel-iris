@@ -43,7 +43,7 @@ export default function TermosPage() {
           <h2 className="text-base font-medium">Modelo de pagamento</h2>
           <ul className="ml-5 list-disc space-y-1.5">
             <li>
-              <strong>Avaliação gratuita:</strong> 3 leituras ou 60 dias (o que
+              <strong>Avaliação gratuita:</strong> 3 leituras ou 15 dias (o que
               ocorrer primeiro), sem necessidade de cartão de crédito.
             </li>
             <li>
