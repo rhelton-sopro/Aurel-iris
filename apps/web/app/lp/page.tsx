@@ -65,12 +65,12 @@ export default function LandingEspelho() {
       <RevealInit />
       <TopBar />
 
-      {/* ════════ HERO — escuro limpo, olho inteiro (sem corte) ════════ */}
-      <section className="relative flex min-h-screen items-start overflow-hidden bg-black lg:items-center">
-        <div className="mx-auto grid w-full max-w-[1280px] grid-cols-1 items-center gap-9 px-6 pb-20 pt-28 md:gap-14 md:px-10 md:pt-32 lg:grid-cols-[1.05fr_0.8fr] lg:gap-16">
-          <div className="order-1">
+      {/* ════════ HERO — texto no topo + faixa horizontal do olho (mobile-safe) ════════ */}
+      <section className="relative overflow-hidden bg-black pt-32 pb-16 md:pb-24 md:pt-36">
+        <div className="mx-auto w-full max-w-[1280px] px-6 md:px-10">
+          <div className="max-w-3xl">
             <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-light)' }}>Para o terapeuta integrativo</p>
-            <h1 className="display lp-reveal mt-6" data-d="1" style={{ fontSize: 'clamp(2.7rem,6vw,5rem)' }}>
+            <h1 className="display lp-reveal mt-6" data-d="1" style={{ fontSize: 'clamp(2.5rem,6vw,5rem)' }}>
               Em minutos, você lê a alma do seu cliente.<br />
               <em style={{ color: 'var(--teal-light)' }}>Sem saber ler uma íris.</em>
             </h1>
@@ -90,13 +90,12 @@ export default function LandingEspelho() {
               Sem cartão · 3 leituras ou 15 dias · Apoio à anamnese, não substitui avaliação médica.
             </p>
           </div>
-          <div className="order-2 flex justify-center lp-reveal" data-d="1">
-            <div className="lp-hero-frame">
-              <Image src="/lp/iris-hero.png" alt="Olho humano em macro — o detalhe que o Iris Codex lê" width={1024} height={1792} priority sizes="(max-width:1024px) 82vw, 400px" className="block h-auto w-full rounded-[2px]" />
+          <div className="lp-reveal mt-12 md:mt-16" data-d="3">
+            <div className="lp-hero-strip">
+              <Image src="/lp/iris-hero.png" alt="Olho humano em macro — o detalhe que o Iris Codex lê" fill priority sizes="(max-width:1280px) 92vw, 1216px" className="object-cover object-center" />
             </div>
           </div>
         </div>
-        <div className="eyebrow absolute bottom-7 left-1/2 -translate-x-1/2" style={{ color: 'rgba(242,237,228,.4)', fontSize: '.6rem' }}>Role</div>
       </section>
 
       {/* ════════ PROVA ════════ */}
@@ -447,8 +446,8 @@ html:has(.lp-root){ scroll-behavior:smooth; }
 .lp-iris-photo--light { box-shadow:0 25px 70px -35px rgba(0,0,0,.45), inset 0 0 0 1px rgba(30,107,97,.22); }
 
 /* hero — olho inteiro (sem corte) num frame com anel teal sutil */
-.lp-hero-frame { width:min(66vw,340px); border-radius:2px; box-shadow:0 40px 100px -45px rgba(0,0,0,.85), 0 0 0 1px rgba(91,191,176,.18); }
-@media (min-width:1024px){ .lp-hero-frame { width:min(34vw,400px); } }
+.lp-hero-strip { position:relative; width:100%; aspect-ratio:16/9; border-radius:2px; overflow:hidden; box-shadow:0 40px 100px -45px rgba(0,0,0,.85), 0 0 0 1px rgba(91,191,176,.18); }
+@media (min-width:768px){ .lp-hero-strip { aspect-ratio:21/9; } }
 
 /* íris procedural (5 cores + fallback) */
 .iris { --c-core:#0e4d46; --c-mid:#1E6B61; --c-rim:#072420; --c-glow:#3D9B8C; --fiber:#5BBFB0; position:relative; aspect-ratio:1; border-radius:50%; isolation:isolate;
