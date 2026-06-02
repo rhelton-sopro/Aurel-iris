@@ -55,7 +55,7 @@ const FAQ = [
   { q: 'É diagnóstico médico?', a: 'Não — é apoio à anamnese, com enfoque emocional e comportamental. Não substitui avaliação médica.', open: true },
   { q: 'É texto genérico?', a: 'Não — cada relatório é único, escrito para aquela pessoa. Sem horóscopo, sem texto-modelo.', open: false },
   { q: 'Meus dados são seguros?', a: 'Sim — você é o controlador dos dados, em conformidade com a LGPD. As imagens não treinam nenhuma IA.', open: false },
-  { q: 'Preciso saber iridologia?', a: 'Você revisa e conduz; a interpretação é sua. O Iris Codex escreve o relatório — a palavra final é sempre do terapeuta.', open: false },
+  { q: 'Preciso saber iridologia?', a: 'Não precisa. Uma IA própria, treinada na tradição iridológica, faz a leitura por você. Você revisa, conduz e dá a palavra final — a interpretação e a relação com o cliente são suas.', open: false },
 ] as const
 
 export default function LandingEspelho() {
@@ -66,9 +66,9 @@ export default function LandingEspelho() {
       <TopBar />
 
       {/* ════════ HERO — escuro limpo, olho inteiro (sem corte) ════════ */}
-      <section className="relative flex min-h-screen items-center overflow-hidden bg-black">
-        <div className="mx-auto grid w-full max-w-[1280px] grid-cols-1 items-center gap-10 px-6 pb-20 pt-32 md:gap-14 md:px-10 lg:grid-cols-[1.05fr_0.8fr] lg:gap-16">
-          <div className="order-2 lg:order-1">
+      <section className="relative flex min-h-screen items-start overflow-hidden bg-black lg:items-center">
+        <div className="mx-auto grid w-full max-w-[1280px] grid-cols-1 items-center gap-9 px-6 pb-20 pt-28 md:gap-14 md:px-10 md:pt-32 lg:grid-cols-[1.05fr_0.8fr] lg:gap-16">
+          <div className="order-1">
             <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-light)' }}>Para o terapeuta integrativo</p>
             <h1 className="display lp-reveal mt-6" data-d="1" style={{ fontSize: 'clamp(2.7rem,6vw,5rem)' }}>
               Em minutos, você lê a alma do seu cliente.<br />
@@ -79,6 +79,9 @@ export default function LandingEspelho() {
               cliente se reconhece, se emociona, e enfim se sente entendido. A própria leitura já é um
               encontro terapêutico: você recebe as perguntas certas e o direcionamento da terapia.
             </p>
+            <p className="eyebrow lp-reveal mt-5" data-d="2" style={{ color: 'var(--teal-light)', letterSpacing: '.22em' }}>
+              Leitura assistida por IA · ancorada na tradição iridológica
+            </p>
             <div className="lp-reveal mt-9 flex flex-wrap items-center gap-x-7 gap-y-4" data-d="3">
               <Link href="/signup" className="btn btn-primary">Começar grátis — 3 leituras</Link>
               <Link href="/login" className="link-quiet text-sm">Já tenho conta · Entrar</Link>
@@ -87,7 +90,7 @@ export default function LandingEspelho() {
               Sem cartão · 3 leituras ou 15 dias · Apoio à anamnese, não substitui avaliação médica.
             </p>
           </div>
-          <div className="order-1 flex justify-center lp-reveal lg:order-2" data-d="1">
+          <div className="order-2 flex justify-center lp-reveal" data-d="1">
             <div className="lp-hero-frame">
               <Image src="/lp/iris-hero.png" alt="Olho humano em macro — o detalhe que o Iris Codex lê" width={1024} height={1792} priority sizes="(max-width:1024px) 82vw, 400px" className="block h-auto w-full rounded-[2px]" />
             </div>
@@ -146,6 +149,21 @@ export default function LandingEspelho() {
         </div>
       </section>
 
+      {/* ════════ A LEITURA JÁ É TERAPIA ════════ */}
+      <section className="bg-white text-black">
+        <div className="mx-auto max-w-[900px] px-6 py-32 text-center md:px-10 md:py-44">
+          <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-dark)' }}>O valor que passa despercebido</p>
+          <h2 className="display lp-reveal mt-6" data-d="1" style={{ fontSize: 'clamp(2rem,4.6vw,3.6rem)', color: '#0d0d0d' }}>
+            Ler o relatório já é <em style={{ color: 'var(--teal-dark)' }}>a primeira sessão.</em>
+          </h2>
+          <p className="body-copy lp-reveal mx-auto mt-7" data-d="2" style={{ color: '#3a3a3a', fontSize: '1.08rem' }}>
+            Quando seu cliente se vê descrito com precisão — os padrões, a história, o que sente e nunca
+            soube dizer — algo se move. O reconhecimento, por si só, já é cuidado. A leitura não prepara a
+            terapia: ela já é terapia.
+          </p>
+        </div>
+      </section>
+
       {/* ════════ PROBLEMA (full-bleed fibras) ════════ */}
       <section className="relative overflow-hidden bg-black">
         <Image src="/lp/fibras-wide.png" alt="" fill sizes="100vw" className="object-cover opacity-65" />
@@ -179,7 +197,7 @@ export default function LandingEspelho() {
             <div className="mt-12 space-y-9">
               {[
                 { n: '01', t: 'Sobre ombros sérios', d: 'Tradição clássica (Jensen, Johnson, Battello, Lindemann), não palpite.' },
-                { n: '02', t: 'Única, sempre', d: 'Sem texto-modelo, sem horóscopo.' },
+                { n: '02', t: 'IA de ponta, com método', d: 'Uma IA própria, treinada na tradição iridológica, gera cada leitura única para aquela pessoa. Sem texto-modelo, sem horóscopo.' },
                 { n: '03', t: 'O enfoque certo', d: 'Padrões emocionais, comportamentais e de estilo de vida — não laudo.' },
               ].map((m, i) => (
                 <div key={m.n}>
@@ -230,6 +248,34 @@ export default function LandingEspelho() {
             </p>
             <hr className="hairline" style={{ width: 32 }} />
           </div>
+        </div>
+      </section>
+
+      {/* ════════ A SESSÃO DE APOIO (perguntas + direção) ════════ */}
+      <section className="bg-ivory text-black">
+        <div className="mx-auto max-w-[1080px] px-6 py-32 md:px-10 md:py-44">
+          <div className="lp-reveal text-center">
+            <p className="eyebrow" style={{ color: 'var(--teal-dark)' }}>Além do relatório</p>
+            <h2 className="display mx-auto mt-6" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)', color: '#0d0d0d', maxWidth: '20ch' }}>
+              Você não recebe só um texto. <em style={{ color: 'var(--teal-dark)' }}>Recebe um caminho.</em>
+            </h2>
+          </div>
+          <div className="mt-16 grid gap-px md:grid-cols-3" style={{ background: '#e8e0d2' }}>
+            {[
+              { n: '01', t: 'As perguntas certas', d: 'Os pontos exatos pra tocar na conversa — onde o seu cliente precisa ser ouvido.' },
+              { n: '02', t: 'Onde focar', d: 'O que merece atenção primeiro, sem rodeios nem achismo.' },
+              { n: '03', t: 'A direção da terapia', d: 'Pra onde conduzir o trabalho, sessão após sessão.' },
+            ].map((c, i) => (
+              <div key={c.t} className="lp-reveal bg-ivory p-10 md:p-12" data-d={String(i + 1)}>
+                <span className="display" style={{ fontSize: '1.8rem', color: 'var(--teal)' }}>{c.n}</span>
+                <h3 className="eyebrow mt-5" style={{ color: '#0d0d0d', letterSpacing: '.16em', fontSize: '.82rem' }}>{c.t}</h3>
+                <p className="body-copy mt-3 text-sm" style={{ color: '#5a5a5a' }}>{c.d}</p>
+              </div>
+            ))}
+          </div>
+          <p className="body-copy lp-reveal mx-auto mt-12 text-center" data-d="2" style={{ color: 'var(--teal-dark)', fontStyle: 'italic', fontFamily: 'var(--font-cormorant),serif', fontSize: '1.3rem' }}>
+            Você conduz com clareza desde o primeiro minuto.
+          </p>
         </div>
       </section>
 
@@ -401,7 +447,8 @@ html:has(.lp-root){ scroll-behavior:smooth; }
 .lp-iris-photo--light { box-shadow:0 25px 70px -35px rgba(0,0,0,.45), inset 0 0 0 1px rgba(30,107,97,.22); }
 
 /* hero — olho inteiro (sem corte) num frame com anel teal sutil */
-.lp-hero-frame { width:min(82vw,400px); border-radius:2px; box-shadow:0 40px 100px -45px rgba(0,0,0,.85), 0 0 0 1px rgba(91,191,176,.18); }
+.lp-hero-frame { width:min(66vw,340px); border-radius:2px; box-shadow:0 40px 100px -45px rgba(0,0,0,.85), 0 0 0 1px rgba(91,191,176,.18); }
+@media (min-width:1024px){ .lp-hero-frame { width:min(34vw,400px); } }
 
 /* íris procedural (5 cores + fallback) */
 .iris { --c-core:#0e4d46; --c-mid:#1E6B61; --c-rim:#072420; --c-glow:#3D9B8C; --fiber:#5BBFB0; position:relative; aspect-ratio:1; border-radius:50%; isolation:isolate;
