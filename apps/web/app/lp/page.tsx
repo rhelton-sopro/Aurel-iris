@@ -61,7 +61,7 @@ export default function LandingEspelho() {
       <section className="relative overflow-hidden bg-black pt-28 pb-12 md:pb-16 md:pt-32">
         <div className="mx-auto w-full max-w-[1280px] px-6 md:px-10">
           <div className="lp-reveal" data-d="1">
-            <div className="lp-hero-strip">
+            <div className="lp-hero-strip" style={{ aspectRatio: '16 / 9' }}>
               <Image src="/lp/hero-captura.png" alt="Terapeuta fotografando a íris do cliente em sessão" fill priority sizes="(max-width:1280px) 92vw, 1216px" className="object-cover object-center" />
             </div>
           </div>
@@ -90,14 +90,19 @@ export default function LandingEspelho() {
         </div>
       </section>
 
-      {/* ════════ A DOR (full-bleed — foto do cliente fechado) ════════ */}
+      {/* ════════ A DOR (desktop full-bleed; mobile banner — mostra os personagens) ════════ */}
       <section className="relative overflow-hidden bg-black">
-        <Image src="/lp/dor.png" alt="Cliente de braços cruzados, fechado, numa sessão de terapia" fill sizes="100vw" className="object-cover object-center" />
-        <div className="vignette" aria-hidden="true" />
-        <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,.55)' }} aria-hidden="true" />
-        <div className="relative z-10 mx-auto max-w-[920px] px-6 py-24 text-center md:px-10 md:py-32">
+        <Image src="/lp/dor.png" alt="Cliente de braços cruzados, fechado, numa sessão de terapia" fill sizes="100vw" className="hidden object-cover object-center md:block" />
+        <div className="vignette hidden md:block" aria-hidden="true" />
+        <div className="absolute inset-0 hidden md:block" style={{ background: 'rgba(0,0,0,.6)' }} aria-hidden="true" />
+        <div className="relative z-10 mx-auto max-w-[920px] px-6 pt-16 pb-16 text-center md:px-10 md:py-32">
+          <div className="lp-reveal mb-10 md:hidden">
+            <div className="lp-hero-strip" style={{ aspectRatio: '16 / 9' }}>
+              <Image src="/lp/dor.png" alt="" fill sizes="92vw" className="object-cover object-center" />
+            </div>
+          </div>
           <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-light)' }}>A verdade do consultório</p>
-          <h2 className="display lp-reveal mt-6" style={{ fontSize: 'clamp(2rem,4.6vw,3.7rem)' }}>
+          <h2 className="display lp-reveal mt-6" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)' }}>
             O mais difícil nunca foi a íris.<br /><em style={{ color: 'var(--teal-light)' }}>É o cliente que senta na sua frente e não se abre.</em>
           </h2>
           <p className="body-copy lp-reveal mx-auto mt-8" data-d="1" style={{ color: 'rgba(242,237,228,.82)', fontSize: '1.08rem' }}>
@@ -120,8 +125,8 @@ export default function LandingEspelho() {
           </div>
           <div className="mx-auto max-w-[900px] text-center">
           <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-dark)' }}>O que muda</p>
-          <h2 className="display lp-reveal mt-6" data-d="1" style={{ fontSize: 'clamp(2rem,4.6vw,3.6rem)', color: '#0d0d0d' }}>
-            E se ele chegasse à sessão <em style={{ color: 'var(--teal-dark)' }}>já se sentindo visto?</em>
+          <h2 className="display lp-reveal mt-6" data-d="1" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)', color: '#0d0d0d' }}>
+            E se ele chegasse à sessão{' '}<em style={{ color: 'var(--teal-dark)' }}>já se sentindo visto?</em>
           </h2>
           <p className="body-copy lp-reveal mx-auto mt-7" data-d="2" style={{ color: '#3a3a3a', fontSize: '1.08rem' }}>
             Com o Iris Codex, a leitura começa antes da sua primeira pergunta. Você abre o relatório com o
@@ -148,7 +153,7 @@ export default function LandingEspelho() {
         <div className="mx-auto grid max-w-[1280px] items-center gap-14 px-6 py-20 md:px-10 md:py-24 lg:grid-cols-2 lg:gap-16">
           <div className="lp-reveal">
             <p className="eyebrow" style={{ color: 'var(--teal-dark)' }}>Veja com seus olhos</p>
-            <h2 className="display mt-6" style={{ fontSize: 'clamp(2.2rem,4.4vw,3.6rem)', color: '#0d0d0d' }}>
+            <h2 className="display mt-6" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)', color: '#0d0d0d' }}>
               Isto é o que ele lê — <em>e se reconhece.</em>
             </h2>
             <p className="body-copy mt-7" style={{ color: '#3a3a3a', fontSize: '1.08rem' }}>
@@ -259,7 +264,7 @@ export default function LandingEspelho() {
         <div className="mx-auto max-w-[1280px] px-6 py-20 md:px-10 md:py-24">
           <div className="lp-reveal text-center">
             <p className="eyebrow" style={{ color: 'var(--teal-dark)' }}>Como funciona</p>
-            <h2 className="display mx-auto mt-6" style={{ fontSize: 'clamp(2.1rem,4.2vw,3.3rem)', color: '#0d0d0d', maxWidth: '18ch' }}>
+            <h2 className="display mx-auto mt-6" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)', color: '#0d0d0d', maxWidth: '18ch' }}>
               Três passos entre a foto e o <em>uau.</em>
             </h2>
           </div>
