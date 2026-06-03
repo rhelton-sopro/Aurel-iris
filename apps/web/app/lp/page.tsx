@@ -48,8 +48,8 @@ const PACOTES = [
 
 const FAQ = [
   { q: 'É diagnóstico médico?', a: 'Não — é apoio à anamnese, com enfoque emocional e comportamental. Não substitui avaliação médica.', open: true },
-  { q: 'É texto genérico?', a: 'Não — cada relatório é único, escrito para aquela pessoa. Sem horóscopo, sem texto-modelo.', open: false },
-  { q: 'Meus dados são seguros?', a: 'Sim — você é o controlador dos dados, em conformidade com a LGPD. As imagens não treinam nenhuma IA.', open: false },
+  { q: 'É texto genérico?', a: 'Não — cada relatório é único, escrito para aquela pessoa. Sem texto-modelo.', open: false },
+  { q: 'Meus dados são seguros?', a: 'Sim. A foto da íris é apagada assim que o relatório é gerado e conferido — e, em qualquer caso, em no máximo 24 horas. Você é o controlador dos dados, em conformidade com a LGPD, e as imagens nunca treinam nenhuma IA.', open: false },
   { q: 'Preciso saber iridologia?', a: 'Não precisa. Uma IA própria, treinada na tradição iridológica, faz a leitura por você. Você revisa, conduz e dá a palavra final — a interpretação e a relação com o cliente são suas.', open: false },
   { q: 'E se eu não souber conduzir a devolutiva?', a: 'A gente te orienta. Além da leitura pronta — que já vem com as perguntas certas — você recebe um guia de como conduzir a devolutiva, presencial ou online. Você nunca está sozinho diante do relatório.', open: false },
 ] as const
@@ -72,19 +72,20 @@ export default function LandingEspelho() {
                 <em style={{ color: 'var(--teal-light)' }}>e conduz a sessão mais profunda da vida dele.</em>
               </h1>
               <p className="body-copy lg lp-reveal mt-6" data-d="2" style={{ color: 'rgba(242,237,228,.82)' }}>
-                Em minutos... O Iris Codex faz a leitura pela íris — a história que seu cliente carrega e
-                raramente põe em palavras. Ele se reconhece, se emociona, e enfim se sente entendido. Ler a análise
-                com ele já é a primeira sessão: você recebe as perguntas certas e o direcionamento da terapia.
+                Em minutos... O Iris Codex faz a leitura pela íris e libera um relatório completo — a história que
+                seu cliente carrega e raramente põe em palavras. Ele se reconhece, se emociona, e enfim se sente
+                entendido. Ler a análise com ele já é a primeira sessão: você recebe as perguntas certas e dá o
+                melhor direcionamento da terapia.
               </p>
               <p className="eyebrow lp-reveal mt-5" data-d="2" style={{ color: 'var(--teal-light)', letterSpacing: '.22em' }}>
-                Leitura assistida por IA · ancorada na tradição iridológica
+                Leitura assistida por IA · Fundamentada na tradição iridológica
               </p>
               <div className="lp-reveal mt-8 flex flex-wrap items-center gap-x-7 gap-y-4" data-d="3">
                 <Link href="/signup" className="btn btn-primary">Começar grátis — 3 leituras</Link>
                 <Link href="/login" className="link-quiet text-sm">Já tenho conta · Entrar</Link>
               </div>
               <p className="lp-reveal mt-7 text-xs leading-relaxed" data-d="3" style={{ color: 'rgba(242,237,228,.74)', letterSpacing: '.04em', maxWidth: '46ch' }}>
-                Sem cartão · 3 leituras ou 15 dias · Apoio à anamnese, não substitui avaliação médica.
+                3 leituras ou 15 dias · Apoio à anamnese, não substitui avaliação médica.
               </p>
             </div>
             <div className="order-1 lp-reveal lg:order-2" data-d="1">
@@ -100,8 +101,8 @@ export default function LandingEspelho() {
       <section className="relative overflow-hidden bg-black">
         <Image src="/lp/dor.png" alt="Cliente de braços cruzados, fechado, numa sessão de terapia" fill sizes="100vw" className="hidden object-cover object-center md:block" />
         <div className="vignette hidden md:block" aria-hidden="true" />
-        <div className="absolute inset-0 hidden md:block" style={{ background: 'rgba(0,0,0,.6)' }} aria-hidden="true" />
-        <div className="relative z-10 mx-auto max-w-[920px] px-6 pt-16 pb-16 text-center md:px-10 md:py-32">
+        <div className="absolute inset-0 hidden md:block" style={{ background: 'linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.78))' }} aria-hidden="true" />
+        <div className="relative z-10 mx-auto max-w-[920px] px-6 pt-16 pb-16 text-center md:px-10 md:py-32" style={{ textShadow: '0 1px 24px rgba(0,0,0,.65)' }}>
           <div className="lp-reveal mb-10 md:hidden">
             <div className="lp-hero-strip" style={{ aspectRatio: '16 / 9' }}>
               <Image src="/lp/dor.png" alt="" fill sizes="92vw" className="object-cover object-center" />
@@ -109,14 +110,16 @@ export default function LandingEspelho() {
           </div>
           <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-light)' }}>A verdade do consultório</p>
           <h2 className="display lp-reveal mt-6" style={{ fontSize: 'clamp(2.35rem,4.8vw,4rem)' }}>
-            O mais difícil nunca foi a íris.<br /><em style={{ color: 'var(--teal-light)' }}>É o cliente que senta na sua frente e não se abre.</em>
+            O mais difícil nunca foi a sua técnica.<br /><em style={{ color: 'var(--teal-light)' }}>É o cliente que senta na sua frente e não se abre.</em>
           </h2>
           <p className="body-copy lp-reveal mx-auto mt-8" data-d="1" style={{ color: 'rgba(242,237,228,.82)', fontSize: '1.18rem' }}>
             Você conhece a cena. Ele responde por cima, mede cada frase, guarda o que importa pra depois —
-            se é que vem. Levam semanas até ele confiar o suficiente pra dizer o que dói de verdade. E tem o
-            outro, o que some: saiu de uma sessão correta, técnica, bem conduzida — e mesmo assim não se
-            sentiu lido. Não marca a próxima. Você nunca soube o que faltou.{' '}
-            <em style={{ color: 'var(--teal-light)' }}>Faltou ele se sentir visto antes de você ganhar a confiança pra ver.</em>
+            se é que vem. Levam semanas até ele confiar o suficiente pra dizer o que dói de verdade.
+          </p>
+          <p className="body-copy lp-reveal mx-auto mt-5" data-d="2" style={{ color: 'rgba(242,237,228,.82)', fontSize: '1.18rem' }}>
+            E tem aquele cliente que desaparece: saiu de uma sessão correta, técnica, bem conduzida — e mesmo
+            assim não se sentiu lido. Não marca a próxima. Você nunca soube o que faltou.{' '}
+            <strong style={{ color: 'var(--teal-light)', fontWeight: 600, fontStyle: 'italic' }}>Faltou ele se sentir visto antes de você ganhar a confiança pra ver.</strong>
           </p>
         </div>
       </section>
@@ -131,7 +134,7 @@ export default function LandingEspelho() {
           </div>
           <div className="mx-auto max-w-[900px] text-center">
           <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-dark)' }}>O que muda</p>
-          <h2 className="display lp-reveal mt-6" data-d="1" style={{ fontSize: 'clamp(2.35rem,4.8vw,4rem)', color: '#0d0d0d' }}>
+          <h2 className="display lp-reveal mt-6" data-d="1" style={{ fontSize: 'clamp(2.6rem,5.4vw,4.6rem)', color: '#0d0d0d' }}>
             E se ele chegasse à sessão{' '}<em style={{ color: 'var(--teal-dark)' }}>já se sentindo visto?</em>
           </h2>
           <p className="body-copy lp-reveal mx-auto mt-7" data-d="2" style={{ color: '#3a3a3a', fontSize: '1.18rem' }}>
@@ -142,8 +145,7 @@ export default function LandingEspelho() {
             <strong style={{ color: '#0d0d0d', fontWeight: 600 }}>Essa devolutiva já é a primeira sessão.</strong>
           </p>
           <p className="body-copy lp-reveal mx-auto mt-6" data-d="2" style={{ color: '#3a3a3a', fontSize: '1.18rem' }}>
-            A largada que levava três sessões acontece no primeiro minuto. O muro de “será que posso confiar
-            nessa pessoa” cai antes de subir.
+            A confiança que levava três semanas pra nascer acontece no primeiro minuto.
           </p>
           <p className="body-copy lp-reveal mx-auto mt-8" data-d="3" style={{ color: '#4a4a4a', fontSize: '1.12rem', maxWidth: '60ch' }}>
             Uma honestidade: isto não substitui o que só você faz. O Iris Codex não cria o vínculo — ele faz
@@ -163,10 +165,23 @@ export default function LandingEspelho() {
           </h2>
           <p className="body-copy lp-reveal mx-auto mt-6" data-d="2" style={{ color: '#3a3a3a', fontSize: '1.05rem' }}>
             Existe um truque velho: escrever vago o bastante pra todo mundo se ver — e chamar de leitura.
-            Horóscopo faz isso. Iridologia genérica faz isso. O Iris Codex foi construído contra isso: cada
-            leitura nasce daquela íris, e duas pessoas nunca recebem o mesmo texto. Troque a pessoa, e não
-            muda um adjetivo — muda tudo.
+            Horóscopo faz isso. Iridologia genérica faz isso. O Iris Codex foi construído contra isso: a leitura
+            não parte de um texto pronto, parte dos sinais que a IA encontra naquela íris — densidade, trama de
+            fibras, pigmentos, pupila. Troque a pessoa, e não muda um adjetivo: muda tudo.
           </p>
+          <div className="lp-reveal mx-auto mt-10 grid max-w-[680px] gap-5 text-left sm:grid-cols-3" data-d="3">
+            {[
+              { n: '01', t: 'Lê os sinais', d: 'Densidade, trama de fibras, pigmentos e pupila — na imagem daquela íris.' },
+              { n: '02', t: 'Organiza em achados', d: 'O que de fato aparece ali, estruturado — não um texto pronto.' },
+              { n: '03', t: 'Escreve única', d: 'A leitura nasce dos achados daquela pessoa. De mais ninguém.' },
+            ].map((s) => (
+              <div key={s.n} style={{ borderTop: '1px solid var(--teal)', paddingTop: '.9rem' }}>
+                <span className="display" style={{ fontSize: '1.1rem', color: 'var(--teal-dark)' }}>{s.n}</span>
+                <h3 className="eyebrow mt-2" style={{ color: '#0d0d0d', letterSpacing: '.12em', fontSize: '.72rem' }}>{s.t}</h3>
+                <p className="body-copy mt-1.5" style={{ color: '#5a5a5a', fontSize: '.85rem' }}>{s.d}</p>
+              </div>
+            ))}
+          </div>
           <p className="body-copy lp-reveal mx-auto mt-6" data-d="3" style={{ color: '#3a3a3a', fontSize: '1.05rem' }}>
             <strong style={{ color: '#0d0d0d', fontWeight: 600 }}>Não acredite na nossa palavra.</strong> Use uma das 3 leituras grátis na íris de um cliente que você conhece de cor — e julgue você mesmo se bate.
           </p>
@@ -179,7 +194,7 @@ export default function LandingEspelho() {
         <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,.52)' }} aria-hidden="true" />
         <div className="relative z-10 mx-auto max-w-[1080px] px-6 py-24 md:px-10 md:py-28">
           <div className="lp-reveal text-center">
-            <p className="eyebrow" style={{ color: 'var(--teal-light)' }}>O que uma leitura abre</p>
+            <p className="eyebrow" style={{ color: 'var(--teal-light)' }}>O que vem no relatório</p>
             <h2 className="display mx-auto mt-6" style={{ fontSize: 'clamp(2.35rem,4.8vw,4rem)', maxWidth: '26ch' }}>
               Não é um retrato. <em style={{ color: 'var(--teal-light)' }}>É a pessoa inteira — em camadas que ela mesma não sabia nomear.</em>
             </h2>
@@ -192,7 +207,10 @@ export default function LandingEspelho() {
               { t: 'As forças que ele subestima', d: 'O que nele já é potência — esperando ser usado de propósito, não por acaso.' },
               { t: 'O que pede cuidado agora', d: 'Onde a vida vem cobrando — em linguagem de emoção e comportamento, nunca de exame.' },
               { t: 'O que ele protege', d: 'A ferida que aprendeu a esconder cedo — e a defesa que montou em volta dela.' },
-              { t: 'O caminho pra sessão', d: 'As perguntas certas e a direção, já na sua mão quando ele sentar.' },
+              { t: 'O ritmo do dia a dia', d: 'Como sono, descanso e o jeito de se cuidar conversam com o que ele sente — estilo de vida, não receita.' },
+              { t: 'As perguntas certas', d: 'O que perguntar — e a hora de perguntar — pra conversa começar funda, sem soar interrogatório.' },
+              { t: 'O caminho pra devolutiva', d: 'Por onde abrir, onde tocar primeiro, o que merece esperar: a direção já na sua mão quando ele sentar.' },
+              { t: 'A síntese em uma frase', d: 'A pessoa inteira condensada num parágrafo que ele vai querer reler — o ponto onde costuma se emocionar.' },
             ].map((item, i) => (
               <div key={item.t} className="lp-reveal" data-d={String((i % 2) + 1)} style={{ borderLeft: '2px solid var(--teal)', paddingLeft: '1.4rem' }}>
                 <h3 className="display" style={{ fontSize: '1.25rem', color: 'var(--ivory)' }}>{item.t}</h3>
@@ -311,7 +329,7 @@ export default function LandingEspelho() {
           </h2>
           <div className="mt-12 grid gap-px md:grid-cols-3" style={{ background: '#e8e0d2' }}>
             {[
-              { n: '01', t: 'Sobre ombros sérios', d: 'A tradição clássica como base: Jensen, Johnson, Battello, Lindemann. Não palpite.' },
+              { n: '01', t: 'Herança de um século', d: 'Mais de cem anos de observação iridológica acumulada como base — a tradição lida com rigor, não palpite.' },
               { n: '02', t: 'IA própria, com método', d: 'Treinada na tradição iridológica, ela escreve cada leitura única — sem texto-modelo, sem horóscopo.' },
               { n: '03', t: 'O enfoque certo', d: 'Padrões emocionais e comportamentais. Não diagnóstico, não laudo.' },
             ].map((m, i) => (
@@ -323,7 +341,7 @@ export default function LandingEspelho() {
             ))}
           </div>
           <p className="display lp-reveal mt-12" data-d="3" style={{ fontStyle: 'italic', fontSize: '1.5rem', color: 'var(--teal-dark)' }}>
-            Espiritualidade encarnada, com ciência e método.
+            O mapa do Ser, com ciência e método.
           </p>
         </div>
       </section>
@@ -384,6 +402,67 @@ export default function LandingEspelho() {
               Você no controle — a interpretação e a conduta são sempre suas.
             </p>
             <hr className="hairline" style={{ width: 32 }} />
+          </div>
+        </div>
+      </section>
+
+      {/* ════════ TIRADA COM O CELULAR (simplicidade — prova o passo "capture") ════════ */}
+      <section className="bg-ivory text-black">
+        <div className="mx-auto max-w-[1080px] px-6 py-20 text-center md:px-10 md:py-24">
+          <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-dark)' }}>Sem equipamento, sem câmera especial</p>
+          <h2 className="display lp-reveal mx-auto mt-6" data-d="1" style={{ fontSize: 'clamp(2.35rem,4.8vw,4rem)', color: '#0d0d0d', maxWidth: '20ch' }}>
+            Você fotografa com o celular que já tem. <em style={{ color: 'var(--teal-dark)' }}>E pronto.</em>
+          </h2>
+          <p className="body-copy lp-reveal mx-auto mt-6" data-d="2" style={{ color: '#3a3a3a', fontSize: '1.18rem', maxWidth: '58ch' }}>
+            Nada de iridoscópio, nada de estúdio. iPhone ou Android, a câmera do dia a dia — o app guia o
+            enquadramento e avisa quando a foto está boa. Você aponta, confirma, e o relatório começa.
+          </p>
+
+          <div className="lp-reveal mt-14 grid gap-6 sm:grid-cols-2" data-d="2">
+            {[
+              { src: '/lp/captura-iphone.png', dispositivo: 'iPhone', legenda: 'Tirada com um iPhone, na sessão.' },
+              { src: '/lp/captura-android.png', dispositivo: 'Android', legenda: 'Tirada com um Android comum.' },
+            ].map((foto) => (
+              <figure key={foto.dispositivo}>
+                <div className="relative w-full" style={{ aspectRatio: '4 / 5', borderRadius: '2px', overflow: 'hidden', boxShadow: '0 30px 70px -38px rgba(0,0,0,.4)', border: '1px solid #e6ddcf', background: 'linear-gradient(135deg, #eef1ed, #dde8e5)' }}>
+                  <Image src={foto.src} alt={`Foto da íris tirada com ${foto.dispositivo}`} fill sizes="(max-width:640px) 92vw, 500px" className="object-cover object-center" />
+                  <span className="absolute left-4 top-4" style={{ fontSize: '.6rem', letterSpacing: '.18em', textTransform: 'uppercase', fontFamily: 'var(--font-raleway),sans-serif', color: 'var(--ivory)', background: 'rgba(0,0,0,.55)', borderRadius: '2px', padding: '.35rem .6rem', backdropFilter: 'blur(4px)' }}>{foto.dispositivo}</span>
+                </div>
+                <figcaption className="mt-3 text-xs" style={{ color: 'var(--mist)', fontStyle: 'italic' }}>{foto.legenda}</figcaption>
+              </figure>
+            ))}
+          </div>
+
+          <p className="display lp-reveal mt-12" data-d="3" style={{ fontStyle: 'italic', fontSize: '1.5rem', color: 'var(--teal-dark)' }}>
+            A íris no seu bolso. <span style={{ fontStyle: 'normal', fontFamily: 'var(--font-raleway),sans-serif', fontSize: '1rem', letterSpacing: '.1em' }}>Voilà.</span>
+          </p>
+        </div>
+      </section>
+
+      {/* ════════ SEGURANÇA DE DADOS (objeção final antes da oferta) ════════ */}
+      <section className="bg-black text-ivory">
+        <div className="mx-auto max-w-[920px] px-6 py-20 text-center md:px-10 md:py-24">
+          <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-light)' }}>A imagem do seu cliente</p>
+          <h2 className="display lp-reveal mx-auto mt-6" data-d="1" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.4rem)', maxWidth: '24ch' }}>
+            A leitura fica. <em style={{ color: 'var(--teal-light)' }}>A foto, não.</em>
+          </h2>
+          <p className="body-copy lp-reveal mx-auto mt-7" data-d="2" style={{ color: 'rgba(242,237,228,.82)', fontSize: '1.15rem', maxWidth: '60ch' }}>
+            A íris é o dado mais íntimo que existe. Por isso ela tem hora pra ir embora: assim que o relatório
+            é gerado e conferido, a imagem é apagada de vez — e, em qualquer caso, no máximo em 24 horas. O que
+            permanece é a leitura. A foto cumpre o papel dela e desaparece.
+          </p>
+          <div className="lp-reveal mx-auto mt-12 grid max-w-[760px] gap-px sm:grid-cols-3" data-d="3" style={{ background: 'rgba(242,237,228,.1)' }}>
+            {[
+              { Icon: Clock, t: 'Apagada na geração', d: 'Ou em até 24 horas — o que vier primeiro.' },
+              { Icon: Lock, t: 'Você é o controlador', d: 'Em conformidade com a LGPD, do início ao fim.' },
+              { Icon: Check, t: 'Nunca treina IA', d: 'A imagem do seu cliente não vira dado de ninguém.' },
+            ].map((s) => (
+              <div key={s.t} className="bg-black p-7 text-left">
+                <s.Icon size={22} strokeWidth={1.5} color="var(--teal-light)" aria-hidden="true" />
+                <h3 className="eyebrow mt-4" style={{ color: 'var(--ivory)', letterSpacing: '.14em', fontSize: '.74rem' }}>{s.t}</h3>
+                <p className="body-copy mt-2 text-sm" style={{ color: 'rgba(242,237,228,.66)' }}>{s.d}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
