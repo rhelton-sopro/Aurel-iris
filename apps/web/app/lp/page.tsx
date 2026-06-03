@@ -106,7 +106,7 @@ export default function LandingEspelho() {
           <h2 className="display lp-reveal mt-6" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)' }}>
             O mais difícil nunca foi a íris.<br /><em style={{ color: 'var(--teal-light)' }}>É o cliente que senta na sua frente e não se abre.</em>
           </h2>
-          <p className="body-copy lp-reveal mx-auto mt-8" data-d="1" style={{ color: 'rgba(242,237,228,.82)', fontSize: '1.08rem' }}>
+          <p className="body-copy lp-reveal mx-auto mt-8" data-d="1" style={{ color: 'rgba(242,237,228,.82)', fontSize: '1.18rem' }}>
             Você conhece a cena. Ele responde por cima, mede cada frase, guarda o que importa pra depois —
             se é que vem. Levam semanas até ele confiar o suficiente pra dizer o que dói de verdade. E tem o
             outro, o que some: saiu de uma sessão correta, técnica, bem conduzida — e mesmo assim não se
@@ -129,18 +129,18 @@ export default function LandingEspelho() {
           <h2 className="display lp-reveal mt-6" data-d="1" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)', color: '#0d0d0d' }}>
             E se ele chegasse à sessão{' '}<em style={{ color: 'var(--teal-dark)' }}>já se sentindo visto?</em>
           </h2>
-          <p className="body-copy lp-reveal mx-auto mt-7" data-d="2" style={{ color: '#3a3a3a', fontSize: '1.08rem' }}>
+          <p className="body-copy lp-reveal mx-auto mt-7" data-d="2" style={{ color: '#3a3a3a', fontSize: '1.18rem' }}>
             Com o Iris Codex, a leitura começa antes da sua primeira pergunta. Você faz a devolutiva —
             lado a lado ou pela tela — e lê o relatório com o cliente. E ali, frase após frase, ele se
             reconhece. Tem gente que se cala. Tem gente que chora. Não porque o texto adivinhou um destino,
             mas porque alguém finalmente pôs em palavras o que ele sentia e nunca soube nomear.{' '}
             <strong style={{ color: '#0d0d0d', fontWeight: 600 }}>Essa devolutiva já é a primeira sessão.</strong>
           </p>
-          <p className="body-copy lp-reveal mx-auto mt-6" data-d="2" style={{ color: '#3a3a3a', fontSize: '1.08rem' }}>
+          <p className="body-copy lp-reveal mx-auto mt-6" data-d="2" style={{ color: '#3a3a3a', fontSize: '1.18rem' }}>
             A largada que levava três sessões acontece no primeiro minuto. O muro de “será que posso confiar
             nessa pessoa” cai antes de subir.
           </p>
-          <p className="body-copy lp-reveal mx-auto mt-8" data-d="3" style={{ color: 'var(--mist)', fontSize: '1rem', maxWidth: '60ch' }}>
+          <p className="body-copy lp-reveal mx-auto mt-8" data-d="3" style={{ color: '#4a4a4a', fontSize: '1.12rem', maxWidth: '60ch' }}>
             Uma honestidade: isto não substitui o que só você faz. O Iris Codex não cria o vínculo — ele faz
             o cliente chegar mais aberto. A relação continua sendo sua, construída sessão a sessão. O que
             muda é por onde você começa: não da página em branco, mas já lá no fundo.
@@ -157,7 +157,7 @@ export default function LandingEspelho() {
             <h2 className="display mt-6" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)', color: '#0d0d0d' }}>
               Isto é o que ele lê — <em>e se reconhece.</em>
             </h2>
-            <p className="body-copy mt-7" style={{ color: '#3a3a3a', fontSize: '1.08rem' }}>
+            <p className="body-copy mt-7" style={{ color: '#3a3a3a', fontSize: '1.18rem' }}>
               Repare: não serve pra todo mundo. É essa pessoa, e ninguém mais. É por isso que, quando o
               cliente lê, ele para — e pensa: <em style={{ color: 'var(--teal-dark)' }}>é exatamente isso.</em>
             </p>
@@ -245,7 +245,7 @@ export default function LandingEspelho() {
             <h2 className="display mx-auto mt-6" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)', color: '#0d0d0d', maxWidth: '22ch' }}>
               Uma frase te parou. <em style={{ color: 'var(--teal-dark)' }}>Agora imagine a leitura inteira.</em>
             </h2>
-            <p className="body-copy mx-auto mt-6" style={{ color: '#3a3a3a', fontSize: '1.08rem', maxWidth: '60ch' }}>
+            <p className="body-copy mx-auto mt-6" style={{ color: '#3a3a3a', fontSize: '1.18rem', maxWidth: '60ch' }}>
               Não é uma página. São mais de uma dúzia de frentes que se conversam — do temperamento ao que
               pede cuidado, da história que formou o cliente ao roteiro pra conduzir a devolutiva.
             </p>
@@ -311,7 +311,7 @@ export default function LandingEspelho() {
               </div>
             ))}
           </div>
-          <p className="body-copy lp-reveal mx-auto mt-14 text-center" data-d="2" style={{ color: '#3a3a3a', fontSize: '1.08rem', maxWidth: '62ch' }}>
+          <p className="body-copy lp-reveal mx-auto mt-14 text-center" data-d="2" style={{ color: '#3a3a3a', fontSize: '1.18rem', maxWidth: '62ch' }}>
             Os catálogos de iridologia te entregam o mapa e te deixam ali, sozinho com ele. O Iris Codex te
             entrega o mapa e a primeira pergunta — onde tocar, o que merece atenção antes do resto, pra onde
             conduzir. Não é interrogatório de anamnese. É a conversa começando funda, porque você já sabe
@@ -377,7 +377,7 @@ export default function LandingEspelho() {
             <h2 className="display mt-6" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)', color: '#0d0d0d' }}>
               A íris embasa de verdade. <em style={{ color: 'var(--teal-dark)' }}>A IA não inventa — parte do que está ali.</em>
             </h2>
-            <p className="body-copy mt-7" style={{ color: '#3a3a3a', fontSize: '1.08rem' }}>
+            <p className="body-copy mt-7" style={{ color: '#3a3a3a', fontSize: '1.18rem' }}>
               Primeiro a IA lê a imagem da íris e identifica os sinais — densidade, trama de fibras,
               pigmentos, pupila — e os organiza em achados. Só então escreve a leitura, partindo dos sinais
               que aparecem naquela íris específica, não de um texto pronto aplicado a todo mundo.{' '}
@@ -418,7 +418,7 @@ export default function LandingEspelho() {
           <h2 className="display lp-reveal mx-auto mt-4" data-d="1" style={{ fontSize: 'clamp(2.2rem,4.8vw,3.8rem)', color: '#0d0d0d', maxWidth: '20ch' }}>
             Agora sinta o <em style={{ color: 'var(--teal-dark)' }}>uau</em> na sua própria íris. De graça.
           </h2>
-          <p className="body-copy lp-reveal mx-auto mt-7" data-d="2" style={{ color: '#4a4a4a', fontSize: '1.08rem' }}>
+          <p className="body-copy lp-reveal mx-auto mt-7" data-d="2" style={{ color: '#4a4a4a', fontSize: '1.18rem' }}>
             Crie sua conta e faça 3 leituras grátis (ou 15 dias) — sem cartão.
           </p>
           <div className="lp-reveal mt-10" data-d="2">
