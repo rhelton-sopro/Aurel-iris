@@ -39,8 +39,8 @@ export const metadata: Metadata = {
 const PACOTES = [
   { nome: 'Avulsa', preco: 'R$ 99,70', leituras: '1 leitura', selo: null },
   { nome: 'Pequeno', preco: 'R$ 298,50', leituras: '5 leituras', selo: null },
-  { nome: 'Médio', preco: 'R$ 745,50', leituras: '15 leituras', selo: 'Mais escolhido' },
-  { nome: 'Grande', preco: 'R$ 1.191,00', leituras: '30 leituras', selo: 'Melhor valor' },
+  { nome: 'Médio', preco: 'R$ 745,50', leituras: '15 leituras', selo: 'Equilíbrio' },
+  { nome: 'Grande', preco: 'R$ 1.191,00', leituras: '30 leituras', selo: 'Melhor por leitura' },
 ] as const
 
 const FAQ = [
@@ -358,6 +358,39 @@ export default function LandingEspelho() {
         </div>
       </section>
 
+      {/* ════════ O LASTRO (íris-vs-IA — de onde vem a leitura) ════════ */}
+      <section className="bg-white text-black">
+        <div className="mx-auto grid max-w-[1280px] items-center gap-14 px-6 py-20 md:px-10 md:py-24 lg:grid-cols-2 lg:gap-16">
+          <div className="order-2 lp-reveal lg:order-1">
+            <div className="lp-iris-photo lp-iris-photo--light mx-auto" style={{ width: 'min(70vw,340px)' }}>
+              <Image src="/lp/iris-marfim.png" alt="Íris humana em detalhe — os sinais que a IA lê" fill sizes="(max-width:1024px) 70vw, 340px" className="object-cover" />
+            </div>
+            <div className="mt-8 flex flex-wrap justify-center gap-x-3 gap-y-2">
+              {['densidade', 'trama de fibras', 'pigmentos', 'pupila'].map((s) => (
+                <span key={s} style={{ fontSize: '.6rem', letterSpacing: '.18em', textTransform: 'uppercase', color: 'var(--teal-dark)', fontFamily: 'var(--font-raleway),sans-serif', border: '1px solid #ddd2c0', borderRadius: '2px', padding: '.4rem .7rem' }}>{s}</span>
+              ))}
+            </div>
+            <p className="mt-4 text-center text-xs" style={{ color: 'var(--mist)', fontStyle: 'italic' }}>os sinais que a IA lê na imagem — e organiza em achados</p>
+          </div>
+          <div className="order-1 lp-reveal lg:order-2">
+            <p className="eyebrow" style={{ color: 'var(--teal-dark)' }}>De onde vem a leitura</p>
+            <h2 className="display mt-6" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)', color: '#0d0d0d' }}>
+              A íris embasa de verdade. <em style={{ color: 'var(--teal-dark)' }}>A IA não inventa — parte do que está ali.</em>
+            </h2>
+            <p className="body-copy mt-7" style={{ color: '#3a3a3a', fontSize: '1.08rem' }}>
+              Primeiro a IA lê a imagem da íris e identifica os sinais — densidade, trama de fibras,
+              pigmentos, pupila — e os organiza em achados. Só então escreve a leitura, partindo dos sinais
+              que aparecem naquela íris específica, não de um texto pronto aplicado a todo mundo.{' '}
+              <strong style={{ color: '#0d0d0d', fontWeight: 600 }}>O achado é o lastro; a leitura terapêutica é o produto.</strong>
+            </p>
+            <p className="body-copy mt-5" style={{ color: 'var(--mist)', fontSize: '1rem' }}>
+              E somos claros: cada achado é uma hipótese pra investigar com o cliente, não um diagnóstico
+              fechado — uma tradição lida com método, não promessa de ciência exata.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ════════ COMO FUNCIONA (faixa enxuta — 3 micro-passos) ════════ */}
       <section className="bg-white text-black">
         <div className="mx-auto max-w-[900px] px-6 py-16 text-center md:px-10 md:py-20">
@@ -403,7 +436,7 @@ export default function LandingEspelho() {
             </p>
             <div className="grid gap-px sm:grid-cols-2" style={{ background: '#ddd2c0', border: '1px solid #ddd2c0' }}>
               {PACOTES.map((p) => (
-                <div key={p.nome} className="bg-ivory p-7 text-left" style={p.selo ? { boxShadow: `inset 3px 0 0 ${p.selo === 'Mais escolhido' ? 'var(--teal)' : 'var(--teal-dark)'}`, position: 'relative' } : undefined}>
+                <div key={p.nome} className="bg-ivory p-7 text-left" style={p.selo ? { boxShadow: `inset 3px 0 0 ${p.selo === 'Equilíbrio' ? 'var(--teal)' : 'var(--teal-dark)'}`, position: 'relative' } : undefined}>
                   {p.selo && <span className="eyebrow" style={{ position: 'absolute', top: '1.1rem', right: '1.1rem', color: 'var(--teal-dark)', fontSize: '.58rem' }}>{p.selo}</span>}
                   <p className="eyebrow" style={{ color: '#0d0d0d', fontSize: '.7rem', letterSpacing: '.14em' }}>{p.nome}</p>
                   <p className="display mt-3" style={{ fontSize: '1.9rem', color: '#0d0d0d' }}>{p.preco}</p>
