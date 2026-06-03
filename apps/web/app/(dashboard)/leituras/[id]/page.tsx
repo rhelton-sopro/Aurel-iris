@@ -28,7 +28,6 @@ import { notFound } from 'next/navigation'
 
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
-import { isFounderEmail } from '@/lib/auth/founder'
 import { convertReservationToConsume } from '@/lib/billing/credits'
 import { LocalDateTime } from '@/components/ui/local-date-time'
 import { StatusBadge } from '@/components/readings/StatusBadge'
@@ -48,11 +47,9 @@ export default async function LeituraDetailPage({
   const { id: readingId } = await params
 
   const supabase = await createClient()
-  // Regen é exclusivo do founder (2026-06-03) — terapeuta não regenera mais.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  const isFounder = isFounderEmail(user?.email)
+  // Regen REMOVIDO da UI de leitura (2026-06-03): nem terapeuta nem founder
+  // regeneram pela tela (cada regen = +1 geração Sonnet 2x = custo). Resgate de
+  // relatório incompleto segue só via /admin/regenerar (founder-only, fora do fluxo).
   const { data: reading, error } = await supabase
     .from('readings')
     .select(
@@ -249,7 +246,6 @@ export default async function LeituraDetailPage({
               clientName={clientName}
               clientPhone={clientPhone}
               isAnalysisInProgress={isAnalysisInProgress}
-              isFounder={isFounder}
             />
           }
         />
@@ -309,7 +305,6 @@ export default async function LeituraDetailPage({
           regenerationCount={regenerationCount}
           isDelivered={isDelivered}
           isAnalysisInProgress={isAnalysisInProgress}
-          isFounder={isFounder}
         />
       </AnalysisHero>
     </div>
