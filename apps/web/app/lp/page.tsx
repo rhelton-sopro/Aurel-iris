@@ -89,7 +89,7 @@ export default function LandingEspelho() {
             </div>
             <div className="order-1 lp-reveal lg:order-2" data-d="1">
               <div className="lp-hero-photo">
-                <Image src="/lp/hero-captura.png" alt="Terapeuta fotografando a íris do cliente em sessão" fill priority sizes="(max-width:1024px) 92vw, 600px" className="object-cover object-center" />
+                <Image src="/lp/cliente-emocionado.png" alt="Cliente emocionado se reconhecendo na leitura, ao lado da terapeuta" fill priority sizes="(max-width:1024px) 92vw, 600px" className="object-cover object-center" />
               </div>
             </div>
           </div>
