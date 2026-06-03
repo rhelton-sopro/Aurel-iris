@@ -129,7 +129,7 @@ export default function LandingEspelho() {
         <div className="mx-auto max-w-[1100px] px-6 py-20 md:px-10 md:py-24">
           <div className="lp-reveal mx-auto mb-10 max-w-[940px]">
             <div className="lp-hero-strip" style={{ aspectRatio: '16 / 9' }}>
-              <Image src="/lp/cliente-emocionado.png" alt="Cliente emocionado se reconhecendo na leitura, ao lado da terapeuta" fill sizes="(max-width:1100px) 92vw, 940px" className="object-cover object-center" />
+              <Image src="/lp/cliente-se-sente-visto.png" alt="Cliente se sentindo visto e acolhido durante a devolutiva, ao lado da terapeuta" fill sizes="(max-width:1100px) 92vw, 940px" className="object-cover object-center" />
             </div>
           </div>
           <div className="mx-auto max-w-[900px] text-center">
