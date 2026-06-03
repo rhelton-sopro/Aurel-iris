@@ -62,10 +62,10 @@ export default function LandingEspelho() {
       <TopBar />
 
       {/* ════════ HERO — texto no topo + faixa horizontal do olho (mobile-safe) ════════ */}
-      <section className="relative overflow-hidden bg-black pt-28 pb-12 md:pb-16 md:pt-32">
+      <section className="relative overflow-hidden bg-black pt-28 pb-12 md:pb-16 md:pt-28">
         <div className="mx-auto w-full max-w-[1280px] px-6 md:px-10">
           <div className="lp-reveal" data-d="1">
-            <div className="lp-hero-strip" style={{ aspectRatio: '16 / 9' }}>
+            <div className="lp-hero-banner">
               <Image src="/lp/hero-captura.png" alt="Terapeuta fotografando a íris do cliente em sessão" fill priority sizes="(max-width:1280px) 92vw, 1216px" className="object-cover object-center" />
             </div>
           </div>
@@ -568,6 +568,9 @@ html:has(.lp-root){ scroll-behavior:smooth; }
 /* hero — olho inteiro (sem corte) num frame com anel teal sutil */
 .lp-hero-strip { position:relative; width:100%; aspect-ratio:16/9; border-radius:2px; overflow:hidden; box-shadow:0 40px 100px -45px rgba(0,0,0,.85), 0 0 0 1px rgba(91,191,176,.18); }
 @media (min-width:768px){ .lp-hero-strip { aspect-ratio:21/9; } }
+/* hero — foto de gente: faixa de altura limitada no desktop pra o texto caber acima da dobra */
+.lp-hero-banner { position:relative; width:100%; aspect-ratio:16/9; border-radius:2px; overflow:hidden; box-shadow:0 40px 100px -45px rgba(0,0,0,.85), 0 0 0 1px rgba(91,191,176,.18); }
+@media (min-width:768px){ .lp-hero-banner { aspect-ratio:auto; height:42vh; max-height:430px; } }
 
 /* íris procedural (5 cores + fallback) */
 .iris { --c-core:#0e4d46; --c-mid:#1E6B61; --c-rim:#072420; --c-glow:#3D9B8C; --fiber:#5BBFB0; position:relative; aspect-ratio:1; border-radius:50%; isolation:isolate;
