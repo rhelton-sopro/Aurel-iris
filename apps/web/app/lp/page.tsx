@@ -40,8 +40,8 @@ export const metadata: Metadata = {
 const PACOTES = [
   { nome: 'Avulsa', porLeitura: 'R$ 99,70', total: 'R$ 99,70', leituras: '1 leitura', micro: 'Pra uma leitura pontual.', selo: 'Comece por aqui', tom: 'neutro' },
   { nome: 'Pequeno', porLeitura: 'R$ 59,70', total: 'R$ 298,50', leituras: '5 leituras', micro: 'Pros primeiros clientes.', selo: null, tom: null },
-  { nome: 'Médio', porLeitura: 'R$ 49,70', total: 'R$ 745,50', leituras: '15 leituras', micro: 'Pra quem já atende com regularidade.', selo: 'Equilíbrio', tom: 'destaque' },
-  { nome: 'Grande', porLeitura: 'R$ 39,70', total: 'R$ 1.191,00', leituras: '30 leituras', micro: 'Pro consultório em volume.', selo: 'Melhor por leitura', tom: 'teal' },
+  { nome: 'Médio', porLeitura: 'R$ 49,70', total: 'R$ 745,50', leituras: '15 leituras', micro: 'Pra quem já atende com regularidade.', selo: 'Nossa recomendação', tom: 'destaque' },
+  { nome: 'Grande', porLeitura: 'R$ 39,70', total: 'R$ 1.191,00', leituras: '30 leituras', micro: 'Pro consultório em volume.', selo: 'Melhor custo por leitura', tom: 'teal' },
 ] as const
 
 const FAQ = [
@@ -435,9 +435,9 @@ export default function LandingEspelho() {
                     boxShadow: destaque ? '0 30px 60px -28px rgba(30,107,97,.32)' : '0 1px 3px rgba(0,0,0,.04)',
                   }}
                 >
-                  <div style={{ minHeight: '1.5rem', marginBottom: '.9rem' }}>
+                  <div style={{ minHeight: '2.1rem', marginBottom: '.8rem' }}>
                     {p.selo && (
-                      <span style={{ display: 'inline-block', fontSize: '.54rem', letterSpacing: '.16em', textTransform: 'uppercase', fontFamily: 'var(--font-raleway),sans-serif', color: badgeColor, border: `1px solid ${badgeBorder}`, borderRadius: '2px', padding: '.28rem .5rem' }}>{p.selo}</span>
+                      <span style={{ display: 'inline-block', fontSize: '.54rem', lineHeight: 1.35, letterSpacing: '.1em', textTransform: 'uppercase', fontFamily: 'var(--font-raleway),sans-serif', color: badgeColor, border: `1px solid ${badgeBorder}`, borderRadius: '2px', padding: '.28rem .5rem' }}>{p.selo}</span>
                     )}
                   </div>
                   <p className="eyebrow" style={{ color: '#0d0d0d', fontSize: '.7rem', letterSpacing: '.16em' }}>{p.nome}</p>
