@@ -149,47 +149,6 @@ export default function LandingEspelho() {
         </div>
       </section>
 
-      {/* ════════ PREVIEW DEMO (exemplo ilustrativo — substitui o mock) ════════ */}
-      <section className="bg-ivory text-black">
-        <div className="mx-auto grid max-w-[1280px] items-center gap-14 px-6 py-20 md:px-10 md:py-24 lg:grid-cols-2 lg:gap-16">
-          <div className="lp-reveal">
-            <p className="eyebrow" style={{ color: 'var(--teal-dark)' }}>Veja com seus olhos</p>
-            <h2 className="display mt-6" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)', color: '#0d0d0d' }}>
-              Isto é o que ele lê — <em>e se reconhece.</em>
-            </h2>
-            <p className="body-copy mt-7" style={{ color: '#3a3a3a', fontSize: '1.18rem' }}>
-              Repare: não serve pra todo mundo. É essa pessoa, e ninguém mais. É por isso que, quando o
-              cliente lê, ele para — e pensa: <em style={{ color: 'var(--teal-dark)' }}>é exatamente isso.</em>
-            </p>
-            <p className="mt-7 text-xs" style={{ color: 'var(--mist)', letterSpacing: '.04em', fontStyle: 'italic' }}>
-              Exemplo ilustrativo de uma leitura — sem dados reais de cliente.
-            </p>
-          </div>
-          {/* mock de relatório — texto 100% fictício, ilustrativo */}
-          <div className="lp-reveal" data-d="1">
-            <div className="paper relative p-9 md:p-11">
-              <div className="flex items-center justify-between">
-                <Image src="/logo/iris_codex_para_fundo_branco.png" alt="" width={1600} height={420} className="h-5 w-auto" />
-              </div>
-              <hr className="rule mt-5 mb-7" />
-              <p style={{ fontSize: '.62rem', letterSpacing: '.26em', textTransform: 'uppercase', color: 'var(--teal)', fontWeight: 400, fontFamily: 'var(--font-raleway),sans-serif' }}>Em poucas palavras</p>
-              <p className="mt-4" style={{ fontStyle: 'italic', fontSize: '1.22rem', lineHeight: 1.5, color: '#15110b' }}>
-                “Alguém que aprende a temperatura de um ambiente antes de entrar nele — que sente o estado do
-                outro mais rápido do que o próprio. Aprendeu cedo que ser útil era a forma mais segura de ser
-                querido. Cansa de ser o porto de todo mundo e não saber de quem é o seu.”
-              </p>
-              <div className="mt-8 space-y-3">
-                <div className="ln" style={{ width: '100%' }} /><div className="ln" style={{ width: '96%' }} /><div className="ln" style={{ width: '99%' }} /><div className="ln" style={{ width: '74%' }} />
-              </div>
-              <p className="mt-7" style={{ fontStyle: 'italic', fontSize: '1.1rem', color: 'var(--teal-dark)' }}>Linha do tempo emocional</p>
-              <div className="mt-4 space-y-3">
-                <div className="ln" style={{ width: '100%' }} /><div className="ln" style={{ width: '88%' }} /><div className="ln" style={{ width: '93%' }} />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ════════ ANTI-FORER (resposta ao "isso serve pra qualquer um") ════════ */}
       <section className="bg-ivory text-black">
         <div className="mx-auto max-w-[820px] px-6 py-16 text-center md:px-10 md:py-20">
@@ -260,7 +219,7 @@ export default function LandingEspelho() {
             <div className="paper" style={{ position: 'absolute', inset: 0, transform: 'rotate(1.8deg) translateY(-7px)', opacity: 0.65 }} aria-hidden="true" />
             <div className="paper relative p-9 md:p-11" style={{ zIndex: 1 }}>
               {[
-                { h: 'Em poucas palavras', f: '“Alguém que aprendeu a temperatura do ambiente antes de entrar nele—”' },
+                { h: 'Em poucas palavras', f: '“Alguém que aprende a temperatura de um ambiente antes de entrar nele. Aprendeu cedo que ser útil era a forma mais segura de ser querido — e cansa de ser o porto de todo mundo, sem saber de quem é o seu.”' },
                 { h: 'Linha do tempo emocional', f: '“Entre os 4 e os 7 anos, algo pediu que ela aprendesse a—”' },
                 { h: 'Forças e recursos', f: '“Lê o não-dito com uma precisão que ela nem reconhece como—”' },
               ].map((row, i) => (
@@ -288,35 +247,39 @@ export default function LandingEspelho() {
         </div>
       </section>
 
-      {/* ════════ PERGUNTAS DEMO (exemplo ilustrativo — substitui Sessão de Apoio) ════════ */}
+      {/* ════════ PERGUNTAS DEMO (exemplo ilustrativo — foto do relatório no tablet) ════════ */}
       <section className="bg-white text-black">
-        <div className="mx-auto max-w-[1080px] px-6 py-20 md:px-10 md:py-24">
-          <div className="lp-reveal text-center">
+        <div className="mx-auto grid max-w-[1280px] items-center gap-14 px-6 py-20 md:px-10 md:py-24 lg:grid-cols-2 lg:gap-16">
+          <div className="order-2 lp-reveal lg:order-1">
+            <div className="relative mx-auto w-full max-w-[440px]" style={{ aspectRatio: '4 / 5', borderRadius: '2px', overflow: 'hidden', boxShadow: '0 30px 80px -40px rgba(0,0,0,.5)' }}>
+              <Image src="/lp/relatorio-tablet.png" alt="Terapeuta segura o relatório do Iris Codex num tablet" fill sizes="(max-width:1024px) 80vw, 440px" className="object-cover object-center" />
+            </div>
+          </div>
+          <div className="order-1 lp-reveal lg:order-2">
             <p className="eyebrow" style={{ color: 'var(--teal-dark)' }}>Além do relatório</p>
-            <h2 className="display mx-auto mt-6" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)', color: '#0d0d0d', maxWidth: '24ch' }}>
+            <h2 className="display mt-6" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)', color: '#0d0d0d' }}>
               Você não chega à sessão com uma página em branco. <em style={{ color: 'var(--teal-dark)' }}>Chega com o caminho.</em>
             </h2>
-            <p className="mt-6 text-xs" style={{ color: 'var(--mist)', letterSpacing: '.04em', fontStyle: 'italic' }}>
+            <p className="mt-5 text-xs" style={{ color: 'var(--mist)', letterSpacing: '.04em', fontStyle: 'italic' }}>
               Exemplo ilustrativo das perguntas que acompanham a leitura.
             </p>
+            <div className="mt-8 space-y-5">
+              {[
+                'Onde no corpo isso vive — agora, enquanto você lê? Garganta que aperta, peito que fecha, estômago que pesa?',
+                'O que se solta quando você imagina receber cuidado sem precisar merecer primeiro?',
+                'Quem na sua vida conhece a versão sua que este texto descreve? E quem você só deixa ver a outra?',
+              ].map((q, i) => (
+                <div key={i} style={{ borderLeft: '2px solid var(--teal)', paddingLeft: '1.4rem' }}>
+                  <p style={{ fontStyle: 'italic', fontFamily: 'var(--font-cormorant),serif', fontSize: '1.3rem', lineHeight: 1.5, color: '#2a2a2a' }}>{q}</p>
+                </div>
+              ))}
+            </div>
+            <p className="body-copy mt-8" style={{ color: '#3a3a3a', fontSize: '1.18rem' }}>
+              Os catálogos de iridologia te entregam o mapa e te deixam ali, sozinho com ele. O Iris Codex te
+              entrega o mapa e a primeira pergunta — onde tocar, o que merece atenção antes do resto. Não é
+              interrogatório de anamnese: é a conversa começando funda.
+            </p>
           </div>
-          <div className="lp-reveal mx-auto mt-14 max-w-[760px] space-y-6" data-d="1">
-            {[
-              'Onde no corpo isso vive — agora, enquanto você lê? Garganta que aperta, peito que fecha, estômago que pesa?',
-              'O que se solta quando você imagina receber cuidado sem precisar merecer primeiro?',
-              'Quem na sua vida conhece a versão sua que este texto descreve? E quem você só deixa ver a outra?',
-            ].map((q, i) => (
-              <div key={i} style={{ borderLeft: '2px solid var(--teal)', paddingLeft: '1.5rem' }}>
-                <p style={{ fontStyle: 'italic', fontFamily: 'var(--font-cormorant),serif', fontSize: '1.35rem', lineHeight: 1.5, color: '#2a2a2a' }}>{q}</p>
-              </div>
-            ))}
-          </div>
-          <p className="body-copy lp-reveal mx-auto mt-14 text-center" data-d="2" style={{ color: '#3a3a3a', fontSize: '1.18rem', maxWidth: '62ch' }}>
-            Os catálogos de iridologia te entregam o mapa e te deixam ali, sozinho com ele. O Iris Codex te
-            entrega o mapa e a primeira pergunta — onde tocar, o que merece atenção antes do resto, pra onde
-            conduzir. Não é interrogatório de anamnese. É a conversa começando funda, porque você já sabe
-            onde ela precisa ir.
-          </p>
         </div>
       </section>
 
@@ -375,7 +338,7 @@ export default function LandingEspelho() {
           <div className="order-1 lp-reveal lg:order-2">
             <p className="eyebrow" style={{ color: 'var(--teal-dark)' }}>De onde vem a leitura</p>
             <h2 className="display mt-6" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)', color: '#0d0d0d' }}>
-              A íris embasa de verdade. <em style={{ color: 'var(--teal-dark)' }}>A IA não inventa — parte do que está ali.</em>
+              A íris fundamenta o relatório. <em style={{ color: 'var(--teal-dark)' }}>A IA não inventa — parte do que está ali.</em>
             </h2>
             <p className="body-copy mt-7" style={{ color: '#3a3a3a', fontSize: '1.18rem' }}>
               Primeiro a IA lê a imagem da íris e identifica os sinais — densidade, trama de fibras,
