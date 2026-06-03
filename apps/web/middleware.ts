@@ -74,8 +74,10 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Usuário logado tentando acessar /login ou /signup → redireciona para /dashboard
-  if (user && (pathname === '/login' || pathname === '/signup')) {
+  // Usuário logado em "/" (landing), /login ou /signup → vai direto pro /dashboard.
+  // A raiz é a landing de marketing (tráfego frio); o terapeuta recorrente não
+  // precisa vê-la — atrito zero. O profile gate de /dashboard cuida do resto.
+  if (user && (pathname === '/' || pathname === '/login' || pathname === '/signup')) {
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'
     return NextResponse.redirect(url)
