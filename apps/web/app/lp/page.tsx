@@ -89,7 +89,7 @@ export default function LandingEspelho() {
             </div>
             <div className="order-1 lp-reveal lg:order-2" data-d="1">
               <div className="lp-hero-photo">
-                <Image src="/lp/virada.png" alt="Terapeuta e cliente leem a leitura juntos; o cliente, emocionado, se reconhece" fill priority sizes="(max-width:1024px) 92vw, 600px" className="object-cover object-center" />
+                <Image src="/lp/hero-captura.png" alt="Terapeuta fotografando a íris do cliente em sessão" fill priority sizes="(max-width:1024px) 92vw, 600px" className="object-cover object-center" />
               </div>
             </div>
           </div>
@@ -124,6 +124,11 @@ export default function LandingEspelho() {
       {/* ════════ A VIRADA (funde prova + leitura-já-é-terapia; foto de ler junto) ════════ */}
       <section className="bg-white text-black">
         <div className="mx-auto max-w-[1100px] px-6 py-20 md:px-10 md:py-24">
+          <div className="lp-reveal mx-auto mb-10 max-w-[940px]">
+            <div className="lp-hero-strip" style={{ aspectRatio: '16 / 9' }}>
+              <Image src="/lp/virada.png" alt="Terapeuta e cliente leem o relatório juntos; o cliente, emocionado, se reconhece" fill sizes="(max-width:1100px) 92vw, 940px" className="object-cover object-center" />
+            </div>
+          </div>
           <div className="mx-auto max-w-[900px] text-center">
           <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-dark)' }}>O que muda</p>
           <h2 className="display lp-reveal mt-6" data-d="1" style={{ fontSize: 'clamp(2.35rem,4.8vw,4rem)', color: '#0d0d0d' }}>
