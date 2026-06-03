@@ -5,7 +5,7 @@ import { Cormorant_Garamond } from 'next/font/google'
 import { DISCLAIMER_COMPACT } from '@/components/legal/DisclaimerCopy'
 import { TopBar } from './TopBar'
 import { RevealInit } from './RevealInit'
-import { Camera, FileText, Check } from 'lucide-react'
+import { Camera, FileText, Check, Lock, CreditCard, Clock } from 'lucide-react'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Landing /lp — "O ESPELHO". Porte da versão do Claude (claude.ai artifact) para
@@ -38,10 +38,10 @@ export const metadata: Metadata = {
 }
 
 const PACOTES = [
-  { nome: 'Avulsa', preco: 'R$ 99,70', leituras: '1 leitura', selo: null },
-  { nome: 'Pequeno', preco: 'R$ 298,50', leituras: '5 leituras', selo: null },
-  { nome: 'Médio', preco: 'R$ 745,50', leituras: '15 leituras', selo: 'Equilíbrio' },
-  { nome: 'Grande', preco: 'R$ 1.191,00', leituras: '30 leituras', selo: 'Melhor por leitura' },
+  { nome: 'Avulsa', porLeitura: 'R$ 99,70', total: 'R$ 99,70', leituras: '1 leitura', micro: 'Pra uma leitura pontual.', selo: 'Comece por aqui', tom: 'neutro' },
+  { nome: 'Pequeno', porLeitura: 'R$ 59,70', total: 'R$ 298,50', leituras: '5 leituras', micro: 'Pros primeiros clientes.', selo: null, tom: null },
+  { nome: 'Médio', porLeitura: 'R$ 49,70', total: 'R$ 745,50', leituras: '15 leituras', micro: 'Pra quem já atende com regularidade.', selo: 'Equilíbrio', tom: 'destaque' },
+  { nome: 'Grande', porLeitura: 'R$ 39,70', total: 'R$ 1.191,00', leituras: '30 leituras', micro: 'Pro consultório em volume.', selo: 'Melhor por leitura', tom: 'teal' },
 ] as const
 
 const FAQ = [
@@ -384,50 +384,87 @@ export default function LandingEspelho() {
         </div>
       </section>
 
-      {/* ════════ OFERTA ════════ */}
+      {/* ════════ OFERTA (trial herói + escada de valor por leitura) ════════ */}
       <section id="oferta" className="bg-ivory text-black">
-        <div className="mx-auto max-w-[1080px] px-6 py-20 text-center md:px-10 md:py-24">
-          <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-dark)' }}>A oferta</p>
-          <p className="lp-reveal mx-auto mt-5" data-d="1" style={{ color: 'var(--teal-dark)', fontStyle: 'italic', fontFamily: 'var(--font-cormorant),serif', fontSize: '1.3rem', maxWidth: '36ch' }}>
-            Você já viu o que ele vai ler na sua frente.
-          </p>
-          <div className="lp-reveal mx-auto mt-8" data-d="1" style={{ width: 188 }}>
-            <div className="relative mx-auto" style={{ aspectRatio: '3 / 4', transform: 'rotate(-3deg)', borderRadius: '2px', overflow: 'hidden', boxShadow: '0 24px 60px -28px rgba(0,0,0,.45)', border: '1px solid #e6ddcf' }}>
-              <Image src="/lp/print-relatorio.png" alt="Capa do relatório do Iris Codex" fill sizes="188px" className="object-cover object-top" />
+        <div className="mx-auto max-w-[1120px] px-6 py-20 md:px-10 md:py-24">
+          <div className="lp-reveal text-center">
+            <p className="eyebrow" style={{ color: 'var(--teal-dark)' }}>A oferta</p>
+            <p className="mx-auto mt-5" style={{ color: 'var(--teal-dark)', fontStyle: 'italic', fontFamily: 'var(--font-cormorant),serif', fontSize: '1.3rem', maxWidth: '36ch' }}>
+              Você já viu o que ele vai ler na sua frente.
+            </p>
+            <div className="mx-auto mt-7" style={{ width: 164 }}>
+              <div className="relative mx-auto" style={{ aspectRatio: '3 / 4', transform: 'rotate(-3deg)', borderRadius: '2px', overflow: 'hidden', boxShadow: '0 24px 60px -28px rgba(0,0,0,.45)', border: '1px solid #e6ddcf' }}>
+                <Image src="/lp/print-relatorio.png" alt="Capa do relatório do Iris Codex" fill sizes="164px" className="object-cover object-top" />
+              </div>
             </div>
           </div>
-          <h2 className="display lp-reveal mx-auto mt-4" data-d="1" style={{ fontSize: 'clamp(2.2rem,4.8vw,3.8rem)', color: '#0d0d0d', maxWidth: '20ch' }}>
-            Agora sinta o <em style={{ color: 'var(--teal-dark)' }}>uau</em> na sua própria íris. De graça.
-          </h2>
-          <p className="body-copy lp-reveal mx-auto mt-7" data-d="2" style={{ color: '#4a4a4a', fontSize: '1.18rem' }}>
-            Crie sua conta e faça 3 leituras grátis (ou 15 dias) — sem cartão.
-          </p>
-          <div className="lp-reveal mt-10" data-d="2">
-            <Link href="/signup" className="btn btn-primary">Começar com 3 leituras grátis</Link>
-          </div>
-          <p className="body-copy lp-reveal mx-auto mt-7" data-d="3" style={{ color: 'var(--mist)', fontSize: '.98rem', maxWidth: '56ch' }}>
-            Depois das 3, você segue no seu ritmo: uma leitura avulsa quando precisar, sem pacote e sem
-            mensalidade. Os pacotes são pra quando o volume crescer — não um degrau pra subir agora.
-          </p>
 
-          <div className="lp-reveal mx-auto mt-12 max-w-[760px]" data-d="2">
-            <p className="eyebrow" style={{ color: 'var(--mist)' }}>Pacotes, sem pressão</p>
-            <p className="lp-reveal mx-auto mb-6 mt-2 text-sm" style={{ color: 'var(--mist)', maxWidth: '50ch' }}>
-              Sem mínimo, sem volume obrigatório. A avulsa fica sempre disponível; o pacote é economia pra quando fizer sentido.
+          {/* bloco trial — o herói da oferta */}
+          <div className="lp-reveal mx-auto mt-10 max-w-[680px] text-center" data-d="1" style={{ background: 'var(--white)', border: '1px solid var(--teal)', borderRadius: '4px', padding: '2.6rem 1.6rem' }}>
+            <h2 className="display mx-auto" style={{ fontSize: 'clamp(2rem,4.4vw,3.2rem)', color: '#0d0d0d', maxWidth: '18ch' }}>
+              Agora sinta o <em style={{ color: 'var(--teal-dark)' }}>uau</em> na sua própria íris. De graça.
+            </h2>
+            <p className="body-copy mx-auto mt-6" style={{ color: '#4a4a4a', fontSize: '1.15rem' }}>
+              Crie sua conta e faça 3 leituras grátis (ou 15 dias) — sem cartão.
             </p>
-            <div className="grid gap-px sm:grid-cols-2" style={{ background: '#ddd2c0', border: '1px solid #ddd2c0' }}>
-              {PACOTES.map((p) => (
-                <div key={p.nome} className="bg-ivory p-7 text-left" style={p.selo ? { boxShadow: `inset 3px 0 0 ${p.selo === 'Equilíbrio' ? 'var(--teal)' : 'var(--teal-dark)'}`, position: 'relative' } : undefined}>
-                  {p.selo && <span className="eyebrow" style={{ position: 'absolute', top: '1.1rem', right: '1.1rem', color: 'var(--teal-dark)', fontSize: '.58rem' }}>{p.selo}</span>}
-                  <p className="eyebrow" style={{ color: '#0d0d0d', fontSize: '.7rem', letterSpacing: '.14em' }}>{p.nome}</p>
-                  <p className="display mt-3" style={{ fontSize: '1.9rem', color: '#0d0d0d' }}>{p.preco}</p>
-                  <p className="mt-1 text-sm" style={{ color: 'var(--mist)' }}>{p.leituras}</p>
-                </div>
-              ))}
+            <div className="mt-8">
+              <Link href="/signup" className="btn btn-primary">Começar com 3 leituras grátis</Link>
             </div>
-            <p className="mt-6 text-xs" style={{ color: 'var(--mist)', letterSpacing: '.04em' }}>
-              PIX ou cartão · créditos válidos por 12 meses · sem assinatura.
+            <p className="mx-auto mt-6 text-sm" style={{ color: 'var(--mist)', maxWidth: '52ch' }}>
+              Depois das 3, você segue no seu ritmo — uma leitura avulsa quando precisar, sem pacote e sem mensalidade.
             </p>
+          </div>
+
+          {/* fileira de pacotes — preço por leitura é o protagonista */}
+          <div className="lp-reveal mt-16 text-center" data-d="2">
+            <p className="eyebrow" style={{ color: 'var(--mist)' }}>Quando quiser continuar</p>
+          </div>
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {PACOTES.map((p, i) => {
+              const destaque = p.tom === 'destaque'
+              const badgeColor = p.tom === 'neutro' ? 'var(--mist)' : 'var(--teal-dark)'
+              const badgeBorder = p.tom === 'neutro' ? '#ddd2c0' : 'var(--teal)'
+              return (
+                <div
+                  key={p.nome}
+                  className={`lp-reveal relative bg-white p-7 text-left${destaque ? ' lg:-translate-y-2' : ''}`}
+                  data-d={String((i % 3) + 1)}
+                  style={{
+                    borderRadius: '4px',
+                    border: destaque ? '1px solid var(--teal)' : '1px solid #e6ddcf',
+                    boxShadow: destaque ? '0 30px 60px -28px rgba(30,107,97,.32)' : '0 1px 3px rgba(0,0,0,.04)',
+                  }}
+                >
+                  <div style={{ minHeight: '1.5rem', marginBottom: '.9rem' }}>
+                    {p.selo && (
+                      <span style={{ display: 'inline-block', fontSize: '.54rem', letterSpacing: '.16em', textTransform: 'uppercase', fontFamily: 'var(--font-raleway),sans-serif', color: badgeColor, border: `1px solid ${badgeBorder}`, borderRadius: '2px', padding: '.28rem .5rem' }}>{p.selo}</span>
+                    )}
+                  </div>
+                  <p className="eyebrow" style={{ color: '#0d0d0d', fontSize: '.7rem', letterSpacing: '.16em' }}>{p.nome}</p>
+                  <p className="display mt-4" style={{ fontSize: '2rem', color: '#0d0d0d', lineHeight: 1 }}>{p.porLeitura}</p>
+                  <p className="mt-1 text-xs" style={{ color: 'var(--mist)', letterSpacing: '.04em' }}>por leitura</p>
+                  <hr style={{ border: 0, borderTop: '1px solid var(--teal)', width: 28, margin: '1.1rem 0' }} />
+                  <p className="display" style={{ fontSize: '1.1rem', color: '#0d0d0d' }}>{p.leituras}</p>
+                  <p className="mt-1 text-xs" style={{ color: 'var(--mist)' }}>{p.total} no total</p>
+                  <p className="body-copy mt-4 text-sm" style={{ color: '#5a5a5a' }}>{p.micro}</p>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* régua de confiança */}
+          <div className="lp-reveal mt-10 flex flex-wrap items-center justify-center gap-x-7 gap-y-3" data-d="3">
+            {[
+              { Icon: Lock, t: 'Sem cartão no teste' },
+              { Icon: CreditCard, t: 'PIX ou cartão' },
+              { Icon: Clock, t: 'Créditos por 12 meses' },
+              { Icon: Check, t: 'Sem assinatura' },
+            ].map((s) => (
+              <span key={s.t} className="inline-flex items-center gap-2 text-xs" style={{ color: 'var(--mist)', letterSpacing: '.02em' }}>
+                <s.Icon size={15} strokeWidth={1.5} color="var(--teal)" aria-hidden="true" />
+                {s.t}
+              </span>
+            ))}
           </div>
         </div>
       </section>
