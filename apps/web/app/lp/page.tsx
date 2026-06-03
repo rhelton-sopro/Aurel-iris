@@ -5,6 +5,7 @@ import { Cormorant_Garamond } from 'next/font/google'
 import { DISCLAIMER_COMPACT } from '@/components/legal/DisclaimerCopy'
 import { TopBar } from './TopBar'
 import { RevealInit } from './RevealInit'
+import { Camera, FileText, Check } from 'lucide-react'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Landing /lp — "O ESPELHO". Porte da versão do Claude (claude.ai artifact) para
@@ -168,13 +169,15 @@ export default function LandingEspelho() {
         </div>
       </section>
 
-      {/* ════════ A PROFUNDIDADE (o que a leitura abre — prova de vastidão) ════════ */}
-      <section className="bg-white text-black">
-        <div className="mx-auto max-w-[1080px] px-6 py-20 md:px-10 md:py-24">
+      {/* ════════ A PROFUNDIDADE (escura — macro de íris ao fundo) ════════ */}
+      <section className="relative overflow-hidden bg-black text-ivory">
+        <Image src="/lp/iris-macro.png" alt="" fill sizes="100vw" className="object-cover" style={{ opacity: 0.32 }} aria-hidden="true" />
+        <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,.52)' }} aria-hidden="true" />
+        <div className="relative z-10 mx-auto max-w-[1080px] px-6 py-24 md:px-10 md:py-28">
           <div className="lp-reveal text-center">
-            <p className="eyebrow" style={{ color: 'var(--teal-dark)' }}>O que uma leitura abre</p>
-            <h2 className="display mx-auto mt-6" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)', color: '#0d0d0d', maxWidth: '26ch' }}>
-              Não é um retrato. <em style={{ color: 'var(--teal-dark)' }}>É a pessoa inteira — em camadas que ela mesma não sabia nomear.</em>
+            <p className="eyebrow" style={{ color: 'var(--teal-light)' }}>O que uma leitura abre</p>
+            <h2 className="display mx-auto mt-6" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)', maxWidth: '26ch' }}>
+              Não é um retrato. <em style={{ color: 'var(--teal-light)' }}>É a pessoa inteira — em camadas que ela mesma não sabia nomear.</em>
             </h2>
           </div>
           <div className="mt-14 grid gap-x-12 gap-y-9 md:grid-cols-2">
@@ -188,8 +191,8 @@ export default function LandingEspelho() {
               { t: 'O caminho pra sessão', d: 'As perguntas certas e a direção, já na sua mão quando ele sentar.' },
             ].map((item, i) => (
               <div key={item.t} className="lp-reveal" data-d={String((i % 2) + 1)} style={{ borderLeft: '2px solid var(--teal)', paddingLeft: '1.4rem' }}>
-                <h3 className="display" style={{ fontSize: '1.25rem', color: '#0d0d0d' }}>{item.t}</h3>
-                <p className="body-copy mt-2" style={{ color: '#4a4a4a', fontSize: '1rem' }}>{item.d}</p>
+                <h3 className="display" style={{ fontSize: '1.25rem', color: 'var(--ivory)' }}>{item.t}</h3>
+                <p className="body-copy mt-2" style={{ color: 'rgba(242,237,228,.72)', fontSize: '1rem' }}>{item.d}</p>
               </div>
             ))}
           </div>
@@ -354,14 +357,24 @@ export default function LandingEspelho() {
         </div>
       </section>
 
-      {/* ════════ COMO FUNCIONA (faixa enxuta — 3 micro-passos) ════════ */}
+      {/* ════════ COMO FUNCIONA (3 micro-passos com ícones) ════════ */}
       <section className="bg-white text-black">
         <div className="mx-auto max-w-[900px] px-6 py-16 text-center md:px-10 md:py-20">
           <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-dark)' }}>Como funciona</p>
-          <p className="display lp-reveal mt-6" data-d="1" style={{ fontSize: 'clamp(1.4rem,3.2vw,2rem)', color: '#0d0d0d' }}>
-            Capture a íris <span style={{ color: 'var(--teal)' }}>·</span> Receba em minutos <span style={{ color: 'var(--teal)' }}>·</span> Revise e entregue
-          </p>
-          <div className="lp-reveal mt-7 flex items-center justify-center gap-4" data-d="2">
+          <div className="mt-10 grid gap-10 sm:grid-cols-3">
+            {[
+              { Icon: Camera, t: 'Capture a íris', d: 'A foto do olho do seu cliente, direto pelo app.' },
+              { Icon: FileText, t: 'Receba em minutos', d: 'O relatório completo chega pronto.' },
+              { Icon: Check, t: 'Revise e entregue', d: 'Você ajusta, assina e conduz.' },
+            ].map((s, i) => (
+              <div key={s.t} className="lp-reveal flex flex-col items-center" data-d={String(i + 1)}>
+                <s.Icon size={30} strokeWidth={1.5} color="var(--teal)" aria-hidden="true" />
+                <h3 className="eyebrow mt-5" style={{ color: '#0d0d0d', letterSpacing: '.14em', fontSize: '.8rem' }}>{s.t}</h3>
+                <p className="body-copy mt-2 text-sm" style={{ color: '#5a5a5a' }}>{s.d}</p>
+              </div>
+            ))}
+          </div>
+          <div className="lp-reveal mt-12 flex items-center justify-center gap-4" data-d="2">
             <hr className="hairline" style={{ width: 32 }} />
             <p className="body-copy" style={{ color: 'var(--teal-dark)', fontStyle: 'italic', fontFamily: 'var(--font-cormorant),serif', fontSize: '1.15rem' }}>
               Você no controle — a interpretação e a conduta são sempre suas.
@@ -378,6 +391,11 @@ export default function LandingEspelho() {
           <p className="lp-reveal mx-auto mt-5" data-d="1" style={{ color: 'var(--teal-dark)', fontStyle: 'italic', fontFamily: 'var(--font-cormorant),serif', fontSize: '1.3rem', maxWidth: '36ch' }}>
             Você já viu o que ele vai ler na sua frente.
           </p>
+          <div className="lp-reveal mx-auto mt-8" data-d="1" style={{ width: 188 }}>
+            <div className="relative mx-auto" style={{ aspectRatio: '3 / 4', transform: 'rotate(-3deg)', borderRadius: '2px', overflow: 'hidden', boxShadow: '0 24px 60px -28px rgba(0,0,0,.45)', border: '1px solid #e6ddcf' }}>
+              <Image src="/lp/print-relatorio.png" alt="Capa do relatório do Iris Codex" fill sizes="188px" className="object-cover object-top" />
+            </div>
+          </div>
           <h2 className="display lp-reveal mx-auto mt-4" data-d="1" style={{ fontSize: 'clamp(2.2rem,4.8vw,3.8rem)', color: '#0d0d0d', maxWidth: '20ch' }}>
             Agora sinta o <em style={{ color: 'var(--teal-dark)' }}>uau</em> na sua própria íris. De graça.
           </h2>
