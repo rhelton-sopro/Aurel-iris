@@ -22,7 +22,23 @@ beforeEach(() => {
 })
 
 describe('components/readings/ReadingModeActions (Plan 7.4-18 — UAT-3 reading-mode top buttons)', () => {
-  it('renders 4 action buttons when not delivered (Plan 19: includes Exportar PDF)', () => {
+  it('founder: renders 4 action buttons when not delivered (Plan 19 + regen founder-only 2026-06-03)', () => {
+    render(
+      <ReadingModeActions
+        readingId="reading-123"
+        regenerationCount={0}
+        isDelivered={false}
+        deliveredAt={null}
+        isFounder={true}
+      />,
+    )
+    expect(screen.getByTestId('reading-mode-export-pdf')).toBeDefined()
+    expect(screen.getByTestId('reading-mode-edit')).toBeDefined()
+    expect(screen.getByTestId('reading-mode-deliver')).toBeDefined()
+    expect(screen.getByTestId('reading-mode-regenerate')).toBeDefined()
+  })
+
+  it('terapeuta (não-founder): regen escondido — só 3 botões (2026-06-03)', () => {
     render(
       <ReadingModeActions
         readingId="reading-123"
@@ -34,7 +50,8 @@ describe('components/readings/ReadingModeActions (Plan 7.4-18 — UAT-3 reading-
     expect(screen.getByTestId('reading-mode-export-pdf')).toBeDefined()
     expect(screen.getByTestId('reading-mode-edit')).toBeDefined()
     expect(screen.getByTestId('reading-mode-deliver')).toBeDefined()
-    expect(screen.getByTestId('reading-mode-regenerate')).toBeDefined()
+    // Regen é exclusivo do founder agora — terapeuta nunca vê.
+    expect(screen.queryByTestId('reading-mode-regenerate')).toBeNull()
   })
 
   it('Plan 23: ExportPdfButton renders as Button (no href — direct fetch + blob download)', () => {
@@ -75,6 +92,7 @@ describe('components/readings/ReadingModeActions (Plan 7.4-18 — UAT-3 reading-
         regenerationCount={1}
         isDelivered={false}
         deliveredAt={null}
+        isFounder={true}
       />,
     )
     // count=1 (1 geração feita, 0 regen usado) → exibe (0/1)
@@ -88,6 +106,7 @@ describe('components/readings/ReadingModeActions (Plan 7.4-18 — UAT-3 reading-
         regenerationCount={2}
         isDelivered={false}
         deliveredAt={null}
+        isFounder={true}
       />,
     )
     const regen = screen.getByTestId('reading-mode-regenerate')
@@ -151,6 +170,7 @@ describe('components/readings/ReadingModeActions (Plan 7.4-18 — UAT-3 reading-
         isDelivered={false}
         deliveredAt={null}
         isSelfReading={true}
+        isFounder={true}
       />,
     )
     // Outros 3 botões seguem renderizando — só o deliver é escondido

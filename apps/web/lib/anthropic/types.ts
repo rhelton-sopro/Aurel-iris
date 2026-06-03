@@ -178,6 +178,25 @@ export type ReportJsonb = Partial<Record<ReportSectionKey, string>>
 
 export type EditTipo = 'adicionado' | 'removido' | 'corrigido' | 'reescrito' | 'none'
 
+/**
+ * Completude do relatório (gate de ciclo de vida da foto — 2026-06-03).
+ * Confere a presença das seções OBRIGATÓRIAS antes de o sistema apagar a
+ * foto da íris para sempre. Como o "regenerar" do terapeuta foi removido,
+ * não há segunda chance: a foto só é deletada na geração quando complete=true.
+ * Incompleto → foto retida + leitura aparece em /admin/regenerar com `missing`
+ * listado (é o "audit relata o que faltou" pedido pelo founder).
+ */
+export interface SectionCompleteness {
+  /** true só quando TODAS as chaves obrigatórias estão presentes e não-vazias. */
+  complete: boolean
+  /** chaves obrigatórias presentes (não-vazias). */
+  present: string[]
+  /** chaves obrigatórias ausentes ou vazias — o que faltou. */
+  missing: string[]
+  required_count: number
+  present_count: number
+}
+
 export interface AuditMetadata {
   low_anchor_rate: boolean
   anchor_rate_pct: number
@@ -191,8 +210,13 @@ export interface AuditMetadata {
    * facilitar reescrita manual.
    */
   dosage_hits: Array<{ section: string; match: string }>
+  /**
+   * Completude das seções (auditor v2). Presente em relatórios gerados a
+   * partir de 2026-06-03. Relatórios anteriores não têm este campo.
+   */
+  section_completeness: SectionCompleteness
   audited_at: string
-  auditor_version: 'v1'
+  auditor_version: 'v1' | 'v2'
 }
 
 export interface RegenerationLogEntry {

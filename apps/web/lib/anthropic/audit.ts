@@ -36,8 +36,13 @@
 import 'server-only'
 import {
   type ReportJsonb,
+  type ReportSectionKey,
   type AuditMetadata,
+  type SectionCompleteness,
   SECTIONS_REQUIRING_ANCHORS,
+  NUMBERED_SECTION_HEADINGS,
+  SECTION_KEY_BY_NUMBER,
+  ZERO_SECTION_KEY,
 } from './types'
 
 // Anchor marker — accepts TWO forms Sonnet 4.6 emits in production:
@@ -329,7 +334,48 @@ export function runAudit(report: ReportJsonb): AuditMetadata {
     anchor_rate_per_section: anchorPerSection,
     forbidden_vocab: forbiddenHits,
     dosage_hits: dosageHits,
+    section_completeness: auditReportCompleteness(report),
     audited_at: new Date().toISOString(),
-    auditor_version: 'v1',
+    auditor_version: 'v2',
+  }
+}
+
+/**
+ * Chaves OBRIGATÓRIAS de um relatório completo: §0 + as 15 seções numeradas +
+ * a frase-essência + o encerramento (este último é server-appended, então
+ * sempre presente). Fonte única: deriva de NUMBERED_SECTION_HEADINGS para não
+ * dessincronizar se a numeração mudar.
+ */
+const REQUIRED_REPORT_KEYS: ReportSectionKey[] = [
+  ZERO_SECTION_KEY,
+  ...NUMBERED_SECTION_HEADINGS.map((h) => SECTION_KEY_BY_NUMBER[h]),
+  'essence_phrase',
+  'encerramento_disclaimer',
+]
+
+/**
+ * Gate de completude (2026-06-03). Confere presença + não-vazio de cada chave
+ * obrigatória. É o portão que autoriza apagar a foto da íris para sempre na
+ * geração — só apaga quando `complete === true`. Conservador por design:
+ * qualquer seção faltando mantém a foto (retida pra regen no /admin/regenerar).
+ *
+ * Relatórios LEGADOS (shape antigo de 13 seções) não têm estas chaves e sairão
+ * como incompletos — isso é só informativo; o delete-na-geração só roda em
+ * relatórios novos. A página admin filtra por section_completeness presente.
+ */
+export function auditReportCompleteness(report: ReportJsonb): SectionCompleteness {
+  const present: string[] = []
+  const missing: string[] = []
+  for (const key of REQUIRED_REPORT_KEYS) {
+    const val = (report as Record<string, unknown>)[key]
+    if (typeof val === 'string' && val.trim().length > 0) present.push(key)
+    else missing.push(key)
+  }
+  return {
+    complete: missing.length === 0,
+    present,
+    missing,
+    required_count: REQUIRED_REPORT_KEYS.length,
+    present_count: present.length,
   }
 }

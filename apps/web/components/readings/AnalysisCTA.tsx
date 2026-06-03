@@ -30,6 +30,12 @@ export interface AnalysisCTAProps {
   regenerationCount: number
   isDelivered: boolean
   onTrigger: () => void
+  /**
+   * Regen só pro founder (2026-06-03): "Regenerar análise" foi removido do
+   * terapeuta. Não-founder com relatório vê apenas "Editar análise". O gate
+   * (e) do /analyze reforça no servidor.
+   */
+  isFounder?: boolean
 }
 
 export function AnalysisCTA({
@@ -38,6 +44,7 @@ export function AnalysisCTA({
   regenerationCount,
   isDelivered,
   onTrigger,
+  isFounder = false,
 }: AnalysisCTAProps) {
   // 1 geração original + 1 regen grátis (founder 2026-05-29). regenerationCount
   // conta gerações TOTAIS (= 1 após a original), então regens usados = count-1
@@ -83,21 +90,23 @@ export function AnalysisCTA({
       >
         Editar análise
       </Link>
-      {regenTooltip ? (
-        <TooltipProvider>
-          <Tooltip>
-            {/* base-ui Tooltip.Trigger uses `render` prop for custom element (not Radix `asChild`).
-                Span wrapper is needed because regenButton may be disabled — disabled buttons
-                don't fire mouse events, so the trigger must render as a non-button. */}
-            <TooltipTrigger render={<span />}>
-              {regenButton}
-            </TooltipTrigger>
-            <TooltipContent>{regenTooltip}</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      ) : (
-        regenButton
-      )}
+      {/* Regen só pro founder (2026-06-03): o terapeuta não regenera mais. */}
+      {isFounder &&
+        (regenTooltip ? (
+          <TooltipProvider>
+            <Tooltip>
+              {/* base-ui Tooltip.Trigger uses `render` prop for custom element (not Radix `asChild`).
+                  Span wrapper is needed because regenButton may be disabled — disabled buttons
+                  don't fire mouse events, so the trigger must render as a non-button. */}
+              <TooltipTrigger render={<span />}>
+                {regenButton}
+              </TooltipTrigger>
+              <TooltipContent>{regenTooltip}</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        ) : (
+          regenButton
+        ))}
     </div>
   )
 }

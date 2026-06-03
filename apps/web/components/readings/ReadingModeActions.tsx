@@ -64,6 +64,14 @@ export interface ReadingModeActionsProps {
    * fica visível com progresso indeterminado, botões disabled.
    */
   isAnalysisInProgress?: boolean
+  /**
+   * Regen só pro founder (2026-06-03): o "Regenerar análise" foi removido do
+   * terapeuta. Como não há mais segunda chance e a foto é apagada na geração,
+   * o resgate de relatório incompleto é manual, via founder (aqui ou em
+   * /admin/regenerar). Não-founder nunca vê o botão; o gate (e) do
+   * /analyze reforça no servidor.
+   */
+  isFounder?: boolean
 }
 
 export function ReadingModeActions({
@@ -75,6 +83,7 @@ export function ReadingModeActions({
   clientName,
   clientPhone,
   isAnalysisInProgress = false,
+  isFounder = false,
 }: ReadingModeActionsProps) {
   const router = useRouter()
   const [deliverOpen, setDeliverOpen] = useState(false)
@@ -357,18 +366,20 @@ export function ReadingModeActions({
         </Button>
       )}
 
-      {regenTooltip ? (
-        <TooltipProvider>
-          <Tooltip>
-            {/* base-ui uses `render` prop (not Radix `asChild`); span wrapper
-                because disabled buttons don't fire mouse events. */}
-            <TooltipTrigger render={<span />}>{regenButton}</TooltipTrigger>
-            <TooltipContent>{regenTooltip}</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      ) : (
-        regenButton
-      )}
+      {/* Regen só pro founder (2026-06-03): o terapeuta não regenera mais. */}
+      {isFounder &&
+        (regenTooltip ? (
+          <TooltipProvider>
+            <Tooltip>
+              {/* base-ui uses `render` prop (not Radix `asChild`); span wrapper
+                  because disabled buttons don't fire mouse events. */}
+              <TooltipTrigger render={<span />}>{regenButton}</TooltipTrigger>
+              <TooltipContent>{regenTooltip}</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        ) : (
+          regenButton
+        ))}
 
       <DeliverDialog
         open={deliverOpen}

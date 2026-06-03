@@ -421,9 +421,19 @@ describe('lib/anthropic/audit — AuditMetadata shape (D-A3)', () => {
     expect(result.audited_at).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)
   })
 
-  it('auditor_version="v1"', () => {
+  it('auditor_version="v2" (2026-06-03: + section_completeness)', () => {
     const result = runAudit({})
-    expect(result.auditor_version).toBe('v1')
+    expect(result.auditor_version).toBe('v2')
+  })
+
+  it('section_completeness: relatório vazio → incompleto, lista o que faltou', () => {
+    const result = runAudit({})
+    expect(result.section_completeness.complete).toBe(false)
+    // §0 + 15 numeradas + essência + encerramento = 18 chaves obrigatórias.
+    expect(result.section_completeness.required_count).toBe(18)
+    expect(result.section_completeness.present_count).toBe(0)
+    expect(result.section_completeness.missing).toContain('1_constituicao_temperamento')
+    expect(result.section_completeness.missing).toContain('essence_phrase')
   })
 
   it('anchor_rate_per_section tem 5 keys (2..6) no legacy path', () => {

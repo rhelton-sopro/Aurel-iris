@@ -31,6 +31,12 @@ const SECTIONS: Array<{
     description:
       'Métricas gerenciais do beta: funil de leituras, qualidade das fotos (aproveitamento da captura), custo AI e throughput por terapeuta. Filtro por data.',
   },
+  {
+    href: '/admin/regenerar',
+    title: 'Regeneração',
+    description:
+      'Relatórios que o gate de auditoria marcou como incompletos (seções faltando). Foto da íris retida até 24h pra resgate — abra a leitura pra regenerar. Relatórios completos têm a foto apagada na geração.',
+  },
 ]
 
 export default async function AdminPortalPage() {

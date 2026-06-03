@@ -27,6 +27,7 @@ import { revalidatePath } from 'next/cache'
 
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
+import { purgeIrisPhotos } from '@/lib/capture/delete-iris-photos'
 import {
   convertReservationToConsume,
   reserveCreditForReading,
@@ -134,18 +135,19 @@ export async function POST(
       { status: 409 },
     )
   }
-  // Gate (e): cap = 1 geração original + 1 regen grátis (founder 2026-05-29).
-  // regeneration_count conta GERAÇÕES totais (incrementa a cada geração,
-  // inclusive a original → 1 após a 1ª). "1 regen" = bloquear na 3ª geração:
-  //   original: count 0→1 | regen: count 1→2 | 3ª: count 2 → BLOQUEIA
-  // Logo o gate é `>= 2`, NÃO `>= 1` (isso mataria a regen). Founder bypassa.
+  // Gate (e): regen REMOVIDO do terapeuta (2026-06-03). regeneration_count
+  // conta GERAÇÕES totais (incrementa a cada geração, inclusive a original →
+  // 1 após a 1ª). Não-founder pode gerar UMA vez (count 0→1); a 2ª geração
+  // (regen) é bloqueada em `>= 1`. Retry de uma 1ª geração que FALHOU continua
+  // ok (count só sobe no sucesso). Founder bypassa — regen vive nele (página
+  // da leitura + /admin/regenerar). Antes era `>= 2` (1 regen grátis).
   const currentCount = reading.regeneration_count ?? 0
   const isFounder = isFounderEmail(user.email)
-  if (currentCount >= 2 && !isFounder) {
+  if (currentCount >= 1 && !isFounder) {
     return NextResponse.json(
       {
         error:
-          'Você já usou a regeneração desta leitura. Para um novo relatório, faça uma nova leitura (novas fotos).',
+          'A regeneração agora é feita pela equipe. Para um novo relatório, faça uma nova leitura (novas fotos).',
       },
       { status: 409 },
     )
@@ -513,6 +515,35 @@ export async function POST(
           console.warn(
             `[analyze] convert reservation threw reading=${readingId}:`,
             consumeErr instanceof Error ? consumeErr.message : consumeErr,
+          )
+        }
+
+        // ===== Ciclo de vida da foto (LGPD — 2026-06-03) =====
+        // Relatório completo+auditado → apaga a íris para sempre AGORA (a LP/FAQ
+        // prometem "apagada na geração"). Incompleto → RETÉM a foto: como o
+        // regen do terapeuta foi removido, a leitura aparece em /admin/regenerar
+        // pro founder resgatar dentro das 24h (depois o cron horário apaga pelo
+        // TTL de qualquer jeito). Best-effort: NUNCA bloqueia a entrega.
+        const completeness = auditWithFallback.section_completeness
+        try {
+          if (completeness?.complete) {
+            const purge = await purgeIrisPhotos(service, readingId, 'audit_complete')
+            if (!purge.ok) {
+              console.warn(
+                `[analyze] purge fotos falhou reading=${readingId}: ${purge.error} — cron horário cobre`,
+              )
+            }
+          } else {
+            console.warn(
+              `[analyze] relatório INCOMPLETO reading=${readingId} missing=${JSON.stringify(
+                completeness?.missing ?? ['section_completeness ausente'],
+              )} — foto RETIDA p/ regen em /admin/regenerar`,
+            )
+          }
+        } catch (purgeErr) {
+          console.warn(
+            `[analyze] purge fotos threw reading=${readingId}:`,
+            purgeErr instanceof Error ? purgeErr.message : purgeErr,
           )
         }
 

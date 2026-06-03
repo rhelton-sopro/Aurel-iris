@@ -28,6 +28,7 @@ import { useState, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { Clock } from 'lucide-react'
 
 import { AnalysisCTA } from '@/components/readings/AnalysisCTA'
 import { AnalysisStream } from '@/components/readings/AnalysisStream'
@@ -50,6 +51,8 @@ export interface AnaliseClientProps {
    * quando terminar.
    */
   isAnalysisInProgress?: boolean
+  /** Regen só pro founder (2026-06-03) — repassa ao AnalysisCTA. */
+  isFounder?: boolean
 }
 
 export function AnaliseClient({
@@ -58,6 +61,7 @@ export function AnaliseClient({
   regenerationCount,
   isDelivered,
   isAnalysisInProgress = false,
+  isFounder = false,
 }: AnaliseClientProps) {
   const router = useRouter()
   const [streaming, setStreaming] = useState(false)
@@ -193,13 +197,28 @@ export function AnaliseClient({
       {streaming ? (
         <AnalysisStream sectionsReceived={sectionsReceived} error={error} />
       ) : (
-        <AnalysisCTA
-          readingId={readingId}
-          hasReport={hasInitialReport}
-          regenerationCount={regenerationCount}
-          isDelivered={isDelivered}
-          onTrigger={handleTrigger}
-        />
+        <>
+          <AnalysisCTA
+            readingId={readingId}
+            hasReport={hasInitialReport}
+            regenerationCount={regenerationCount}
+            isDelivered={isDelivered}
+            onTrigger={handleTrigger}
+            isFounder={isFounder}
+          />
+          {/* Aviso de ciclo de vida da foto (2026-06-03) — só antes da geração:
+              depois de gerar, a foto já foi apagada. */}
+          {!hasInitialReport && (
+            <p className="mt-3 flex items-start gap-1.5 text-xs text-muted-foreground">
+              <Clock className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
+              <span>
+                Por privacidade, a foto da íris é apagada assim que o relatório é
+                gerado — e, em qualquer caso, em até 24h após o envio. Gere o
+                relatório dentro desse prazo.
+              </span>
+            </p>
+          )}
+        </>
       )}
     </>
   )

@@ -17,7 +17,7 @@ describe('components/readings/AnalysisCTA — Surface 1 button group', () => {
     expect(screen.queryByText('Editar análise')).toBeNull()
   })
 
-  it('renderiza "Editar análise" + "Regenerar análise (0/1)" quando hasReport=true (1 regen disponível)', () => {
+  it('terapeuta (não-founder) com relatório: só "Editar análise", regen escondido (2026-06-03)', () => {
     render(
       <AnalysisCTA
         readingId="r1"
@@ -28,6 +28,21 @@ describe('components/readings/AnalysisCTA — Surface 1 button group', () => {
       />,
     )
     expect(screen.getByText('Editar análise')).toBeDefined()
+    expect(screen.queryByTestId('analysis-cta-regenerate')).toBeNull()
+  })
+
+  it('founder: "Editar análise" + "Regenerar análise (0/1)" quando hasReport=true (1 regen disponível)', () => {
+    render(
+      <AnalysisCTA
+        readingId="r1"
+        hasReport={true}
+        regenerationCount={1}
+        isDelivered={false}
+        onTrigger={vi.fn()}
+        isFounder={true}
+      />,
+    )
+    expect(screen.getByText('Editar análise')).toBeDefined()
     // regenerationCount=1 = original gerada, 0 regens usados → "(0/1)", disponível.
     expect(screen.getByText(/Regenerar análise \(0\/1\)/)).toBeDefined()
     expect(
@@ -35,7 +50,7 @@ describe('components/readings/AnalysisCTA — Surface 1 button group', () => {
     ).toBe(false)
   })
 
-  it('Regenerar fica disabled e mostra (1/1) quando regenerationCount=2 (cap = 1 regen atingido)', () => {
+  it('founder: Regenerar disabled e (1/1) quando regenerationCount=2 (cap atingido)', () => {
     render(
       <AnalysisCTA
         readingId="r1"
@@ -43,6 +58,7 @@ describe('components/readings/AnalysisCTA — Surface 1 button group', () => {
         regenerationCount={2}
         isDelivered={false}
         onTrigger={vi.fn()}
+        isFounder={true}
       />,
     )
     expect(screen.getByText(/Regenerar análise \(1\/1\)/)).toBeDefined()
@@ -50,7 +66,7 @@ describe('components/readings/AnalysisCTA — Surface 1 button group', () => {
     expect(btn.hasAttribute('disabled')).toBe(true)
   })
 
-  it('Regenerar fica disabled quando isDelivered=true', () => {
+  it('founder: Regenerar disabled quando isDelivered=true', () => {
     render(
       <AnalysisCTA
         readingId="r1"
@@ -58,6 +74,7 @@ describe('components/readings/AnalysisCTA — Surface 1 button group', () => {
         regenerationCount={1}
         isDelivered={true}
         onTrigger={vi.fn()}
+        isFounder={true}
       />,
     )
     const btn = screen.getByTestId('analysis-cta-regenerate')
@@ -79,7 +96,7 @@ describe('components/readings/AnalysisCTA — Surface 1 button group', () => {
     expect(onTrigger).toHaveBeenCalledTimes(1)
   })
 
-  it('Tooltip wrapper presente (data-slot tooltip-trigger) quando regenerationCount=2 (cap atingido)', () => {
+  it('founder: Tooltip wrapper presente quando regenerationCount=2 (cap atingido)', () => {
     const { container } = render(
       <AnalysisCTA
         readingId="r1"
@@ -87,18 +104,17 @@ describe('components/readings/AnalysisCTA — Surface 1 button group', () => {
         regenerationCount={2}
         isDelivered={false}
         onTrigger={vi.fn()}
+        isFounder={true}
       />,
     )
     // Base-UI Tooltip renders a trigger wrapper element with data-slot="tooltip-trigger"
-    // Tooltip content text is lazily rendered on hover (not in initial DOM in jsdom)
     const trigger = container.querySelector('[data-slot="tooltip-trigger"]')
     expect(trigger).toBeDefined()
-    // And the regenerate button inside is disabled
     const btn = screen.getByTestId('analysis-cta-regenerate')
     expect(btn.hasAttribute('disabled')).toBe(true)
   })
 
-  it('Tooltip wrapper presente quando isDelivered=true, botão disabled', () => {
+  it('founder: Tooltip wrapper presente quando isDelivered=true, botão disabled', () => {
     const { container } = render(
       <AnalysisCTA
         readingId="r1"
@@ -106,9 +122,9 @@ describe('components/readings/AnalysisCTA — Surface 1 button group', () => {
         regenerationCount={1}
         isDelivered={true}
         onTrigger={vi.fn()}
+        isFounder={true}
       />,
     )
-    // Tooltip is rendered around the disabled button
     const trigger = container.querySelector('[data-slot="tooltip-trigger"]')
     expect(trigger).toBeDefined()
     const btn = screen.getByTestId('analysis-cta-regenerate')
