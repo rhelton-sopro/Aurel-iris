@@ -17,7 +17,7 @@ export function TopBar() {
     <header className={`lp-topbar ${solid ? 'solid' : ''}`}>
       <nav className="mx-auto flex h-[68px] max-w-[1280px] items-center justify-between px-6 md:px-10">
         <Link href="#top" aria-label="Iris Codex — início" className="flex items-center">
-          <Image src="/logo/iris_codex_horizontal.png" alt="Iris Codex" width={976} height={488} priority className="h-9 w-auto sm:h-11" />
+          <Image src="/logo/iris_codex_horizontal.png" alt="Iris Codex" width={976} height={488} priority className="h-[43px] w-auto sm:h-[53px]" />
         </Link>
         <div className="flex items-center gap-7">
           <Link href="/signup" className="eyebrow link-quiet hidden sm:inline" style={{ color: 'rgba(242,237,228,.6)' }}>
