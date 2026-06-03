@@ -156,34 +156,20 @@ export default function LandingEspelho() {
         </div>
       </section>
 
-      {/* ════════ ANTI-FORER (resposta ao "isso serve pra qualquer um") ════════ */}
+      {/* ════════ UNICIDADE (afirmativa — cada leitura é de uma pessoa só) ════════ */}
       <section className="bg-ivory text-black">
         <div className="mx-auto max-w-[820px] px-6 py-16 text-center md:px-10 md:py-20">
-          <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-dark)' }}>A pergunta que você acabou de fazer</p>
-          <h2 className="display lp-reveal mt-5" data-d="1" style={{ fontSize: 'clamp(1.6rem,3.6vw,2.4rem)', color: '#0d0d0d' }}>
-            “Isso não serviria pra qualquer pessoa?”
+          <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-dark)' }}>Feito pra uma pessoa só</p>
+          <h2 className="display lp-reveal mt-5" data-d="1" style={{ fontSize: 'clamp(1.8rem,3.8vw,2.7rem)', color: '#0d0d0d' }}>
+            Duas pessoas <em style={{ color: 'var(--teal-dark)' }}>nunca recebem o mesmo texto.</em>
           </h2>
           <p className="body-copy lp-reveal mx-auto mt-6" data-d="2" style={{ color: '#3a3a3a', fontSize: '1.05rem' }}>
-            Existe um truque velho: escrever vago o bastante pra todo mundo se ver — e chamar de leitura.
-            Horóscopo faz isso. Iridologia genérica faz isso. O Iris Codex foi construído contra isso: a leitura
-            não parte de um texto pronto, parte dos sinais que a IA encontra naquela íris — densidade, trama de
-            fibras, pigmentos, pupila. Troque a pessoa, e não muda um adjetivo: muda tudo.
+            Cada leitura nasce daquela íris — e de mais nenhuma. Ela não parte de um texto pronto: parte dos
+            sinais que a IA encontra naquela íris — densidade, trama de fibras, pigmentos, pupila. Troque a
+            pessoa, e não muda um adjetivo: muda tudo.
           </p>
-          <div className="lp-reveal mx-auto mt-10 grid max-w-[680px] gap-5 text-left sm:grid-cols-3" data-d="3">
-            {[
-              { n: '01', t: 'Lê os sinais', d: 'Densidade, trama de fibras, pigmentos e pupila — na imagem daquela íris.' },
-              { n: '02', t: 'Organiza em achados', d: 'O que de fato aparece ali, estruturado — não um texto pronto.' },
-              { n: '03', t: 'Escreve única', d: 'A leitura nasce dos achados daquela pessoa. De mais ninguém.' },
-            ].map((s) => (
-              <div key={s.n} style={{ borderTop: '1px solid var(--teal)', paddingTop: '.9rem' }}>
-                <span className="display" style={{ fontSize: '1.1rem', color: 'var(--teal-dark)' }}>{s.n}</span>
-                <h3 className="eyebrow mt-2" style={{ color: '#0d0d0d', letterSpacing: '.12em', fontSize: '.72rem' }}>{s.t}</h3>
-                <p className="body-copy mt-1.5" style={{ color: '#5a5a5a', fontSize: '.85rem' }}>{s.d}</p>
-              </div>
-            ))}
-          </div>
           <p className="body-copy lp-reveal mx-auto mt-6" data-d="3" style={{ color: '#3a3a3a', fontSize: '1.05rem' }}>
-            <strong style={{ color: '#0d0d0d', fontWeight: 600 }}>Não acredite na nossa palavra.</strong> Use uma das 3 leituras grátis na íris de um cliente que você conhece de cor — e julgue você mesmo se bate.
+            <strong style={{ color: '#0d0d0d', fontWeight: 600 }}>Não acredite na nossa palavra.</strong> Use uma das 3 leituras grátis na íris de um cliente que você conhece de cor — e veja se ele se reconhece.
           </p>
         </div>
       </section>
