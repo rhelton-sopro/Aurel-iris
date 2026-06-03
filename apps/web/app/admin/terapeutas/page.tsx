@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
@@ -71,12 +70,6 @@ export default async function TerapeutasAdminPage() {
             {rows.length === 1 ? '' : 's'}.
           </p>
         </div>
-        <Link
-          href="/admin/calibration"
-          className="text-sm text-muted-foreground hover:text-foreground"
-        >
-          /admin/calibration →
-        </Link>
       </div>
 
       <InviteTherapistForm />

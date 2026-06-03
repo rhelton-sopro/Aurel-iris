@@ -20,12 +20,6 @@ const SECTIONS: Array<{
     destructive: true,
   },
   {
-    href: '/admin/calibration',
-    title: 'Calibração',
-    description:
-      'Revisar leituras de todos terapeutas e anotar para calibração (Sonnet/SAM/comparar/re-parsers).',
-  },
-  {
     href: '/admin/relatorios',
     title: 'Relatórios',
     description:
