@@ -18,7 +18,7 @@ import { Camera, FileText, Check, Lock, CreditCard, Clock } from 'lucide-react'
 // ─────────────────────────────────────────────────────────────────────────────
 
 const cormorant = Cormorant_Garamond({
-  subsets: ['latin'],
+  subsets: ['latin', 'latin-ext'],
   weight: ['300', '400', '500', '600'],
   style: ['normal', 'italic'],
   variable: '--font-cormorant',
@@ -104,7 +104,7 @@ export default function LandingEspelho() {
             </div>
           </div>
           <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-light)' }}>A verdade do consultório</p>
-          <h2 className="display lp-reveal mt-6" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)' }}>
+          <h2 className="display lp-reveal mt-6" style={{ fontSize: 'clamp(2.35rem,4.8vw,4rem)' }}>
             O mais difícil nunca foi a íris.<br /><em style={{ color: 'var(--teal-light)' }}>É o cliente que senta na sua frente e não se abre.</em>
           </h2>
           <p className="body-copy lp-reveal mx-auto mt-8" data-d="1" style={{ color: 'rgba(242,237,228,.82)', fontSize: '1.18rem' }}>
@@ -127,7 +127,7 @@ export default function LandingEspelho() {
           </div>
           <div className="mx-auto max-w-[900px] text-center">
           <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-dark)' }}>O que muda</p>
-          <h2 className="display lp-reveal mt-6" data-d="1" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)', color: '#0d0d0d' }}>
+          <h2 className="display lp-reveal mt-6" data-d="1" style={{ fontSize: 'clamp(2.35rem,4.8vw,4rem)', color: '#0d0d0d' }}>
             E se ele chegasse à sessão{' '}<em style={{ color: 'var(--teal-dark)' }}>já se sentindo visto?</em>
           </h2>
           <p className="body-copy lp-reveal mx-auto mt-7" data-d="2" style={{ color: '#3a3a3a', fontSize: '1.18rem' }}>
@@ -176,7 +176,7 @@ export default function LandingEspelho() {
         <div className="relative z-10 mx-auto max-w-[1080px] px-6 py-24 md:px-10 md:py-28">
           <div className="lp-reveal text-center">
             <p className="eyebrow" style={{ color: 'var(--teal-light)' }}>O que uma leitura abre</p>
-            <h2 className="display mx-auto mt-6" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)', maxWidth: '26ch' }}>
+            <h2 className="display mx-auto mt-6" style={{ fontSize: 'clamp(2.35rem,4.8vw,4rem)', maxWidth: '26ch' }}>
               Não é um retrato. <em style={{ color: 'var(--teal-light)' }}>É a pessoa inteira — em camadas que ela mesma não sabia nomear.</em>
             </h2>
           </div>
@@ -204,7 +204,7 @@ export default function LandingEspelho() {
         <div className="mx-auto max-w-[1080px] px-6 py-20 md:px-10 md:py-24">
           <div className="lp-reveal text-center">
             <p className="eyebrow" style={{ color: 'var(--teal-dark)' }}>Por dentro de uma leitura</p>
-            <h2 className="display mx-auto mt-6" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)', color: '#0d0d0d', maxWidth: '22ch' }}>
+            <h2 className="display mx-auto mt-6" style={{ fontSize: 'clamp(2.35rem,4.8vw,4rem)', color: '#0d0d0d', maxWidth: '22ch' }}>
               Uma frase te parou. <em style={{ color: 'var(--teal-dark)' }}>Agora imagine a leitura inteira.</em>
             </h2>
             <p className="body-copy mx-auto mt-6" style={{ color: '#3a3a3a', fontSize: '1.18rem', maxWidth: '60ch' }}>
@@ -260,7 +260,7 @@ export default function LandingEspelho() {
           </div>
           <div className="order-1 lp-reveal lg:order-2">
             <p className="eyebrow" style={{ color: 'var(--teal-dark)' }}>Além do relatório</p>
-            <h2 className="display mt-6" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)', color: '#0d0d0d' }}>
+            <h2 className="display mt-6" style={{ fontSize: 'clamp(2.35rem,4.8vw,4rem)', color: '#0d0d0d' }}>
               Você não chega à sessão com uma página em branco. <em style={{ color: 'var(--teal-dark)' }}>Chega com o caminho.</em>
             </h2>
             <p className="mt-5 text-xs" style={{ color: 'var(--mist)', letterSpacing: '.04em', fontStyle: 'italic' }}>
@@ -302,7 +302,7 @@ export default function LandingEspelho() {
       <section className="bg-ivory text-black">
         <div className="mx-auto max-w-[1100px] px-6 py-20 text-center md:px-10 md:py-24">
           <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-dark)' }}>O método</p>
-          <h2 className="display lp-reveal mx-auto mt-6" data-d="1" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)', color: '#0d0d0d', maxWidth: '20ch' }}>
+          <h2 className="display lp-reveal mx-auto mt-6" data-d="1" style={{ fontSize: 'clamp(2.35rem,4.8vw,4rem)', color: '#0d0d0d', maxWidth: '20ch' }}>
             Tradição como base. <em style={{ color: 'var(--teal-dark)' }}>Método como diferença.</em>
           </h2>
           <div className="mt-12 grid gap-px md:grid-cols-3" style={{ background: '#e8e0d2' }}>
@@ -340,7 +340,7 @@ export default function LandingEspelho() {
           </div>
           <div className="order-1 lp-reveal lg:order-2">
             <p className="eyebrow" style={{ color: 'var(--teal-dark)' }}>De onde vem a leitura</p>
-            <h2 className="display mt-6" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.5rem)', color: '#0d0d0d' }}>
+            <h2 className="display mt-6" style={{ fontSize: 'clamp(2.35rem,4.8vw,4rem)', color: '#0d0d0d' }}>
               A íris fundamenta o relatório. <em style={{ color: 'var(--teal-dark)' }}>A IA não inventa — parte do que está ali.</em>
             </h2>
             <p className="body-copy mt-7" style={{ color: '#3a3a3a', fontSize: '1.18rem' }}>
@@ -539,7 +539,7 @@ function LpStyle() {
 .lp-root *{ -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; }
 html:has(.lp-root){ scroll-behavior:smooth; }
 
-.display { font-family: var(--font-cormorant), Georgia, serif; font-weight:300; letter-spacing:-0.02em; line-height:1.04; text-wrap:balance; }
+.display { font-family: var(--font-cormorant), Georgia, serif; font-weight:400; letter-spacing:-0.015em; line-height:1.06; text-wrap:balance; }
 .display em { font-style:italic; font-weight:400; }
 .eyebrow { font-family: var(--font-raleway), sans-serif; font-weight:400; font-size:.72rem; letter-spacing:.34em; text-transform:uppercase; }
 .body-copy { font-weight:300; line-height:1.68; letter-spacing:.005em; max-width:68ch; }
