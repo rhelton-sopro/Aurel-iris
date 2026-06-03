@@ -499,7 +499,7 @@ export default function LandingEspelho() {
                   <p className="mt-1 text-xs" style={{ color: 'var(--mist)', letterSpacing: '.04em' }}>por leitura</p>
                   <hr style={{ border: 0, borderTop: '1px solid var(--teal)', width: 28, margin: '1.1rem 0' }} />
                   <p className="display" style={{ fontSize: '1.1rem', color: '#0d0d0d' }}>{p.leituras}</p>
-                  <p className="mt-1 text-xs" style={{ color: 'var(--mist)' }}>{p.total} no total</p>
+                  <p className="display mt-1" style={{ fontSize: '1.4rem', color: '#0d0d0d', lineHeight: 1.05 }}>{p.total} <span className="body-copy" style={{ fontSize: '.72rem', color: 'var(--mist)', letterSpacing: '.04em' }}>no total</span></p>
                   <p className="body-copy mt-4 text-sm" style={{ color: '#5a5a5a' }}>{p.micro}</p>
                 </div>
               )
