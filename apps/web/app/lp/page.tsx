@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Cormorant_Garamond } from 'next/font/google'
+import { Fraunces } from 'next/font/google'
 import { DISCLAIMER_COMPACT } from '@/components/legal/DisclaimerCopy'
 import { TopBar } from './TopBar'
 import { RevealInit } from './RevealInit'
@@ -17,9 +17,11 @@ import { Camera, FileText, Check, Lock, CreditCard, Clock } from 'lucide-react'
 // ⚠️ Antes de abrir ao público: reverter pricing R$5→oficial e virar robots.index=true.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const cormorant = Cormorant_Garamond({
+// Display: Fraunces (serifa com alma, latin-ext pleno, acentos PT sólidos).
+// Mantém a CSS var --font-cormorant pra não tocar nas ~20 referências existentes.
+const fraunces = Fraunces({
   subsets: ['latin', 'latin-ext'],
-  weight: ['300', '400', '500', '600'],
+  weight: ['400', '500', '600'],
   style: ['normal', 'italic'],
   variable: '--font-cormorant',
   display: 'swap',
@@ -54,7 +56,7 @@ const FAQ = [
 
 export default function LandingEspelho() {
   return (
-    <div id="top" className={`${cormorant.variable} lp-root`}>
+    <div id="top" className={`${fraunces.variable} lp-root`}>
       <LpStyle />
       <RevealInit />
       <TopBar />
@@ -85,7 +87,7 @@ export default function LandingEspelho() {
               <Link href="/signup" className="btn btn-primary">Começar grátis — 3 leituras</Link>
               <Link href="/login" className="link-quiet text-sm">Já tenho conta · Entrar</Link>
             </div>
-            <p className="lp-reveal mt-8 text-xs leading-relaxed" data-d="3" style={{ color: 'rgba(242,237,228,.58)', letterSpacing: '.04em', maxWidth: '48ch' }}>
+            <p className="lp-reveal mt-8 text-xs leading-relaxed" data-d="3" style={{ color: 'rgba(242,237,228,.74)', letterSpacing: '.04em', maxWidth: '48ch' }}>
               Sem cartão · 3 leituras ou 15 dias · Apoio à anamnese, não substitui avaliação médica.
             </p>
           </div>
@@ -539,7 +541,7 @@ function LpStyle() {
 .lp-root *{ -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; }
 html:has(.lp-root){ scroll-behavior:smooth; }
 
-.display { font-family: var(--font-cormorant), Georgia, serif; font-weight:400; letter-spacing:-0.015em; line-height:1.06; text-wrap:balance; }
+.display { font-family: var(--font-cormorant), Georgia, serif; font-weight:400; letter-spacing:-0.01em; line-height:1.1; text-wrap:balance; }
 .display em { font-style:italic; font-weight:400; }
 .eyebrow { font-family: var(--font-raleway), sans-serif; font-weight:400; font-size:.72rem; letter-spacing:.34em; text-transform:uppercase; }
 .body-copy { font-weight:300; line-height:1.68; letter-spacing:.005em; max-width:68ch; }
