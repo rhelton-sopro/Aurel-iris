@@ -72,8 +72,8 @@ export default function LandingEspelho() {
                 <em style={{ color: 'var(--teal-light)' }}>e conduz a sessão mais profunda da vida dele.</em>
               </h1>
               <p className="body-copy lg lp-reveal mt-6" data-d="2" style={{ color: 'rgba(242,237,228,.82)' }}>
-                Em minutos... O Iris Codex faz a leitura pela íris e libera um relatório completo — a história que
-                seu cliente carrega e raramente põe em palavras. Ele se reconhece, se emociona, e enfim se sente
+                Em poucos minutos, o Iris Codex lê a íris e devolve um relatório completo — a história que
+                seu cliente carrega e raramente põe em palavras. Ele se reconhece. E pela primeira vez se sente
                 entendido. Ler a análise com ele já é a primeira sessão: você recebe as perguntas certas e dá o
                 melhor direcionamento da terapia.
               </p>
@@ -134,14 +134,14 @@ export default function LandingEspelho() {
           </div>
           <div className="mx-auto max-w-[900px] text-center">
           <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-dark)' }}>O que muda</p>
-          <h2 className="display lp-reveal mt-6" data-d="1" style={{ fontSize: 'clamp(2.6rem,5.4vw,4.6rem)', color: '#0d0d0d' }}>
+          <h2 className="display lp-reveal mt-6" data-d="1" style={{ fontSize: 'clamp(2.5rem,5vw,4.3rem)', color: '#0d0d0d' }}>
             E se ele chegasse à sessão{' '}<em style={{ color: 'var(--teal-dark)' }}>já se sentindo visto?</em>
           </h2>
           <p className="body-copy lp-reveal mx-auto mt-7" data-d="2" style={{ color: '#3a3a3a', fontSize: '1.18rem' }}>
-            Com o Iris Codex, a leitura começa antes da sua primeira pergunta. Você faz a devolutiva —
-            lado a lado ou pela tela — e lê o relatório com o cliente. E ali, frase após frase, ele se
-            reconhece. Tem gente que se cala. Tem gente que chora. Não porque o texto adivinhou um destino,
-            mas porque alguém finalmente pôs em palavras o que ele sentia e nunca soube nomear.{' '}
+            Com o Iris Codex, a leitura começa antes da sua primeira pergunta. Você faz a devolutiva,
+            lado a lado ou pela tela, lendo o relatório junto com ele. E ele vai se reconhecendo. Tem
+            gente que se cala. Tem gente que chora — não porque o texto adivinhou um destino, mas porque
+            alguém finalmente pôs em palavras o que ele sentia e nunca soube nomear.{' '}
             <strong style={{ color: '#0d0d0d', fontWeight: 600 }}>Essa devolutiva já é a primeira sessão.</strong>
           </p>
           <p className="body-copy lp-reveal mx-auto mt-6" data-d="2" style={{ color: '#3a3a3a', fontSize: '1.18rem' }}>
@@ -167,15 +167,15 @@ export default function LandingEspelho() {
           <div className="lp-reveal text-center">
             <p className="eyebrow" style={{ color: 'var(--teal-light)' }}>O que vem no relatório</p>
             <h2 className="display mx-auto mt-6" style={{ fontSize: 'clamp(2.35rem,4.8vw,4rem)', maxWidth: '26ch' }}>
-              Não é um retrato. <em style={{ color: 'var(--teal-light)' }}>É a pessoa inteira — em camadas que ela mesma não sabia nomear.</em>
+              A pessoa inteira — <em style={{ color: 'var(--teal-light)' }}>inclusive as partes que ela não consegue explicar.</em>
             </h2>
           </div>
           <div className="mt-14 grid gap-x-12 gap-y-9 md:grid-cols-2">
             {[
-              { t: 'O jeito de processar a vida', d: 'O temperamento de base — a maneira de sentir o mundo que ele sempre teve, e nunca soube que tinha nome.' },
+              { t: 'O jeito de processar a vida', d: 'O temperamento de base — a maneira de sentir o mundo que ele sempre teve, sem nunca ter reparado.' },
               { t: 'Onde tudo começou', d: 'A linha do tempo emocional: quando o padrão se formou, e o que o manteve de pé desde então.' },
-              { t: 'O que se repete', d: 'Aquilo que ele refaz de novo e de novo, sem perceber que escolhe.' },
-              { t: 'As forças que ele subestima', d: 'O que nele já é potência — esperando ser usado de propósito, não por acaso.' },
+              { t: 'O que se repete', d: 'O que ele repete sem perceber que está escolhendo.' },
+              { t: 'As forças que ele subestima', d: 'A força que ele tem e não usa de propósito — porque nunca reparou que era força.' },
               { t: 'O que pede cuidado agora', d: 'Onde a vida vem cobrando — em linguagem de emoção e comportamento, nunca de exame.' },
               { t: 'O que ele protege', d: 'A ferida que aprendeu a esconder cedo — e a defesa que montou em volta dela.' },
               { t: 'O ritmo do dia a dia', d: 'Como sono, descanso e o jeito de se cuidar conversam com o que ele sente — estilo de vida, não receita.' },
@@ -201,8 +201,8 @@ export default function LandingEspelho() {
               Uma frase te parou. <em style={{ color: 'var(--teal-dark)' }}>Agora imagine a leitura inteira.</em>
             </h2>
             <p className="body-copy mx-auto mt-6" style={{ color: '#3a3a3a', fontSize: '1.18rem', maxWidth: '60ch' }}>
-              Não é uma página. São mais de uma dúzia de frentes que se conversam — do temperamento ao que
-              pede cuidado, da história que formou o cliente ao roteiro pra conduzir a devolutiva.
+              Não é uma página. São mais de dez frentes que conversam entre si: o temperamento, a história
+              que formou o cliente, o que pede cuidado, o roteiro pra conduzir a devolutiva.
             </p>
             <p className="mt-5 text-xs" style={{ color: 'var(--mist)', letterSpacing: '.04em', fontStyle: 'italic' }}>
               Tópicos e trechos ilustrativos — sem dados reais de cliente.
@@ -247,7 +247,7 @@ export default function LandingEspelho() {
       <section className="bg-white text-black">
         <div className="mx-auto grid max-w-[1280px] items-center gap-14 px-6 py-20 md:px-10 md:py-24 lg:grid-cols-2 lg:gap-16">
           <div className="order-2 lp-reveal lg:order-1">
-            <div className="relative mx-auto w-full max-w-[440px]" style={{ aspectRatio: '4 / 5', borderRadius: '2px', overflow: 'hidden', boxShadow: '0 30px 80px -40px rgba(0,0,0,.5)' }}>
+            <div className="lp-frame-light relative mx-auto w-full max-w-[440px]" style={{ aspectRatio: '4 / 5' }}>
               <Image src="/lp/relatorio-tablet.png" alt="Terapeuta segura o relatório do Iris Codex num tablet" fill sizes="(max-width:1024px) 80vw, 440px" className="object-cover object-center" />
             </div>
           </div>
@@ -272,8 +272,8 @@ export default function LandingEspelho() {
             </div>
             <p className="body-copy mt-8" style={{ color: '#3a3a3a', fontSize: '1.18rem' }}>
               Os catálogos de iridologia te entregam o mapa e te deixam ali, sozinho com ele. O Iris Codex te
-              entrega o mapa e a primeira pergunta — onde tocar, o que merece atenção antes do resto. Não é
-              interrogatório de anamnese: é a conversa começando funda.
+              entrega o mapa e a primeira pergunta — onde tocar, o que merece atenção antes do resto. Não soa
+              interrogatório. A conversa já começa funda.
             </p>
           </div>
         </div>
@@ -298,7 +298,7 @@ export default function LandingEspelho() {
           <h2 className="display lp-reveal mx-auto mt-6" data-d="1" style={{ fontSize: 'clamp(2.35rem,4.8vw,4rem)', color: '#0d0d0d', maxWidth: '20ch' }}>
             Tradição como base. <em style={{ color: 'var(--teal-dark)' }}>Método como diferença.</em>
           </h2>
-          <div className="mt-12 grid gap-px md:grid-cols-3" style={{ background: '#e8e0d2' }}>
+          <div className="mt-12 grid gap-px md:grid-cols-3" style={{ background: 'var(--rule-light)' }}>
             {[
               { n: '01', t: 'Herança de um século', d: 'Mais de cem anos de observação iridológica acumulada como base — a tradição lida com rigor, não palpite.' },
               { n: '02', t: 'IA própria, com método', d: 'Treinada na tradição iridológica, ela escreve cada leitura única — sem texto-modelo, sem horóscopo.' },
@@ -352,7 +352,7 @@ export default function LandingEspelho() {
       </section>
 
       {/* ════════ COMO FUNCIONA (3 micro-passos com ícones) ════════ */}
-      <section className="bg-white text-black">
+      <section className="bg-ivory text-black">
         <div className="mx-auto max-w-[900px] px-6 py-16 text-center md:px-10 md:py-20">
           <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-dark)' }}>Como funciona</p>
           <div className="mt-10 grid gap-10 sm:grid-cols-3">
@@ -363,7 +363,7 @@ export default function LandingEspelho() {
             ].map((s, i) => (
               <div key={s.t} className="lp-reveal flex flex-col items-center" data-d={String(i + 1)}>
                 <s.Icon size={30} strokeWidth={1.5} color="var(--teal)" aria-hidden="true" />
-                <h3 className="eyebrow mt-5" style={{ color: '#0d0d0d', letterSpacing: '.14em', fontSize: '.8rem' }}>{s.t}</h3>
+                <h3 className="eyebrow mt-5" style={{ color: '#0d0d0d', letterSpacing: '.16em', fontSize: '.8rem' }}>{s.t}</h3>
                 <p className="body-copy mt-2 text-sm" style={{ color: '#5a5a5a' }}>{s.d}</p>
               </div>
             ))}
@@ -379,7 +379,7 @@ export default function LandingEspelho() {
       </section>
 
       {/* ════════ TIRADA COM O CELULAR (simplicidade — prova o passo "capture") ════════ */}
-      <section className="bg-ivory text-black">
+      <section className="bg-white text-black">
         <div className="mx-auto max-w-[1080px] px-6 py-20 text-center md:px-10 md:py-24">
           <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-dark)' }}>Sem equipamento, sem câmera especial</p>
           <h2 className="display lp-reveal mx-auto mt-6" data-d="1" style={{ fontSize: 'clamp(2.35rem,4.8vw,4rem)', color: '#0d0d0d', maxWidth: '20ch' }}>
@@ -396,7 +396,7 @@ export default function LandingEspelho() {
               { src: '/lp/captura-android.png', dispositivo: 'Android', legenda: 'Tirada com um Android comum.' },
             ].map((foto) => (
               <figure key={foto.dispositivo}>
-                <div className="relative w-full" style={{ aspectRatio: '4 / 5', borderRadius: '2px', overflow: 'hidden', boxShadow: '0 30px 70px -38px rgba(0,0,0,.4)', border: '1px solid #e6ddcf', background: 'linear-gradient(135deg, #eef1ed, #dde8e5)' }}>
+                <div className="lp-frame-light relative w-full" style={{ aspectRatio: '4 / 5', background: 'linear-gradient(135deg, #eef1ed, #dde8e5)' }}>
                   <Image src={foto.src} alt={`Foto da íris tirada com ${foto.dispositivo}`} fill sizes="(max-width:640px) 92vw, 500px" className="object-cover object-center" />
                   <span className="absolute left-4 top-4" style={{ fontSize: '.6rem', letterSpacing: '.18em', textTransform: 'uppercase', fontFamily: 'var(--font-raleway),sans-serif', color: 'var(--ivory)', background: 'rgba(0,0,0,.55)', borderRadius: '2px', padding: '.35rem .6rem', backdropFilter: 'blur(4px)' }}>{foto.dispositivo}</span>
                 </div>
@@ -415,7 +415,7 @@ export default function LandingEspelho() {
       <section className="bg-black text-ivory">
         <div className="mx-auto max-w-[920px] px-6 py-20 text-center md:px-10 md:py-24">
           <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-light)' }}>A imagem do seu cliente</p>
-          <h2 className="display lp-reveal mx-auto mt-6" data-d="1" style={{ fontSize: 'clamp(2.1rem,4.4vw,3.4rem)', maxWidth: '24ch' }}>
+          <h2 className="display lp-reveal mx-auto mt-6" data-d="1" style={{ fontSize: 'clamp(2.35rem,4.8vw,4rem)', maxWidth: '24ch' }}>
             A leitura fica. <em style={{ color: 'var(--teal-light)' }}>A foto, não.</em>
           </h2>
           <p className="body-copy lp-reveal mx-auto mt-7" data-d="2" style={{ color: 'rgba(242,237,228,.82)', fontSize: '1.15rem', maxWidth: '60ch' }}>
@@ -423,7 +423,7 @@ export default function LandingEspelho() {
             é gerado e conferido, a imagem é apagada de vez — e, em qualquer caso, no máximo em 24 horas. O que
             permanece é a leitura. A foto cumpre o papel dela e desaparece.
           </p>
-          <div className="lp-reveal mx-auto mt-12 grid max-w-[760px] gap-px sm:grid-cols-3" data-d="3" style={{ background: 'rgba(242,237,228,.1)' }}>
+          <div className="lp-reveal mx-auto mt-12 grid max-w-[760px] gap-px sm:grid-cols-3" data-d="3" style={{ background: 'var(--rule-dark)' }}>
             {[
               { Icon: Clock, t: 'Apagada na geração', d: 'Ou em até 24 horas — o que vier primeiro.' },
               { Icon: Lock, t: 'Você é o controlador', d: 'Em conformidade com a LGPD, do início ao fim.' },
@@ -431,7 +431,7 @@ export default function LandingEspelho() {
             ].map((s) => (
               <div key={s.t} className="bg-black p-7 text-left">
                 <s.Icon size={22} strokeWidth={1.5} color="var(--teal-light)" aria-hidden="true" />
-                <h3 className="eyebrow mt-4" style={{ color: 'var(--ivory)', letterSpacing: '.14em', fontSize: '.74rem' }}>{s.t}</h3>
+                <h3 className="eyebrow mt-4" style={{ color: 'var(--ivory)', letterSpacing: '.16em', fontSize: '.74rem' }}>{s.t}</h3>
                 <p className="body-copy mt-2 text-sm" style={{ color: 'rgba(242,237,228,.66)' }}>{s.d}</p>
               </div>
             ))}
@@ -448,7 +448,7 @@ export default function LandingEspelho() {
               Você já viu o que ele vai ler na sua frente.
             </p>
             <div className="mx-auto mt-7" style={{ width: 164 }}>
-              <div className="relative mx-auto" style={{ aspectRatio: '3 / 4', transform: 'rotate(-3deg)', borderRadius: '2px', overflow: 'hidden', boxShadow: '0 24px 60px -28px rgba(0,0,0,.45)', border: '1px solid #e6ddcf' }}>
+              <div className="lp-frame-light relative mx-auto" style={{ aspectRatio: '3 / 4', transform: 'rotate(-3deg)' }}>
                 <Image src="/lp/print-relatorio.png" alt="Capa do relatório do Iris Codex" fill sizes="164px" className="object-cover object-top" />
               </div>
             </div>
@@ -456,7 +456,7 @@ export default function LandingEspelho() {
 
           {/* bloco trial — o herói da oferta */}
           <div className="lp-reveal mx-auto mt-10 max-w-[680px] text-center" data-d="1" style={{ background: 'var(--white)', border: '1px solid var(--teal)', borderRadius: '4px', padding: '2.6rem 1.6rem' }}>
-            <h2 className="display mx-auto" style={{ fontSize: 'clamp(2rem,4.4vw,3.2rem)', color: '#0d0d0d', maxWidth: '18ch' }}>
+            <h2 className="display mx-auto" style={{ fontSize: 'clamp(2rem,4.2vw,3.2rem)', color: '#0d0d0d', maxWidth: '18ch' }}>
               Agora sinta o <em style={{ color: 'var(--teal-dark)' }}>uau</em> na sua própria íris. De graça.
             </h2>
             <p className="body-copy mx-auto mt-6" style={{ color: '#4a4a4a', fontSize: '1.15rem' }}>
@@ -483,7 +483,7 @@ export default function LandingEspelho() {
                 <div
                   key={p.nome}
                   className={`lp-reveal relative bg-white p-7 text-left${destaque ? ' lg:-translate-y-2' : ''}`}
-                  data-d={String((i % 3) + 1)}
+                  data-d={String((i % 4) + 1)}
                   style={{
                     borderRadius: '4px',
                     border: destaque ? '1px solid var(--teal)' : '1px solid #e6ddcf',
@@ -529,11 +529,11 @@ export default function LandingEspelho() {
         <div className="mx-auto max-w-[820px] px-6 py-20 md:px-10 md:py-24">
           <div className="lp-reveal mb-10 text-center">
             <p className="eyebrow" style={{ color: 'var(--teal-dark)' }}>Perguntas</p>
-            <h2 className="display mt-6" style={{ fontSize: 'clamp(2rem,4vw,3rem)', color: '#0d0d0d' }}>Antes de começar.</h2>
+            <h2 className="display mt-6" style={{ fontSize: 'clamp(2rem,4.2vw,3.2rem)', color: '#0d0d0d' }}>Antes de começar.</h2>
           </div>
-          <div style={{ borderTop: '1px solid #e8e0d2', borderBottom: '1px solid #e8e0d2' }}>
+          <div style={{ borderTop: '1px solid var(--rule-light)', borderBottom: '1px solid var(--rule-light)' }}>
             {FAQ.map((item) => (
-              <details key={item.q} name="faq" className="lp-faq lp-reveal" open={item.open || undefined} style={{ borderTop: '1px solid #e8e0d2' }}>
+              <details key={item.q} name="faq" className="lp-faq lp-reveal" open={item.open || undefined} style={{ borderTop: '1px solid var(--rule-light)' }}>
                 <summary className="flex cursor-pointer list-none items-start justify-between gap-6 py-7">
                   <span className="display" style={{ fontSize: '1.5rem', color: '#0d0d0d' }}>{item.q}</span>
                   <span className="lp-faq-sign" aria-hidden="true">＋</span>
@@ -551,7 +551,7 @@ export default function LandingEspelho() {
         <div className="vignette" aria-hidden="true" />
         <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,.55)' }} aria-hidden="true" />
         <div className="relative z-10 mx-auto max-w-[900px] px-6 py-24 text-center md:px-10 md:py-32">
-          <h2 className="display lp-reveal" style={{ fontSize: 'clamp(2.3rem,5.2vw,4.2rem)' }}>
+          <h2 className="display lp-reveal" style={{ fontSize: 'clamp(2.5rem,5vw,4.3rem)' }}>
             Seu próximo cliente<br />merece <em style={{ color: 'var(--teal-light)' }}>se sentir lido.</em>
           </h2>
           <div className="lp-reveal mt-12" data-d="1">
@@ -587,6 +587,7 @@ function LpStyle() {
 .lp-root {
   --black:#000; --ivory:#F2EDE4; --white:#fff;
   --teal:#3D9B8C; --teal-light:#5BBFB0; --teal-dark:#1E6B61; --mist:#7A7A7A;
+  --rule-light:#e8e0d2; --rule-dark:rgba(242,237,228,.1);
   background:var(--black); color:var(--ivory);
   font-family: var(--font-raleway), ui-sans-serif, system-ui, sans-serif; font-weight:300;
   overflow-x:hidden;
@@ -597,7 +598,7 @@ html:has(.lp-root){ scroll-behavior:smooth; }
 .display { font-family: var(--font-cormorant), Georgia, serif; font-weight:400; letter-spacing:-0.01em; line-height:1.1; text-wrap:balance; }
 .display em { font-style:italic; font-weight:400; }
 .eyebrow { font-family: var(--font-raleway), sans-serif; font-weight:400; font-size:.72rem; letter-spacing:.34em; text-transform:uppercase; }
-.body-copy { font-weight:300; line-height:1.68; letter-spacing:.005em; max-width:68ch; }
+.body-copy { font-weight:300; line-height:1.68; letter-spacing:.005em; max-width:68ch; text-wrap:pretty; }
 .body-copy.lg { font-size:1.12rem; }
 
 .btn { display:inline-flex; align-items:center; justify-content:center; gap:.6em; font-family:var(--font-raleway),sans-serif; font-weight:400; font-size:.78rem; letter-spacing:.18em; text-transform:uppercase; padding:1.15rem 2.1rem; border-radius:2px; cursor:pointer; border:1px solid transparent; min-height:48px; transition:background .2s ease,color .2s ease,border-color .2s ease,transform .12s ease; text-decoration:none; }
@@ -625,21 +626,9 @@ html:has(.lp-root){ scroll-behavior:smooth; }
 .lp-hero-photo { position:relative; width:100%; aspect-ratio:16/9; border-radius:2px; overflow:hidden; box-shadow:0 40px 100px -45px rgba(0,0,0,.85), 0 0 0 1px rgba(91,191,176,.18); }
 @media (min-width:1024px){ .lp-hero-photo { aspect-ratio:3/2; } }
 
-/* íris procedural (5 cores + fallback) */
-.iris { --c-core:#0e4d46; --c-mid:#1E6B61; --c-rim:#072420; --c-glow:#3D9B8C; --fiber:#5BBFB0; position:relative; aspect-ratio:1; border-radius:50%; isolation:isolate;
-  background:
-    repeating-conic-gradient(from 0deg, rgba(0,0,0,0) 0deg .5deg, color-mix(in srgb, var(--fiber) 55%, transparent) .5deg .95deg, rgba(0,0,0,0) .95deg 1.7deg),
-    radial-gradient(circle at 50% 47%, var(--c-core) 0%, var(--c-mid) 30%, color-mix(in srgb, var(--c-mid) 60%, #000) 58%, var(--c-rim) 82%, #000 100%);
-  box-shadow: inset 0 0 60px 10px rgba(0,0,0,.55), inset 0 0 0 1px color-mix(in srgb, var(--c-glow) 40%, transparent); }
-.iris::before { content:""; position:absolute; inset:0; border-radius:50%; z-index:1; background:radial-gradient(circle at 50% 47%, transparent 10%, rgba(0,0,0,0) 24%, rgba(0,0,0,.28) 55%, rgba(0,0,0,.62) 100%); }
-.iris::after { content:""; position:absolute; z-index:2; width:30%; height:30%; left:50%; top:47%; transform:translate(-50%,-50%); border-radius:50%; background:#000; box-shadow:0 0 22px 6px rgba(0,0,0,.7), inset 0 0 0 1px rgba(91,191,176,.16); }
-.iris .catch { position:absolute; z-index:3; width:7%; height:7%; left:43%; top:40%; border-radius:50%; background:radial-gradient(circle, rgba(255,255,255,.92), rgba(255,255,255,0) 70%); filter:blur(.5px); }
-.iris .slot-tag { position:absolute; z-index:4; bottom:7%; left:50%; transform:translateX(-50%); font-family:var(--font-geist-mono),ui-monospace,monospace; font-size:.58rem; letter-spacing:.22em; text-transform:uppercase; color:rgba(242,237,228,.42); white-space:nowrap; }
-.iris.castanho { --c-core:#5a3415; --c-mid:#7a4a1f; --c-rim:#1d0f05; --c-glow:#a86a32; --fiber:#caa06a; }
-.iris.ambar { --c-core:#7a4a08; --c-mid:#a86c10; --c-rim:#2a1804; --c-glow:#d39b2c; --fiber:#e7c878; }
-.iris.mel { --c-core:#8a6a16; --c-mid:#b08a1f; --c-rim:#2e2206; --c-glow:#d7b13e; --fiber:#ecd98a; }
-.iris.azul { --c-core:#13405f; --c-mid:#1d5d86; --c-rim:#05141f; --c-glow:#3f8fc0; --fiber:#86c2e6; }
-.iris.verde { --c-core:#244f1c; --c-mid:#356f29; --c-rim:#0a1c06; --c-glow:#5a9a3f; --fiber:#9ac878; }
+/* molduras de foto — sistema único (M1): fundo claro = borda bege; fundo escuro = anel teal */
+.lp-frame-light { position:relative; border-radius:2px; overflow:hidden; border:1px solid #e6ddcf; box-shadow:0 30px 70px -38px rgba(0,0,0,.42); }
+.lp-frame-dark { position:relative; border-radius:2px; overflow:hidden; box-shadow:0 40px 100px -45px rgba(0,0,0,.85), 0 0 0 1px rgba(91,191,176,.18); }
 
 .vignette { position:absolute; inset:0; z-index:1; pointer-events:none; background:radial-gradient(circle at 50% 45%, transparent 30%, rgba(0,0,0,.55) 78%, rgba(0,0,0,.85) 100%); }
 
@@ -650,7 +639,7 @@ html:has(.lp-root){ scroll-behavior:smooth; }
 /* reveal — visível por padrão; só esconde quando JS arma (html.lp-anim) */
 .lp-reveal { transition:opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1); }
 html.lp-anim .lp-reveal:not(.in) { opacity:0; transform:translateY(22px); }
-.lp-reveal[data-d="1"] { transition-delay:.1s; } .lp-reveal[data-d="2"] { transition-delay:.2s; } .lp-reveal[data-d="3"] { transition-delay:.3s; }
+.lp-reveal[data-d="1"] { transition-delay:.1s; } .lp-reveal[data-d="2"] { transition-delay:.2s; } .lp-reveal[data-d="3"] { transition-delay:.3s; } .lp-reveal[data-d="4"] { transition-delay:.4s; }
 
 /* nav */
 .lp-topbar { position:fixed; top:0; left:0; right:0; z-index:50; border-bottom:1px solid transparent; transition:background .4s ease,border-color .4s ease,backdrop-filter .4s ease; }
