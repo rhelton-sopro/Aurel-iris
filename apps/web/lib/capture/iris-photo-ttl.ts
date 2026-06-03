@@ -32,36 +32,29 @@ export async function purgeExpiredIrisPhotos(): Promise<TtlSweepResult> {
   const result: TtlSweepResult = { ttl_purged: 0, catchup_purged: 0, errors: 0 }
 
   // ── Pass A: TTL 24h ────────────────────────────────────────────────────
+  // Dirigido pela readings (não por reading_images): leituras de convite às
+  // vezes NÃO têm rows em reading_images, então buscar por lá as deixava
+  // invisíveis ao cron — fotos eternas no storage. readings.created_at ≈
+  // momento da captura no beta; é a fonte robusta. purgeIrisPhotos deleta pelo
+  // prefixo do storage, então leitura sem foto vira no-op (removed:0, ok).
   const cutoff = new Date(Date.now() - TTL_MS).toISOString()
-  const { data: oldImgs, error: oldErr } = await service
-    .from('reading_images')
-    .select('reading_id, created_at')
+  const { data: oldRaw, error: oldErr } = await service
+    .from('readings')
+    // images_purged_at é da migration 0043 — fora dos types gerados; cast isola.
+    .select('id, images_purged_at' as never)
     .lt('created_at', cutoff)
+    .is('images_purged_at' as never, null)
+    .limit(1000)
 
   if (oldErr) {
     console.error('[photo-ttl] pass A list falhou:', oldErr.message)
     result.errors += 1
   } else {
-    const candidateIds = [...new Set((oldImgs ?? []).map((i) => i.reading_id))]
-    if (candidateIds.length > 0) {
-      // images_purged_at é da migration 0043 — ainda fora dos types gerados
-      // (founder regenera após db push). Cast isola o type-check.
-      const { data: rowsRaw } = await service
-        .from('readings')
-        .select('id, images_purged_at' as never)
-        .in('id', candidateIds)
-      const rows = (rowsRaw ?? []) as unknown as Array<{
-        id: string
-        images_purged_at: string | null
-      }>
-      const toPurge = rows
-        .filter((r) => r.images_purged_at == null)
-        .map((r) => r.id)
-      for (const id of toPurge) {
-        const r = await purgeIrisPhotos(service, id, 'ttl_24h')
-        if (r.ok) result.ttl_purged += 1
-        else result.errors += 1
-      }
+    const rows = (oldRaw ?? []) as unknown as Array<{ id: string }>
+    for (const row of rows) {
+      const r = await purgeIrisPhotos(service, row.id, 'ttl_24h')
+      if (r.ok) result.ttl_purged += 1
+      else result.errors += 1
     }
   }
 
