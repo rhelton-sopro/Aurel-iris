@@ -152,25 +152,10 @@ export default function LandingEspelho() {
             o cliente chegar mais aberto. A relação continua sendo sua, construída sessão a sessão. O que
             muda é por onde você começa: não da página em branco, mas já lá no fundo.
           </p>
+          <p className="body-copy lp-reveal mx-auto mt-8" data-d="3" style={{ color: '#3a3a3a', fontSize: '1.15rem', maxWidth: '60ch' }}>
+            <strong style={{ color: '#0d0d0d', fontWeight: 600 }}>Não acredite na nossa palavra.</strong> Faça a primeira leitura na íris de um cliente que você conhece de cor — e veja se ele se reconhece.
+          </p>
           </div>
-        </div>
-      </section>
-
-      {/* ════════ UNICIDADE (afirmativa — cada leitura é de uma pessoa só) ════════ */}
-      <section className="bg-ivory text-black">
-        <div className="mx-auto max-w-[820px] px-6 py-16 text-center md:px-10 md:py-20">
-          <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-dark)' }}>Feito pra uma pessoa só</p>
-          <h2 className="display lp-reveal mt-5" data-d="1" style={{ fontSize: 'clamp(1.8rem,3.8vw,2.7rem)', color: '#0d0d0d' }}>
-            Duas pessoas <em style={{ color: 'var(--teal-dark)' }}>nunca recebem o mesmo texto.</em>
-          </h2>
-          <p className="body-copy lp-reveal mx-auto mt-6" data-d="2" style={{ color: '#3a3a3a', fontSize: '1.05rem' }}>
-            Cada leitura nasce daquela íris — e de mais nenhuma. Ela não parte de um texto pronto: parte dos
-            sinais que a IA encontra naquela íris — densidade, trama de fibras, pigmentos, pupila. Troque a
-            pessoa, e não muda um adjetivo: muda tudo.
-          </p>
-          <p className="body-copy lp-reveal mx-auto mt-6" data-d="3" style={{ color: '#3a3a3a', fontSize: '1.05rem' }}>
-            <strong style={{ color: '#0d0d0d', fontWeight: 600 }}>Não acredite na nossa palavra.</strong> Use uma das 3 leituras grátis na íris de um cliente que você conhece de cor — e veja se ele se reconhece.
-          </p>
         </div>
       </section>
 
@@ -354,7 +339,8 @@ export default function LandingEspelho() {
             <p className="body-copy mt-7" style={{ color: '#3a3a3a', fontSize: '1.18rem' }}>
               Primeiro a IA lê a imagem da íris e identifica os sinais — densidade, trama de fibras,
               pigmentos, pupila — e os organiza em achados. Só então escreve a leitura, partindo dos sinais
-              que aparecem naquela íris específica, não de um texto pronto aplicado a todo mundo.{' '}
+              que aparecem naquela íris específica, não de um texto pronto aplicado a todo mundo. Troque a
+              pessoa, e não muda um adjetivo: muda tudo.{' '}
               <strong style={{ color: '#0d0d0d', fontWeight: 600 }}>O achado é o lastro; a leitura terapêutica é o produto.</strong>
             </p>
             <p className="body-copy mt-5" style={{ color: 'var(--mist)', fontSize: '1rem' }}>
