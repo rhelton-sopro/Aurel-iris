@@ -64,32 +64,34 @@ export default function LandingEspelho() {
       {/* ════════ HERO — texto no topo + faixa horizontal do olho (mobile-safe) ════════ */}
       <section className="relative overflow-hidden bg-black pt-28 pb-12 md:pb-16 md:pt-28">
         <div className="mx-auto w-full max-w-[1280px] px-6 md:px-10">
-          <div className="lp-reveal" data-d="1">
-            <div className="lp-hero-banner">
-              <Image src="/lp/hero-captura.png" alt="Terapeuta fotografando a íris do cliente em sessão" fill priority sizes="(max-width:1280px) 92vw, 1216px" className="object-cover object-center" />
+          <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
+            <div className="order-2 lg:order-1">
+              <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-light)' }}>Para o terapeuta integrativo</p>
+              <h1 className="display lp-reveal mt-6" data-d="1" style={{ fontSize: 'clamp(2.2rem,4vw,3.6rem)' }}>
+                Você vê o que seu cliente nunca soube dizer —{' '}
+                <em style={{ color: 'var(--teal-light)' }}>e conduz a sessão mais profunda da vida dele.</em>
+              </h1>
+              <p className="body-copy lg lp-reveal mt-6" data-d="2" style={{ color: 'rgba(242,237,228,.82)' }}>
+                Em minutos... O Iris Codex faz a leitura pela íris — a história que seu cliente carrega e
+                raramente põe em palavras. Ele se reconhece, se emociona, e enfim se sente entendido. Ler a análise
+                com ele já é a primeira sessão: você recebe as perguntas certas e o direcionamento da terapia.
+              </p>
+              <p className="eyebrow lp-reveal mt-5" data-d="2" style={{ color: 'var(--teal-light)', letterSpacing: '.22em' }}>
+                Leitura assistida por IA · ancorada na tradição iridológica
+              </p>
+              <div className="lp-reveal mt-8 flex flex-wrap items-center gap-x-7 gap-y-4" data-d="3">
+                <Link href="/signup" className="btn btn-primary">Começar grátis — 3 leituras</Link>
+                <Link href="/login" className="link-quiet text-sm">Já tenho conta · Entrar</Link>
+              </div>
+              <p className="lp-reveal mt-7 text-xs leading-relaxed" data-d="3" style={{ color: 'rgba(242,237,228,.74)', letterSpacing: '.04em', maxWidth: '46ch' }}>
+                Sem cartão · 3 leituras ou 15 dias · Apoio à anamnese, não substitui avaliação médica.
+              </p>
             </div>
-          </div>
-          <div className="mt-12 max-w-3xl md:mt-14">
-            <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-light)' }}>Para o terapeuta integrativo</p>
-            <h1 className="display lp-reveal mt-6" data-d="1" style={{ fontSize: 'clamp(2.5rem,6vw,5rem)' }}>
-              Você vê o que seu cliente nunca soube dizer —{' '}
-              <em style={{ color: 'var(--teal-light)' }}>e conduz a sessão mais profunda da vida dele.</em>
-            </h1>
-            <p className="body-copy lg lp-reveal mt-7" data-d="2" style={{ color: 'rgba(242,237,228,.82)' }}>
-              Em minutos... O Iris Codex faz a leitura pela íris — a história que seu cliente carrega e
-              raramente põe em palavras. Ele se reconhece, se emociona, e enfim se sente entendido. Ler a análise
-              com ele já é a primeira sessão: você recebe as perguntas certas e o direcionamento da terapia.
-            </p>
-            <p className="eyebrow lp-reveal mt-5" data-d="2" style={{ color: 'var(--teal-light)', letterSpacing: '.22em' }}>
-              Leitura assistida por IA · ancorada na tradição iridológica
-            </p>
-            <div className="lp-reveal mt-9 flex flex-wrap items-center gap-x-7 gap-y-4" data-d="3">
-              <Link href="/signup" className="btn btn-primary">Começar grátis — 3 leituras</Link>
-              <Link href="/login" className="link-quiet text-sm">Já tenho conta · Entrar</Link>
+            <div className="order-1 lp-reveal lg:order-2" data-d="1">
+              <div className="lp-hero-photo">
+                <Image src="/lp/hero-captura.png" alt="Terapeuta fotografando a íris do cliente em sessão" fill priority sizes="(max-width:1024px) 92vw, 600px" className="object-cover object-center" />
+              </div>
             </div>
-            <p className="lp-reveal mt-8 text-xs leading-relaxed" data-d="3" style={{ color: 'rgba(242,237,228,.74)', letterSpacing: '.04em', maxWidth: '48ch' }}>
-              Sem cartão · 3 leituras ou 15 dias · Apoio à anamnese, não substitui avaliação médica.
-            </p>
           </div>
         </div>
       </section>
@@ -568,9 +570,9 @@ html:has(.lp-root){ scroll-behavior:smooth; }
 /* hero — olho inteiro (sem corte) num frame com anel teal sutil */
 .lp-hero-strip { position:relative; width:100%; aspect-ratio:16/9; border-radius:2px; overflow:hidden; box-shadow:0 40px 100px -45px rgba(0,0,0,.85), 0 0 0 1px rgba(91,191,176,.18); }
 @media (min-width:768px){ .lp-hero-strip { aspect-ratio:21/9; } }
-/* hero — foto de gente: faixa de altura limitada no desktop pra o texto caber acima da dobra */
-.lp-hero-banner { position:relative; width:100%; aspect-ratio:16/9; border-radius:2px; overflow:hidden; box-shadow:0 40px 100px -45px rgba(0,0,0,.85), 0 0 0 1px rgba(91,191,176,.18); }
-@media (min-width:768px){ .lp-hero-banner { aspect-ratio:auto; height:42vh; max-height:430px; } }
+/* hero — foto de gente em 2 colunas no desktop (texto ao lado; ambos na 1ª tela) */
+.lp-hero-photo { position:relative; width:100%; aspect-ratio:16/9; border-radius:2px; overflow:hidden; box-shadow:0 40px 100px -45px rgba(0,0,0,.85), 0 0 0 1px rgba(91,191,176,.18); }
+@media (min-width:1024px){ .lp-hero-photo { aspect-ratio:3/2; } }
 
 /* íris procedural (5 cores + fallback) */
 .iris { --c-core:#0e4d46; --c-mid:#1E6B61; --c-rim:#072420; --c-glow:#3D9B8C; --fiber:#5BBFB0; position:relative; aspect-ratio:1; border-radius:50%; isolation:isolate;
