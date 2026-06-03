@@ -23,6 +23,7 @@ import {
 import type { QualityLevel } from '@/lib/capture/quality-scoring'
 // Phase 4 -- novos imports
 import { UploadDropzone } from '@/components/upload/UploadDropzone'
+import { PhotoPrivacyNotice } from '@/components/capture/PhotoPrivacyNotice'
 import { validateUploadFile } from '@/lib/upload/validate-file'
 import { convertHeicToJpeg } from '@/lib/upload/heic-to-jpeg'
 
@@ -343,6 +344,7 @@ export function UploadClient({
               onFileAccepted={handleFileAccepted}
               slotLabel={`Foto ${slotIndex + 1} de ${SEQUENCE.length}`}
             />
+            {slotIndex === 0 && <PhotoPrivacyNotice className="w-full" />}
           </div>
         )}
 

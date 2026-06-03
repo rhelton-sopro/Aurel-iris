@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
 
 import { signInviteTermAction } from '@/app/actions/invite-consent'
+import { PhotoPrivacyNotice } from '@/components/capture/PhotoPrivacyNotice'
 
 interface Props {
   token: string
@@ -70,6 +71,8 @@ export function InviteTermoStep({
         fotografias são tratadas conforme a LGPD (Lei 13.709/2018) como dado
         pessoal sensível.
       </p>
+
+      <PhotoPrivacyNotice />
 
       <div className="space-y-2 rounded-md border border-border bg-muted/20 px-3 py-2.5">
         <label className="flex cursor-pointer items-start gap-2.5 text-sm">

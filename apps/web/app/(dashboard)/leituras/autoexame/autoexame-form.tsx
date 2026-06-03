@@ -5,6 +5,7 @@ import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { BirthDateInput } from '@/components/clientes/birth-date-input'
 import { startSelfExamAction } from '@/app/actions/profile'
+import { PhotoPrivacyNotice } from '@/components/capture/PhotoPrivacyNotice'
 
 const inputClass =
   'h-11 w-full rounded-none border-0 border-b border-b-ink bg-transparent px-3 text-base outline-none transition-colors duration-[180ms] placeholder:text-mist focus-visible:border-b-teal'
@@ -102,6 +103,8 @@ export function AutoexameForm(p: {
           de análise iridológica.
         </span>
       </label>
+
+      <PhotoPrivacyNotice />
 
       <Button
         type="submit"
