@@ -89,7 +89,7 @@ export default function LandingEspelho() {
             </div>
             <div className="order-1 lp-reveal lg:order-2" data-d="1">
               <div className="lp-hero-photo">
-                <Image src="/lp/cliente-emocionado.png" alt="Cliente emocionado se reconhecendo na leitura, ao lado da terapeuta" fill priority sizes="(max-width:1024px) 92vw, 600px" className="object-cover object-center" />
+                <Image src="/lp/hero-captura.png" alt="Terapeuta fotografando a íris do cliente em sessão" fill priority sizes="(max-width:1024px) 92vw, 600px" className="object-cover object-center" />
               </div>
             </div>
           </div>
@@ -126,7 +126,7 @@ export default function LandingEspelho() {
         <div className="mx-auto max-w-[1100px] px-6 py-20 md:px-10 md:py-24">
           <div className="lp-reveal mx-auto mb-10 max-w-[940px]">
             <div className="lp-hero-strip" style={{ aspectRatio: '16 / 9' }}>
-              <Image src="/lp/virada.png" alt="Terapeuta e cliente leem o relatório juntos; o cliente, emocionado, se reconhece" fill sizes="(max-width:1100px) 92vw, 940px" className="object-cover object-center" />
+              <Image src="/lp/cliente-emocionado.png" alt="Cliente emocionado se reconhecendo na leitura, ao lado da terapeuta" fill sizes="(max-width:1100px) 92vw, 940px" className="object-cover object-center" />
             </div>
           </div>
           <div className="mx-auto max-w-[900px] text-center">
