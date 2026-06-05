@@ -75,8 +75,8 @@ export default function LandingEspelho() {
               </h1>
               <p className="body-copy lg lp-reveal mt-6" data-d="2" style={{ color: 'rgba(242,237,228,.82)' }}>
                 Está tudo ali: o jeito de sentir o mundo, a ferida antiga, a força que ela nem sabe que tem. O
-                Iris Codex lê na íris e te entrega o mapa pronto pra conduzir. Na devolutiva, quem lê em voz alta
-                é você. E no meio da leitura, ele se depara com algo que tinha esquecido de si — e para de se defender.
+                Iris Codex lê na íris e te entrega o mapa pronto pra conduzir a sessão. E quando o cliente se
+                reconhece no que você lê, ele para de se defender.
               </p>
               <p className="display lp-reveal mt-6" data-d="2" style={{ fontStyle: 'italic', fontSize: 'clamp(1.5rem,3vw,2.1rem)', color: 'var(--teal-light)' }}>
                 A terapia começou.
@@ -89,7 +89,7 @@ export default function LandingEspelho() {
                 <Link href="/login" className="link-quiet text-sm">Já tenho conta · Entrar</Link>
               </div>
               <p className="lp-reveal mt-7 text-xs leading-relaxed" data-d="3" style={{ color: 'rgba(242,237,228,.74)', letterSpacing: '.04em', maxWidth: '46ch' }}>
-                1 leitura grátis · Apoio à anamnese, não substitui avaliação médica.
+                1 leitura grátis · sem cartão · Apoio à anamnese, não substitui avaliação médica.
               </p>
             </div>
             <div className="order-1 lp-reveal lg:order-2" data-d="1">
@@ -383,7 +383,7 @@ export default function LandingEspelho() {
           </div>
 
           <p className="display lp-reveal mt-12" data-d="3" style={{ fontStyle: 'italic', fontSize: '1.5rem', color: 'var(--teal-dark)' }}>
-            A íris no seu bolso. <span style={{ fontStyle: 'normal', fontFamily: 'var(--font-raleway),sans-serif', fontSize: '1rem', letterSpacing: '.1em' }}>Voilà.</span>
+            A íris no seu bolso. Só isso.
           </p>
         </div>
       </section>
@@ -416,13 +416,40 @@ export default function LandingEspelho() {
         </div>
       </section>
 
+      {/* ════════ A PROVA (anti-genérico: mesma rubrica, duas pessoas — antes da oferta) ════════ */}
+      <section className="bg-ivory text-black">
+        <div className="mx-auto max-w-[1000px] px-6 py-20 text-center md:px-10 md:py-24">
+          <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-dark)' }}>A prova</p>
+          <h2 className="display lp-reveal mx-auto mt-6" data-d="1" style={{ fontSize: 'clamp(2rem,4.2vw,3.2rem)', color: '#0d0d0d', maxWidth: '22ch' }}>
+            Duas pessoas. <em style={{ color: 'var(--teal-dark)' }}>A mesma pergunta. Nunca a mesma resposta.</em>
+          </h2>
+          <div className="lp-reveal mt-12 grid gap-5 text-left sm:grid-cols-2" data-d="2">
+            {[
+              '“A trama fechada e firme da íris fala de quem cedo virou a própria muralha. Ela protege a ideia de que dar conta sozinha é o mesmo que estar segura — e trata pedir ajuda como uma rachadura na muralha. O que defende não é o orgulho: é a criança que aprendeu que ninguém viria.”',
+              '“A trama mais aberta e os anéis de tensão falam de quem sente tudo cedo demais e forte demais. Ele protege a própria sensibilidade fingindo dureza — ri primeiro, minimiza, sai pela tangente. O que defende não é a calma: é o medo de que, se baixar a guarda, não consiga fechar de novo.”',
+            ].map((trecho, i) => (
+              <div key={i} className="paper p-8 md:p-9">
+                <p style={{ fontSize: '.62rem', letterSpacing: '.24em', textTransform: 'uppercase', color: 'var(--teal)', fontFamily: 'var(--font-raleway),sans-serif' }}>O que ele protege</p>
+                <p className="mt-3" style={{ fontStyle: 'italic', fontFamily: 'var(--font-cormorant),serif', fontSize: '1.18rem', lineHeight: 1.55, color: '#15110b' }}>{trecho}</p>
+              </div>
+            ))}
+          </div>
+          <p className="lp-reveal mt-6 text-xs" data-d="2" style={{ color: 'var(--mist)', letterSpacing: '.04em', fontStyle: 'italic' }}>
+            Dois exemplos ilustrativos — a mesma seção do relatório, duas pessoas diferentes. Sem dados reais de cliente.
+          </p>
+          <p className="display lp-reveal mx-auto mt-10" data-d="3" style={{ fontStyle: 'italic', fontSize: 'clamp(1.4rem,2.6vw,1.9rem)', color: 'var(--teal-dark)', maxWidth: '32ch' }}>
+            Não existe leitura de prateleira. Cada íris só sabe falar de uma pessoa — e é sempre a que está na sua frente.
+          </p>
+        </div>
+      </section>
+
       {/* ════════ OFERTA (trial herói + escada de valor por leitura) ════════ */}
       <section id="oferta" className="bg-ivory text-black">
         <div className="mx-auto max-w-[1120px] px-6 py-20 md:px-10 md:py-24">
           <div className="lp-reveal text-center">
             <p className="eyebrow" style={{ color: 'var(--teal-dark)' }}>Comece</p>
             <p className="mx-auto mt-5" style={{ color: 'var(--teal-dark)', fontStyle: 'italic', fontFamily: 'var(--font-cormorant),serif', fontSize: '1.3rem', maxWidth: '36ch' }}>
-              Você já viu o que uma íris revela.
+              Agora veja na íris de alguém que você atende.
             </p>
             <div className="mx-auto mt-7" style={{ width: 164 }}>
               <div className="lp-frame-light relative mx-auto" style={{ aspectRatio: '3 / 4', transform: 'rotate(-3deg)' }}>
@@ -535,7 +562,7 @@ export default function LandingEspelho() {
             Seu próximo cliente já traz<br />o mapa <em style={{ color: 'var(--teal-light)' }}>nos próprios olhos.</em>
           </h2>
           <div className="lp-reveal mt-12" data-d="1">
-            <Link href="/signup" className="btn btn-primary">Começar grátis</Link>
+            <Link href="/signup" className="btn btn-primary">Fazer minha leitura grátis</Link>
           </div>
           <p className="lp-reveal mt-8 text-xs" data-d="1" style={{ color: 'var(--mist)', letterSpacing: '.06em' }}>
             Sem cartão · 1 leitura grátis · sem assinatura.

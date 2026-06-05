@@ -3,14 +3,14 @@
 //
 // Decisões:
 //   - D-03: validade créditos = 12 meses (365 days)
-//   - D-06: trial = 3 leituras OU 15 dias first-wins (15d: founder 2026-05-31)
+//   - D-06: trial = 1 leitura OU 15 dias first-wins (1 leitura: founder 2026-06-05; 15d: 2026-05-31)
 //   - D-11: reserva temporária = 7 dias
 //   - D-13: arrependimento CDC = 7 dias após compra
 //
 // Histórico:
 //   - 2026-05-27: criação inicial Fase 8.
 
-export const TRIAL_READINGS_MAX = 3 as const
+export const TRIAL_READINGS_MAX = 1 as const
 export const TRIAL_DAYS = 15 as const
 export const CREDIT_VALIDITY_DAYS = 365 as const // 12 meses ≈ 365 dias (D-03)
 export const RESERVATION_DAYS = 7 as const // D-11
