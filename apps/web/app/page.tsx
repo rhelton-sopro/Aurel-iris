@@ -76,7 +76,7 @@ export default function LandingEspelho() {
               <p className="body-copy lg lp-reveal mt-6" data-d="2" style={{ color: 'rgba(242,237,228,.82)' }}>
                 Está tudo ali: o jeito de sentir o mundo, a ferida antiga, a força que ela nem sabe que tem. O
                 Iris Codex lê na íris e te entrega o mapa pronto pra conduzir a sessão. E quando o cliente se
-                reconhece no que você lê, ele para de se defender.
+                reconhece no que você lê…
               </p>
               <p className="display lp-reveal mt-6" data-d="2" style={{ fontStyle: 'italic', fontSize: 'clamp(1.5rem,3vw,2.1rem)', color: 'var(--teal-light)' }}>
                 A terapia começou.
