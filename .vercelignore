@@ -1,2 +1,5 @@
 vision-service/
 /supabase/
+tmp/
+apps/web/tmp/
+**/tmp/
