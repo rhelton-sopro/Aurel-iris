@@ -39,10 +39,10 @@ export const metadata: Metadata = {
 }
 
 const PACOTES = [
-  { nome: 'Avulsa', porLeitura: 'R$ 99,70', total: 'R$ 99,70', leituras: '1 leitura', micro: 'Pra uma leitura pontual.', selo: 'Comece por aqui', tom: 'neutro' },
-  { nome: 'Pequeno', porLeitura: 'R$ 59,70', total: 'R$ 298,50', leituras: '5 leituras', micro: 'Pros primeiros clientes.', selo: null, tom: null },
-  { nome: 'Médio', porLeitura: 'R$ 49,70', total: 'R$ 745,50', leituras: '15 leituras', micro: 'Pra quem já atende com regularidade.', selo: 'Nossa recomendação', tom: 'destaque' },
-  { nome: 'Grande', porLeitura: 'R$ 39,70', total: 'R$ 1.191,00', leituras: '30 leituras', micro: 'Pro consultório em volume.', selo: 'Melhor custo por leitura', tom: 'teal' },
+  { nome: 'Avulsa', porLeitura: 'R$ 99,70', total: 'R$ 99,70', leituras: '1 leitura completa', micro: 'Pra uma leitura pontual.', selo: 'Comece por aqui', tom: 'neutro' },
+  { nome: 'Pequeno', porLeitura: 'R$ 59,70', total: 'R$ 298,50', leituras: '5 leituras completas', micro: 'Pros primeiros clientes.', selo: null, tom: null },
+  { nome: 'Médio', porLeitura: 'R$ 49,70', total: 'R$ 745,50', leituras: '15 leituras completas', micro: 'Pra quem já atende com regularidade.', selo: 'Nossa recomendação', tom: 'destaque' },
+  { nome: 'Grande', porLeitura: 'R$ 39,70', total: 'R$ 1.191,00', leituras: '30 leituras completas', micro: 'Pro consultório em volume.', selo: 'Melhor custo por leitura', tom: 'teal' },
 ] as const
 
 const FAQ = [
@@ -53,7 +53,7 @@ const FAQ = [
   { q: 'Preciso saber iridologia?', a: 'Não precisa. Uma IA própria, treinada na tradição iridológica, faz a leitura por você. Você revisa, conduz e dá a palavra final — a interpretação e a relação com o cliente são suas.', open: false },
   { q: 'Posso editar o relatório antes de entregar?', a: 'Pode. O relatório chega como ponto de partida: você revisa, ajusta o que quiser e dá a palavra final. A interpretação e a conduta são sempre suas.', open: false },
   { q: 'E se eu não souber conduzir a devolutiva?', a: 'A gente te orienta. Além da leitura pronta — que já vem com as perguntas certas — você recebe um guia de como conduzir a devolutiva, presencial ou online. Você nunca está sozinho diante do relatório.', open: false },
-  { q: 'Como pago — e posso parar quando quiser?', a: 'Você paga só pelas leituras que usar — PIX ou cartão, sem assinatura e sem mensalidade. Não há o que cancelar: usa quando precisa, para quando quiser. Os créditos valem 12 meses.', open: false },
+  { q: 'Como pago — e posso parar quando quiser?', a: 'Sem assinatura e sem mensalidade. Você compra suas leituras antes de usar — uma avulsa ou um pacote — e vai consumindo no seu ritmo. Não há fatura correndo nem nada a cancelar: comprou, é seu, com até 12 meses para usar. PIX ou cartão.', open: false },
   { q: 'Meus dados são seguros?', a: 'Sim. A foto da íris é apagada assim que o relatório é gerado e conferido — e, em qualquer caso, em no máximo 24 horas. Você é o controlador dos dados, em conformidade com a LGPD, e as imagens nunca treinam nenhuma IA.', open: false },
 ] as const
 
@@ -443,7 +443,7 @@ export default function LandingEspelho() {
               <Link href="/signup" className="btn btn-primary">Fazer minha leitura grátis</Link>
             </div>
             <p className="mx-auto mt-6 text-sm" style={{ color: 'var(--mist)', maxWidth: '52ch' }}>
-              Se fizer sentido, você segue no seu ritmo: paga só pelas leituras que usar, sem assinatura.
+              Se fizer sentido, você compra suas leituras quando quiser — avulsa ou pacote, sem assinatura. No seu ritmo.
             </p>
           </div>
 
@@ -451,7 +451,7 @@ export default function LandingEspelho() {
           <div className="lp-reveal mt-20 text-center" data-d="2">
             <p className="eyebrow" style={{ color: 'var(--teal-dark)' }}>Quando quiser continuar</p>
             <h2 className="display mx-auto mt-6" style={{ fontSize: 'clamp(2rem,4.2vw,3.2rem)', color: '#0d0d0d' }}>
-              Você paga por leitura. <em style={{ color: 'var(--teal-dark)' }}>Só isso.</em>
+              Compre quando quiser. <em style={{ color: 'var(--teal-dark)' }}>Sem assinatura.</em>
             </h2>
           </div>
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
