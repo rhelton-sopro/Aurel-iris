@@ -457,14 +457,17 @@ export default function LandingEspelho() {
           <p className="lp-reveal mt-14" style={{ fontSize: '.66rem', letterSpacing: '.24em', textTransform: 'uppercase', color: 'var(--teal)', fontFamily: 'var(--font-raleway),sans-serif' }}>O reconhecimento</p>
           <div className="lp-reveal mt-6 grid gap-x-10 gap-y-9 sm:grid-cols-2" data-d="1">
             {[
-              { q: '“Estou impactada. Já chorei tanto… Nunca ninguém me descreveu tão bem em toda a minha vida.”', a: 'Débora' },
-              { q: '“Caramba, quanta precisão. Comecei minha vida adulta ainda criança e carreguei muita responsabilidade desde cedo — de fato.”', a: 'Nara' },
-              { q: '“Descreveu que minha mente não desliga, sempre em alerta — realmente procede.”', a: 'Maeli' },
-              { q: '“A leitura descreveu em palavras tudo o que eu realmente sou.”', a: 'Evá' },
+              { q: '“Estou impactada. Já chorei tanto… Nunca ninguém me descreveu tão bem em toda a minha vida.”', a: 'Débora', img: '/lp/dep-debora.png' },
+              { q: '“Caramba, quanta precisão. Comecei minha vida adulta ainda criança e carreguei muita responsabilidade desde cedo — de fato.”', a: 'Nara', img: '/lp/dep-nara.png' },
+              { q: '“Descreveu que minha mente não desliga, sempre em alerta — realmente procede.”', a: 'Maeli', img: '/lp/dep-maeli.png' },
+              { q: '“A leitura descreveu em palavras tudo o que eu realmente sou.”', a: 'Evá', img: '/lp/dep-eva.png' },
             ].map((t, i) => (
               <figure key={i} style={{ borderLeft: '2px solid var(--teal)', paddingLeft: '1.3rem' }}>
                 <blockquote style={{ fontStyle: 'italic', fontFamily: 'var(--font-cormorant),serif', fontSize: '1.25rem', lineHeight: 1.5, color: '#2a2a2a' }}>{t.q}</blockquote>
-                <figcaption className="mt-3" style={{ fontSize: '.7rem', letterSpacing: '.08em', textTransform: 'uppercase', fontFamily: 'var(--font-raleway),sans-serif', color: 'var(--mist)' }}>— <span style={{ color: '#0d0d0d' }}>{t.a}</span>, terapeuta integrativa</figcaption>
+                <figcaption className="mt-4 flex items-center gap-3">
+                  <Image src={t.img} alt={`Foto de ${t.a}`} width={42} height={42} style={{ borderRadius: '50%', border: '1px solid rgba(0,0,0,.07)' }} />
+                  <span style={{ fontSize: '.7rem', letterSpacing: '.08em', textTransform: 'uppercase', fontFamily: 'var(--font-raleway),sans-serif', color: 'var(--mist)' }}><span style={{ color: '#0d0d0d' }}>{t.a}</span>, terapeuta integrativa</span>
+                </figcaption>
               </figure>
             ))}
           </div>
@@ -473,12 +476,15 @@ export default function LandingEspelho() {
           <p className="lp-reveal mt-14" style={{ fontSize: '.66rem', letterSpacing: '.24em', textTransform: 'uppercase', color: 'var(--teal)', fontFamily: 'var(--font-raleway),sans-serif' }}>No trabalho</p>
           <div className="lp-reveal mt-6 grid gap-x-10 gap-y-9 sm:grid-cols-2" data-d="1">
             {[
-              { q: '“Um salto no trabalho com os interagentes. Isso está revolucionando a terapia. Anos de terapia e essa leitura traz tanta profundidade.”', a: 'Cristiane' },
-              { q: '“O que eu li bate exatamente com o que estou sentindo. Será uma ferramenta poderosíssima pra complementar o nosso trabalho.”', a: 'Carol' },
+              { q: '“Um salto no trabalho com os interagentes. Isso está revolucionando a terapia. Anos de terapia e essa leitura traz tanta profundidade.”', a: 'Cristiane', img: '/lp/dep-cristiane.png' },
+              { q: '“O que eu li bate exatamente com o que estou sentindo. Será uma ferramenta poderosíssima pra complementar o nosso trabalho.”', a: 'Carol', img: '/lp/dep-carol.png' },
             ].map((t, i) => (
               <figure key={i} style={{ borderLeft: '2px solid var(--teal)', paddingLeft: '1.3rem' }}>
                 <blockquote style={{ fontStyle: 'italic', fontFamily: 'var(--font-cormorant),serif', fontSize: '1.25rem', lineHeight: 1.5, color: '#2a2a2a' }}>{t.q}</blockquote>
-                <figcaption className="mt-3" style={{ fontSize: '.7rem', letterSpacing: '.08em', textTransform: 'uppercase', fontFamily: 'var(--font-raleway),sans-serif', color: 'var(--mist)' }}>— <span style={{ color: '#0d0d0d' }}>{t.a}</span>, terapeuta integrativa</figcaption>
+                <figcaption className="mt-4 flex items-center gap-3">
+                  <Image src={t.img} alt={`Foto de ${t.a}`} width={42} height={42} style={{ borderRadius: '50%', border: '1px solid rgba(0,0,0,.07)' }} />
+                  <span style={{ fontSize: '.7rem', letterSpacing: '.08em', textTransform: 'uppercase', fontFamily: 'var(--font-raleway),sans-serif', color: 'var(--mist)' }}><span style={{ color: '#0d0d0d' }}>{t.a}</span>, terapeuta integrativa</span>
+                </figcaption>
               </figure>
             ))}
           </div>
