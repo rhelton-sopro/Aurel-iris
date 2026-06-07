@@ -419,7 +419,7 @@ export default function LandingEspelho() {
       {/* ════════ A PROVA (anti-genérico: mesma rubrica, duas pessoas — antes da oferta) ════════ */}
       <section className="bg-ivory text-black">
         <div className="mx-auto max-w-[1000px] px-6 py-20 text-center md:px-10 md:py-24">
-          <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-dark)' }}>A prova</p>
+          <p className="eyebrow lp-reveal" style={{ color: 'var(--teal-dark)' }}>A demonstração</p>
           <h2 className="display lp-reveal mx-auto mt-6" data-d="1" style={{ fontSize: 'clamp(2rem,4.2vw,3.2rem)', color: '#0d0d0d', maxWidth: '22ch' }}>
             Duas pessoas. <em style={{ color: 'var(--teal-dark)' }}>A mesma pergunta. Nunca a mesma resposta.</em>
           </h2>
@@ -439,6 +439,52 @@ export default function LandingEspelho() {
           </p>
           <p className="display lp-reveal mx-auto mt-10" data-d="3" style={{ fontStyle: 'italic', fontSize: 'clamp(1.4rem,2.6vw,1.9rem)', color: 'var(--teal-dark)', maxWidth: '32ch' }}>
             Não existe leitura de prateleira. Cada íris só sabe falar de uma pessoa — e é sempre a que está na sua frente.
+          </p>
+        </div>
+      </section>
+
+      {/* ════════ DEPOIMENTOS (validação — terapeutas que se reconheceram na própria leitura) ════════ */}
+      <section className="bg-white text-black">
+        <div className="mx-auto max-w-[1000px] px-6 py-20 md:px-10 md:py-24">
+          <div className="lp-reveal text-center">
+            <p className="eyebrow" style={{ color: 'var(--teal-dark)' }}>Quem já viu</p>
+            <h2 className="display mx-auto mt-6" style={{ fontSize: 'clamp(2rem,4.2vw,3.2rem)', color: '#0d0d0d', maxWidth: '24ch' }}>
+              Elas leram sobre si mesmas. <em style={{ color: 'var(--teal-dark)' }}>E reconheceram cada palavra.</em>
+            </h2>
+          </div>
+
+          {/* Bloco A — o reconhecimento */}
+          <p className="lp-reveal mt-14" style={{ fontSize: '.66rem', letterSpacing: '.24em', textTransform: 'uppercase', color: 'var(--teal)', fontFamily: 'var(--font-raleway),sans-serif' }}>O reconhecimento</p>
+          <div className="lp-reveal mt-6 grid gap-x-10 gap-y-9 sm:grid-cols-2" data-d="1">
+            {[
+              { q: '“Estou impactada. Já chorei tanto… Nunca ninguém me descreveu tão bem em toda a minha vida.”', a: 'Débora' },
+              { q: '“Caramba, quanta precisão. Comecei minha vida adulta ainda criança e carreguei muita responsabilidade desde cedo — de fato.”', a: 'Nara' },
+              { q: '“Descreveu que minha mente não desliga, sempre em alerta — realmente procede.”', a: 'Maeli' },
+              { q: '“A leitura descreveu em palavras tudo o que eu realmente sou.”', a: 'Evá' },
+            ].map((t, i) => (
+              <figure key={i} style={{ borderLeft: '2px solid var(--teal)', paddingLeft: '1.3rem' }}>
+                <blockquote style={{ fontStyle: 'italic', fontFamily: 'var(--font-cormorant),serif', fontSize: '1.25rem', lineHeight: 1.5, color: '#2a2a2a' }}>{t.q}</blockquote>
+                <figcaption className="mt-3" style={{ fontSize: '.7rem', letterSpacing: '.08em', textTransform: 'uppercase', fontFamily: 'var(--font-raleway),sans-serif', color: 'var(--mist)' }}>— <span style={{ color: '#0d0d0d' }}>{t.a}</span>, terapeuta integrativa</figcaption>
+              </figure>
+            ))}
+          </div>
+
+          {/* Bloco B — no trabalho */}
+          <p className="lp-reveal mt-14" style={{ fontSize: '.66rem', letterSpacing: '.24em', textTransform: 'uppercase', color: 'var(--teal)', fontFamily: 'var(--font-raleway),sans-serif' }}>No trabalho</p>
+          <div className="lp-reveal mt-6 grid gap-x-10 gap-y-9 sm:grid-cols-2" data-d="1">
+            {[
+              { q: '“Um salto no trabalho com os interagentes. Isso está revolucionando a terapia. Anos de terapia e essa leitura traz tanta profundidade.”', a: 'Cristiane' },
+              { q: '“O que eu li bate exatamente com o que estou sentindo. Será uma ferramenta poderosíssima pra complementar o nosso trabalho.”', a: 'Carol' },
+            ].map((t, i) => (
+              <figure key={i} style={{ borderLeft: '2px solid var(--teal)', paddingLeft: '1.3rem' }}>
+                <blockquote style={{ fontStyle: 'italic', fontFamily: 'var(--font-cormorant),serif', fontSize: '1.25rem', lineHeight: 1.5, color: '#2a2a2a' }}>{t.q}</blockquote>
+                <figcaption className="mt-3" style={{ fontSize: '.7rem', letterSpacing: '.08em', textTransform: 'uppercase', fontFamily: 'var(--font-raleway),sans-serif', color: 'var(--mist)' }}>— <span style={{ color: '#0d0d0d' }}>{t.a}</span>, terapeuta integrativa</figcaption>
+              </figure>
+            ))}
+          </div>
+
+          <p className="display lp-reveal mx-auto mt-14 text-center" data-d="2" style={{ fontStyle: 'italic', fontSize: 'clamp(1.4rem,2.6vw,1.9rem)', color: 'var(--teal-dark)', maxWidth: '34ch' }}>
+            Foram elas que se reconheceram. O Iris Codex só mostrou o que já estava na íris.
           </p>
         </div>
       </section>
