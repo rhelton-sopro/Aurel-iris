@@ -82,23 +82,16 @@ export function InviteLinkDialog({
   }
 
   // Mensagem pronta que o terapeuta cola no WhatsApp do cliente. Tom de marca
-  // (Bob/Nefertiti): não-médico, sóbrio, instrução de captura leve. Usa o
-  // primeiro nome do cliente quando disponível (convite de cliente existente);
-  // cai numa saudação neutra quando é cliente novo (sem nome).
+  // (Bob): não-médico, sóbrio, DIRETA — o cliente já sabe que vai fotografar
+  // (o terapeuta já conversou ao vivo), então nada de "propor"/explicar: é só
+  // o link + a instrução prática da captura. Sem personalização por nome.
   function buildClientMessage(url: string): string {
-    const fullName =
-      client?.full_name ??
-      availableClients.find((c) => c.id === selectedClientId)?.full_name ??
-      null
-    const first = fullName ? fullName.trim().split(/\s+/)[0] : null
-    const saudacao = first ? `Oi, ${first}.` : 'Oi.'
-    return `${saudacao} Quero te propor algo no nosso trabalho: uma leitura da íris — um olhar sobre seus padrões emocionais e comportamentais, pra a gente aprofundar juntos depois.
+    return `Olá. Aqui está o seu link para a leitura da íris.
 
-É simples e leva poucos minutos. Abra o link abaixo no celular, num lugar bem iluminado, e siga o passo a passo — o próprio app guia a foto do seu olho.
+Abra no celular, num lugar bem iluminado, e siga o passo a passo — o app guia a foto do seu olho. Leva poucos minutos.
 
-A imagem é apagada assim que o relatório fica pronto, em no máximo 24 horas.
+A imagem é apagada assim que o relatório fica pronto, em no máximo 24 horas. O link é só seu e fica disponível por 7 dias:
 
-O link é só seu e fica disponível por 7 dias:
 ${url}`
   }
 
