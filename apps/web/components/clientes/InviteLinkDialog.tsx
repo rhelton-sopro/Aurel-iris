@@ -44,6 +44,7 @@ export function InviteLinkDialog({
   const [generated, setGenerated] = useState<{ url: string; expires_at: string } | null>(null)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [copiedMsg, setCopiedMsg] = useState(false)
   const [isPending, startTransition] = useTransition()
   // v2.9.0: toggle "avisar por email quando cliente terminar as fotos".
   // Default true (comportamento prévio). Persistido por TOKEN no banco
@@ -55,6 +56,7 @@ export function InviteLinkDialog({
     setGenerated(null)
     setErrorMsg(null)
     setCopied(false)
+    setCopiedMsg(false)
     setMode(initialMode)
     setSelectedClientId(client?.id ?? '')
     setNotifyOnCapture(true)
@@ -79,7 +81,28 @@ export function InviteLinkDialog({
     })
   }
 
-  async function handleCopy() {
+  // Mensagem pronta que o terapeuta cola no WhatsApp do cliente. Tom de marca
+  // (Bob/Nefertiti): não-médico, sóbrio, instrução de captura leve. Usa o
+  // primeiro nome do cliente quando disponível (convite de cliente existente);
+  // cai numa saudação neutra quando é cliente novo (sem nome).
+  function buildClientMessage(url: string): string {
+    const fullName =
+      client?.full_name ??
+      availableClients.find((c) => c.id === selectedClientId)?.full_name ??
+      null
+    const first = fullName ? fullName.trim().split(/\s+/)[0] : null
+    const saudacao = first ? `Oi, ${first}.` : 'Oi.'
+    return `${saudacao} Quero te propor algo no nosso trabalho: uma leitura da íris — um olhar sobre seus padrões emocionais e comportamentais, pra a gente aprofundar juntos depois.
+
+É simples e leva poucos minutos. Abra o link abaixo no celular, num lugar bem iluminado, e siga o passo a passo — o próprio app guia a foto do seu olho.
+
+A imagem é apagada assim que o relatório fica pronto, em no máximo 24 horas.
+
+O link é só seu e fica disponível por 7 dias:
+${url}`
+  }
+
+  async function handleCopyLink() {
     if (!generated) return
     try {
       await navigator.clipboard.writeText(generated.url)
@@ -88,6 +111,17 @@ export function InviteLinkDialog({
     } catch {
       // navigator.clipboard pode falhar em HTTP / sem permissão.
       // Fallback: input já está com select-all readonly, usuário copia manual.
+    }
+  }
+
+  async function handleCopyMessage() {
+    if (!generated) return
+    try {
+      await navigator.clipboard.writeText(buildClientMessage(generated.url))
+      setCopiedMsg(true)
+      setTimeout(() => setCopiedMsg(false), 1500)
+    } catch {
+      // sem clipboard: o preview da mensagem fica visível pra cópia manual.
     }
   }
 
@@ -221,9 +255,9 @@ export function InviteLinkDialog({
                   type="button"
                   variant="outline"
                   size="icon"
-                  onClick={handleCopy}
-                  aria-label="Copiar link"
-                  title="Copiar link"
+                  onClick={handleCopyLink}
+                  aria-label="Copiar só o link"
+                  title="Copiar só o link"
                 >
                   {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                 </Button>
@@ -235,8 +269,33 @@ export function InviteLinkDialog({
                 cliente concluir a captura, o link deixa de funcionar.
               </p>
             )}
+
+            {/* Mensagem pronta — é o que o botão "Copiar mensagem" entrega */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Mensagem pronta pro cliente
+              </label>
+              <p className="whitespace-pre-line rounded-md border border-border bg-muted/20 px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
+                {buildClientMessage(generated.url)}
+              </p>
+            </div>
+
+            <Button type="button" onClick={handleCopyMessage} className="w-full">
+              {copiedMsg ? (
+                <>
+                  <Check className="mr-2 h-4 w-4" />
+                  Mensagem copiada
+                </>
+              ) : (
+                <>
+                  <Copy className="mr-2 h-4 w-4" />
+                  Copiar mensagem pro cliente
+                </>
+              )}
+            </Button>
+
             <a
-              href={`https://wa.me/?text=${encodeURIComponent(`Olá! Aqui está o link para sua leitura iridológica: ${generated.url}`)}`}
+              href={`https://wa.me/?text=${encodeURIComponent(buildClientMessage(generated.url))}`}
               target="_blank"
               rel="noopener noreferrer"
               className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'w-full')}
