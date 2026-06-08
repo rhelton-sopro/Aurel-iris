@@ -264,16 +264,9 @@ ${url}`
               </p>
             )}
 
-            {/* Mensagem pronta — é o que o botão "Copiar mensagem" entrega */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                Mensagem pronta pro cliente
-              </label>
-              <p className="whitespace-pre-line break-words rounded-md border border-border bg-muted/20 px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
-                {buildClientMessage(generated.url)}
-              </p>
-            </div>
-
+            {/* O texto da mensagem NÃO é exibido (decisão do founder — evita
+                poluir/estourar no mobile). O botão abaixo copia a mensagem
+                pronta direto pro clipboard. */}
             <Button type="button" onClick={handleCopyMessage} className="w-full">
               {copiedMsg ? (
                 <>
