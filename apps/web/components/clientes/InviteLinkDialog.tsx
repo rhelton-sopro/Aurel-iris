@@ -242,7 +242,7 @@ ${url}`
                   readOnly
                   value={generated.url}
                   onFocus={(e) => e.currentTarget.select()}
-                  className="font-mono text-xs"
+                  className="min-w-0 flex-1 font-mono text-xs"
                 />
                 <Button
                   type="button"
@@ -251,6 +251,7 @@ ${url}`
                   onClick={handleCopyLink}
                   aria-label="Copiar só o link"
                   title="Copiar só o link"
+                  className="shrink-0"
                 >
                   {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                 </Button>
@@ -268,7 +269,7 @@ ${url}`
               <label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                 Mensagem pronta pro cliente
               </label>
-              <p className="whitespace-pre-line rounded-md border border-border bg-muted/20 px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
+              <p className="whitespace-pre-line break-words rounded-md border border-border bg-muted/20 px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
                 {buildClientMessage(generated.url)}
               </p>
             </div>
