@@ -95,15 +95,19 @@ A imagem é apagada assim que o relatório fica pronto, em no máximo 24 horas. 
 ${url}`
   }
 
+  // Ícone ao lado do campo: copia a MENSAGEM completa (não só o link). O
+  // founder clica no ícone por instinto e espera a mensagem pronta — então
+  // ícone e botão fazem a mesma coisa. Quem quiser só a URL ainda pode focar
+  // o campo (select-all) e copiar manual.
   async function handleCopyLink() {
     if (!generated) return
     try {
-      await navigator.clipboard.writeText(generated.url)
+      await navigator.clipboard.writeText(buildClientMessage(generated.url))
       setCopied(true)
       setTimeout(() => setCopied(false), 1500)
     } catch {
       // navigator.clipboard pode falhar em HTTP / sem permissão.
-      // Fallback: input já está com select-all readonly, usuário copia manual.
+      // Fallback: input com select-all readonly permite cópia manual da URL.
     }
   }
 
@@ -249,8 +253,8 @@ ${url}`
                   variant="outline"
                   size="icon"
                   onClick={handleCopyLink}
-                  aria-label="Copiar só o link"
-                  title="Copiar só o link"
+                  aria-label="Copiar mensagem"
+                  title="Copiar mensagem"
                   className="shrink-0"
                 >
                   {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
