@@ -1898,12 +1898,22 @@ há mais abertura de rotina genérica):
 
 ### Formato OBRIGATÓRIO — lista numerada markdown
 
-Após a linha-ponte de enquadramento, **6-8 perguntas** (qualidade de
-toque acima de quantidade — preferir 6 que tocam a 10 mornas) como
-**lista numerada markdown** (cada linha começa com `N. `). ReactMarkdown
-renderiza `<ol>`. Cada pergunta com os 3 movimentos completos. Sem
-perguntas mornas de rotina salvo ancoradas num padrão psicossomático
-específico que a leitura identificou.
+Após a linha-ponte de enquadramento, **8-12 perguntas** (idealmente 10)
+como **lista numerada markdown** (cada linha começa com `N. `).
+ReactMarkdown renderiza `<ol>`. Cada pergunta com os 3 movimentos completos.
+
+A quantidade EMERGE da riqueza da íris, não de um teto fixo: quando a
+leitura traz muitos achados (linha do tempo cheia, vários eixos
+emocionais, áreas de atenção múltiplas), seja generoso — não economize.
+Cada achado relevante de §3/§4/§5 merece ao menos uma pergunta ancorada,
+e **um achado central ou rico PODE gerar mais de uma pergunta**, cada uma
+explorando um ângulo distinto do MESMO achado (ex.: o gatilho que o
+disparou, a sensação corporal agora, o micro-movimento de soltar) — sem
+repetir, cada pergunta abre uma porta diferente. Só reduza abaixo de 8
+quando faltar âncora real (skip-rather-than-fabricate): qualidade de
+toque sempre acima de quantidade, mas a íris cheia sustenta 10-12 sem
+cair no morno. Sem perguntas mornas de rotina salvo ancoradas num padrão
+psicossomático específico que a leitura identificou.
 
 ### Exemplos — ANTES (morno) vs DEPOIS (UAU)
 
@@ -2142,7 +2152,7 @@ seções têm funções complementares — §14 abre/convida; §15 estrutura.
 - ✓ §3 emite APENAS 4 campos por marcador (sem setor/hora/olho/Cronorichio visível)
 - ✓ §2 subseção "Sistemas em bom funcionamento" emite 5 sistemas com ancoragem positiva (ausência/zona clara/ausência de aneis/marcadores positivos)
 - ✓ §10 abre simbolicamente (sem inventário anatômico de abertura)
-- ✓ §12 abre com a **linha-ponte de enquadramento** (parágrafo calmo client-facing) e DEPOIS **6-8 perguntas** em lista numerada markdown (`1. ... 2. ...`); CADA pergunta com os 3 movimentos UAU (ancora no achado desta íris → sensação corporal AGORA nomeada → micro-movimento interno gentil); sem perguntas mornas de rotina; NÃO parágrafo corrido
+- ✓ §12 abre com a **linha-ponte de enquadramento** (parágrafo calmo client-facing) e DEPOIS **8-12 perguntas** (idealmente 10; um achado rico pode gerar mais de uma, em ângulos distintos) em lista numerada markdown (`1. ... 2. ...`); CADA pergunta com os 3 movimentos UAU (ancora no achado desta íris → sensação corporal AGORA nomeada → micro-movimento interno gentil); sem perguntas mornas de rotina; NÃO parágrafo corrido
 - ✓ §13 sintetiza apenas temas humanos (sem coordenadas iridológicas)
 - ✓ §15 — Síntese Rápida com 6 subsections (### EMOJI Label) na ordem exata: 🔴 Fragilidades / 🟢 Forças / 💛 Emoções a Cuidar / ✨ Potências / 🧭 Perfil e Temperamento / 🌱 Aptidões; bullets nas 4 primeiras, parágrafos nas 2 últimas
 - ✓ §5 conecta os órgãos de §2 com os padrões emocionais de §4 (eixo psicossomático integrativo)

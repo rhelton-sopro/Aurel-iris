@@ -165,13 +165,20 @@ export function loadSystemPrompt(): string {
  *   - §2: exemplo 🔬 deixou de listar bilirrubinas/ALT/AST/GGT.
  * Motivado por audit-compliance-risk (vetor "pedir exame" = 50% das
  * leituras). Não-retroativo. Founder-aprovado 2026-06-09.
+ *
+ * v2.10.1 (2026-06-09) = §12 Roteiro de Anamnese: faixa de perguntas
+ * 6-8 → 8-12 (idealmente 10). Postura de "preferir 6 fortes" → "ser
+ * generoso quando a íris sustenta": quantidade emerge da riqueza dos
+ * achados; um achado central/rico PODE gerar mais de uma pergunta (ângulos
+ * distintos do mesmo achado). Mantém skip-rather-than-fabricate como trava
+ * anti-morno. Founder pediu mais perguntas (caso Iris Maria veio só 6).
  */
 export const REPORT_PROMPT_LABEL = (() => {
   const v = process.env.REPORT_PROMPT_VERSION?.trim().toLowerCase()
   if (v === 'v1') return 'v1.0.0'
   if (v === 'v2-1') return 'v2.1.0'
-  return 'v2.10.0'
-})() as 'v1.0.0' | 'v2.1.0' | 'v2.10.0'
+  return 'v2.10.1'
+})() as 'v1.0.0' | 'v2.1.0' | 'v2.10.1'
 
 /**
  * Stable short fingerprint of the EFFECTIVE system.md content (12 hex chars

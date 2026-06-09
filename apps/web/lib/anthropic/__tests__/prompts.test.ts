@@ -351,8 +351,8 @@ describe('lib/anthropic/prompts — Plan 21 UAT-4 fixes (§ removal + §1 breath
     expect(sys).toContain('Movimento 1 — Ancora no achado específico')
     expect(sys).toContain('Movimento 2 — Convida à sensação corporal AGORA')
     expect(sys).toContain('Movimento 3 — Micro-movimento interno')
-    // Quality-over-quantity target
-    expect(sys).toContain('6-8 perguntas')
+    // Quality-over-quantity target (v2.10.1: 6-8 → 8-12, idealmente 10)
+    expect(sys).toContain('8-12 perguntas')
   })
 
   it('§15 Síntese Rápida section exists with 6 mandatory subsections', () => {
