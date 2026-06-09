@@ -733,7 +733,7 @@ cliente):**
   em silêncio. ❌ NÃO emita: "raiva engolida", "filtragem silenciosa",
   "contas que não cobrou", "o que fermentava".
 
-- **Circulação / vasc escleral / sistema circulatório** — TEMA: vida
+- **Circulação / sistema circulatório** — TEMA: vida
   que correu sob compressão por tempo demais; pulso vital que aprendeu
   via estreita. ❌ NÃO emita: "caminho que ficou estreito por décadas",
   "pulso vital que aprendeu a passar por uma fresta".
@@ -842,7 +842,7 @@ adapte ao Stage 1 desta cliente):
 | Achado Stage 1 | TEMA emocional (construa a frase pra esta cliente — NÃO use cláusula "em nome de" pronta) |
 |---|---|
 | Fígado / pigmento âmbar | raiva não processada / atrito repetido sem via |
-| Vasc escleral marcante | tensão sustentada por tempo demais |
+| Anel sódico / sobrecarga circulatória | tensão sustentada por tempo demais |
 | Midríase / SNA simpático | hipervigilância como modo de base |
 | Icterícia escleral | metabolização tardia chegando à superfície |
 | Sistema linfático carga | retenção do que não encontrou via |
@@ -1233,23 +1233,24 @@ ordem diferente, REORDENE no markdown:
 
 O leitor reconstrói a vida cronologicamente — fluxo natural de leitura.
 
-## §7 Carências Funcionais — NOME DA CARÊNCIA primeiro, não categoria
+## §7 Repertório de Suporte — NOME DO ITEM primeiro, não categoria
 
-Cada bullet COMEÇA pelo NOME ESPECÍFICO da carência:
+Cada bullet COMEÇA pelo NOME ESPECÍFICO do item de suporte:
 
   ✅ "**Cardo-mariano (silimarina)** — ..."
-  ✅ "**Magnésio glicinato (300-400mg/dia)** — ..."
+  ✅ "**Magnésio glicinato** — ..."
   ✅ "**Complexo B ativado (B6/B9/B12 metilados)** — ..."
   ❌ "**Suporte hepático e biliar** — considere cardo-mariano..."
   ❌ "**Suporte renal-eliminatório** — chás de cavalinha..."
 
 Formato unificado por bullet:
-  **Nome específico (forma/dose se aplicável)** — sinal/correlação
-  visual nesta íris — lab a investigar — observação clínica relevante.
+  **Nome específico (forma se aplicável, SEM dose)** — sinal/correlação
+  visual nesta íris — repertório para o terapeuta avaliar e compor —
+  observação clínica relevante. NUNCA nomear exame laboratorial.
 
 ANTI-REDUNDÂNCIA: cada item entrega valor ÚNICO. Se Cardo-mariano
 está em §7, NÃO repete em §11.fitoterapia — escolha onde faz mais
-sentido (§7 = laboratorial/suplementação; §11.fitoterapia = tradição
+sentido (§7 = repertório de suporte/suplementação; §11.fitoterapia = tradição
 herbal de suporte). Vale o oposto também.
 
 Liste 5-8 carências priorizadas pelos achados desta íris, ordenadas
@@ -1397,8 +1398,8 @@ zona específica não foi conclusivamente avaliada, mas existe leitura
 integrativa do eixo identificado em A.5.
 
 **§8 e §10 NÃO recebem cobertura A.5 (v2.7.0):** §8 (estado mental
-e nervoso) descreve SNA com achados disponíveis (vasc escleral,
-contexto biográfico, padrão pupilar quando presente em A.1) sem
+e nervoso) descreve SNA com achados disponíveis (contexto
+biográfico, padrão pupilar quando presente em A.1) sem
 ancorar exclusivamente em pupila. §10 (dimensão arquetípica) emerge
 do conjunto de achados ATIVOS desta cliente — sem default a
 "sentinela vigilante" / "guardiã que não dorme".
@@ -1428,8 +1429,8 @@ leitura própria.
 - Listar APENAS em §2 **Categoria C ('Campos não-conclusivos')** com
   formato fixo de declaração de limitação (lista bullet, NUNCA prosa
   elaborada, NUNCA hipótese clínica).
-- Mencionar UMA VEZ em §12 como nota técnica de investigação
-  laboratorial.
+- Mencionar UMA VEZ em §12 como nota técnica de acompanhamento com
+  profissional de saúde habilitado (sem nomear exame).
 
 ### Caso 3 — \`motivo_indeterminacao\` ausente ou null
 

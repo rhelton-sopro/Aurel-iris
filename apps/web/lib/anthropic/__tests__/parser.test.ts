@@ -190,7 +190,7 @@ Conteúdo §5.
 
 Conteúdo §6.
 
-## 7. Carências Funcionais
+## 7. Repertório de Suporte
 
 Conteúdo §7.
 

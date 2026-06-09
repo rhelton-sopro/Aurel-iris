@@ -150,13 +150,28 @@ export function loadSystemPrompt(): string {
  * Pareado com getSystemPromptVersion() (sha curto) — label é o nome
  * humano, sha é a impressão digital exata do conteúdo (varia a cada
  * edit; label só varia quando você bumpa).
+ *
+ * v2.10.0 (2026-06-09) = pacote de CONFORMIDADE ("dar base ao terapeuta,
+ * não exercer medicina"). Reconcilia o débito do const (congelou em v2.3.0
+ * enquanto o prompt evoluiu v2.4→v2.9 só em comentários + sha). Mudanças:
+ *   - §7 renomeado "Carências Funcionais" → "Repertório de Suporte"
+ *     (tira o quase-diagnóstico "carência"); reposicionado de "direciona
+ *     investigação laboratorial" → "repertório que o terapeuta avalia e
+ *     compõe". Slug interno 7_carencias_funcionais PRESERVADO (chave por
+ *     número, não pelo título — banco/auditor/diff intactos).
+ *   - Linha vermelha nova: NUNCA nomear exame laboratorial/clínico
+ *     específico nem "dosar/investigar [exame]". PERMITIDO sugerir
+ *     acompanhamento médico GERAL + nomear o SISTEMA que pede atenção.
+ *   - §2: exemplo 🔬 deixou de listar bilirrubinas/ALT/AST/GGT.
+ * Motivado por audit-compliance-risk (vetor "pedir exame" = 50% das
+ * leituras). Não-retroativo. Founder-aprovado 2026-06-09.
  */
 export const REPORT_PROMPT_LABEL = (() => {
   const v = process.env.REPORT_PROMPT_VERSION?.trim().toLowerCase()
   if (v === 'v1') return 'v1.0.0'
   if (v === 'v2-1') return 'v2.1.0'
-  return 'v2.3.0'
-})() as 'v1.0.0' | 'v2.1.0' | 'v2.3.0'
+  return 'v2.10.0'
+})() as 'v1.0.0' | 'v2.1.0' | 'v2.10.0'
 
 /**
  * Stable short fingerprint of the EFFECTIVE system.md content (12 hex chars

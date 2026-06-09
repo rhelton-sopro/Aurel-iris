@@ -175,7 +175,7 @@ export const SECTION_TITLE_BY_NUMBER: Record<NumberedSectionHeading, string> = {
   '4': 'Padrões Emocionais Ativos',
   '5': 'Eixo Psicossomático',
   '6': 'Heranças Transgeracionais',
-  '7': 'Carências Funcionais',
+  '7': 'Repertório de Suporte',
   '8': 'Estado Mental e Nervoso',
   '9': 'Recursos e Forças',
   '10': 'Dimensão Arquetípica',

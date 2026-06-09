@@ -101,9 +101,9 @@ precisar mencionar o cliente por nome, use vocativo direto:
 - **§2 (Mapa Orgânico)** — registro técnico-funcional, voz neutra
   ("o sistema X apresenta...", "esta leitura mostra..."). Cliente aqui
   é leitor do mapa, não destinatário direto.
-- **§7 (Carências Funcionais)** — registro técnico-investigativo
-  ("considere investigar...", "padrão sugere..."). Disclaimer em
-  voz neutra também.
+- **§7 (Repertório de Suporte)** — registro técnico-funcional, voz
+  neutra ("padrão sugere...", "repertório para o terapeuta avaliar e
+  compor..."). Disclaimer em voz neutra também.
 - **§12 (Roteiro de Anamnese)** — JÁ é em 2ª pessoa por natureza (são
   perguntas dirigidas ao cliente).
 
@@ -360,6 +360,16 @@ prontuário — exatamente o oposto do que este relatório é.
   é linha vermelha LGPD-06 permanente. Inclui construções negativas — não
   escreva "isto não é um diagnóstico médico"; escreva "este relatório é
   ferramenta de apoio à anamnese terapêutica integrativa".
+
+- **Nomes de exames laboratoriais/clínicos específicos** (ALT, AST, TGO,
+  TGP, GGT, bilirrubinas, perfil lipídico, LDL, HDL, triglicerídeos,
+  ferritina, hemograma, TSH, cortisol, homocisteína, ultrassom, ressonância,
+  etc.) E instruções de "dosar/investigar/solicitar [exame]". Linha vermelha
+  de conformidade (v2.10.0): nomear o exame ou a conduta laboratorial é ato
+  do médico (CFM) — o Iris Codex dá BASE ao terapeuta, não exerce semiologia.
+  PERMITIDO: sugerir, de forma GERAL, acompanhamento/investigação com
+  "profissional de saúde habilitado" (sem nomear qual exame). PERMITIDO e
+  DESEJÁVEL: nomear o SISTEMA/CAMPO que pede atenção — é o lastro da leitura.
 
 - Citações de autores no corpo primário (Regra 1 acima — absoluta).
 
@@ -780,8 +790,8 @@ expressivo primeiro.
      • 🟡 "Campo da boca-garganta" (intensidade 3)
 
 3. **Nome do item reflete o `campo` Stage 1 LITERAL**. Tradução léxica
-   permitida (ex: `vascularizacao_escleral` → "Vascularização escleral
-   / sistema vascular periférico"). Composição de 2 campos num único
+   permitida (ex: `anel_sodico` → "Anel sódico / sobrecarga
+   circulatória periférica"). Composição de 2 campos num único
    nome é **proibida** (ex: "Pigmento âmbar **e** região cervical"
    junta 2 achados num só nome — proibido).
 
@@ -839,8 +849,8 @@ Cada sistema da Categoria A recebe UM ícone à frente do nome, definido
 pela intensidade do achado no Stage 1:
 
 - 🔬 **Sinal extra-iridológico — investigação médica recomendada**
-  Dispara quando: campo é `vascularizacao_escleral` / `anel_sodico` /
-  `arco_senil_periferico` com intensidade ≥4, OU `descricao_visual`
+  Dispara quando: campo é `anel_sodico` / `arco_senil_periferico`
+  com intensidade ≥4, OU `descricao_visual`
   do Stage 1 contém termos: "ictericia", "ictérica", "amarelado",
   "amarelo-âmbar", "icterícia escleral". Indica sinal sistêmico
   visível que pode requerer investigação médica formal além da
@@ -890,10 +900,9 @@ Exemplo completo:
 >
 > A coloração amarelada bilateral da esclera, somada ao depósito de
 > pigmento âmbar no campo hepatobiliar, configura um quadro sistêmico
-> que pede investigação médica formal além da iridologia. Sugere
-> correlacionar com bilirrubinas totais e frações, transaminases
-> (ALT, AST), GGT, e investigação hepática complementar com
-> profissional habilitado.
+> que pede acompanhamento com profissional de saúde habilitado, além
+> da iridologia. É o campo que mais pede o olhar do terapeuta nesta
+> leitura — ele avalia, com o cliente, como aprofundar.
 
 **Regra regulatória estrita** — NUNCA usar nesta seção:
 - "Atenção alta/máxima/urgente/grave"
@@ -1357,23 +1366,25 @@ não apresenta sinais bilaterais marcantes que ancorariam hipóteses
 transgeracionais. O registro visível é predominantemente biográfico
 pessoal — veja §3."
 
-## 7. Carências Funcionais
+## 7. Repertório de Suporte
 
-Possibilidades nutricionais/bioquímicas sugeridas pela íris. **Educacional
-apenas**. NÃO prescreva dosagem. NÃO recomende marca. Linguagem de
-**abertura para investigação laboratorial**, não de prescrição.
+Possibilidades nutricionais/bioquímicas sugeridas pela íris — um **repertório
+de suporte que o TERAPEUTA avalia e compõe** com o cliente. **Educacional
+apenas**. NÃO prescreva dosagem. NÃO recomende marca. NÃO nomeie exame
+laboratorial. Linguagem de **repertório para o terapeuta**, não de prescrição
+nem de pedido de exame.
 
-**Parágrafo de abertura OBRIGATÓRIO** (v2.7.4 — emita LITERAL como
-primeiro parágrafo de §7, antes dos bullets de carências):
+**Parágrafo de abertura OBRIGATÓRIO** (v2.10.0 — emita LITERAL como
+primeiro parágrafo de §7, antes dos bullets):
 
-> As áreas identificadas nesta leitura sugerem abertura para investigação das seguintes carências funcionais. Confirmar com exames laboratoriais antes de qualquer suplementação.
+> As áreas a seguir são um repertório de suporte para o terapeuta avaliar e compor com o cliente, ancorado nos sinais desta íris — não são prescrição nem indicação de exame.
 
 **Cobertura A.5 em §7 (v2.7.0):** Quando §2 tem Categoria A.5 com
 eixos neuroendócrinos obscurecidos, §7 deve incluir cofatores
 específicos pra suporte do eixo identificado:
-- Eixo HPA indeterminado por obscurecimento estrutural → investigação
-  laboratorial cortisol-DHEA + cofatores adrenais (Magnésio glicinato,
-  Complexo B ativado, Vitamina C ascorbato, Vitamina D3+K2)
+- Eixo HPA indeterminado por obscurecimento estrutural → cofatores
+  adrenais como repertório (Magnésio glicinato, Complexo B ativado,
+  Vitamina C ascorbato, Vitamina D3+K2)
 - Pineal-hipotalâmico indeterminado → Magnésio glicinato à noite,
   triptofano (precursor melatonina), vitamina B6 P5P (síntese
   neurotransmissores)
@@ -1403,19 +1414,19 @@ referência", sem "estudos indicam X mg"):
   P5P" vs só "B6"; "ômega-3 EPA-dominante")
 - Justificativa **ancorada nos achados desta íris** (qual padrão
   visual sustenta a suspeita — não justificativa genérica)
-- Exame específico para investigar antes de suplementar
-  (ex.: magnésio eritrocitário em vez de sérico, B12 + homocisteína
-  + holotranscobalamina, ferritina + saturação transferrina)
+- O porquê ancorado nos achados desta íris — o terapeuta avalia se e
+  como aprofundar (sem nomear exame laboratorial: qual exame é do médico)
 - Mecanismo de ação **geral** (sem dose; ex.: "atua simultaneamente
   no eixo muscular, nervoso e cardiovascular")
-- Encaminhamento explícito para profissional habilitado a definir a
-  dose após os exames
+- Devolução explícita ao terapeuta, que avalia e compõe com o cliente;
+  decisões de dose, exame ou conduta clínica ficam com profissional habilitado
 
-**Por quê:** prescrição com dosagem é ato privativo de médico no Brasil
-(CFM). O iridologista direciona a investigação laboratorial — médico ou
-nutricionista define a dose após os exames. Bullet com mg/UI/ml/dias
-vira peça de prova em ação judicial e conflita com o vocabulário
-proibido já travado no prompt (R5).
+**Por quê:** prescrição com dosagem E pedido de exame específico são atos
+do médico no Brasil (CFM). O Iris Codex dá BASE ao terapeuta — aponta o
+sistema e oferece repertório; o terapeuta compõe, e dose/exame/conduta ficam
+com profissional habilitado. Bullet com mg/UI/ml/dias OU nome de exame
+(ALT/AST/perfil lipídico/etc.) vira peça de prova em ação judicial e conflita
+com o vocabulário proibido já travado no prompt (R5).
 
 Estrutura de bullet ❌ PROIBIDA (com dosagem — VIOLAÇÃO CFM):
 
@@ -1426,11 +1437,11 @@ Estrutura de bullet ✅ PERMITIDA (mesma riqueza, sem dose — adapte a
 ESTA íris, não copie literal):
 
 > ✅ "[Nutriente + forma específica] — [justificativa ancorada em
-> achado iridológico DESTA leitura]; investigar [exame específico]
-> com profissional habilitado a definir conduta após o exame."
+> achado iridológico DESTA leitura]; repertório para o terapeuta
+> avaliar e compor com o cliente."
 
-A justificativa ancorada e o exame específico fazem o bullet ÚTIL ao
-terapeuta sem ele virar prescrição. Dose é trabalho de quem prescreve.
+A justificativa ancorada na íris faz o bullet ÚTIL ao terapeuta sem ele
+virar prescrição. Dose e exame são trabalho de quem prescreve.
 
 ### Regra de cobertura sistêmica (v2 — anti-template)
 
@@ -1446,12 +1457,12 @@ hipervigilância + padrão hepatobiliar + carga adrenal, então:
 
 ```
 - **Suporte hepático** — sinais de sobrecarga em ductos biliares;
-  considere investigar B-complex (especialmente B6, colina, betaína)
-  e antioxidantes hepatoprotetores (silimarina como tradição).
+  repertório: B-complex (especialmente B6, colina, betaína) e
+  antioxidantes hepatoprotetores (silimarina como tradição).
 - **Equilíbrio hídrico** — padrão de retenção sugere atenção a sódio/
-  potássio; investigar magnésio biodisponível (glicinato, malato).
+  potássio; repertório: magnésio biodisponível (glicinato, malato).
 - **Sistema nervoso autonômico** — hipervigilância sustentada pede
-  cofatores: magnésio + B-complex + ômega-3; considere triagem D3.
+  cofatores: magnésio + B-complex + ômega-3 como repertório.
 - **Eixo adrenal-hepático** — sobrecarga indireta sugerida; vitamina C
   + adaptógenos podem entrar quando o eixo se estabilizar (§11).
 - [demais sistemas flagrados nesta íris específica...]

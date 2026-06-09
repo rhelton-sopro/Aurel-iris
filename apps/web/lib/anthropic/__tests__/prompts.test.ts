@@ -61,7 +61,7 @@ describe('lib/anthropic/prompts — file content (Plan 21 — 16-section Iris Co
       'Padrões Emocionais Ativos',
       'Eixo Psicossomático',
       'Heranças Transgeracionais',
-      'Carências Funcionais',
+      'Repertório de Suporte',
       'Estado Mental e Nervoso',
       'Recursos e Forças',
       'Dimensão Arquetípica',

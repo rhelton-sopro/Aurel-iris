@@ -209,7 +209,7 @@ especulativa.
      `pnpm generate:schema-artifacts`.
 -->
 
-## Glossário canônico — 43 termos
+## Glossário canônico — 42 termos
 
 Vocabulário REFERENCIAL para uso em `campo`. Você pode usar termo
 composto fora do glossário se a íris realmente pede.
@@ -234,7 +234,7 @@ composto fora do glossário se a íris realmente pede.
 | `pancreas` | Lateralidade OE preferencial (~7-8h OE, mais sutil em OD) | Pigmento âmbar, lacunas, pigmentação na zona pancreática | Zona íntegra |
 | `sistema_reprodutor` | Inferior medial (~6h) | Lacunas/manchas, irregularidades | Zona limpa |
 | `sistema_urinario` | Inferior (rim → ureter → bexiga) | Lacunas conectadas em sequência | Setor urinário limpo |
-| `sistema_circulatorio` | Coroa periférica + anel periférico | Anel sódico, arco senil, vascularização escleral marcante | Coroa simpática regular, ausência de anel sódico |
+| `sistema_circulatorio` | Coroa periférica + anel periférico | Anel sódico, arco senil | Coroa simpática regular, ausência de anel sódico |
 | `sistema_musculoesqueletico` | Estroma intermediário-periférico | Trama afrouxada, fibras irregulares | Fibras compactas, densas, estroma firme |
 | `pele_tegumentar` | Anel periférico extremo (zona 7 Jensen) | Escurecimento ou irregularidade no anel periférico (NÃO confundir com rosário linfático da zona 6) | Borda íntegra, sem marcas |
 
@@ -281,11 +281,10 @@ composto fora do glossário se a íris realmente pede.
 | `pupila` | centrada_regular / descentrada / deformada / miose / midriase | Centrada = eixo neuroendócrino organizado. |
 | `bordas_pupilares` | regulares / achatamentos / descentralizacoes / irregulares | Achatamentos sinalizam padrões psicossomáticos específicos. |
 
-### Periféricos (1)
+### Periféricos (0)
 
 | campo | onde | sinal de CARGA |
 |---|---|---|
-| `vascularizacao_escleral` | Branco do olho (esclera, fora da íris) | Vascularização EXTENSA (≥3 quadrantes da esclera), OU vasos TORTUOSOS bem definidos, OU injeção bilateral densa visível nas 6 fotografias. Vasos finos isolados em 1-2 quadrantes são normais (cansaço/sol/álcool/tela), NÃO qualificam como achado hepático/circulatório. |
 
 <!-- GLOSSARY-END -->
 

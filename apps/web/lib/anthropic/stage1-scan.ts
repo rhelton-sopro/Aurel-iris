@@ -192,7 +192,18 @@ const STAGE1_PROMPT_FILENAME = 'stage1-scan.md'
 //   - anel_interno ≤ 7/10
 //   - figado_vesicula ≤ 8/10 (carga hepática é prevalente em BR adulto;
 //     piso menor de redução)
-const STAGE1_METHOD_VERSION = 'sonnet_2x_0.5.0' as const
+//
+// v2.10.0 (2026-06-09): bump MINOR 0.5.0 → 0.6.0 — campo
+// `vascularizacao_escleral` REMOVIDO do glossário (decisão founder A2).
+// Audit das últimas 5 leituras mostrou escleral em 5/5 (protagonista no
+// Bernardo) apesar do piso subido em v2.9.0 — Sonnet contornava descrevendo
+// tudo "extensa/tortuosa". Removido o campo standalone E "vascularização
+// escleral marcante" do sinal_carga de sistema_circulatorio: carga
+// circulatória agora lida só por sinais intra-íris (anel sódico, arco senil).
+// Stage 2 (system.md): escleral retirado do gatilho 🔬 e do exemplo de
+// tradução léxica; theme-maps §8/§10 (analyze-direct) trimados. Icterícia
+// escleral (cor) PRESERVADA. Não-retroativo.
+const STAGE1_METHOD_VERSION = 'sonnet_2x_0.6.0' as const
 
 let _stage1PromptCache: string | null = null
 let _stage1ShaCache: string | null = null

@@ -201,7 +201,7 @@ export const GLOSSARY: readonly GlossaryEntry[] = [
   {
     group: 'sistema_orgao', campo: 'sistema_circulatorio',
     zona: 'Coroa periférica + anel periférico',
-    sinal_carga: 'Anel sódico, arco senil, vascularização escleral marcante',
+    sinal_carga: 'Anel sódico, arco senil',
     sinal_preservacao: 'Coroa simpática regular, ausência de anel sódico',
   },
   {
@@ -387,19 +387,20 @@ export const GLOSSARY: readonly GlossaryEntry[] = [
     observacao: 'Achatamentos sinalizam padrões psicossomáticos específicos.',
   },
 
-  // === Periféricos (1) ===
-  {
-    // v2.9.0 (2026-05-27): sinal_carga reescrito pra subir piso clínico.
-    // Audit das últimas 10 leituras mostrou vascularizacao_escleral em
-    // 90%-100% das leituras — viés sistemático. Causa: "vasos dilatados"
-    // qualifica qualquer adulto cansado/sol/álcool/tela — esclera com
-    // alguns vasos visíveis é normal. Novo piso exige extensão (≥3
-    // quadrantes da esclera) OU tortuosidade marcada OU injeção bilateral
-    // densa. Vasos finos isolados em 1-2 pontos é base, não carga.
-    group: 'periferico', campo: 'vascularizacao_escleral',
-    zona: 'Branco do olho (esclera, fora da íris)',
-    sinal_carga: 'Vascularização EXTENSA (≥3 quadrantes da esclera), OU vasos TORTUOSOS bem definidos, OU injeção bilateral densa visível nas 6 fotografias. Vasos finos isolados em 1-2 quadrantes são normais (cansaço/sol/álcool/tela), NÃO qualificam como achado hepático/circulatório.',
-  },
+  // === Periféricos ===
+  // v2.10.0 (2026-06-09): campo `vascularizacao_escleral` REMOVIDO.
+  // Audit das últimas 5 leituras mostrou escleral em 5/5 (até protagonista
+  // no Bernardo), apesar do piso subido em v2.9.0 — o Sonnet contornava
+  // descrevendo tudo como "extensa/tortuosa". Causa raiz: esclera (branco
+  // do olho) é extra-iridológica E o sinal é o menos específico que existe
+  // (qualquer adulto cansado/sol/álcool/tela), violando a quality bar.
+  // Empiricamente o achado NUNCA saía sozinho — sempre pareado com
+  // anel_sodico/sistema_circulatorio. Decisão founder (A2): remover o campo
+  // standalone E tirar "vascularização escleral marcante" do sinal_carga de
+  // sistema_circulatorio (acima) — carga circulatória passa a ser lida só
+  // por sinais INTRA-íris (anel sódico, arco senil). Icterícia escleral
+  // (cor amarelada = sinal hepático medicalizado) PERMANECE, roteada por
+  // termos de cor no Stage 2 (gatilho 🔬). Não-retroativo.
 ]
 
 /**
