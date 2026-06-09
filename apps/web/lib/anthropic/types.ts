@@ -107,6 +107,36 @@ export const NUMBERED_SECTION_HEADINGS = [
 export type NumberedSectionHeading = (typeof NUMBERED_SECTION_HEADINGS)[number]
 
 /**
+ * Ordem de EXIBIÇÃO das seções no documento entregue (web + PDF), 2026-06-09.
+ * Segue o arco narrativo da devolutiva (construção de confiança: espelho →
+ * história → padrão → o que pesa + perguntas → força → fecho), em vez da ordem
+ * de emissão 1..15.
+ *
+ * IMPORTANTE: NÃO afeta o Sonnet nem o parser. O relatório continua sendo
+ * GERADO e PARSEADO em NUMBERED_SECTION_HEADINGS (monotônica 1..15) — esta
+ * constante só reordena a APRESENTAÇÃO. O número exibido ao leitor é a POSIÇÃO
+ * neste array (renumerado 1..15), não o heading-number original. A §0 "Em
+ * poucas palavras" permanece como bloco de abertura especial (sem número).
+ */
+export const DISPLAY_SECTION_ORDER = [
+  '1',  // Constituição e Temperamento — o espelho (quem é)
+  '3',  // Linha do Tempo Emocional    — a história (por idades)
+  '6',  // Heranças Transgeracionais   — a história (linhagem)
+  '4',  // Padrões Emocionais Ativos   — o padrão
+  '5',  // Eixo Psicossomático         — o padrão no corpo
+  '2',  // Mapa Orgânico               — o que pesa (clímax)
+  '7',  // Carências Funcionais        — o que pesa
+  '8',  // Estado Mental e Nervoso     — o que pesa
+  '12', // Roteiro de Anamnese         — as perguntas (clímax, já aberto)
+  '9',  // Recursos e Forças           — a força
+  '10', // Dimensão Arquetípica        — o sentido
+  '11', // Sugestões Integrativas      — os caminhos
+  '13', // Síntese Integrativa         — o fecho
+  '14', // Mensagem para o Cliente     — o fecho caloroso
+  '15', // Síntese Rápida              — o cartão pra levar
+] as const satisfies readonly NumberedSectionHeading[]
+
+/**
  * Display title for each numbered section, keyed by heading-number string.
  * Single source of truth — consumed by AnalysisStream (streaming progress UI),
  * EditorAccordion (editor surface), and ReportReadView (reading-mode flowing

@@ -31,7 +31,7 @@ import type { ReactNode } from 'react'
 
 import { LocalDateTime } from '@/components/ui/local-date-time'
 import {
-  NUMBERED_SECTION_HEADINGS,
+  DISPLAY_SECTION_ORDER,
   SECTION_KEY_BY_NUMBER,
   sectionDisplayTitle,
 } from '@/lib/anthropic/types'
@@ -147,7 +147,9 @@ export function ReportReadView({
   const encerramento = sections['encerramento_disclaimer']
   const essence = sections['essence_phrase']?.trim()
   const zeroSection = sections['0_em_poucas_palavras']?.trim()
-  const present = NUMBERED_SECTION_HEADINGS.filter((h) => {
+  // Ordem de apresentação = arco narrativo da devolutiva (DISPLAY_SECTION_ORDER),
+  // não a ordem de emissão. O número mostrado é a POSIÇÃO entre as presentes.
+  const present = DISPLAY_SECTION_ORDER.filter((h) => {
     const raw = sections[SECTION_KEY_BY_NUMBER[h]]
     return raw && raw.trim().length > 0
   })
@@ -276,7 +278,7 @@ export function ReportReadView({
           >
             Índice
           </p>
-          {present.map((h) => (
+          {present.map((h, i) => (
             <a
               key={h}
               href={`#sec-${h}`}
@@ -284,7 +286,7 @@ export function ReportReadView({
               style={{ color: C.ink }}
             >
               <span className="w-6 text-sm" style={{ color: C.teal }}>
-                {h}
+                {i + 1}
               </span>
               <span className="text-sm">{sectionDisplayTitle(h, clientName)}</span>
             </a>
@@ -293,7 +295,7 @@ export function ReportReadView({
       )}
 
       <div className="space-y-2">
-        {NUMBERED_SECTION_HEADINGS.map((headingStr, idx) => {
+        {present.map((headingStr, idx) => {
           const key = SECTION_KEY_BY_NUMBER[headingStr]
           const raw = sections[key]
           if (!raw || raw.trim().length === 0) return null
@@ -316,7 +318,7 @@ export function ReportReadView({
                 className={`${headingMargin} text-2xl font-bold tracking-tight`}
                 style={SERIF}
               >
-                <span style={{ color: C.teal }}>{headingStr}</span>
+                <span style={{ color: C.teal }}>{idx + 1}</span>
                 <span className="font-normal">{' — '}</span>
                 {title}
               </h2>
