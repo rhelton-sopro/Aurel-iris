@@ -33,7 +33,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
 import {
-  DISPLAY_SECTION_ORDER,
+  resolveDisplayOrder,
   SECTION_KEY_BY_NUMBER,
   sectionDisplayTitle,
 } from '@/lib/anthropic/types'
@@ -444,9 +444,10 @@ export async function renderBodyHtml(
   const encerramento = sections['encerramento_disclaimer']
   const essence = sections['essence_phrase']?.trim()
   const zeroSection = sections['0_em_poucas_palavras']?.trim()
-  // Apresentação na ordem do arco narrativo (DISPLAY_SECTION_ORDER); número
-  // exibido = posição entre as presentes. Geração/parse seguem inalterados.
-  const present = DISPLAY_SECTION_ORDER.filter((h) => {
+  // Apresentação: flag narrativa → arco da devolutiva (renumerado por posição);
+  // legacy → ordem de emissão 1..15 com número original. Não-retroativo.
+  const { headings: displayHeadings, renumber } = resolveDisplayOrder(sections)
+  const present = displayHeadings.filter((h) => {
     const raw = sections[SECTION_KEY_BY_NUMBER[h]]
     return raw && raw.trim().length > 0
   })
@@ -462,7 +463,7 @@ export async function renderBodyHtml(
         <div className="toc-rule" />
         {present.map((h, i) => (
           <a className="toc-row" key={h} href={`#sec-${h}`}>
-            <span className="toc-num">{i + 1}</span>
+            <span className="toc-num">{renumber ? i + 1 : h}</span>
             <span className="toc-name">{sectionDisplayTitle(h, clientName)}</span>
             <span className="toc-leader" />
           </a>
@@ -509,7 +510,7 @@ export async function renderBodyHtml(
               key={key}
             >
               <h2 className="sec-title">
-                <span className="sec-num">{secIdx + 1}</span>
+                <span className="sec-num">{renumber ? secIdx + 1 : headingStr}</span>
                 <span className="sec-dash"> — </span>
                 {title}
               </h2>

@@ -137,6 +137,32 @@ export const DISPLAY_SECTION_ORDER = [
 ] as const satisfies readonly NumberedSectionHeading[]
 
 /**
+ * Flag (chave NÃO-seção) persistida no jsonb do relatório marcando que a leitura
+ * deve ser EXIBIDA na ordem narrativa da devolutiva (DISPLAY_SECTION_ORDER),
+ * renumerada por posição. Gerações a partir de 2026-06-09 setam 'narrative';
+ * leituras anteriores não têm a chave → exibidas na ordem clássica de emissão
+ * 1..15 (NUMBERED_SECTION_HEADINGS). NÃO-RETROATIVO por design (só as próximas).
+ * É metadado — ignorado pelos loops de seção, pelo parser e pelo Sonnet.
+ */
+export const REPORT_DISPLAY_ORDER_KEY = '_display_order' as const
+export const NARRATIVE_DISPLAY_ORDER = 'narrative' as const
+
+/**
+ * Resolve a ordem de exibição + numeração de um relatório, conforme a flag
+ * REPORT_DISPLAY_ORDER_KEY: 'narrative' → arco da devolutiva, renumerado por
+ * posição; ausente/legacy → ordem de emissão 1..15 com o número original.
+ * Usado pelo render web (ReportReadView) e pelo PDF para ficarem idênticos.
+ */
+export function resolveDisplayOrder(
+  sections: Record<string, string | undefined>,
+): { headings: readonly NumberedSectionHeading[]; renumber: boolean } {
+  const narrative = sections[REPORT_DISPLAY_ORDER_KEY] === NARRATIVE_DISPLAY_ORDER
+  return narrative
+    ? { headings: DISPLAY_SECTION_ORDER, renumber: true }
+    : { headings: NUMBERED_SECTION_HEADINGS, renumber: false }
+}
+
+/**
  * Display title for each numbered section, keyed by heading-number string.
  * Single source of truth — consumed by AnalysisStream (streaming progress UI),
  * EditorAccordion (editor surface), and ReportReadView (reading-mode flowing

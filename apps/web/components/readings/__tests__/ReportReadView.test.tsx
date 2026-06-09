@@ -77,7 +77,7 @@ describe('components/readings/ReportReadView (Plan 7.4-18 — UAT-3 reading-mode
     expect(screen.getByText(/Leitura realizada em/)).toBeDefined()
   })
 
-  it('renders 15 sections in DISPLAY_SECTION_ORDER (arco da devolutiva), renumbered 1..15 by position', () => {
+  it('classic order (sem flag): renders sections 1..15 in emission order, original numbers', () => {
     const { container } = render(
       <ReportReadView
         sections={FULL_15_SECTIONS}
@@ -87,30 +87,49 @@ describe('components/readings/ReportReadView (Plan 7.4-18 — UAT-3 reading-mode
     )
     const headings = container.querySelectorAll('h2')
     expect(headings.length).toBe(15)
-    // 2026-06-09: ordem de apresentação = arco narrativo (espelho → história →
-    // padrão → o que pesa+perguntas → força → fecho), renumerada pela posição.
-    // §14 "Mensagem para o Cliente" → "Para {nome}" (clientName="Cliente Teste").
+    // Sem a flag _display_order → ordem clássica de emissão, número original.
+    const expectedOrder = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15']
+    expectedOrder.forEach((n, idx) => {
+      expect(headings[idx]?.textContent).toContain(`${n} —`)
+    })
+    expect(headings[1]?.textContent).toBe('2 — Mapa Orgânico')
+    expect(headings[14]?.textContent).toBe('15 — Síntese Rápida')
+  })
+
+  it('narrative order (flag _display_order): arco da devolutiva, renumerado 1..15 por posição', () => {
+    // 2026-06-09: só leituras marcadas usam o arco (espelho → história → padrão
+    // → o que pesa+perguntas → força → fecho). §14 → "Para {nome}".
+    const flagged = { ...FULL_15_SECTIONS, _display_order: 'narrative' }
+    const { container } = render(
+      <ReportReadView
+        sections={flagged}
+        clientName="Cliente Teste"
+        readingDate="2026-05-14T15:00:00.000Z"
+      />,
+    )
+    const headings = container.querySelectorAll('h2')
+    expect(headings.length).toBe(15)
     const expectedTitles = [
-      'Constituição e Temperamento', // espelho
-      'Linha do Tempo Emocional',    // história
+      'Constituição e Temperamento',
+      'Linha do Tempo Emocional',
       'Heranças Transgeracionais',
-      'Padrões Emocionais Ativos',   // padrão
+      'Padrões Emocionais Ativos',
       'Eixo Psicossomático',
-      'Mapa Orgânico',               // o que pesa (migrou do 2º pro clímax)
+      'Mapa Orgânico',
       'Carências Funcionais',
       'Estado Mental e Nervoso',
-      'Roteiro de Anamnese',         // as perguntas, no clímax
-      'Recursos e Forças',           // a força
+      'Roteiro de Anamnese',
+      'Recursos e Forças',
       'Dimensão Arquetípica',
       'Sugestões Integrativas',
-      'Síntese Integrativa',         // o fecho
+      'Síntese Integrativa',
       'Para Cliente',
       'Síntese Rápida',
     ]
     expectedTitles.forEach((title, idx) => {
       expect(headings[idx]?.textContent).toBe(`${idx + 1} — ${title}`)
     })
-    // Marcos do arco: Mapa Orgânico no clímax (6), Síntese Rápida fecha (15).
+    // Mapa Orgânico migra pro clímax (6); Síntese Rápida fecha (15).
     expect(headings[5]?.textContent).toBe('6 — Mapa Orgânico')
     expect(headings[14]?.textContent).toBe('15 — Síntese Rápida')
   })
@@ -129,10 +148,9 @@ describe('components/readings/ReportReadView (Plan 7.4-18 — UAT-3 reading-mode
     )
     const headings = container.querySelectorAll('h2')
     expect(headings.length).toBe(2)
-    // Renumerado pela POSIÇÃO entre as presentes (sem buracos): Constituição (1)
-    // vem antes de Eixo Psicossomático na DISPLAY_SECTION_ORDER, que vira "2".
-    expect(headings[0]?.textContent).toBe('1 — Constituição e Temperamento')
-    expect(headings[1]?.textContent).toBe('2 — Eixo Psicossomático')
+    // Sem flag → ordem clássica, número original (1 e 5).
+    expect(headings[0]?.textContent).toContain('1 —')
+    expect(headings[1]?.textContent).toContain('5 —')
   })
 
   it('strips leading `## N. Title` (and legacy `## §N — Title`) heading from rendered body', () => {
@@ -241,7 +259,7 @@ describe('components/readings/ReportReadView (Plan 7.4-18 — UAT-3 reading-mode
     })
   })
 
-  it('Síntese Rápida heading + prose fallback (renumbered to "1" when alone)', () => {
+  it('§15 Síntese Rápida heading renders as "15 — Síntese Rápida" (classic, sem flag)', () => {
     const sections = {
       '15_sintese_rapida':
         '## 15. Síntese Rápida\n\nSem subseções aqui — prosa simples.',
@@ -254,9 +272,7 @@ describe('components/readings/ReportReadView (Plan 7.4-18 — UAT-3 reading-mode
       />,
     )
     const h2 = screen.getByRole('heading', { level: 2 })
-    // Sozinha → posição 1 (renumeração por posição). O título é preservado;
-    // o tratamento especial (grid vs prosa) é por KEY ('15'), não por posição.
-    expect(h2.textContent).toBe('1 — Síntese Rápida')
+    expect(h2.textContent).toBe('15 — Síntese Rápida')
     const article = screen.getByTestId('report-read-view')
     expect(within(article).getByText('Sem subseções aqui — prosa simples.')).toBeDefined()
   })

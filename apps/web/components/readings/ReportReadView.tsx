@@ -31,7 +31,7 @@ import type { ReactNode } from 'react'
 
 import { LocalDateTime } from '@/components/ui/local-date-time'
 import {
-  DISPLAY_SECTION_ORDER,
+  resolveDisplayOrder,
   SECTION_KEY_BY_NUMBER,
   sectionDisplayTitle,
 } from '@/lib/anthropic/types'
@@ -147,9 +147,11 @@ export function ReportReadView({
   const encerramento = sections['encerramento_disclaimer']
   const essence = sections['essence_phrase']?.trim()
   const zeroSection = sections['0_em_poucas_palavras']?.trim()
-  // Ordem de apresentação = arco narrativo da devolutiva (DISPLAY_SECTION_ORDER),
-  // não a ordem de emissão. O número mostrado é a POSIÇÃO entre as presentes.
-  const present = DISPLAY_SECTION_ORDER.filter((h) => {
+  // Ordem de apresentação: relatórios marcados com a flag narrativa usam o arco
+  // da devolutiva (renumerado por posição); os demais (legacy) mantêm a ordem
+  // de emissão 1..15 com o número original. Não-retroativo.
+  const { headings: displayHeadings, renumber } = resolveDisplayOrder(sections)
+  const present = displayHeadings.filter((h) => {
     const raw = sections[SECTION_KEY_BY_NUMBER[h]]
     return raw && raw.trim().length > 0
   })
@@ -286,7 +288,7 @@ export function ReportReadView({
               style={{ color: C.ink }}
             >
               <span className="w-6 text-sm" style={{ color: C.teal }}>
-                {i + 1}
+                {renumber ? i + 1 : h}
               </span>
               <span className="text-sm">{sectionDisplayTitle(h, clientName)}</span>
             </a>
@@ -318,7 +320,7 @@ export function ReportReadView({
                 className={`${headingMargin} text-2xl font-bold tracking-tight`}
                 style={SERIF}
               >
-                <span style={{ color: C.teal }}>{idx + 1}</span>
+                <span style={{ color: C.teal }}>{renumber ? idx + 1 : headingStr}</span>
                 <span className="font-normal">{' — '}</span>
                 {title}
               </h2>

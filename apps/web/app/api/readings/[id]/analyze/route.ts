@@ -59,6 +59,8 @@ import { MODEL } from '@/lib/anthropic/client'
 import { getSystemPromptVersion } from '@/lib/anthropic/prompts'
 import {
   ENCERRAMENTO_LITERAL,
+  REPORT_DISPLAY_ORDER_KEY,
+  NARRATIVE_DISPLAY_ORDER,
   type ReportJsonb,
   type RegenerationLogEntry,
   type CanonicalMetadata,
@@ -459,6 +461,14 @@ export async function POST(
 
         const finalization = await analysis.finalize()
         const audit = runAudit(completedSections)
+
+        // 2026-06-09: marca esta geração para ser EXIBIDA na ordem narrativa da
+        // devolutiva (render web + PDF reordenam por DISPLAY_SECTION_ORDER e
+        // renumeram por posição). Adicionado APÓS o runAudit para não entrar no
+        // scan de vocabulário. Não-retroativo: leituras antigas não têm a flag.
+        // Metadado (chave não-seção) — ignorado pelos loops de seção e parser.
+        ;(completedSections as Record<string, string>)[REPORT_DISPLAY_ORDER_KEY] =
+          NARRATIVE_DISPLAY_ORDER
 
         const logEntry: RegenerationLogEntry = {
           timestamp: new Date().toISOString(),
