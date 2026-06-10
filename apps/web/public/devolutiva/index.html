@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Iris Codex — Apresentação e Devolutiva</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --black:#000;--white:#fff;
+    --teal:#3D9B8C;--teal-light:#5BBFB0;--teal-dark:#1E6B61;
+    --ivory:#F2EDE4;--mist:#7A7A7A;--ink:#0d0d0d;
+    --display:'Fraunces',Georgia,serif;--serif:'Cormorant Garamond',Georgia,serif;--sans:'Raleway',ui-sans-serif,system-ui,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{font-family:var(--sans);background:var(--black);color:var(--ivory);overflow:hidden;-webkit-font-smoothing:antialiased}
+
+  .deck{position:fixed;inset:0}
+  .slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:clamp(2rem,6vw,7rem);opacity:0;visibility:hidden;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease,visibility .6s;overflow-y:auto}
+  .slide.active{opacity:1;visibility:visible;transform:none;z-index:2}
+  .slide-inner{max-width:1020px;margin:0 auto;width:100%}
+
+  .slide.dark{background:var(--black);color:var(--ivory)}
+  .slide.ivory{background:var(--ivory);color:var(--ink)}
+  .slide.deep{background:linear-gradient(160deg,#06100e 0%,#0c1a17 60%,#04221d 100%);color:var(--ivory)}
+
+  .eyebrow{font-weight:600;font-size:clamp(.6rem,1vw,.72rem);letter-spacing:.28em;text-transform:uppercase;color:var(--teal-light);margin-bottom:1.5rem}
+  .slide.ivory .eyebrow{color:var(--teal-dark)}
+  .step-of{font-weight:600;font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--mist);margin-bottom:.7rem}
+  h1{font-family:var(--display);font-weight:340;font-size:clamp(2.6rem,7vw,6rem);line-height:1.02;letter-spacing:-.01em}
+  h2{font-family:var(--display);font-weight:360;font-size:clamp(1.9rem,4.4vw,3.5rem);line-height:1.08;letter-spacing:-.005em}
+  h3{font-family:var(--display);font-weight:400;font-size:clamp(1.4rem,3vw,2.4rem);line-height:1.12}
+  em{font-style:italic;color:var(--teal-light)}
+  .slide.ivory em{color:var(--teal-dark)}
+  .lead{font-family:var(--serif);font-style:italic;font-size:clamp(1.4rem,3vw,2.25rem);line-height:1.5;color:var(--teal-light);max-width:32ch}
+  .slide.ivory .lead{color:var(--teal-dark)}
+  .body{font-size:clamp(1.07rem,1.5vw,1.25rem);line-height:1.72;color:rgba(242,237,228,.84);max-width:64ch;font-weight:300}
+  .slide.ivory .body{color:#3a3a3a}
+  .body b{font-weight:600;color:var(--ivory)} .slide.ivory .body b{color:var(--ink)}
+  .say{font-family:var(--serif);font-style:italic;color:var(--teal-light);font-size:clamp(1.05rem,1.7vw,1.3rem)}
+  .slide.ivory .say{color:var(--teal-dark)}
+  .mt-s{margin-top:1rem}.mt-m{margin-top:1.7rem}.mt-l{margin-top:2.5rem}
+  .kicker{font-size:.78rem;letter-spacing:.04em;color:var(--mist);margin-top:1.5rem;max-width:64ch;line-height:1.5}
+  .tagline{font-family:var(--serif);font-style:italic;font-size:clamp(1.1rem,2vw,1.5rem);color:var(--teal-light);margin-top:1rem}
+  .cta-bar{display:inline-block;margin-top:2.4rem;background:var(--teal);color:#042019;font-weight:600;letter-spacing:.01em;font-size:clamp(.95rem,1.5vw,1.18rem);padding:.9rem 1.9rem;border-radius:3px;text-decoration:none;transition:.2s;box-shadow:0 10px 30px rgba(61,155,140,.28)}
+  .cta-bar:hover{background:var(--teal-light);transform:translateY(-1px)}
+  .cta-bar b{font-weight:700}
+  .pullquote{font-family:var(--serif);font-style:italic;font-size:clamp(1.5rem,3.4vw,2.6rem);line-height:1.3;color:var(--teal-light);border-left:2px solid var(--teal-dark);padding-left:1.3rem;margin-top:1.7rem;max-width:34ch}
+  .slide.ivory .pullquote{color:var(--teal-dark);border-color:var(--teal)}
+  .wordmark{font-weight:600;letter-spacing:.2em;text-transform:uppercase;font-size:clamp(.8rem,1.4vw,1rem);color:var(--ivory)}
+
+  .grid{display:grid;gap:1.1rem;margin-top:2rem}
+  .grid.cols-2{grid-template-columns:repeat(2,1fr)}
+  .grid.cols-3{grid-template-columns:repeat(3,1fr)}
+  .card{border:1px solid rgba(242,237,228,.14);border-radius:3px;padding:1.3rem 1.4rem}
+  .slide.ivory .card{border-color:#dcd2c0;background:rgba(255,255,255,.4)}
+  .card .k{font-weight:600;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--teal);display:block;margin-bottom:.5rem}
+  .card .v{font-size:.98rem;line-height:1.5;color:rgba(242,237,228,.8);font-weight:300}
+  .slide.ivory .card .v{color:#444}
+
+  .tags{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.6rem}
+  .sec{font-size:.64rem;font-weight:500;letter-spacing:.05em;border:1px solid var(--teal-dark);color:var(--teal-light);border-radius:2px;padding:.32rem .58rem}
+  .slide.ivory .sec{color:var(--teal-dark);border-color:var(--teal)}
+
+  ul.clean{list-style:none;margin-top:1.4rem;max-width:64ch}
+  ul.clean li{position:relative;padding-left:1.5rem;margin-bottom:.9rem;font-size:clamp(1.07rem,1.45vw,1.2rem);line-height:1.6;color:rgba(242,237,228,.85);font-weight:300}
+  .slide.ivory ul.clean li{color:#3a3a3a}
+  ul.clean li::before{content:'';position:absolute;left:0;top:.62em;width:7px;height:7px;background:var(--teal);border-radius:50%}
+  ul.clean li b{font-weight:600;color:var(--ivory)} .slide.ivory ul.clean li b{color:var(--ink)}
+
+  /* lista numerada do mapa */
+  ol.path{list-style:none;counter-reset:p;margin-top:1.8rem;display:grid;gap:.9rem}
+  ol.path li{counter-increment:p;position:relative;padding-left:3rem;font-size:clamp(1.07rem,1.5vw,1.26rem);line-height:1.4;color:rgba(242,237,228,.9);font-weight:300}
+  .slide.ivory ol.path li{color:#2a2a2a}
+  ol.path li::before{content:counter(p);position:absolute;left:0;top:-.1em;font-family:var(--display);font-weight:300;font-size:1.5rem;color:var(--teal);width:2rem;text-align:left}
+  ol.path li b{font-weight:600;color:var(--ivory)} .slide.ivory ol.path li b{color:var(--ink)}
+  ol.path li span{color:var(--mist);font-size:.92em}
+
+  .price{font-family:var(--display);font-weight:300;font-size:clamp(3rem,9vw,6rem);line-height:1;color:var(--teal-light)}
+  .slide.ivory .price{color:var(--teal-dark)}
+
+  .wave{margin-top:1.8rem;width:100%}
+  .wave text{font-family:var(--sans);font-size:13px;letter-spacing:.04em;fill:var(--mist)}
+
+  .nav{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;align-items:center;justify-content:center;gap:1rem;padding:.6rem 1.1rem;pointer-events:none}
+  .nav button{pointer-events:auto;cursor:pointer;background:transparent;border:1px solid rgba(122,122,122,.5);color:var(--mist);border-radius:50%;width:32px;height:32px;font-size:.9rem;display:flex;align-items:center;justify-content:center;transition:.2s}
+  .nav button:hover{border-color:var(--teal);color:var(--teal-light)}
+  .dots{pointer-events:auto;display:flex;gap:.34rem;align-items:center;flex-wrap:nowrap;justify-content:center}
+  .dot{width:3px;height:3px;border-radius:50%;background:rgba(122,122,122,.38);cursor:pointer;transition:.25s;border:0;padding:0;flex:0 0 auto}
+  .dot.on{background:var(--teal-light);transform:scale(1.35)}
+  .counter{position:fixed;top:1.4rem;right:1.6rem;z-index:50;font-size:.7rem;letter-spacing:.14em;color:var(--mist)}
+  .brandtag{position:fixed;top:1.3rem;left:1.6rem;z-index:50;display:flex;align-items:center}
+  .brandtag img{height:24px;width:auto;display:block;opacity:.95}
+  .logo-hero{height:clamp(40px,6vw,62px);width:auto;display:block;margin-bottom:.2rem}
+  .slide.ivory .logo-hero{filter:none}
+  .progress{position:fixed;top:0;left:0;height:2px;background:var(--teal);z-index:60;transition:width .4s ease}
+  .hint{position:fixed;bottom:4.5rem;left:50%;transform:translateX(-50%);font-size:.66rem;letter-spacing:.1em;color:var(--mist);z-index:40;opacity:.7;transition:opacity .5s}
+
+  /* ── imagens de fundo (full-bleed) ── */
+  .slide .bg{position:absolute;inset:0;z-index:0;background-size:cover;background-position:center;opacity:0;transition:opacity 1.1s ease .05s;transform:scale(1.04)}
+  .slide.active .bg{opacity:1;transform:scale(1);transition:opacity 1.1s ease,transform 7s ease}
+  .slide.has-img .slide-inner{position:relative;z-index:2}
+  .slide.has-img::after{content:'';position:absolute;inset:0;z-index:1;pointer-events:none}
+  .slide.deep.has-img::after,.slide.dark.has-img::after{background:linear-gradient(95deg,rgba(4,12,10,.96) 0%,rgba(4,12,10,.84) 36%,rgba(4,12,10,.46) 66%,rgba(4,12,10,.24) 100%)}
+  .slide.ivory.has-img::after{background:linear-gradient(95deg,rgba(242,237,228,.98) 0%,rgba(242,237,228,.9) 40%,rgba(242,237,228,.52) 74%,rgba(242,237,228,.18) 100%)}
+  /* variante cinematográfica: foto inteira, texto no terço inferior */
+  .slide.img-bottom{justify-content:flex-end}
+  .slide.img-bottom.has-img::after{background:linear-gradient(0deg,rgba(4,12,10,.97) 0%,rgba(4,12,10,.88) 26%,rgba(4,12,10,.55) 52%,rgba(4,12,10,.18) 78%,rgba(4,12,10,.05) 100%)}
+  .slide.img-bottom .slide-inner{max-width:62ch;margin-bottom:3.4rem}
+  .slide.img-left .slide-inner{margin:0;max-width:44ch}
+
+  /* ── split: texto | imagem ── */
+  .split .slide-inner{display:grid;grid-template-columns:1.04fr .96fr;gap:clamp(1.5rem,4vw,3.6rem);align-items:center;max-width:1120px}
+  .col-img{position:relative}
+  .col-img img{width:100%;height:auto;border-radius:4px;display:block;box-shadow:0 26px 64px rgba(0,0,0,.5)}
+  .slide.ivory .col-img img{box-shadow:0 26px 64px rgba(0,0,0,.16)}
+  .col-img.framed img{border:1px solid rgba(242,237,228,.12)}
+  .slide.ivory .col-img.framed img{border-color:#dcd2c0}
+  .figcap{font-size:.64rem;letter-spacing:.18em;text-transform:uppercase;color:var(--mist);margin-top:.85rem;text-align:center}
+
+  /* ── capa de revista (cover lines) ── */
+  .mag-head{font-family:var(--display);font-weight:340;font-size:clamp(2.4rem,6vw,5rem);line-height:1.02;letter-spacing:-.01em}
+  .coverlines{margin-top:2.2rem;display:grid;gap:0;max-width:62ch}
+  .cl{padding:1.05rem 0;border-top:1px solid rgba(242,237,228,.15);display:grid;grid-template-columns:minmax(0,15rem) 1fr;gap:1.4rem;align-items:baseline}
+  .cl:last-child{border-bottom:1px solid rgba(242,237,228,.15)}
+  .cl-k{font-family:var(--serif);font-style:italic;color:var(--teal-light);font-size:clamp(1.1rem,1.7vw,1.4rem);line-height:1.2}
+  .cl-v{font-weight:300;line-height:1.58;color:rgba(242,237,228,.85);font-size:clamp(.98rem,1.3vw,1.1rem)}
+  @media (max-width:680px){.cl{grid-template-columns:1fr;gap:.3rem}}
+
+  /* ── crescendo (6 momentos) ── */
+  .crescendo{display:grid;grid-template-columns:repeat(6,1fr);gap:clamp(.5rem,1.4vw,1.05rem);margin-top:2.4rem;align-items:end}
+  .cr{display:flex;flex-direction:column;justify-content:flex-end}
+  .cr-track{height:128px;display:flex;align-items:flex-end;margin-bottom:.85rem}
+  .cr-bar{width:100%;background:linear-gradient(180deg,var(--teal-light),var(--teal-dark));border-radius:3px 3px 0 0;height:var(--h);min-height:14px}
+  .cr-n{font-family:var(--display);font-weight:300;font-size:1.3rem;color:var(--teal-dark);line-height:1}
+  .cr b{display:block;font-family:var(--display);font-weight:500;font-size:clamp(.95rem,1.15vw,1.08rem);color:var(--ink);margin:.22rem 0 .25rem}
+  .cr span{font-size:clamp(.74rem,.92vw,.86rem);line-height:1.42;color:#5a5a5a;font-weight:300}
+  @media (max-width:680px){.crescendo{grid-template-columns:1fr;gap:.55rem;margin-top:1.6rem}.cr{flex-direction:row;align-items:baseline;gap:.7rem}.cr-track{display:none}.cr b{display:inline;margin:0}.cr span{display:block}}
+
+  /* ── passos verticais ── */
+  ol.steps{list-style:none;counter-reset:s;display:grid;gap:1.2rem;margin-top:1.7rem;max-width:46ch}
+  ol.steps li{counter-increment:s;position:relative;padding-left:2.7rem;line-height:1.5}
+  ol.steps li::before{content:counter(s,decimal-leading-zero);position:absolute;left:0;top:.05em;font-family:var(--display);font-weight:300;font-size:1.15rem;color:var(--teal)}
+  ol.steps b{display:block;font-weight:600;color:var(--ink);font-size:1.04rem;margin-bottom:.18rem}
+  .slide.dark ol.steps b,.slide.deep ol.steps b{color:var(--ivory)}
+  ol.steps span{font-size:.98rem;line-height:1.55;color:#555;font-weight:300}
+  .slide.dark ol.steps span,.slide.deep ol.steps span{color:rgba(242,237,228,.78)}
+
+  @media (max-width:680px){
+    .grid.cols-2,.grid.cols-3{grid-template-columns:1fr}.slide{padding:2rem 1.4rem 5rem}.counter,.brandtag{font-size:.6rem}
+    .nav{gap:.7rem;padding:.6rem .7rem}.dots{gap:.2rem}.dot{width:2px;height:2px}.nav button{width:30px;height:30px}.slide.img-bottom .slide-inner{margin-bottom:3rem}
+    .split .slide-inner{grid-template-columns:1fr;gap:1.6rem}.col-img{order:2;max-width:330px;margin:0 auto}
+    .slide.deep.has-img::after,.slide.dark.has-img::after{background:linear-gradient(180deg,rgba(4,12,10,.66),rgba(4,12,10,.93))}
+    .slide.ivory.has-img::after{background:linear-gradient(180deg,rgba(242,237,228,.72),rgba(242,237,228,.97))}
+  }
+  @media print{body{overflow:visible;background:#fff}.nav,.counter,.brandtag,.progress,.hint{display:none!important}.slide{position:relative!important;inset:auto!important;opacity:1!important;visibility:visible!important;transform:none!important;page-break-after:always;height:100vh}.slide .bg{opacity:1!important;transform:none!important}}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+<div class="brandtag"><img src="/devolutiva/img/logo.png" alt="Iris Codex" /></div>
+<div class="counter"><span id="cur">1</span> / <span id="tot">18</span></div>
+
+<div class="deck" id="deck">
+
+  <!-- 1 · CAPA -->
+  <section class="slide deep has-img active">
+    <div class="bg" style="background-image:url(/devolutiva/img/macro-iris.png);background-position:right center"></div>
+    <div class="slide-inner">
+      <img class="logo-hero" src="/devolutiva/img/logo.png" alt="Iris Codex" />
+      <h1 class="mt-m">A íris lembra<br><em>o que a pessoa esqueceu de si.</em></h1>
+      <p class="tagline">O mapa do ser, com método e mais de um século de leitura.</p>
+      <p class="body mt-l">O que é o Iris Codex — e como conduzir a devolutiva: a sessão em que a leitura da íris se torna uma travessia que o cliente não esquece.</p>
+    </div>
+  </section>
+
+  <!-- ░ PARTE 1 — O IRIS CODEX ░ -->
+
+  <!-- 2 · A DOR -->
+  <section class="slide dark">
+    <div class="slide-inner">
+      <div class="eyebrow">Por que ele existe</div>
+      <h2>O que trava o seu cliente <em>nem ele alcança.</em></h2>
+      <p class="body mt-l">Não porque esconde de você — porque está guardado onde a fala não chega. Você leva meses cavando até começar a aparecer. E metade da terapia se vai nesse caminho.</p>
+      <p class="lead mt-m">E se ele chegasse com o mapa já aberto, nos próprios olhos, na primeira sessão?</p>
+    </div>
+  </section>
+
+  <!-- 3 · O QUE É -->
+  <section class="slide ivory split">
+    <div class="slide-inner">
+      <div class="col-text">
+        <div class="eyebrow">O que é o Iris Codex</div>
+        <h2>Uma foto da íris vira um <em>retrato inteiro</em> de quem a pessoa é.</h2>
+        <ol class="steps">
+          <li><b>A foto</b><span>O cliente fotografa a íris pelo próprio celular. O app guia o enquadramento — sem aparelho, em minutos.</span></li>
+          <li><b>A leitura</b><span>Uma IA própria, treinada na tradição iridológica, lê os padrões e escreve — nunca um texto-modelo.</span></li>
+          <li><b>O relatório</b><span>Chega pronto, único para aquela pessoa. É a matéria-prima da sua sessão.</span></li>
+        </ol>
+        <p class="kicker">Você não precisa saber iridologia. A leitura faz a parte técnica; a interpretação e a relação são sempre suas.</p>
+      </div>
+      <div class="col-img framed">
+        <img src="/devolutiva/img/consultorio.png" alt="Terapeuta fotografa a íris da cliente pelo celular, no consultório" />
+        <p class="figcap">Do celular ao relatório — em minutos</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 · POR QUE É DIFERENTE (capa de revista) -->
+  <section class="slide dark mag">
+    <div class="slide-inner">
+      <div class="eyebrow">Edição única · sobre esta pessoa</div>
+      <h1 class="mag-head">O que torna o Iris Codex <em>diferente.</em></h1>
+      <div class="coverlines">
+        <div class="cl"><span class="cl-k">Único de verdade</span><span class="cl-v">Troque a pessoa, e não muda um adjetivo? Está errado. O relatório fala daquela íris — não serve para qualquer um.</span></div>
+        <div class="cl"><span class="cl-k">Sobre a pessoa, não sobre sinais</span><span class="cl-v">Fala de como ela sente, age e se relaciona — em linguagem humana, não em achado técnico. Apoio à anamnese, nunca diagnóstico.</span></div>
+        <div class="cl"><span class="cl-k">Tradição com método</span><span class="cl-v">Mais de um século de leitura da íris, destilado num sistema que escreve com profundidade — e devolve a condução pra você.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 · O QUE O RELATÓRIO ENTREGA -->
+  <section class="slide ivory split">
+    <div class="slide-inner">
+      <div class="col-text">
+        <div class="eyebrow">Dentro do relatório</div>
+        <h2>Dezesseis seções — <em>uma pessoa inteira.</em></h2>
+        <div class="grid cols-2 mt-m">
+          <div class="card"><span class="k">Quem ela é</span><span class="v">Em poucas palavras (a essência) · Constituição e Temperamento · Eixo Psicossomático</span></div>
+          <div class="card"><span class="k">O que ela viveu</span><span class="v">Linha do Tempo Emocional · Padrões Emocionais Ativos · Heranças Transgeracionais</span></div>
+          <div class="card"><span class="k">O que pede cuidado</span><span class="v">Mapa Orgânico · Estado Mental e Nervoso</span></div>
+          <div class="card"><span class="k">Como conduzir</span><span class="v">Recursos e Forças · Repertório de Suporte · Dimensão Arquetípica · Roteiro de Anamnese · Mensagem ao Cliente · Síntese</span></div>
+        </div>
+      </div>
+      <div class="col-img">
+        <img src="/devolutiva/img/relatorio-print.png" alt="Capa do relatório personalizado do Iris Codex" />
+        <p class="figcap">Único para aquela pessoa — nunca um modelo</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░ PARTE 2 — A DEVOLUTIVA ░ -->
+
+  <!-- 6 · A VIRADA -->
+  <section class="slide deep has-img img-bottom">
+    <div class="bg" style="background-image:url(/devolutiva/img/cliente-emocionado.png);background-position:center 30%"></div>
+    <div class="slide-inner">
+      <div class="eyebrow">Onde está o valor</div>
+      <h2>O relatório não é o produto.<br><em>A devolutiva é.</em></h2>
+      <p class="body mt-l">O arquivo chega pronto em minutos. Mas o que transforma não vem no PDF — vem do que acontece quando você senta com o cliente e ele se vê pela primeira vez. Esse instante é seu.</p>
+      <p class="lead mt-m">A leitura abre a porta. A devolutiva é a sessão.</p>
+    </div>
+  </section>
+
+  <!-- 7 · O CAMINHO (overview) -->
+  <section class="slide ivory">
+    <div class="slide-inner">
+      <div class="eyebrow">A devolutiva, em seis momentos</div>
+      <h2>Uma abertura que <em>cresce.</em></h2>
+      <div class="crescendo">
+        <div class="cr"><div class="cr-track"><div class="cr-bar" style="--h:30%"></div></div><span class="cr-n">1</span><b>O espelho</b><span>Ele se reconhece — e baixa a guarda.</span></div>
+        <div class="cr"><div class="cr-track"><div class="cr-bar" style="--h:44%"></div></div><span class="cr-n">2</span><b>A história</b><span>Envolve-se com a própria vida, por idades.</span></div>
+        <div class="cr"><div class="cr-track"><div class="cr-bar" style="--h:58%"></div></div><span class="cr-n">3</span><b>O padrão</b><span>Vê o que se repete, do passado até hoje.</span></div>
+        <div class="cr"><div class="cr-track"><div class="cr-bar" style="--h:74%"></div></div><span class="cr-n">4</span><b>O que pesa</b><span>Já aberto, toca a ferida — e responde fundo.</span></div>
+        <div class="cr"><div class="cr-track"><div class="cr-bar" style="--h:88%"></div></div><span class="cr-n">5</span><b>A força</b><span>Descobre o que tem, não só o que falta.</span></div>
+        <div class="cr"><div class="cr-track"><div class="cr-bar" style="--h:100%"></div></div><span class="cr-n">6</span><b>O fecho</b><span>Leva uma frase — e o próximo passo.</span></div>
+      </div>
+      <p class="kicker">A confiança e a profundidade sobem juntas. Por isso as perguntas que tocam fundo vêm <b style="color:var(--teal-dark)">depois</b> — não na chegada, quando ele ainda está se convencendo.</p>
+    </div>
+  </section>
+
+  <!-- 8 · PREPARAÇÃO -->
+  <section class="slide dark split">
+    <div class="slide-inner">
+      <div class="col-text">
+        <div class="eyebrow">Antes de o cliente sentar</div>
+        <h2>Prepare a travessia.</h2>
+        <ul class="clean">
+          <li><b>Leia o relatório inteiro, sem caneta.</b> Deixe a pessoa aparecer pra você antes de virar técnica.</li>
+          <li><b>Releia a essência.</b> É a pessoa inteira numa frase, e a pergunta que move tudo. É por aqui que se abre.</li>
+          <li><b>Imprima e tenha em mãos.</b> Marque o que mais pulsa — mas sem fechar a régua: o que pesa de verdade aparece ao vivo, na reação do cliente, enquanto você lê.</li>
+          <li><b>Desenhe o caminho:</b> por onde abrir, onde está o ponto que mais pesa, com que frase fechar.</li>
+        </ul>
+      </div>
+      <div class="col-img">
+        <img src="/devolutiva/img/relatorio-tablet.png" alt="Relatório do Iris Codex aberto, pronto para a leitura antes da sessão" />
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 · 1 · O ESPELHO -->
+  <section class="slide deep has-img img-bottom">
+    <div class="bg" style="background-image:url(/devolutiva/img/cliente-visto.png);background-position:center 28%"></div>
+    <div class="slide-inner">
+      <div class="step-of">A devolutiva · 1 de 6</div>
+      <h3>Comece por <em>quem ele é.</em></h3>
+      <p class="body mt-m">Leia a essência e o Temperamento em voz alta, devagar. Aqui não se fala de sinais nem de técnica — fala-se da <b>pessoa</b>: como ela sente, como reage, o que carrega. É por isso que ela se reconhece. Leia, e então <b>pare</b>. O silêncio é onde a guarda cai. <span class="say">"…é de mim que você está falando."</span></p>
+      <div class="tags"><span class="sec">§0 Em poucas palavras</span><span class="sec">§1 Constituição e Temperamento</span></div>
+    </div>
+  </section>
+
+  <!-- 10 · 2 · A HISTÓRIA -->
+  <section class="slide dark">
+    <div class="slide-inner">
+      <div class="step-of">A devolutiva · 2 de 6</div>
+      <h3>Depois, a história — <em>contada por idades.</em></h3>
+      <p class="body mt-s">Percorra a vida dele na ordem, dos primeiros anos até hoje: o que pesou cedo, o que mudou na adolescência, o que veio depois. A vida tem uma forma de onda — alta aqui, funda ali — e narrá-la em sequência faz o cliente ver, sozinho, o fio que liga tudo. E parte disso ele herdou: vem de antes dele.</p>
+      <svg class="wave" viewBox="0 0 800 165" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <path d="M40,108 C110,40 170,40 240,93 C310,148 360,148 420,98 C480,52 540,28 610,78 C670,120 720,116 760,94" fill="none" stroke="#5BBFB0" stroke-width="2.5" stroke-linecap="round"/>
+        <g fill="#5BBFB0"><circle cx="40" cy="108" r="5"/><circle cx="240" cy="93" r="5"/><circle cx="420" cy="98" r="5"/><circle cx="610" cy="78" r="5"/><circle cx="760" cy="94" r="5"/></g>
+        <g text-anchor="middle"><text x="40" y="148">0–7</text><text x="240" y="148">8–13</text><text x="420" y="148">14–20</text><text x="610" y="148">21–35</text><text x="760" y="148">hoje</text></g>
+      </svg>
+      <div class="tags"><span class="sec">§2 Linha do Tempo Emocional</span><span class="sec">§3 Heranças Transgeracionais</span></div>
+    </div>
+  </section>
+
+  <!-- 11 · 3 · O PADRÃO -->
+  <section class="slide dark">
+    <div class="slide-inner">
+      <div class="step-of">A devolutiva · 3 de 6</div>
+      <h3>Mostre o que <em>se repete.</em></h3>
+      <p class="body mt-m">Com a história na mesa, conecte: aquilo que ele aprendeu cedo virou um jeito de reagir que ainda age hoje — e que mora no corpo. Ele começa a ver o fio entre o ontem e o agora, e a se implicar na própria trama. A abertura aumenta.</p>
+      <div class="tags"><span class="sec">§4 Padrões Emocionais Ativos</span><span class="sec">§5 Eixo Psicossomático</span></div>
+    </div>
+  </section>
+
+  <!-- 12 · 4 · O QUE PESA + AS PERGUNTAS (clímax) -->
+  <section class="slide deep">
+    <div class="slide-inner">
+      <div class="step-of">A devolutiva · 4 de 6</div>
+      <h3>Agora — <em>só agora</em> — as perguntas que tocam fundo.</h3>
+      <p class="body mt-s">Ele já está aberto. É a hora das perguntas que não pedem explicação, fazem sentir: <span class="say">"onde no corpo isso mora agora?"</span> — e de tocar o que pesa, o que falta, o nervoso. Sempre como <b>hipótese</b>, nunca diagnóstico: <span class="say">"isso costuma aparecer em quem aprendeu cedo a se virar sozinho — faz sentido?"</span> A mesma pergunta que ricochetearia na chegada, aqui entra fundo.</p>
+      <div class="tags"><span class="sec">§9 Roteiro de Anamnese</span></div>
+    </div>
+  </section>
+
+  <!-- 13 · 5 · A FORÇA -->
+  <section class="slide dark">
+    <div class="slide-inner">
+      <div class="step-of">A devolutiva · 5 de 6</div>
+      <h3>Devolva o que ele <em>tem.</em></h3>
+      <p class="body mt-m">Ninguém pode sair só na ferida. Mostre a força que ele subestima e o sentido maior do que viveu — a ferida que virou sensibilidade, o que a vida pedia que ele aprendesse. É o que transforma "diagnóstico do problema" em reencontro consigo. Ao se ver inteiro, ele já começa a ser outro.</p>
+      <div class="tags"><span class="sec">§10 Recursos e Forças</span><span class="sec">§11 Dimensão Arquetípica</span><span class="sec">§12 Sugestões Integrativas</span></div>
+    </div>
+  </section>
+
+  <!-- 14 · 6 · O FECHO -->
+  <section class="slide deep">
+    <div class="slide-inner">
+      <div class="step-of">A devolutiva · 6 de 6</div>
+      <h3>Feche com uma frase que fica — e <em>ancore.</em></h3>
+      <p class="body mt-m">Termine na Mensagem para o Cliente e na Síntese — o parágrafo que ele vai querer reler. Entregue a Síntese Rápida pra levar e devolva a <b>pergunta de virada</b> como o próximo passo. A boa devolutiva não fecha um ciclo: abre o próximo.</p>
+      <p class="pullquote">Guarda essa sensação —<br>é daqui que a gente parte.</p>
+      <div class="tags"><span class="sec">§13 Síntese</span><span class="sec">§14 Mensagem ao Cliente</span><span class="sec">§15 Síntese Rápida</span></div>
+    </div>
+  </section>
+
+  <!-- 15 · A CONDUÇÃO -->
+  <section class="slide deep has-img img-left">
+    <div class="bg" style="background-image:url(/devolutiva/img/slide15-B-medium.png);background-position:right center"></div>
+    <div class="slide-inner">
+      <div class="eyebrow">O fio invisível</div>
+      <h2>O que separa um laudo de uma <em>sessão.</em></h2>
+      <ul class="clean">
+        <li><b>Ritmo.</b> Aperto e alívio se alternam. Construa, não despeje — a revelação só pesa se houve respiro antes.</li>
+        <li><b>Silêncio.</b> A pausa é instrumento. Depois da frase que acerta, não preencha — deixe o cliente cair dentro dela.</li>
+        <li><b>Estado.</b> Você rege a energia da sala: a voz baixa que aproxima, o olhar que sustenta, o ponto que ele leva no corpo.</li>
+        <li><b>A frase que fica.</b> Escolha a síntese que ele vai repetir para si por semanas. É o que ele leva pra casa.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 16 · O QUE NUNCA FAZER -->
+  <section class="slide dark">
+    <div class="slide-inner">
+      <div class="eyebrow">As linhas que não se cruzam</div>
+      <h2>O que <em>nunca</em> fazer.</h2>
+      <ul class="clean">
+        <li><b>Não diagnostique nem prescreva.</b> Sem nome de doença, dose ou tratamento. É leitura de padrões emocionais e comportamentais — apoio, não avaliação de saúde.</li>
+        <li><b>Não entregue como verdade absoluta.</b> O relatório é ponto de partida, não sentença. Cada achado é hipótese — quem valida é o cliente.</li>
+        <li><b>Não force o sentido.</b> A leitura mais profunda se oferece, não se impõe. Se a pessoa não vibra com ela, fique no humano — funciona igual.</li>
+        <li><b>Não despeje as 16 seções.</b> Menos é mais. Dois ou três pontos tocados fundo valem mais que dezesseis varridos por cima.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 17 · COMO COBRAR -->
+  <section class="slide deep">
+    <div class="slide-inner">
+      <div class="eyebrow">Posicionamento e valor</div>
+      <h2>Uma sessão, não um arquivo.</h2>
+      <div class="grid cols-2 mt-m" style="align-items:center">
+        <div>
+          <p class="body">Não ofereça "uma foto da íris". Ofereça uma <b>Sessão de Leitura da Íris + Devolutiva</b>: o exame e a travessia conduzida, juntos. O relatório é só o ponto de partida; o que o cliente paga é a sua presença, os seus métodos e a sessão que ele não esquece.</p>
+          <p class="body mt-m">Ancorado no que entrega — o atalho de meses de terapia, no primeiro dia — uma faixa de</p>
+        </div>
+        <div style="text-align:center">
+          <div class="price">R$ 400</div>
+          <p class="kicker">referência para a sessão completa (exame + devolutiva). Você define o seu valor.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 18 · ENCERRAMENTO -->
+  <section class="slide deep">
+    <div class="slide-inner" style="text-align:center">
+      <img class="logo-hero" src="/devolutiva/img/logo.png" alt="Iris Codex" style="margin:0 auto .2rem" />
+      <h1 class="mt-m">Você conduz.<br><em>A íris só abre a porta.</em></h1>
+      <p class="lead mt-l" style="margin-left:auto;margin-right:auto">Seu próximo cliente já traz o mapa nos próprios olhos.</p>
+      <a class="cta-bar" href="https://iriscodex.com">Acesse agora <b>iriscodex.com</b> — e descubra com seus próprios olhos.</a>
+    </div>
+  </section>
+
+</div>
+
+<div class="hint" id="hint">use ← → ou as setas abaixo · barra de espaço avança</div>
+
+<nav class="nav">
+  <button id="prev" aria-label="Anterior">←</button>
+  <div class="dots" id="dots"></div>
+  <button id="next" aria-label="Próximo">→</button>
+</nav>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  const dotsWrap=document.getElementById('dots');
+  const progress=document.getElementById('progress');
+  const cur=document.getElementById('cur'); const tot=document.getElementById('tot');
+  let i=0; tot.textContent=slides.length;
+  slides.forEach((_,n)=>{const b=document.createElement('button');b.className='dot'+(n===0?' on':'');b.setAttribute('aria-label','Slide '+(n+1));b.addEventListener('click',()=>go(n));dotsWrap.appendChild(b)});
+  const dots=[...document.querySelectorAll('.dot')];
+  function go(n){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+    dots.forEach((d,k)=>d.classList.toggle('on',k===i));
+    cur.textContent=i+1; progress.style.width=((i+1)/slides.length*100)+'%';
+    document.getElementById('hint').style.opacity=i===0?'.7':'0';
+  }
+  function next(){go(i+1)} function prev(){go(i-1)}
+  document.getElementById('next').addEventListener('click',next);
+  document.getElementById('prev').addEventListener('click',prev);
+  document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){e.preventDefault();next()}
+    if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();prev()}
+    if(e.key==='Home')go(0); if(e.key==='End')go(slides.length-1);
+  });
+  let x0=null;
+  document.addEventListener('touchstart',e=>x0=e.touches[0].clientX,{passive:true});
+  document.addEventListener('touchend',e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>50){dx<0?next():prev()}x0=null},{passive:true});
+  progress.style.width=(1/slides.length*100)+'%';
+</script>
+</body>
+</html>

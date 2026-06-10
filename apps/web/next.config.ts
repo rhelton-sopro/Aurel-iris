@@ -7,6 +7,13 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [{ source: '/lp', destination: '/', permanent: true }]
   },
+  // Deck de apresentação/devolutiva (estático em public/devolutiva/index.html).
+  // Rewrite serve o HTML na URL limpa /devolutiva — sem o rewrite, a URL sem
+  // extensão poderia não resolver pro index.html. Imagens usam caminho absoluto
+  // (/devolutiva/img/...), então funcionam com ou sem barra final.
+  async rewrites() {
+    return [{ source: '/devolutiva', destination: '/devolutiva/index.html' }]
+  },
   outputFileTracingIncludes: {
     // Pitfall 9 (07-RESEARCH.md): Next.js 15 não traça arquivos .md por
     // default no bundle de função. Sem isso, `vercel deploy` produz ENOENT
