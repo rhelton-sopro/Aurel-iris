@@ -9,6 +9,7 @@ import {
   createAsaasCustomer,
   createAsaasPayment,
   refundAsaasPayment,
+  updateAsaasCustomer,
 } from '@/lib/asaas/client'
 import { computeRefundValue } from '@/lib/billing/refund-policy'
 import { humanizeAsaasError } from '@/lib/asaas/humanize-error'
@@ -106,6 +107,22 @@ export async function createChargeAction(
       .from('profiles')
       .update({ asaas_customer_id: asaasCustomerId })
       .eq('id', profile.id)
+  } else if (profile.cep) {
+    // Cliente JÁ existe: o create acima não roda, então o endereço não seria
+    // (re)enviado. Sincroniza ANTES de cobrar — sem isso, com NF-e ligada, o
+    // Asaas recusa o cartão de quem se cadastrou antes da feature de endereço.
+    // Best-effort: falha não bloqueia a compra (só loga). Cidade/UF o Asaas
+    // deriva do CEP.
+    const upd = await updateAsaasCustomer(asaasCustomerId, {
+      postalCode: cepDigits(profile.cep),
+      address: profile.address ?? undefined,
+      addressNumber: profile.address_number ?? undefined,
+      complement: profile.address_complement ?? undefined,
+      province: profile.district ?? undefined,
+    })
+    if (!upd.ok) {
+      console.error('[billing] asaas address sync failed:', upd.error)
+    }
   }
 
   // 5. INSERT customer_credits pending ANTES do payment — precisa do id como
