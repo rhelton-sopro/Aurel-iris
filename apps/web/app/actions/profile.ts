@@ -6,7 +6,15 @@ import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import { z } from 'zod'
 
-import { buildSpecialties, phoneIsValidBR, MAX_SPECIALTIES } from '@/lib/profile/fields'
+import {
+  buildSpecialties,
+  phoneIsValidBR,
+  MAX_SPECIALTIES,
+  cepIsValidBR,
+  ufIsValidBR,
+  cepDigits,
+} from '@/lib/profile/fields'
+import { updateAsaasCustomer } from '@/lib/asaas/client'
 import { TOS_VERSION } from '@/lib/consent/tos'
 import { MIN_AGE, isAdult } from '@/lib/gates/profile-completeness'
 import { isValidCpf, cpfDigits } from '@/lib/auth/cpf'
@@ -21,6 +29,13 @@ export async function completeProfileAction(input: {
   specialties: string[]
   otherText: string
   tosAccepted: boolean
+  cep: string
+  address: string
+  addressNumber: string
+  complement: string
+  district: string
+  city: string
+  state: string
 }): Promise<{ error?: string } | void> {
   const supabase = await createClient()
   // SEMPRE reautenticar no server action (não confiar só no middleware).
@@ -41,6 +56,13 @@ export async function completeProfileAction(input: {
     tosAccepted: z
       .boolean()
       .refine((v) => v === true, 'É necessário aceitar os Termos e a Política'),
+    cep: z.string().refine(cepIsValidBR, 'CEP inválido'),
+    address: z.string().trim().min(2, 'Informe o logradouro (rua/avenida)'),
+    addressNumber: z.string().trim().min(1, 'Informe o número'),
+    complement: z.string(),
+    district: z.string().trim().min(1, 'Informe o bairro'),
+    city: z.string().trim().min(1, 'Informe a cidade'),
+    state: z.string().refine(ufIsValidBR, 'UF inválida'),
   })
 
   const parsed = schema.safeParse(input)
@@ -64,6 +86,14 @@ export async function completeProfileAction(input: {
       specialties: finalSpecialties,
       tos_accepted_at: new Date().toISOString(),
       tos_version: TOS_VERSION,
+      // Endereço (Fase 8) — CEP só dígitos; UF normalizada.
+      cep: cepDigits(parsed.data.cep),
+      address: parsed.data.address.trim(),
+      address_number: parsed.data.addressNumber.trim(),
+      address_complement: parsed.data.complement.trim() || null,
+      district: parsed.data.district.trim(),
+      city: parsed.data.city.trim(),
+      state: parsed.data.state.trim().toUpperCase(),
     })
     .eq('id', user.id)
 
@@ -78,6 +108,27 @@ export async function completeProfileAction(input: {
       return { error: 'Dados duplicados detectados. Faça login se já possui conta.' }
     }
     return { error: 'Não foi possível salvar agora. Tente novamente.' }
+  }
+
+  // Backfill do endereço no cliente Asaas (se já existir). Sem ele, com NF-e
+  // ligada, o Asaas recusa o cartão. Best-effort: falha não bloqueia o
+  // cadastro (na próxima compra o endereço também vai no create do customer).
+  const { data: prof } = await supabase
+    .from('profiles')
+    .select('asaas_customer_id')
+    .eq('id', user.id)
+    .maybeSingle()
+  if (prof?.asaas_customer_id) {
+    const upd = await updateAsaasCustomer(prof.asaas_customer_id, {
+      postalCode: cepDigits(parsed.data.cep),
+      address: parsed.data.address.trim(),
+      addressNumber: parsed.data.addressNumber.trim(),
+      complement: parsed.data.complement.trim() || undefined,
+      province: parsed.data.district.trim(),
+    })
+    if (!upd.ok) {
+      console.error('[profile] asaas address backfill failed:', upd.error)
+    }
   }
 
   redirect('/dashboard')

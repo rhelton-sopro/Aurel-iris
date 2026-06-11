@@ -8,14 +8,21 @@
 // terapeuta (profiles.tos_accepted_at), separado do consent do examinado.
 
 import { isValidCpf } from '@/lib/auth/cpf'
+import { cepIsValidBR, ufIsValidBR } from '@/lib/profile/fields'
 
-export type TherapistGap = 'phone' | 'specialties' | 'tos' | 'cpf'
+export type TherapistGap = 'phone' | 'specialties' | 'tos' | 'cpf' | 'address'
 
 export interface TherapistProfileInput {
   phone: string | null
   specialties: string[] | null
   tos_accepted_at: string | null
   cpf: string | null // Fase 8 (D-12): CPF anti-fraud trial obrigatório
+  // Fase 8 (endereço): obrigatório p/ NF-e + antifraude de cartão Asaas.
+  // CEP + número são digitados; city/state vêm do ViaCEP (autofill).
+  cep: string | null
+  address_number: string | null
+  city: string | null
+  state: string | null
 }
 
 export type TherapistGateResult =
@@ -40,6 +47,16 @@ export function evaluateTherapistProfile(
     missing.push('specialties')
   if (!nonEmpty(p.tos_accepted_at)) missing.push('tos')
   if (!p.cpf || !isValidCpf(p.cpf)) missing.push('cpf') // Fase 8 D-12
+  // Endereço completo: CEP (8 díg) + número + cidade + UF. city/state são
+  // preenchidos pelo ViaCEP a partir do CEP; se faltarem, o cadastro ficou
+  // incompleto. Sem isso, NF-e não emite e o cartão é recusado pelo Asaas.
+  if (
+    !cepIsValidBR(p.cep ?? '') ||
+    !nonEmpty(p.address_number) ||
+    !nonEmpty(p.city) ||
+    !ufIsValidBR(p.state)
+  )
+    missing.push('address')
 
   if (missing.length > 0) return { status: 'incomplete', missing }
   return { status: 'ok' }

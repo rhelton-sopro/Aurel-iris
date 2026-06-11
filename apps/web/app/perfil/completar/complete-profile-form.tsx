@@ -9,6 +9,8 @@ import {
   OTHER,
   MAX_SPECIALTIES,
   formatPhoneBR,
+  formatCepBR,
+  cepDigits,
 } from '@/lib/profile/fields'
 import { formatCpfBR } from '@/lib/auth/cpf'
 import { completeProfileAction } from '@/app/actions/profile'
@@ -16,12 +18,48 @@ import { completeProfileAction } from '@/app/actions/profile'
 const inputClass =
   'h-11 w-full rounded-none border-0 border-b border-b-ink bg-transparent px-3 text-base outline-none transition-colors duration-[180ms] placeholder:text-mist focus-visible:border-b-teal'
 
-export function CompleteProfileForm() {
-  const [phone, setPhone] = useState('')
-  const [cpf, setCpf] = useState('')
-  const [selected, setSelected] = useState<string[]>([])
-  const [otherText, setOtherText] = useState('')
-  const [tosAccepted, setTosAccepted] = useState(false)
+type Initial = {
+  phone: string
+  cpf: string
+  specialties: string[]
+  tosAccepted: boolean
+  cep: string
+  address: string
+  addressNumber: string
+  complement: string
+  district: string
+  city: string
+  state: string
+}
+
+const FIXED = SPECIALTIES as readonly string[]
+
+export function CompleteProfileForm({ initial }: { initial?: Initial }) {
+  // specialties salvas: separa as da lista fixa do texto livre ("Outro").
+  const savedSpecs = initial?.specialties ?? []
+  const freeText = savedSpecs.find((s) => !FIXED.includes(s)) ?? ''
+  const initialSelected = (() => {
+    const fixed = savedSpecs.filter((s) => FIXED.includes(s))
+    return freeText ? [...fixed, OTHER] : fixed
+  })()
+
+  const [phone, setPhone] = useState(initial?.phone ? formatPhoneBR(initial.phone) : '')
+  const [cpf, setCpf] = useState(initial?.cpf ? formatCpfBR(initial.cpf) : '')
+  const [selected, setSelected] = useState<string[]>(initialSelected)
+  const [otherText, setOtherText] = useState(freeText)
+  const [tosAccepted, setTosAccepted] = useState(initial?.tosAccepted ?? false)
+
+  // endereço
+  const [cep, setCep] = useState(initial?.cep ? formatCepBR(initial.cep) : '')
+  const [address, setAddress] = useState(initial?.address ?? '')
+  const [addressNumber, setAddressNumber] = useState(initial?.addressNumber ?? '')
+  const [complement, setComplement] = useState(initial?.complement ?? '')
+  const [district, setDistrict] = useState(initial?.district ?? '')
+  const [city, setCity] = useState(initial?.city ?? '')
+  const [uf, setUf] = useState(initial?.state ?? '')
+  const [cepLoading, setCepLoading] = useState(false)
+  const [cepError, setCepError] = useState<string | null>(null)
+
   const [pending, setPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -35,6 +73,37 @@ export function CompleteProfileForm() {
     })
   }
 
+  async function lookupCep(raw: string) {
+    const d = cepDigits(raw)
+    if (d.length !== 8) return
+    setCepLoading(true)
+    setCepError(null)
+    try {
+      const r = await fetch(`https://viacep.com.br/ws/${d}/json/`)
+      const data = await r.json()
+      if (data?.erro) {
+        setCepError('CEP não encontrado. Confira ou preencha manualmente.')
+        return
+      }
+      // ViaCEP preenche o que tiver; o usuário completa/ajusta o resto.
+      setAddress(data.logradouro ?? '')
+      setDistrict(data.bairro ?? '')
+      setCity(data.localidade ?? '')
+      setUf((data.uf ?? '').toUpperCase())
+    } catch {
+      setCepError('Não foi possível buscar o CEP agora. Preencha manualmente.')
+    } finally {
+      setCepLoading(false)
+    }
+  }
+
+  function onCepChange(v: string) {
+    const masked = formatCepBR(v)
+    setCep(masked)
+    setCepError(null)
+    if (cepDigits(masked).length === 8) void lookupCep(masked)
+  }
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
@@ -45,6 +114,13 @@ export function CompleteProfileForm() {
       specialties: selected,
       otherText,
       tosAccepted,
+      cep,
+      address,
+      addressNumber,
+      complement,
+      district,
+      city,
+      state: uf,
     })
     // Sucesso → a action faz redirect('/dashboard'). Só chega aqui em erro.
     if (res?.error) {
@@ -71,7 +147,6 @@ export function CompleteProfileForm() {
           type="tel"
           inputMode="numeric"
           autoComplete="tel"
-          autoFocus
           value={phone}
           onChange={(e) => setPhone(formatPhoneBR(e.target.value))}
           placeholder="(11) 99999-9999"
@@ -101,9 +176,7 @@ export function CompleteProfileForm() {
       <div className="flex flex-col gap-2">
         <span className="text-sm font-medium">
           Especialidades{' '}
-          <span className="text-mist">
-            (1 a {MAX_SPECIALTIES})
-          </span>
+          <span className="text-mist">(1 a {MAX_SPECIALTIES})</span>
         </span>
         <div className="flex flex-wrap gap-2">
           {SPECIALTIES.map((s) => {
@@ -141,6 +214,137 @@ export function CompleteProfileForm() {
         )}
       </div>
 
+      {/* ── Endereço (NF-e + cobrança) ── */}
+      <fieldset className="flex flex-col gap-4 border-t border-b-ink/15 pt-5">
+        <legend className="text-sm font-medium">
+          Endereço{' '}
+          <span className="text-mist">(para a nota fiscal e o pagamento)</span>
+        </legend>
+
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="cep" className="text-sm font-medium">
+            CEP
+          </label>
+          <div className="relative">
+            <input
+              id="cep"
+              name="cep"
+              type="text"
+              inputMode="numeric"
+              autoComplete="postal-code"
+              value={cep}
+              onChange={(e) => onCepChange(e.target.value)}
+              placeholder="00000-000"
+              maxLength={9}
+              className={inputClass}
+            />
+            {cepLoading && (
+              <Loader2 className="absolute right-3 top-3 h-4 w-4 animate-spin text-mist" />
+            )}
+          </div>
+          {cepError && <span className="text-xs text-destructive">{cepError}</span>}
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="address" className="text-sm font-medium">
+            Logradouro
+          </label>
+          <input
+            id="address"
+            name="address"
+            type="text"
+            autoComplete="address-line1"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            placeholder="Rua / Avenida"
+            className={inputClass}
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="addressNumber" className="text-sm font-medium">
+              Número
+            </label>
+            <input
+              id="addressNumber"
+              name="addressNumber"
+              type="text"
+              inputMode="numeric"
+              value={addressNumber}
+              onChange={(e) => setAddressNumber(e.target.value)}
+              placeholder="123"
+              className={inputClass}
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="complement" className="text-sm font-medium">
+              Complemento{' '}
+              <span className="text-mist">(opcional)</span>
+            </label>
+            <input
+              id="complement"
+              name="complement"
+              type="text"
+              autoComplete="address-line2"
+              value={complement}
+              onChange={(e) => setComplement(e.target.value)}
+              placeholder="Apto, bloco…"
+              className={inputClass}
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="district" className="text-sm font-medium">
+            Bairro
+          </label>
+          <input
+            id="district"
+            name="district"
+            type="text"
+            value={district}
+            onChange={(e) => setDistrict(e.target.value)}
+            placeholder="Bairro"
+            className={inputClass}
+          />
+        </div>
+
+        <div className="grid grid-cols-[1fr_auto] gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="city" className="text-sm font-medium">
+              Cidade
+            </label>
+            <input
+              id="city"
+              name="city"
+              type="text"
+              autoComplete="address-level2"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              placeholder="Cidade"
+              className={inputClass}
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="uf" className="text-sm font-medium">
+              UF
+            </label>
+            <input
+              id="uf"
+              name="uf"
+              type="text"
+              autoComplete="address-level1"
+              value={uf}
+              onChange={(e) => setUf(e.target.value.toUpperCase().slice(0, 2))}
+              placeholder="SP"
+              maxLength={2}
+              className={inputClass + ' w-16 text-center'}
+            />
+          </div>
+        </div>
+      </fieldset>
+
       <label className="flex items-start gap-2 text-sm">
         <input
           type="checkbox"
@@ -161,12 +365,7 @@ export function CompleteProfileForm() {
         </span>
       </label>
 
-      <Button
-        type="submit"
-        className="w-full"
-        disabled={pending}
-        aria-busy={pending}
-      >
+      <Button type="submit" className="w-full" disabled={pending} aria-busy={pending}>
         {pending ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -56,7 +56,7 @@ export async function middleware(request: NextRequest) {
   if (isProtected && user) {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('phone, specialties, tos_accepted_at, cpf')
+      .select('phone, specialties, tos_accepted_at, cpf, cep, address_number, city, state')
       .eq('id', user.id)
       .maybeSingle()
 
@@ -65,6 +65,10 @@ export async function middleware(request: NextRequest) {
       specialties: profile?.specialties ?? null,
       tos_accepted_at: profile?.tos_accepted_at ?? null,
       cpf: profile?.cpf ?? null,
+      cep: profile?.cep ?? null,
+      address_number: profile?.address_number ?? null,
+      city: profile?.city ?? null,
+      state: profile?.state ?? null,
     })
     if (gate.status !== 'ok') {
       const url = request.nextUrl.clone()

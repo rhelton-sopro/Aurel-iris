@@ -692,12 +692,17 @@ export type Database = {
       }
       profiles: {
         Row: {
+          address: string | null
+          address_complement: string | null
+          address_number: string | null
           asaas_customer_id: string | null
           beta_readings_used: number
           bio: string | null
+          cep: string | null
           city: string | null
           cpf: string | null
           created_at: string | null
+          district: string | null
           full_name: string
           id: string
           internal_use: boolean
@@ -713,12 +718,17 @@ export type Database = {
           trial_ends_at: string | null
         }
         Insert: {
+          address?: string | null
+          address_complement?: string | null
+          address_number?: string | null
           asaas_customer_id?: string | null
           beta_readings_used?: number
           bio?: string | null
+          cep?: string | null
           city?: string | null
           cpf?: string | null
           created_at?: string | null
+          district?: string | null
           full_name: string
           id: string
           internal_use?: boolean
@@ -734,12 +744,17 @@ export type Database = {
           trial_ends_at?: string | null
         }
         Update: {
+          address?: string | null
+          address_complement?: string | null
+          address_number?: string | null
           asaas_customer_id?: string | null
           beta_readings_used?: number
           bio?: string | null
+          cep?: string | null
           city?: string | null
           cpf?: string | null
           created_at?: string | null
+          district?: string | null
           full_name?: string
           id?: string
           internal_use?: boolean

@@ -56,7 +56,17 @@ async function asaasRequest(path: string, init: RequestInit): Promise<AsaasResul
   }
 }
 
-export interface CreateCustomerInput {
+// Campos de endereço do cliente Asaas (NF-e + antifraude cartão). O Asaas
+// deriva cidade/UF a partir do postalCode (CEP), então não os enviamos aqui.
+export interface AsaasCustomerAddress {
+  postalCode?: string // CEP só dígitos
+  address?: string // logradouro
+  addressNumber?: string
+  complement?: string
+  province?: string // bairro
+}
+
+export interface CreateCustomerInput extends AsaasCustomerAddress {
   name: string
   cpfCnpj: string // só dígitos
   email: string
@@ -75,6 +85,25 @@ export async function createAsaasCustomer(
   const r = await asaasRequest('/customers', {
     method: 'POST',
     body: JSON.stringify({ ...input, notificationDisabled: true }),
+  })
+  if (!r.ok) return r
+  const parsed = asaasCustomerSchema.safeParse(r.data)
+  if (!parsed.success) return { ok: false, status: 502, error: 'asaas response shape invalid' }
+  return { ok: true, data: parsed.data }
+}
+
+/**
+ * Atualiza um cliente Asaas existente (POST /customers/{id}). Usado pra
+ * backfill de endereço em clientes criados antes da feature (sem o qual a
+ * NF-e não emite e o cartão é recusado). Só envia os campos passados.
+ */
+export async function updateAsaasCustomer(
+  customerId: string,
+  fields: AsaasCustomerAddress,
+): Promise<AsaasResult<AsaasCustomer>> {
+  const r = await asaasRequest(`/customers/${customerId}`, {
+    method: 'POST',
+    body: JSON.stringify(fields),
   })
   if (!r.ok) return r
   const parsed = asaasCustomerSchema.safeParse(r.data)

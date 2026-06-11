@@ -35,7 +35,7 @@ export default async function DashboardPage() {
     supabase
       .from('profiles')
       .select(
-        'phone, specialties, tos_accepted_at, onboarding_dismissed_at, cpf',
+        'phone, specialties, tos_accepted_at, onboarding_dismissed_at, cpf, cep, address_number, city, state',
       )
       .eq('id', user?.id ?? '')
       .single(),
@@ -58,6 +58,10 @@ export default async function DashboardPage() {
     specialties: profile?.specialties ?? null,
     tos_accepted_at: profile?.tos_accepted_at ?? null,
     cpf: profile?.cpf ?? null,
+    cep: profile?.cep ?? null,
+    address_number: profile?.address_number ?? null,
+    city: profile?.city ?? null,
+    state: profile?.state ?? null,
   })
   const step1Complete = therapistGate.status === 'ok'
   const step2Complete = (clientsCount ?? 0) > 0

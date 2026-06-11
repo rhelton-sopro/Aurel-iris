@@ -15,7 +15,9 @@ export default async function CompletarPerfilPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('phone, specialties, tos_accepted_at, cpf')
+    .select(
+      'phone, specialties, tos_accepted_at, cpf, cep, address, address_number, address_complement, district, city, state',
+    )
     .eq('id', user.id)
     .maybeSingle()
 
@@ -24,8 +26,29 @@ export default async function CompletarPerfilPage() {
     specialties: profile?.specialties ?? null,
     tos_accepted_at: profile?.tos_accepted_at ?? null,
     cpf: profile?.cpf ?? null,
+    cep: profile?.cep ?? null,
+    address_number: profile?.address_number ?? null,
+    city: profile?.city ?? null,
+    state: profile?.state ?? null,
   })
   if (gate.status === 'ok') redirect('/dashboard')
+
+  // Prefill: quem já tem parte do cadastro (ex.: só falta endereço) não
+  // re-digita tudo. specialties podem trazer texto livre ("Outro") — o form
+  // mantém o que casa com a lista fixa e ignora o resto pro multi-select.
+  const initial = {
+    phone: profile?.phone ?? '',
+    cpf: profile?.cpf ?? '',
+    specialties: profile?.specialties ?? [],
+    tosAccepted: Boolean(profile?.tos_accepted_at),
+    cep: profile?.cep ?? '',
+    address: profile?.address ?? '',
+    addressNumber: profile?.address_number ?? '',
+    complement: profile?.address_complement ?? '',
+    district: profile?.district ?? '',
+    city: profile?.city ?? '',
+    state: profile?.state ?? '',
+  }
 
   return (
     <main className="min-h-screen bg-background flex flex-col items-center justify-center px-4 py-12">
@@ -38,7 +61,7 @@ export default async function CompletarPerfilPage() {
             Faltam alguns dados para continuar usando o Iris Codex.
           </p>
         </div>
-        <CompleteProfileForm />
+        <CompleteProfileForm initial={initial} />
       </div>
     </main>
   )

@@ -17,6 +17,7 @@ import { logAuditEvent } from '@/lib/audit/log'
 import { notifyRefundProcessed } from '@/lib/notifications/notify-refund-processed'
 import { cpfDigits } from '@/lib/auth/cpf'
 import { phoneDigits } from '@/lib/auth/phone'
+import { cepDigits } from '@/lib/profile/fields'
 
 import {
   createChargeSchema,
@@ -59,7 +60,9 @@ export async function createChargeAction(
       .maybeSingle(),
     supabase
       .from('profiles')
-      .select('id, asaas_customer_id, full_name, cpf, phone')
+      .select(
+        'id, asaas_customer_id, full_name, cpf, phone, cep, address, address_number, address_complement, district',
+      )
       .eq('id', user.id)
       .maybeSingle(),
   ])
@@ -85,6 +88,14 @@ export async function createChargeAction(
       // em cpfDigits, ex. validar 11 dígitos de CPF, corromperia o telefone).
       mobilePhone: phoneDigits(profile.phone),
       externalReference: profile.id,
+      // Endereço (Fase 8) — o gate garante que existe antes de chegar aqui.
+      // Sem ele, com NF-e ligada, o Asaas recusa o cartão. Cidade/UF o Asaas
+      // deriva do CEP.
+      postalCode: profile.cep ? cepDigits(profile.cep) : undefined,
+      address: profile.address ?? undefined,
+      addressNumber: profile.address_number ?? undefined,
+      complement: profile.address_complement ?? undefined,
+      province: profile.district ?? undefined,
     })
     if (!cust.ok) {
       console.error('[billing] createAsaasCustomer failed:', cust.error)

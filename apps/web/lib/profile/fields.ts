@@ -68,3 +68,31 @@ export function phoneIsValidBR(v: string): boolean {
   const n = phoneDigits(v).length
   return n === 10 || n === 11
 }
+
+// ── Endereço (Fase 8 — NF-e + antifraude cartão Asaas) ──────────────────────
+
+/** Só dígitos do CEP. */
+export function cepDigits(v: string): string {
+  return (v || '').replace(/\D/g, '').slice(0, 8)
+}
+
+/** Máscara 99999-999. */
+export function formatCepBR(v: string): string {
+  const d = cepDigits(v)
+  if (d.length <= 5) return d
+  return `${d.slice(0, 5)}-${d.slice(5)}`
+}
+
+/** CEP válido = 8 dígitos. */
+export function cepIsValidBR(v: string): boolean {
+  return cepDigits(v).length === 8
+}
+
+/** UF brasileira válida (2 letras). */
+const UFS = new Set([
+  'AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB',
+  'PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO',
+])
+export function ufIsValidBR(v: string | null | undefined): boolean {
+  return typeof v === 'string' && UFS.has(v.trim().toUpperCase())
+}
