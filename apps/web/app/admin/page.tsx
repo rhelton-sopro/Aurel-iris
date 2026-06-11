@@ -11,6 +11,9 @@ const SECTIONS: Array<{
   title: string
   description: string
   destructive?: boolean
+  // external: href é arquivo estático (rewrite), não rota Next → usa <a> com
+  // hard-nav em vez de <Link> (senão o roteamento client tenta resolver e 404).
+  external?: boolean
 }> = [
   {
     href: '/admin/terapeutas',
@@ -30,6 +33,13 @@ const SECTIONS: Array<{
     title: 'Regeneração',
     description:
       'Relatórios que o gate de auditoria marcou como incompletos (seções faltando). Foto da íris retida até 24h pra resgate — abra a leitura pra regenerar. Relatórios completos têm a foto apagada na geração.',
+  },
+  {
+    href: '/admin/painel',
+    title: 'Conteúdo (marketing)',
+    description:
+      'Painel de aprovação de conteúdo de marketing: fila de posts gerados pelo time (carrossel/reel + legenda + estratégia) pra aprovar/reprovar. Preview de design — ainda não-funcional.',
+    external: true,
   },
 ]
 
@@ -53,12 +63,11 @@ export default async function AdminPortalPage() {
       </div>
 
       <ul className="space-y-3">
-        {SECTIONS.map((s) => (
-          <li key={s.href}>
-            <Link
-              href={s.href}
-              className="block rounded-md border bg-card px-4 py-3 hover:bg-muted/40 transition-colors"
-            >
+        {SECTIONS.map((s) => {
+          const cardClass =
+            'block rounded-md border bg-card px-4 py-3 hover:bg-muted/40 transition-colors'
+          const inner = (
+            <>
               <div className="flex items-center justify-between gap-2">
                 <span className="text-sm font-medium text-foreground">
                   {s.title}
@@ -78,9 +87,22 @@ export default async function AdminPortalPage() {
               <p className="mt-2 font-mono text-xs text-muted-foreground/70">
                 {s.href}
               </p>
-            </Link>
-          </li>
-        ))}
+            </>
+          )
+          return (
+            <li key={s.href}>
+              {s.external ? (
+                <a href={s.href} className={cardClass}>
+                  {inner}
+                </a>
+              ) : (
+                <Link href={s.href} className={cardClass}>
+                  {inner}
+                </Link>
+              )}
+            </li>
+          )
+        })}
       </ul>
     </div>
   )
