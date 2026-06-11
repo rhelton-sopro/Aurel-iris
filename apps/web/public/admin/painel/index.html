@@ -144,6 +144,48 @@
   .note svg{width:14px;height:14px;margin-top:.15rem;flex:0 0 auto}
 
   .mock-tag{position:fixed;bottom:1rem;right:1rem;background:var(--black);color:var(--ivory);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;padding:.4rem .7rem;border-radius:2px;opacity:.8;z-index:99}
+
+  /* ───────────────── mobile ───────────────── */
+  @media (max-width:820px){
+    .app{grid-template-columns:1fr}
+    /* sidebar vira barra horizontal rolável no topo */
+    .side{position:sticky;top:0;height:auto;flex-direction:row;align-items:center;gap:.4rem;padding:.6rem .9rem;overflow-x:auto;z-index:30}
+    .side::-webkit-scrollbar{display:none}
+    .brand{padding:0 .6rem 0 0;flex:0 0 auto}
+    .nav{flex-direction:row;gap:.15rem;padding:0;flex:1;flex-wrap:nowrap}
+    .nav-label,.side-foot{display:none}
+    .nav a{white-space:nowrap;padding:.45rem .6rem;font-size:.8rem}
+    .nav a svg{width:15px;height:15px}
+
+    .main{padding:1.3rem 1.05rem 3.5rem;max-width:none}
+    .topline{flex-direction:column;align-items:stretch;gap:1rem}
+    h1{font-size:2rem}
+    .btn{justify-content:center;width:100%}
+
+    .strip{flex-direction:column;align-items:stretch}
+    .strip .seg{border-right:0;border-bottom:1px solid var(--line)}
+    .strip .seg:last-child{border-bottom:0;margin-left:0}
+
+    .tabs{overflow-x:auto;white-space:nowrap;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
+    .tabs::-webkit-scrollbar{display:none}
+    .tab{flex:0 0 auto}
+
+    /* card: imagem em cima, corpo embaixo */
+    .post{grid-template-columns:1fr}
+    .ig{border-right:0;border-bottom:1px solid var(--line)}
+    .ig .frame{aspect-ratio:1/1;max-height:62vh}
+    .ig .arrow{opacity:1}
+    .body{padding:1.1rem 1.15rem}
+    .meta .when{margin-left:0;width:100%}
+    .actions{flex-wrap:wrap;gap:.45rem}
+    .actions .spacer{display:none}
+    .ico-btn{flex:1;justify-content:center;min-width:8rem}
+
+    .feature .vstage{padding:1rem .6rem}
+    .feature video{height:auto;width:100%;max-width:320px;max-height:74vh}
+
+    .mock-tag{bottom:.5rem;right:.5rem}
+  }
 </style>
 </head>
 <body>
