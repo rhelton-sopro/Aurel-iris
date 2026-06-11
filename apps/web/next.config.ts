@@ -12,7 +12,12 @@ const nextConfig: NextConfig = {
   // extensão poderia não resolver pro index.html. Imagens usam caminho absoluto
   // (/devolutiva/img/...), então funcionam com ou sem barra final.
   async rewrites() {
-    return [{ source: '/devolutiva', destination: '/devolutiva/index.html' }]
+    return [
+      { source: '/devolutiva', destination: '/devolutiva/index.html' },
+      // Mockup do painel de conteúdo (estático). Vive sob /admin → o middleware
+      // o gateia (founder-only). É preview de design, não a feature real.
+      { source: '/admin/painel', destination: '/admin/painel/index.html' },
+    ]
   },
   outputFileTracingIncludes: {
     // Pitfall 9 (07-RESEARCH.md): Next.js 15 não traça arquivos .md por
