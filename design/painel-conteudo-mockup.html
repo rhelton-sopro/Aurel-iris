@@ -63,6 +63,16 @@
   .strip .link{font-size:.78rem;color:var(--teal-dark);font-weight:600;display:inline-flex;align-items:center;gap:.35rem}
   .strip .link svg{width:14px;height:14px}
 
+  /* prévia de vídeo (POC) */
+  .feature{border:1px solid var(--line);background:var(--card);border-radius:4px;overflow:hidden;margin:0 0 1.7rem}
+  .feature .fhead{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.85rem 1.2rem;border-bottom:1px solid var(--line)}
+  .feature .ft{display:flex;align-items:center;gap:.55rem;font-weight:600;font-size:.92rem}
+  .feature .ft svg{width:16px;height:16px;color:var(--teal-dark)}
+  .feature .tag{font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mist);font-weight:700;border:1px solid var(--line-strong);padding:.2rem .45rem;border-radius:2px}
+  .feature video{display:block;width:100%;aspect-ratio:16/9;background:#000;object-fit:cover}
+  .feature .fnote{padding:.7rem 1.2rem;font-size:.78rem;color:var(--mist);display:flex;gap:.5rem;align-items:center}
+  .feature .fnote svg{width:14px;height:14px;flex:0 0 auto}
+
   /* tabs */
   .tabs{display:flex;gap:.3rem;border-bottom:1px solid var(--line);margin-bottom:1.7rem}
   .tab{padding:.7rem .95rem;font-size:.84rem;font-weight:600;color:var(--mist);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;display:flex;align-items:center;gap:.45rem}
@@ -176,6 +186,16 @@
       <div class="seg"><span class="k">Público</span><span class="v">Terapeutas · B2B</span></div>
       <div class="seg"><span class="k">Cadência</span><span class="v">3 posts / semana</span></div>
       <div class="seg"><a class="link" href="#">Ver estratégia da Nefertiti <i data-lucide="arrow-up-right"></i></a></div>
+    </div>
+
+    <!-- prévia de vídeo (POC) -->
+    <div class="feature">
+      <div class="fhead">
+        <div class="ft"><i data-lucide="clapperboard"></i> Prévia · Filme narrado</div>
+        <span class="tag">proof of concept · 23s · 16:9</span>
+      </div>
+      <video src="../apresentacao/teste-video.mp4" controls preload="metadata" playsinline></video>
+      <div class="fnote"><i data-lucide="info"></i> POC: voz de IA pt-BR + 5 fotos com zoom lento e crossfade. Ainda sem trilha, texto animado ou end-card — é só pra você sentir o movimento.</div>
     </div>
 
     <!-- tabs -->
