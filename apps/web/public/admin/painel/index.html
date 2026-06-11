@@ -80,8 +80,20 @@
   .ig .fmt{position:absolute;top:.7rem;left:.7rem;z-index:2;display:inline-flex;align-items:center;gap:.35rem;background:rgba(0,0,0,.62);backdrop-filter:blur(4px);color:#fff;font-size:.66rem;font-weight:600;letter-spacing:.04em;padding:.3rem .55rem;border-radius:2px}
   .ig .fmt svg{width:13px;height:13px;stroke-width:2}
   .ig .carrossel{position:absolute;bottom:.7rem;right:.7rem;z-index:2;display:flex;gap:.25rem}
-  .ig .carrossel i{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.5)}
-  .ig .carrossel i.on{background:#fff}
+  .ig .carrossel i{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.5);transition:.2s}
+  .ig .carrossel i.on{background:#fff;transform:scale(1.25)}
+  .ig .slides{position:absolute;inset:0}
+  .ig .slides img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .28s ease}
+  .ig .slides img.on{opacity:1}
+  .ig .arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.42);backdrop-filter:blur(3px);border:0;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;transition:.15s}
+  .ig:hover .arrow{opacity:1}
+  .ig .arrow:hover{background:rgba(0,0,0,.72)}
+  .ig .arrow.prev{left:.5rem}.ig .arrow.next{right:.5rem}
+  .ig .arrow svg{width:16px;height:16px;stroke-width:2.5}
+  .ig .counter-pill{position:absolute;top:.7rem;right:.7rem;z-index:3;background:rgba(0,0,0,.6);color:#fff;font-size:.66rem;font-weight:600;padding:.2rem .5rem;border-radius:11px}
+  .ig .play{position:absolute;inset:0;z-index:3;display:flex;align-items:center;justify-content:center;pointer-events:none}
+  .ig .play span{width:54px;height:54px;border-radius:50%;background:rgba(0,0,0,.38);backdrop-filter:blur(4px);border:1.5px solid rgba(255,255,255,.82);display:flex;align-items:center;justify-content:center}
+  .ig .play svg{width:20px;height:20px;color:#fff;fill:#fff;margin-left:3px}
   .ig .handle{display:flex;align-items:center;gap:.5rem;padding:.6rem .75rem;color:#fff;font-size:.74rem;font-weight:500}
   .ig .handle .dot{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--teal-light),var(--teal-dark))}
 
@@ -180,9 +192,19 @@
       <!-- POST 1 — pendente -->
       <article class="post">
         <div class="ig">
-          <div class="frame">
+          <div class="frame" data-carousel>
             <span class="fmt"><i data-lucide="layers"></i> Carrossel · 6</span>
-            <img src="/admin/painel/img/slide12-B-medium.png" alt="preview" />
+            <span class="counter-pill"><span class="cur">1</span>/6</span>
+            <div class="slides">
+              <img class="on" src="/admin/painel/img/slide12-B-medium.png" alt="slide 1" />
+              <img src="/admin/painel/img/cliente-emocionado.png" alt="slide 2" />
+              <img src="/admin/painel/img/cliente-visto.png" alt="slide 3" />
+              <img src="/admin/painel/img/consultorio.png" alt="slide 4" />
+              <img src="/admin/painel/img/relatorio-print.png" alt="slide 5" />
+              <img src="/admin/painel/img/macro-iris.png" alt="slide 6" />
+            </div>
+            <button class="arrow prev" aria-label="anterior"><i data-lucide="chevron-left"></i></button>
+            <button class="arrow next" aria-label="próximo"><i data-lucide="chevron-right"></i></button>
             <div class="carrossel"><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div>
           </div>
           <div class="handle"><span class="dot"></span> iriscodex</div>
@@ -219,6 +241,7 @@ Nos próximos cards, os seis momentos de uma devolutiva que não se esquece.</di
           <div class="frame">
             <span class="fmt"><i data-lucide="clapperboard"></i> Reel · 18s</span>
             <img src="/admin/painel/img/cliente-visto.png" alt="preview" />
+            <div class="play"><span><i data-lucide="play"></i></span></div>
           </div>
           <div class="handle"><span class="dot"></span> iriscodex</div>
         </div>
@@ -251,9 +274,17 @@ O que você faz no segundo seguinte à pergunta certa?</div>
       <!-- POST 3 — aprovado/agendado -->
       <article class="post approved">
         <div class="ig">
-          <div class="frame">
+          <div class="frame" data-carousel>
             <span class="fmt"><i data-lucide="layers"></i> Carrossel · 4</span>
-            <img src="/admin/painel/img/macro-iris.png" alt="preview" />
+            <span class="counter-pill"><span class="cur">1</span>/4</span>
+            <div class="slides">
+              <img class="on" src="/admin/painel/img/macro-iris.png" alt="slide 1" />
+              <img src="/admin/painel/img/cliente-visto.png" alt="slide 2" />
+              <img src="/admin/painel/img/slide12-B-medium.png" alt="slide 3" />
+              <img src="/admin/painel/img/relatorio-tablet.png" alt="slide 4" />
+            </div>
+            <button class="arrow prev" aria-label="anterior"><i data-lucide="chevron-left"></i></button>
+            <button class="arrow next" aria-label="próximo"><i data-lucide="chevron-right"></i></button>
             <div class="carrossel"><i class="on"></i><i></i><i></i><i></i></div>
           </div>
           <div class="handle"><span class="dot"></span> iriscodex</div>
@@ -288,6 +319,22 @@ Cada íris é única. Por isso cada relatório também é: nasce daquela pessoa,
 </div>
 
 <div class="mock-tag">Mockup · não funcional</div>
-<script>lucide.createIcons();</script>
+<script>
+  lucide.createIcons();
+  document.querySelectorAll('[data-carousel]').forEach(function(fr){
+    var imgs=[].slice.call(fr.querySelectorAll('.slides img'));
+    var dots=[].slice.call(fr.querySelectorAll('.carrossel i'));
+    var cur=fr.querySelector('.cur');
+    var idx=0;
+    function show(n){
+      idx=(n+imgs.length)%imgs.length;
+      imgs.forEach(function(im,k){im.classList.toggle('on',k===idx)});
+      dots.forEach(function(d,k){d.classList.toggle('on',k===idx)});
+      if(cur)cur.textContent=idx+1;
+    }
+    fr.querySelector('.next').addEventListener('click',function(){show(idx+1)});
+    fr.querySelector('.prev').addEventListener('click',function(){show(idx-1)});
+  });
+</script>
 </body>
 </html>
