@@ -38,8 +38,7 @@ const SECTIONS: Array<{
     href: '/admin/painel',
     title: 'Conteúdo (marketing)',
     description:
-      'Painel de aprovação de conteúdo de marketing: fila de posts gerados pelo time (carrossel/reel + legenda + estratégia) pra aprovar/reprovar. Preview de design — ainda não-funcional.',
-    external: true,
+      'Fila de aprovação de conteúdo de marketing: posts montados pelo time (carrossel/reel + legenda + estratégia) pra aprovar, editar, agendar, comentar ou reprovar. Funcional (v1) — auto-geração e publish no Instagram vêm nas próximas fases.',
   },
 ]
 

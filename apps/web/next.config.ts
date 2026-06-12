@@ -14,9 +14,10 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       { source: '/devolutiva', destination: '/devolutiva/index.html' },
-      // Mockup do painel de conteúdo (estático). Vive sob /admin → o middleware
-      // o gateia (founder-only). É preview de design, não a feature real.
-      { source: '/admin/painel', destination: '/admin/painel/index.html' },
+      // (O /admin/painel deixou de ser rewrite estático em 2026-06-12 — virou
+      //  rota Next real: app/admin/painel/page.tsx, fila de aprovação funcional
+      //  v1, migration 0045. Os assets img/*.png e o reel seguem em
+      //  public/admin/painel/ e são servidos como estáticos normais.)
     ]
   },
   outputFileTracingIncludes: {

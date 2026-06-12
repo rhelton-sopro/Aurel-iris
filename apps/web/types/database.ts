@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      social_posts: {
+        Row: {
+          caption: string
+          comment: string | null
+          created_at: string
+          format: string
+          generated_by: string[]
+          id: string
+          media: Json
+          pilar: string | null
+          scheduled_at: string | null
+          sort_order: number
+          status: string
+          suggested_slot: string | null
+          tags: string[]
+          updated_at: string
+          why: string | null
+        }
+        Insert: {
+          caption?: string
+          comment?: string | null
+          created_at?: string
+          format?: string
+          generated_by?: string[]
+          id?: string
+          media?: Json
+          pilar?: string | null
+          scheduled_at?: string | null
+          sort_order?: number
+          status?: string
+          suggested_slot?: string | null
+          tags?: string[]
+          updated_at?: string
+          why?: string | null
+        }
+        Update: {
+          caption?: string
+          comment?: string | null
+          created_at?: string
+          format?: string
+          generated_by?: string[]
+          id?: string
+          media?: Json
+          pilar?: string | null
+          scheduled_at?: string | null
+          sort_order?: number
+          status?: string
+          suggested_slot?: string | null
+          tags?: string[]
+          updated_at?: string
+          why?: string | null
+        }
+        Relationships: []
+      }
       ai_model_pricing: {
         Row: {
           created_at: string
