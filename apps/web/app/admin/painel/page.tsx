@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { Clapperboard, Info, Sparkles, ArrowUpRight } from 'lucide-react'
+import { Sparkles, ArrowUpRight } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { isFounderEmail } from '@/lib/auth/founder'
 import {
@@ -79,35 +79,6 @@ export default async function PainelConteudoPage({
         <div className="px-4 py-3 sm:ml-auto">
           <span className="inline-flex items-center gap-1.5 text-[0.78rem] font-semibold text-[#1E6B61]">
             Estratégia: o norte da Nefertiti <ArrowUpRight className="h-3.5 w-3.5" />
-          </span>
-        </div>
-      </div>
-
-      {/* prévia do reel */}
-      <div className="overflow-hidden rounded-md border border-[#E7E1D5] bg-card">
-        <div className="flex items-center justify-between gap-4 border-b border-[#E7E1D5] px-5 py-3">
-          <div className="flex items-center gap-2 text-sm font-semibold">
-            <Clapperboard className="h-4 w-4 text-[#1E6B61]" /> Prévia · Filme narrado
-          </div>
-          <span className="rounded-sm border border-[#D8D0BF] px-2 py-1 text-[0.6rem] font-bold uppercase tracking-wider text-muted-foreground">
-            28s · 9:16 · reel
-          </span>
-        </div>
-        <div className="flex justify-center bg-black px-4 py-6">
-          <video
-            src="/admin/painel/iris-reel-nat.mp4"
-            controls
-            preload="metadata"
-            playsInline
-            className="aspect-[9/16] w-auto max-h-[70vh] rounded-sm bg-black"
-          />
-        </div>
-        <div className="flex items-start gap-2 px-5 py-3 text-[0.78rem] text-muted-foreground">
-          <Info className="mt-0.5 h-3.5 w-3.5 flex-none" />
-          <span>
-            Recut nativo: <b className="text-foreground">corte seco</b>, legenda sans bold,
-            narração corrigida (o cliente se reconhece <b className="text-foreground">na sessão</b>,
-            não lendo). Conteúdo de valor; CTA na bio/caption.
           </span>
         </div>
       </div>

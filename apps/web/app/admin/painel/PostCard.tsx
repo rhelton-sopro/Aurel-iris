@@ -251,18 +251,31 @@ function Media({ post }: { post: SocialPost }) {
     return (
       <div className="relative border-b border-[#E7E1D5] bg-black sm:border-b-0 sm:border-r">
         <div className="relative aspect-square overflow-hidden sm:aspect-[4/5]">
-          <span className="absolute left-3 top-3 z-10 inline-flex items-center gap-1.5 rounded-sm bg-black/60 px-2 py-1 text-[0.66rem] font-semibold text-white backdrop-blur">
+          <span className="pointer-events-none absolute left-3 top-3 z-10 inline-flex items-center gap-1.5 rounded-sm bg-black/60 px-2 py-1 text-[0.66rem] font-semibold text-white backdrop-blur">
             <Play className="h-3 w-3" /> Reel{m.duration ? ` · ${m.duration}` : ''}
           </span>
-          {m.poster && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={m.poster} alt="prévia do reel" className="h-full w-full object-cover" />
+          {m.video ? (
+            <video
+              src={m.video}
+              poster={m.poster}
+              controls
+              preload="metadata"
+              playsInline
+              className="h-full w-full bg-black object-contain"
+            />
+          ) : (
+            <>
+              {m.poster && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={m.poster} alt="prévia do reel" className="h-full w-full object-cover" />
+              )}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="flex h-14 w-14 items-center justify-center rounded-full border border-white/80 bg-black/40 backdrop-blur">
+                  <Play className="ml-0.5 h-5 w-5 fill-white text-white" />
+                </span>
+              </div>
+            </>
           )}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="flex h-14 w-14 items-center justify-center rounded-full border border-white/80 bg-black/40 backdrop-blur">
-              <Play className="ml-0.5 h-5 w-5 fill-white text-white" />
-            </span>
-          </div>
         </div>
       </div>
     )
