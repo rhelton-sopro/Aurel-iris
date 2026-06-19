@@ -388,6 +388,77 @@ export async function fetchCost(range: DateRange): Promise<CostStats> {
   }
 }
 
+// ── 3.5. VENDAS / RECEITA ──────────────────────────────────────────────
+
+export interface RevenueStats {
+  gross_brl: number // receita bruta — compras confirmadas (type=purchase) no período
+  refunds_brl: number // reembolsos no período (proporcional, cobre parcial)
+  net_brl: number // bruta − reembolsos
+  sales_count: number // nº de compras confirmadas no período
+  by_sku: Record<string, { count: number; brl: number }> // por pacote (sku)
+}
+
+/**
+ * Receita do período. Base = credit_transactions (created_at = confirmação do
+ * pagamento, gravado pelo webhook): type='purchase' é venda; type='refund' é
+ * devolução (amount em leituras → BRL via preço unitário do pacote). 'adjust'
+ * (concessão manual) NÃO é venda e fica de fora. N pequena no beta → lê o mapa
+ * de créditos inteiro p/ resolver preço/sku de cada transação.
+ */
+export async function fetchRevenue(range: DateRange): Promise<RevenueStats> {
+  const service = createServiceClient()
+
+  const { data: creditsData } = await service
+    .from('customer_credits')
+    .select('id, credit_packages(sku, price_brl, leituras_count)')
+  interface CreditMeta { sku: string; price_brl: number; leituras_count: number }
+  const creditMeta = new Map<string, CreditMeta>()
+  for (const c of creditsData ?? []) {
+    const pkg = (Array.isArray(c.credit_packages) ? c.credit_packages[0] : c.credit_packages) as
+      | { sku: string | null; price_brl: number | null; leituras_count: number | null }
+      | null
+    if (!pkg) continue
+    creditMeta.set(c.id as string, {
+      sku: pkg.sku ?? 'desconhecido',
+      price_brl: numOrZero(pkg.price_brl),
+      leituras_count: pkg.leituras_count ?? 0,
+    })
+  }
+
+  const { data: txData } = await service
+    .from('credit_transactions')
+    .select('type, amount, credit_id')
+    .gte('created_at', range.from)
+    .lte('created_at', range.to)
+
+  let gross_brl = 0
+  let refunds_brl = 0
+  let sales_count = 0
+  const by_sku: Record<string, { count: number; brl: number }> = {}
+  for (const t of txData ?? []) {
+    const meta = t.credit_id ? creditMeta.get(t.credit_id as string) : undefined
+    if (!meta) continue
+    if (t.type === 'purchase') {
+      gross_brl += meta.price_brl
+      sales_count += 1
+      const bucket = (by_sku[meta.sku] ??= { count: 0, brl: 0 })
+      bucket.count += 1
+      bucket.brl += meta.price_brl
+    } else if (t.type === 'refund') {
+      const unit = meta.leituras_count > 0 ? meta.price_brl / meta.leituras_count : 0
+      refunds_brl += Math.abs(numOrZero(t.amount)) * unit
+    }
+  }
+
+  return {
+    gross_brl,
+    refunds_brl,
+    net_brl: gross_brl - refunds_brl,
+    sales_count,
+    by_sku,
+  }
+}
+
 // ── 4. THROUGHPUT POR TERAPEUTA + REGENERAÇÕES + ERROS ─────────────────
 
 export interface ThroughputRow {

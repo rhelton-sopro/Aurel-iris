@@ -9,6 +9,7 @@ import {
   fetchFunnel,
   fetchQuality,
   fetchCost,
+  fetchRevenue,
   fetchThroughput,
   fetchDeviceBreakdown,
   resolveRange,
@@ -58,14 +59,16 @@ export default async function RelatoriosAdminPage({
 
   // Fetch tudo em paralelo. fetchThroughput precisa do mapa de terapeutas.
   const therapistsMap = await fetchTherapistsMap()
-  const [funnel, quality, cost, throughput, devices, dogfooding] = await Promise.all([
-    fetchFunnel(range),
-    fetchQuality(range),
-    fetchCost(range),
-    fetchThroughput(range, therapistsMap),
-    fetchDeviceBreakdown(range),
-    fetchDogfoodingProgress(user.id),
-  ])
+  const [funnel, quality, cost, revenue, throughput, devices, dogfooding] =
+    await Promise.all([
+      fetchFunnel(range),
+      fetchQuality(range),
+      fetchCost(range),
+      fetchRevenue(range),
+      fetchThroughput(range, therapistsMap),
+      fetchDeviceBreakdown(range),
+      fetchDogfoodingProgress(user.id),
+    ])
 
   return (
     <div className="space-y-8">
@@ -155,6 +158,48 @@ export default async function RelatoriosAdminPage({
           hint={`${funnel.self_exam} de ${funnel.total}`}
         />
       </section>
+
+      {/* Bloco 0: Vendas / Receita */}
+      <Block title="Vendas / Receita (R$)">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <SimpleTable
+            headers={['Métrica', 'Valor']}
+            rows={[
+              ['Receita bruta', brl(revenue.gross_brl)],
+              ['Reembolsos no período', `− ${brl(revenue.refunds_brl)}`],
+              ['Receita líquida', brl(revenue.net_brl)],
+              ['Nº de vendas', revenue.sales_count.toLocaleString('pt-BR')],
+              [
+                'Ticket médio',
+                revenue.sales_count > 0
+                  ? brl(revenue.gross_brl / revenue.sales_count)
+                  : '—',
+              ],
+            ]}
+          />
+          <div className="space-y-2">
+            <h5 className="mb-1 text-xs text-muted-foreground">Por pacote</h5>
+            <SimpleTable
+              headers={['Pacote', 'Vendas', 'R$']}
+              rows={
+                Object.keys(revenue.by_sku).length === 0
+                  ? [['—', '0', brl(0)]]
+                  : Object.entries(revenue.by_sku)
+                      .sort((a, b) => b[1].brl - a[1].brl)
+                      .map(([sku, v]) => [
+                        skuLabel(sku),
+                        v.count.toLocaleString('pt-BR'),
+                        brl(v.brl),
+                      ])
+              }
+            />
+          </div>
+        </div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Venda = pagamento confirmado no período (não inclui concessões manuais
+          de crédito). Reembolso proporcional cobre devoluções parciais.
+        </p>
+      </Block>
 
       {/* Bloco 1: Funil */}
       <Block title="Funil de leituras + entrega + autoexame">
@@ -632,4 +677,18 @@ function formatRange(range: { from: string; to: string }): string {
   const f = new Date(range.from).toLocaleDateString('pt-BR')
   const t = new Date(range.to).toLocaleDateString('pt-BR')
   return f === t ? f : `${f} → ${t}`
+}
+
+function brl(n: number): string {
+  return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+}
+
+function skuLabel(sku: string): string {
+  switch (sku) {
+    case 'avulsa': return 'Avulsa (1)'
+    case 'pequeno': return 'Pequeno (5)'
+    case 'medio': return 'Médio (15)'
+    case 'grande': return 'Grande (30)'
+    default: return sku
+  }
 }
