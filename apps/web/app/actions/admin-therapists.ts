@@ -22,6 +22,114 @@ export interface InviteTherapistResult {
   email?: string
 }
 
+export interface GrantCreditsResult {
+  ok: boolean
+  error?: string
+  /** Nº de leituras creditadas (quando ok=true). */
+  leituras?: number
+  /** Validade do pacote (ISO, quando ok=true). */
+  expiresAt?: string
+}
+
+/**
+ * Crédito MANUAL de leituras pelo founder (stopgap: pagamento via link
+ * InfinitePay enquanto o cartão do Asaas está sob análise do Validador de
+ * Segurança — chamado #1285903). Espelha o que o webhook PAYMENT_CONFIRMED faria:
+ * cria UMA row em customer_credits status='active' + lança no ledger, com
+ * purchase_date=agora e expires_at=agora+12 meses (D-03). Versão UI do script
+ * scripts/grant-credits.mjs.
+ */
+export async function grantCreditsAction(
+  therapistId: string,
+  sku: string,
+  infinitepayRef: string,
+): Promise<GrantCreditsResult> {
+  // Founder gate (defense-in-depth — middleware + layout já bloqueiam).
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user || !isFounderEmail(user.email)) {
+    return { ok: false, error: 'Não autorizado.' }
+  }
+
+  if (!therapistId) return { ok: false, error: 'Terapeuta inválido.' }
+  const skuClean = (sku ?? '').trim()
+  if (!skuClean) return { ok: false, error: 'Selecione um pacote.' }
+  const ref = (infinitepayRef ?? '').trim().slice(0, 120)
+
+  const service = createServiceClient()
+
+  // Alvo existe? (cinto de segurança contra id inválido)
+  const { data: target, error: tErr } =
+    await service.auth.admin.getUserById(therapistId)
+  if (tErr || !target?.user) {
+    return { ok: false, error: 'Terapeuta não encontrado.' }
+  }
+
+  // Pacote (preço/leituras vêm do DB — nunca do client) + package_id NOT NULL.
+  const { data: pkg, error: pkgErr } = await service
+    .from('credit_packages')
+    .select('id, sku, name, leituras_count')
+    .eq('sku', skuClean)
+    .maybeSingle()
+  if (pkgErr) return { ok: false, error: 'Erro ao buscar pacote.' }
+  if (!pkg) return { ok: false, error: 'Pacote não encontrado.' }
+
+  // Datas: compra agora, validade 12 meses (D-03).
+  const now = new Date()
+  const expires = new Date(now)
+  expires.setMonth(expires.getMonth() + 12)
+  const expiresISO = expires.toISOString()
+
+  // INSERT customer_credits ativo — espelha o webhook PAYMENT_CONFIRMED.
+  const { data: credit, error: insErr } = await service
+    .from('customer_credits')
+    .insert({
+      user_id: therapistId,
+      package_id: pkg.id,
+      leituras_purchased: pkg.leituras_count,
+      leituras_remaining: pkg.leituras_count,
+      leituras_reserved: 0,
+      purchase_date: now.toISOString(),
+      expires_at: expiresISO,
+      status: 'active',
+      asaas_payment_status: 'MANUAL_INFINITEPAY',
+    })
+    .select('id')
+    .single()
+  if (insErr || !credit) {
+    return { ok: false, error: `Falha ao creditar: ${insErr?.message ?? '—'}` }
+  }
+
+  // Ledger (registro financeiro).
+  const note = `InfinitePay manual grant${ref ? ` ref=${ref}` : ''} — pacote ${pkg.sku}, ${pkg.leituras_count} leituras (admin/terapeutas)`
+  const { error: txErr } = await service.from('credit_transactions').insert({
+    user_id: therapistId,
+    credit_id: credit.id,
+    type: 'purchase',
+    amount: pkg.leituras_count,
+    notes: note,
+  })
+  if (txErr) {
+    console.error('[admin-therapists] grant ledger failed:', txErr.message)
+  }
+
+  console.log('[admin-therapists] MANUAL_GRANT', {
+    therapistId,
+    targetEmail: target.user.email,
+    sku: pkg.sku,
+    leituras: pkg.leituras_count,
+    ref: ref || null,
+    credit_id: credit.id,
+    by: user.email,
+    at: now.toISOString(),
+  })
+
+  revalidatePath('/admin/terapeutas')
+  return { ok: true, leituras: pkg.leituras_count, expiresAt: expiresISO }
+}
+
 /**
  * Gera link de cadastro pro founder copiar e enviar via WhatsApp.
  * Hand-held protocol da Fase 11 + signup fix da Fase 11.1 (2026-05-26).

@@ -4,6 +4,7 @@ import { createServiceClient } from '@/lib/supabase/service'
 import { isFounderEmail } from '@/lib/auth/founder'
 import { DeleteTherapistDialog } from './DeleteTherapistDialog'
 import { InviteTherapistForm } from './InviteTherapistForm'
+import { GrantCreditsDialog } from './GrantCreditsDialog'
 
 // Cache off — listagem reflete deletes imediatamente após revalidatePath.
 export const dynamic = 'force-dynamic'
@@ -34,6 +35,7 @@ export default async function TerapeutasAdminPage() {
     readingsRes,
     txRes,
     activeCreditsRes,
+    packagesRes,
   ] = await Promise.all([
     service
       .from('profiles')
@@ -49,9 +51,21 @@ export default async function TerapeutasAdminPage() {
       .from('customer_credits')
       .select('user_id, leituras_remaining')
       .eq('status', 'active'),
+    service
+      .from('credit_packages')
+      .select('sku, name, leituras_count, price_brl')
+      .eq('active', true)
+      .order('leituras_count', { ascending: true }),
   ])
 
   const profiles = profilesRes.data ?? []
+  const packages = (packagesRes.data ?? []) as Array<{
+    sku: string
+    name: string
+    leituras_count: number
+    price_brl: number
+  }>
+
   const users = usersRes.data?.users ?? []
   const clientCounts = countByKey(
     (clientsRes.data ?? []) as Array<{ therapist_id: string | null }>,
@@ -186,13 +200,21 @@ export default async function TerapeutasAdminPage() {
                       : '—'}
                   </td>
                   <td className="px-3 py-2 text-right">
-                    <DeleteTherapistDialog
-                      therapistId={r.id}
-                      email={r.email}
-                      fullName={r.full_name}
-                      clientsCount={r.clients_count}
-                      readingsCount={r.readings_count}
-                    />
+                    <div className="flex items-center justify-end gap-1">
+                      <GrantCreditsDialog
+                        therapistId={r.id}
+                        email={r.email}
+                        fullName={r.full_name}
+                        packages={packages}
+                      />
+                      <DeleteTherapistDialog
+                        therapistId={r.id}
+                        email={r.email}
+                        fullName={r.full_name}
+                        clientsCount={r.clients_count}
+                        readingsCount={r.readings_count}
+                      />
+                    </div>
                   </td>
                 </tr>
               ))}
