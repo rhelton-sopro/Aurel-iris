@@ -49,6 +49,35 @@ substitui o gate de dogfooding** e só é desbloqueada quando as 4 semanas
 do Estágio 1 estiverem cumpridas com resposta afirmativa ao teste de
 disposição a pagar.
 
+## Current Milestone: v1.1 Motor de Conteúdo
+
+**Goal:** Transformar a fila de aprovação do painel `/admin/painel` num motor que
+publica conteúdo de marketing no Instagram de ponta a ponta e fecha o loop de
+aprendizado — produção → aprovação → publicação automática → métricas → pauta.
+
+**Target features:**
+- **Cockpit/painel** — refino da superfície de aprovação/agendamento que já
+  existe (migration 0045): régua de composição do feed (tom/assunto/formato),
+  agendamento na régua da Nefertiti, estados e fila.
+- **Publicação no Instagram (prioridade)** — conectar via API oficial do Meta
+  (Instagram Content Publishing API). Cron no Vercel pega posts `agendado` com
+  `scheduled_at` vencido, publica carrossel + reel lendo as mídias das URLs
+  públicas, e marca `publicado`. Sem App Review (conta própria do founder, dev
+  mode). Conta IG → Professional + Página FB (pré-requisito do founder).
+- **Loop de dados** — métricas do Insta (saves, watch-time, alcance
+  não-seguidor, perfil→trial) de volta ao painel → aprendizado → pauta. Fecha as
+  estações de medição/aprendizado do "motor".
+
+**Key context:**
+- Infra existente: tabela `social_posts` (migration 0045) com máquina de estados
+  `pendente→aprovado→agendado→publicado→reprovado`, `scheduled_at`, `media`
+  (carrossel/reel/post). O painel já é a superfície de dupla-aprovação
+  (Nefertiti coerência + founder).
+- Publicação via Meta API direta (decisão founder 2026-06-19); conta IG ainda
+  pessoal — homework de conversão (Professional + Página FB) em andamento.
+- Workstream de DISTRIBUIÇÃO/marketing, paralelo ao núcleo do produto
+  (iridologia). Não toca o pipeline de visão/LLM/relatório.
+
 ## Requisitos
 
 ### Validados
@@ -194,5 +223,22 @@ para ADR.
 | Heurísticas OpenCV + MediaPipe no MVP, U-Net/CNN próprias em v1.1+ | Acelera MVP; o moat de CNNs próprias depende de banco de casos consentido (efeito de rede) | — Pendente |
 | Trial de 14 dias automático com middleware de bloqueio | Padrão SaaS; reduz fricção de aquisição mantendo custo controlado | — Pendente |
 
+## Evolution
+
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `/gsd-transition`):
+1. Requirements invalidated? → Move to Out of Scope with reason
+2. Requirements validated? → Move to Validated with phase reference
+3. New requirements emerged? → Add to Active
+4. Decisions to log? → Add to Key Decisions
+5. "What This Is" still accurate? → Update if drifted
+
+**After each milestone** (via `/gsd-complete-milestone`):
+1. Full review of all sections
+2. Core Value check — still the right priority?
+3. Audit Out of Scope — reasons still valid?
+4. Update Context with current state
+
 ---
-*Última atualização: 2026-04-30 após bootstrap inicial a partir de doc-ingest do SPEC.md, com refinamentos pós-revisão (métrica de sucesso falsificável, edição humana obrigatória, RAG seed ampliado).*
+*Última atualização: 2026-06-19 — início do milestone v1.1 "Motor de Conteúdo" (publicação Instagram via Meta API + cockpit do painel + loop de dados). Bootstrap inicial: 2026-04-30 a partir de doc-ingest do SPEC.md.*

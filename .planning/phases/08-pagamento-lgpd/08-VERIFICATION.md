@@ -1,10 +1,115 @@
-# Fase 8 — VERIFICATION
+---
+phase: 08-pagamento-lgpd
+verified: 2026-05-29T09:10:00Z
+status: human_needed
+score: 9/9 success criteria com código presente e wired (verificação independente de código); 6 cenários E2E live = founder
+overrides_applied: 0
+human_verification:
+  - test: "Cenário A — Trial → exhaust → buy → reserve → generate → consume"
+    expected: "Trial 3/3 bloqueia; compra Asaas sandbox PIX R$99,70 → webhook PAYMENT_CONFIRMED ativa crédito; reserva 7d; relatório converte reserva em consumo"
+    why_human: "Exige Asaas sandbox + webhook URL live + Supabase + pagamento PIX real — não testável estaticamente"
+  - test: "Cenário B — Arrependimento 7d (compra Pequeno + refund integral)"
+    expected: "refundPackageAction → Asaas refund API → status='refunded' + email recibo"
+    why_human: "Exige chamada real à Asaas refund API + recebimento de email"
+  - test: "Cenário C — LGPD-01 termo biométrico (PDF + assinatura + gate)"
+    expected: "POST /api/consent/generate-pdf renderiza corpo hidratado + footer (IP/data BRT/SHA-256) via Gotenberg; bucket immutable; gate bloqueia captura sem termo nos 2 paths (office_handoff E remote_link)"
+    why_human: "Exige Gotenberg live + bucket Storage client-consents + render visual do PDF"
+  - test: "Cenário D — internal_use bypass (founder gera N sem afetar saldo)"
+    expected: "fifo_reserve_credit retorna source='internal'; nunca debita; audit admin.internal_use_used"
+    why_human: "Exige conta com internal_use=true em ambiente live + verificação de saldo no DB"
+  - test: "Cenário E — Cron daily (libera reserva expirada + JSON 4 results)"
+    expected: "curl -H 'Authorization: Bearer $CRON_SECRET' .../api/cron/daily → 200 + {reservations, credits, trials, warnings}; reserva expirada liberada"
+    why_human: "Exige deploy live + CRON_SECRET configurado + dados com expires_at no passado"
+  - test: "Cenário F — Páginas legais (/privacidade, /termos, deleção, disclaimer)"
+    expected: "/privacidade + /termos renderizam; #deletar-dados com mailto OPERATOR_EMAIL; DisclaimerCopy em 3+ superfícies"
+    why_human: "Render visual + verificação de copy em produção"
+deferred:
+  - truth: "LGPD-03 completo (export/delete self-service automático)"
+    addressed_in: "Fase 8.1+"
+    evidence: "CONTEXT.md D-16: movido pra Fase 8.1+. Fase 8 entrega só LGPD-03 básico (link deleção via email)."
+  - truth: "LGPD-04 completo (dashboard de auditoria configurável)"
+    addressed_in: "Fase 8.1+"
+    evidence: "CONTEXT.md D-16: movido pra Fase 8.1+. Fase 8 entrega só LGPD-04 básico (audit_events + emitter)."
+  - truth: "Hardening LGPD-06 (allowlist/refino dos 27 arquivos pré-existentes Fases 3-7)"
+    addressed_in: "Fase 8.1+"
+    evidence: "deferred-items.md: audit-vocabulary.mjs JÁ vermelho no baseline 5c4a80a (não causado pela Fase 8); 3 superfícies novas têm allowlist marker = 0 hits novos."
+---
 
-**Verified (estático/automatizado):** 2026-05-29
-**Status:** PARTIAL — evidência estática + test suite PASS; pendentes os smokes E2E que exigem ambiente live (founder) e a decisão de cutover prod.
+# Fase 8 — VERIFICATION (Pagamento + LGPD)
 
-> Este arquivo separa explicitamente o que foi **provado automaticamente/estaticamente** (rodado por agente executor neste working tree) do que **só o founder pode validar** (ambiente live: Vercel preview + Asaas sandbox + Supabase + deploy + decisão go/no-go).
-> Marcadores: `[x]` provado agora · `[ ] PENDING-FOUNDER` precisa de ação live do founder · `[~]` parcial.
+**Verificado (independente, code-level):** 2026-05-29 por gsd-verifier
+**Status:** human_needed — **TODO o código dos 9 Success Criteria está presente, substantivo e wired** (verificado lendo os arquivos-fonte + grep de wiring, não apenas SUMMARY). Os únicos pendentes são os 6 smokes E2E que exigem ambiente live (Asaas sandbox + Gotenberg + Supabase + deploy), legitimamente do founder.
+
+> **Nota do verificador:** Esta seção (parte superior) é a verificação independente goal-backward. As seções 1-8 abaixo (checklist go-live, requirements coverage, cutover) são o draft original do 08-14 — PRESERVADO intacto. Onde meu achado diverge ou confirma, anoto.
+
+---
+
+## Verificação independente — Observable Truths (9 ROADMAP Success Criteria)
+
+| # | Truth (SC ROADMAP) | Status | Evidência code-level |
+|---|---|---|---|
+| 1 | Signup CPF+telefone (dedup UNIQUE) + trial automático (3 OU 60d) + consome trial_status | ✓ VERIFIED | `signup/page.tsx` valida `isValidCpf`/`phoneIsValidBR` + dedup error (L98-99); `0039` propaga cpf via `handle_new_user`; `profiles_cpf_unique_idx` UNIQUE parcial; `is_in_trial()` (0037) + `fifo_reserve_credit` decrementa `trial_readings_used` |
+| 2 | Trial esgotado → bloqueia + redireciona /assinatura/comprar; histórico visível | ✓ VERIFIED | `evaluateBilling` (billing-gate.ts) retorna `no_balance` + `redirect_to: '/assinatura/comprar'`; `createReadingAction` L155-159 retorna erro "Sem saldo… /assinatura/comprar"; `middleware.ts` gateia prefixo /assinatura; readings.delete só na falha de reserve (histórico intacto) |
+| 3 | /assinatura/comprar 4 SKUs em 2 grupos → Asaas checkout | ✓ VERIFIED | `comprar/page.tsx` query DB `credit_packages active order display_order` → `PackageGrid`; seed `0038` = 4 SKUs pricing locked (99.70/298.50/745.50/1191.00); `createChargeAction` → `createAsaasPayment` retorna invoiceUrl |
+| 4 | Webhook PAYMENT_CONFIRMED ativa customer_credits + email; idempotente event.id PK | ✓ VERIFIED | `app/api/asaas/webhook/route.ts`: auth timing-safe → Zod → `recordWebhookEvent` (event.id PK + first_seen) → `applyPaymentEvent`; `apply-payment.ts` Branch 1 (A1=CONFIRMED) status pending→active + leituras_remaining=purchased + `notifyCreditPurchaseConfirmed` |
+| 5 | Reserva 7d nos 3 momentos D-10; cron libera expiradas | ✓ VERIFIED | `fifo_reserve_credit` (0037) cria reserva +7d; wired em `createReadingAction` (office), `convite/[token]/capturar/page.tsx` (link+captura remota), conversão na `analyze/route.ts` (`convertReservationToConsume`); `cron-jobs.ts releaseExpiredReservations` + `vercel.json` cron `0 5 * * *` |
+| 6 | Termo biométrico LGPD-01 nativo: PDF Gotenberg + storage immutable + footer IP/data/SHA256 + client_consents append-only | ✓ VERIFIED | `api/consent/generate-pdf/route.ts`: hydrateTerm + renderTermoHtml + Gotenberg + upload `upsert:false` (immutable) + SHA256; `signBiometricTerm` INSERT append-only client_consents; gate `assertClientTermoSigned` lê current-pointer; wired em createReadingAction + invite (InviteCaptureWrapper/InviteTermoStep, fail-closed) |
+| 7 | Arrependimento 7d via /assinatura: integral se 0 consumidas; proporcional se ≥1; após 7d caso-a-caso | ✓ VERIFIED | `refundPackageAction` → `computeRefundValue` (refund-policy.ts: window_expired/total/partial) → `refundAsaasPayment` → estado local + ledger + `notifyRefundProcessed`; `RefundPackageButton` na /assinatura |
+| 8 | internal_use=true bypassa gates + não consome + excluído de métricas | ✓ VERIFIED | `fifo_reserve_credit` Branch 1 internal (credit_id NULL, sem débito); `evaluateBilling` retorna source='internal'; audit `admin.internal_use_used` em createReadingAction L166 + invite L170 |
+| 9 | /privacidade + /termos públicos LGPD; mailto deleção; copy obrigatória 3 surfaces; audit-vocab green | ✓ VERIFIED (vocab ⚠️ ver nota) | `privacidade/page.tsx` (279L) + `termos/page.tsx` (255L) substantivos; `#deletar-dados` + `mailto:${OPERATOR_EMAIL}`; `DisclaimerCopy` em footer/header/dashboard/report-pdf/assinatura/comprar/termos/privacidade (8 pontos); 3 superfícies novas com allowlist = 0 hits novos |
+
+**Score: 9/9 truths com código VERIFIED no nível 4 (existe + substantivo + wired + dados fluem).**
+
+### Nota SC9 / LGPD-06 (não-bloqueante)
+`audit-vocabulary.mjs` JÁ saía exit 1 no baseline `5c4a80a` (27 arquivos pré-existentes Fases 3-7 — RAG/Jensen metadata, test fixtures). NÃO regressão da Fase 8. As 3 superfícies legais novas têm marcador `audit-vocabulary:allowlist` → 0 hits novos. Hardening dos 27 = Fase 8.1+ (deferred). Confirmado independentemente: não é gap da Fase 8.
+
+### Artefatos verificados (níveis 1-4)
+| Artefato | Existe | Substantivo | Wired | Dados | Status |
+|---|---|---|---|---|---|
+| migrations 0035-0039 (8 tabelas + RLS + 3 RPCs + seed + CPF trigger) | ✓ | ✓ (DDL completo, CHECK constraints, advisory lock FIFO) | ✓ | ✓ | VERIFIED |
+| lib/asaas/{client,webhook-auth,idempotency,types} | ✓ | ✓ | ✓ | n/a | VERIFIED |
+| app/api/asaas/webhook/route.ts + lib/billing/apply-payment.ts | ✓ | ✓ (state machine 4 branches) | ✓ | ✓ | VERIFIED |
+| lib/billing/{credits,trial,reservations,refund-policy,config,cron-jobs} | ✓ | ✓ | ✓ | ✓ | VERIFIED |
+| app/actions/billing.ts (createCharge/refund) | ✓ | ✓ | ✓ | ✓ | VERIFIED |
+| lib/gates/{billing-gate,termo-gate} + wiring em readings.ts/invite | ✓ | ✓ | ✓ | ✓ | VERIFIED |
+| lib/consent/{sign,hydrate-term,pdf-template} + api/consent/generate-pdf | ✓ | ✓ | ✓ | ✓ | VERIFIED |
+| app/actions/{consent,invite-consent} (signTerm/signInviteTerm) | ✓ | ✓ | ✓ | ✓ | VERIFIED |
+| app/privacidade + app/termos + components/legal/DisclaimerCopy | ✓ | ✓ | ✓ (8 superfícies) | n/a | VERIFIED |
+| app/assinatura + app/assinatura/comprar + components/billing/* | ✓ | ✓ | ✓ | ✓ (DB real) | VERIFIED |
+| lib/notifications/notify-credit-{purchase-confirmed,expiring} + notify-refund-processed | ✓ | ✓ | ✓ | n/a | VERIFIED |
+| lib/audit/{log,events} (21 event types) | ✓ | ✓ | ✓ (usados em todo o pipeline) | ✓ | VERIFIED |
+| app/api/cron/daily/route.ts (bearer auth) + vercel.json crons | ✓ | ✓ (4 jobs idempotentes) | ✓ | ✓ | VERIFIED |
+
+### Key Links (wiring crítico) — todos WIRED
+| De | Para | Via | Status |
+|---|---|---|---|
+| createReadingAction | termo-gate | `assertClientTermoSigned(client_id)` antes do INSERT (fail-closed) | WIRED |
+| createReadingAction | billing | `reserveCreditForReading` + rollback on no_balance | WIRED |
+| convite capturar | billing + termo | `reserveCreditForReading(therapist_id)` + `assertClientTermoSigned` → InviteCaptureWrapper | WIRED |
+| analyze/route.ts | billing | `convertReservationToConsume(readingId)` pós-relatório (idempotente) | WIRED |
+| webhook | apply-payment | `applyPaymentEvent` após idempotency PK | WIRED |
+| apply-payment CONFIRMED | DB + email | UPDATE status guard + notifyCreditPurchaseConfirmed | WIRED |
+| signTermAction/signInviteTermAction | current-pointer | UPDATE clients.consent_last_at + consent_current_version (lido pelo gate) | WIRED |
+| cron daily | RPC release_reservation | loop sobre reservas expiradas | WIRED |
+
+### Spot-checks comportamentais
+- Suite Fase 8 (vitest, 11 arquivos lib+actions): **70 passed / 1 skipped** (race integration-gated). Re-rodado independentemente 2026-05-29 — verde.
+- Sem stubs detectados: nenhum `return null`/placeholder/TODO bloqueante nos arquivos-fonte da Fase 8. Componentes UI consomem queries DB reais (não props hardcoded vazias).
+
+### Requirements coverage (independente)
+| Req | Status | Onde |
+|---|---|---|
+| BILLING-01 | ✓ SATISFIED (live smoke pendente) | asaas/* + webhook + apply-payment + createCharge + UI + seed 0038 |
+| BILLING-02 | ✓ SATISFIED (live smoke pendente) | trial_status + is_in_trial + evaluateTrial + cron expireOldTrials |
+| BILLING-03 | ✓ SATISFIED (live smoke pendente) | billing-gate + reserve nos 3 momentos + middleware redirect |
+| LGPD-01 | ✓ SATISFIED (live smoke pendente) | consent/* + generate-pdf + termo-gate nos 2 paths |
+| LGPD-02 | ✓ SATISFIED | /privacidade |
+| LGPD-03 (básico) | ✓ SATISFIED (founder cria caixa email) | #deletar-dados + mailto |
+| LGPD-04 (básico) | ✓ SATISFIED | audit_events + logAuditEvent + 21 event types |
+| LGPD-05 | ✓ SATISFIED | DisclaimerCopy em 8 superfícies |
+| LGPD-06 | ✓ SATISFIED p/ 3 superfícies novas (hardening 27 legados = deferred 8.1+) | allowlist markers |
+
+> REQUIREMENTS.md tem texto OBSOLETO (Stripe/DocuSeal/3 tiers) — CONTEXT.md D-01..D-22 substitui (modelo Asaas pré-pago + termo nativo). Coverage acima é contra o CONTEXT, que é o contrato vigente.
 
 ---
 
@@ -95,7 +200,7 @@ Confirmado contra baseline `5c4a80a` (tech debt rastreado, ver memória):
 ### LGPD-04 básico — Audit log
 - [x] `audit_events` table (08-01)
 - [x] `logAuditEvent` emitter best-effort (08-03)
-- [x] **20 event types** definidos em `lib/audit/events.ts` (auth.login/signup, consent.term_signed/version_changed, credit.* x7, lgpd.deletion_requested, reading.* x4, trial.started/ended, admin.internal_use_used)
+- [x] **21 event types** definidos em `lib/audit/events.ts` (auth.login/signup, consent.term_signed/version_changed, credit.* x9, lgpd.deletion_requested, reading.* x4, trial.started/ended, admin.internal_use_used)
 - [ ] PENDING-FOUNDER — query DB confirmando ≥1 row por event_type principal (só preenche com tráfego live)
 
 ### LGPD-05 — Copy obrigatória 3 superfícies
@@ -180,7 +285,7 @@ Tudo que foi diferido pros checkpoints e este plano, consolidado. Ordem sugerida
 ## 6. Known limitations / tech debt
 
 - **A1** (PAYMENT_CONFIRMED vs RECEIVED em cartão): default CONFIRMED; override via `ASAAS_CREDIT_EVENT`. Chargeback raro estorna via branch PAYMENT_REFUNDED.
-- **PARTIAL_REFUNDED** webhook não decrementa proporcional automático; review manual admin.
+- **PARTIAL_REFUNDED** webhook não decrementa proporcional automático; review manual admin. (Verificador: na verdade `apply-payment.ts` Branch 3 SIM decrementa proporcional automático via refundedValue/netValue — esta nota do draft está desatualizada; o que é manual é o caminho `refundPackageAction` proativo.)
 - **Race test** (`lib/billing/__tests__/race.test.ts`) skipped por default; rodar manual em sandbox.
 - **audit-vocabulary** vermelho no baseline (27 arquivos pré-Fase-8); decidir antes do GA.
 - **Build eslint gate** — 20 errors pré-existentes precisam limpeza antes do LIVE.
@@ -202,4 +307,4 @@ Founder decide path de go-live prod (ver `08-14-PLAN.md` Task 4):
 
 ---
 
-*Verificação estática/automatizada por agente executor 2026-05-29. Smokes live + cutover = founder.*
+*Verificação estática/automatizada por agente executor 2026-05-29 (seções 1-8). Verificação independente goal-backward code-level por gsd-verifier 2026-05-29 (topo): 9/9 SC com código presente, substantivo e wired; smokes live + cutover = founder.*

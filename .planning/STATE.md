@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: "Wave 3 entregou 9 commits atômicos em paralelo via 3 worktrees disjuntos:"
-stopped_at: Phase 8 context gathered — pacote pré-pago + LGPD core locked
-last_updated: "2026-05-31"
+milestone: v1.1
+milestone_name: Motor de Conteúdo
+status: planning
+last_updated: "2026-06-19T13:04:56.923Z"
+last_activity: 2026-06-19
 progress:
-  total_phases: 16
-  completed_phases: 12
-  total_plans: 124
-  completed_plans: 120
-  percent: 98
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Estado do projeto
@@ -26,6 +26,7 @@ progress:
 ## ⛔ GATE PRÉ-GA — checkout segue FECHADO ao público até concluir
 
 O checkout NÃO abre pro público geral até TODOS os itens abaixo:
+
 1. ✅ ~~#3 captura fail-open~~ CORRIGIDO (`8990538` — clamp fail-safe). Ver [[project_pente_fino_backlog_2026_05_31]].
 2. **#6 trial frágil** corrigido (trial_status só criada client-side best-effort → paywall pré-aha).
 3. **Reverter pricing de teste**: 4 SKUs R$5 → reais (99,70/298,50/745,50/1191). Ver [[project_prod_avulsa_test_pricing_pending_revert]].
@@ -33,6 +34,7 @@ O checkout NÃO abre pro público geral até TODOS os itens abaixo:
 Recomendados antes do GA (não-bloqueantes): #2 refund swallow (1 linha), #5 toast 502. Higiene pós-GA: #4/#7/#8/#9.
 
 **Pendências ativas (detalhe na memória de handoff):**
+
 1. Estorno parcial — testar D+1 (01/06) com IRIS CODEX, crédito `cf40c129`.
 2. Geração >5min sem erro falso + captura (ruim bloqueia / borrada→borrado).
 3. Callback auto-retorno E2E (flag `ASAAS_CALLBACK_ENABLED` + domínio no Asaas).
@@ -283,3 +285,10 @@ Próxima ação sugerida:
 Sessão anterior (2026-05-04 madrugada UTC): **Fase 4 (Upload desktop) fechada** via UAT founder + gsd-verifier passed (4/4 success criteria, 2/2 requirements UPLOAD-01/02). 7/7 plans concluídos. Smoke: `pnpm build` verde, bundle splitting de heic2any validado (chunk dedicado 1.35 MB).
 
 Sessão anterior anterior (2026-05-03 manhã): **Fase 3 fechada via UAT 03**. 20 commits de calibração culminando em VLM gate confiável (Claude Haiku 4.5 via /api/capture/validate). PWA standalone Android pendente como dívida não-blocking pra Estágio 1.
+
+## Current Position
+
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-06-19 — Milestone v1.1 started
