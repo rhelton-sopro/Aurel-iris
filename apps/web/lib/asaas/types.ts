@@ -23,6 +23,13 @@ export const asaasPaymentSchema = z
     clientPaymentDate: z.string().nullable().optional(),
     invoiceUrl: z.string().url().nullable().optional(),
     bankSlipUrl: z.string().url().nullable().optional(),
+    // Parcelamento: `installment` = id do GRUPO (compartilhado por todas as
+    // parcelas; cada parcela tem `id` próprio). `installmentNumber` = nº da
+    // parcela (1..N). Presentes só em cobranças parceladas.
+    installment: z.string().nullable().optional(),
+    installmentNumber: z.number().nullable().optional(),
+    // Acumulado já devolvido (refund parcial); usado no débito proporcional.
+    refundedValue: z.number().nullable().optional(),
   })
   .passthrough()
 

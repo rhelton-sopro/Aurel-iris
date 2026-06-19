@@ -60,6 +60,33 @@ const CREDIT_TRIGGER_EVENTS = new Set<string>([
   'PAYMENT_RECEIVED',
 ])
 
+/**
+ * Localiza a row de customer_credits de um payment, ciente de PARCELAMENTO.
+ *
+ * Compra parcelada (cartão grande até 3x) = UMA cobrança que vira N parcelas;
+ * cada parcela é um payment com `id` PRÓPRIO e dispara webhooks PRÓPRIOS, mas
+ * todas compartilham `payment.installment` (id do grupo). Guardamos
+ * `asaas_payment_id` (1ª parcela) E `asaas_installment_id` (grupo). Casar só pelo
+ * payment.id deixava refund-do-grupo e chargeback de parcela 2+ sem match →
+ * crédito não revertia (auditoria 2026-06-19).
+ *
+ * Estratégia: tenta por `asaas_payment_id` (cobre à vista/PIX e a 1ª parcela);
+ * se não achar e houver grupo, tenta por `asaas_installment_id`. A unicidade
+ * (asaas_payment_id UNIQUE + asaas_installment_id UNIQUE parcial) garante ≤1 row.
+ */
+async function findCreditForPayment<
+  Q extends PromiseLike<{ data: unknown; error: { message: string } | null }>,
+>(
+  payment: AsaasWebhookEnvelope['payment'],
+  lookup: (column: 'asaas_payment_id' | 'asaas_installment_id', value: string) => Q,
+): Promise<Awaited<Q>> {
+  const primary = await lookup('asaas_payment_id', payment.id)
+  if (primary.error || primary.data) return primary
+  const group = payment.installment
+  if (group) return await lookup('asaas_installment_id', group)
+  return primary
+}
+
 export async function applyPaymentEvent(
   envelope: AsaasWebhookEnvelope,
 ): Promise<ApplyPaymentResult> {
@@ -68,11 +95,13 @@ export async function applyPaymentEvent(
 
   // ---- Branch 1: CREDIT (PAYMENT_CONFIRMED OU PAYMENT_RECEIVED) ----
   if (CREDIT_TRIGGER_EVENTS.has(event)) {
-    const { data: credit, error: selErr } = await service
-      .from('customer_credits')
-      .select('id, user_id, package_id, leituras_purchased, status')
-      .eq('asaas_payment_id', payment.id)
-      .maybeSingle()
+    const { data: credit, error: selErr } = await findCreditForPayment(payment, (col, val) =>
+      service
+        .from('customer_credits')
+        .select('id, user_id, package_id, leituras_purchased, status')
+        .eq(col, val)
+        .maybeSingle(),
+    )
     if (selErr) {
       console.error('[apply-payment] select failed:', selErr.message)
       return { applied: false, reason: 'db_error', detail: selErr.message }
@@ -189,11 +218,13 @@ export async function applyPaymentEvent(
 
   // ---- Branch 2: PAYMENT_REFUNDED (full refund) ----
   if (event === 'PAYMENT_REFUNDED') {
-    const { data: credit } = await service
-      .from('customer_credits')
-      .select('id, user_id, leituras_remaining, status')
-      .eq('asaas_payment_id', payment.id)
-      .maybeSingle()
+    const { data: credit } = await findCreditForPayment(payment, (col, val) =>
+      service
+        .from('customer_credits')
+        .select('id, user_id, leituras_remaining, status')
+        .eq(col, val)
+        .maybeSingle(),
+    )
     if (!credit) {
       console.warn(
         `[apply-payment] refund without customer_credits row payment=${payment.id}`,
@@ -253,13 +284,15 @@ export async function applyPaymentEvent(
 
   // ---- Branch 3: PAYMENT_PARTIALLY_REFUNDED (débito proporcional D-13) ----
   if (event === 'PAYMENT_PARTIALLY_REFUNDED') {
-    const { data: credit } = await service
-      .from('customer_credits')
-      .select(
-        'id, user_id, leituras_purchased, leituras_remaining, status, credit_packages(price_brl, leituras_count)',
-      )
-      .eq('asaas_payment_id', payment.id)
-      .maybeSingle()
+    const { data: credit } = await findCreditForPayment(payment, (col, val) =>
+      service
+        .from('customer_credits')
+        .select(
+          'id, user_id, leituras_purchased, leituras_remaining, status, credit_packages(price_brl, leituras_count)',
+        )
+        .eq(col, val)
+        .maybeSingle(),
+    )
     if (!credit) {
       console.warn(
         `[apply-payment] partial refund without credit row payment=${payment.id}`,
@@ -285,13 +318,12 @@ export async function applyPaymentEvent(
     }
 
     // Asaas payload: payment.refundedValue (acumulado total devolvido) OU
-    // diff value-netValue. AsaasPayment .passthrough() não tipa refundedValue.
-    const pAny = payment as { refundedValue?: number; netValue?: number; value: number }
+    // diff value-netValue (ambos tipados no asaasPaymentSchema).
     const totalRefundedBrl =
-      typeof pAny.refundedValue === 'number'
-        ? pAny.refundedValue
-        : typeof pAny.netValue === 'number'
-          ? pAny.value - pAny.netValue
+      typeof payment.refundedValue === 'number'
+        ? payment.refundedValue
+        : typeof payment.netValue === 'number'
+          ? payment.value - payment.netValue
           : 0
 
     if (totalRefundedBrl <= 0) {
@@ -383,17 +415,24 @@ export async function applyPaymentEvent(
 
   // ---- Branch 4: CHARGEBACK ----
   if (event === 'PAYMENT_CHARGEBACK_REQUESTED') {
-    const { data: credit } = await service
-      .from('customer_credits')
-      .select('id, user_id')
-      .eq('asaas_payment_id', payment.id)
-      .maybeSingle()
-    if (credit) {
+    const { data: credit } = await findCreditForPayment(payment, (col, val) =>
+      service
+        .from('customer_credits')
+        .select('id, user_id, status')
+        .eq(col, val)
+        .maybeSingle(),
+    )
+    // Status guard: num parcelado, o chargeback pode disparar por PARCELA (cada
+    // uma com id próprio, todas no mesmo grupo). A 1ª já zera o saldo; as demais
+    // casam pelo grupo mas encontram status='refunded' → no-op (sem audit log
+    // duplicado). Idempotente.
+    if (credit && credit.status !== 'refunded') {
       await service
         .from('customer_credits')
         .update({ status: 'refunded', leituras_remaining: 0 })
         .eq('id', credit.id)
         .eq('user_id', credit.user_id) // DEFENSIVE — pitfall #9
+        .eq('status', credit.status) // status guard — race-safe
       await logAuditEvent({
         event_type: 'credit.refunded',
         actor_user_id: credit.user_id,

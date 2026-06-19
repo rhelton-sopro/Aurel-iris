@@ -329,6 +329,83 @@ describe('applyPaymentEvent', () => {
     if (!r.applied) expect(r.detail).toBe('missing_refund_value')
   })
 
+  // --- Parcelamento: casar por grupo installment (auditoria 2026-06-19) -------
+  it('parcelado: parcela 2 (id próprio, mesmo grupo) casa por installment e NÃO credita 2×', async () => {
+    // payment.id da parcela 2 NÃO é o asaas_payment_id guardado (1ª parcela) →
+    // primary lookup retorna null → fallback por asaas_installment_id acha a row
+    // já ativa → status guard → no-op (sem 2º crédito).
+    maybeSingleMock.mockResolvedValueOnce({ data: null, error: null }) // por payment.id
+    maybeSingleMock.mockResolvedValueOnce({
+      data: {
+        id: 'cred-1',
+        user_id: 'u-1',
+        package_id: 'pkg-1',
+        leituras_purchased: 30,
+        status: 'active',
+      },
+      error: null,
+    }) // por asaas_installment_id
+
+    const r = await applyPaymentEvent({
+      ...baseEnvelope,
+      event: 'PAYMENT_RECEIVED',
+      payment: { ...baseEnvelope.payment, id: 'pay_parcela2', installment: 'inst_grp' },
+    } as Envelope)
+    expect(r.applied).toBe(false)
+    if (!r.applied) expect(r.reason).toBe('wrong_state')
+    expect(updateMock).not.toHaveBeenCalled() // sem 2º crédito
+    expect(maybeSingleMock).toHaveBeenCalledTimes(2) // primary + fallback
+  })
+
+  it('parcelado: chargeback de parcela posterior casa por installment e zera o saldo', async () => {
+    // SEM o fix, chargeback da parcela 2 (id próprio) não casava → crédito de
+    // fraude permanecia. Agora casa pelo grupo e zera.
+    maybeSingleMock.mockResolvedValueOnce({ data: null, error: null }) // por payment.id
+    maybeSingleMock.mockResolvedValueOnce({
+      data: { id: 'cred-1', user_id: 'u-1', status: 'active' },
+      error: null,
+    }) // por asaas_installment_id
+    nextAwait.push({ data: null, error: null }) // UPDATE bare-awaited
+
+    const r = await applyPaymentEvent({
+      ...baseEnvelope,
+      event: 'PAYMENT_CHARGEBACK_REQUESTED',
+      payment: { ...baseEnvelope.payment, id: 'pay_parcela2', installment: 'inst_grp' },
+    } as Envelope)
+    expect(r.applied).toBe(true)
+    if (r.applied) expect(r.action).toBe('chargeback')
+    expect(updateMock).toHaveBeenCalledWith(
+      expect.objectContaining({ status: 'refunded', leituras_remaining: 0 }),
+    )
+  })
+
+  it('parcelado: chargeback de 2ª/3ª parcela é no-op se já refunded (sem update/audit dup)', async () => {
+    maybeSingleMock.mockResolvedValueOnce({ data: null, error: null }) // por payment.id
+    maybeSingleMock.mockResolvedValueOnce({
+      data: { id: 'cred-1', user_id: 'u-1', status: 'refunded' },
+      error: null,
+    }) // por asaas_installment_id — já estornado pela 1ª parcela
+
+    const r = await applyPaymentEvent({
+      ...baseEnvelope,
+      event: 'PAYMENT_CHARGEBACK_REQUESTED',
+      payment: { ...baseEnvelope.payment, id: 'pay_parcela3', installment: 'inst_grp' },
+    } as Envelope)
+    expect(r.applied).toBe(true) // ação registrada
+    expect(updateMock).not.toHaveBeenCalled() // status guard — idempotente
+  })
+
+  it('à vista (sem installment): payment.id não casa → not_found, SEM fallback', async () => {
+    maybeSingleMock.mockResolvedValueOnce({ data: null, error: null })
+    const r = await applyPaymentEvent({
+      ...baseEnvelope,
+      event: 'PAYMENT_CONFIRMED',
+    } as Envelope)
+    expect(r.applied).toBe(false)
+    if (!r.applied) expect(r.reason).toBe('not_found')
+    expect(maybeSingleMock).toHaveBeenCalledTimes(1) // sem grupo → 1 lookup só
+  })
+
   it('no-op on PAYMENT_CREATED', async () => {
     const r = await applyPaymentEvent({
       ...baseEnvelope,

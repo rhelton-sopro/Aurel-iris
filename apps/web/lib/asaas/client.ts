@@ -156,3 +156,20 @@ export async function refundAsaasPayment(
   if (!parsed.success) return { ok: false, status: 502, error: 'asaas response shape invalid' }
   return { ok: true, data: parsed.data }
 }
+
+/**
+ * Estorna uma cobrança PARCELADA inteira (todas as parcelas do grupo) via
+ * `POST /installments/{id}/refund`. Necessário porque `refundAsaasPayment` (que
+ * bate em /payments/{id}/refund) só estorna UMA parcela — para compra parcelada
+ * isso deixava as parcelas 2..N cobradas (auditoria 2026-06-19). Body vazio =
+ * estorno total do grupo. A resposta é o objeto da parcelada (não validamos o
+ * shape — o caller só checa `.ok`).
+ */
+export async function refundAsaasInstallment(
+  installmentId: string,
+): Promise<AsaasResult<unknown>> {
+  return asaasRequest(`/installments/${installmentId}/refund`, {
+    method: 'POST',
+    body: JSON.stringify({}),
+  })
+}

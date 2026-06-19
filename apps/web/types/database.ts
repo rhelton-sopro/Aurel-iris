@@ -644,6 +644,7 @@ export type Database = {
       }
       customer_credits: {
         Row: {
+          asaas_installment_id: string | null
           asaas_invoice_url: string | null
           asaas_payment_id: string | null
           asaas_payment_status: string | null
@@ -659,6 +660,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          asaas_installment_id?: string | null
           asaas_invoice_url?: string | null
           asaas_payment_id?: string | null
           asaas_payment_status?: string | null
@@ -674,6 +676,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          asaas_installment_id?: string | null
           asaas_invoice_url?: string | null
           asaas_payment_id?: string | null
           asaas_payment_status?: string | null

@@ -9,6 +9,7 @@ import {
   createAsaasCustomer,
   createAsaasPayment,
   refundAsaasPayment,
+  refundAsaasInstallment,
   updateAsaasCustomer,
 } from '@/lib/asaas/client'
 import { computeRefundValue } from '@/lib/billing/refund-policy'
@@ -213,11 +214,17 @@ export async function createChargeAction(
     return { ok: false, error: humanizeAsaasError(payment.error) }
   }
 
-  // 7. Liga o payment à row (asaas_payment_id UNIQUE — idempotência webhook)
+  // 7. Liga o payment à row (asaas_payment_id UNIQUE — idempotência webhook).
+  //    Parcelado: guarda também o grupo `installment` (payment.data.installment).
+  //    `payment.data.id` é a 1ª parcela; cada parcela dispara webhooks com id
+  //    PRÓPRIO — o handler casa por payment_id OU installment_id (apply-payment),
+  //    e o refund de parcelado usa o grupo (refundAsaasInstallment). À vista:
+  //    installment vem ausente → NULL.
   await service
     .from('customer_credits')
     .update({
       asaas_payment_id: payment.data.id,
+      asaas_installment_id: payment.data.installment ?? null,
       asaas_invoice_url: payment.data.invoiceUrl ?? null,
       asaas_payment_status: payment.data.status ?? null,
     })
@@ -270,7 +277,7 @@ export async function refundPackageAction(
   const { data: credit, error: selErr } = await supabase
     .from('customer_credits')
     .select(
-      'id, user_id, asaas_payment_id, purchase_date, leituras_purchased, leituras_remaining, leituras_reserved, status, credit_packages(name, price_brl)',
+      'id, user_id, asaas_payment_id, asaas_installment_id, purchase_date, leituras_purchased, leituras_remaining, leituras_reserved, status, credit_packages(name, price_brl)',
     )
     .eq('id', parsed.data.credit_id)
     .maybeSingle()
@@ -310,6 +317,21 @@ export async function refundPackageAction(
   if (!credit.asaas_payment_id) {
     return { ok: false, error: 'Pagamento Asaas não associado.' }
   }
+  // Compra PARCELADA (cartão grande até 3x): cada parcela é um payment próprio;
+  // /payments/{id}/refund estornaria SÓ a 1ª parcela (auditoria 2026-06-19).
+  // - Total → estorna o GRUPO inteiro via /installments/{id}/refund.
+  // - Parcial → o endpoint de grupo não aceita valor parcial; refund parcial de
+  //   parcelado é raro (arrependimento CDC 7d com leituras já usadas) e fica como
+  //   tratamento manual via suporte (mensagem clara, sem estorno silenciosamente
+  //   incompleto). Limitação registrada em memory project_asaas_parcelamento_grande_3x.
+  const isInstallment = !!credit.asaas_installment_id
+  if (isInstallment && policy.kind !== 'total') {
+    return {
+      ok: false,
+      error:
+        'Reembolso parcial de compra parcelada precisa ser feito pelo suporte. Fale com a gente que resolvemos.',
+    }
+  }
   const refundBody =
     policy.kind === 'total'
       ? undefined
@@ -317,7 +339,9 @@ export async function refundPackageAction(
           value: policy.value_brl,
           description: `Iris Codex — arrependimento 7d (${policy.leituras_to_refund} leituras restantes)`,
         }
-  const refund = await refundAsaasPayment(credit.asaas_payment_id, refundBody)
+  const refund = isInstallment
+    ? await refundAsaasInstallment(credit.asaas_installment_id!)
+    : await refundAsaasPayment(credit.asaas_payment_id, refundBody)
   if (!refund.ok) return { ok: false, error: humanizeAsaasError(refund.error) }
 
   // 4. Estado local — webhook PAYMENT_REFUNDED/PARTIALLY_REFUNDED também
