@@ -38,6 +38,14 @@ A numeração das fases v1 segue 1–9 (em vez de 0–8 do SPEC) por convenção
 - [~] **Fase 11 (INSERTED, NEW 2026-05-25): Launch readiness B2B — 3/4 DELIVERED 2026-05-26; smoke E2E (11-04) deferido pra exercício orgânico** — Gates entregues via execução direta sem `/gsd-plan-phase 11` (rastreio em git+memory, não em PLAN files): (a) **11-01** Resend domain verification + sender `noreply@iriscodex.com` autenticado via DMARC pass em smoke externo (memory `project_resend_domain_unverified_launch_gate` RESOLVED); (b) **11-02** MIN_AGE revert 0→18 em `apps/web/lib/gates/profile-completeness.ts` commit `55d54ea` + tests revertidos 16/16 GREEN (memory `project_min_age_beta_revert_before_ga` RESOLVED); (c) **11-03** Consent term Path B liberado consciente pra ≤5 terapeutas externos com trigger ATIVO (memory `project_consent_term_legal_review_debt`). (d) **11-04** smoke E2E hand-held com 1ª terapeuta convidada — pendente, acontece organicamente quando founder dispara primeiro convite real via `/admin/terapeutas`.
 - [x] **Fase 11.1 (INSERTED, NEW 2026-05-26): Invite terapeuta via signup form — DELIVERED + LIVE 2026-05-26** — Bug descoberto durante smoke Fase 9 (09-05): `inviteTherapistAction` usava `supabase.auth.admin.generateLink({type:'invite', redirectTo:/dashboard})` mas `/dashboard` não trocava PKCE code por sessão → terapeuta caía em `/login`. Fix entregue: tabela `therapist_invites(token uuid, email, expires_at 7d, used_at)` + rewrite `inviteTherapistAction` (D-DUPE bloqueia email já cadastrado em auth.users) + rota `/convite-terapeuta/[token]` (RSC lookup + form com email read-only + OTP 8 dígitos obrigatório) + middleware update (PUBLIC_INVITE_PREFIXES). Inclui também `UNIQUE(therapist_id, email) ON clients` resolvendo memory tech debt `project_clients_unique_email_tech_debt` (cleanup empírico de 11 rows duplicadas em prod: 6 grupos, 5 shells-vazios + 1 caso real família Nailli/Luiz). 3 plans + 15 commits + 27 vitest GREEN. Deploy LIVE (`iriscodex.com` HTTP 200, alias `aurel-iris-fgu7e66tu-sopro-da-origem.vercel.app`).
 
+## Fases - v1.1 Motor de Conteudo
+
+> **Milestone v1.1 "Motor de Conteudo"** (inicio 2026-06-19). Workstream de DISTRIBUICAO/marketing, paralelo ao nucleo do produto (iridologia). Transforma a fila de aprovacao do painel `/admin/painel` num motor que publica conteudo no Instagram de ponta a ponta e fecha o loop de aprendizado: producao -> aprovacao -> publicacao automatica -> metricas -> pauta. **Numeracao continua de v1** (ultima fase de produto = 11.1) -> v1.1 comeca em **Fase 12**. As fases 01-11.1 acima sao o produto core e ficam intocadas.
+
+- [ ] **Fase 12: Publicacao Instagram** - Cron Vercel publica posts `agendado` vencidos no IG (carrossel + reel) via Meta Content Publishing API, idempotente, marcando `publicado` ou expondo erro. *(PRIORIDADE - primeira fase v1.1.)*
+- [ ] **Fase 13: Cockpit do painel** - Refino da superficie do `/admin/painel`: agendar na regua de composicao do feed, ver a fila como linha do tempo e o status de publicacao de cada post (link IG ou erro + reenfileirar).
+- [ ] **Fase 14: Loop de dados** - Metricas do Insta (saves, alcance, alcance nao-seguidor, watch-time) de volta ao painel via Insights API -> exibicao por post/linha editorial -> sinal de aprendizado pra proxima pauta.
+
 ## Detalhes das fases
 
 ### Fase 1: Setup
@@ -576,6 +584,49 @@ See `.planning/phases/07.5-tendency-mapping-engine/07.5-CONTEXT.md` (a criar via
 
 **UI hint**: no (gates são server-side + config + docs; sem UI nova).
 
+---
+
+## Detalhes das fases - v1.1 Motor de Conteudo
+
+### Fase 12: Publicacao Instagram
+**Milestone:** v1.1 Motor de Conteudo. **Prioridade - primeira fase v1.1.**
+**Goal**: O conteudo aprovado e agendado no painel e publicado automaticamente no Instagram do founder de ponta a ponta - carrossel e reel - sem acao manual no momento da publicacao, com falhas visiveis e re-tentaveis.
+**Depends on**: Infra existente da migration 0045 (tabela `social_posts` com maquina de estados `pendente -> aprovado -> agendado -> publicado -> reprovado`, `scheduled_at`, `media`) + server actions de aprovacao/agendamento ja existentes no painel. Pre-requisitos EXTERNOS do founder (conta IG -> Professional + Pagina FB vinculada, app Meta, token de longa duracao) sao tratados a parte; a pesquisa profunda da API Meta acontece no `/gsd-plan-phase 12`. Sem App Review (conta propria, dev mode).
+**Requirements**: IGPUB-01, IGPUB-02, IGPUB-03, IGPUB-04, IGPUB-05, IGPUB-06
+**Success Criteria** (o que deve ser verdade):
+  1. A conexao com a conta IG (token de longa duracao + IG Business Account ID em env Vercel) passa por um health-check que confirma que da pra publicar; token invalido/expirado e detectado e reportado, nao falha silenciosa.
+  2. Um post `agendado` com `scheduled_at` no passado e publicado automaticamente pelo cron do Vercel sem ninguem clicar nada; rodar o cron duas vezes nao republica o mesmo post (idempotente).
+  3. Um carrossel multi-imagem aprovado aparece no feed real do Instagram com todas as slides na ordem, lidas das URLs publicas das midias.
+  4. Um reel (video 9:16, H.264) aprovado aparece no feed real do Instagram, publicado a partir do MP4 da URL publica (com poll de status do container ate ficar pronto).
+  5. O post publicado sai com a caption + hashtags definidas no painel; apos publicar, o `social_posts` correspondente fica `publicado` com o permalink/ID do post gravado.
+  6. Quando a publicacao falha, o post NAO entra em `publicado`, o motivo do erro fica registrado e visivel pro founder, e o post pode ser reenfileirado.
+**Plans**: TBD (planejar em `/gsd-plan-phase 12`; inclui pesquisa profunda da Instagram Content Publishing API + fluxo de container/poll/media_publish).
+**UI hint**: no (cron server-side + server actions + env; a superficie de status no painel e detalhada na Fase 13. IGPUB-06 entrega apenas o registro minimo de erro/permalink no estado; o display polido e COCKPIT-03).
+
+### Fase 13: Cockpit do painel
+**Milestone:** v1.1 Motor de Conteudo.
+**Goal**: O `/admin/painel` vira um cockpit de composicao do feed - o founder agenda um post aprovado na regua de tom/assunto/formato, ve a fila inteira como uma linha do tempo na ordem de publicacao, e acompanha o destino de cada post (publicado com link pro IG, ou falhou com motivo e botao de reenfileirar).
+**Depends on**: Fase 12 (o status de publicacao e o registro de erro/permalink que a Fase 12 grava em `social_posts` sao a fonte de dados de COCKPIT-03). Consolida server actions de aprovar/agendar ja existentes (migration 0045) numa superficie unica.
+**Requirements**: COCKPIT-01, COCKPIT-02, COCKPIT-03
+**Success Criteria** (o que deve ser verdade):
+  1. O founder pega um post aprovado e define o `scheduled_at` direto na regua de composicao do feed (tom/assunto/formato), fechando o fluxo aprovar -> agendar numa so superficie.
+  2. A fila de posts agendados aparece como linha do tempo/regua do feed, na ordem em que serao publicados.
+  3. Cada post mostra seu status de publicacao: publicado (com link clicavel pro post no Instagram) ou falhou (com o motivo do erro), e o founder consegue reenfileirar um post que falhou direto do painel.
+**Plans**: TBD (planejar em `/gsd-plan-phase 13`).
+**UI hint**: yes
+
+### Fase 14: Loop de dados
+**Milestone:** v1.1 Motor de Conteudo.
+**Goal**: O motor fecha o ciclo de aprendizado - as metricas reais de cada post publicado voltam do Instagram pro painel, sao mostradas por post e agregadas por linha editorial, e viram sinal pra orientar a proxima leva de conteudo (o que performou guia a pauta).
+**Depends on**: Fase 12 (so existe metrica de post que foi publicado pela engine) + Fase 13 (o painel ja exibe os posts publicados, onde as metricas se penduram). DATA-01 usa a Insights API do Meta e exige a permissao `instagram_manage_insights` - homework de escopo/permissao detalhado no `/gsd-plan-phase 14`.
+**Requirements**: DATA-01, DATA-02, DATA-03
+**Success Criteria** (o que deve ser verdade):
+  1. Para um post publicado, o painel puxa automaticamente as metricas do Insta via Insights API (saves, alcance, alcance de nao-seguidores e, para reel, watch-time), com a permissao `instagram_manage_insights` ativa.
+  2. As metricas aparecem no painel por post e agregadas por linha editorial.
+  3. O painel mostra, de forma agregada, o que performou por formato e por linha editorial - um sinal explicito que o founder usa pra decidir a proxima leva de conteudo.
+**Plans**: TBD (planejar em `/gsd-plan-phase 14`).
+**UI hint**: yes
+
 ## Progresso
 
 **Ordem de execução:**
@@ -602,5 +653,13 @@ Fases v1 executam em ordem numérica: 1 → 2 → 4 → 5 → 6 → 7 → 7.1 �
 | 10. Sistema de Aprendizagem Clínica | 0/TBD | 📅 Backlog longo prazo | — |
 | 11. Launch readiness B2B | 3/4 | 🔄 11-01/02/03 DELIVERED + LIVE (sem plans formais — execução direta rastreada em git+memory). 11-04 (smoke E2E) deferido pra exercício orgânico. | 2026-05-26 (parcial) |
 | 11.1. Invite terapeuta via signup form | 3/3 | ✅ DELIVERED + LIVE — bug bloqueador descoberto durante smoke Fase 9 fixado via migration 0033 + rota `/convite-terapeuta/[token]` + signup form (27 vitest GREEN + 2 CRITICAL security fixes pós-review) | 2026-05-26 |
+
+**Milestone v1.1 - Motor de Conteudo** (workstream de distribuicao, paralelo ao produto). Ordem de execucao: 12 (Publicacao IG, prioridade) -> 13 (Cockpit) -> 14 (Loop de dados).
+
+| Fase | Plans concluidos | Status | Concluida em |
+|-------|------------------|--------|--------------|
+| 12. Publicacao Instagram | 0/TBD | Nao iniciada (planejar em /gsd-plan-phase 12) | - |
+| 13. Cockpit do painel | 0/TBD | Nao iniciada | - |
+| 14. Loop de dados | 0/TBD | Nao iniciada | - |
 
 \* **Fase 3 nota**: Plans 03-01 a 03-07 executados normalmente. Plan 03-08 (RecoveryBanner D-12, PWAInstallBanner D-14, listagem rascunhos) teve scope reduzido durante UAT — finalizeReadingAction foi absorvida em fixes pós-execução. RecoveryBanner e PWAInstallBanner deferidos para Fase 9 (polish pré-beta). Captura mobile principal funcional pós-UAT 03 (20 rounds de calibração do gate VLM Claude Haiku 4.5). Único issue conhecido: PWA standalone Android Chrome (instala mas abre com URL bar). Não bloqueia Estágio 1 (dogfood iPhone Safari).

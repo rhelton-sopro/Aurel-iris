@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Motor de Conteúdo
 status: planning
-last_updated: "2026-06-19T13:04:56.923Z"
+last_updated: "2026-06-19T18:00:00.000Z"
 last_activity: 2026-06-19
 progress:
-  total_phases: 0
+  total_phases: 3
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -14,6 +14,23 @@ progress:
 ---
 
 # Estado do projeto
+
+## Posicao atual (2026-06-19) - milestone v1.1 "Motor de Conteudo" (ROADMAP criado)
+
+**Milestone:** v1.1 Motor de Conteudo. **Status:** planning. **Fase atual:** 12 (Publicacao Instagram) - nao iniciada.
+
+Roadmap v1.1 criado e mapeado em ROADMAP.md (secao "Fases - v1.1 Motor de Conteudo" + "Detalhes das fases - v1.1"). Tres fases, numeracao continuando do produto core (ultima = 11.1) -> v1.1 comeca em 12. As fases 01-11.1 (produto de iridologia) ficam intocadas.
+
+- **Fase 12 - Publicacao Instagram (PRIORIDADE):** IGPUB-01..06. Cron Vercel publica posts `agendado` vencidos no IG (carrossel + reel) via Meta Content Publishing API, idempotente, marca `publicado` ou expoe erro. Constroi sobre `social_posts` (migration 0045). Sem App Review (conta propria, dev mode). Pesquisa profunda da API Meta acontece no /gsd-plan-phase 12.
+- **Fase 13 - Cockpit do painel:** COCKPIT-01..03. Agendar na regua de composicao, fila como linha do tempo, status de publicacao por post (link IG ou erro + reenfileirar). Depende da Fase 12 (fonte do status/erro).
+- **Fase 14 - Loop de dados:** DATA-01..03. Metricas via Insights API (saves/alcance/nao-seguidor/watch-time; exige `instagram_manage_insights`) -> exibicao por post/linha editorial -> sinal de pauta. Depende das Fases 12+13.
+
+**Cobertura v1.1:** 12/12 requisitos mapeados (IGPUB 6 -> F12, COCKPIT 3 -> F13, DATA 3 -> F14). Sem orfaos.
+
+**Proxima acao:** aprovar o roadmap v1.1 e rodar `/gsd-plan-phase 12` (Publicacao Instagram) - inclui pesquisa profunda da Instagram Content Publishing API (container -> poll -> media_publish) e os pre-requisitos externos do founder (conta IG Professional + Pagina FB + token de longa duracao).
+
+> Conteudo abaixo e historico do milestone v1.0 (produto de iridologia), preservado para contexto.
+
 
 ## Foco atual (2026-05-31) — re-sync pós-go-live
 

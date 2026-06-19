@@ -199,10 +199,32 @@ Excluídos explicitamente. Documentado para evitar reintrodução.
 | ONBOARD-04 | Fase 9 | 🚧 In progress (Plan 09-04, instrumentation entregue) — founder usa diariamente desde 2026-05-15; gate fecha quando 3 semanas consecutivas ≥3 leituras/sem em clientes reais; declaração final em memory `project_dogfooding_gate_status` |
 | ONBOARD-05 | Fase 9 | ⏸️ Deferred V1.1+ (decisão founder 2026-05-26) — beta 10-20 depende de Fase 8 Stripe + ONBOARD-03 landing |
 
+**Milestone v1.1 - Motor de Conteudo:**
+
+| Requisito | Fase | Status |
+|-----------|------|--------|
+| IGPUB-01 | Fase 12 | Pendente |
+| IGPUB-02 | Fase 12 | Pendente |
+| IGPUB-03 | Fase 12 | Pendente |
+| IGPUB-04 | Fase 12 | Pendente |
+| IGPUB-05 | Fase 12 | Pendente |
+| IGPUB-06 | Fase 12 | Pendente |
+| COCKPIT-01 | Fase 13 | Pendente |
+| COCKPIT-02 | Fase 13 | Pendente |
+| COCKPIT-03 | Fase 13 | Pendente |
+| DATA-01 | Fase 14 | Pendente |
+| DATA-02 | Fase 14 | Pendente |
+| DATA-03 | Fase 14 | Pendente |
+
 **Cobertura:**
 - Requisitos v1 totais: 43
 - Mapeados em fases: 43
 - Não mapeados: 0 OK
+
+**Cobertura v1.1 - Motor de Conteudo:**
+- Requisitos v1.1 totais: 12 (IGPUB 6 + COCKPIT 3 + DATA 3)
+- Mapeados em fases: 12 (Fase 12: 6, Fase 13: 3, Fase 14: 3)
+- Nao mapeados: 0 OK
 
 ---
 *Requisitos definidos: 2026-04-30*
