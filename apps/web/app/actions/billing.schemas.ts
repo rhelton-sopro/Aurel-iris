@@ -18,6 +18,10 @@ export const createChargeSchema = z.object({
   // do checkout Asaas → cliente volta pra ESSA leitura após pagar (autoRedirect).
   // Ausente = compra avulsa pela tela /assinatura/comprar → volta pra /assinatura.
   reading_id: z.string().uuid('reading_id inválido').optional(),
+  // Parcelas no cartão (founder 2026-06-19): o cliente escolhe 1–3x na nossa tela.
+  // SÓ vale pro pacote grande + CREDIT_CARD; a action re-clampa (preço/regra vêm
+  // do servidor, nunca do client). Ausente = 1x à vista.
+  installments: z.number().int().min(1).max(3).optional(),
 })
 
 export const refundPackageSchema = z.object({

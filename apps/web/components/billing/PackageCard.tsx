@@ -48,6 +48,15 @@ export function PackageCard(props: Props) {
   // B-lite: cliente escolhe PIX ou cartão AQUI; passamos o billingType específico
   // pra cobrança Asaas → checkout hospedado mostra só esse método (boleto nunca).
   const [method, setMethod] = useState<'PIX' | 'CREDIT_CARD'>('PIX')
+  // Parcelas no cartão (founder 2026-06-19): só o pacote grande pode parcelar,
+  // até 3x. A action re-clampa no servidor; aqui é só UX.
+  const [installments, setInstallments] = useState(1)
+  const canParcel = props.sku === 'grande' && method === 'CREDIT_CARD'
+
+  function chooseMethod(value: 'PIX' | 'CREDIT_CARD') {
+    setMethod(value)
+    if (value !== 'CREDIT_CARD') setInstallments(1) // PIX nunca parcela
+  }
 
   function handleBuy() {
     startTransition(async () => {
@@ -55,6 +64,7 @@ export function PackageCard(props: Props) {
         sku: props.sku,
         billingType: method,
         reading_id: props.readingId,
+        installments: canParcel ? installments : undefined,
       })
       if (!r.ok) {
         toast.error(r.error)
@@ -129,7 +139,7 @@ export function PackageCard(props: Props) {
               role="radio"
               aria-checked={active}
               disabled={isPending}
-              onClick={() => setMethod(m.value)}
+              onClick={() => chooseMethod(m.value)}
               className={cn(
                 'rounded-[2px] border px-2 py-1.5 text-[11px] font-medium uppercase tracking-label transition-colors',
                 active
@@ -143,6 +153,45 @@ export function PackageCard(props: Props) {
           )
         })}
       </div>
+
+      {/* Parcelamento — só pacote grande no cartão, até 3x sem juros. */}
+      {canParcel ? (
+        <div className="mb-2">
+          <div
+            role="radiogroup"
+            aria-label="Parcelas"
+            className="grid grid-cols-3 gap-1"
+          >
+            {[1, 2, 3].map((n) => {
+              const active = installments === n
+              return (
+                <button
+                  key={n}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  disabled={isPending}
+                  onClick={() => setInstallments(n)}
+                  className={cn(
+                    'rounded-[2px] border px-2 py-1.5 text-[11px] font-medium uppercase tracking-label transition-colors',
+                    active
+                      ? 'border-teal-dark bg-teal-dark/5 text-teal-dark'
+                      : 'border-border text-muted-foreground hover:border-teal-dark/40',
+                  )}
+                  data-testid={`installments-${n}-${props.sku}`}
+                >
+                  {n}x
+                </button>
+              )
+            })}
+          </div>
+          <p className="mt-1 text-center text-[11px] text-muted-foreground">
+            {installments > 1
+              ? `${installments}x de R$ ${formatBrl(props.priceBrl / installments)} sem juros`
+              : 'à vista'}
+          </p>
+        </div>
+      ) : null}
 
       <Button
         type="button"

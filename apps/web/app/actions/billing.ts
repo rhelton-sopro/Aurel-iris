@@ -169,16 +169,30 @@ export async function createChargeAction(
   // pesquisa 2026-05-31). O checkout hospedado mostra só o método escolhido. O
   // webhook credita em PAYMENT_CONFIRMED **ou** PAYMENT_RECEIVED, então cartão
   // (confirma na autorização, instantâneo) credita na hora — sem mudar o webhook.
-  const paymentInput = {
+  // Parcelamento (founder 2026-06-19): SÓ pacote grande + cartão pode parcelar,
+  // até 3x. Clamp server-side — a regra/limite NUNCA vêm do client (espelha o
+  // preço, que também vem do DB). PIX e demais SKUs ficam sempre em 1x à vista.
+  const maxInstallments =
+    parsed.data.billingType === 'CREDIT_CARD' && pkg.sku === 'grande' ? 3 : 1
+  const installmentCount = Math.min(
+    Math.max(parsed.data.installments ?? 1, 1),
+    maxInstallments,
+  )
+
+  const baseInput = {
     customer: asaasCustomerId,
     billingType: parsed.data.billingType,
-    value: pkg.price_brl,
     dueDate,
     description: `Iris Codex — ${pkg.name} (${pkg.leituras_count} ${
       pkg.leituras_count === 1 ? 'leitura' : 'leituras'
     })`,
     externalReference: pendingCredit.id,
   }
+  // Parcelado (doc Asaas): installmentCount + totalValue, SEM value. À vista: só value.
+  const paymentInput =
+    installmentCount > 1
+      ? { ...baseInput, installmentCount, totalValue: pkg.price_brl }
+      : { ...baseInput, value: pkg.price_brl }
 
   // Callback de auto-retorno pós-pagamento (item 3): só é enviado se o domínio
   // do successUrl estiver cadastrado na conta Asaas (Configurações → Integrações).

@@ -114,7 +114,12 @@ export async function updateAsaasCustomer(
 export interface CreatePaymentInput {
   customer: string // cus_xxxxx
   billingType: 'UNDEFINED' | 'PIX' | 'BOLETO' | 'CREDIT_CARD'
-  value: number // R$ decimal (não centavos)
+  // À vista: enviar SÓ `value`. Parcelado (doc Asaas criar-uma-cobranca-parcelada):
+  // enviar `installmentCount` + `totalValue` e OMITIR `value`. Exatamente um dos
+  // dois modos — a action (billing.ts) garante isso; nunca os dois juntos.
+  value?: number // R$ decimal (não centavos) — só no modo à vista
+  installmentCount?: number // nº de parcelas (>1) — só no modo parcelado
+  totalValue?: number // valor total a parcelar — Asaas calcula cada parcela
   dueDate: string // ISO YYYY-MM-DD
   description: string
   externalReference: string // customer_credits.id UUID (pitfall #5 — UNIQUE app-level)
