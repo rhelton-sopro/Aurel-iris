@@ -86,6 +86,36 @@ Requisitos para o release inicial. Cada um mapeia para exatamente uma fase do ro
 - [~] **ONBOARD-04**: Fundador (terapeuta em exercício) usa Aurel Iris **semanalmente em clientes reais** por pelo menos 3 semanas consecutivas sem recorrer a notas manuais paralelas; ajustes em prompt, UX e features dirigidos por esse uso real.
 - [ ] **ONBOARD-05**: Após gate de dogfooding fechado, beta privado com 5 terapeutas internos seguido de 10–20 terapeutas selecionados (SPEC §7 Fase 8).
 
+## Requisitos v1.1 — Motor de Conteúdo (Instagram)
+
+Milestone v1.1. Transformar a fila de aprovação do painel `/admin/painel` num
+motor que publica conteúdo no Instagram de ponta a ponta e fecha o loop de
+aprendizado. Infra existente: tabela `social_posts` (migration 0045) com máquina
+de estados `pendente→aprovado→agendado→publicado→reprovado`, `scheduled_at`,
+`media` (carrossel/reel/post). Publicação via API oficial do Meta (Instagram
+Content Publishing API), sem App Review (conta própria do founder, dev mode).
+
+### Publicação Instagram (IGPUB — prioridade)
+
+- [ ] **IGPUB-01**: Conta IG (Professional + Página FB) conectada via Meta API — token de longa duração + IG Business Account ID em env Vercel, com validação/health-check da conexão.
+- [ ] **IGPUB-02**: Cron no Vercel varre posts `agendado` com `scheduled_at` vencido e dispara a publicação de forma idempotente (não republica um post já publicado).
+- [ ] **IGPUB-03**: Publicar carrossel multi-imagem lendo as slides das URLs públicas (container por slide → container do carrossel → media_publish).
+- [ ] **IGPUB-04**: Publicar reel (vídeo 9:16, H.264) lendo o MP4 da URL pública (container de vídeo → poll de status → media_publish).
+- [ ] **IGPUB-05**: Caption + hashtags enviadas junto com o post no momento da publicação.
+- [ ] **IGPUB-06**: Pós-publicação, marcar `publicado` gravando o permalink/ID do post no IG; em falha, manter o post fora de `publicado` e expor o erro (motivo) no painel para reenfileiramento.
+
+### Cockpit do painel (COCKPIT)
+
+- [ ] **COCKPIT-01**: Terapeuta/founder agenda um post aprovado definindo `scheduled_at` na régua de composição do feed (tom/assunto/formato), consolidando o fluxo aprovar → agendar.
+- [ ] **COCKPIT-02**: Ver a fila de agendados como linha do tempo/régua do feed, na ordem de publicação.
+- [ ] **COCKPIT-03**: Ver no painel o status de publicação de cada post (publicado + link pro post no IG, ou erro + motivo) e reenfileirar em caso de falha.
+
+### Loop de dados (DATA)
+
+- [ ] **DATA-01**: Puxar automaticamente métricas do post publicado via Insights API do Meta (saves, alcance, alcance de não-seguidores, watch-time para reel) — requer permissão `instagram_manage_insights`.
+- [ ] **DATA-02**: Exibir as métricas no painel por post e agregadas por linha editorial.
+- [ ] **DATA-03**: Sinal de aprendizado → pauta: agregar o que performou por formato/linha editorial para orientar a próxima leva de conteúdo.
+
 ## Requisitos v2
 
 Diferidos para release futuro. Rastreados, mas fora do roadmap atual. Origem: SPEC §9.
