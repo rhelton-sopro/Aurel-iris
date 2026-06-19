@@ -64,7 +64,11 @@ export default async function ComprarPage({
       <section className="mt-10 space-y-2 rounded-[2px] border border-border bg-muted/30 p-5 text-sm">
         <h3 className="font-semibold text-ink">Informações importantes</h3>
         <ul className="list-disc space-y-1 pl-6 text-muted-foreground">
-          <li>Pagamento via PIX, cartão de crédito ou boleto (checkout Asaas).</li>
+          <li>Pagamento via PIX ou cartão de crédito (checkout Asaas).</li>
+          <li>
+            5% de desconto no PIX nos pacotes Médio e Grande. No cartão: Médio em
+            até 2x e Grande em até 3x, sem juros.
+          </li>
           <li>Validade: 12 meses a partir da confirmação do pagamento.</li>
           <li>
             Direito de arrependimento: 7 dias (reembolso integral se nenhuma

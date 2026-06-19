@@ -15,6 +15,12 @@ import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { createChargeAction } from '@/app/actions/billing'
+import {
+  hasPixDiscount,
+  maxInstallmentsFor,
+  pixPriceBrl,
+  PIX_DISCOUNT_LABEL,
+} from '@/lib/billing/pricing'
 import { cn } from '@/lib/utils'
 
 interface Props {
@@ -48,10 +54,16 @@ export function PackageCard(props: Props) {
   // B-lite: cliente escolhe PIX ou cartão AQUI; passamos o billingType específico
   // pra cobrança Asaas → checkout hospedado mostra só esse método (boleto nunca).
   const [method, setMethod] = useState<'PIX' | 'CREDIT_CARD'>('PIX')
-  // Parcelas no cartão (founder 2026-06-19): só o pacote grande pode parcelar,
-  // até 3x. A action re-clampa no servidor; aqui é só UX.
+  // Parcelas no cartão (founder 2026-06-19): médio até 2x, grande até 3x
+  // (lib/billing/pricing). A action re-clampa no servidor; aqui é só UX.
   const [installments, setInstallments] = useState(1)
-  const canParcel = props.sku === 'grande' && method === 'CREDIT_CARD'
+  const maxInst = maxInstallmentsFor(props.sku)
+  const canParcel = maxInst > 1 && method === 'CREDIT_CARD'
+  // Desconto PIX (5% em médio+grande). displayPrice reage ao método escolhido.
+  const pixEligible = hasPixDiscount(props.sku)
+  const pixPrice = pixPriceBrl(props.sku, props.priceBrl)
+  const showPixPrice = method === 'PIX' && pixEligible
+  const displayPrice = showPixPrice ? pixPrice : props.priceBrl
 
   function chooseMethod(value: 'PIX' | 'CREDIT_CARD') {
     setMethod(value)
@@ -106,8 +118,17 @@ export function PackageCard(props: Props) {
 
       <div className="my-4 flex-1">
         <p className="text-3xl font-bold tracking-tight text-ink">
-          R$ {formatBrl(props.priceBrl)}
+          R$ {formatBrl(displayPrice)}
         </p>
+        {showPixPrice ? (
+          <p className="mt-0.5 text-xs font-medium text-teal-dark">
+            {PIX_DISCOUNT_LABEL} de desconto no PIX (de R$ {formatBrl(props.priceBrl)})
+          </p>
+        ) : pixEligible ? (
+          <p className="mt-0.5 text-xs font-medium text-teal-dark">
+            À vista no PIX: R$ {formatBrl(pixPrice)} ({PIX_DISCOUNT_LABEL} off)
+          </p>
+        ) : null}
         {props.leiturasCount > 1 ? (
           <p className="mt-1 text-xs text-muted-foreground">
             R$ {formatBrl(props.pricePerUnit)} por leitura
@@ -154,15 +175,15 @@ export function PackageCard(props: Props) {
         })}
       </div>
 
-      {/* Parcelamento — só pacote grande no cartão, até 3x sem juros. */}
+      {/* Parcelamento sem juros — médio até 2x, grande até 3x (cartão). */}
       {canParcel ? (
         <div className="mb-2">
           <div
             role="radiogroup"
             aria-label="Parcelas"
-            className="grid grid-cols-3 gap-1"
+            className={cn('grid gap-1', maxInst === 2 ? 'grid-cols-2' : 'grid-cols-3')}
           >
-            {[1, 2, 3].map((n) => {
+            {Array.from({ length: maxInst }, (_, i) => i + 1).map((n) => {
               const active = installments === n
               return (
                 <button

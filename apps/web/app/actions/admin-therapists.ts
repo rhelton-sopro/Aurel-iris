@@ -70,7 +70,7 @@ export async function grantCreditsAction(
   // Pacote (preço/leituras vêm do DB — nunca do client) + package_id NOT NULL.
   const { data: pkg, error: pkgErr } = await service
     .from('credit_packages')
-    .select('id, sku, name, leituras_count')
+    .select('id, sku, name, leituras_count, price_brl')
     .eq('sku', skuClean)
     .maybeSingle()
   if (pkgErr) return { ok: false, error: 'Erro ao buscar pacote.' }
@@ -95,6 +95,7 @@ export async function grantCreditsAction(
       expires_at: expiresISO,
       status: 'active',
       asaas_payment_status: 'MANUAL_INFINITEPAY',
+      paid_brl: pkg.price_brl, // grant manual = preço de tabela (receita/reembolso)
     })
     .select('id')
     .single()

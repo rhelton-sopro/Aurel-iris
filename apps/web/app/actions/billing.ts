@@ -13,6 +13,7 @@ import {
   updateAsaasCustomer,
 } from '@/lib/asaas/client'
 import { computeRefundValue } from '@/lib/billing/refund-policy'
+import { maxInstallmentsFor, pixPriceBrl } from '@/lib/billing/pricing'
 import { humanizeAsaasError } from '@/lib/asaas/humanize-error'
 import { creditExpiresAt } from '@/lib/billing/config'
 import { logAuditEvent } from '@/lib/audit/log'
@@ -170,15 +171,23 @@ export async function createChargeAction(
   // pesquisa 2026-05-31). O checkout hospedado mostra só o método escolhido. O
   // webhook credita em PAYMENT_CONFIRMED **ou** PAYMENT_RECEIVED, então cartão
   // (confirma na autorização, instantâneo) credita na hora — sem mudar o webhook.
-  // Parcelamento (founder 2026-06-19): SÓ pacote grande + cartão pode parcelar,
-  // até 3x. Clamp server-side — a regra/limite NUNCA vêm do client (espelha o
-  // preço, que também vem do DB). PIX e demais SKUs ficam sempre em 1x à vista.
+  // Parcelamento (founder 2026-06-19): cartão pode parcelar SEM juros — médio
+  // até 2x, grande até 3x (lib/billing/pricing). Clamp server-side — a regra/
+  // limite NUNCA vêm do client (espelha o preço, que também vem do DB). PIX e
+  // demais SKUs ficam sempre em 1x à vista.
   const maxInstallments =
-    parsed.data.billingType === 'CREDIT_CARD' && pkg.sku === 'grande' ? 3 : 1
+    parsed.data.billingType === 'CREDIT_CARD' ? maxInstallmentsFor(pkg.sku) : 1
   const installmentCount = Math.min(
     Math.max(parsed.data.installments ?? 1, 1),
     maxInstallments,
   )
+
+  // Desconto PIX (founder 2026-06-19): 5% no PIX só em médio+grande
+  // (lib/billing/pricing). Cartão (à vista ou parcelado) paga o preço cheio.
+  // `paidBrl` = valor REALMENTE cobrado → gravado em paid_brl (reembolso/receita).
+  const isPix = parsed.data.billingType === 'PIX'
+  const chargeBrl = isPix ? pixPriceBrl(pkg.sku, pkg.price_brl) : pkg.price_brl
+  const paidBrl = installmentCount > 1 ? pkg.price_brl : chargeBrl
 
   const baseInput = {
     customer: asaasCustomerId,
@@ -189,11 +198,12 @@ export async function createChargeAction(
     })`,
     externalReference: pendingCredit.id,
   }
-  // Parcelado (doc Asaas): installmentCount + totalValue, SEM value. À vista: só value.
+  // Parcelado (doc Asaas): installmentCount + totalValue (preço cheio), SEM value.
+  // À vista: só value (com desconto PIX quando aplicável).
   const paymentInput =
     installmentCount > 1
       ? { ...baseInput, installmentCount, totalValue: pkg.price_brl }
-      : { ...baseInput, value: pkg.price_brl }
+      : { ...baseInput, value: chargeBrl }
 
   // Callback de auto-retorno pós-pagamento (item 3): só é enviado se o domínio
   // do successUrl estiver cadastrado na conta Asaas (Configurações → Integrações).
@@ -227,6 +237,7 @@ export async function createChargeAction(
       asaas_installment_id: payment.data.installment ?? null,
       asaas_invoice_url: payment.data.invoiceUrl ?? null,
       asaas_payment_status: payment.data.status ?? null,
+      paid_brl: paidBrl, // valor real cobrado (com desconto PIX quando aplicável)
     })
     .eq('id', pendingCredit.id)
     .eq('user_id', profile.id) // defensive
@@ -277,17 +288,21 @@ export async function refundPackageAction(
   const { data: credit, error: selErr } = await supabase
     .from('customer_credits')
     .select(
-      'id, user_id, asaas_payment_id, asaas_installment_id, purchase_date, leituras_purchased, leituras_remaining, leituras_reserved, status, credit_packages(name, price_brl)',
+      'id, user_id, asaas_payment_id, asaas_installment_id, paid_brl, purchase_date, leituras_purchased, leituras_remaining, leituras_reserved, status, credit_packages(name, price_brl)',
     )
     .eq('id', parsed.data.credit_id)
     .maybeSingle()
   if (selErr || !credit) return { ok: false, error: 'Crédito não encontrado.' }
 
-  // 2. Política de refund (pura)
+  // 2. Política de refund (pura). Base = valor REALMENTE pago (paid_brl, que pode
+  //    ter desconto PIX); compras antigas sem paid_brl caem no preço de tabela.
+  const listPriceBrl = (
+    credit as unknown as { credit_packages: { price_brl: number } }
+  ).credit_packages.price_brl
+  const paidBaseBrl = credit.paid_brl ?? listPriceBrl
   const policy = computeRefundValue({
     purchase_date: credit.purchase_date,
-    price_brl: (credit as unknown as { credit_packages: { price_brl: number } }).credit_packages
-      .price_brl,
+    price_brl: paidBaseBrl,
     leituras_purchased: credit.leituras_purchased,
     leituras_remaining: credit.leituras_remaining,
     leituras_reserved: credit.leituras_reserved,

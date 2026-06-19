@@ -655,6 +655,7 @@ export type Database = {
           leituras_remaining: number
           leituras_reserved: number
           package_id: string
+          paid_brl: number | null
           purchase_date: string
           status: string
           user_id: string
@@ -671,6 +672,7 @@ export type Database = {
           leituras_remaining: number
           leituras_reserved?: number
           package_id: string
+          paid_brl?: number | null
           purchase_date?: string
           status?: string
           user_id: string
@@ -687,6 +689,7 @@ export type Database = {
           leituras_remaining?: number
           leituras_reserved?: number
           package_id?: string
+          paid_brl?: number | null
           purchase_date?: string
           status?: string
           user_id?: string

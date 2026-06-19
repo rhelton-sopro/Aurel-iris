@@ -288,7 +288,7 @@ export async function applyPaymentEvent(
       service
         .from('customer_credits')
         .select(
-          'id, user_id, leituras_purchased, leituras_remaining, status, credit_packages(price_brl, leituras_count)',
+          'id, user_id, paid_brl, leituras_purchased, leituras_remaining, status, credit_packages(price_brl, leituras_count)',
         )
         .eq(col, val)
         .maybeSingle(),
@@ -346,8 +346,12 @@ export async function applyPaymentEvent(
       // Poison-pill: dados do pacote ausentes — retry não resolve (WR-05).
       return { applied: false, reason: 'invalid_payload', detail: 'missing_package' }
     }
-    // CR-03: base ÚNICA compartilhada com refund-policy.ts (path manual).
-    const unitPrice = unitPriceBrl(pkg.price_brl, pkg.leituras_count)
+    // CR-03: base ÚNICA compartilhada com refund-policy.ts (path manual). Usa o
+    // valor REALMENTE pago (paid_brl, com desconto PIX); rows antigas sem
+    // paid_brl caem no preço de tabela.
+    const paidBaseBrl =
+      (credit as unknown as { paid_brl: number | null }).paid_brl ?? pkg.price_brl
+    const unitPrice = unitPriceBrl(paidBaseBrl, pkg.leituras_count)
     const leiturasDeviasDebitar = Math.round(totalRefundedBrl / unitPrice)
 
     // Quanto já foi debitado em refunds prévios? Soma absoluta dos amounts type='refund'.

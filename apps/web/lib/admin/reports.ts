@@ -410,7 +410,10 @@ export async function fetchRevenue(range: DateRange): Promise<RevenueStats> {
 
   const { data: creditsData } = await service
     .from('customer_credits')
-    .select('id, credit_packages(sku, price_brl, leituras_count)')
+    .select('id, paid_brl, credit_packages(sku, price_brl, leituras_count)')
+  // price_brl aqui = valor REALMENTE pago (paid_brl, com desconto PIX); compras
+  // antigas sem paid_brl caem no preço de tabela. Mantém o nome do campo p/ não
+  // mexer no resto da função.
   interface CreditMeta { sku: string; price_brl: number; leituras_count: number }
   const creditMeta = new Map<string, CreditMeta>()
   for (const c of creditsData ?? []) {
@@ -418,9 +421,10 @@ export async function fetchRevenue(range: DateRange): Promise<RevenueStats> {
       | { sku: string | null; price_brl: number | null; leituras_count: number | null }
       | null
     if (!pkg) continue
+    const paid = (c as { paid_brl: number | null }).paid_brl
     creditMeta.set(c.id as string, {
       sku: pkg.sku ?? 'desconhecido',
-      price_brl: numOrZero(pkg.price_brl),
+      price_brl: paid != null ? numOrZero(paid) : numOrZero(pkg.price_brl),
       leituras_count: pkg.leituras_count ?? 0,
     })
   }
