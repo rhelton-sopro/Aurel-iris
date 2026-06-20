@@ -38,12 +38,17 @@ vi.mock('@/lib/supabase/service', () => ({
 // client Asaas direto — mockamos o provedor ativo.
 const createChargeMock = vi.fn()
 const refundChargeMock = vi.fn()
+const notifyRefundRequestMock = vi.fn((..._args: unknown[]) => Promise.resolve())
 vi.mock('@/lib/payments', () => ({
   getPaymentProvider: () => ({
     name: 'mercadopago',
     createCharge: createChargeMock,
     refundCharge: refundChargeMock,
   }),
+}))
+vi.mock('@/lib/notifications/notify-refund-request', () => ({
+  // wrapper lazy: acessa o mock só quando chamado (evita TDZ no hoisting do vi.mock)
+  notifyRefundRequest: (...args: unknown[]) => notifyRefundRequestMock(...args),
 }))
 vi.mock('@/lib/audit/log', () => ({ logAuditEvent: vi.fn() }))
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }))
@@ -223,7 +228,7 @@ describe('refundPackageAction', () => {
       credit_id: '11111111-1111-4111-8111-111111111111',
     })
     expect(r.ok).toBe(true)
-    if (r.ok) {
+    if (r.ok && r.mode === 'refunded') {
       expect(r.kind).toBe('total')
       // refund total → amountBrl undefined
       expect(refundChargeMock).toHaveBeenCalledWith(
@@ -233,6 +238,8 @@ describe('refundPackageAction', () => {
           amountBrl: undefined,
         }),
       )
+    } else {
+      throw new Error('esperava mode=refunded')
     }
   })
 
@@ -245,7 +252,7 @@ describe('refundPackageAction', () => {
     if (!r.ok) expect(r.error).toContain('não encontrado')
   })
 
-  it('partial refund sends amountBrl to provider', async () => {
+  it('partial refund → solicitação ao suporte (não executa estorno)', async () => {
     const recent = new Date(Date.now() - 86400000).toISOString()
     selectChain.maybeSingle.mockResolvedValueOnce({
       data: {
@@ -258,28 +265,32 @@ describe('refundPackageAction', () => {
         leituras_remaining: 3,
         leituras_reserved: 0,
         status: 'active',
-        credit_packages: { price_brl: 298.5 },
+        credit_packages: { name: 'Médio', price_brl: 298.5 },
       },
       error: null,
     })
-    refundChargeMock.mockResolvedValueOnce({ ok: true, data: undefined })
+    // 2º maybeSingle: profiles.full_name (service client) p/ o email ao suporte
+    selectChain.maybeSingle.mockResolvedValueOnce({ data: { full_name: 'Maria Silva' } })
     const r = await refundPackageAction({
       credit_id: '11111111-1111-4111-8111-111111111111',
     })
     expect(r.ok).toBe(true)
-    if (r.ok) {
-      expect(r.kind).toBe('partial')
-      expect(r.refunded_value_brl).toBe(179.1)
-      const call = refundChargeMock.mock.calls[0]
-      expect((call?.[0] as { amountBrl: number }).amountBrl).toBe(179.1)
-      // Fix pacote-fantasma: parcial manual também marca refunded (sai de "ativo").
-      expect(serviceUpdateMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          status: 'refunded',
-          leituras_remaining: 0,
-          leituras_reserved: 0,
-        }),
-      )
+    if (r.ok && r.mode === 'requested') {
+      expect(r.value_brl).toBe(179.1)
+      expect(r.leituras_to_refund).toBe(3)
+    } else {
+      throw new Error('esperava mode=requested')
     }
+    // não executa estorno no provedor (é manual via suporte)
+    expect(refundChargeMock).not.toHaveBeenCalled()
+    // envia o demonstrativo ao suporte (2 usadas, 3 a devolver, R$59,70/leitura)
+    expect(notifyRefundRequestMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        refundValueBrl: 179.1,
+        leiturasToRefund: 3,
+        leiturasUsed: 2,
+        unitPriceBrl: 59.7,
+      }),
+    )
   })
 })

@@ -59,15 +59,21 @@ export function RefundPackageButton(props: Props) {
         toast.error(r.error)
         return
       }
-      toast.success(
-        `Reembolso solicitado — R$ ${formatBrl(r.refunded_value_brl)} (${
-          r.kind === 'total' ? 'integral' : 'proporcional'
-        })`,
-        {
-          description:
-            'O valor retorna ao método original: PIX em até 1 dia útil, cartão na próxima fatura.',
-        },
-      )
+      if (r.mode === 'refunded') {
+        toast.success(
+          `Reembolso integral de R$ ${formatBrl(r.refunded_value_brl)} processado`,
+          {
+            description:
+              'O valor retorna ao método original: PIX em até 1 dia útil, cartão na próxima fatura.',
+          },
+        )
+      } else {
+        toast.success('Solicitação de reembolso enviada ao suporte', {
+          description: `Vamos processar o estorno de R$ ${formatBrl(
+            r.value_brl,
+          )} (${r.leituras_to_refund} leituras restantes) em até 2 dias úteis.`,
+        })
+      }
       setOpen(false)
     })
   }
@@ -108,12 +114,20 @@ export function RefundPackageButton(props: Props) {
                 </>
               )}
             </p>
-            <p className="text-xs text-muted-foreground">
-              O crédito será zerado imediatamente. O valor retorna ao método
-              original: <strong>PIX em até 1 dia útil</strong>;{' '}
-              <strong>cartão na próxima fatura</strong> (pode levar 1–2 ciclos,
-              conforme o banco emissor).
-            </p>
+            {policy.kind === 'total' ? (
+              <p className="text-xs text-muted-foreground">
+                O crédito será zerado e o valor retorna ao método original:{' '}
+                <strong>PIX em até 1 dia útil</strong>;{' '}
+                <strong>cartão na próxima fatura</strong> (pode levar 1–2 ciclos,
+                conforme o banco emissor).
+              </p>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Sua solicitação será <strong>encaminhada ao suporte</strong> e
+                processada em até <strong>2 dias úteis</strong>. O valor retorna ao
+                método original (PIX/cartão).
+              </p>
+            )}
             <div className="flex justify-end gap-2">
               <Button
                 type="button"
@@ -132,7 +146,11 @@ export function RefundPackageButton(props: Props) {
                 disabled={isPending}
                 aria-busy={isPending}
               >
-                {isPending ? 'Processando…' : 'Confirmar reembolso'}
+                {isPending
+                  ? 'Processando…'
+                  : policy.kind === 'total'
+                    ? 'Confirmar reembolso'
+                    : 'Enviar solicitação'}
               </Button>
             </div>
           </div>

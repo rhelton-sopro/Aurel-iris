@@ -39,5 +39,8 @@ export type CreateChargeResult =
   | { ok: false; error: string }
 
 export type RefundPackageResult =
-  | { ok: true; refunded_value_brl: number; kind: 'total' | 'partial' }
+  // total (0 leituras usadas) → estornado na hora via API
+  | { ok: true; mode: 'refunded'; refunded_value_brl: number; kind: 'total' }
+  // parcial (já usou leituras) → solicitação enviada ao suporte (estorno manual no MP)
+  | { ok: true; mode: 'requested'; value_brl: number; leituras_to_refund: number }
   | { ok: false; error: string }

@@ -11,6 +11,7 @@ import { maxInstallmentsFor, pixPriceBrl } from '@/lib/billing/pricing'
 import { creditExpiresAt } from '@/lib/billing/config'
 import { logAuditEvent } from '@/lib/audit/log'
 import { notifyRefundProcessed } from '@/lib/notifications/notify-refund-processed'
+import { notifyRefundRequest } from '@/lib/notifications/notify-refund-request'
 import { cpfDigits } from '@/lib/auth/cpf'
 import { phoneDigits } from '@/lib/auth/phone'
 import { cepDigits } from '@/lib/profile/fields'
@@ -270,45 +271,79 @@ export async function refundPackageAction(
     return { ok: false, error: msg }
   }
 
-  // 2b. Estorno PARCIAL: NÃO pré-bloqueamos por dia-calendário (founder
-  // 2026-06-01). O gate REAL do provedor é SALDO LIQUIDADO — deixamos o provedor
-  // ser o juiz: tentamos e, se recusar por saldo, a mensagem humanizada do
-  // adaptador devolve o motivo claro.
+  const service = createServiceClient()
+  const pkgName = (credit as unknown as { credit_packages: { name: string } })
+    .credit_packages.name
 
-  // 3. Refund no provedor ativo — total (sem valor) ou parcial (com valor).
+  // 3. PARCIAL (cliente já usou leituras): NÃO executa o estorno. Calcula o
+  //    demonstrativo e envia ao suporte (suporte@iriscodex.com); o suporte
+  //    estorna manual no MP e o webhook PARTIALLY_REFUNDED reconcilia o crédito
+  //    (founder 2026-06-20). Só o TOTAL (0 usadas) segue self-service via API.
+  if (policy.kind === 'partial') {
+    const usadas = credit.leituras_purchased - policy.leituras_to_refund
+    const { data: prof } = await service
+      .from('profiles')
+      .select('full_name')
+      .eq('id', user.id)
+      .maybeSingle()
+    await logAuditEvent({
+      event_type: 'credit.refund_requested',
+      actor_user_id: user.id,
+      actor_email: user.email,
+      target_type: 'credit',
+      target_id: credit.id,
+      metadata: {
+        kind: 'partial',
+        value_brl: policy.value_brl,
+        leituras_to_refund: policy.leituras_to_refund,
+        leituras_usadas: usadas,
+      },
+    })
+    // Email ao suporte — best-effort, não bloqueia o retorno.
+    void notifyRefundRequest({
+      therapistName: prof?.full_name ?? null,
+      therapistEmail: user.email!,
+      packageName: pkgName,
+      paidBrl: paidBaseBrl,
+      leiturasPurchased: credit.leituras_purchased,
+      leiturasUsed: usadas,
+      leiturasToRefund: policy.leituras_to_refund,
+      refundValueBrl: policy.value_brl,
+      unitPriceBrl: policy.unit_price_brl,
+      paymentId: credit.asaas_payment_id,
+      purchaseDate: credit.purchase_date,
+      creditId: credit.id,
+    }).catch((err) =>
+      console.warn(
+        '[billing] notify refund request failed (non-fatal):',
+        err instanceof Error ? err.message : err,
+      ),
+    )
+    console.info(
+      `[billing] REFUND_REQUESTED credit=${credit.id} value=${policy.value_brl} leituras=${policy.leituras_to_refund}`,
+    )
+    return {
+      ok: true,
+      mode: 'requested',
+      value_brl: policy.value_brl,
+      leituras_to_refund: policy.leituras_to_refund,
+    }
+  }
+
+  // 4. TOTAL (0 usadas) → estorno na hora via API do provedor ativo. O webhook
+  //    PAYMENT_REFUNDED também reconcilia; aqui é proativo.
   if (!credit.asaas_payment_id) {
     return { ok: false, error: 'Pagamento não associado.' }
-  }
-  // Compra PARCELADA no Asaas (cartão grande até 3x): cada parcela é um payment
-  // próprio; o estorno parcial do grupo não é suportado pelo endpoint de grupo →
-  // fica como tratamento manual via suporte. (No MP não há grupo: parcelado é 1
-  // payment, asaas_installment_id é null e este guard não dispara.)
-  const isInstallment = !!credit.asaas_installment_id
-  if (isInstallment && policy.kind !== 'total') {
-    return {
-      ok: false,
-      error:
-        'Reembolso parcial de compra parcelada precisa ser feito pelo suporte. Fale com a gente que resolvemos.',
-    }
   }
   const provider = getPaymentProvider()
   const refund = await provider.refundCharge({
     providerPaymentId: credit.asaas_payment_id,
     groupId: credit.asaas_installment_id,
-    isInstallment,
-    amountBrl: policy.kind === 'total' ? undefined : policy.value_brl,
-    description:
-      policy.kind === 'total'
-        ? undefined
-        : `Iris Codex — arrependimento 7d (${policy.leituras_to_refund} leituras restantes)`,
+    isInstallment: !!credit.asaas_installment_id,
+    amountBrl: undefined, // total
   })
   if (!refund.ok) return { ok: false, error: refund.error }
 
-  // 4. Estado local — o webhook PAYMENT_REFUNDED/PARTIALLY_REFUNDED também
-  //    reconcilia; aqui é proativo. Total E parcial marcam status='refunded' +
-  //    zeram saldo (no path manual o "parcial" reembolsa TODAS as leituras não
-  //    usadas → o pacote está liquidado e sai de "ativo"). .eq('user_id') defensive.
-  const service = createServiceClient()
   await service
     .from('customer_credits')
     .update({ status: 'refunded', leituras_remaining: 0, leituras_reserved: 0 })
@@ -320,9 +355,8 @@ export async function refundPackageAction(
     type: 'refund',
     amount: -policy.leituras_to_refund,
     asaas_payment_id: credit.asaas_payment_id,
-    notes: `D-13 arrependimento ${policy.kind}; valor R$ ${policy.value_brl.toFixed(2)}`,
+    notes: `D-13 arrependimento total; valor R$ ${policy.value_brl.toFixed(2)}`,
   })
-
   await logAuditEvent({
     event_type: 'credit.refunded',
     actor_user_id: user.id,
@@ -330,18 +364,17 @@ export async function refundPackageAction(
     target_type: 'credit',
     target_id: credit.id,
     metadata: {
-      kind: policy.kind,
+      kind: 'total',
       value_brl: policy.value_brl,
       leituras_refunded: policy.leituras_to_refund,
       manual: true,
     },
   })
-
   console.info(
-    `[billing] REFUND_PROCESSED credit=${credit.id} kind=${policy.kind} value=${policy.value_brl}`,
+    `[billing] REFUND_PROCESSED credit=${credit.id} kind=total value=${policy.value_brl}`,
   )
 
-  // Email recibo — BEST-EFFORT, fire-and-forget. Falha não bloqueia o retorno.
+  // Email recibo ao cliente — BEST-EFFORT, fire-and-forget.
   void (async () => {
     const { data: prof } = await service
       .from('profiles')
@@ -351,10 +384,9 @@ export async function refundPackageAction(
     await notifyRefundProcessed({
       userEmail: user.email!,
       userName: prof?.full_name ?? null,
-      packageName: (credit as unknown as { credit_packages: { name: string } })
-        .credit_packages.name,
+      packageName: pkgName,
       refundValueBrl: policy.value_brl,
-      kind: policy.kind,
+      kind: 'total',
       leiturasRefunded: policy.leituras_to_refund,
     })
   })().catch((err) =>
@@ -365,5 +397,10 @@ export async function refundPackageAction(
   )
 
   revalidatePath('/assinatura')
-  return { ok: true, refunded_value_brl: policy.value_brl, kind: policy.kind }
+  return {
+    ok: true,
+    mode: 'refunded',
+    refunded_value_brl: policy.value_brl,
+    kind: 'total',
+  }
 }

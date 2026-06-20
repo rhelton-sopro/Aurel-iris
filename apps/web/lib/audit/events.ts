@@ -20,6 +20,7 @@ export type AuditEventType =
   | 'credit.consumed'
   | 'credit.released'
   | 'credit.refunded'
+  | 'credit.refund_requested' // parcial: solicitação enviada ao suporte (estorno manual)
   | 'credit.expired'
   | 'credit.expiring_warning' // WARN-4: notificação 30/7/0 dias antes do expired terminal
   | 'trial.started'
@@ -44,6 +45,7 @@ export const AUDIT_EVENT_TYPES: ReadonlySet<AuditEventType> = new Set([
   'credit.consumed',
   'credit.released',
   'credit.refunded',
+  'credit.refund_requested',
   'credit.expired',
   'credit.expiring_warning',
   'trial.started',
