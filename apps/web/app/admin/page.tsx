@@ -29,6 +29,12 @@ const SECTIONS: Array<{
       'Métricas gerenciais do beta: funil de leituras, qualidade das fotos (aproveitamento da captura), custo AI e throughput por terapeuta. Filtro por data.',
   },
   {
+    href: '/admin/suporte',
+    title: 'Caixa de suporte',
+    description:
+      'Emails recebidos em suporte@iriscodex.com (Hostinger) — inclui as solicitações de reembolso parcial. Leia sem sair do painel; o estorno é manual no Mercado Pago.',
+  },
+  {
     href: '/admin/regenerar',
     title: 'Regeneração',
     description:
