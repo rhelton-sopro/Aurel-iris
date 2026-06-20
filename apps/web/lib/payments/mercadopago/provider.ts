@@ -77,9 +77,11 @@ export const mercadoPagoProvider: PaymentProvider = {
       statement_descriptor: 'IRISCODEX',
       payment_methods: {
         // installments = TETO de parcelas (1/2/3 por SKU, clampado por billing.ts).
-        // "sem juros" mora na config da CONTA (não na API). default 1 = à vista.
+        // default_installments = abre o checkout JÁ no nº que o cliente escolheu na
+        // nossa tela (founder 2026-06-20: escolhia 2x/3x e o MP abria em 1x). "sem
+        // juros" mora na config da CONTA (não na API).
         installments: params.installments,
-        default_installments: 1,
+        default_installments: params.installments,
         excluded_payment_types: isPix ? EXCLUDE_FOR_PIX : EXCLUDE_FOR_CARD,
       },
       metadata: { credit_id: params.creditId, sku: params.sku },

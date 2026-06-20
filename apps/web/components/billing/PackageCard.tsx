@@ -59,11 +59,11 @@ export function PackageCard(props: Props) {
   const [installments, setInstallments] = useState(1)
   const maxInst = maxInstallmentsFor(props.sku)
   const canParcel = maxInst > 1 && method === 'CREDIT_CARD'
-  // Desconto PIX (5% em médio+grande). displayPrice reage ao método escolhido.
+  // Desconto PIX (5% em médio+grande). Comunicado como bônus à vista embaixo — o
+  // DESTAQUE do card é o parcelamento sem juros (founder 2026-06-20).
   const pixEligible = hasPixDiscount(props.sku)
   const pixPrice = pixPriceBrl(props.sku, props.priceBrl)
-  const showPixPrice = method === 'PIX' && pixEligible
-  const displayPrice = showPixPrice ? pixPrice : props.priceBrl
+  const canShowInstallments = maxInst > 1
 
   function chooseMethod(value: 'PIX' | 'CREDIT_CARD') {
     setMethod(value)
@@ -118,15 +118,19 @@ export function PackageCard(props: Props) {
 
       <div className="my-4 flex-1">
         <p className="text-3xl font-bold tracking-tight text-ink">
-          R$ {formatBrl(displayPrice)}
+          R$ {formatBrl(props.priceBrl)}
         </p>
-        {showPixPrice ? (
-          <p className="mt-0.5 text-xs font-medium text-teal-dark">
-            {PIX_DISCOUNT_LABEL} de desconto no PIX (de R$ {formatBrl(props.priceBrl)})
+        {/* Parcelamento sem juros em DESTAQUE (founder 2026-06-20): no ticket alto
+            o gancho é "cabe no bolso"; o PIX 5% vem como bônus à vista abaixo. */}
+        {canShowInstallments ? (
+          <p className="mt-1 text-sm font-semibold text-teal-dark">
+            em até {maxInst}x de R$ {formatBrl(props.priceBrl / maxInst)} sem juros
           </p>
-        ) : pixEligible ? (
-          <p className="mt-0.5 text-xs font-medium text-teal-dark">
-            À vista no PIX: R$ {formatBrl(pixPrice)} ({PIX_DISCOUNT_LABEL} off)
+        ) : null}
+        {pixEligible ? (
+          <p className="mt-0.5 text-xs font-medium text-muted-foreground">
+            ou <span className="text-teal-dark">{PIX_DISCOUNT_LABEL} no PIX</span>: R${' '}
+            {formatBrl(pixPrice)}
           </p>
         ) : null}
         {props.leiturasCount > 1 ? (
