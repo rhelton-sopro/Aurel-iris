@@ -8,7 +8,7 @@ import { PackageCard } from './PackageCard'
 
 export interface CreditPackage {
   id: string
-  sku: 'avulsa' | 'pequeno' | 'medio' | 'grande'
+  sku: 'avulsa' | 'pequeno' | 'medio' | 'grande' | 'teste' // 'teste' = UAT efêmero
   name: string
   leituras_count: number
   price_brl: number

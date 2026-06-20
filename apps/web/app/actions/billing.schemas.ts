@@ -6,7 +6,9 @@
 import { z } from 'zod'
 
 export const createChargeSchema = z.object({
-  sku: z.enum(['avulsa', 'pequeno', 'medio', 'grande']),
+  // 'teste' = SKU EFÊMERO de UAT (R$5, 1 leitura). Remover do enum + desativar no
+  // banco após validar o fluxo de compra em produção (founder 2026-06-20).
+  sku: z.enum(['avulsa', 'pequeno', 'medio', 'grande', 'teste']),
   // Método escolhido pelo cliente na NOSSA tela (B-lite, founder 2026-05-31):
   // SÓ PIX ou cartão — NUNCA UNDEFINED/BOLETO. O /payments aceita 1 billingType
   // por cobrança e não existe valor "PIX+cartão" (doc Asaas criar-nova-cobranca),

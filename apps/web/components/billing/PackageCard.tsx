@@ -24,7 +24,7 @@ import {
 import { cn } from '@/lib/utils'
 
 interface Props {
-  sku: 'avulsa' | 'pequeno' | 'medio' | 'grande'
+  sku: 'avulsa' | 'pequeno' | 'medio' | 'grande' | 'teste' // 'teste' = UAT efêmero
   name: string
   leiturasCount: number
   priceBrl: number
