@@ -54,11 +54,11 @@ export function PackageCard(props: Props) {
   // B-lite: cliente escolhe PIX ou cartão AQUI; passamos o billingType específico
   // pra cobrança Asaas → checkout hospedado mostra só esse método (boleto nunca).
   const [method, setMethod] = useState<'PIX' | 'CREDIT_CARD'>('PIX')
-  // Parcelas no cartão (founder 2026-06-19): médio até 2x, grande até 3x
-  // (lib/billing/pricing). A action re-clampa no servidor; aqui é só UX.
-  const [installments, setInstallments] = useState(1)
+  // Parcelamento (médio até 2x, grande até 3x — lib/billing/pricing). O cliente
+  // NÃO escolhe o nº de parcelas aqui: o Checkout Pro do MP não pré-trava (abre
+  // sempre em 1x), então mandamos o TETO do SKU e ele escolhe 1..teto no checkout.
+  // O card só COMUNICA "em até Nx sem juros" (founder 2026-06-20).
   const maxInst = maxInstallmentsFor(props.sku)
-  const canParcel = maxInst > 1 && method === 'CREDIT_CARD'
   // Desconto PIX (5% em médio+grande). Comunicado como bônus à vista embaixo — o
   // DESTAQUE do card é o parcelamento sem juros (founder 2026-06-20).
   const pixEligible = hasPixDiscount(props.sku)
@@ -67,7 +67,6 @@ export function PackageCard(props: Props) {
 
   function chooseMethod(value: 'PIX' | 'CREDIT_CARD') {
     setMethod(value)
-    if (value !== 'CREDIT_CARD') setInstallments(1) // PIX nunca parcela
   }
 
   function handleBuy() {
@@ -76,7 +75,8 @@ export function PackageCard(props: Props) {
         sku: props.sku,
         billingType: method,
         reading_id: props.readingId,
-        installments: canParcel ? installments : undefined,
+        // Teto de parcelas do SKU (cliente escolhe quantas no checkout do MP).
+        installments: method === 'CREDIT_CARD' && maxInst > 1 ? maxInst : undefined,
       })
       if (!r.ok) {
         toast.error(r.error)
@@ -179,43 +179,12 @@ export function PackageCard(props: Props) {
         })}
       </div>
 
-      {/* Parcelamento sem juros — médio até 2x, grande até 3x (cartão). */}
-      {canParcel ? (
-        <div className="mb-2">
-          <div
-            role="radiogroup"
-            aria-label="Parcelas"
-            className={cn('grid gap-1', maxInst === 2 ? 'grid-cols-2' : 'grid-cols-3')}
-          >
-            {Array.from({ length: maxInst }, (_, i) => i + 1).map((n) => {
-              const active = installments === n
-              return (
-                <button
-                  key={n}
-                  type="button"
-                  role="radio"
-                  aria-checked={active}
-                  disabled={isPending}
-                  onClick={() => setInstallments(n)}
-                  className={cn(
-                    'rounded-[2px] border px-2 py-1.5 text-[11px] font-medium uppercase tracking-label transition-colors',
-                    active
-                      ? 'border-teal-dark bg-teal-dark/5 text-teal-dark'
-                      : 'border-border text-muted-foreground hover:border-teal-dark/40',
-                  )}
-                  data-testid={`installments-${n}-${props.sku}`}
-                >
-                  {n}x
-                </button>
-              )
-            })}
-          </div>
-          <p className="mt-1 text-center text-[11px] text-muted-foreground">
-            {installments > 1
-              ? `${installments}x de R$ ${formatBrl(props.priceBrl / installments)} sem juros`
-              : 'à vista'}
-          </p>
-        </div>
+      {/* Parcelas (cartão): escolhidas pelo cliente no checkout do MP — aqui só
+          informamos. O Checkout Pro não pré-trava o nº de parcelas. */}
+      {canShowInstallments && method === 'CREDIT_CARD' ? (
+        <p className="mb-2 text-center text-[11px] text-muted-foreground">
+          parcele em até {maxInst}x sem juros no checkout
+        </p>
       ) : null}
 
       <Button
