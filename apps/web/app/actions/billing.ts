@@ -5,16 +5,9 @@ import { revalidatePath } from 'next/cache'
 
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
-import {
-  createAsaasCustomer,
-  createAsaasPayment,
-  refundAsaasPayment,
-  refundAsaasInstallment,
-  updateAsaasCustomer,
-} from '@/lib/asaas/client'
+import { getPaymentProvider } from '@/lib/payments'
 import { computeRefundValue } from '@/lib/billing/refund-policy'
 import { maxInstallmentsFor, pixPriceBrl } from '@/lib/billing/pricing'
-import { humanizeAsaasError } from '@/lib/asaas/humanize-error'
 import { creditExpiresAt } from '@/lib/billing/config'
 import { logAuditEvent } from '@/lib/audit/log'
 import { notifyRefundProcessed } from '@/lib/notifications/notify-refund-processed'
@@ -32,11 +25,12 @@ import {
 } from './billing.schemas'
 
 /**
- * Compra de pacote (D-01/D-02). Cria customer Asaas (1ª vez) → INSERT
- * customer_credits status='pending' → cria payment Asaas com a row como
- * externalReference (idempotência do webhook 08-04) → retorna invoiceUrl.
+ * Compra de pacote (D-01/D-02). INSERT customer_credits status='pending' → cria
+ * a cobrança no provedor ATIVO (PAYMENT_PROVIDER: Asaas dormente / Mercado Pago)
+ * usando a row como externalReference (idempotência do webhook) → retorna a URL
+ * de redirect (invoiceUrl Asaas / init_point MP).
  *
- * leituras_remaining fica 0 até o webhook PAYMENT_CONFIRMED ativar (A1=confirmed):
+ * leituras_remaining fica 0 até o webhook confirmar o pagamento (A1=confirmed):
  * créditos só liberam após pagamento confirmado.
  */
 export async function createChargeAction(
@@ -79,64 +73,18 @@ export async function createChargeAction(
 
   const service = createServiceClient()
 
-  // 4. Asaas customer — criar se ausente (CPF/phone NUNCA logados — T-08-06-04)
-  let asaasCustomerId = profile.asaas_customer_id
-  if (!asaasCustomerId) {
-    const cust = await createAsaasCustomer({
-      name: profile.full_name ?? user.email ?? 'Terapeuta',
-      cpfCnpj: cpfDigits(profile.cpf),
-      email: user.email ?? '',
-      // CR-01: telefone tem sanitizador próprio (strip não-dígitos), NUNCA
-      // reusa cpfDigits — desacopla dois campos não relacionados (mudança futura
-      // em cpfDigits, ex. validar 11 dígitos de CPF, corromperia o telefone).
-      mobilePhone: phoneDigits(profile.phone),
-      externalReference: profile.id,
-      // Endereço (Fase 8) — o gate garante que existe antes de chegar aqui.
-      // Sem ele, com NF-e ligada, o Asaas recusa o cartão. Cidade/UF o Asaas
-      // deriva do CEP.
-      postalCode: profile.cep ? cepDigits(profile.cep) : undefined,
-      address: profile.address ?? undefined,
-      addressNumber: profile.address_number ?? undefined,
-      complement: profile.address_complement ?? undefined,
-      province: profile.district ?? undefined,
-    })
-    if (!cust.ok) {
-      console.error('[billing] createAsaasCustomer failed:', cust.error)
-      return { ok: false, error: humanizeAsaasError(cust.error) }
-    }
-    asaasCustomerId = cust.data.id
-    await service
-      .from('profiles')
-      .update({ asaas_customer_id: asaasCustomerId })
-      .eq('id', profile.id)
-  } else if (profile.cep) {
-    // Cliente JÁ existe: o create acima não roda, então o endereço não seria
-    // (re)enviado. Sincroniza ANTES de cobrar — sem isso, com NF-e ligada, o
-    // Asaas recusa o cartão de quem se cadastrou antes da feature de endereço.
-    // Best-effort: falha não bloqueia a compra (só loga). Cidade/UF o Asaas
-    // deriva do CEP.
-    const upd = await updateAsaasCustomer(asaasCustomerId, {
-      postalCode: cepDigits(profile.cep),
-      address: profile.address ?? undefined,
-      addressNumber: profile.address_number ?? undefined,
-      complement: profile.address_complement ?? undefined,
-      province: profile.district ?? undefined,
-    })
-    if (!upd.ok) {
-      console.error('[billing] asaas address sync failed:', upd.error)
-    }
-  }
-
-  // 5. INSERT customer_credits pending ANTES do payment — precisa do id como
-  //    externalReference. expires_at é placeholder (12m); webhook reseta a
-  //    partir de confirmed_at quando ativa (D-03).
+  // 4. INSERT customer_credits pending ANTES da cobrança — precisa do id como
+  //    externalReference (idempotência do webhook). expires_at é placeholder
+  //    (12m); o webhook reseta a partir de confirmed_at quando ativa (D-03).
+  //    Reordenado vs. a versão Asaas-inline: o customer persistente (Asaas) agora
+  //    é criado dentro do adaptador; a compensação (delete) cobre falha lá.
   const { data: pendingCredit, error: insErr } = await service
     .from('customer_credits')
     .insert({
       user_id: profile.id,
       package_id: pkg.id,
       leituras_purchased: pkg.leituras_count,
-      leituras_remaining: 0, // vira pkg.leituras_count no webhook PAYMENT_CONFIRMED
+      leituras_remaining: 0, // vira pkg.leituras_count quando o webhook confirma
       leituras_reserved: 0,
       expires_at: creditExpiresAt(new Date()).toISOString(),
       status: 'pending',
@@ -148,15 +96,24 @@ export async function createChargeAction(
     return { ok: false, error: 'Erro interno ao registrar compra.' }
   }
 
-  // 6. Asaas payment
-  const dueDate = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10)
-  // Retorno pós-pagamento (D-23): se a compra veio de uma leitura (banner "sem
-  // créditos"), o cliente volta pra ESSA leitura — pronta pra gerar. Senão, volta
-  // pra /assinatura (saldo). autoRedirect=true: Asaas devolve sozinho ao confirmar.
-  // `||` (não `??`): env vazio ('') TAMBÉM cai no fallback apex. `??` só pega
-  // null/undefined → um NEXT_PUBLIC_SITE_URL='' geraria successUrl sem host e o
-  // Asaas rejeitaria o callback (flash "an error"). Garante host mesmo com env
-  // ilegível/ausente. Domínio a cadastrar no Asaas = iriscodex.com (apex).
+  // 5. Preço de venda. Clamp server-side — regra/limite NUNCA vêm do client
+  //    (espelha o preço, que também vem do DB). Parcelamento sem juros: cartão
+  //    médio até 2x, grande até 3x (lib/billing/pricing); PIX e demais 1x à vista.
+  const maxInstallments =
+    parsed.data.billingType === 'CREDIT_CARD' ? maxInstallmentsFor(pkg.sku) : 1
+  const installmentCount = Math.min(
+    Math.max(parsed.data.installments ?? 1, 1),
+    maxInstallments,
+  )
+  // Desconto PIX (5% médio+grande); cartão (à vista/parcelado) paga o cheio.
+  // `paidBrl` = valor REALMENTE cobrado → paid_brl (reembolso/receita).
+  const isPix = parsed.data.billingType === 'PIX'
+  const chargeBrl = isPix ? pixPriceBrl(pkg.sku, pkg.price_brl) : pkg.price_brl
+  const paidBrl = installmentCount > 1 ? pkg.price_brl : chargeBrl
+
+  // Retorno pós-pagamento (D-23): se veio de uma leitura (banner "sem créditos"),
+  // volta pra ESSA leitura; senão pra /assinatura. `||` (não `??`): env vazio
+  // também cai no apex.
   const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://iriscodex.com').replace(
     /\/$/,
     '',
@@ -165,82 +122,74 @@ export async function createChargeAction(
     ? `${siteUrl}/leituras/${parsed.data.reading_id}`
     : `${siteUrl}/assinatura`
 
-  // B-lite (founder 2026-05-31): o cliente escolheu PIX ou cartão na NOSSA tela;
-  // passamos o billingType específico. Boleto NUNCA é oferecido (não existe
-  // billingType "PIX+cartão", e o painel Asaas não tem toggle p/ conta de API —
-  // pesquisa 2026-05-31). O checkout hospedado mostra só o método escolhido. O
-  // webhook credita em PAYMENT_CONFIRMED **ou** PAYMENT_RECEIVED, então cartão
-  // (confirma na autorização, instantâneo) credita na hora — sem mudar o webhook.
-  // Parcelamento (founder 2026-06-19): cartão pode parcelar SEM juros — médio
-  // até 2x, grande até 3x (lib/billing/pricing). Clamp server-side — a regra/
-  // limite NUNCA vêm do client (espelha o preço, que também vem do DB). PIX e
-  // demais SKUs ficam sempre em 1x à vista.
-  const maxInstallments =
-    parsed.data.billingType === 'CREDIT_CARD' ? maxInstallmentsFor(pkg.sku) : 1
-  const installmentCount = Math.min(
-    Math.max(parsed.data.installments ?? 1, 1),
-    maxInstallments,
-  )
-
-  // Desconto PIX (founder 2026-06-19): 5% no PIX só em médio+grande
-  // (lib/billing/pricing). Cartão (à vista ou parcelado) paga o preço cheio.
-  // `paidBrl` = valor REALMENTE cobrado → gravado em paid_brl (reembolso/receita).
-  const isPix = parsed.data.billingType === 'PIX'
-  const chargeBrl = isPix ? pixPriceBrl(pkg.sku, pkg.price_brl) : pkg.price_brl
-  const paidBrl = installmentCount > 1 ? pkg.price_brl : chargeBrl
-
-  const baseInput = {
-    customer: asaasCustomerId,
+  // 6. Cria a cobrança no provedor ativo. Asaas e Mercado Pago atrás do mesmo
+  //    contrato (lib/payments) — o adaptador cuida das diferenças (customer
+  //    persistente + endereço no Asaas; preference no MP). PIX/cartão é a escolha
+  //    da nossa tela; o adaptador restringe os métodos do checkout.
+  const provider = getPaymentProvider()
+  const charge = await provider.createCharge({
+    creditId: pendingCredit.id,
+    sku: pkg.sku,
+    packageName: pkg.name,
+    leiturasCount: pkg.leituras_count,
     billingType: parsed.data.billingType,
-    dueDate,
+    installments: installmentCount,
+    chargeBrl,
+    totalBrl: pkg.price_brl,
     description: `Iris Codex — ${pkg.name} (${pkg.leituras_count} ${
       pkg.leituras_count === 1 ? 'leitura' : 'leituras'
     })`,
-    externalReference: pendingCredit.id,
-  }
-  // Parcelado (doc Asaas): installmentCount + totalValue (preço cheio), SEM value.
-  // À vista: só value (com desconto PIX quando aplicável).
-  const paymentInput =
-    installmentCount > 1
-      ? { ...baseInput, installmentCount, totalValue: pkg.price_brl }
-      : { ...baseInput, value: chargeBrl }
-
-  // Callback de auto-retorno pós-pagamento (item 3): só é enviado se o domínio
-  // do successUrl estiver cadastrado na conta Asaas (Configurações → Integrações).
-  // Sem cadastro, o Asaas rejeita a cobrança INTEIRA com invalid_object ("nenhum
-  // domínio configurado"). Gated por ASAAS_CALLBACK_ENABLED (runtime, sem prefixo
-  // NEXT_PUBLIC — lê em call-time, liga sem rebuild): default OFF → 1 chamada só,
-  // sem callback, compra direta. Quando o founder cadastrar o domínio, seta a
-  // flag=true na Vercel e o auto-retorno liga (successUrl intacto, só destravado).
-  const callbackEnabled = process.env.ASAAS_CALLBACK_ENABLED === 'true'
-  const payment = await createAsaasPayment(
-    callbackEnabled
-      ? { ...paymentInput, callback: { successUrl, autoRedirect: true } }
-      : paymentInput,
-  )
-  if (!payment.ok) {
-    // Compensação: Asaas rejeitou → remove a row pendente órfã
+    successUrl,
+    payer: {
+      profileId: profile.id,
+      // CPF/telefone NUNCA logados (T-08-06-04). cpfDigits/phoneDigits são
+      // sanitizadores próprios e desacoplados (CR-01).
+      name: profile.full_name ?? user.email ?? 'Terapeuta',
+      email: user.email ?? '',
+      cpf: cpfDigits(profile.cpf),
+      phone: phoneDigits(profile.phone),
+      address: profile.cep
+        ? {
+            cep: cepDigits(profile.cep),
+            street: profile.address ?? undefined,
+            number: profile.address_number ?? undefined,
+            complement: profile.address_complement ?? undefined,
+            district: profile.district ?? undefined,
+          }
+        : undefined,
+    },
+    providerCustomerId: profile.asaas_customer_id ?? null,
+  })
+  if (!charge.ok) {
+    // Compensação: provedor rejeitou → remove a row pendente órfã.
     await service.from('customer_credits').delete().eq('id', pendingCredit.id)
-    return { ok: false, error: humanizeAsaasError(payment.error) }
+    return { ok: false, error: charge.error }
   }
 
-  // 7. Liga o payment à row (asaas_payment_id UNIQUE — idempotência webhook).
-  //    Parcelado: guarda também o grupo `installment` (payment.data.installment).
-  //    `payment.data.id` é a 1ª parcela; cada parcela dispara webhooks com id
-  //    PRÓPRIO — o handler casa por payment_id OU installment_id (apply-payment),
-  //    e o refund de parcelado usa o grupo (refundAsaasInstallment). À vista:
-  //    installment vem ausente → NULL.
+  // 7. Liga a cobrança à row (asaas_payment_id UNIQUE — idempotência webhook).
+  //    Colunas `asaas_*` reaproveitadas como "provider_*" (sem renomear — evita
+  //    migration). Asaas: providerPaymentId = payment.id (1ª parcela), groupId =
+  //    grupo installment. MP: providerPaymentId = preference.id (o payment.id
+  //    real chega no webhook), groupId = null. Persistir o customer do provedor
+  //    em profiles se o adaptador criou um novo (Asaas 1ª compra).
   await service
     .from('customer_credits')
     .update({
-      asaas_payment_id: payment.data.id,
-      asaas_installment_id: payment.data.installment ?? null,
-      asaas_invoice_url: payment.data.invoiceUrl ?? null,
-      asaas_payment_status: payment.data.status ?? null,
-      paid_brl: paidBrl, // valor real cobrado (com desconto PIX quando aplicável)
+      asaas_payment_id: charge.data.providerPaymentId,
+      asaas_installment_id: charge.data.groupId,
+      asaas_invoice_url: charge.data.redirectUrl,
+      asaas_payment_status: charge.data.status,
+      paid_brl: paidBrl,
     })
     .eq('id', pendingCredit.id)
     .eq('user_id', profile.id) // defensive
+
+  if (charge.data.providerCustomerId) {
+    await service
+      .from('profiles')
+      .update({ asaas_customer_id: charge.data.providerCustomerId })
+      .eq('id', profile.id)
+  }
 
   await logAuditEvent({
     event_type: 'credit.purchase_initiated',
@@ -248,29 +197,32 @@ export async function createChargeAction(
     actor_email: user.email,
     target_type: 'credit',
     target_id: pendingCredit.id,
-    metadata: { sku: pkg.sku, asaas_payment_id: payment.data.id, value_brl: pkg.price_brl },
+    metadata: {
+      sku: pkg.sku,
+      asaas_payment_id: charge.data.providerPaymentId,
+      value_brl: pkg.price_brl,
+      provider: provider.name,
+    },
   })
 
   console.info(
-    `[billing] CHARGE_CREATED user=${profile.id} sku=${pkg.sku} payment=${payment.data.id}`,
+    `[billing] CHARGE_CREATED user=${profile.id} sku=${pkg.sku} payment=${charge.data.providerPaymentId} provider=${provider.name}`,
   )
   // NÃO revalidar /assinatura aqui: o crédito ainda é 'pending' (nada muda no
-  // saldo) e o cliente é redirecionado JÁ pro checkout Asaas. revalidatePath
-  // forçava um re-render da rota atual que corria com o window.location.href
-  // (hard nav) → exceção client transiente ("Application error" pisca antes do
-  // Asaas). Quem revalida o saldo é o webhook PAYMENT_CONFIRMED (pós-pagamento).
+  // saldo) e o cliente é redirecionado JÁ pro checkout. Quem revalida o saldo é
+  // o webhook ao confirmar (pós-pagamento).
   return {
     ok: true,
     credit_id: pendingCredit.id,
-    invoice_url: payment.data.invoiceUrl ?? '',
-    asaas_payment_id: payment.data.id,
+    invoice_url: charge.data.redirectUrl,
+    asaas_payment_id: charge.data.providerPaymentId,
   }
 }
 
 /**
  * Reembolso por arrependimento CDC 7d (D-13). SELECT via session client
- * (RLS bloqueia cross-tenant — T-08-06-05) → computeRefundValue → Asaas
- * refund (body vazio = total, com value = parcial) → estado local + ledger.
+ * (RLS bloqueia cross-tenant — T-08-06-05) → computeRefundValue → refund no
+ * provedor ativo (total/parcial) → estado local + ledger.
  */
 export async function refundPackageAction(
   input: RefundPackageInput,
@@ -318,27 +270,19 @@ export async function refundPackageAction(
     return { ok: false, error: msg }
   }
 
-  // 2b. Estorno PARCIAL: NÃO pré-bloqueamos mais por dia-calendário (founder
-  // 2026-06-01). O gate REAL do Asaas é SALDO LIQUIDADO — o PIX recebido precisa
-  // cair no saldo disponível antes de poder ser estornado, e isso segue DIA ÚTIL
-  // (liquidação), não calendário. Em vez de adivinhar dia útil/feriado aqui,
-  // deixamos o Asaas ser o juiz: tentamos o estorno e, se ele recusar por saldo
-  // ou "próximo dia", humanizeAsaasError já devolve a mensagem clara (ramos
-  // 'parcial…próximo dia' e /saldo/ em lib/asaas/humanize-error.ts). Num dia útil
-  // com o valor liquidado, o parcial passa. (isPartialRefundBlockedToday segue
-  // exportada+testada documentando o fato empírico do Asaas, mas fora do fluxo.)
+  // 2b. Estorno PARCIAL: NÃO pré-bloqueamos por dia-calendário (founder
+  // 2026-06-01). O gate REAL do provedor é SALDO LIQUIDADO — deixamos o provedor
+  // ser o juiz: tentamos e, se recusar por saldo, a mensagem humanizada do
+  // adaptador devolve o motivo claro.
 
-  // 3. Asaas refund — body undefined = total, com value = parcial (D-13)
+  // 3. Refund no provedor ativo — total (sem valor) ou parcial (com valor).
   if (!credit.asaas_payment_id) {
-    return { ok: false, error: 'Pagamento Asaas não associado.' }
+    return { ok: false, error: 'Pagamento não associado.' }
   }
-  // Compra PARCELADA (cartão grande até 3x): cada parcela é um payment próprio;
-  // /payments/{id}/refund estornaria SÓ a 1ª parcela (auditoria 2026-06-19).
-  // - Total → estorna o GRUPO inteiro via /installments/{id}/refund.
-  // - Parcial → o endpoint de grupo não aceita valor parcial; refund parcial de
-  //   parcelado é raro (arrependimento CDC 7d com leituras já usadas) e fica como
-  //   tratamento manual via suporte (mensagem clara, sem estorno silenciosamente
-  //   incompleto). Limitação registrada em memory project_asaas_parcelamento_grande_3x.
+  // Compra PARCELADA no Asaas (cartão grande até 3x): cada parcela é um payment
+  // próprio; o estorno parcial do grupo não é suportado pelo endpoint de grupo →
+  // fica como tratamento manual via suporte. (No MP não há grupo: parcelado é 1
+  // payment, asaas_installment_id é null e este guard não dispara.)
   const isInstallment = !!credit.asaas_installment_id
   if (isInstallment && policy.kind !== 'total') {
     return {
@@ -347,29 +291,23 @@ export async function refundPackageAction(
         'Reembolso parcial de compra parcelada precisa ser feito pelo suporte. Fale com a gente que resolvemos.',
     }
   }
-  const refundBody =
-    policy.kind === 'total'
-      ? undefined
-      : {
-          value: policy.value_brl,
-          description: `Iris Codex — arrependimento 7d (${policy.leituras_to_refund} leituras restantes)`,
-        }
-  const refund = isInstallment
-    ? await refundAsaasInstallment(credit.asaas_installment_id!)
-    : await refundAsaasPayment(credit.asaas_payment_id, refundBody)
-  if (!refund.ok) return { ok: false, error: humanizeAsaasError(refund.error) }
+  const provider = getPaymentProvider()
+  const refund = await provider.refundCharge({
+    providerPaymentId: credit.asaas_payment_id,
+    groupId: credit.asaas_installment_id,
+    isInstallment,
+    amountBrl: policy.kind === 'total' ? undefined : policy.value_brl,
+    description:
+      policy.kind === 'total'
+        ? undefined
+        : `Iris Codex — arrependimento 7d (${policy.leituras_to_refund} leituras restantes)`,
+  })
+  if (!refund.ok) return { ok: false, error: refund.error }
 
-  // 4. Estado local — webhook PAYMENT_REFUNDED/PARTIALLY_REFUNDED também
-  //    reconcilia (08-04); aqui é proativo. .eq('user_id') defensive.
-  //
-  // Total E parcial marcam status='refunded' + zeram saldo. No path MANUAL
-  // (arrependimento CDC 7d) o "parcial" reembolsa TODAS as leituras não usadas
-  // (remaining+reserved → 0): nada sobra, o pacote está liquidado e NÃO pode
-  // seguir como "ativo". Sem o status, /assinatura (filtra status active/pending)
-  // mostrava "Ativo · 0/N disponíveis" = pacote ativo FANTASMA. Difere do webhook
-  // PARTIALLY_REFUNDED genérico (apply-payment.ts:347), que pode deixar
-  // remaining>0 e mantém active — lá faz sentido; aqui não. O webhook posterior
-  // é no-op: jaDebitado já cobre o delta (apply-payment.ts:333), não toca status.
+  // 4. Estado local — o webhook PAYMENT_REFUNDED/PARTIALLY_REFUNDED também
+  //    reconcilia; aqui é proativo. Total E parcial marcam status='refunded' +
+  //    zeram saldo (no path manual o "parcial" reembolsa TODAS as leituras não
+  //    usadas → o pacote está liquidado e sai de "ativo"). .eq('user_id') defensive.
   const service = createServiceClient()
   await service
     .from('customer_credits')
@@ -403,8 +341,7 @@ export async function refundPackageAction(
     `[billing] REFUND_PROCESSED credit=${credit.id} kind=${policy.kind} value=${policy.value_brl}`,
   )
 
-  // Email recibo — BEST-EFFORT, fire-and-forget. Falha não bloqueia o retorno
-  // da action nem afeta o estado do refund (já aplicado acima).
+  // Email recibo — BEST-EFFORT, fire-and-forget. Falha não bloqueia o retorno.
   void (async () => {
     const { data: prof } = await service
       .from('profiles')

@@ -34,20 +34,21 @@ vi.mock('@/lib/supabase/service', () => ({
     }),
   }),
 }))
-vi.mock('@/lib/asaas/client', () => ({
-  createAsaasCustomer: vi.fn(),
-  createAsaasPayment: vi.fn(),
-  refundAsaasPayment: vi.fn(),
+// billing.ts agora fala com a camada gateway-agnóstica (lib/payments), não com o
+// client Asaas direto — mockamos o provedor ativo.
+const createChargeMock = vi.fn()
+const refundChargeMock = vi.fn()
+vi.mock('@/lib/payments', () => ({
+  getPaymentProvider: () => ({
+    name: 'mercadopago',
+    createCharge: createChargeMock,
+    refundCharge: refundChargeMock,
+  }),
 }))
 vi.mock('@/lib/audit/log', () => ({ logAuditEvent: vi.fn() }))
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }))
 
 import { createChargeAction, refundPackageAction } from '../billing'
-import {
-  createAsaasCustomer,
-  createAsaasPayment,
-  refundAsaasPayment,
-} from '@/lib/asaas/client'
 
 describe('createChargeAction', () => {
   beforeEach(() => {
@@ -81,7 +82,7 @@ describe('createChargeAction', () => {
     if (!r.ok) expect(r.error).toContain('Complete CPF')
   })
 
-  it('happy path: creates Asaas customer + payment + credit row', async () => {
+  it('happy path: inserts pending credit + creates charge via provider', async () => {
     selectChain.maybeSingle
       .mockResolvedValueOnce({
         data: { id: 'pkg1', sku: 'medio', name: 'Médio', leituras_count: 15, price_brl: 745.5 },
@@ -95,26 +96,65 @@ describe('createChargeAction', () => {
           full_name: 'X',
         },
       })
-    vi.mocked(createAsaasCustomer).mockResolvedValueOnce({
-      ok: true,
-      data: { id: 'cus_1' } as never,
-    })
     insertChain.single.mockResolvedValueOnce({ data: { id: 'credit-1' }, error: null })
-    vi.mocked(createAsaasPayment).mockResolvedValueOnce({
+    createChargeMock.mockResolvedValueOnce({
       ok: true,
-      data: { id: 'pay_1', invoiceUrl: 'https://asaas/i/x', status: 'PENDING' } as never,
+      data: {
+        providerPaymentId: 'pay_1',
+        groupId: null,
+        redirectUrl: 'https://mp/i/x',
+        status: null,
+        providerCustomerId: null,
+      },
     })
 
     const r = await createChargeAction({ sku: 'medio', billingType: 'PIX' })
     expect(r.ok).toBe(true)
     if (r.ok) {
-      expect(r.invoice_url).toBe('https://asaas/i/x')
+      expect(r.invoice_url).toBe('https://mp/i/x')
       expect(r.credit_id).toBe('credit-1')
       expect(r.asaas_payment_id).toBe('pay_1')
     }
+    // external_reference da cobrança = id da row pending
+    expect(createChargeMock).toHaveBeenCalledWith(
+      expect.objectContaining({ creditId: 'credit-1', billingType: 'PIX' }),
+    )
   })
 
-  it('rolls back credit insert if Asaas payment fails', async () => {
+  it('clamps installments por SKU (médio teto 2) e passa preço cheio no cartão', async () => {
+    selectChain.maybeSingle
+      .mockResolvedValueOnce({
+        data: { id: 'pkg1', sku: 'medio', name: 'Médio', leituras_count: 15, price_brl: 745.5 },
+      })
+      .mockResolvedValueOnce({
+        data: { id: 'u1', cpf: '12345678909', phone: '47999999999', asaas_customer_id: 'cus_1' },
+      })
+    insertChain.single.mockResolvedValueOnce({ data: { id: 'credit-2' }, error: null })
+    createChargeMock.mockResolvedValueOnce({
+      ok: true,
+      data: {
+        providerPaymentId: 'pref_1',
+        groupId: null,
+        redirectUrl: 'https://mp/i/y',
+        status: null,
+        providerCustomerId: null,
+      },
+    })
+
+    // cliente pede 3x no médio (zod permite até 3) — deve clampar pra 2 (teto do médio).
+    // Cartão não tem desconto PIX → chargeBrl = totalBrl = preço cheio.
+    const r = await createChargeAction({
+      sku: 'medio',
+      billingType: 'CREDIT_CARD',
+      installments: 3,
+    })
+    expect(r.ok).toBe(true)
+    expect(createChargeMock).toHaveBeenCalledWith(
+      expect.objectContaining({ installments: 2, totalBrl: 745.5, chargeBrl: 745.5 }),
+    )
+  })
+
+  it('rolls back pending credit if provider charge fails', async () => {
     selectChain.maybeSingle
       .mockResolvedValueOnce({
         data: { id: 'pkg1', sku: 'medio', leituras_count: 15, price_brl: 745.5 },
@@ -123,34 +163,12 @@ describe('createChargeAction', () => {
         data: { id: 'u1', cpf: '12345678909', phone: '47999999999', asaas_customer_id: 'cus_1' },
       })
     insertChain.single.mockResolvedValueOnce({ data: { id: 'credit-x' }, error: null })
-    vi.mocked(createAsaasPayment).mockResolvedValueOnce({
-      ok: false,
-      status: 400,
-      error: 'invalid customer',
-    })
+    createChargeMock.mockResolvedValueOnce({ ok: false, error: 'provedor recusou' })
 
     const r = await createChargeAction({ sku: 'medio', billingType: 'PIX' })
     expect(r.ok).toBe(false)
+    if (!r.ok) expect(r.error).toBe('provedor recusou')
     expect(deleteChain.eq).toHaveBeenCalledWith('id', 'credit-x')
-  })
-
-  it('errors (no row inserted) when Asaas customer creation fails', async () => {
-    selectChain.maybeSingle
-      .mockResolvedValueOnce({
-        data: { id: 'pkg1', sku: 'medio', leituras_count: 15, price_brl: 745.5 },
-      })
-      .mockResolvedValueOnce({
-        data: { id: 'u1', cpf: '12345678909', phone: '47999999999', asaas_customer_id: null },
-      })
-    vi.mocked(createAsaasCustomer).mockResolvedValueOnce({
-      ok: false,
-      status: 400,
-      error: 'cpfCnpj inválido',
-    })
-
-    const r = await createChargeAction({ sku: 'medio', billingType: 'PIX' })
-    expect(r.ok).toBe(false)
-    expect(insertChain.single).not.toHaveBeenCalled()
   })
 })
 
@@ -190,6 +208,7 @@ describe('refundPackageAction', () => {
         id: 'c1',
         user_id: 'u1',
         asaas_payment_id: 'pay_1',
+        asaas_installment_id: null,
         purchase_date: recent,
         leituras_purchased: 5,
         leituras_remaining: 5,
@@ -199,18 +218,21 @@ describe('refundPackageAction', () => {
       },
       error: null,
     })
-    vi.mocked(refundAsaasPayment).mockResolvedValueOnce({
-      ok: true,
-      data: { status: 'REFUNDED' } as never,
-    })
+    refundChargeMock.mockResolvedValueOnce({ ok: true, data: undefined })
     const r = await refundPackageAction({
       credit_id: '11111111-1111-4111-8111-111111111111',
     })
     expect(r.ok).toBe(true)
     if (r.ok) {
       expect(r.kind).toBe('total')
-      // refund total → body undefined (sem value)
-      expect(vi.mocked(refundAsaasPayment)).toHaveBeenCalledWith('pay_1', undefined)
+      // refund total → amountBrl undefined
+      expect(refundChargeMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          providerPaymentId: 'pay_1',
+          isInstallment: false,
+          amountBrl: undefined,
+        }),
+      )
     }
   })
 
@@ -223,13 +245,14 @@ describe('refundPackageAction', () => {
     if (!r.ok) expect(r.error).toContain('não encontrado')
   })
 
-  it('partial refund sends value in Asaas body', async () => {
+  it('partial refund sends amountBrl to provider', async () => {
     const recent = new Date(Date.now() - 86400000).toISOString()
     selectChain.maybeSingle.mockResolvedValueOnce({
       data: {
         id: 'c1',
         user_id: 'u1',
         asaas_payment_id: 'pay_1',
+        asaas_installment_id: null,
         purchase_date: recent,
         leituras_purchased: 5,
         leituras_remaining: 3,
@@ -239,10 +262,7 @@ describe('refundPackageAction', () => {
       },
       error: null,
     })
-    vi.mocked(refundAsaasPayment).mockResolvedValueOnce({
-      ok: true,
-      data: { status: 'REFUNDED' } as never,
-    })
+    refundChargeMock.mockResolvedValueOnce({ ok: true, data: undefined })
     const r = await refundPackageAction({
       credit_id: '11111111-1111-4111-8111-111111111111',
     })
@@ -250,9 +270,8 @@ describe('refundPackageAction', () => {
     if (r.ok) {
       expect(r.kind).toBe('partial')
       expect(r.refunded_value_brl).toBe(179.1)
-      const call = vi.mocked(refundAsaasPayment).mock.calls[0]
-      expect(call?.[0]).toBe('pay_1')
-      expect((call?.[1] as { value: number }).value).toBe(179.1)
+      const call = refundChargeMock.mock.calls[0]
+      expect((call?.[0] as { amountBrl: number }).amountBrl).toBe(179.1)
       // Fix pacote-fantasma: parcial manual também marca refunded (sai de "ativo").
       expect(serviceUpdateMock).toHaveBeenCalledWith(
         expect.objectContaining({
