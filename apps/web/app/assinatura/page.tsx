@@ -42,7 +42,10 @@ export default async function AssinaturaPage() {
         'id, status, purchase_date, expires_at, leituras_purchased, leituras_remaining, leituras_reserved, credit_packages(name, price_brl, sku)',
       )
       .eq('user_id', user.id)
-      .in('status', ['active', 'pending'])
+      // Só pacotes ATIVOS (pagos). Compras 'pending' (cobrança criada e não paga)
+      // não fazem sentido na lista — poluem com tentativas abandonadas (founder
+      // 2026-06-20). refunded/expired também ficam fora.
+      .eq('status', 'active')
       .order('purchase_date', { ascending: true }),
     listActiveReservations(user.id),
   ])
@@ -102,27 +105,21 @@ export default async function AssinaturaPage() {
                     {c.credit_packages.name}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Status:{' '}
-                    {c.status === 'pending' ? 'Aguardando pagamento' : 'Ativo'}
-                    {c.status === 'active'
-                      ? ` · ${c.leituras_remaining}/${c.leituras_purchased} disponíveis · expira em ${new Date(
-                          c.expires_at,
-                        ).toLocaleDateString('pt-BR')}`
-                      : ''}
+                    {c.leituras_remaining}/{c.leituras_purchased} disponíveis ·
+                    expira em{' '}
+                    {new Date(c.expires_at).toLocaleDateString('pt-BR')}
                   </p>
-                  {c.status === 'active' ? (
-                    <div className="mt-2">
-                      <RefundPackageButton
-                        creditId={c.id}
-                        purchaseDate={c.purchase_date}
-                        priceBrl={c.credit_packages.price_brl}
-                        leiturasPurchased={c.leituras_purchased}
-                        leiturasRemaining={c.leituras_remaining}
-                        leiturasReserved={c.leituras_reserved}
-                        status={c.status}
-                      />
-                    </div>
-                  ) : null}
+                  <div className="mt-2">
+                    <RefundPackageButton
+                      creditId={c.id}
+                      purchaseDate={c.purchase_date}
+                      priceBrl={c.credit_packages.price_brl}
+                      leiturasPurchased={c.leituras_purchased}
+                      leiturasRemaining={c.leituras_remaining}
+                      leiturasReserved={c.leituras_reserved}
+                      status={c.status}
+                    />
+                  </div>
                 </div>
               </li>
             ))}
