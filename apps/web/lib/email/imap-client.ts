@@ -31,6 +31,21 @@ function newClient(): ImapFlow {
   })
 }
 
+/** Conta emails NÃO-LIDOS no INBOX (leve — usa STATUS). 0 se não configurado/erro. */
+export async function getUnreadCount(): Promise<number> {
+  if (!imapConfigured()) return 0
+  const client = newClient()
+  try {
+    await client.connect()
+    const status = await client.status('INBOX', { unseen: true })
+    return status?.unseen ?? 0
+  } catch {
+    return 0
+  } finally {
+    await client.logout().catch(() => {})
+  }
+}
+
 /** Lista os últimos `limit` emails do INBOX (mais recentes primeiro). [] se não configurado. */
 export async function listSupportEmails(limit = 30): Promise<SupportEmailHeader[]> {
   if (!imapConfigured()) return []

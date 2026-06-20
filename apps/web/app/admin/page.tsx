@@ -3,6 +3,10 @@ import { notFound } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
 import { createClient } from '@/lib/supabase/server'
 import { isFounderEmail } from '@/lib/auth/founder'
+import { getAdminNotifications } from '@/lib/admin/notifications-summary'
+
+// IMAP (caixa de suporte) abre TCP — precisa do runtime nodejs.
+export const runtime = 'nodejs'
 
 // Portal index do /admin. Para adicionar uma nova seção: appende uma entry
 // neste array, nada mais.
@@ -58,6 +62,19 @@ export default async function AdminPortalPage() {
     notFound()
   }
 
+  const notif = await getAdminNotifications()
+  const cards: Array<{
+    label: string
+    count: number
+    href: string
+    alert: boolean
+  }> = [
+    { label: 'Emails não lidos', count: notif.unreadEmails, href: '/admin/suporte', alert: notif.unreadEmails > 0 },
+    { label: 'Reembolsos pendentes', count: notif.pendingRefunds, href: '/admin/suporte', alert: notif.pendingRefunds > 0 },
+    { label: 'Compras hoje', count: notif.purchasesToday, href: '/admin/relatorios', alert: false },
+    { label: 'Falhas', count: notif.failures, href: '/admin/relatorios', alert: notif.failures > 0 },
+  ]
+
   return (
     <div className="space-y-6">
       <div>
@@ -65,6 +82,24 @@ export default async function AdminPortalPage() {
         <p className="text-sm text-muted-foreground">
           Ferramentas de administração restritas ao founder.
         </p>
+      </div>
+
+      {/* Central de notificações: "o que chegou de importante". */}
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        {cards.map((c) => (
+          <Link
+            key={c.label}
+            href={c.href}
+            className={`rounded-md border px-4 py-3 transition-colors hover:bg-muted/40 ${
+              c.alert ? 'border-teal-dark/50 bg-teal-dark/5' : 'border-border bg-card'
+            }`}
+          >
+            <p className={`text-2xl font-bold ${c.alert ? 'text-teal-dark' : 'text-foreground'}`}>
+              {c.count}
+            </p>
+            <p className="mt-0.5 text-xs text-muted-foreground">{c.label}</p>
+          </Link>
+        ))}
       </div>
 
       <ul className="space-y-3">
