@@ -8,6 +8,7 @@
   "outputDirectory": ".next",
   "crons": [
     { "path": "/api/cron/daily", "schedule": "0 5 * * *" },
-    { "path": "/api/cron/photo-ttl", "schedule": "0 * * * *" }
+    { "path": "/api/cron/photo-ttl", "schedule": "0 * * * *" },
+    { "path": "/api/cron/instagram-publish", "schedule": "0 * * * *" }
   ]
 }
