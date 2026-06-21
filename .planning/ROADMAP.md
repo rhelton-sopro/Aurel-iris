@@ -663,7 +663,7 @@ Fases v1 executam em ordem numérica: 1 → 2 → 4 → 5 → 6 → 7 → 7.1 �
 
 | Fase | Plans concluidos | Status | Concluida em |
 |-------|------------------|--------|--------------|
-| 12. Publicacao Instagram | 3/5 | Em execucao (12-02 token + 12-03 nucleo + 12-04 notificacoes /admin prontos; 12-01 db push pendente no founder) | 2026-06-21 |
+| 12. Publicacao Instagram | 3/5 | Em execucao (12-02 token + 12-03 nucleo + 12-04 notificacoes /admin prontos; 12-05 codigo do motor pronto [cron+actions+UI+testes] mas BLOCKING no Task 7 = founder conecta Meta/IG + smoke E2E; 12-01 db push pendente no founder) | 2026-06-21 |
 | 13. Cockpit do painel | 0/TBD | Nao iniciada | - |
 | 14. Loop de dados | 0/TBD | Nao iniciada | - |
 

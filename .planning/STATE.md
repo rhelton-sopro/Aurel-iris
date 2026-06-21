@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Motor de Conteudo
 status: executing
-stopped_at: "Phase 12 Plan 04 COMPLETE (falhas de publicação na central de notificações /admin: publishErrors conta social_posts status='erro' [IGPUB-06, D-04] + instagramAuthError lê app_settings.instagram_health [D-07] + card 'Falhas de publicação'; 6/6 test GREEN; sucesso silencioso D-05). Plan 01 ainda BLOCKING no founder db push 0049."
-last_updated: "2026-06-21T23:15:00.000Z"
-last_activity: 2026-06-21 -- Phase 12 Plan 04 completo (notifications-summary.ts ganha publishErrors+instagramAuthError best-effort + card no /admin + teste mockado 6/6 GREEN; 1 Rule 3 deviation = cliente untyped pra app_settings). Plan 05 next; Plan 01 awaiting founder db push (0049)
+stopped_at: "Phase 12 Plan 05 Tasks 1-6 DONE (código do motor: cron horário /api/cron/instagram-publish [8dcdd0b] + refresh/health no daily + flag instagram_health [c2c8dbc] + publishNowAction/reenqueuePostAction founder-gated [cd64336] + UI PostCard botões Publicar agora/Reenfileirar + branches erro/publicando [cfff387] + 2 testes mockados 4+4 GREEN [6557fbf, 204bea0]). Task 7 = CHECKPOINT BLOCKING no founder: bootstrap Meta/IG (conta Professional + app Meta + Instagram Tester + OAuth→token long-lived + envs Vercel + seed app_settings.instagram_token) + smoke E2E. SUMMARY 12-05 ainda NÃO criado (resume-signal: 'conectado'). Plan 01 ainda BLOCKING no founder db push 0049 (+ pnpm gen:types limpa 2 erros tsc transitórios em actions.ts)."
+last_updated: "2026-06-21T23:30:00.000Z"
+last_activity: 2026-06-21 -- Phase 12 Plan 05 Tasks 1-6 executados (6 commits atômicos; cron+token+actions+UI+2 testes GREEN). Task 7 parado em checkpoint:human-action (founder conecta Meta/IG + smoke E2E). 1 item deferido (test mock daily pré-existente). Plan 05 NÃO completo até 'conectado'
 progress:
   total_phases: 17
   completed_phases: 12
