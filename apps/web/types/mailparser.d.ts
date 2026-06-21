@@ -10,6 +10,14 @@ declare module 'mailparser' {
     value: EmailAddress[]
     text: string
   }
+  export interface Attachment {
+    filename?: string
+    contentType?: string
+    size?: number
+    content: Buffer
+    contentId?: string
+    cid?: string
+  }
   export interface ParsedMail {
     subject?: string
     from?: AddressObject
@@ -18,6 +26,7 @@ declare module 'mailparser' {
     text?: string
     html?: string | false
     textAsHtml?: string
+    attachments?: Attachment[]
   }
   export function simpleParser(
     source: Buffer | string | NodeJS.ReadableStream,

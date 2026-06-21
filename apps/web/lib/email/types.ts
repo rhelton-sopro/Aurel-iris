@@ -1,6 +1,20 @@
 // Tipos da caixa de suporte (IMAP). SEM 'server-only' — importável por client
 // components (a UI da inbox no admin). A implementação fica em imap-client.ts.
 
+export interface SupportMailbox {
+  path: string // caminho IMAP real (ex: "INBOX", "INBOX.Sent")
+  name: string // rótulo amigável
+  specialUse: string | null // \Sent \Trash \Drafts \Junk \Archive
+  unread: number
+}
+
+export interface SupportAttachment {
+  index: number // posição no array de anexos (pra download)
+  filename: string
+  contentType: string
+  size: number
+}
+
 export interface SupportEmailHeader {
   uid: number
   fromName: string
@@ -8,6 +22,7 @@ export interface SupportEmailHeader {
   subject: string
   date: string // ISO
   seen: boolean
+  hasAttachments: boolean
 }
 
 export interface SupportEmailBody {
@@ -18,4 +33,5 @@ export interface SupportEmailBody {
   date: string
   text: string
   html: string | null
+  attachments: SupportAttachment[]
 }
