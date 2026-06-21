@@ -485,16 +485,12 @@ Not a rename/refactor phase — greenfield wiring. Skipped (no pre-existing runt
 | A5 | nyquist_validation enabled (no config override read) | Validation | Low — confirm `.planning/config.json` |
 | A6 | Daily publish limit is low-risk at founder volume | Pitfall 4 | Medium — exact cap unclear (25/50/100); handle as retryable regardless |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Image format: PNG vs JPEG.** Meta docs say images must be **JPEG**. Seed carousel slides are `*.png`.
-   - Known: Meta lists JPEG; many integrations report PNG also works in practice but it's not guaranteed.
-   - Recommendation: **Plan a JPEG path** — either store/serve JPEG versions of slides, or add a conversion step. Verify empirically in the founder smoke test (D-08) with one PNG carousel; if it fails, convert. Flag as a content-pipeline rule.
-2. **Exact content-publishing daily limit (25 vs 50 vs 100).** Sources conflict.
-   - Recommendation: query `GET /{ig-user-id}/content_publishing_limit` at runtime; never hardcode; treat quota errors as retryable.
-3. **Graph API version to pin** (e.g. v21 vs v23).
-   - Recommendation: pin the latest stable `vXX.0` at plan time; verify against current Meta changelog.
-4. **`.planning/config.json` nyquist flag** — not read this session; confirm before finalizing Validation section scope.
+1. **Image format: PNG vs JPEG.** — **RESOLVED (policy):** Plan for JPEG (Meta docs list JPEG). The publisher does NOT convert in Phase 12 — it sends the public URL as-is and **classifies a format rejection as a permanent error** (visible + reenqueueable). Empirical check = founder smoke test (D-08) with one PNG carousel. If PNG fails in practice, serving/storing JPEG slides is a **content-pipeline rule outside Phase 12 code scope** (feed asset generation, not the publisher). Noted in 12-VALIDATION.md Manual-Only.
+2. **Exact content-publishing daily limit (25/50/100).** — **RESOLVED:** never hardcode. Quota/limit errors are treated as **retryable** (D-03 path); the plan may query `GET /{ig-user-id}/content_publishing_limit` at runtime. No fixed number is relied upon.
+3. **Graph API version to pin.** — **RESOLVED:** pin **`v23.0`** (used in Plan 02 `token.ts` and Plan 03 `publish.ts`). Single constant; re-verify against Meta changelog only if a call returns a version-deprecation error.
+4. **`.planning/config.json` nyquist flag.** — **RESOLVED:** confirmed `workflow.nyquist_validation: true`; 12-VALIDATION.md created and backfilled (`nyquist_compliant: true`).
 
 ---
 
