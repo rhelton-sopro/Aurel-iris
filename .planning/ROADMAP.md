@@ -600,7 +600,12 @@ See `.planning/phases/07.5-tendency-mapping-engine/07.5-CONTEXT.md` (a criar via
   4. Um reel (video 9:16, H.264) aprovado aparece no feed real do Instagram, publicado a partir do MP4 da URL publica (com poll de status do container ate ficar pronto).
   5. O post publicado sai com a caption + hashtags definidas no painel; apos publicar, o `social_posts` correspondente fica `publicado` com o permalink/ID do post gravado.
   6. Quando a publicacao falha, o post NAO entra em `publicado`, o motivo do erro fica registrado e visivel pro founder, e o post pode ser reenfileirado.
-**Plans**: TBD (planejar em `/gsd-plan-phase 12`; inclui pesquisa profunda da Instagram Content Publishing API + fluxo de container/poll/media_publish).
+**Plans**: 5 plans em 3 waves
+- [ ] 12-01-PLAN.md — Migration 0049 (colunas publish + estados publicando/erro + RPCs de claim/reaper) + bump SocialPostStatus
+- [ ] 12-02-PLAN.md — Modulo de token IG (app_settings store + refresh <10d + health-check)
+- [ ] 12-03-PLAN.md — Nucleo de publicacao (carrossel/reel-poll/imagem → media_publish + permalink + classificacao de erro)
+- [ ] 12-04-PLAN.md — Falhas de publicacao na central de notificacoes /admin + card
+- [ ] 12-05-PLAN.md — Cron horario + refresh no cron diario + "publicar agora" (founder-gated) + homework Meta/IG
 **UI hint**: no (cron server-side + server actions + env; a superficie de status no painel e detalhada na Fase 13. IGPUB-06 entrega apenas o registro minimo de erro/permalink no estado; o display polido e COCKPIT-03).
 
 ### Fase 13: Cockpit do painel
