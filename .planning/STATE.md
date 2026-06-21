@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Motor de Conteudo
 status: executing
-stopped_at: "Phase 12 Plan 03 COMPLETE (núcleo de publicação IG: publishDuePosts/publishPost + carrossel/reel-poll/imagem → media_publish + permalink + classificação D-03; 22/22 instagram GREEN). Plan 01 ainda BLOCKING no founder db push 0049."
-last_updated: "2026-06-21T23:09:00.263Z"
-last_activity: 2026-06-21 -- Phase 12 Plan 03 completo (lib/instagram/publish.ts + suite 10 casos + idempotência consumer-level; 22/22 GREEN); Plans 12-04/12-05 desbloqueados. Plan 01 awaiting founder db push (0049)
+stopped_at: "Phase 12 Plan 04 COMPLETE (falhas de publicação na central de notificações /admin: publishErrors conta social_posts status='erro' [IGPUB-06, D-04] + instagramAuthError lê app_settings.instagram_health [D-07] + card 'Falhas de publicação'; 6/6 test GREEN; sucesso silencioso D-05). Plan 01 ainda BLOCKING no founder db push 0049."
+last_updated: "2026-06-21T23:15:00.000Z"
+last_activity: 2026-06-21 -- Phase 12 Plan 04 completo (notifications-summary.ts ganha publishErrors+instagramAuthError best-effort + card no /admin + teste mockado 6/6 GREEN; 1 Rule 3 deviation = cliente untyped pra app_settings). Plan 05 next; Plan 01 awaiting founder db push (0049)
 progress:
   total_phases: 17
   completed_phases: 12
   total_plans: 129
-  completed_plans: 124
-  percent: 96
+  completed_plans: 125
+  percent: 97
 ---
 
 # Estado do projeto

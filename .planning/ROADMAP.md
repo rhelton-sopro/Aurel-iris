@@ -604,7 +604,7 @@ See `.planning/phases/07.5-tendency-mapping-engine/07.5-CONTEXT.md` (a criar via
 - [ ] 12-01-PLAN.md — Migration 0049 (colunas publish + estados publicando/erro + RPCs de claim/reaper) + bump SocialPostStatus
 - [x] 12-02-PLAN.md — Modulo de token IG (app_settings store + refresh <10d + health-check) ✓ 2026-06-21
 - [x] 12-03-PLAN.md — Nucleo de publicacao (carrossel/reel-poll/imagem → media_publish + permalink + classificacao de erro) ✓ 2026-06-21
-- [ ] 12-04-PLAN.md — Falhas de publicacao na central de notificacoes /admin + card
+- [x] 12-04-PLAN.md — Falhas de publicacao na central de notificacoes /admin + card ✓ 2026-06-21
 - [ ] 12-05-PLAN.md — Cron horario + refresh no cron diario + "publicar agora" (founder-gated) + homework Meta/IG
 **UI hint**: no (cron server-side + server actions + env; a superficie de status no painel e detalhada na Fase 13. IGPUB-06 entrega apenas o registro minimo de erro/permalink no estado; o display polido e COCKPIT-03).
 
@@ -663,7 +663,7 @@ Fases v1 executam em ordem numérica: 1 → 2 → 4 → 5 → 6 → 7 → 7.1 �
 
 | Fase | Plans concluidos | Status | Concluida em |
 |-------|------------------|--------|--------------|
-| 12. Publicacao Instagram | 2/5 | Em execucao (12-02 token + 12-03 nucleo de publicacao prontos; 12-01 db push pendente no founder) | 2026-06-21 |
+| 12. Publicacao Instagram | 3/5 | Em execucao (12-02 token + 12-03 nucleo + 12-04 notificacoes /admin prontos; 12-01 db push pendente no founder) | 2026-06-21 |
 | 13. Cockpit do painel | 0/TBD | Nao iniciada | - |
 | 14. Loop de dados | 0/TBD | Nao iniciada | - |
 

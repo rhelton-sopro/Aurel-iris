@@ -208,7 +208,7 @@ Excluídos explicitamente. Documentado para evitar reintrodução.
 | IGPUB-03 | Fase 12 | Pendente |
 | IGPUB-04 | Fase 12 | Pendente |
 | IGPUB-05 | Fase 12 | Pendente |
-| IGPUB-06 | Fase 12 | Pendente |
+| IGPUB-06 | Fase 12 | Concluido (12-03 grava permalink/erro; 12-04 expoe erro no /admin pra reenfileirar) |
 | COCKPIT-01 | Fase 13 | Pendente |
 | COCKPIT-02 | Fase 13 | Pendente |
 | COCKPIT-03 | Fase 13 | Pendente |
