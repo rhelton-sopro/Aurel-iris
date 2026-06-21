@@ -79,7 +79,11 @@ export default async function AdminPortalPage() {
     { label: 'Reembolsos pendentes', count: notif.pendingRefunds, href: '/admin/suporte', alert: notif.pendingRefunds > 0 },
     { label: 'Compras hoje', count: notif.purchasesToday, href: '/admin/relatorios', alert: false },
     { label: 'Compras travadas (+2h)', count: notif.stuckPending, href: '/admin/relatorios', alert: notif.stuckPending > 0 },
+    { label: 'Falhas de publicação', count: notif.publishErrors, href: '/admin/painel?status=erro', alert: notif.publishErrors > 0 },
   ]
+  if (notif.instagramAuthError) {
+    cards.push({ label: 'Conexão Instagram', count: 1, href: '/admin/painel', alert: true })
+  }
 
   return (
     <div className="space-y-6">
