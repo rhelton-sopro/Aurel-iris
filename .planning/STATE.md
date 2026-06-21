@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Motor de Conteudo
 status: executing
-stopped_at: "Phase 12 Plan 01 — Tasks 1-3 done, BLOCKING checkpoint Task 4 (founder db push 0049)"
-last_updated: "2026-06-21T22:53:00.000Z"
-last_activity: 2026-06-21 -- Phase 12 Plan 01 Tasks 1-3 committed; awaiting founder db push (0049)
+stopped_at: "Phase 12 Plan 02 COMPLETE (token IG: store + refresh <10d + health-check). Plan 01 ainda BLOCKING no founder db push 0049."
+last_updated: "2026-06-21T22:58:00.000Z"
+last_activity: 2026-06-21 -- Phase 12 Plan 02 completo (lib/instagram/token.ts + teste, 7/7 GREEN); Plan 01 awaiting founder db push (0049)
 progress:
   total_phases: 17
   completed_phases: 12
   total_plans: 129
-  completed_plans: 122
+  completed_plans: 123
   percent: 95
 ---
 

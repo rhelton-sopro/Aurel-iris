@@ -602,7 +602,7 @@ See `.planning/phases/07.5-tendency-mapping-engine/07.5-CONTEXT.md` (a criar via
   6. Quando a publicacao falha, o post NAO entra em `publicado`, o motivo do erro fica registrado e visivel pro founder, e o post pode ser reenfileirado.
 **Plans**: 5 plans em 3 waves
 - [ ] 12-01-PLAN.md — Migration 0049 (colunas publish + estados publicando/erro + RPCs de claim/reaper) + bump SocialPostStatus
-- [ ] 12-02-PLAN.md — Modulo de token IG (app_settings store + refresh <10d + health-check)
+- [x] 12-02-PLAN.md — Modulo de token IG (app_settings store + refresh <10d + health-check) ✓ 2026-06-21
 - [ ] 12-03-PLAN.md — Nucleo de publicacao (carrossel/reel-poll/imagem → media_publish + permalink + classificacao de erro)
 - [ ] 12-04-PLAN.md — Falhas de publicacao na central de notificacoes /admin + card
 - [ ] 12-05-PLAN.md — Cron horario + refresh no cron diario + "publicar agora" (founder-gated) + homework Meta/IG
