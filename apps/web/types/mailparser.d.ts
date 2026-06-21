@@ -23,6 +23,7 @@ declare module 'mailparser' {
     from?: AddressObject
     to?: AddressObject
     date?: Date
+    messageId?: string
     text?: string
     html?: string | false
     textAsHtml?: string

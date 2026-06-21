@@ -8,7 +8,9 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 import { fetchSupportEmailBody, markEmailSeen, deleteEmailAction } from './actions'
+import { ComposeForm, type ComposeInitial } from './ComposeForm'
 import type {
   SupportEmailHeader,
   SupportEmailBody,
@@ -25,6 +27,31 @@ function fmtSize(b: number): string {
   return `${(b / 1024 / 1024).toFixed(1)} MB`
 }
 
+function quote(body: SupportEmailBody): string {
+  const lines = (body.text || '').split('\n').map((l) => `> ${l}`).join('\n')
+  return `\n\n\n----- Em ${fmtDate(body.date)}, ${body.fromName} escreveu: -----\n${lines}`
+}
+function replyInitial(body: SupportEmailBody): ComposeInitial {
+  const s = body.subject || ''
+  return {
+    title: 'Responder',
+    to: body.fromAddress,
+    subject: /^re:/i.test(s) ? s : `Re: ${s}`,
+    text: quote(body),
+    inReplyTo: body.messageId,
+    references: body.messageId,
+  }
+}
+function forwardInitial(body: SupportEmailBody): ComposeInitial {
+  const s = body.subject || ''
+  return {
+    title: 'Encaminhar',
+    to: '',
+    subject: /^fwd:/i.test(s) ? s : `Fwd: ${s}`,
+    text: `\n\n----- Mensagem encaminhada -----\nDe: ${body.fromName} <${body.fromAddress}>\nData: ${fmtDate(body.date)}\nAssunto: ${body.subject}\n\n${body.text || ''}`,
+  }
+}
+
 interface Props {
   mailboxes: SupportMailbox[]
   emails: SupportEmailHeader[]
@@ -38,6 +65,7 @@ export function SupportInbox({ mailboxes, emails, currentMailbox }: Props) {
   const [bodyError, setBodyError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const [acting, startAction] = useTransition()
+  const [compose, setCompose] = useState<ComposeInitial | null>(null)
 
   function toggle(uid: number) {
     if (openUid === uid) {
@@ -79,7 +107,18 @@ export function SupportInbox({ mailboxes, emails, currentMailbox }: Props) {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-[180px_1fr]">
+    <div className="space-y-3">
+      <div className="flex justify-end">
+        <Button
+          type="button"
+          size="sm"
+          onClick={() => setCompose({ title: 'Escrever', to: '', subject: '', text: '' })}
+          className="bg-teal-dark text-white hover:bg-teal-dark/90"
+        >
+          ✎ Escrever
+        </Button>
+      </div>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-[180px_1fr]">
       {/* Pastas */}
       <aside className="space-y-1">
         {mailboxes.map((m) => {
@@ -148,7 +187,21 @@ export function SupportInbox({ mailboxes, emails, currentMailbox }: Props) {
                             <p className="text-xs text-muted-foreground">
                               De: {body.fromName} &lt;{body.fromAddress}&gt; · {fmtDate(body.date)}
                             </p>
-                            <div className="flex gap-2">
+                            <div className="flex flex-wrap gap-2">
+                              <button
+                                type="button"
+                                onClick={() => setCompose(replyInitial(body))}
+                                className="text-xs text-teal-dark underline hover:text-teal-dark/80"
+                              >
+                                Responder
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setCompose(forwardInitial(body))}
+                                className="text-xs text-muted-foreground underline hover:text-foreground"
+                              >
+                                Encaminhar
+                              </button>
                               <button
                                 type="button"
                                 onClick={() => markUnread(e.uid)}
@@ -207,6 +260,11 @@ export function SupportInbox({ mailboxes, emails, currentMailbox }: Props) {
           </ul>
         )}
       </div>
+      </div>
+
+      {compose ? (
+        <ComposeForm initial={compose} onClose={() => setCompose(null)} />
+      ) : null}
     </div>
   )
 }

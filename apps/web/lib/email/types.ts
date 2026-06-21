@@ -31,6 +31,7 @@ export interface SupportEmailBody {
   fromAddress: string
   subject: string
   date: string
+  messageId: string | null // pra threading (In-Reply-To/References ao responder)
   text: string
   html: string | null
   attachments: SupportAttachment[]

@@ -51,6 +51,29 @@ export async function getUnreadCount(): Promise<number> {
   }
 }
 
+/** Salva uma cópia (mensagem raw) na pasta Enviados. Best-effort. */
+export async function appendToSent(raw: Buffer): Promise<boolean> {
+  if (!imapConfigured()) return false
+  const client = newClient()
+  try {
+    await client.connect()
+    let sentPath: string | null = null
+    for (const b of await client.list()) {
+      if ((b.specialUse as string) === '\\Sent') {
+        sentPath = b.path
+        break
+      }
+    }
+    if (!sentPath) return false
+    await client.append(sentPath, raw, ['\\Seen'])
+    return true
+  } catch {
+    return false
+  } finally {
+    await client.logout().catch(() => {})
+  }
+}
+
 // Rótulos amigáveis por specialUse / nome.
 function mailboxLabel(path: string, specialUse: string | null): string {
   switch (specialUse) {
@@ -184,6 +207,7 @@ export async function getSupportEmailBody(
         fromAddress: from?.address || '',
         subject: parsed.subject || '(sem assunto)',
         date: parsed.date?.toISOString() ?? '',
+        messageId: parsed.messageId ?? null,
         text: parsed.text ?? '',
         html: typeof parsed.html === 'string' ? parsed.html : null,
         attachments,
