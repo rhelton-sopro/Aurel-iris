@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { isFounderEmail } from '@/lib/auth/founder'
+import { publishPost } from '@/lib/instagram/publish'
 import type { ActionResult } from '@/lib/admin/social-posts'
 
 // Server actions da fila de aprovação de conteúdo (/admin/painel). Migration 0045.
@@ -93,4 +94,48 @@ export async function commentPostAction(
   comment: string,
 ): Promise<ActionResult> {
   return patch(id, { comment: comment?.trim() || null })
+}
+
+/**
+ * "Publicar agora" (D-08): força a publicação imediata reusando o MESMO núcleo do
+ * cron (`publishPost`). Founder-gated; roda no contexto autenticado do founder
+ * (NÃO usa CRON_SECRET). Valida o id como uuid antes de chamar (RESEARCH §V5).
+ */
+export async function publishNowAction(id: string): Promise<ActionResult> {
+  const denied = await requireFounder()
+  if (denied) return denied
+  if (!id || !/^[0-9a-f-]{36}$/i.test(id)) {
+    return { ok: false, error: 'Post inválido.' }
+  }
+  const result = await publishPost(id)
+  revalidatePath(PAINEL_PATH)
+  return result.ok ? { ok: true } : { ok: false, error: result.error }
+}
+
+/**
+ * Reenfileira um post que falhou (D-04, IGPUB-06): de `erro` → `agendado`,
+ * zerando `publish_attempts` e limpando `publish_error` para que o próximo
+ * sweep do cron (ou "publicar agora") possa tentar de novo do zero.
+ * Founder-gated. Só age sobre posts em `erro` (não reseta tentativas de outros estados).
+ */
+export async function reenqueuePostAction(id: string): Promise<ActionResult> {
+  const denied = await requireFounder()
+  if (denied) return denied
+  if (!id) return { ok: false, error: 'Post inválido.' }
+
+  const service = createServiceClient()
+  const { error } = await service
+    .from('social_posts')
+    .update({
+      status: 'agendado',
+      publish_attempts: 0,
+      publish_error: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', id)
+    .eq('status', 'erro')
+  if (error) return { ok: false, error: error.message }
+
+  revalidatePath(PAINEL_PATH)
+  return { ok: true }
 }
