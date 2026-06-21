@@ -27,6 +27,8 @@ import {
   schedulePostAction,
   editCaptionAction,
   commentPostAction,
+  publishNowAction,
+  reenqueuePostAction,
 } from './actions'
 
 type Mode = null | 'edit' | 'comment' | 'schedule'
@@ -183,6 +185,12 @@ export function PostCard({ post }: { post: SocialPost }) {
                 'Post agendado.',
               )
             }}
+            onPublishNow={() =>
+              run(() => publishNowAction(post.id), 'Publicando agora…')
+            }
+            onReenqueue={() =>
+              run(() => reenqueuePostAction(post.id), 'Reenfileirado.')
+            }
           />
         </div>
       </div>
@@ -307,6 +315,8 @@ function Actions({
   onSaveCaption,
   onSaveComment,
   onSaveSchedule,
+  onPublishNow,
+  onReenqueue,
 }: {
   post: SocialPost
   mode: Mode
@@ -318,6 +328,8 @@ function Actions({
   onSaveCaption: () => void
   onSaveComment: () => void
   onSaveSchedule: () => void
+  onPublishNow: () => void
+  onReenqueue: () => void
 }) {
   const spin = isPending && <Loader2 className="h-4 w-4 animate-spin" />
 
@@ -362,6 +374,9 @@ function Actions({
       <>
         <StatusBar icon={<CheckCircle2 className="h-4 w-4" />}>Aprovado</StatusBar>
         <span className="ml-auto" />
+        <Btn primary onClick={onPublishNow} disabled={isPending}>
+          {spin || <Send className="h-4 w-4" />} Publicar agora
+        </Btn>
         <Btn onClick={() => setMode('schedule')} disabled={isPending}>
           <CalendarClock className="h-4 w-4" /> Agendar
         </Btn>
@@ -387,6 +402,9 @@ function Actions({
           )}
         </StatusBar>
         <span className="ml-auto" />
+        <Btn onClick={onPublishNow} disabled={isPending}>
+          {spin || <Send className="h-4 w-4" />} Publicar agora
+        </Btn>
         <Btn onClick={onBack} disabled={isPending}>
           {spin || <Undo2 className="h-4 w-4" />} Voltar p/ pendente
         </Btn>
@@ -394,8 +412,52 @@ function Actions({
     )
   }
 
-  if (post.status === 'publicado') {
+  if (post.status === 'publicando') {
     return (
+      <StatusBar icon={<Loader2 className="h-4 w-4 animate-spin" />}>
+        Publicando…
+      </StatusBar>
+    )
+  }
+
+  if (post.status === 'erro') {
+    return (
+      <>
+        <div className="flex w-full flex-col gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <StatusBar icon={<X className="h-4 w-4" />}>Falhou</StatusBar>
+            {post.publish_error && (
+              <span className="text-[0.74rem] text-muted-foreground">
+                · {post.publish_error}
+              </span>
+            )}
+            <span className="ml-auto" />
+            <Btn primary onClick={onReenqueue} disabled={isPending}>
+              {spin || <Undo2 className="h-4 w-4" />} Reenfileirar
+            </Btn>
+            <Btn onClick={onPublishNow} disabled={isPending}>
+              <Send className="h-4 w-4" /> Publicar agora
+            </Btn>
+            <Btn onClick={onBack} disabled={isPending}>
+              <Undo2 className="h-4 w-4" /> Voltar p/ pendente
+            </Btn>
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  if (post.status === 'publicado') {
+    return post.ig_permalink ? (
+      <a
+        href={post.ig_permalink}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-2 text-[0.8rem] font-semibold text-[#1E6B61] hover:underline"
+      >
+        <CheckCircle2 className="h-4 w-4" /> Ver no Instagram
+      </a>
+    ) : (
       <StatusBar icon={<CheckCircle2 className="h-4 w-4" />}>Publicado</StatusBar>
     )
   }
