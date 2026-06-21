@@ -15,8 +15,10 @@ export type SocialPostStatus =
   | 'pendente'
   | 'aprovado'
   | 'agendado'
+  | 'publicando'
   | 'publicado'
   | 'reprovado'
+  | 'erro'
 
 export type SocialPostFormat = 'carrossel' | 'reel' | 'post'
 
@@ -42,6 +44,14 @@ export interface SocialPost {
   sort_order: number
   created_at: string
   updated_at: string
+  // Campos de publicação no Instagram (migration 0049).
+  ig_media_id: string | null
+  ig_permalink: string | null
+  ig_container_id: string | null
+  publish_error: string | null
+  publish_attempts: number
+  last_attempt_at: string | null
+  published_at: string | null
 }
 
 // Ordem das abas + rótulos (a contagem vem do banco).
@@ -49,8 +59,10 @@ export const STATUS_TABS: Array<{ status: SocialPostStatus; label: string }> = [
   { status: 'pendente', label: 'Pendentes' },
   { status: 'aprovado', label: 'Aprovados' },
   { status: 'agendado', label: 'Agendados' },
+  { status: 'publicando', label: 'Publicando' },
   { status: 'publicado', label: 'Publicados' },
   { status: 'reprovado', label: 'Reprovados' },
+  { status: 'erro', label: 'Falhou' },
 ]
 
 export function isSocialPostStatus(v: string | undefined): v is SocialPostStatus {
@@ -58,8 +70,10 @@ export function isSocialPostStatus(v: string | undefined): v is SocialPostStatus
     v === 'pendente' ||
     v === 'aprovado' ||
     v === 'agendado' ||
+    v === 'publicando' ||
     v === 'publicado' ||
-    v === 'reprovado'
+    v === 'reprovado' ||
+    v === 'erro'
   )
 }
 
@@ -93,8 +107,10 @@ export async function fetchStatusCounts(): Promise<
     pendente: 0,
     aprovado: 0,
     agendado: 0,
+    publicando: 0,
     publicado: 0,
     reprovado: 0,
+    erro: 0,
   }
   for (const row of (data ?? []) as Array<{ status: string }>) {
     if (isSocialPostStatus(row.status)) counts[row.status] += 1
