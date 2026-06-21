@@ -3,7 +3,13 @@ import 'server-only'
 
 import { createClient } from '@/lib/supabase/server'
 import { isFounderEmail } from '@/lib/auth/founder'
-import { getSupportEmailBody, setSeen, deleteEmail } from '@/lib/email/imap-client'
+import {
+  getSupportEmailBody,
+  setSeen,
+  deleteEmail,
+  setSeenMany,
+  deleteMany,
+} from '@/lib/email/imap-client'
 import { sendSupportEmail } from '@/lib/email/smtp-client'
 import type { SupportEmailBody } from '@/lib/email/types'
 
@@ -53,6 +59,25 @@ export async function deleteEmailAction(
 ): Promise<{ ok: boolean }> {
   if (!(await assertFounder())) return { ok: false }
   return { ok: await deleteEmail(mailbox, uid) }
+}
+
+/** Marca vários como lido/não-lido. Founder-only. */
+export async function markSeenBatchAction(
+  mailbox: string,
+  uids: number[],
+  seen: boolean,
+): Promise<{ ok: boolean }> {
+  if (!(await assertFounder())) return { ok: false }
+  return { ok: await setSeenMany(mailbox, uids, seen) }
+}
+
+/** Exclui vários (move pra Lixeira). Founder-only. */
+export async function deleteBatchAction(
+  mailbox: string,
+  uids: number[],
+): Promise<{ ok: boolean }> {
+  if (!(await assertFounder())) return { ok: false }
+  return { ok: await deleteMany(mailbox, uids) }
 }
 
 export interface SendEmailActionInput {

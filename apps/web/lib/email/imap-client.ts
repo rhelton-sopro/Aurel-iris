@@ -284,6 +284,64 @@ export async function deleteEmail(mailbox: string, uid: number): Promise<boolean
   }
 }
 
+/** Marca VÁRIOS emails como lido/não-lido numa só conexão. */
+export async function setSeenMany(
+  mailbox: string,
+  uids: number[],
+  seen: boolean,
+): Promise<boolean> {
+  if (!imapConfigured() || uids.length === 0) return false
+  const client = newClient()
+  await client.connect()
+  try {
+    const lock = await client.getMailboxLock(mailbox)
+    try {
+      const range = uids.join(',')
+      if (seen) await client.messageFlagsAdd({ uid: range }, ['\\Seen'], { uid: true })
+      else await client.messageFlagsRemove({ uid: range }, ['\\Seen'], { uid: true })
+      return true
+    } finally {
+      lock.release()
+    }
+  } catch {
+    return false
+  } finally {
+    await client.logout().catch(() => {})
+  }
+}
+
+/** Exclui VÁRIOS emails (move pra Lixeira, ou apaga se já nela) numa só conexão. */
+export async function deleteMany(mailbox: string, uids: number[]): Promise<boolean> {
+  if (!imapConfigured() || uids.length === 0) return false
+  const client = newClient()
+  await client.connect()
+  try {
+    let trashPath: string | null = null
+    for (const b of await client.list()) {
+      if ((b.specialUse as string) === '\\Trash') {
+        trashPath = b.path
+        break
+      }
+    }
+    const lock = await client.getMailboxLock(mailbox)
+    try {
+      const range = uids.join(',')
+      if (!trashPath || mailbox === trashPath) {
+        await client.messageDelete({ uid: range }, { uid: true })
+      } else {
+        await client.messageMove({ uid: range }, trashPath, { uid: true })
+      }
+      return true
+    } finally {
+      lock.release()
+    }
+  } catch {
+    return false
+  } finally {
+    await client.logout().catch(() => {})
+  }
+}
+
 /** Baixa o conteúdo de um anexo (por índice na lista de attachments). */
 export async function getAttachment(
   mailbox: string,

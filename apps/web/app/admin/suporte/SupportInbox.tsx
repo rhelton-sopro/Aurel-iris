@@ -3,13 +3,19 @@
 // Webmail: sidebar de pastas + lista de emails + leitura do corpo (com anexos) e
 // ações (marcar não-lido, excluir) on-demand via server actions IMAP.
 
-import { useState, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { fetchSupportEmailBody, markEmailSeen, deleteEmailAction } from './actions'
+import {
+  fetchSupportEmailBody,
+  markEmailSeen,
+  deleteEmailAction,
+  markSeenBatchAction,
+  deleteBatchAction,
+} from './actions'
 import { ComposeForm, type ComposeInitial } from './ComposeForm'
 import type {
   SupportEmailBody,
@@ -76,6 +82,41 @@ export function SupportInbox({ mailboxes, result, currentMailbox, search }: Prop
   const [isPending, startTransition] = useTransition()
   const [acting, startAction] = useTransition()
   const [compose, setCompose] = useState<ComposeInitial | null>(null)
+  const [selected, setSelected] = useState<Set<number>>(new Set())
+
+  // Auto-atualização: re-busca a lista a cada 60s sem F5 (o estado do client —
+  // email aberto, seleção, composição — é preservado pelo React).
+  useEffect(() => {
+    const id = setInterval(() => router.refresh(), 60000)
+    return () => clearInterval(id)
+  }, [router])
+
+  function toggleSelect(uid: number) {
+    setSelected((prev) => {
+      const next = new Set(prev)
+      if (next.has(uid)) next.delete(uid)
+      else next.add(uid)
+      return next
+    })
+  }
+  function batchMark(seen: boolean) {
+    const uids = [...selected]
+    startAction(async () => {
+      await markSeenBatchAction(currentMailbox, uids, seen)
+      setSelected(new Set())
+      router.refresh()
+    })
+  }
+  function batchDelete() {
+    const uids = [...selected]
+    startAction(async () => {
+      await deleteBatchAction(currentMailbox, uids)
+      setSelected(new Set())
+      setOpenUid(null)
+      setBody(null)
+      router.refresh()
+    })
+  }
 
   function toggle(uid: number) {
     if (openUid === uid) {
@@ -118,7 +159,48 @@ export function SupportInbox({ mailboxes, result, currentMailbox, search }: Prop
 
   return (
     <div className="space-y-3">
-      <div className="flex justify-end">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-3">
+          <Button type="button" variant="outline" size="sm" onClick={() => router.refresh()}>
+            ↻ Atualizar
+          </Button>
+          {selected.size > 0 ? (
+            <div className="flex items-center gap-3 text-xs">
+              <span className="text-muted-foreground">{selected.size} selecionado(s)</span>
+              <button
+                type="button"
+                onClick={() => batchMark(true)}
+                disabled={acting}
+                className="underline disabled:opacity-50"
+              >
+                Marcar lido
+              </button>
+              <button
+                type="button"
+                onClick={() => batchMark(false)}
+                disabled={acting}
+                className="underline disabled:opacity-50"
+              >
+                Não lido
+              </button>
+              <button
+                type="button"
+                onClick={batchDelete}
+                disabled={acting}
+                className="text-[#B23A2B] underline disabled:opacity-50"
+              >
+                Excluir
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelected(new Set())}
+                className="text-muted-foreground underline"
+              >
+                limpar
+              </button>
+            </div>
+          ) : null}
+        </div>
         <Button
           type="button"
           size="sm"
@@ -188,10 +270,18 @@ export function SupportInbox({ mailboxes, result, currentMailbox, search }: Prop
               const open = openUid === e.uid
               return (
                 <li key={e.uid}>
+                  <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={selected.has(e.uid)}
+                    onChange={() => toggleSelect(e.uid)}
+                    className="ml-3 size-4 shrink-0 accent-teal-dark"
+                    aria-label="selecionar email"
+                  />
                   <button
                     type="button"
                     onClick={() => toggle(e.uid)}
-                    className="flex w-full items-baseline gap-3 px-4 py-3 text-left hover:bg-muted/40"
+                    className="flex flex-1 items-baseline gap-3 px-4 py-3 text-left hover:bg-muted/40"
                   >
                     <span
                       className={cn('mt-1.5 size-2 shrink-0 rounded-full', !e.seen ? 'bg-teal-dark' : 'bg-transparent')}
@@ -209,6 +299,7 @@ export function SupportInbox({ mailboxes, result, currentMailbox, search }: Prop
                     </div>
                     <span className="shrink-0 text-xs text-muted-foreground">{fmtDate(e.date)}</span>
                   </button>
+                  </div>
 
                   {open ? (
                     <div className="border-t border-border bg-muted/20 px-4 py-3">
