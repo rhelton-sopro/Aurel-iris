@@ -180,6 +180,39 @@ export async function refreshInstagramTokenIfNeeded(): Promise<{
 }
 
 /**
+ * Combina refresh + health-check e PERSISTE a flag de saúde em `app_settings`
+ * (chave `instagram_health`), lida pelo /admin (Plan 04, D-07). Chamada pelo cron
+ * diário. NUNCA lança (o cron faz `.catch`) e NUNCA loga/persiste o token — só
+ * `ok`/`checked_at`/`error`.
+ */
+export async function refreshAndHealthcheckInstagram(): Promise<{
+  refreshed: boolean
+  healthy: boolean
+  error?: string
+}> {
+  const refresh = await refreshInstagramTokenIfNeeded()
+  const health = await instagramHealthCheck()
+  // persiste a flag pro /admin (D-07): upsert app_settings key 'instagram_health'.
+  const now = new Date().toISOString()
+  const db = appSettingsDb()
+  await db
+    .from('app_settings')
+    .upsert(
+      {
+        key: 'instagram_health',
+        value: { ok: health.ok, checked_at: now, error: health.error ?? null },
+        updated_at: now,
+      },
+      { onConflict: 'key' },
+    )
+  return {
+    refreshed: refresh.refreshed,
+    healthy: health.ok,
+    error: refresh.error ?? health.error,
+  }
+}
+
+/**
  * Health-check leve da conexão: GET /me?fields=id com o token armazenado. Falha é
  * DETECTÁVEL (não-silenciosa) para alimentar o sinal de notificação do admin.
  *

@@ -9,6 +9,7 @@ import {
   releaseExpiredReservations,
   sendExpirationWarnings,
 } from '@/lib/billing/cron-jobs'
+import { refreshAndHealthcheckInstagram } from '@/lib/instagram/token'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60 // bem abaixo do limite PRO (800s); jobs são bounded
@@ -64,6 +65,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     orphan_consumes: await reconcileOrphanedConsumes().catch((err) => ({
       consumed: 0,
       errors: 1,
+      error: String(err),
+    })),
+    // IGPUB-01 / D-07: refresha o token do IG (buffer 10d) + health-check e grava
+    // a flag instagram_health pro /admin. Falha aqui NÃO derruba os outros jobs.
+    instagram: await refreshAndHealthcheckInstagram().catch((err) => ({
+      refreshed: false,
+      healthy: false,
       error: String(err),
     })),
   }
