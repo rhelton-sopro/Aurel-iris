@@ -45,6 +45,12 @@ const SECTIONS: Array<{
       'Relatórios que o gate de auditoria marcou como incompletos (seções faltando). Foto da íris retida até 24h pra resgate — abra a leitura pra regenerar. Relatórios completos têm a foto apagada na geração.',
   },
   {
+    href: '/admin/relatorio-cliente',
+    title: 'Versão do cliente (relatório)',
+    description:
+      'Escolha quais seções entram na versão condensada que o terapeuta entrega ao cliente (botão “Versão do cliente” → PDF). As demais ficam só no relatório completo. Padrão: Em poucas palavras, Recursos e Forças, Mensagem para o Cliente e Síntese Rápida.',
+  },
+  {
     href: '/admin/painel',
     title: 'Conteúdo (marketing)',
     description:

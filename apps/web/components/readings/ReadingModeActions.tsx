@@ -103,6 +103,7 @@ export function ReadingModeActions({
     return (
       <>
         <ExportPdfButton readingId={readingId} />
+        <ExportPdfButton readingId={readingId} variant="client" />
         <p
           className="text-sm text-muted-foreground"
           data-testid="reading-mode-delivered-status"
@@ -338,6 +339,7 @@ export function ReadingModeActions({
       {regenBanner}
 
       <ExportPdfButton readingId={readingId} />
+      <ExportPdfButton readingId={readingId} variant="client" />
 
       <Link
         href={`/leituras/${readingId}/editar`}

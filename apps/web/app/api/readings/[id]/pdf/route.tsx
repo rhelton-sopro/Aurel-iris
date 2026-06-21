@@ -42,6 +42,8 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
 import { createClient } from '@/lib/supabase/server'
+import { filterSectionsForClient } from '@/lib/anthropic/types'
+import { getClientReportSections } from '@/lib/admin/client-report-config'
 import {
   renderCoverHtml,
   renderBodyHtml,
@@ -80,6 +82,10 @@ export async function GET(
   // no code duplication. Default (absent/any other value) = production report.
   const variant = request.nextUrl.searchParams.get('variant')
   const isSam = variant === 'sam'
+  // "Versão do cliente" (2026-06-21): mesmo relatório de produção, mas reduzido
+  // ao subconjunto de seções escolhido pelo founder (app_settings). O filtro é
+  // aplicado depois de resolver reportToShow; o gerador renumera por posição.
+  const isClient = variant === 'client'
 
   const supabase = await createClient()
   const { data: reading, error } = await supabase
@@ -129,6 +135,14 @@ export async function GET(
     }
     reportToShow = (reportDelivered ?? reportGenerated) as Record<string, string>
   }
+
+  // Versão do cliente: filtra o jsonb pro subconjunto global. Mantém disclaimer
+  // + _display_order; o render renumera as seções presentes 1..N (sem buracos).
+  if (isClient) {
+    const allowed = await getClientReportSections()
+    reportToShow = filterSectionsForClient(reportToShow, allowed)
+  }
+
   const clientName =
     (reading.client as { full_name?: string } | null)?.full_name ?? 'Cliente'
   const reportGeneratedAt =
@@ -151,7 +165,9 @@ export async function GET(
   const footerHtml = renderFooterHtml(clientName, disclaimerFooterLine(reportToShow))
   const filename = isSam
     ? buildPdfFilename(clientName, readingDate).replace(/\.pdf$/i, '-SAM.pdf')
-    : buildPdfFilename(clientName, readingDate)
+    : isClient
+      ? buildPdfFilename(clientName, readingDate).replace(/\.pdf$/i, '-cliente.pdf')
+      : buildPdfFilename(clientName, readingDate)
 
   const base = gotenbergUrl.replace(/\/$/, '')
   const headers: Record<string, string> = {}

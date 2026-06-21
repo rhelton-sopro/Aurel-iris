@@ -230,6 +230,44 @@ export const SECTION_KEY_BY_NUMBER: Record<NumberedSectionHeading, NumberedSecti
   '15': '15_sintese_rapida',
 }
 
+/** Chave do bloco de abertura §0 ("Em poucas palavras") — não está em NUMBERED_SECTION_HEADINGS. */
+export const SECTION_ZERO_KEY = '0_em_poucas_palavras' as const
+
+/**
+ * "Versão do cliente" (2026-06-21): reduz o jsonb do relatório ao subconjunto de
+ * seções escolhido globalmente pelo founder (app_settings → client_report_sections).
+ * `allowedHeadings` são heading-numbers internos ('0' + '1'..'15').
+ *
+ * Mantém SEMPRE o disclaimer LGPD (`encerramento_disclaimer`) e a flag
+ * `_display_order`, para que renderBodyHtml/ReportReadView reordenem no arco
+ * narrativo e RENUMEREM por posição (1..N, sem buracos). As seções não
+ * escolhidas simplesmente não entram no dicionário — o render já filtra por
+ * presença, então a numeração do cliente sai contínua. `essence_phrase` (peça
+ * legada, hoje não emitida) só passa se presente E selecionável — como não está
+ * em ALL_CLIENT_SELECTABLE_HEADINGS, fica naturalmente de fora.
+ */
+export function filterSectionsForClient(
+  sections: Record<string, string>,
+  allowedHeadings: readonly string[],
+): Record<string, string> {
+  const allowed = new Set(allowedHeadings)
+  const out: Record<string, string> = {}
+  const flag = sections[REPORT_DISPLAY_ORDER_KEY]
+  if (flag) out[REPORT_DISPLAY_ORDER_KEY] = flag
+  const disclaimer = sections['encerramento_disclaimer']
+  if (disclaimer) out['encerramento_disclaimer'] = disclaimer
+  if (allowed.has('0') && sections[SECTION_ZERO_KEY]) {
+    out[SECTION_ZERO_KEY] = sections[SECTION_ZERO_KEY]
+  }
+  for (const h of NUMBERED_SECTION_HEADINGS) {
+    if (!allowed.has(h)) continue
+    const key = SECTION_KEY_BY_NUMBER[h]
+    const v = sections[key]
+    if (v) out[key] = v
+  }
+  return out
+}
+
 export type ReportJsonb = Partial<Record<ReportSectionKey, string>>
 
 export type EditTipo = 'adicionado' | 'removido' | 'corrigido' | 'reescrito' | 'none'

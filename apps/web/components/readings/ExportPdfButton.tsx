@@ -29,8 +29,13 @@ import { Button } from '@/components/ui/button'
 
 export interface ExportPdfButtonProps {
   readingId: string
-  /** Phase 7.4 SAM harness: 'sam' appends ?variant=sam (parallel report). */
-  variant?: 'sam'
+  /**
+   * Variante do PDF:
+   *  - 'sam'    → harness SAM (relatório paralelo, Phase 7.4)
+   *  - 'client' → versão condensada do cliente (subconjunto de seções global)
+   *  - ausente  → relatório completo de produção
+   */
+  variant?: 'sam' | 'client'
   /** Optional override for the button label (defaults to "Exportar PDF"). */
   label?: string
 }
@@ -59,10 +64,11 @@ export function ExportPdfButton({ readingId, variant, label }: ExportPdfButtonPr
   const [localPending, setLocalPending] = useState(false)
   const isPending = pending || localPending
   const isSam = variant === 'sam'
-  const pdfUrl = isSam
-    ? `/api/readings/${readingId}/pdf?variant=sam`
+  const isClient = variant === 'client'
+  const pdfUrl = variant
+    ? `/api/readings/${readingId}/pdf?variant=${variant}`
     : `/api/readings/${readingId}/pdf`
-  const idleLabel = label ?? 'Exportar PDF'
+  const idleLabel = label ?? (isClient ? 'Versão do cliente' : 'Exportar PDF')
 
   function onClick() {
     setLocalPending(true)
@@ -78,7 +84,7 @@ export function ExportPdfButton({ readingId, variant, label }: ExportPdfButtonPr
         const blob = await res.blob()
         const filename =
           parseFilenameFromHeader(res.headers.get('Content-Disposition')) ??
-          `leitura-${readingId}${isSam ? '-SAM' : ''}.pdf`
+          `leitura-${readingId}${isSam ? '-SAM' : isClient ? '-cliente' : ''}.pdf`
         triggerDownload(blob, filename)
         toast.success('PDF baixado.')
       } catch (err) {
@@ -97,7 +103,13 @@ export function ExportPdfButton({ readingId, variant, label }: ExportPdfButtonPr
       onClick={onClick}
       disabled={isPending}
       className="gap-2"
-      data-testid={isSam ? 'reading-mode-export-pdf-sam' : 'reading-mode-export-pdf'}
+      data-testid={
+        isSam
+          ? 'reading-mode-export-pdf-sam'
+          : isClient
+            ? 'reading-mode-export-pdf-client'
+            : 'reading-mode-export-pdf'
+      }
     >
       {isPending ? (
         <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
