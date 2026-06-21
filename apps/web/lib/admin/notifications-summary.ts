@@ -13,6 +13,8 @@
  */
 import 'server-only'
 
+import type { SupabaseClient } from '@supabase/supabase-js'
+
 import { createServiceClient } from '@/lib/supabase/service'
 import { getUnreadCount } from '@/lib/email/imap-client'
 
@@ -21,6 +23,8 @@ export interface AdminNotifications {
   pendingRefunds: number
   purchasesToday: number
   stuckPending: number // compras 'pending' há +2h (pagou e não creditou, ou abandono)
+  publishErrors: number // posts em 'erro' (IGPUB-06, D-04)
+  instagramAuthError: boolean // falha de health-check/refresh do token IG (D-07)
 }
 
 export async function getAdminNotifications(): Promise<AdminNotifications> {
@@ -28,14 +32,54 @@ export async function getAdminNotifications(): Promise<AdminNotifications> {
   startOfDay.setHours(0, 0, 0, 0)
   const twoHoursAgo = new Date(Date.now() - 2 * 3600 * 1000).toISOString()
 
-  const [unreadEmails, pendingRefunds, purchasesToday, stuckPending] = await Promise.all([
-    getUnreadCount().catch(() => 0),
-    countPendingRefunds().catch(() => 0),
-    countPurchasesToday(startOfDay.toISOString()).catch(() => 0),
-    countStuckPending(twoHoursAgo).catch(() => 0),
-  ])
+  const [unreadEmails, pendingRefunds, purchasesToday, stuckPending, publishErrors, instagramAuthError] =
+    await Promise.all([
+      getUnreadCount().catch(() => 0),
+      countPendingRefunds().catch(() => 0),
+      countPurchasesToday(startOfDay.toISOString()).catch(() => 0),
+      countStuckPending(twoHoursAgo).catch(() => 0),
+      countPublishErrors().catch(() => 0),
+      checkInstagramAuthError().catch(() => false),
+    ])
 
-  return { unreadEmails, pendingRefunds, purchasesToday, stuckPending }
+  return {
+    unreadEmails,
+    pendingRefunds,
+    purchasesToday,
+    stuckPending,
+    publishErrors,
+    instagramAuthError,
+  }
+}
+
+/** Posts de marketing que falharam ao publicar (status 'erro' — IGPUB-06, D-04). */
+async function countPublishErrors(): Promise<number> {
+  const service = createServiceClient()
+  const { count } = await service
+    .from('social_posts')
+    .select('id', { count: 'exact', head: true })
+    .eq('status', 'erro')
+  return count ?? 0
+}
+
+/**
+ * Falha de health-check/refresh do token do Instagram (D-07).
+ * Lê a flag `instagram_health` de `app_settings`, escrita pelo cron daily (Plan 05).
+ * Best-effort: enquanto a flag não existir (Plan 05 ainda não rodou), default false
+ * — ausência NÃO é regressão, é o estado esperado até o cron escrever a 1ª vez.
+ */
+async function checkInstagramAuthError(): Promise<boolean> {
+  // `app_settings` não está no Database type gerado (tabela auxiliar — ver
+  // lib/instagram/token.ts e lib/admin/client-report-config.ts). Acesso por um
+  // cliente untyped de propósito, restrito a este módulo server-only.
+  const service = createServiceClient() as unknown as SupabaseClient
+  const { data } = await service
+    .from('app_settings')
+    .select('value')
+    .eq('key', 'instagram_health')
+    .maybeSingle()
+  const v = (data as { value?: { ok?: boolean } } | null)?.value
+  return v?.ok === false
 }
 
 /** Compras 'pending' antigas (>2h) — webhook que não creditou OU checkout abandonado. */
