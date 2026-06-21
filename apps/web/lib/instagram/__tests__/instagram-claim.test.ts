@@ -4,7 +4,37 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 
 import type { Database } from '@/types/database'
 
-import { claimDue } from '../publish'
+// Env de runtime lidas no top-level de publish.ts (hoisted antes dos imports ESM).
+vi.hoisted(() => {
+  process.env.INSTAGRAM_BUSINESS_ACCOUNT_ID = '17841400000000000'
+  process.env.NEXT_PUBLIC_SITE_URL = 'https://iriscodex.com'
+})
+
+// O consumer de varredura (publishDuePosts) cria seu próprio service-role via
+// createServiceClient — controlamos o que reap + claim_due devolvem por chamada,
+// e mockamos getValidToken + fetch + server-only para um caminho de sucesso seco.
+const sweepClaimResults: Array<{ data: unknown; error: { message: string } | null }> = []
+
+vi.mock('@/lib/supabase/service', () => {
+  const makeClient = () => ({
+    rpc: vi.fn(async (fn: string) => {
+      if (fn === 'reap_stuck_publishing') return { data: 0, error: null }
+      if (fn === 'claim_due_social_posts') {
+        return sweepClaimResults.shift() ?? { data: [], error: null }
+      }
+      return { data: [], error: null }
+    }),
+    from: vi.fn(() => ({
+      update: vi.fn(() => ({ eq: vi.fn(async () => ({ error: null })) })),
+    })),
+  })
+  return { createServiceClient: vi.fn(makeClient) }
+})
+
+vi.mock('@/lib/instagram/token', () => ({ getValidToken: vi.fn(async () => 'TKN') }))
+vi.mock('server-only', () => ({}))
+
+import { claimDue, publishDuePosts } from '../publish'
 
 // Fase 12 Plan 01 — Task 3 (Wave 0 contract da idempotência do claim, IGPUB-02).
 //
@@ -75,5 +105,62 @@ describe('claimDue (idempotência do claim — IGPUB-02)', () => {
       { data: null, error: { message: 'boom' } },
     ])
     await expect(claimDue(service, 5)).rejects.toThrow(/boom/)
+  })
+})
+
+describe('publishDuePosts (idempotência ponta-a-ponta — IGPUB-02)', () => {
+  it('processa exatamente 2 posts na 1ª varredura e 0 na 2ª (status já mudou)', async () => {
+    const postRow = (id: string) => ({
+      id,
+      format: 'post',
+      status: 'publicando',
+      caption: '',
+      media: { kind: 'post', image: `/${id}.png` },
+      publish_attempts: 1,
+    })
+
+    // mock fetch: container → media_publish → permalink (sucesso seco)
+    let fetchCalls = 0
+    const fetchFn = vi.fn(async (url: string) => {
+      fetchCalls += 1
+      const id = `MEDIA_${fetchCalls}`
+      if (String(url).includes('/media_publish')) {
+        return { ok: true, status: 200, json: async () => ({ id }) } as unknown as Response
+      }
+      if (String(url).includes('/media')) {
+        return { ok: true, status: 200, json: async () => ({ id }) } as unknown as Response
+      }
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({ id, permalink: 'https://instagr.am/p/x' }),
+      } as unknown as Response
+    })
+    // @ts-expect-error mock global fetch
+    global.fetch = fetchFn
+
+    // 1ª varredura reivindica 2; 2ª recebe [] (concorrência: status já mudou).
+    sweepClaimResults.length = 0
+    sweepClaimResults.push({ data: [postRow('a'), postRow('b')], error: null })
+    sweepClaimResults.push({ data: [], error: null })
+
+    const first = await publishDuePosts()
+    expect(first.published).toBe(2)
+
+    const second = await publishDuePosts()
+    expect(second.published).toBe(0)
+    expect(second.retried).toBe(0)
+    expect(second.failed).toBe(0)
+
+    vi.restoreAllMocks()
+  })
+
+  it('um post publicado nunca chega ao consumidor (a RPC só casa status=agendado)', async () => {
+    // a RPC já filtra publicados FORA do retorno → o consumer recebe [] e não publica.
+    sweepClaimResults.length = 0
+    sweepClaimResults.push({ data: [], error: null })
+    const r = await publishDuePosts()
+    expect(r.published).toBe(0)
+    expect(r.failed).toBe(0)
   })
 })
