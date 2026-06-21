@@ -99,10 +99,10 @@ Content Publishing API), sem App Review (conta própria do founder, dev mode).
 
 - [ ] **IGPUB-01**: Conta IG Professional (Business/Creator) conectada via **Instagram API with Instagram Login** (`graph.instagram.com`; ~~Página FB~~ SEM Página do Facebook obrigatória; dev mode com a conta do founder como Instagram Tester) — token de longa duração (~60d) + IG Business Account ID em `app_settings`/env Vercel, com validação/health-check da conexão.
 - [ ] **IGPUB-02**: Cron no Vercel varre posts `agendado` com `scheduled_at` vencido e dispara a publicação de forma idempotente (não republica um post já publicado).
-- [ ] **IGPUB-03**: Publicar carrossel multi-imagem lendo as slides das URLs públicas (container por slide → container do carrossel → media_publish).
-- [ ] **IGPUB-04**: Publicar reel (vídeo 9:16, H.264) lendo o MP4 da URL pública (container de vídeo → poll de status → media_publish).
-- [ ] **IGPUB-05**: Caption + hashtags enviadas junto com o post no momento da publicação.
-- [ ] **IGPUB-06**: Pós-publicação, marcar `publicado` gravando o permalink/ID do post no IG; em falha, manter o post fora de `publicado` e expor o erro (motivo) no painel para reenfileiramento.
+- [x] **IGPUB-03**: Publicar carrossel multi-imagem lendo as slides das URLs públicas (container por slide → container do carrossel → media_publish).
+- [x] **IGPUB-04**: Publicar reel (vídeo 9:16, H.264) lendo o MP4 da URL pública (container de vídeo → poll de status → media_publish).
+- [x] **IGPUB-05**: Caption + hashtags enviadas junto com o post no momento da publicação.
+- [x] **IGPUB-06**: Pós-publicação, marcar `publicado` gravando o permalink/ID do post no IG; em falha, manter o post fora de `publicado` e expor o erro (motivo) no painel para reenfileiramento.
 
 ### Cockpit do painel (COCKPIT)
 
