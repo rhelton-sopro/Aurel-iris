@@ -1,16 +1,17 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.1
-milestone_name: Motor de Conteúdo
+milestone_name: Motor de Conteudo
 status: planning
-last_updated: "2026-06-19T18:00:00.000Z"
-last_activity: 2026-06-19
+stopped_at: Phase 12 context gathered
+last_updated: "2026-06-21T21:59:31.624Z"
+last_activity: 2026-06-19 — Milestone v1.1 started
 progress:
-  total_phases: 3
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_phases: 17
+  completed_phases: 12
+  total_plans: 124
+  completed_plans: 122
+  percent: 98
 ---
 
 # Estado do projeto
@@ -30,7 +31,6 @@ Roadmap v1.1 criado e mapeado em ROADMAP.md (secao "Fases - v1.1 Motor de Conteu
 **Proxima acao:** aprovar o roadmap v1.1 e rodar `/gsd-plan-phase 12` (Publicacao Instagram) - inclui pesquisa profunda da Instagram Content Publishing API (container -> poll -> media_publish) e os pre-requisitos externos do founder (conta IG Professional + Pagina FB + token de longa duracao).
 
 > Conteudo abaixo e historico do milestone v1.0 (produto de iridologia), preservado para contexto.
-
 
 ## Foco atual (2026-05-31) — re-sync pós-go-live
 
@@ -270,9 +270,9 @@ Nenhum ainda.
 
 Sessão anterior: 2026-05-09 noite + supplement (mesma sessão estendida) — **PLAN 07.1-03 ENTREGUE + iterative calibration loop adicionado em cima**. Total 14 commits (7 do PLAN original + 7 supplement), 32 testes vitest verdes, 3 bugs descobertos em produção e corrigidos durante a sessão (safeArray defensivo, 'use server' export hygiene, RLS broken auth.users subquery). Founder smoke confirmado: AnnotationForm + CalibrationDiagnosisForm ambos funcionais em produção; primeiro diagnóstico salvo pra Nailli. Ver `.planning/phases/07.1-dogfooding-fixes/07.1-03-admin-calibration-page-SUMMARY.md` (seção "Post-PLAN supplement").
 
-Stopped at: Phase 8 context gathered — pacote pré-pago + LGPD core locked
+Stopped at: Phase 12 context gathered
 
-Resume file: None
+Resume file: .planning/phases/12-publicacao-instagram/12-CONTEXT.md
 
 **Estado das tabelas:**
 
