@@ -1,35 +1,39 @@
 // Webmail da caixa de suporte (suporte@iriscodex.com) no painel admin. Pastas,
-// listagem, leitura (com anexos), marcar lido/não-lido e excluir, via IMAP
-// (Hostinger). Founder-only (gated no admin/layout). runtime nodejs (IMAP TCP).
+// busca, paginação, leitura (com anexos), marcar lido/não-lido, excluir e
+// compor/responder via SMTP. Founder-only (gated no admin/layout). runtime nodejs.
 
 import { listMailboxes, listSupportEmails } from '@/lib/email/imap-client'
-import type { SupportMailbox, SupportEmailHeader } from '@/lib/email/types'
+import type { SupportMailbox, SupportListResult } from '@/lib/email/types'
 import { SupportInbox } from './SupportInbox'
 
 export const runtime = 'nodejs'
 export const maxDuration = 30
 export const metadata = { title: 'Suporte — Iris Codex' }
 
+const PAGE_SIZE = 30
+
 export default async function SuportePage({
   searchParams,
 }: {
-  searchParams: Promise<{ mailbox?: string }>
+  searchParams: Promise<{ mailbox?: string; page?: string; q?: string }>
 }) {
-  const { mailbox } = await searchParams
-  const current = mailbox || 'INBOX'
+  const sp = await searchParams
+  const current = sp.mailbox || 'INBOX'
+  const page = Math.max(1, Number(sp.page) || 1)
+  const q = (sp.q || '').trim()
   const configured = !!process.env.IMAP_USER && !!process.env.IMAP_PASSWORD
 
   let mailboxes: SupportMailbox[] = []
-  let emails: SupportEmailHeader[] = []
+  let result: SupportListResult = { emails: [], total: 0, page, pageSize: PAGE_SIZE }
   let error: string | null = null
   if (configured) {
     try {
-      const [mb, em] = await Promise.all([
+      const [mb, res] = await Promise.all([
         listMailboxes(),
-        listSupportEmails(current, 50),
+        listSupportEmails(current, { page, pageSize: PAGE_SIZE, search: q || undefined }),
       ])
       mailboxes = mb
-      emails = em
+      result = res
     } catch (err) {
       error = err instanceof Error ? err.message : 'erro ao conectar'
     }
@@ -56,7 +60,12 @@ export default async function SuportePage({
           <p className="mt-1 text-muted-foreground">{error}</p>
         </div>
       ) : (
-        <SupportInbox mailboxes={mailboxes} emails={emails} currentMailbox={current} />
+        <SupportInbox
+          mailboxes={mailboxes}
+          result={result}
+          currentMailbox={current}
+          search={q}
+        />
       )}
     </div>
   )

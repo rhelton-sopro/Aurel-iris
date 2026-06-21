@@ -59,6 +59,7 @@ export interface SendEmailActionInput {
   to: string
   subject: string
   text: string
+  html?: string
   inReplyTo?: string | null
   references?: string | null
 }
@@ -81,6 +82,7 @@ export async function sendEmailAction(
     to,
     subject,
     text: input.text,
+    html: input.html,
     inReplyTo: input.inReplyTo,
     references: input.references,
   })

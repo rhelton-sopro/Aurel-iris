@@ -25,6 +25,13 @@ export interface SupportEmailHeader {
   hasAttachments: boolean
 }
 
+export interface SupportListResult {
+  emails: SupportEmailHeader[]
+  total: number
+  page: number
+  pageSize: number
+}
+
 export interface SupportEmailBody {
   uid: number
   fromName: string

@@ -17,6 +17,7 @@ import type {
   SupportEmailBody,
   SupportMailbox,
   SupportAttachment,
+  SupportListResult,
 } from './types'
 
 function imapConfigured(): boolean {
@@ -129,40 +130,50 @@ export async function listMailboxes(): Promise<SupportMailbox[]> {
   }
 }
 
-/** Lista os últimos `limit` emails de uma pasta (mais recentes primeiro). */
+/** Lista emails de uma pasta com paginação e busca opcional (mais recentes primeiro). */
 export async function listSupportEmails(
   mailbox = 'INBOX',
-  limit = 30,
-): Promise<SupportEmailHeader[]> {
-  if (!imapConfigured()) return []
+  opts: { page?: number; pageSize?: number; search?: string } = {},
+): Promise<SupportListResult> {
+  const page = Math.max(1, opts.page ?? 1)
+  const pageSize = opts.pageSize ?? 30
+  if (!imapConfigured()) return { emails: [], total: 0, page, pageSize }
   const client = newClient()
   await client.connect()
   try {
     const lock = await client.getMailboxLock(mailbox)
     try {
-      const box = client.mailbox
-      const total = box && typeof box === 'object' ? box.exists : 0
-      if (!total) return []
-      const start = Math.max(1, total - limit + 1)
-      const out: SupportEmailHeader[] = []
-      for await (const msg of client.fetch(`${start}:*`, {
-        uid: true,
-        envelope: true,
-        flags: true,
-        bodyStructure: true,
-      })) {
-        const from = msg.envelope?.from?.[0]
-        out.push({
-          uid: msg.uid,
-          fromName: from?.name || from?.address || '(desconhecido)',
-          fromAddress: from?.address || '',
-          subject: msg.envelope?.subject || '(sem assunto)',
-          date: msg.envelope?.date?.toISOString() ?? '',
-          seen: msg.flags?.has('\\Seen') ?? false,
-          hasAttachments: hasAttachment(msg.bodyStructure),
-        })
+      const search = opts.search?.trim()
+      const query = search
+        ? { or: [{ subject: search }, { from: search }, { body: search }] }
+        : { all: true }
+      let uids = ((await client.search(query, { uid: true })) || []) as number[]
+      uids = uids.sort((a, b) => b - a) // desc: uid maior = mais recente
+      const total = uids.length
+      const slice = uids.slice((page - 1) * pageSize, page * pageSize)
+
+      const byUid = new Map<number, SupportEmailHeader>()
+      if (slice.length > 0) {
+        for await (const msg of client.fetch(
+          slice.join(','),
+          { uid: true, envelope: true, flags: true, bodyStructure: true },
+          { uid: true },
+        )) {
+          const from = msg.envelope?.from?.[0]
+          byUid.set(msg.uid, {
+            uid: msg.uid,
+            fromName: from?.name || from?.address || '(desconhecido)',
+            fromAddress: from?.address || '',
+            subject: msg.envelope?.subject || '(sem assunto)',
+            date: msg.envelope?.date?.toISOString() ?? '',
+            seen: msg.flags?.has('\\Seen') ?? false,
+            hasAttachments: hasAttachment(msg.bodyStructure),
+          })
+        }
       }
-      return out.reverse()
+      // preserva a ordem desc do slice (o fetch pode devolver fora de ordem)
+      const emails = slice.map((u) => byUid.get(u)).filter((h): h is SupportEmailHeader => !!h)
+      return { emails, total, page, pageSize }
     } finally {
       lock.release()
     }

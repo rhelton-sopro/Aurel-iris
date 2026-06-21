@@ -20,25 +20,33 @@ export interface AdminNotifications {
   unreadEmails: number
   pendingRefunds: number
   purchasesToday: number
-  failures: number
+  stuckPending: number // compras 'pending' há +2h (pagou e não creditou, ou abandono)
 }
 
 export async function getAdminNotifications(): Promise<AdminNotifications> {
   const startOfDay = new Date()
   startOfDay.setHours(0, 0, 0, 0)
+  const twoHoursAgo = new Date(Date.now() - 2 * 3600 * 1000).toISOString()
 
-  const [unreadEmails, pendingRefunds, purchasesToday] = await Promise.all([
+  const [unreadEmails, pendingRefunds, purchasesToday, stuckPending] = await Promise.all([
     getUnreadCount().catch(() => 0),
     countPendingRefunds().catch(() => 0),
     countPurchasesToday(startOfDay.toISOString()).catch(() => 0),
+    countStuckPending(twoHoursAgo).catch(() => 0),
   ])
 
-  return {
-    unreadEmails,
-    pendingRefunds,
-    purchasesToday,
-    failures: 0, // fase futura: detector de webhooks falhos / cobranças recusadas
-  }
+  return { unreadEmails, pendingRefunds, purchasesToday, stuckPending }
+}
+
+/** Compras 'pending' antigas (>2h) — webhook que não creditou OU checkout abandonado. */
+async function countStuckPending(beforeISO: string): Promise<number> {
+  const service = createServiceClient()
+  const { count } = await service
+    .from('customer_credits')
+    .select('id', { count: 'exact', head: true })
+    .eq('status', 'pending')
+    .lt('created_at', beforeISO)
+  return count ?? 0
 }
 
 async function countPurchasesToday(sinceISO: string): Promise<number> {

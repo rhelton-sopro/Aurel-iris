@@ -12,9 +12,9 @@ import { Button } from '@/components/ui/button'
 import { fetchSupportEmailBody, markEmailSeen, deleteEmailAction } from './actions'
 import { ComposeForm, type ComposeInitial } from './ComposeForm'
 import type {
-  SupportEmailHeader,
   SupportEmailBody,
   SupportMailbox,
+  SupportListResult,
 } from '@/lib/email/types'
 
 function fmtDate(iso: string): string {
@@ -54,12 +54,22 @@ function forwardInitial(body: SupportEmailBody): ComposeInitial {
 
 interface Props {
   mailboxes: SupportMailbox[]
-  emails: SupportEmailHeader[]
+  result: SupportListResult
   currentMailbox: string
+  search: string
 }
 
-export function SupportInbox({ mailboxes, emails, currentMailbox }: Props) {
+function pageHref(mailbox: string, page: number, q: string): string {
+  const p = new URLSearchParams({ mailbox })
+  if (page > 1) p.set('page', String(page))
+  if (q) p.set('q', q)
+  return `/admin/suporte?${p.toString()}`
+}
+
+export function SupportInbox({ mailboxes, result, currentMailbox, search }: Props) {
   const router = useRouter()
+  const emails = result.emails
+  const totalPages = Math.max(1, Math.ceil(result.total / result.pageSize))
   const [openUid, setOpenUid] = useState<number | null>(null)
   const [body, setBody] = useState<SupportEmailBody | null>(null)
   const [bodyError, setBodyError] = useState<string | null>(null)
@@ -144,9 +154,34 @@ export function SupportInbox({ mailboxes, emails, currentMailbox }: Props) {
       </aside>
 
       {/* Lista de emails */}
-      <div>
+      <div className="space-y-3">
+        <form method="get" className="flex gap-2">
+          <input type="hidden" name="mailbox" value={currentMailbox} />
+          <input
+            name="q"
+            defaultValue={search}
+            placeholder="Buscar assunto, remetente, conteúdo…"
+            className="flex-1 rounded-[2px] border border-border bg-card px-2 py-1.5 text-sm focus:border-teal-dark focus:outline-none"
+          />
+          <button
+            type="submit"
+            className="rounded-[2px] border border-border px-3 py-1.5 text-sm hover:bg-muted/40"
+          >
+            Buscar
+          </button>
+          {search ? (
+            <a
+              href={pageHref(currentMailbox, 1, '')}
+              className="self-center text-xs text-muted-foreground underline"
+            >
+              limpar
+            </a>
+          ) : null}
+        </form>
         {emails.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Nenhum email nesta pasta.</p>
+          <p className="text-sm text-muted-foreground">
+            {search ? 'Nenhum resultado para a busca.' : 'Nenhum email nesta pasta.'}
+          </p>
         ) : (
           <ul className="divide-y divide-border rounded-[2px] border border-border bg-card">
             {emails.map((e) => {
@@ -259,6 +294,25 @@ export function SupportInbox({ mailboxes, emails, currentMailbox }: Props) {
             })}
           </ul>
         )}
+        {totalPages > 1 ? (
+          <div className="flex items-center justify-between text-sm">
+            <a
+              href={pageHref(currentMailbox, result.page - 1, search)}
+              className={cn('underline', result.page <= 1 && 'pointer-events-none opacity-40')}
+            >
+              ← Anterior
+            </a>
+            <span className="text-muted-foreground">
+              Página {result.page} de {totalPages} · {result.total} emails
+            </span>
+            <a
+              href={pageHref(currentMailbox, result.page + 1, search)}
+              className={cn('underline', result.page >= totalPages && 'pointer-events-none opacity-40')}
+            >
+              Próxima →
+            </a>
+          </div>
+        ) : null}
       </div>
       </div>
 

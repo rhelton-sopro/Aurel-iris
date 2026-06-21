@@ -72,7 +72,7 @@ export default async function AdminPortalPage() {
     { label: 'Emails não lidos', count: notif.unreadEmails, href: '/admin/suporte', alert: notif.unreadEmails > 0 },
     { label: 'Reembolsos pendentes', count: notif.pendingRefunds, href: '/admin/suporte', alert: notif.pendingRefunds > 0 },
     { label: 'Compras hoje', count: notif.purchasesToday, href: '/admin/relatorios', alert: false },
-    { label: 'Falhas', count: notif.failures, href: '/admin/relatorios', alert: notif.failures > 0 },
+    { label: 'Compras travadas (+2h)', count: notif.stuckPending, href: '/admin/relatorios', alert: notif.stuckPending > 0 },
   ]
 
   return (

@@ -15,6 +15,7 @@ export interface SendEmailInput {
   to: string
   subject: string
   text: string
+  html?: string
   inReplyTo?: string | null
   references?: string | null
 }
@@ -41,6 +42,7 @@ export async function sendSupportEmail(
     to: input.to,
     subject: input.subject,
     text: input.text,
+    html: input.html || undefined,
     inReplyTo: input.inReplyTo ?? undefined,
     references: input.references ?? undefined,
   }
