@@ -491,16 +491,72 @@ function ManualPostKit({ post }: { post: SocialPost }) {
   const singleImage = m && 'kind' in m && m.kind === 'post' ? m.image : null
   const isReel = !!reelVideo
   const [copied, setCopied] = React.useState(false)
+  const [downloading, setDownloading] = React.useState(false)
 
-  function copyCaption() {
-    navigator.clipboard.writeText(post.caption).then(
-      () => {
-        setCopied(true)
-        toast.success('Legenda copiada — cole no Instagram.')
-        window.setTimeout(() => setCopied(false), 1800)
-      },
-      () => toast.error('Não consegui copiar. Selecione o texto e copie manualmente.'),
-    )
+  async function copyCaption() {
+    const text = post.caption ?? ''
+    let ok = false
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text)
+        ok = true
+      }
+    } catch {
+      ok = false
+    }
+    if (!ok) {
+      // fallback iOS/Safari antigo — textarea + execCommand dentro do gesto de toque
+      try {
+        const ta = document.createElement('textarea')
+        ta.value = text
+        ta.readOnly = true
+        ta.style.position = 'fixed'
+        ta.style.top = '0'
+        ta.style.opacity = '0'
+        document.body.appendChild(ta)
+        ta.focus()
+        ta.select()
+        ta.setSelectionRange(0, text.length)
+        ok = document.execCommand('copy')
+        document.body.removeChild(ta)
+      } catch {
+        ok = false
+      }
+    }
+    if (ok) {
+      setCopied(true)
+      toast.success('Legenda copiada — cole no Instagram.')
+      window.setTimeout(() => setCopied(false), 1800)
+    } else {
+      toast.error('Não consegui copiar. Segure o dedo no texto da legenda pra copiar.')
+    }
+  }
+
+  async function downloadAll() {
+    if (!slides.length || downloading) return
+    setDownloading(true)
+    try {
+      for (let i = 0; i < slides.length; i++) {
+        try {
+          const res = await fetch(slides[i])
+          const blob = await res.blob()
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = `${String(i + 1).padStart(2, '0')}-slide.png`
+          document.body.appendChild(a)
+          a.click()
+          document.body.removeChild(a)
+          await new Promise((r) => window.setTimeout(r, 450))
+          URL.revokeObjectURL(url)
+        } catch {
+          // segue pras próximas
+        }
+      }
+      toast.success('Baixadas. No iPhone: app Arquivos → selecionar todas → Salvar Imagens.')
+    } finally {
+      setDownloading(false)
+    }
   }
 
   return (
@@ -545,8 +601,25 @@ function ManualPostKit({ post }: { post: SocialPost }) {
               </div>
             ))}
           </div>
+          <div className="mt-2.5 flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={downloadAll}
+              disabled={downloading}
+              className="inline-flex items-center gap-2 rounded-sm border border-[#D8D0BF] bg-white px-3.5 py-2.5 text-[0.85rem] font-semibold text-foreground transition-colors hover:border-[#3D9B8C] hover:text-[#1E6B61] disabled:opacity-50"
+            >
+              {downloading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
+              {downloading ? 'Baixando…' : `Baixar todas (${slides.length})`}
+            </button>
+          </div>
           <div className="mt-1.5 text-[0.7rem] leading-relaxed text-muted-foreground">
-            iPhone: <b>segure o dedo na imagem → “Adicionar às Fotos”</b> — vai direto pra Galeria, na ordem 1→{slides.length}. (Botão de baixar manda pra Arquivos.)
+            <b>Direto na Galeria:</b> segure o dedo em cada imagem acima → “Adicionar às Fotos” (ordem 1→{slides.length}).
+            <br />
+            <b>Tudo de uma vez:</b> “Baixar todas” → app <b>Arquivos</b> → selecionar todas → <b>Salvar Imagens</b>.
           </div>
         </div>
       )}
