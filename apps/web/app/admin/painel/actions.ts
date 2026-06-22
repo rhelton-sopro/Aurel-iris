@@ -113,6 +113,19 @@ export async function publishNowAction(id: string): Promise<ActionResult> {
 }
 
 /**
+ * Marca um post como publicado MANUALMENTE (→ `publicado`), SEM chamar a API do
+ * Instagram. Para quando o founder posta na mão pelo app do IG e só quer registrar
+ * no painel. Grava `published_at`; não toca em ig_permalink/ig_media_id (não houve
+ * publicação via API). Founder-gated.
+ */
+export async function markAsPostedAction(id: string): Promise<ActionResult> {
+  return patch(id, {
+    status: 'publicado',
+    published_at: new Date().toISOString(),
+  })
+}
+
+/**
  * Reenfileira um post que falhou (D-04, IGPUB-06): de `erro` → `agendado`,
  * zerando `publish_attempts` e limpando `publish_error` para que o próximo
  * sweep do cron (ou "publicar agora") possa tentar de novo do zero.

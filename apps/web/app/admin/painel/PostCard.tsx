@@ -17,6 +17,9 @@ import {
   ChevronRight,
   Loader2,
   Send,
+  Copy,
+  Download,
+  Music,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import type { SocialPost, ActionResult } from '@/lib/admin/social-posts'
@@ -29,6 +32,7 @@ import {
   commentPostAction,
   publishNowAction,
   reenqueuePostAction,
+  markAsPostedAction,
 } from './actions'
 
 type Mode = null | 'edit' | 'comment' | 'schedule'
@@ -159,6 +163,9 @@ export function PostCard({ post }: { post: SocialPost }) {
           </div>
         )}
 
+        {/* kit de postagem manual (só aprovados, fora de edição) */}
+        {approved && mode === null && <ManualPostKit post={post} />}
+
         {/* ações */}
         <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-[#E7E1D5] pt-4">
           <Actions
@@ -190,6 +197,9 @@ export function PostCard({ post }: { post: SocialPost }) {
             }
             onReenqueue={() =>
               run(() => reenqueuePostAction(post.id), 'Reenfileirado.')
+            }
+            onMarkPosted={() =>
+              run(() => markAsPostedAction(post.id), 'Marcado como postado.')
             }
           />
         </div>
@@ -317,6 +327,7 @@ function Actions({
   onSaveSchedule,
   onPublishNow,
   onReenqueue,
+  onMarkPosted,
 }: {
   post: SocialPost
   mode: Mode
@@ -330,6 +341,7 @@ function Actions({
   onSaveSchedule: () => void
   onPublishNow: () => void
   onReenqueue: () => void
+  onMarkPosted: () => void
 }) {
   const spin = isPending && <Loader2 className="h-4 w-4 animate-spin" />
 
@@ -374,11 +386,8 @@ function Actions({
       <>
         <StatusBar icon={<CheckCircle2 className="h-4 w-4" />}>Aprovado</StatusBar>
         <span className="ml-auto" />
-        <Btn primary onClick={onPublishNow} disabled={isPending}>
-          {spin || <Send className="h-4 w-4" />} Publicar agora
-        </Btn>
-        <Btn onClick={() => setMode('schedule')} disabled={isPending}>
-          <CalendarClock className="h-4 w-4" /> Agendar
+        <Btn primary onClick={onMarkPosted} disabled={isPending}>
+          {spin || <CheckCircle2 className="h-4 w-4" />} Marcar como postado
         </Btn>
         <Btn onClick={() => setMode('edit')} disabled={isPending}>
           <Pencil className="h-4 w-4" /> Editar
@@ -471,6 +480,135 @@ function Actions({
         {spin || <Undo2 className="h-4 w-4" />} Voltar p/ pendente
       </Btn>
     </>
+  )
+}
+
+/* ── kit de postagem manual (aba aprovados) ── */
+function ManualPostKit({ post }: { post: SocialPost }) {
+  const m = post.media
+  const slides = m && 'kind' in m && m.kind === 'carrossel' ? m.slides : []
+  const reelVideo = m && 'kind' in m && m.kind === 'reel' ? m.video : null
+  const singleImage = m && 'kind' in m && m.kind === 'post' ? m.image : null
+  const isReel = !!reelVideo
+  const [copied, setCopied] = React.useState(false)
+
+  function copyCaption() {
+    navigator.clipboard.writeText(post.caption).then(
+      () => {
+        setCopied(true)
+        toast.success('Legenda copiada — cole no Instagram.')
+        window.setTimeout(() => setCopied(false), 1800)
+      },
+      () => toast.error('Não consegui copiar. Selecione o texto e copie manualmente.'),
+    )
+  }
+
+  return (
+    <div className="mt-4 rounded-sm border border-[#D8D0BF] bg-[#FAF7F1] p-4">
+      <div className="mb-3 flex items-center gap-1.5 text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#1E6B61]">
+        <Download className="h-3 w-3" /> Postar manualmente
+      </div>
+
+      {/* copiar legenda */}
+      <button
+        type="button"
+        onClick={copyCaption}
+        className={`inline-flex w-full items-center justify-center gap-2 rounded-sm border px-3.5 py-3 text-[0.9rem] font-semibold transition-colors sm:w-auto ${
+          copied
+            ? 'border-[#1E6B61] bg-[#1E6B61] text-white'
+            : 'border-[#3D9B8C] bg-[#3D9B8C] text-[#042019] hover:bg-[#5BBFB0]'
+        }`}
+      >
+        {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+        {copied ? 'Legenda copiada ✓' : 'Copiar legenda'}
+      </button>
+
+      {/* baixar mídia */}
+      {slides.length > 0 && (
+        <div className="mt-3.5">
+          <div className="mb-1.5 text-[0.74rem] font-semibold text-[#5a5650]">
+            Baixar imagens — na ordem 1 → {slides.length}
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {slides.map((s, i) => (
+              <a
+                key={i}
+                href={s}
+                download={`${post.id}-slide-${i + 1}.png`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-sm border border-[#D8D0BF] bg-white text-[0.85rem] font-semibold text-foreground transition-colors hover:border-[#3D9B8C] hover:text-[#1E6B61]"
+                title={`Baixar slide ${i + 1}`}
+              >
+                {i + 1}
+              </a>
+            ))}
+          </div>
+          <div className="mt-1.5 text-[0.7rem] leading-relaxed text-muted-foreground">
+            No celular: toque no número → segure a imagem → <b>Adicionar às Fotos</b>. Salve na sequência pro carrossel sair na ordem certa.
+          </div>
+        </div>
+      )}
+      {reelVideo && (
+        <div className="mt-3.5">
+          <a
+            href={reelVideo}
+            download
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-sm border border-[#D8D0BF] bg-white px-3.5 py-3 text-[0.9rem] font-semibold text-foreground transition-colors hover:border-[#3D9B8C] hover:text-[#1E6B61] sm:w-auto"
+          >
+            <Download className="h-4 w-4" /> Baixar vídeo do reel
+          </a>
+          <div className="mt-1.5 text-[0.7rem] leading-relaxed text-muted-foreground">
+            No iPhone: toque em baixar → abre o vídeo → compartilhar → <b>Salvar Vídeo</b>.
+          </div>
+        </div>
+      )}
+      {singleImage && (
+        <div className="mt-3.5">
+          <a
+            href={singleImage}
+            download={`${post.id}.png`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-sm border border-[#D8D0BF] bg-white px-3.5 py-3 text-[0.9rem] font-semibold text-foreground transition-colors hover:border-[#3D9B8C] hover:text-[#1E6B61] sm:w-auto"
+          >
+            <Download className="h-4 w-4" /> Baixar imagem
+          </a>
+        </div>
+      )}
+
+      {/* sugestões de música (reels) */}
+      {isReel && (
+        <div className="mt-3.5 rounded-r-sm border-l-2 border-[#3D9B8C] bg-[#3D9B8C]/[0.045] px-3.5 py-3">
+          <div className="mb-1.5 flex items-center gap-1.5 text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#1E6B61]">
+            <Music className="h-3 w-3" /> Sugestões de música
+          </div>
+          <ul className="space-y-1 text-[0.82rem] leading-relaxed text-[#4a4740]">
+            <li>
+              <b>Piano cinematográfico</b> (Einaudi, Max Richter) — busque{' '}
+              <i>cinematic piano</i>
+            </li>
+            <li>
+              <b>Ambient / etéreo</b> (textura, sem batida) — busque <i>ambient</i>,{' '}
+              <i>ethereal</i>
+            </li>
+            <li>
+              <b>Lo-fi orgânico suave</b> — busque <i>warm lofi</i>,{' '}
+              <i>soft instrumental</i>
+            </li>
+          </ul>
+          <div className="mt-1.5 text-[0.7rem] leading-relaxed text-muted-foreground">
+            Dica: um áudio em alta <b>bem baixinho</b> sob a sua voz pega alcance sem quebrar o clima.
+          </div>
+        </div>
+      )}
+
+      <div className="mt-3 text-[0.72rem] leading-relaxed text-muted-foreground">
+        Depois de postar no Instagram, clique em <b className="text-[#1E6B61]">Marcar como postado</b> abaixo.
+      </div>
+    </div>
   )
 }
 
