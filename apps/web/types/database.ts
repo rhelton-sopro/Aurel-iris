@@ -14,60 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      social_posts: {
-        Row: {
-          caption: string
-          comment: string | null
-          created_at: string
-          format: string
-          generated_by: string[]
-          id: string
-          media: Json
-          pilar: string | null
-          scheduled_at: string | null
-          sort_order: number
-          status: string
-          suggested_slot: string | null
-          tags: string[]
-          updated_at: string
-          why: string | null
-        }
-        Insert: {
-          caption?: string
-          comment?: string | null
-          created_at?: string
-          format?: string
-          generated_by?: string[]
-          id?: string
-          media?: Json
-          pilar?: string | null
-          scheduled_at?: string | null
-          sort_order?: number
-          status?: string
-          suggested_slot?: string | null
-          tags?: string[]
-          updated_at?: string
-          why?: string | null
-        }
-        Update: {
-          caption?: string
-          comment?: string | null
-          created_at?: string
-          format?: string
-          generated_by?: string[]
-          id?: string
-          media?: Json
-          pilar?: string | null
-          scheduled_at?: string | null
-          sort_order?: number
-          status?: string
-          suggested_slot?: string | null
-          tags?: string[]
-          updated_at?: string
-          why?: string | null
-        }
-        Relationships: []
-      }
       ai_model_pricing: {
         Row: {
           created_at: string
@@ -98,6 +44,24 @@ export type Database = {
           output_usd_per_mtok?: number
           valid_from?: string
           valid_to?: string | null
+        }
+        Relationships: []
+      }
+      app_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: Json
         }
         Relationships: []
       }
@@ -938,6 +902,8 @@ export type Database = {
           exam_notes: string | null
           feedback_collected_at: string | null
           id: string
+          images_purge_reason: string | null
+          images_purged_at: string | null
           iris_map: string | null
           is_delivered: boolean | null
           notification_sent_at: string | null
@@ -985,6 +951,8 @@ export type Database = {
           exam_notes?: string | null
           feedback_collected_at?: string | null
           id?: string
+          images_purge_reason?: string | null
+          images_purged_at?: string | null
           iris_map?: string | null
           is_delivered?: boolean | null
           notification_sent_at?: string | null
@@ -1032,6 +1000,8 @@ export type Database = {
           exam_notes?: string | null
           feedback_collected_at?: string | null
           id?: string
+          images_purge_reason?: string | null
+          images_purged_at?: string | null
           iris_map?: string | null
           is_delivered?: boolean | null
           notification_sent_at?: string | null
@@ -1252,6 +1222,81 @@ export type Database = {
         }
         Relationships: []
       }
+      social_posts: {
+        Row: {
+          caption: string
+          comment: string | null
+          created_at: string
+          format: string
+          generated_by: string[]
+          id: string
+          ig_container_id: string | null
+          ig_media_id: string | null
+          ig_permalink: string | null
+          last_attempt_at: string | null
+          media: Json
+          pilar: string | null
+          publish_attempts: number
+          publish_error: string | null
+          published_at: string | null
+          scheduled_at: string | null
+          sort_order: number
+          status: string
+          suggested_slot: string | null
+          tags: string[]
+          updated_at: string
+          why: string | null
+        }
+        Insert: {
+          caption?: string
+          comment?: string | null
+          created_at?: string
+          format?: string
+          generated_by?: string[]
+          id?: string
+          ig_container_id?: string | null
+          ig_media_id?: string | null
+          ig_permalink?: string | null
+          last_attempt_at?: string | null
+          media?: Json
+          pilar?: string | null
+          publish_attempts?: number
+          publish_error?: string | null
+          published_at?: string | null
+          scheduled_at?: string | null
+          sort_order?: number
+          status?: string
+          suggested_slot?: string | null
+          tags?: string[]
+          updated_at?: string
+          why?: string | null
+        }
+        Update: {
+          caption?: string
+          comment?: string | null
+          created_at?: string
+          format?: string
+          generated_by?: string[]
+          id?: string
+          ig_container_id?: string | null
+          ig_media_id?: string | null
+          ig_permalink?: string | null
+          last_attempt_at?: string | null
+          media?: Json
+          pilar?: string | null
+          publish_attempts?: number
+          publish_error?: string | null
+          published_at?: string | null
+          scheduled_at?: string | null
+          sort_order?: number
+          status?: string
+          suggested_slot?: string | null
+          tags?: string[]
+          updated_at?: string
+          why?: string | null
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           created_at: string | null
@@ -1371,6 +1416,81 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_due_social_posts: {
+        Args: { p_limit?: number }
+        Returns: {
+          caption: string
+          comment: string | null
+          created_at: string
+          format: string
+          generated_by: string[]
+          id: string
+          ig_container_id: string | null
+          ig_media_id: string | null
+          ig_permalink: string | null
+          last_attempt_at: string | null
+          media: Json
+          pilar: string | null
+          publish_attempts: number
+          publish_error: string | null
+          published_at: string | null
+          scheduled_at: string | null
+          sort_order: number
+          status: string
+          suggested_slot: string | null
+          tags: string[]
+          updated_at: string
+          why: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "social_posts"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      claim_one_social_post: {
+        Args: { p_id: string }
+        Returns: {
+          caption: string
+          comment: string | null
+          created_at: string
+          format: string
+          generated_by: string[]
+          id: string
+          ig_container_id: string | null
+          ig_media_id: string | null
+          ig_permalink: string | null
+          last_attempt_at: string | null
+          media: Json
+          pilar: string | null
+          publish_attempts: number
+          publish_error: string | null
+          published_at: string | null
+          scheduled_at: string | null
+          sort_order: number
+          status: string
+          suggested_slot: string | null
+          tags: string[]
+          updated_at: string
+          why: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "social_posts"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      convert_reservation_to_consume: {
+        Args: { p_reading_id: string }
+        Returns: {
+          credit_id: string
+          outcome: string
+          reservation_id: string
+          user_id: string
+        }[]
+      }
       fifo_reserve_credit: {
         Args: { p_reading_id: string; p_user_id: string }
         Returns: {
@@ -1433,6 +1553,7 @@ export type Database = {
         }
         Returns: string
       }
+      reap_stuck_publishing: { Args: never; Returns: number }
       release_reservation: {
         Args: { p_reading_id: string; p_reason?: string }
         Returns: boolean
