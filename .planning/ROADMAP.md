@@ -601,7 +601,7 @@ See `.planning/phases/07.5-tendency-mapping-engine/07.5-CONTEXT.md` (a criar via
   5. O post publicado sai com a caption + hashtags definidas no painel; apos publicar, o `social_posts` correspondente fica `publicado` com o permalink/ID do post gravado.
   6. Quando a publicacao falha, o post NAO entra em `publicado`, o motivo do erro fica registrado e visivel pro founder, e o post pode ser reenfileirado.
 **Plans**: 5 plans em 3 waves
-- [ ] 12-01-PLAN.md — Migration 0049 (colunas publish + estados publicando/erro + RPCs de claim/reaper) + bump SocialPostStatus
+- [x] 12-01-PLAN.md — Migration 0049 (colunas publish + estados publicando/erro + RPCs de claim/reaper) + bump SocialPostStatus ✓ 2026-06-22
 - [x] 12-02-PLAN.md — Modulo de token IG (app_settings store + refresh <10d + health-check) ✓ 2026-06-21
 - [x] 12-03-PLAN.md — Nucleo de publicacao (carrossel/reel-poll/imagem → media_publish + permalink + classificacao de erro) ✓ 2026-06-21
 - [x] 12-04-PLAN.md — Falhas de publicacao na central de notificacoes /admin + card ✓ 2026-06-21
@@ -663,7 +663,7 @@ Fases v1 executam em ordem numérica: 1 → 2 → 4 → 5 → 6 → 7 → 7.1 �
 
 | Fase | Plans concluidos | Status | Concluida em |
 |-------|------------------|--------|--------------|
-| 12. Publicacao Instagram | 3/5 | Em execucao (12-02 token + 12-03 nucleo + 12-04 notificacoes /admin prontos; 12-05 codigo do motor pronto [cron+actions+UI+testes] mas BLOCKING no Task 7 = founder conecta Meta/IG + smoke E2E; 12-01 db push pendente no founder) | 2026-06-21 |
+| 12. Publicacao Instagram | 4/5 | Em execucao (12-01 schema/claim + 12-02 token + 12-03 nucleo + 12-04 notificacoes /admin prontos; migration 0049 APLICADA em prod 2026-06-22; 12-05 codigo do motor pronto [cron+actions+UI+testes] mas BLOCKING no Task 7 = founder conecta Meta/IG + smoke E2E) | 2026-06-22 |
 | 13. Cockpit do painel | 0/TBD | Nao iniciada | - |
 | 14. Loop de dados | 0/TBD | Nao iniciada | - |
 

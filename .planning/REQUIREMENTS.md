@@ -204,7 +204,7 @@ Excluídos explicitamente. Documentado para evitar reintrodução.
 | Requisito | Fase | Status |
 |-----------|------|--------|
 | IGPUB-01 | Fase 12 | Pendente |
-| IGPUB-02 | Fase 12 | Pendente |
+| IGPUB-02 | Fase 12 | Substrato pronto (12-01: claim atomico idempotente em prod via RPCs + migration 0049); fecha end-to-end quando 12-05 conectar o cron ao Meta/IG (Task 7 BLOCKING founder) |
 | IGPUB-03 | Fase 12 | Pendente |
 | IGPUB-04 | Fase 12 | Pendente |
 | IGPUB-05 | Fase 12 | Pendente |
