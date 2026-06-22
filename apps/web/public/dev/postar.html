@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex,nofollow" />
+<title>Iris Codex — baixar para postar</title>
+<style>
+  :root{ --teal:#0f3a3a; --teal2:#155e5e; --ivory:#f7f4ee; --ink:#1c2b2b; --mut:#6b7d7d; --line:#e3ddd2; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--ivory);color:var(--ink);line-height:1.5}
+  header{background:var(--teal);color:var(--ivory);padding:20px 18px;position:sticky;top:0;z-index:5}
+  header h1{margin:0;font-size:18px;font-weight:600}
+  header p{margin:4px 0 0;font-size:13px;opacity:.8}
+  .wrap{max-width:680px;margin:0 auto;padding:14px}
+  .post{background:#fff;border:1px solid var(--line);border-radius:14px;margin:14px 0;overflow:hidden}
+  .post>.head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+  .badge{background:var(--teal);color:#fff;font-size:12px;font-weight:600;padding:4px 9px;border-radius:999px;white-space:nowrap}
+  .ttl{font-weight:600;font-size:15px}
+  .sub{font-size:12px;color:var(--mut)}
+  .body{padding:14px 16px}
+  .cap{white-space:pre-wrap;font-size:14px;background:var(--ivory);border:1px solid var(--line);border-radius:10px;padding:12px;max-height:160px;overflow:auto}
+  button.copy{margin-top:10px;width:100%;background:var(--teal2);color:#fff;border:0;border-radius:10px;padding:13px;font-size:15px;font-weight:600}
+  button.copy:active{background:var(--teal)}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+  .grid a{position:relative;display:block;border:1px solid var(--line);border-radius:8px;overflow:hidden;aspect-ratio:1/1}
+  .grid img{width:100%;height:100%;object-fit:cover;display:block}
+  .grid .n{position:absolute;top:4px;left:4px;background:rgba(15,58,58,.85);color:#fff;font-size:11px;font-weight:600;padding:1px 7px;border-radius:999px}
+  video{width:100%;border-radius:10px;margin-top:12px;background:#000}
+  a.dl{display:block;text-align:center;margin-top:10px;background:var(--teal2);color:#fff;text-decoration:none;border-radius:10px;padding:13px;font-size:15px;font-weight:600}
+  .tip{font-size:12px;color:var(--mut);margin-top:10px}
+  .tip b{color:var(--ink)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Baixar para postar</h1>
+  <p>Toque numa imagem → segure → <b>Adicionar às Fotos</b>. Legenda: botão <b>Copiar</b>.</p>
+</header>
+<div class="wrap">
+
+  <!-- POST 1 -->
+  <section class="post">
+    <div class="head"><span class="badge">Carrossel</span><div><div class="ttl">A leitura na mão</div><div class="sub">7 imagens · postar na ordem 1→7</div></div></div>
+    <div class="body">
+      <div class="cap" id="cap1"></div>
+      <button class="copy" data-cap="cap1">Copiar legenda</button>
+      <div class="grid" id="g1"></div>
+      <div class="tip"><b>Ordem importa:</b> adicione na sequência 1, 2, 3… no carrossel do Instagram.</div>
+    </div>
+  </section>
+
+  <!-- POST 2 -->
+  <section class="post">
+    <div class="head"><span class="badge">Carrossel</span><div><div class="ttl">Tecido vivo (credibilidade)</div><div class="sub">6 imagens · postar na ordem 1→6</div></div></div>
+    <div class="body">
+      <div class="cap" id="cap2"></div>
+      <button class="copy" data-cap="cap2">Copiar legenda</button>
+      <div class="grid" id="g2"></div>
+      <div class="tip"><b>Ordem importa:</b> adicione na sequência 1, 2, 3…</div>
+    </div>
+  </section>
+
+  <!-- POST 3 -->
+  <section class="post">
+    <div class="head"><span class="badge">Carrossel</span><div><div class="ttl">O cliente que some</div><div class="sub">7 imagens · postar na ordem 1→7</div></div></div>
+    <div class="body">
+      <div class="cap" id="cap3"></div>
+      <button class="copy" data-cap="cap3">Copiar legenda</button>
+      <div class="grid" id="g3"></div>
+      <div class="tip"><b>Ordem importa:</b> adicione na sequência 1, 2, 3…</div>
+    </div>
+  </section>
+
+  <!-- POST 4 -->
+  <section class="post">
+    <div class="head"><span class="badge">Reel</span><div><div class="ttl">Passaporte pela íris</div><div class="sub">vídeo · ~23 MB</div></div></div>
+    <div class="body">
+      <div class="cap" id="cap4"></div>
+      <button class="copy" data-cap="cap4">Copiar legenda</button>
+      <video controls preload="metadata" src="/admin/painel/reel-fascinio.mp4"></video>
+      <a class="dl" href="/admin/painel/reel-fascinio.mp4" download>Baixar vídeo do reel</a>
+      <div class="tip">No iPhone: toque em <b>Baixar</b> → abre o vídeo → ícone de compartilhar → <b>Salvar Vídeo</b>. Depois poste como Reel.</div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+const CAROUSELS = {
+  g1: { base:'/admin/painel/carrosseis/06-produto/', n:7 },
+  g2: { base:'/admin/painel/carrosseis/02-credibilidade/', n:6 },
+  g3: { base:'/admin/painel/carrosseis/04-cliente-some/', n:7 },
+};
+for (const [id,{base,n}] of Object.entries(CAROUSELS)){
+  const grid = document.getElementById(id);
+  for (let i=1;i<=n;i++){
+    const a=document.createElement('a');
+    a.href=base+'slide-'+i+'.png'; a.target='_blank'; a.rel='noopener';
+    a.innerHTML='<span class="n">'+i+'</span><img loading="lazy" src="'+base+'slide-'+i+'.png" alt="slide '+i+'">';
+    grid.appendChild(a);
+  }
+}
+const CAPS = {
+  cap1: `Aprender a ler uma íris leva anos. Ter a leitura dela na mão, minutos.
+
+Existe um relatório que parte de uma foto da íris — você tira do próprio celular. Dela são extraídos os padrões, escritos como uma leitura. Não um texto-modelo que serve para qualquer um: uma leitura que nasce daquela íris, daquela pessoa, de como ela sente e reage. Só dela.
+
+Chega pronto, na hora. Você não estuda iridologia, não escreve nada do zero. Porque o relatório é só a matéria-prima — o valor está na sessão que você conduz a partir dele, a conversa em que a pessoa enfim se reconhece. A leitura abre a porta; a condução é sua. Em vez de meia sessão quebrando o gelo, você começa já lá dentro.
+
+Isto existe, e chama-se Iris Codex. Salve — e siga, que em breve mostramos como funciona por dentro.
+
+#iriscodex #iridologia #terapiaintegrativa #terapeutaholistico #saudeintegrativa`,
+  cap2: `Pare três segundos no que você está vendo.
+
+O que parece um detalhe colorido é tecido vivo: fibras, anéis, criptas, desenhados fio por fio. Esse desenho se forma na primeira infância e permanece essencialmente o mesmo a vida toda — tão único que serve para reconhecer alguém com precisão.
+
+E há algo além de reconhecer quem é. Nesse mesmo tecido ficam registrados padrões de como aquela pessoa sente e reage. Lê-los não é palpite: é observação com critério, com mais de um século de tradição por trás.
+
+A parte mais bela do olho também é a mais funda. Esse olhar com método tem um nome: Iris Codex. Veja por dentro no link da bio.
+
+Salve para reler com calma — e siga, que isto está só começando.
+
+#iridologia #terapiaintegrativa #saudeintegrativa #terapeutaholistico #autoconhecimento`,
+  cap3: `Para você, terapeuta: pense no cliente que volta. Agora pense no que sentou na sua frente uma vez, no seu consultório, e nunca mais voltou.
+
+É fácil se conformar achando que ele ficou bem. Quase nunca foi isso. Ele te procurou, falou dos sintomas, ouviu boas orientações — e saiu da sua sala com uma sensação difícil de nomear: a de que ninguém ali viu quem ele é por inteiro.
+
+O contrário também é verdade. O cliente que se sente visto, logo nos primeiros minutos da sua sessão, fica. Volta. E te indica. A diferença raramente está na técnica — está em quanto a pessoa se sentiu vista.
+
+E se, antes de ela terminar de falar, você já enxergasse quem ela é por inteiro — o que sente, como reage — logo nos primeiros minutos? Existe. Tem um nome: Iris Codex. Veja por dentro no link da bio.
+
+Pense no seu próximo atendimento — e siga, que nos próximos a gente vai por aí.
+
+#terapiaintegrativa #vinculoterapeutico #terapeutaholistico #cuidadointegral #escutaterapeutica`,
+  cap4: `Os Emirados Árabes já deixam você cruzar a fronteira sem passaporte — só pela íris. E na Índia, mais de um bilhão de pessoas usam a íris como documento de identidade.
+
+Essa mesma íris guarda padrões de como a pessoa sente e reage. A gente aprendeu a ler o rosto, a voz, a postura. A íris ficou de fora.
+
+E se você pudesse ler isso no seu cliente — sem virar iridólogo? Essa ferramenta existe: o Iris Codex. Você fotografa a íris pelo celular e recebe uma leitura escrita só daquela pessoa, pronta na hora. Você chega com o relatório na mão, e a sessão já começa profunda.
+
+A leitura abre a porta. Quem conduz é você.
+
+Iris Codex — maiores informações, link na bio.
+
+#iriscodex #iridologia #terapiaintegrativa #terapeutaholistico #autoconhecimento`,
+};
+for (const [id,txt] of Object.entries(CAPS)) document.getElementById(id).textContent = txt;
+document.querySelectorAll('button.copy').forEach(b=>{
+  b.addEventListener('click', async ()=>{
+    try{ await navigator.clipboard.writeText(CAPS[b.dataset.cap]); const o=b.textContent; b.textContent='Copiado ✓'; setTimeout(()=>b.textContent=o,1500);}
+    catch(e){ alert('Não consegui copiar automático — segure no texto da legenda e copie.'); }
+  });
+});
+</script>
+</body>
+</html>
