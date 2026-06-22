@@ -527,25 +527,26 @@ function ManualPostKit({ post }: { post: SocialPost }) {
       {slides.length > 0 && (
         <div className="mt-3.5">
           <div className="mb-1.5 text-[0.74rem] font-semibold text-[#5a5650]">
-            Baixar imagens — na ordem 1 → {slides.length}
+            Salvar na galeria — na ordem 1 → {slides.length}
           </div>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-2">
             {slides.map((s, i) => (
-              <a
-                key={i}
-                href={s}
-                download={`${post.id}-slide-${i + 1}.png`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-sm border border-[#D8D0BF] bg-white text-[0.85rem] font-semibold text-foreground transition-colors hover:border-[#3D9B8C] hover:text-[#1E6B61]"
-                title={`Baixar slide ${i + 1}`}
-              >
-                {i + 1}
-              </a>
+              <div key={i} className="relative h-20 w-20 flex-none">
+                <span className="absolute left-1 top-1 z-10 rounded-full bg-black/70 px-1.5 py-0.5 text-[0.62rem] font-semibold text-white">
+                  {i + 1}
+                </span>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={s}
+                  alt={`slide ${i + 1}`}
+                  loading="lazy"
+                  className="h-20 w-20 rounded-sm border border-[#D8D0BF] object-cover"
+                />
+              </div>
             ))}
           </div>
           <div className="mt-1.5 text-[0.7rem] leading-relaxed text-muted-foreground">
-            No celular: toque no número → segure a imagem → <b>Adicionar às Fotos</b>. Salve na sequência pro carrossel sair na ordem certa.
+            iPhone: <b>segure o dedo na imagem → “Adicionar às Fotos”</b> — vai direto pra Galeria, na ordem 1→{slides.length}. (Botão de baixar manda pra Arquivos.)
           </div>
         </div>
       )}
@@ -561,7 +562,7 @@ function ManualPostKit({ post }: { post: SocialPost }) {
             <Download className="h-4 w-4" /> Baixar vídeo do reel
           </a>
           <div className="mt-1.5 text-[0.7rem] leading-relaxed text-muted-foreground">
-            No iPhone: toque em baixar → abre o vídeo → compartilhar → <b>Salvar Vídeo</b>.
+            iPhone: baixa pra <b>Arquivos</b> → abra no app Arquivos → toque em compartilhar → <b>Salvar Vídeo</b> (cai na Galeria). Vídeo não salva pelo segurar-o-dedo.
           </div>
         </div>
       )}
