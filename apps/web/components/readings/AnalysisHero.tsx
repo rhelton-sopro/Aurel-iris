@@ -79,7 +79,7 @@ export function AnalysisHero({
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            As features de visão estão prontas. Ao clicar abaixo, geramos um relatório iridológico em pt-BR ancorado em conhecimento de referência. O texto chega em streaming e pode ser revisado e editado antes de entregar ao cliente.
+            As features de visão estão prontas. Ao clicar abaixo, geramos um relatório iridológico em pt-BR ancorado em conhecimento de referência. O texto chega em streaming e pode ser revisado e editado antes de concluir a leitura.
           </p>
           {children}
         </CardContent>
@@ -106,7 +106,7 @@ export function AnalysisHero({
           <Badge variant={auditOk ? 'outline' : 'destructive'}>
             {auditOk ? 'Auditoria OK' : 'Revisão recomendada'}
           </Badge>
-          {isDelivered && <Badge variant="outline">Entregue ao cliente</Badge>}
+          {isDelivered && <Badge variant="outline">Leitura concluída</Badge>}
         </div>
         {children}
       </CardContent>

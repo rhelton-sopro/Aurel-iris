@@ -49,7 +49,7 @@ export interface ReadingModeActionsProps {
   regenerationCount: number
   isDelivered: boolean
   deliveredAt: string | null
-  /** Autoexame (terapeuta = cliente): esconde "Entregar ao cliente". */
+  /** Autoexame (terapeuta = cliente): esconde "Concluir leitura". */
   isSelfReading?: boolean
   /** Nome do cliente — usado no greeting do WhatsApp deeplink. */
   clientName?: string
@@ -108,7 +108,7 @@ export function ReadingModeActions({
           className="text-sm text-muted-foreground"
           data-testid="reading-mode-delivered-status"
         >
-          Entregue ao cliente
+          Leitura concluída
           {deliveredAt && (
             <>
               {' '}
@@ -148,7 +148,7 @@ export function ReadingModeActions({
       setDeliverOpen(false)
 
       // 2. Gera + baixa o PDF (Gotenberg/Chromium → /api/readings/[id]/pdf).
-      toast.success('Análise entregue. Gerando PDF…')
+      toast.success('Leitura concluída. Gerando PDF…')
       try {
         const res = await fetch(`/api/readings/${readingId}/pdf`, { method: 'GET' })
         if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -364,7 +364,7 @@ export function ReadingModeActions({
           data-testid="reading-mode-deliver"
         >
           <Send className="h-4 w-4" aria-hidden />
-          Entregar ao cliente
+          Concluir leitura
         </Button>
       )}
 

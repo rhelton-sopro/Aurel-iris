@@ -151,7 +151,7 @@ export function ReadingsListManager({
                 href={`/leituras/${r.id}`}
                 className={cn(buttonVariants({ size: 'sm', variant: 'outline' }))}
               >
-                Ver entregue
+                Ver concluída
               </Link>
             )
           } else if (status === 'edited') {

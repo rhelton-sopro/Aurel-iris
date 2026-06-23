@@ -83,7 +83,7 @@ export async function saveReportDelivered(
     .eq('therapist_id', user.id)
     .single()
   if (readingError || !reading) return { error: 'Leitura não encontrada' }
-  if (reading.is_delivered) return { error: 'Leitura já entregue ao cliente — somente leitura.' }
+  if (reading.is_delivered) return { error: 'Leitura já concluída — somente leitura.' }
 
   const generated = (reading.report_generated as ReportJsonb | null) ?? {}
   const delivered = bodyParsed.data as ReportJsonb
@@ -136,7 +136,7 @@ export async function markReadingDelivered(readingId: string): Promise<DeliverRe
     .eq('therapist_id', user.id)
     .single()
   if (readingError || !reading) return { error: 'Leitura não encontrada' }
-  if (reading.is_delivered) return { error: 'Leitura já entregue ao cliente' }
+  if (reading.is_delivered) return { error: 'Leitura já concluída' }
 
   // 2026-05-21 (founder UAT): se terapeuta não editou (report_delivered vazio),
   // entregar usa o report_generated como conteúdo final — não bloqueia mais.
@@ -155,7 +155,7 @@ export async function markReadingDelivered(readingId: string): Promise<DeliverRe
     return { error: 'Auditoria de ancoragem ausente. Re-gere a análise para re-rodar a auditoria.' }
   }
   if (audit.low_anchor_rate !== false) {
-    return { error: 'Âncora insuficiente — taxa de ancoragem abaixo de 95% nas seções clínicas. Edite e re-salve antes de entregar.' }
+    return { error: 'Âncora insuficiente — taxa de ancoragem abaixo de 95% nas seções clínicas. Edite e re-salve antes de concluir.' }
   }
   const allHits = []
   for (const [key, value] of Object.entries(finalDelivered)) {
@@ -165,7 +165,7 @@ export async function markReadingDelivered(readingId: string): Promise<DeliverRe
   if (allHits.length > 0) {
     const terms = Array.from(new Set(allHits.map((h) => h.term))).join(', ')
     return {
-      error: `Não foi possível entregar: corrija os termos afirmativos antes da entrega final (${terms}).`,
+      error: `Não foi possível concluir: corrija os termos afirmativos antes de concluir a leitura (${terms}).`,
     }
   }
 
@@ -185,7 +185,7 @@ export async function markReadingDelivered(readingId: string): Promise<DeliverRe
     .update(updatePayload as never)
     .eq('id', readingId)
 
-  if (updateError) return { error: `Falha ao entregar: ${updateError.message}` }
+  if (updateError) return { error: `Falha ao concluir: ${updateError.message}` }
 
   revalidatePath(`/leituras/${readingId}`)
   revalidatePath(`/leituras/${readingId}/editar`)

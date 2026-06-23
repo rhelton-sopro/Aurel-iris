@@ -140,7 +140,7 @@ export function AnaliseClient({
         const boundaryMatches = accumulated.match(BOUNDARY_RE) ?? []
         setSectionsReceived(boundaryMatches.length)
       }
-      toast.success('Análise gerada. Revise as seções antes de entregar.')
+      toast.success('Análise gerada. Revise as seções antes de concluir.')
       router.refresh()
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'desconhecido'

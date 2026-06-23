@@ -33,7 +33,7 @@ export function DeliverDialog({ open, onOpenChange, onConfirm, pending }: Delive
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton={false} initialFocus={cancelRef}>
         <DialogHeader>
-          <DialogTitle>Entregar ao cliente?</DialogTitle>
+          <DialogTitle>Concluir leitura?</DialogTitle>
           <DialogDescription>
             Ao confirmar: a análise fica congelada e não poderá mais ser editada, o PDF é
             gerado e baixado pra este dispositivo, e o WhatsApp do cliente abre com uma mensagem
@@ -50,7 +50,7 @@ export function DeliverDialog({ open, onOpenChange, onConfirm, pending }: Delive
             Cancelar
           </Button>
           <Button variant="destructive" onClick={onConfirm} disabled={pending}>
-            {pending ? 'Entregando…' : 'Sim, entregar'}
+            {pending ? 'Concluindo…' : 'Sim, concluir'}
           </Button>
         </DialogFooter>
       </DialogContent>

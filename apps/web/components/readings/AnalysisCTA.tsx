@@ -13,7 +13,7 @@
  *
  * Disabled tooltips (D-S4):
  *   - regenerationCount >= 2 → "Você já usou a regeneração desta leitura. Para um novo relatório, faça uma nova leitura (novas fotos)."
- *   - isDelivered=true       → "Esta leitura já foi entregue ao cliente. Para gerar nova versão, crie uma nova leitura."
+ *   - isDelivered=true       → "Esta leitura já foi concluída. Para gerar nova versão, crie uma nova leitura."
  *
  * Phase 7 | Plan 07-09 | UI-SPEC §Surface 1 lines 100-118
  */
@@ -55,7 +55,7 @@ export function AnalysisCTA({
     regenerationCount >= 2
       ? 'Você já usou a regeneração desta leitura. Para um novo relatório, faça uma nova leitura (novas fotos).'
       : isDelivered
-        ? 'Esta leitura já foi entregue ao cliente. Para gerar nova versão, crie uma nova leitura.'
+        ? 'Esta leitura já foi concluída. Para gerar nova versão, crie uma nova leitura.'
         : null
 
   if (!hasReport) {

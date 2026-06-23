@@ -72,7 +72,7 @@ export function EditarClient({
       if (editedCount > 0) {
         const saveResult = await saveReportDelivered(readingId, delivered)
         if (saveResult.error) {
-          toast.error(`Falha ao salvar antes de entregar: ${saveResult.error}`)
+          toast.error(`Falha ao salvar antes de concluir: ${saveResult.error}`)
           return
         }
       }
@@ -83,7 +83,7 @@ export function EditarClient({
       }
       setDeliverOpen(false)
 
-      toast.success('Análise entregue. Gerando PDF…')
+      toast.success('Leitura concluída. Gerando PDF…')
       try {
         const res = await fetch(`/api/readings/${readingId}/pdf`, { method: 'GET' })
         if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -131,7 +131,7 @@ export function EditarClient({
 
       {isDelivered && (
         <p className="rounded-md border bg-muted px-4 py-3 text-sm">
-          Análise entregue ao cliente — somente leitura.
+          Leitura concluída — somente leitura.
         </p>
       )}
 
@@ -156,7 +156,7 @@ export function EditarClient({
               </Button>
               {!isSelfReading && (
                 <Button variant="default" onClick={() => setDeliverOpen(true)}>
-                  Entregar ao cliente
+                  Concluir leitura
                 </Button>
               )}
             </div>

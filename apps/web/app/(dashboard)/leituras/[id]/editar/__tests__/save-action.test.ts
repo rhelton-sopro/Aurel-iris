@@ -129,7 +129,7 @@ describe('saveReportDelivered (D-A2 + WR-08 + CR-05)', () => {
 
     const result = await saveReportDelivered(VALID_READING_UUID, VALID_REPORT_DELIVERED)
 
-    expect(result.error).toBe('Leitura já entregue ao cliente — somente leitura.')
+    expect(result.error).toBe('Leitura já concluída — somente leitura.')
     expect(supabaseMock.__update).not.toHaveBeenCalled()
   })
 
@@ -276,7 +276,7 @@ describe('markReadingDelivered (CR-04 + SC2 + WR-08-existing)', () => {
     const result = await markReadingDelivered(VALID_READING_UUID)
 
     expect(result.error).toBe(
-      'Âncora insuficiente — taxa de ancoragem abaixo de 95% nas seções clínicas. Edite e re-salve antes de entregar.',
+      'Âncora insuficiente — taxa de ancoragem abaixo de 95% nas seções clínicas. Edite e re-salve antes de concluir.',
     )
     expect(supabaseMock.__update).not.toHaveBeenCalled()
   })

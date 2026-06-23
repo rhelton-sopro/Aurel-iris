@@ -130,7 +130,7 @@ describe('components/readings/ReadingModeActions (Plan 7.4-18 — UAT-3 reading-
     expect(screen.queryByTestId('reading-mode-deliver')).toBeNull()
     expect(screen.queryByTestId('reading-mode-regenerate')).toBeNull()
     const status = screen.getByTestId('reading-mode-delivered-status')
-    expect(status.textContent).toContain('Entregue ao cliente')
+    expect(status.textContent).toContain('Leitura concluída')
   })
 
   it('isDelivered=true with no deliveredAt still renders status without crashing', () => {
@@ -143,10 +143,10 @@ describe('components/readings/ReadingModeActions (Plan 7.4-18 — UAT-3 reading-
       />,
     )
     const status = screen.getByTestId('reading-mode-delivered-status')
-    expect(status.textContent).toContain('Entregue ao cliente')
+    expect(status.textContent).toContain('Leitura concluída')
   })
 
-  it('clicking Entregar opens DeliverDialog (rendered after click)', () => {
+  it('clicking Concluir leitura opens DeliverDialog (rendered after click)', () => {
     render(
       <ReadingModeActions
         readingId="reading-123"
@@ -156,13 +156,13 @@ describe('components/readings/ReadingModeActions (Plan 7.4-18 — UAT-3 reading-
       />,
     )
     // Dialog content not visible before click
-    expect(screen.queryByText(/Entregar ao cliente\?/)).toBeNull()
+    expect(screen.queryByText(/Concluir leitura\?/)).toBeNull()
     fireEvent.click(screen.getByTestId('reading-mode-deliver'))
     // Dialog title appears
-    expect(screen.getByText(/Entregar ao cliente\?/)).toBeDefined()
+    expect(screen.getByText(/Concluir leitura\?/)).toBeDefined()
   })
 
-  it('autoexame (isSelfReading=true): hides "Entregar ao cliente" button (2026-05-21)', () => {
+  it('autoexame (isSelfReading=true): hides "Concluir leitura" button (2026-05-21)', () => {
     render(
       <ReadingModeActions
         readingId="reading-self"

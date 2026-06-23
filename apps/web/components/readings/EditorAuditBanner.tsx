@@ -44,7 +44,7 @@ export function EditorAuditBanner({ auditMetadata }: EditorAuditBannerProps) {
           <AlertTitle>Baixa ancoragem em features</AlertTitle>
           <AlertDescription>
             {missingPct}% das afirmações nas seções 2 a 6 não citam a feature de visão que as
-            fundamenta. Revise essas seções antes de entregar ao cliente.
+            fundamenta. Revise essas seções antes de concluir a leitura.
           </AlertDescription>
         </Alert>
       )}
@@ -54,7 +54,7 @@ export function EditorAuditBanner({ auditMetadata }: EditorAuditBannerProps) {
           <AlertTitle>Termos clinicamente afirmativos detectados</AlertTitle>
           <AlertDescription>
             <p>
-              Linguagem hipotética é obrigatória. Corrija antes da entrega — cada
+              Linguagem hipotética é obrigatória. Corrija antes de concluir — cada
               termo está na(s) seção(ões) indicada(s):
             </p>
             <ul className="mt-1 list-disc pl-4">
