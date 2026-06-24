@@ -52,7 +52,7 @@ function computeQualityScore(analysis: PostCaptureAnalysis): number {
 // Tipos
 // ---------------------------------------------------------------------------
 
-type Phase = 'instruction' | 'analyzing' | 'previewing' | 'finalizing'
+type Phase = 'instruction' | 'analyzing' | 'previewing' | 'finalizing' | 'incomplete'
 
 interface CapturedSlot { eye: string; angle: string }
 
@@ -121,11 +121,19 @@ export function CaptureClient({
   const [phase, setPhase] = React.useState<Phase>('instruction')
   const [capturedCount, setCapturedCount] = React.useState(initialCaptured.length)
   const [pendingPreview, setPendingPreview] = React.useState<PendingPreview | null>(null)
+  // "Block & retry" (2026-06-24): índices da SEQUENCE cujas fotos NÃO chegaram
+  // ao servidor — preenchido no finalize quando count<6. Dispara a tela
+  // 'incomplete' que obriga o cliente a refazer SÓ essas antes de concluir.
+  const [missingSlots, setMissingSlots] = React.useState<number[]>([])
 
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   const slotAbortRefs = React.useRef<Map<number, AbortController>>(new Map())
   const uploadPromisesRef = React.useRef<Map<number, Promise<unknown>>>(new Map())
   const finalizingTriggeredRef = React.useRef(false)
+  // Quando não-null, estamos no modo "refazer faltantes": o avanço de slot
+  // anda APENAS por estes índices (em vez de +1 sequencial) e, ao esgotar,
+  // volta pro 'finalizing' que re-verifica o count no servidor.
+  const retryQueueRef = React.useRef<number[] | null>(null)
 
   const slot: Slot = SEQUENCE[Math.min(slotIndex, SEQUENCE.length - 1)]
 
@@ -259,6 +267,23 @@ export function CaptureClient({
     setPendingPreview(null)
     setCapturedCount(c => c + 1)
 
+    const queue = retryQueueRef.current
+    if (queue) {
+      // Modo "refazer faltantes": avança pro próximo índice da fila. Ao
+      // esgotar, volta pro finalizing — que re-consulta o servidor; se ainda
+      // faltar (retry também caiu), reabre a tela 'incomplete' com o que sobrou.
+      const pos = queue.indexOf(slotIndex)
+      const nextMissing = pos >= 0 && pos + 1 < queue.length ? queue[pos + 1] : -1
+      finalizingTriggeredRef.current = false
+      if (nextMissing === -1) {
+        setPhase('finalizing')
+      } else {
+        setSlotIndex(nextMissing)
+        setPhase('instruction')
+      }
+      return
+    }
+
     const next = slotIndex + 1
     if (next >= SEQUENCE.length) {
       setPhase('finalizing')
@@ -286,6 +311,18 @@ export function CaptureClient({
     setPhase('instruction')
     window.setTimeout(() => fileInputRef.current?.click(), 50)
   }, [pendingPreview, slotIndex])
+
+  // "Block & retry": começa a refazer as fotos faltantes. Pula pro 1º slot
+  // faltante e entra no fluxo normal de captura (instruction → câmera). O
+  // avanço em executeUpload anda pela retryQueueRef até esgotar, então volta
+  // pro finalizing que re-verifica o servidor.
+  const startRetry = React.useCallback(() => {
+    const queue = retryQueueRef.current ?? missingSlots
+    if (!queue || queue.length === 0) return
+    finalizingTriggeredRef.current = false
+    setSlotIndex(queue[0])
+    setPhase('instruction')
+  }, [missingSlots])
 
   React.useEffect(() => {
     if (phase !== 'finalizing') return
@@ -317,34 +354,63 @@ export function CaptureClient({
         // response do upload) são dispensados antes do redirect, e o
         // finalizeInvite é skippado (server já fechou o ciclo).
         let serverCount = 0
+        let serverSlots: { eye: string; angle: string }[] = []
         try {
           const res = await fetch(
             `/api/convite/${encodeURIComponent(inviteToken)}/status?reading_id=${encodeURIComponent(readingId)}`,
           )
           if (res.ok) {
-            const data = (await res.json()) as { count?: number }
+            const data = (await res.json()) as {
+              count?: number
+              slots?: { eye: string; angle: string }[]
+            }
             serverCount = data.count ?? 0
+            serverSlots = data.slots ?? []
           }
         } catch (err) {
           console.error('[capture-client] status check failed (non-fatal):', err)
         }
 
         if (serverCount >= SEQUENCE.length) {
-          // Server tem todas as 6 fotos + auto-finalize já rodou. Erros de
-          // upload exibidos foram falsos positivos (response failure após
-          // server-side commit). Dispensa toasts antes do redirect pra /obrigada.
+          // Server tem todas as 6 fotos. O auto-finalize (upload route, count=6)
+          // normalmente já marcou ready + queimou token. finalizeInvite aqui é
+          // backstop idempotente: se o auto-finalize falhou (ex: count query
+          // errou), garante ready/token. Agora seguro — o gate do /finalize só
+          // marca ready com 6 fotos, que é exatamente este ramo. Non-fatal.
           toast.dismiss()
-        } else {
-          // Fallback: count<6. Tenta finalize manual (path histórico). Falhas
-          // não viram toast — auto-finalize cobre caso normal; se count<6
-          // permanece, terapeuta tem "Reprocessar" em /leituras/[id].
+          retryQueueRef.current = null
           try {
             await finalizeInvite(inviteToken, readingId, clientId)
           } catch (err) {
-            console.error('[capture-client] finalizeInvite error (non-fatal):', err)
+            console.error('[capture-client] finalizeInvite backstop falhou (non-fatal):', err)
           }
+          router.push(finalizeRedirect ?? `/convite/${inviteToken}/obrigada`)
+          return
         }
-        router.push(finalizeRedirect ?? `/convite/${inviteToken}/obrigada`)
+
+        // count<6: ALGUMAS fotos não chegaram (rede caiu no envio). NÃO manda
+        // pro /obrigada (seria "pronto" falso) e NÃO marca ready — o servidor
+        // também recusa marcar ready com <6 (gate em /finalize + piso em
+        // markReadingReady). Computa as faltantes e abre a tela 'incomplete'
+        // que OBRIGA o cliente a refazer só essas antes de concluir.
+        const presentSet = new Set(serverSlots.map(s => `${s.eye}_${s.angle}`))
+        const missing: number[] = []
+        for (let i = 0; i < SEQUENCE.length; i++) {
+          const s = SEQUENCE[i]
+          if (!presentSet.has(`${s.eye}_${s.angle}`)) missing.push(i)
+        }
+        toast.dismiss()
+        if (missing.length === 0) {
+          // Borda rara: count<6 mas todos os slots distintos presentes (não
+          // deve acontecer com o unique constraint). Trata como completo.
+          retryQueueRef.current = null
+          router.push(finalizeRedirect ?? `/convite/${inviteToken}/obrigada`)
+          return
+        }
+        setCapturedCount(serverCount)
+        setMissingSlots(missing)
+        retryQueueRef.current = missing
+        setPhase('incomplete')
         return
       }
 
@@ -378,7 +444,7 @@ export function CaptureClient({
     <div className="relative flex-1 flex flex-col bg-background">
       {/* Tip de iluminação — escondido durante phase=previewing pra não cobrir
           o badge de qualidade do CapturePreview (UAT 03 issue de overlap). */}
-      {phase !== 'previewing' && (
+      {phase !== 'previewing' && phase !== 'incomplete' && (
         <div
           role="note"
           className="absolute top-0 left-0 right-0 z-[60] pt-[env(safe-area-inset-top)] bg-amber-500/95 backdrop-blur-sm border-b border-amber-700/30"
@@ -437,6 +503,45 @@ export function CaptureClient({
         <div className="absolute inset-0 z-50 bg-background flex flex-col items-center justify-center gap-4 text-foreground">
           <h1 className="text-xl font-semibold">{getSlotProgressLabel(SEQUENCE.length - 1)} imagens registradas</h1>
           <p className="text-sm text-muted-foreground">Finalizando leitura...</p>
+        </div>
+      )}
+
+      {phase === 'incomplete' && (
+        <div className="absolute inset-0 z-50 bg-background flex flex-col items-center justify-center gap-6 px-6 text-center text-foreground">
+          <div className="max-w-sm space-y-3">
+            <h1 className="text-xl font-semibold">
+              {missingSlots.length === 1
+                ? 'Faltou 1 foto'
+                : `Faltaram ${missingSlots.length} fotos`}
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              A conexão oscilou e {missingSlots.length === 1 ? 'esta foto não chegou' : 'algumas fotos não chegaram'} ao
+              servidor. Vamos refazer só {missingSlots.length === 1 ? 'ela' : 'essas'} — leva um instante:
+            </p>
+          </div>
+          <ul className="w-full max-w-sm space-y-2 text-left">
+            {missingSlots.map(i => {
+              const s = SEQUENCE[i]
+              return (
+                <li
+                  key={`${s.eye}_${s.angle}`}
+                  className="rounded-lg border border-border bg-muted/40 px-4 py-2.5 text-sm"
+                >
+                  Foto {i + 1} de {SEQUENCE.length} — olho {EYE_LABEL[s.eye]} · {ANGLE_LABEL[s.angle]}
+                </li>
+              )
+            })}
+          </ul>
+          <button
+            type="button"
+            onClick={startRetry}
+            className="w-full max-w-sm rounded-full bg-primary px-6 py-3 text-base font-medium text-primary-foreground"
+          >
+            Refazer {missingSlots.length === 1 ? 'a foto' : `as ${missingSlots.length} fotos`}
+          </button>
+          <p className="text-xs text-muted-foreground/80 max-w-sm">
+            Se possível, aproxime-se do Wi-Fi ou de um sinal melhor antes de refazer.
+          </p>
         </div>
       )}
 

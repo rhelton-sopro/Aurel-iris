@@ -32,12 +32,26 @@ export interface InviteUploadResult {
 }
 
 /**
- * 1 tentativa + 1 retry no fail geral (matches uploadWithRetry maxAttempts=2),
- * SEM re-subir o blob 4K no retry interno do server (server faz seu próprio
- * retry de DB insert internamente como uploadCaptureImage faz no path authed).
+ * Retry resiliente p/ rede móvel ruim (2026-06-24). Cliente da Alessandra:
+ * fotos 4K cruas (vários MB) caíam em 4G e só 3 de 6 chegavam. Sem comprimir
+ * o arquivo (decisão do founder: manter 4K pela qualidade da íris), a defesa
+ * é tentar mais vezes com backoff EXPONENCIAL + jitter (em vez de 2 fixas/
+ * 800ms), o que reabsorve a maioria dos blips transitórios.
+ *
+ * 4 tentativas, delays ~600ms, 1.2s, 2.4s (×2 a cada falha) + jitter de até
+ * 400ms pra não sincronizar várias fotos retentando ao mesmo tempo. O blob 4K
+ * NÃO é recompactado entre tentativas (mesmo Blob reusado). AbortError (refazer
+ * foto / sair) interrompe na hora sem retentar.
+ *
+ * Camada complementar (não está aqui): "block & retry" no fim da captura
+ * (capture-client) garante que, mesmo se as 4 tentativas falharem, o cliente
+ * é OBRIGADO a refazer as fotos faltantes antes de concluir — nada incompleto
+ * passa. Próximo lever de confiabilidade (se ainda houver falha): upload
+ * resumível TUS do Supabase.
  */
 export async function uploadInvite(args: InviteUploadArgs): Promise<InviteUploadResult> {
-  const MAX_ATTEMPTS = 2
+  const MAX_ATTEMPTS = 4
+  const BASE_DELAY_MS = 600
   let lastError: Error | undefined
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     if (args.signal?.aborted) {
@@ -50,7 +64,9 @@ export async function uploadInvite(args: InviteUploadArgs): Promise<InviteUpload
       lastError = err
       if (err.name === 'AbortError') throw err
       if (attempt < MAX_ATTEMPTS) {
-        await new Promise(r => setTimeout(r, 800))
+        const backoff = BASE_DELAY_MS * 2 ** (attempt - 1)
+        const jitter = Math.floor(Math.random() * 400)
+        await new Promise(r => setTimeout(r, backoff + jitter))
       }
     }
   }

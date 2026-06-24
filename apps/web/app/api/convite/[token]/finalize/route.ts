@@ -106,6 +106,27 @@ export async function POST(
     }
   }
 
+  // 2026-06-24 (caso cliente da Alessandra): este endpoint é chamado pelo
+  // client-side como FALLBACK quando o /status reporta count<6 (uploads que
+  // falharam silenciosamente — rede/aba/iOS background-kill). O caminho do
+  // terapeuta (/api/readings/[id]/process) JÁ tinha o gate count<6 desde o
+  // caso Caroline, mas ESTE path público ficou de fora: marcava ready com
+  // 3 fotos → Sonnet rodava captura incompleta → "deu pronto" com lixo.
+  // Espelha o gate aqui. Sem 6 fotos, NÃO marca ready: a leitura fica em
+  // 'pending' ("Rascunho N/6") e o cliente retoma pelo botão "Continuar".
+  // markReadingReady também tem piso interno (defense-in-depth), mas aqui
+  // retornamos cedo pra não queimar token nem notificar terapeuta à toa.
+  const { count: imgCount, error: countErr } = await service
+    .from('reading_images')
+    .select('id', { count: 'exact', head: true })
+    .eq('reading_id', readingId)
+  if (!countErr && (imgCount ?? 0) < 6) {
+    return NextResponse.json(
+      { ok: false, reason: 'incomplete_capture', image_count: imgCount ?? 0 },
+      { status: 200 },
+    )
+  }
+
   // Idempotência (2026-05-22, caso Caroline): este endpoint vira segundo
   // caminho redundante. O primary é o auto-finalize em /api/convite/[token]/
   // upload quando o INSERT do 6º reading_image leva count=6 (markReadingReady

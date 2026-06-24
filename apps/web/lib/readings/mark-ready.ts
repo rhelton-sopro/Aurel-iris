@@ -47,6 +47,24 @@ export async function markReadingReady(args: MarkReadyArgs): Promise<MarkReadyRe
   const { readingId, currentStatus } = args
   const svc = createServiceClient()
 
+  // 0. Piso defensivo (2026-06-24): 'ready' SEMPRE significa "captura
+  //    completa, pronta pra análise" — o gate do /analyze exige status==='ready'.
+  //    Nenhum caller pode marcar ready com <6 fotos. Os callers já têm gates
+  //    próprios (upload auto-finalize só roda em count=6; process route retorna
+  //    'incomplete_capture'; finalize route idem), mas este piso fecha a classe
+  //    inteira do bug — incluindo o furo histórico do finalize público que
+  //    marcou a leitura do cliente da Alessandra como ready com 3/6 fotos.
+  const { count: imgCount, error: countErr } = await svc
+    .from('reading_images')
+    .select('id', { count: 'exact', head: true })
+    .eq('reading_id', readingId)
+  if (countErr) {
+    return { error: `Mark-ready count failed: ${countErr.message}` }
+  }
+  if ((imgCount ?? 0) < 6) {
+    return { error: `incomplete_capture: ${imgCount ?? 0}/6 fotos — não marca ready` }
+  }
+
   // 1. Marca status='ready' (idempotente — UPDATE roda mesmo se já está
   //    ready; sem WHERE de status pra simplificar; CAS em beta_counted
   //    abaixo evita duplo-incremento).

@@ -51,13 +51,18 @@ export async function GET(
     return NextResponse.json({ error: 'reading não pertence ao convite' }, { status: 403 })
   }
 
-  const { count } = await service
+  // 2026-06-24: além do count, devolve QUAIS slots (eye/angle) chegaram —
+  // o client usa pra computar as fotos faltantes e guiar o "refazer na hora"
+  // quando count<6 (em vez de mandar o cliente pra /obrigada achando que
+  // terminou). count derivado do length pra ficar 1 query só.
+  const { data: rows } = await service
     .from('reading_images')
-    .select('id', { count: 'exact', head: true })
+    .select('eye, angle')
     .eq('reading_id', readingId)
 
   return NextResponse.json({
-    count: count ?? 0,
+    count: rows?.length ?? 0,
+    slots: (rows ?? []).map(r => ({ eye: r.eye, angle: r.angle })),
     status: reading.status,
   })
 }
