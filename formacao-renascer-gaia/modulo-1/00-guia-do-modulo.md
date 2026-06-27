@@ -8,7 +8,7 @@
 
 ## 1. Por que este módulo existe
 
-Antes de desconstruir o ego (Módulo 2), respirar a catarse (Etapa da Água) ou constelar a origem (Etapa da Terra), o aluno precisa de um **chão**: o que é renascer, de onde vem o método, o que a ciência sustenta e o que é mapa simbólico. Sem esse chão, a formação vira crença; com ele, vira ofício.
+Antes de desconstruir o ego (Aulas 5–6), respirar a catarse (Etapa da Água) ou constelar a origem (Etapa da Terra), o aluno precisa de um **chão**: o que é renascer, de onde vem o método, o que a ciência sustenta e o que é mapa simbólico. Sem esse chão, a formação vira crença; com ele, vira ofício.
 
 Este módulo planta três sementes:
 1. **O método tem uma visão** (renascimento = reintegração da alma no corpo via respiração + sistema + origem).

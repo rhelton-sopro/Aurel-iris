@@ -248,7 +248,7 @@ Dor torácica, desmaio, confusão intensa que não cede, sinais neurológicos, p
 - **Tetania:** contração de mãos/lábios por alcalose; benigna e reversível.
 - **Imprint perinatal:** hipótese de que concepção/gestação/parto deixam marca nos padrões de vida.
 - **Matrizes Perinatais Básicas (BPM):** as quatro fases simbólicas de Grof.
-- **Padrão normótico (Bollas):** o "anormalmente normal" — fuga da vida interior (aprofundado no Módulo 2).
+- **Padrão normótico (Bollas):** o "anormalmente normal" — fuga da vida interior (aprofundado nas Aulas 5–6).
 - **Gêmeo evanescente:** reabsorção de um gemelar no início da gestação.
 - **Ordens do amor (Hellinger):** pertencimento, ordem/hierarquia, equilíbrio dar-receber.
 
@@ -274,4 +274,4 @@ Dor torácica, desmaio, confusão intensa que não cede, sinais neurológicos, p
 
 Você plantou o chão. Sabe **o que** é renascer, **de onde vem** o método, **o que** a ciência sustenta e **o que** é mapa simbólico. Sabe respirar uma primeira vez, com segurança. E sabe a postura: **profundidade com verdade.**
 
-> O Fogo já começou a queimar o que não é essencial. No Módulo 2, entramos no **ego-personagem** e nas **máscaras que impedem de respirar**.
+> O Fogo já começou a queimar o que não é essencial. Esta apostila cobriu a **Parte A** do Módulo 1 (introdução, respiração, origem). A **Parte B — Desconstrução do Ego** (ego-personagem, padrões normóticos, couraças e dissolução de crenças) está desenvolvida nas **Aulas 5 e 6** e seus materiais de apoio, dentro deste mesmo Módulo 1 / Etapa do Fogo.

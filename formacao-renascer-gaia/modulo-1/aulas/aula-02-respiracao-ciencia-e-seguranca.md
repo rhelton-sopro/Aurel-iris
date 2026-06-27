@@ -58,7 +58,7 @@
 ## Bloco 1 — A fisiologia básica (a verdade do corpo)
 
 ### 1.1 O diafragma: o músculo esquecido
-A respiração é movida principalmente pelo **diafragma**, um músculo em forma de cúpula sob os pulmões. Ao inspirar, ele desce e cria espaço; ao expirar, sobe. Quando vivemos em tensão crônica, o diafragma "trava" e passamos a respirar curto, só no alto do peito. Isso é, literalmente, parte do que o método chama de **couraça** (conceito de Wilhelm Reich, que veremos no Módulo 2): a contenção emocional vira contenção muscular, e a respiração encolhe. 🔵 a leitura emocional; 🟢 o fato de que tensão e padrão respiratório se influenciam.
+A respiração é movida principalmente pelo **diafragma**, um músculo em forma de cúpula sob os pulmões. Ao inspirar, ele desce e cria espaço; ao expirar, sobe. Quando vivemos em tensão crônica, o diafragma "trava" e passamos a respirar curto, só no alto do peito. Isso é, literalmente, parte do que o método chama de **couraça** (conceito de Wilhelm Reich, que veremos na Aula 6): a contenção emocional vira contenção muscular, e a respiração encolhe. 🔵 a leitura emocional; 🟢 o fato de que tensão e padrão respiratório se influenciam.
 
 ### 1.2 O sistema nervoso autônomo: os dois pedais
 Seu corpo tem dois "pedais" automáticos:

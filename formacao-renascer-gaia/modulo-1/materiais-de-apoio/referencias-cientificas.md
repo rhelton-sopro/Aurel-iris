@@ -46,7 +46,7 @@
 - Hayton, A. — *Womb Twin Survivors* (síndrome do gêmeo evanescente, leitura psicológica).
   https://www.wombtwin.com/
   https://www.counselling-directory.org.uk/articles/mental-health-implications-for-womb-twin-survivors
-- Bollas, C. — *The Shadow of the Object* (personalidade normótica) — base do Módulo 2.
+- Bollas, C. — *The Shadow of the Object* (personalidade normótica) — base das Aulas 5–6.
   https://en.wikipedia.org/wiki/Normopathy
 
 ## ⚠️ Evidência fraca / insuficiente (usar com transparência)

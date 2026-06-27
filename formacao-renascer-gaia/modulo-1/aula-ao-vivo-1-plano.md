@@ -48,7 +48,7 @@
 **7) Fechamento ritual (100–120 min)**
 - Colher o aprendizado em uma palavra de cada um.
 - Tarefas até o próximo encontro: completar avaliação do módulo (mapa do método, caso comentado, auto-relato respiratório).
-- Ponte para o Módulo 2: o ego-personagem e "a máscara que me impede de respirar".
+- Ponte para as Aulas 5–6: o ego-personagem e "a máscara que me impede de respirar".
 - Encerramento: respiração coletiva + agradecimento ao campo.
 
 ---

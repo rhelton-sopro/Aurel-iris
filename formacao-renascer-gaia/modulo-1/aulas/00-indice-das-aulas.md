@@ -50,6 +50,6 @@ Do conceito à prática, do geral ao íntimo, do íntimo ao sistêmico, e do sis
 - [x] Estrutura de slides das 4 aulas
 - [ ] *(opcional)* Gravação/edição dos vídeos e áudios a partir destes roteiros
 - [ ] *(opcional)* Diagramação da apostila em formato aluno (PDF)
-- [ ] *(próximo)* Etapa da Água / Módulo 2
+- [ ] *(próximo módulo)* Etapa da Água — respiração catártica plena
 
 > **Módulo 1 está completo no nível de conteúdo** — pronto para produção (gravação, diagramação).

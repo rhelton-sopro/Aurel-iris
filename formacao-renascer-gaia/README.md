@@ -61,15 +61,23 @@ Cada pilar é um elemento de Gaia e um estado de consciência que o terapeuta in
 | **Resultado ao final** | Clareza e vazio fértil |
 | **Experiência-chave** | Ego, padrões normóticos, respiração consciente catártica |
 
-### Módulo 1 — Introdução ao Método Renascer Gaia ← *você está aqui*
+### Módulo 1 — A Etapa do Fogo (Introdução + Desconstrução) ← *você está aqui*
+
+O Módulo 1 cobre **toda a Etapa do Fogo** em 6 aulas, em dois movimentos:
+
+**Parte A — Introdução ao método (Aulas 1–4)**
 - Princípios e teoria do renascimento
+- A respiração: ciência e segurança
 - "Como você foi gestado e nascido é como você está na vida" (imprint perinatal)
 - Síndrome do gêmeo evanescente / sobrevivente
 
-### Módulo 2 — Desconstrução do Ego e Padrões Normóticos
+**Parte B — Desconstrução do Ego e Padrões Normóticos (Aulas 5–6)**
 - Identidade dos personagens / diagnóstico do ego-personagem
 - Dissolução de crenças
 - Dinâmica: "A máscara que me impede de respirar"
+
+### Próximo — Módulo 2: a Etapa da Água
+- Respiração catártica e circular plena, emoção que flui, memória do nascer no corpo
 
 ---
 

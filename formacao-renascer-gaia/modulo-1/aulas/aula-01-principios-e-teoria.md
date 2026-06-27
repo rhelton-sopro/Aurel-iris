@@ -63,7 +63,7 @@ O **Método Renascer Gaia** é um processo terapêutico de renascimento. Renasce
 
 Toda pessoa constrói, ao longo da vida, um *personagem*: um conjunto de máscaras, defesas, crenças e estratégias que um dia serviram para sobreviver. O personagem não é o inimigo — ele foi a solução de uma criança que precisou se adaptar. O problema é quando o personagem **toma o lugar** da pessoa: quando você não consegue mais respirar livre, sentir de verdade, ocupar a sua vida inteira. Renascer é desfazer essa identificação e devolver o trono a quem é dono dele: o **ser**.
 
-> **Importante (postura):** "morte do personagem" é linguagem simbólica — 🔵. Não há morte literal, não há transe perigoso obrigatório, não há promessa mágica. Há um processo gradual de **desidentificação**, que a psicologia conhece e estuda há um século (Jung, Winnicott — veremos na Aula 1 do Módulo 2).
+> **Importante (postura):** "morte do personagem" é linguagem simbólica — 🔵. Não há morte literal, não há transe perigoso obrigatório, não há promessa mágica. Há um processo gradual de **desidentificação**, que a psicologia conhece e estuda há um século (Jung, Winnicott — veremos nas Aulas 5–6).
 
 ### 1.2 Os três movimentos do renascimento
 
@@ -134,7 +134,7 @@ Orr (EUA, anos 1960–70) criou o *Rebirthing*. Entre 1962 e 1976 desenvolveu a 
 Dispenza traduz para a linguagem da neurociência uma ideia antiga: **mudar o estado interno muda o corpo**. Pensamento + emoção elevada reorganizam o sistema nervoso e, possivelmente, marcadores epigenéticos. Estudo associado aos seus retiros (Frontiers in Psychology, 2022) reportou mudanças em cortisol, IgA secretora e sinais moleculares. **O que tomamos dele:** a disciplina de **ensaiar internamente o novo ser** — não só catarse, mas reconstrução. Evidência emergente (🟡): promissora, não definitiva.
 
 ### Osho — a catarse e a testemunha 🔵
-Osho trouxe ao Ocidente a meditação **ativa**: usar respiração intensa, movimento e catarse para descarregar a repressão e, do outro lado, encontrar o silêncio da **testemunha** — aquele que observa sem se identificar. **O que tomamos dele:** a catarse como **porta** (nunca como fim) e a postura de testemunha. *(Atenção: catarse no sentido de "desabafar para aliviar" tem ressalva científica — veremos isso a fundo no Módulo 2. Aqui catarse = descarga somática + integração, não venting.)*
+Osho trouxe ao Ocidente a meditação **ativa**: usar respiração intensa, movimento e catarse para descarregar a repressão e, do outro lado, encontrar o silêncio da **testemunha** — aquele que observa sem se identificar. **O que tomamos dele:** a catarse como **porta** (nunca como fim) e a postura de testemunha. *(Atenção: catarse no sentido de "desabafar para aliviar" tem ressalva científica — veremos isso a fundo na Aula 6. Aqui catarse = descarga somática + integração, não venting.)*
 
 ### Bert Hellinger — o olhar sistêmico ⚠️🔵
 Hellinger criou as **Constelações Familiares** e as **Ordens do Amor** (pertencimento, ordem, equilíbrio dar-receber). **O que tomamos dele:** a leitura de que o indivíduo está dentro de um **sistema**, e que reposicionar-se nele cura. **Selo honesto:** revisões sistemáticas recentes mostram evidência **fraca/insuficiente** das Constelações como tratamento clínico. Usamos como **instrumento fenomenológico de sentido** — 🔵 — não como terapia comprovada. Dizer isso à aluna **aumenta** a confiança dela em você, não diminui.
