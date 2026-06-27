@@ -39,5 +39,11 @@ Do conceito à prática, do geral ao íntimo, do íntimo ao sistêmico. A Aula 4
 - [x] Apostila completa
 - [x] Plano da aula ao vivo
 - [x] Materiais de apoio (prática, ficha, referências)
-- [ ] *(opcional)* Gravação/edição dos vídeos a partir destes roteiros
+- [x] Roteiros de áudio das práticas guiadas (P1–P5)
+- [x] Avaliação do módulo (rubrica + quiz de segurança eliminatório)
+- [x] Estrutura de slides das 4 aulas
+- [ ] *(opcional)* Gravação/edição dos vídeos e áudios a partir destes roteiros
+- [ ] *(opcional)* Diagramação da apostila em formato aluno (PDF)
 - [ ] *(próximo)* Etapa da Água / Módulo 2
+
+> **Módulo 1 está completo no nível de conteúdo** — pronto para produção (gravação, diagramação).
