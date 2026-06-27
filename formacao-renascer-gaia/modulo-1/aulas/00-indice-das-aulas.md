@@ -10,10 +10,14 @@ Estas são as **aulas desenvolvidas em profundidade** do Módulo 1 — o conteú
 | 2 | [A respiração: ciência e segurança](aula-02-respiracao-ciencia-e-seguranca.md) | Fisiologia, evidência, mecanismo, contraindicações | 🟢 |
 | 3 | [O imprint perinatal](aula-03-imprint-perinatal.md) | "Como você nasceu é como você vive" | 🔵 sobre núcleo 🟢 |
 | 4 | [O gêmeo evanescente](aula-04-gemeo-evanescente.md) | A origem e o que se perdeu nela | 🟢 fato / 🔵 leitura |
+| 5 | [O ego-personagem e as máscaras](aula-05-ego-personagem-e-mascaras.md) | Identidade dos personagens, normóticos, diagnóstico | 🔵 (Jung, Winnicott, Bollas) |
+| 6 | [Couraças e dissolução de crenças](aula-06-couracas-e-dissolucao-de-crencas.md) | Reich, a verdade da catarse, crenças, dinâmica | 🟢 (catarse) + 🔵 |
 
 ## Sequência pedagógica
-**1 (mapa e postura) → 2 (a ferramenta e a segurança) → 3 (a própria origem) → 4 (a origem profunda).**
-Do conceito à prática, do geral ao íntimo, do íntimo ao sistêmico. A Aula 4 fecha o Fogo e abre a porta da Água.
+**1 (mapa e postura) → 2 (a ferramenta e a segurança) → 3 (a própria origem) → 4 (a origem profunda) → 5 (as máscaras do ego) → 6 (as couraças e a dissolução).**
+Do conceito à prática, do geral ao íntimo, do íntimo ao sistêmico, e do sistêmico à desconstrução do personagem. A Aula 6 fecha o Fogo (clareza e vazio fértil) e abre a porta da Água.
+
+> **Núcleo de Desconstrução do Fogo** (sua estrutura original): as Aulas 5 e 6 cobrem "Desconstrução do Ego e Padrões Normóticos", a "Identidade dos personagens", a "Dissolução de crenças" e a dinâmica "A máscara que me impede de respirar" — **dentro do Módulo 1**, conforme definido.
 
 ## Molde de cada aula
 1. **Ficha técnica** — posição, formato, pré-requisito, resultado esperado.
@@ -36,6 +40,8 @@ Do conceito à prática, do geral ao íntimo, do íntimo ao sistêmico. A Aula 4
 - [x] Aula 2 — Respiração, ciência e segurança
 - [x] Aula 3 — Imprint perinatal
 - [x] Aula 4 — Gêmeo evanescente
+- [x] Aula 5 — O ego-personagem e as máscaras
+- [x] Aula 6 — Couraças e dissolução de crenças
 - [x] Apostila completa
 - [x] Plano da aula ao vivo
 - [x] Materiais de apoio (prática, ficha, referências)
