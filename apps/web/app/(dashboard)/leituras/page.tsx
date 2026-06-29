@@ -29,6 +29,7 @@ export default async function LeiturasPage() {
         vision_features,
         report_generated,
         is_delivered,
+        images_purged_at,
         client:clients(id, full_name, is_self),
         reading_images(count)
       `)

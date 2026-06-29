@@ -31,6 +31,7 @@ export interface ReadingRow {
   vision_features: unknown
   report_generated: unknown
   is_delivered: boolean | null
+  images_purged_at?: string | null
   reading_images: { count: number }[] | null
   client?: ClientRef | ClientRef[] | null
 }
@@ -136,6 +137,10 @@ export function ReadingsListManager({
             Object.keys(r.report_generated as Record<string, unknown>).length > 0
           const isDelivered = r.is_delivered ?? false
           const isSelected = selected.has(r.id)
+          // "Fotos apagadas" (furo 2026-06-29): imagens purgadas (TTL 24h) +
+          // sem relatório = leitura morta. Não mostra "Gerar análise" (só dá
+          // erro) — marca como expirada e oferece refazer a captura.
+          const photosExpired = r.images_purged_at != null && !hasReport
           // 2026-05-21: founder UAT — qualquer leitura pending com <6 fotos
           // mostra "Continuar" (inclui count=0, ex: convite abandonado pelo
           // cliente). Antes só count>0 disparava — leitura zerada ficava
@@ -145,7 +150,20 @@ export function ReadingsListManager({
           let action: ReactNode = (
             <span className="text-sm text-muted-foreground">—</span>
           )
-          if (!isRascunho && isDelivered) {
+          if (photosExpired) {
+            action = (
+              <Link
+                href={
+                  client?.id
+                    ? `/leituras/nova?cliente=${client.id}`
+                    : '/leituras/nova'
+                }
+                className={cn(buttonVariants({ size: 'sm', variant: 'outline' }))}
+              >
+                Refazer
+              </Link>
+            )
+          } else if (!isRascunho && isDelivered) {
             action = (
               <Link
                 href={`/leituras/${r.id}`}
@@ -193,7 +211,7 @@ export function ReadingsListManager({
             <ReprocessButton readingId={r.id} status={status as ReadingStatus} />
           ) : null
 
-          return { r, client, count, status, isRascunho, errorSummary, hasReport, isDelivered, isSelected, action, continueAction }
+          return { r, client, count, status, isRascunho, errorSummary, hasReport, isDelivered, isSelected, photosExpired, action, continueAction }
         })
 
         return (
@@ -221,7 +239,7 @@ export function ReadingsListManager({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {derived.map(({ r, client, count, status, isRascunho, errorSummary, isSelected, action, continueAction }) => (
+                  {derived.map(({ r, client, count, status, isRascunho, errorSummary, isSelected, photosExpired, action, continueAction }) => (
                     <TableRow key={r.id} data-state={isSelected ? 'selected' : undefined}>
                       <TableCell>
                         <Checkbox
@@ -258,11 +276,21 @@ export function ReadingsListManager({
                         </span>
                       </TableCell>
                       <TableCell>
-                        <StatusBadge
-                          status={(status as ReadingStatus) ?? 'pending'}
-                          isRascunho={isRascunho}
-                          errorSummary={errorSummary}
-                        />
+                        <div className="flex items-center gap-1.5">
+                          <StatusBadge
+                            status={(status as ReadingStatus) ?? 'pending'}
+                            isRascunho={isRascunho}
+                            errorSummary={errorSummary}
+                          />
+                          {photosExpired && (
+                            <Badge
+                              variant="outline"
+                              className="border-amber-600/40 bg-amber-50 text-amber-800"
+                            >
+                              Fotos expiradas
+                            </Badge>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell>{continueAction}</TableCell>
                       <TableCell>{action}</TableCell>
@@ -285,7 +313,7 @@ export function ReadingsListManager({
 
             {/* Mobile cards (<md) — Gmail-style stack, sem scroll horizontal */}
             <ul className="block md:hidden space-y-2">
-              {derived.map(({ r, client, count, status, isRascunho, errorSummary, isSelected, action, continueAction }) => (
+              {derived.map(({ r, client, count, status, isRascunho, errorSummary, isSelected, photosExpired, action, continueAction }) => (
                 <li
                   key={r.id}
                   className={cn(
@@ -343,11 +371,21 @@ export function ReadingsListManager({
                   </div>
 
                   <div className="flex items-center justify-between gap-2 flex-wrap pl-7">
-                    <StatusBadge
-                      status={(status as ReadingStatus) ?? 'pending'}
-                      isRascunho={isRascunho}
-                      errorSummary={errorSummary}
-                    />
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <StatusBadge
+                        status={(status as ReadingStatus) ?? 'pending'}
+                        isRascunho={isRascunho}
+                        errorSummary={errorSummary}
+                      />
+                      {photosExpired && (
+                        <Badge
+                          variant="outline"
+                          className="border-amber-600/40 bg-amber-50 text-amber-800"
+                        >
+                          Fotos expiradas
+                        </Badge>
+                      )}
+                    </div>
                     <div className="flex items-center gap-2 ml-auto">
                       {continueAction}
                       {action}

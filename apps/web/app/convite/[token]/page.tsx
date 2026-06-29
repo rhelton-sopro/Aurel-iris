@@ -111,6 +111,19 @@ export default async function InviteLandingPage({
           </ul>
         </div>
 
+        {/* Aviso de prazo (furo corrigido 2026-06-29): por privacidade, as fotos
+            são apagadas 24h após a captura (cron photo-ttl). Se o cliente começa
+            e não conclui — ou o terapeuta não gera o relatório — nesse prazo, as
+            imagens somem e a leitura precisa ser refeita. Avisamos quem captura. */}
+        <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+          <p>
+            <strong>Conclua as 6 fotos de uma vez.</strong> Por privacidade, as
+            imagens são apagadas automaticamente{' '}
+            <strong>24 horas depois que você começa</strong>. Se passar desse
+            prazo, será preciso recomeçar a leitura.
+          </p>
+        </div>
+
         <Link
           href={`/convite/${token}/capturar?client=${validation.token.client_id}`}
           className="block w-full rounded-md bg-foreground py-3 text-center text-sm font-medium text-background hover:opacity-90"

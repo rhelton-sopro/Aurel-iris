@@ -63,11 +63,12 @@ export default async function LeituraDetailPage({
   // 'as never' isola o type-check; RLS authed garante isolation.
   const { data: progress } = await supabase
     .from('readings')
-    .select('analysis_started_at, analysis_completed_at' as never)
+    .select('analysis_started_at, analysis_completed_at, images_purged_at' as never)
     .eq('id', readingId)
     .maybeSingle<{
       analysis_started_at: string | null
       analysis_completed_at: string | null
+      images_purged_at: string | null
     }>()
 
   if (error || !reading) notFound()
@@ -175,6 +176,27 @@ export default async function LeituraDetailPage({
   // — UI libera retry). FIX founder UAT 2026-05-20.
   const analysisStartedAt = progress?.analysis_started_at ?? null
   const analysisCompletedAt = progress?.analysis_completed_at ?? null
+  const photosPurgedAt = progress?.images_purged_at ?? null
+
+  // "Fotos apagadas" (furo corrigido 2026-06-29 — caso Lidia/Alessandra): o
+  // expurgo de 24h (TTL, promessa de privacidade da LP/FAQ) apaga as imagens da
+  // íris INDEPENDENTE do estado do relatório. Se a leitura não foi gerada dentro
+  // da janela (terapeuta demorou OU captura ficou incompleta), as fotos somem e
+  // NÃO há como gerar — qualquer clique em "Gerar análise" só bate em 404/502 e
+  // mostra um toast enganoso de "rodando no servidor" que nunca atualiza. Aqui
+  // detectamos o estado terminal (fotos purgadas + sem relatório) e renderizamos
+  // um aviso claro + caminho de refazer captura, SEM o botão de gerar.
+  const photosExpired = photosPurgedAt != null && !hasReport
+
+  // Parte C (preventiva — 2026-06-29): prazo de geração. O cron photo-ttl apaga
+  // as fotos 24h após a captura (readings.created_at), INDEPENDENTE do relatório.
+  // Enquanto a leitura está pronta-pra-gerar e as fotos ainda existem, avisamos o
+  // terapeuta do prazo pra não perder as imagens — foi exatamente o vão do caso
+  // Lidia: captura completa, mas a geração só veio 2 dias depois (fotos já idas).
+  const PURGE_TTL_MS = 24 * 60 * 60 * 1000
+  const photosExpireAt = new Date(
+    new Date(reading.created_at ?? Date.now()).getTime() + PURGE_TTL_MS,
+  )
   // Frescura dirigida pela CONCLUSÃO real (completed_at), não por timer curto.
   // A geração (canonicalize lazy + Stage 1 + Stage 2) pode levar ~5-6min; o
   // timer antigo de 5min parava o AutoRefresh ANTES de terminar → a página
@@ -197,6 +219,11 @@ export default async function LeituraDetailPage({
     }
     return true
   })()
+
+  // Parte C: só avisa o prazo quando a leitura está pronta-pra-gerar, ainda tem
+  // fotos e não está gerando agora. (Declarado após isAnalysisInProgress.)
+  const showPurgeDeadline =
+    status === 'ready' && !hasReport && !photosExpired && !isAnalysisInProgress
 
   // Phase 7.4 Sonnet-direct: signal (no hard block) when ≥1 photo was read
   // from a non-iris-centered frame (canonicalization fallback).
@@ -253,6 +280,53 @@ export default async function LeituraDetailPage({
     )
   }
 
+  // ---- FOTOS APAGADAS (estado terminal — sem fotos, sem relatório) ----
+  // Precede o State A/B pra NUNCA mostrar o botão "Gerar análise" numa leitura
+  // cujas imagens já foram purgadas. Caminho único: refazer a captura.
+  if (photosExpired) {
+    return (
+      <div className="space-y-6 -mx-7 px-4 py-8 sm:mx-0 sm:px-6">
+        <div className="flex items-center justify-between">
+          <Link
+            href="/leituras"
+            className="text-sm text-muted-foreground hover:underline"
+          >
+            ← Voltar para leituras
+          </Link>
+          <span className="inline-flex items-center rounded-full border border-amber-600/40 bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-800">
+            Fotos expiradas
+          </span>
+        </div>
+
+        <div className="rounded-lg border-2 border-amber-500 bg-amber-50 px-5 py-5 space-y-3">
+          <h1 className="text-lg font-semibold text-amber-950">
+            As fotos desta leitura foram apagadas
+          </h1>
+          <p className="text-sm text-amber-900/90">
+            Por privacidade, as imagens da íris são apagadas automaticamente{' '}
+            <strong>24 horas após a captura</strong>. As fotos desta leitura
+            {clientName ? ` (${clientName})` : ''} já passaram desse prazo e
+            foram removidas — por isso{' '}
+            <strong>não é possível gerar o relatório</strong>.
+          </p>
+          <p className="text-sm text-amber-900/90">
+            Para fazer a leitura, é necessário{' '}
+            <strong>refazer a captura</strong>. Lembre-se de gerar o relatório
+            em até 24 horas após tirar as fotos.
+          </p>
+          {clientRel?.id && (
+            <Link
+              href={`/leituras/nova?cliente=${clientRel.id}`}
+              className="inline-flex items-center rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background hover:opacity-90"
+            >
+              Refazer captura
+            </Link>
+          )}
+        </div>
+      </div>
+    )
+  }
+
   // ---- WAITING / EMPTY / STREAMING (State A or State B) ----
   // Preserved AnalysisHero + AnaliseClient path.
   return (
@@ -285,6 +359,21 @@ export default async function LeituraDetailPage({
             A geração do relatório está rodando no servidor (~2-3 minutos no
             total). Esta página atualiza sozinha quando terminar — pode fechar e
             voltar à vontade, a análise continua mesmo se você sair daqui.
+          </p>
+        </div>
+      )}
+
+      {showPurgeDeadline && (
+        <div className="rounded-md border-2 border-amber-500 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          <p className="font-medium">Gere o relatório em até 24h</p>
+          <p className="mt-1 text-amber-900/90">
+            Por privacidade, as fotos da íris são apagadas automaticamente 24h
+            após a captura. Gere o relatório antes de{' '}
+            <strong>
+              <LocalDateTime iso={photosExpireAt.toISOString()} />
+            </strong>{' '}
+            — passado esse prazo as imagens são removidas e a leitura precisa ser
+            refeita.
           </p>
         </div>
       )}
