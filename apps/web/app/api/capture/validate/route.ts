@@ -107,13 +107,17 @@ const REQUEST_TIMEOUT_MS = 8000
 // sinal misto. Viés holístico (JULGAMENTO DIRETO DE FOCO) e 'hesitação=borrado'
 // MANTIDOS (é relaxe leve, não remoção). 'muito_longe' rebaixado a soft-warning
 // na UI (CapturePreview) — prompt do muito_longe intocado.
+// 2026-06-29 (founder): muito_longe afrouxado ~10% — limiar de tamanho 1/8 → 1/9
+// em TODOS os pontos (def, teste mental 8×→9×, boa, precedência #5, tiebreaker).
+// Baixo risco: muito_longe é soft-warning (não bloqueia Confirmar), então afrouxar
+// só reduz aviso, não muda o que entra no relatório. Independente da res 1536.
 const SYSTEM_PROMPT = `Avalie a foto para análise iridológica. Retorne APENAS JSON, sem markdown:
 {"quality":"<ruim|regular|boa|excelente>","reason":"<reason>"}
 
 quality "ruim" (com reason correspondente):
 - sem_olho: sem olho humano na imagem
 - dois_olhos: AMBAS as íris estão claramente visíveis e identificáveis individualmente como duas íris separadas, ocupando regiões distintas da imagem. NÃO use este reason quando houver apenas uma íris e o restante seja sobrancelha, cílios, pálpebra do outro olho parcialmente visível, ou contexto facial. Só dispare 'dois_olhos' quando o terapeuta poderia legitimamente fotografar UMA íris só recortando metade da imagem — ou seja, há literalmente duas íris completas e nítidas.
-- muito_longe: a íris é DRASTICAMENTE minúscula no frame — seu diâmetro visual é igual ou menor que 1/8 da menor dimensão da imagem. TESTE MENTAL: imagine empilhar a íris 8 vezes ao longo da menor dimensão; se ela couber 8× ou mais, é 'muito_longe'. NÃO USE este reason quando a íris é claramente identificável e dá pra distinguir a região colorida do disco — mesmo que apareça rosto inteiro com sobrancelhas, bochechas, nariz, pele ao redor. Smartphones em modo selfie capturam o rosto inteiro naturalmente; isso NÃO é "muito longe", isso é só "rosto enquadrado normalmente". Só dispare 'muito_longe' se você precisar FORÇAR a vista pra identificar onde está a íris. NÃO use por causa de desfoque (use 'borrado'). EM CASO DE DÚVIDA por tamanho (íris >1/8 da menor dim), prefira 'olho_detectado' (boa/regular) — não rejeite por distância.
+- muito_longe: a íris é DRASTICAMENTE minúscula no frame — seu diâmetro visual é igual ou menor que 1/9 da menor dimensão da imagem. TESTE MENTAL: imagine empilhar a íris 9 vezes ao longo da menor dimensão; se ela couber 9× ou mais, é 'muito_longe'. NÃO USE este reason quando a íris é claramente identificável e dá pra distinguir a região colorida do disco — mesmo que apareça rosto inteiro com sobrancelhas, bochechas, nariz, pele ao redor. Smartphones em modo selfie capturam o rosto inteiro naturalmente; isso NÃO é "muito longe", isso é só "rosto enquadrado normalmente". Só dispare 'muito_longe' se você precisar FORÇAR a vista pra identificar onde está a íris. NÃO use por causa de desfoque (use 'borrado'). EM CASO DE DÚVIDA por tamanho (íris >1/9 da menor dim), prefira 'olho_detectado' (boa/regular) — não rejeite por distância.
 - olho_fechado: a íris NÃO está visível na imagem — pálpebra fechada ou semi-cerrada ocultando o disco da íris. REGRA SIMPLES E DECISIVA: se você consegue ver o disco circular colorido da íris, NÃO é 'olho_fechado', INDEPENDENTE de haver dedos/mão sobre as pálpebras segurando o olho aberto. Mão/dedos segurando o olho aberto é uma TÉCNICA LEGÍTIMA de captura iridológica (cliente fotografa sozinho); o dedo está sobre a pálpebra, não sobre a íris. Cílios cruzando a íris também não disparam 'olho_fechado'. Reflexo grande na íris é 'reflexo_total', não 'olho_fechado'.
 - reflexo_total: reflexo cobre >70% da área da íris
 - borrado: as fibras radiais DA ÍRIS (linhas finas que partem da pupila em direção à borda externa, como raios de uma roda) NÃO são individualmente contáveis. TESTE QUANTITATIVO ESTRITO: olhe SOMENTE para a região circular colorida da íris e tente contar fibras radiais distintas como linhas individuais com bordas definidas (não manchas suaves, não regiões de transição borrada, não áreas onde só se vê cor uniforme). Se você NÃO consegue contar PELO MENOS 25 fibras radiais distintas em diferentes setores da íris, é 'borrado'. CALIBRAÇÃO PRÁTICA: em smartphones recentes (iPhone/Android flagship), uma foto VERDADEIRAMENTE nítida mostra 40-60+ fibras com facilidade; uma foto que mostra só ~18-22 fibras é quase sempre borrada com algum reflexo/sombra mascarando o estado real.
@@ -127,7 +131,7 @@ Qualquer suavização, fusão ou manchamento das fibras da íris = 'borrado', ME
 
 caso contrário, reason "olho_detectado" e:
 - excelente: íris é VISIVELMENTE GRANDE no frame (claramente maior que 1/3 da menor dimensão — "é o sujeito principal da foto, ocupa boa parte do quadro") E pelo menos 36 fibras radiais individualmente nítidas em todos os setores da íris. Specular highlights localizados (pequenos pontos de luz da câmera) são OK e NÃO impedem 'excelente'. Resto da imagem (pele, cílios) PODE estar fora de foco.
-- boa: íris claramente maior que 1/8 da menor dimensão (passa no teste 'muito_longe' invertido — qualquer rosto enquadrado normalmente passa nisso) E pelo menos 25 fibras radiais individualmente contáveis (passa no teste 'borrado' invertido). Reflexo leve disperso é OK. Resto da imagem PODE estar fora de foco.
+- boa: íris claramente maior que 1/9 da menor dimensão (passa no teste 'muito_longe' invertido — qualquer rosto enquadrado normalmente passa nisso) E pelo menos 25 fibras radiais individualmente contáveis (passa no teste 'borrado' invertido). Reflexo leve disperso é OK. Resto da imagem PODE estar fora de foco.
 - regular: SOMENTE quando há um REFLEXO VERDADEIRO (ponto brilhante específico de luz da câmera com BORDAS DEFINIDAS — releia a distinção blur vs reflexo acima) cobrindo 30-70% da íris E a íris EM SI (fora da área do reflexo) tem ≥25 fibras radiais nítidas contáveis. Se você está marcando 'regular' por causa de "área um pouco mais clara" ou "mancha suave" SEM brilho específico de luz definido, isso É BLUR → use 'borrado', NUNCA 'regular'. Reflexo + íris borrada/suave = 'borrado', NUNCA 'regular'.
 
 REGRAS DE PRECEDÊNCIA (ORDEM OBRIGATÓRIA — avalie nesta sequência, NÃO pule etapas):
@@ -135,7 +139,7 @@ REGRAS DE PRECEDÊNCIA (ORDEM OBRIGATÓRIA — avalie nesta sequência, NÃO pul
 2. **SEGUNDO teste: olho_fechado.** Você consegue ver o disco circular colorido da íris? Se NÃO (pálpebra fechada/semi-cerrada cobrindo a íris) → 'olho_fechado'. Dedos sobre as pálpebras com íris visível NÃO contam.
 3. **TERCEIRO teste: reflexo_total.** Reflexo cobre >70% da íris? → 'reflexo_total'.
 4. **QUARTO teste: dois_olhos.** DUAS íris circulares completas e nítidas, ocupando regiões distintas? → 'dois_olhos'.
-5. **QUINTO teste: muito_longe.** Íris ≤1/8 da menor dimensão E você precisa forçar a vista pra identificá-la? → 'muito_longe'. Rosto inteiro visível por si só NÃO é 'muito_longe'.
+5. **QUINTO teste: muito_longe.** Íris ≤1/9 da menor dimensão E você precisa forçar a vista pra identificá-la? → 'muito_longe'. Rosto inteiro visível por si só NÃO é 'muito_longe'.
 6. **SEXTO teste: sem_olho.** Sem olho humano na imagem.
 7. Se passou em todos os testes acima → 'olho_detectado' + decide entre excelente/boa/regular conforme tamanho da íris e reflexo.
 
@@ -145,7 +149,7 @@ TIEBREAKERS (ordem importa):
 - Em dúvida APENAS entre excelente/boa/regular (com nitidez DA ÍRIS já confirmada como ≥25 fibras): prefira 'boa'. Não rebaixe para 'regular' por reflexo pequeno.
 - Em dúvida entre 'borrado' e 'boa' por contagem de fibras (~23-27 visíveis ou fibras quase-nítidas): prefira 'borrado'. Falso negativo destrói análise downstream.
 - Em dúvida entre 'borrado' e 'regular' (foto tem "área mais clara" mas você não tem certeza se é reflexo ou blur): SEMPRE 'borrado'. Reflexo de verdade NÃO gera dúvida — o brilho específico é óbvio. Hesitação = blur = borrado.
-- Em dúvida entre 'muito_longe' e 'boa' por tamanho da íris (~1/8 a 1/3 da menor dim): prefira 'boa'. Falso positivo de distância frustra terapeuta sem ganho. Rosto inteiro num frame de selfie NÃO é 'muito_longe' por padrão.
+- Em dúvida entre 'muito_longe' e 'boa' por tamanho da íris (~1/9 a 1/3 da menor dim): prefira 'boa'. Falso positivo de distância frustra terapeuta sem ganho. Rosto inteiro num frame de selfie NÃO é 'muito_longe' por padrão.
 - Em dúvida entre 'olho_fechado' e qualquer outro reason: se você consegue ver o disco circular colorido da íris, NUNCA é 'olho_fechado'. Dedos sobre as pálpebras (cliente segurando o olho aberto pra fotografar sozinho) é técnica legítima — a íris fica visível, e isso é o único que importa.`
 
 interface VLMJsonResponse {
