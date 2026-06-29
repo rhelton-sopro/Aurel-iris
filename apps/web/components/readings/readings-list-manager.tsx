@@ -151,13 +151,11 @@ export function ReadingsListManager({
             <span className="text-sm text-muted-foreground">—</span>
           )
           if (photosExpired) {
+            // Leva ao detalhe — lá o painel "fotos apagadas" oferece as opções
+            // certas (gerar novo link p/ cliente remoto OU refazer presencial).
             action = (
               <Link
-                href={
-                  client?.id
-                    ? `/leituras/nova?cliente=${client.id}`
-                    : '/leituras/nova'
-                }
+                href={`/leituras/${r.id}`}
                 className={cn(buttonVariants({ size: 'sm', variant: 'outline' }))}
               >
                 Refazer

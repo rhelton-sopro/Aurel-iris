@@ -35,6 +35,7 @@ import { AnalysisHero } from '@/components/readings/AnalysisHero'
 import { ReportReadView } from '@/components/readings/ReportReadView'
 import { ReadingModeActions } from '@/components/readings/ReadingModeActions'
 import { AutoRefreshWhileProcessing } from '@/components/readings/AutoRefreshWhileProcessing'
+import { ExpiredReadingActions } from '@/components/readings/ExpiredReadingActions'
 import { AnaliseClient } from './analise-client'
 
 export const dynamic = 'force-dynamic'
@@ -311,16 +312,14 @@ export default async function LeituraDetailPage({
           </p>
           <p className="text-sm text-amber-900/90">
             Para fazer a leitura, é necessário{' '}
-            <strong>refazer a captura</strong>. Lembre-se de gerar o relatório
-            em até 24 horas após tirar as fotos.
+            <strong>refazer a captura</strong>. Gere um novo link para o cliente
+            tirar as fotos pelo celular, ou refaça presencialmente. Lembre-se de
+            gerar o relatório em até 24 horas após tirar as fotos.
           </p>
           {clientRel?.id && (
-            <Link
-              href={`/leituras/nova?cliente=${clientRel.id}`}
-              className="inline-flex items-center rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background hover:opacity-90"
-            >
-              Refazer captura
-            </Link>
+            <ExpiredReadingActions
+              client={{ id: clientRel.id, full_name: clientName }}
+            />
           )}
         </div>
       </div>
