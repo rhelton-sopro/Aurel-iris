@@ -209,16 +209,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'imageBase64 (string) required' }, { status: 400 })
   }
 
-  // Sanity bound — 512×512 JPEG quality 0.85 fica em ~30-80KB, base64 ~40-110KB.
-  // Rejeita payloads claramente fora do range esperado pra evitar abuse.
-  if (body.imageBase64.length > 600_000) {
+  // Sanity bound — 2026-06-29: VALIDATION_DIM subiu p/ 1536 (íris com fibras
+  // visíveis, fim do "borrado" falso). 1536-lado-maior JPEG q0.85 fica em
+  // ~250-700KB binário → base64 ~330-950KB. Limite 1.5MB cobre com folga e
+  // ainda barra payload absurdo (JPEG 4K cru ~4-6MB) pra evitar abuse.
+  if (body.imageBase64.length > 1_500_000) {
     return NextResponse.json({ error: 'imageBase64 too large' }, { status: 413 })
   }
 
-  // Diagnóstico de custo (UAT 03 round 13): verifica que o resize 512×512 do
-  // client está chegando aqui. Esperado ~40-110KB pra JPEG quality 0.85 do
-  // canvas 512×512. Se aparecer >300KB, o resize falhou e estamos enviando
-  // o JPEG original 4K — explosão de tokens.
+  // Diagnóstico de custo: verifica o tamanho do resize que chega aqui.
+  // Esperado ~330-950KB base64 pra JPEG q0.85 do canvas 1536-lado-maior.
+  // Se aparecer >1.4MB, o resize falhou e estamos enviando o 4K cru.
   console.log('[vlm] imageBase64 length (bytes):', body.imageBase64.length)
 
   const apiKey = process.env.ANTHROPIC_API_KEY

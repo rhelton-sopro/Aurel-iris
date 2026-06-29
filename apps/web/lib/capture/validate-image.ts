@@ -6,17 +6,26 @@
  * latência 500ms-1s, custo ~$0.00043/foto, requer rede.
  *
  * Pipeline:
- *   1. Resize do JPEG original (4K) pra 512×512 via canvas (economiza tokens)
+ *   1. Resize do JPEG original (4K) pra lado-maior=1536 via canvas
  *   2. Converte canvas pra base64
  *   3. POST pro endpoint /api/capture/validate (route handler server-side
  *      mantém ANTHROPIC_API_KEY fora do bundle)
- *   4. Timeout 5s — failure mode é fallback pra valid:true (graceful)
+ *   4. Timeout 8s — failure mode é fallback pra valid:true (graceful)
+ *
+ * 2026-06-29 (founder): VALIDATION_DIM 512 → 1536. A 512px a íris ocupava
+ * ~200px e as fibras radiais finas eram FISICAMENTE irresolvíveis → o VLM
+ * recusava "borrado" mesmo em foto nítida (47% das recusas em 15 dias eram
+ * borrado/reflexo, em grande parte falso-positivo da resolução). A 1536 a
+ * íris fica com ~600px — fibras visíveis de verdade. Custo de tokens ~9× mas
+ * irrelevante (US$ ~0,06/foto → ainda centavos no volume atual). Timeout subiu
+ * pra 8s porque a imagem maior leva mais tempo de processamento no VLM (sem
+ * isso, mais validações cairiam no fallback que aceita sem checar).
  */
 
 import type { QualityLevel } from './quality-scoring'
 
-const VALIDATION_DIM = 512
-const REQUEST_TIMEOUT_MS = 5000
+const VALIDATION_DIM = 1536
+const REQUEST_TIMEOUT_MS = 8000
 
 export type ValidationReason =
   | 'olho_detectado'
@@ -68,10 +77,11 @@ export function isBlockingRejection(result: ValidationResult): boolean {
 
 /**
  * Resize aspect-preserving do blob original. NÃO corta nada — a foto inteira
- * vai pro VLM. Maior dimensão vira VALIDATION_DIM (512), menor é proporcional.
+ * vai pro VLM. Maior dimensão vira VALIDATION_DIM (1536), menor é proporcional.
  *
- * Exemplo: 4032×3024 (4:3) → 512×384 (~196k px, ~262 tokens — vs ~349 tokens
- * do center-crop 512×512 anterior). Economia de ~25% em image tokens.
+ * Exemplo: 4032×3024 (4:3) → 1536×1152 (~1.77M px). Resolução alta o bastante
+ * pra íris (~600px) mostrar as fibras radiais — o gate de "borrado" só funciona
+ * se ele consegue de fato ver fibras.
  *
  * Resultado é base64 sem prefixo `data:image/...`.
  *
