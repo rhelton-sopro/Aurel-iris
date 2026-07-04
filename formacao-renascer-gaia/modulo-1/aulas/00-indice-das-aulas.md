@@ -8,6 +8,7 @@ Estas são as **aulas desenvolvidas em profundidade** do Módulo 1 — o conteú
 |---|---|---|---|
 | 1 | [Princípios e teoria](aula-01-principios-e-teoria.md) | O que é renascer, 5 pilares, 4 linhagens, postura ética | 🔵 + postura |
 | 2 | [A respiração: ciência e segurança](aula-02-respiracao-ciencia-e-seguranca.md) | Fisiologia, evidência, mecanismo, contraindicações | 🟢 |
+| 2b | [Masterclass de Breathwork](aula-02b-masterclass-breathwork.md) | As 4 vozes na respiração (Orr, Osho, Dispenza, Hellinger), protocolo completo, holding space | 🔵 + 🟢 |
 | 3 | [O imprint perinatal](aula-03-imprint-perinatal.md) | "Como você nasceu é como você vive" | 🔵 sobre núcleo 🟢 |
 | 4 | [O gêmeo evanescente](aula-04-gemeo-evanescente.md) | A origem e o que se perdeu nela | 🟢 fato / 🔵 leitura |
 | 5 | [O ego-personagem e as máscaras](aula-05-ego-personagem-e-mascaras.md) | Identidade dos personagens, normóticos, diagnóstico | 🔵 (Jung, Winnicott, Bollas) |
