@@ -7,6 +7,7 @@ import { X } from 'lucide-react'
 import { toast } from 'sonner'
 import { finalizeReadingAction } from '@/app/actions/readings'
 import { AngleInterstitial } from '@/components/capture/AngleInterstitial'
+import { PhotoExamples, hasDismissedExamples } from '@/components/capture/PhotoExamples'
 import { CapturePreview } from '@/components/capture/CapturePreview'
 import { CaptureProgress } from '@/components/capture/CaptureProgress'
 import {
@@ -52,7 +53,16 @@ function computeQualityScore(analysis: PostCaptureAnalysis): number {
 // Tipos
 // ---------------------------------------------------------------------------
 
-type Phase = 'instruction' | 'analyzing' | 'previewing' | 'finalizing' | 'incomplete'
+// 'examples' (2026-07-17): fotos modelo, UMA vez, antes da PRIMEIRA foto.
+// A desistência é toda nas 3 primeiras (o cliente Adriano morreu na 1ª), então
+// é aqui que se ganha ou se perde a pessoa — não antes de cada foto.
+type Phase =
+  | 'examples'
+  | 'instruction'
+  | 'analyzing'
+  | 'previewing'
+  | 'finalizing'
+  | 'incomplete'
 
 interface CapturedSlot { eye: string; angle: string }
 
@@ -118,7 +128,22 @@ export function CaptureClient({
   }, [initialCaptured])
 
   const [slotIndex, setSlotIndex] = React.useState(initialIndex)
-  const [phase, setPhase] = React.useState<Phase>('instruction')
+  // CLIENTE (convite) SEMPRE vê as fotos modelo na 1ª foto — decisão do founder,
+  // e é o que o dado manda (terapeuta erra 20%, cliente 59%). Determinístico:
+  // depende só de props, então não há mismatch de hidratação.
+  // Retomada (initialIndex>0) NÃO remostra: quem já tirou foto já viu.
+  const [phase, setPhase] = React.useState<Phase>(
+    initialIndex === 0 && isInviteMode ? 'examples' : 'instruction',
+  )
+  // TERAPEUTA: pode ter dispensado. localStorage não existe no server, então a
+  // decisão sai no client — default 'instruction' e promove aqui. Assim ninguém
+  // vê de relance aquilo que já mandou não mostrar.
+  React.useEffect(() => {
+    if (initialIndex === 0 && !isInviteMode && !hasDismissedExamples()) {
+      setPhase((p) => (p === 'instruction' ? 'examples' : p))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const [capturedCount, setCapturedCount] = React.useState(initialCaptured.length)
   const [pendingPreview, setPendingPreview] = React.useState<PendingPreview | null>(null)
   // "Block & retry" (2026-06-24): índices da SEQUENCE cujas fotos NÃO chegaram
@@ -465,6 +490,13 @@ export function CaptureClient({
           <X className="h-5 w-5" />
         </Link>
       </header>
+
+      {phase === 'examples' && (
+        <PhotoExamples
+          allowDismiss={!isInviteMode}
+          onProceed={() => setPhase('instruction')}
+        />
+      )}
 
       {phase === 'instruction' && (
         <>
