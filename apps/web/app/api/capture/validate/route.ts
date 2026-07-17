@@ -13,8 +13,9 @@ export const runtime = 'nodejs'
 // Não trocar pra modelos mais antigos sem re-validar accuracy do gate.
 const MODEL = 'claude-haiku-4-5-20251001'
 
-// max_tokens conservador — esperamos JSON curto. Margem pra raciocínio
-// inline se Haiku decidir verbalizar antes do JSON.
+// max_tokens conservador. Com tool_choice forçado o Haiku só emite o bloco
+// tool_use (~30 tokens) — não há preâmbulo pra caber. Folga de sobra.
+// (Pré-2026-07-17 isto truncava 17% das respostas em texto livre.)
 const MAX_TOKENS = 256
 
 // Timeout server-side independente do timeout client-side. Corta retransmissão
@@ -111,8 +112,7 @@ const REQUEST_TIMEOUT_MS = 8000
 // em TODOS os pontos (def, teste mental 8×→9×, boa, precedência #5, tiebreaker).
 // Baixo risco: muito_longe é soft-warning (não bloqueia Confirmar), então afrouxar
 // só reduz aviso, não muda o que entra no relatório. Independente da res 1536.
-const SYSTEM_PROMPT = `Avalie a foto para análise iridológica. Retorne APENAS JSON, sem markdown:
-{"quality":"<ruim|regular|boa|excelente>","reason":"<reason>"}
+const SYSTEM_PROMPT = `Avalie a foto para análise iridológica e registre o veredito chamando a ferramenta \`registrar_avaliacao\`. NÃO escreva texto nem explicação: a chamada da ferramenta é a única resposta. Julgue internamente e preencha os campos quality e reason.
 
 quality "ruim" (com reason correspondente):
 - sem_olho: sem olho humano na imagem
@@ -167,6 +167,50 @@ const VALID_REASON_VALUES = [
   'reflexo_total',
   'olho_fechado',
 ] as const
+
+// 2026-07-17: STRUCTURED OUTPUT (tool use + tool_choice forçado).
+//
+// RAIZ (auditoria de capture_attempts, 17 dias pós-res-1536): o gate recusava
+// 35,4% das fotos por ERRO DE FORMATO, não por qualidade — e subindo (59% em
+// 07-13). A 1536px o Haiku passou a DIVAGAR em vez de devolver só o JSON: das
+// respostas curtas (≤40 tok = só o JSON) 0% caía no clamp e 48,4% eram aceitas;
+// das longas (>40 tok), 56,9% caíam no clamp e só 2,0% eram aceitas. O `reason`
+// saía fora do enum → normalizeEnum devolvia null → clamp 'olho_detectado' +
+// quality 'ruim' → UI bloqueava foto potencialmente PERFEITA.
+//
+// FIX: o veredito agora é um tool call com schema. `strict: true` garante
+// validação de schema no input (Haiku 4.5 suporta structured outputs), e
+// tool_choice forçado faz o modelo emitir SÓ o tool_use — divagar deixa de ser
+// possível estruturalmente, em vez de ser desencorajado por prompt.
+// Limiares (borrado ≥25 fibras, reflexo >70%) INTOCADOS de propósito: este é
+// bug de formato, não calibração. Re-medir a taxa de recusa DEPOIS deste deploy.
+const VALIDATION_TOOL = {
+  name: 'registrar_avaliacao',
+  description:
+    'Registra o veredito de qualidade da foto de íris. Chame exatamente uma vez, ' +
+    'aplicando as REGRAS DE PRECEDÊNCIA do system prompt.',
+  strict: true,
+  input_schema: {
+    type: 'object' as const,
+    properties: {
+      quality: {
+        type: 'string',
+        enum: VALID_QUALITY_VALUES,
+        description:
+          "Veredito. 'ruim' = rejeita (refazer). 'regular'/'boa'/'excelente' = aceita.",
+      },
+      reason: {
+        type: 'string',
+        enum: VALID_REASON_VALUES,
+        description:
+          "Motivo canônico. Use 'olho_detectado' quando a foto PASSA " +
+          '(regular/boa/excelente). Para ruim, use o motivo específico da precedência.',
+      },
+    },
+    required: ['quality', 'reason'],
+    additionalProperties: false,
+  },
+}
 
 interface ValidateBody {
   imageBase64?: unknown
@@ -243,6 +287,9 @@ export async function POST(request: NextRequest) {
       model: MODEL,
       max_tokens: MAX_TOKENS,
       system: SYSTEM_PROMPT,
+      tools: [VALIDATION_TOOL],
+      // Força a tool: o Haiku não consegue responder em texto livre.
+      tool_choice: { type: 'tool', name: VALIDATION_TOOL.name },
       messages: [
         {
           role: 'user',
@@ -275,54 +322,52 @@ export async function POST(request: NextRequest) {
   // Esperado pra resize 512×512 + prompt atual: ~500-560 input + ~20 output.
   console.log('[vlm] usage:', response.usage, 'model:', response.model)
 
-  // Extrai texto da resposta (assistant message com text blocks).
-  const textBlock = response.content.find((b) => b.type === 'text')
-  if (!textBlock || textBlock.type !== 'text') {
-    console.error('[capture/validate] no text block in response')
-    return NextResponse.json({ error: 'VLM returned no text' }, { status: 502 })
-  }
-
-  // Parse do JSON. Haiku às vezes envolve em ```json — extrai bloco se houver.
-  let parsed: VLMJsonResponse
-  try {
-    const raw = textBlock.text.trim()
-    const jsonMatch = raw.match(/\{[\s\S]*\}/)
-    parsed = JSON.parse(jsonMatch ? jsonMatch[0] : raw) as VLMJsonResponse
-  } catch (err) {
-    console.error('[capture/validate] parse error:', err, textBlock.text.slice(0, 200))
-    return NextResponse.json(
-      { error: 'VLM returned invalid JSON', text: textBlock.text.slice(0, 200) },
-      { status: 502 },
+  // Veredito vem do bloco tool_use (tool_choice forçado + strict schema) —
+  // não há mais texto livre pra parsear com regex.
+  const toolBlock = response.content.find((b) => b.type === 'tool_use')
+  if (!toolBlock || toolBlock.type !== 'tool_use') {
+    // Só acontece se a chamada truncar (stop_reason 'max_tokens') ou a API mudar.
+    console.error(
+      '[capture/validate] sem tool_use na resposta. stop_reason:',
+      response.stop_reason,
+      'blocos:',
+      response.content.map((b) => b.type).join(','),
     )
+    return NextResponse.json({ error: 'VLM returned no tool_use' }, { status: 502 })
   }
 
-  if (typeof parsed.quality !== 'string' || typeof parsed.reason !== 'string') {
-    return NextResponse.json(
-      { error: 'VLM JSON missing quality/reason', received: parsed },
-      { status: 502 },
-    )
-  }
+  const parsed = toolBlock.input as VLMJsonResponse
 
-  // Normaliza variantes cosméticas do VLM (pontuação/caixa/espaço: 'Boa', 'boa.',
-  // ' ruim ') de volta pro valor canônico ANTES de comparar. Claude às vezes
-  // formata o enum assim — o comentário antigo já documentava 'boa.'.
-  const normalizeEnum = (raw: string, valid: readonly string[]): string | null => {
+  // Normaliza variantes cosméticas (pontuação/caixa/espaço: 'Boa', 'boa.', ' ruim ').
+  // Com `strict: true` o schema já garante os enums, então isto é defesa em
+  // profundidade — não deve mais disparar.
+  const normalizeEnum = (raw: unknown, valid: readonly string[]): string | null => {
+    if (typeof raw !== 'string') return null
     const cleaned = raw.trim().toLowerCase().replace(/[.!,;:]+$/, '')
     return valid.includes(cleaned) ? cleaned : null
   }
 
-  // FIX bug#3 (fail-SAFE): quality desconhecida/irreconhecível → 'ruim' (BLOQUEIA),
-  // nunca 'regular' (o fallback antigo deixava passar — 'ruim.' virava 'regular' →
-  // Confirmar habilitado → foto ruim VAZAVA). Variantes cosméticas de boa/excelente
-  // são recuperadas pelo normalizeEnum, então foto BOA não trava — só o que o
-  // servidor genuinamente não entende vira 'ruim'. Filosofia do gate: prefere
-  // false-positive (pede refazer) a false-negative (envia foto-lixo, gasta crédito).
+  // FIX bug#3 (fail-SAFE): quality irreconhecível → 'ruim' (BLOQUEIA), nunca
+  // 'regular' (o fallback antigo deixava foto ruim VAZAR). Prefere false-positive
+  // (pede refazer) a false-negative (foto-lixo entra e gasta crédito).
+  //
+  // ⚠️ OBSERVABILIDADE (2026-07-17): o clamp era SILENCIOSO — foi por isso que a
+  // regressão de 35% só apareceu por inferência estatística sobre capture_attempts,
+  // e nunca em log. Agora ele grita com o input bruto. Pós tool use + strict, um
+  // clamp aqui significa que a API mudou ou o schema quebrou: investigar, não ignorar.
   const normalizedQuality = normalizeEnum(parsed.quality, VALID_QUALITY_VALUES)
+  const normalizedReason = normalizeEnum(parsed.reason, VALID_REASON_VALUES)
+  if (normalizedQuality === null || normalizedReason === null) {
+    console.error(
+      '[capture/validate] CLAMP disparou apesar do strict schema — tool input inesperado:',
+      JSON.stringify(toolBlock.input)?.slice(0, 300),
+      '| stop_reason:',
+      response.stop_reason,
+    )
+  }
   const quality = (normalizedQuality ?? 'ruim') as (typeof VALID_QUALITY_VALUES)[number]
   // reason: fallback 'olho_detectado' (neutro, dentro do check constraint 0023).
-  // O bloqueio chaveia em quality==='ruim' (isVlmRejection), não no reason —
-  // quality já clampada a 'ruim' bloqueia mesmo com reason neutro.
-  const normalizedReason = normalizeEnum(parsed.reason, VALID_REASON_VALUES)
+  // O bloqueio chaveia em quality==='ruim' (isVlmRejection), não no reason.
   const reason = (normalizedReason ?? 'olho_detectado') as (typeof VALID_REASON_VALUES)[number]
 
   // Log best-effort em capture_attempts (migration 0023+0024) — alimenta
