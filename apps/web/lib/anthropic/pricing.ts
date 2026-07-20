@@ -20,22 +20,33 @@ export interface ModelPricing {
 }
 
 // Fallback hardcoded — usado SE migration 0024 não aplicada OU modelo
-// não tem linha. Ref. anthropic.com/pricing 2026-01.
+// não tem linha. Ref. platform.claude.com/docs/en/about-claude/pricing
+// (verificado 2026-07-20).
 const FALLBACK_PRICING: Array<{
   match: (modelVersion: string) => boolean
   pricing: ModelPricing
 }> = [
   {
+    // Haiku 4.5 = $1/$5 (NÃO $0.80/$4 — esse era o preço do Haiku 3.5).
     match: (m) => /^claude-haiku-4-5/.test(m),
-    pricing: { input_usd_per_mtok: 0.80, output_usd_per_mtok: 4.0 },
+    pricing: { input_usd_per_mtok: 1.0, output_usd_per_mtok: 5.0 },
   },
   {
-    match: (m) => /^claude-sonnet-4-(5|6)/.test(m),
+    // Sonnet 4.5 / 4.6 / 5 — todos $3/$15 base (Sonnet 5 tem preço
+    // introdutório $2/$10 até 31/08/2026; fallback usa o padrão pós-intro).
+    match: (m) => /^claude-sonnet-(4-(5|6)|5)/.test(m),
     pricing: { input_usd_per_mtok: 3.0, output_usd_per_mtok: 15.0 },
   },
   {
-    match: (m) => /^claude-opus-4-7/.test(m),
-    pricing: { input_usd_per_mtok: 15.0, output_usd_per_mtok: 75.0 },
+    // Opus 4.5 / 4.6 / 4.7 / 4.8 — todos $5/$25 (Opus 4.1 e anteriores
+    // eram $15/$75; NÃO aplicar aqui).
+    match: (m) => /^claude-opus-4-(5|6|7|8)/.test(m),
+    pricing: { input_usd_per_mtok: 5.0, output_usd_per_mtok: 25.0 },
+  },
+  {
+    // Fable 5 / Mythos 5 — tier frontier acima do Opus.
+    match: (m) => /^claude-(fable|mythos)-5/.test(m),
+    pricing: { input_usd_per_mtok: 10.0, output_usd_per_mtok: 50.0 },
   },
 ]
 
