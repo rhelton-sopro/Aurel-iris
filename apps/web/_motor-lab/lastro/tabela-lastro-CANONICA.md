@@ -158,10 +158,10 @@ Esta é a tabela-mestra. O 🔴 de um campo é a carga daquele elemento; o 🟢 
   - **🔴 crenças:** "desconto em mim a raiva do que não recebo"
 
 ### `coracao` — superior esquerda OE (2-3h)
-- **Elemento(s):** 💧Água 60% · 💨Ar 40% (carga). **Derivação:** medo de não ser amado(💧0.6/💨0.4) + abandono(💧0.8/💨0.2) + dificuldade de vínculo(💨0.5/💧0.5) → 💧=1.9 · 💨=1.1 sobre 3.0 → **💧60 · 💨40**. A MTC dá "alegria/Fogo" ao coração, mas nos livros Dias a CARGA cardíaca é 💧Água(medo/abandono)+💨Ar(vínculo); **alegria entra no polo 🟢 do 💨Ar**.
+- **Elemento(s):** 💧Água 50% · 💨Ar 35% · 🔥Fogo 15%. **Derivação:** carga = medo de não ser amado(💧0.6/💨0.4) + abandono(💧0.8/💨0.2) + dificuldade de vínculo(💨0.5/💧0.5) → 💧Água+💨Ar dominam. **🔥Fogo 15% (ajuste pós-auditoria):** honra a MTC (Coração=Fogo) — o Fogo entra como calor/vitalidade/desejo de aproximar-se, sem desmontar a carga. Alegria social fica no 🟢 do Ar; o ardor/calor fica no Fogo.
 - **Centro:** Coração (vínculo, amor).
 - **💧 Água**
-  - **🟢 emoções:** segurança amorosa, calor no vínculo (Br) · sentir fundo e se deixar amar (assinatura Água+) · sentir-se amado e conectado (Br/Dias)
+  - **🟢 emoções:** segurança amorosa (Br) · sentir fundo e se deixar amar (assinatura Água+) · sentir-se amado e conectado (Br/Dias)
   - **🟢 crenças:** "posso me abrir e me deixar amar" · "mereço vínculos que me façam bem" · "meu coração aguenta amar de novo"
   - **🔴 emoções:** medo de não ser amado / amor não recebido (Br/Dias) · abandono (Br) · perda (Br) · traição (Br) · desamparo (Br) · vulnerabilidade (Br) · esforço não reconhecido (Br) · angústia (Br) · coração endurecido / medo de sentir (Hay)
   - **🔴 crenças:** "se eu me abrir, vão me abandonar" · "amar é arriscado demais" · "no fundo, não sou digno de ser amado de verdade" · "melhor não me apegar pra não sofrer" (coração endurecido — Hay)
@@ -170,6 +170,11 @@ Esta é a tabela-mestra. O 🔴 de um campo é a carga daquele elemento; o 🟢 
   - **🟢 crenças:** "dá pra sentir alegria e prazer sem culpa" · "gosto de me conectar e me abrir pras pessoas" · "meu coração aberto atrai bons encontros"
   - **🔴 emoções:** dificuldade de vínculo / de ligar-se (Dias) · idealismo afetivo — "coração aventureiro que não sustenta o vínculo" (Dias) · falta de alegria/prazer, rejeição da vida (Hay)
   - **🔴 crenças:** "me ligo fácil, mas não sustento o vínculo" (idealismo afetivo — Dias) · "meu esforço nos vínculos nunca é reconhecido" · "perdi o gosto pelas coisas"
+- **🔥 Fogo**
+  - **🟢 emoções:** calor no vínculo / afeto que aquece (MTC — Coração=Fogo) · vitalidade e presença na conexão (assinatura Fogo+) · desejo saudável de aproximar-se, ardor afetivo vivo (MTC — Shen/Fogo radiante)
+  - **🟢 crenças:** "posso amar com calor e presença" · "meu afeto aquece quem está perto de mim" · "aproximar-me de quem amo me dá vida"
+  - **🔴 emoções:** paixão possessiva / drama afetivo (assinatura Fogo−) · intensidade que consome, "queimar-se" no outro (MTC — Fogo do Coração em excesso: agitação) · ciúme ardente no vínculo (Br/Dias)
+  - **🔴 crenças:** "amo com uma intensidade que me consome" · "quando me apego, perco a medida" · "preciso do outro perto o tempo todo pra me sentir vivo"
 
 ---
 
