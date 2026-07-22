@@ -85,8 +85,8 @@ Esta é a tabela-mestra. O 🔴 de um campo é a carga daquele elemento; o 🟢 
   - **🔴 emoções:** tristeza (Br/MTC/Hay) · luto/pesar (Br/MTC) · desânimo (Br) · auto-rejeição (Dias) · choro (Br) · melancolia (MTC) · depressão/desesperança (Hay/MTC) · rejeição (Br) · desapego difícil (MTC) · baixa autoestima por auto-comparação (Dias) · pessimismo (Dias) · desproteção (Br)
   - **🔴 crenças:** "perdi algo que não volta mais" · "não tenho muito o que comemorar" · "os outros são melhores do que eu" (auto-comparação — Dias) · "é mais seguro não esperar muito da vida" (pessimismo)
 - **💨 Ar** (face-recurso)
-  - **🟢 emoções:** capacidade de inspirar/receber a vida, abertura ao novo (MTC — pulmão em harmonia) · fôlego/vitalidade (PROPOSTA recurso — 💨1.0) · otimismo e leveza depois do luto (assinatura Ar+)
-  - **🟢 crenças:** "tem coisa boa pra receber da vida" · "consigo me abrir pro novo" · "cada respiração é um recomeço"
+  - **🟢 emoções:** capacidade de inspirar/receber a vida, abertura ao novo (MTC — pulmão em harmonia) · fôlego/vitalidade (PROPOSTA recurso — 💨1.0) · **pneuma / conexão espiritual — o sopro que liga a algo maior** (respiração=pneuma; a "dimensão espiritual" que o próprio glossário de produção põe na pineal) · otimismo e leveza depois do luto (assinatura Ar+)
+  - **🟢 crenças:** "tem coisa boa pra receber da vida" · "consigo me abrir pro novo" · "cada respiração é um recomeço" · "quando respiro fundo, me reconecto com algo maior que eu"
   - **🔴 emoções:** fôlego curto / sufocamento — "não digno de respirar a vida plena" (Hay) · fechamento ao novo depois da perda
   - **🔴 crenças:** "não me sinto digno de ocupar meu espaço" (Hay tema) · "prefiro não me abrir pra não perder de novo"
 - **Nota:** a CARGA do pulmão é 💧Água (luto/valor); o 💨Ar é a face-recurso (respirar, receber a vida). O Ar aqui aparece no polo saudável, não como carga — sem forçar.
