@@ -138,3 +138,25 @@ Diferentes de verdade (self=mental+visceral, coração=0/preservado; miguel=visc
 **Ponto do founder (preservação):** zona quieta ≠ ausência do elemento. Coração 0% do self = coração PRESERVADO (recurso), não "sem coração". → o motor deve pontuar preservação + tensão, não só tensão.
 
 **RECEITA v3 (a construir):** (1) somar achados por centro (peso=intensidade) + somar preservados por centro → distribuição Mente/Coração/Instinto; (2) Centro→elemento: Mente→Ar · Coração→Água · Instinto→Fogo(fígado/radii/coroa)+Terra(intestino/apego/músculo); (3) o eixo ativo/passivo (colarete) e o pigmento afinam. UNIFICA com o bloco 2 (3 centros). Validar center→elemento nos 3 exames.
+
+---
+
+## ⭐⭐⭐ PRINCÍPIO GOVERNANTE (founder 2026-07-22): EQUILIBRAR O INSTRUMENTO, NÃO O RESULTADO
+Há DOIS "equilíbrios" e são erros opostos:
+- ✅ **Instrumento equilibrado (certo):** o olhar do Stage 1 + o mapa devem conseguir DETECTAR cada elemento igualmente bem. Se a pessoa É Ar, o sistema tem que conseguir dar Ar.
+- ❌ **Resultado equilibrado (tendencioso):** forçar todo output pra 25/25/25/25 — impõe a suposição (falsa?) de que a população é igual. PROIBIDO.
+→ A "normalização por cobertura" que eu propus escorregava pro ❌ (forçava output). DESCARTADA nesse formato. Consertar o INSTRUMENTO; o resultado da pessoa é o que for.
+
+**Miguel Ar=6 = cegueira do instrumento, não verdade:** só capturamos mente como CARGA (ruminação); mente clara/organizada (Ar-recurso) é invisível → Ar zera falsamente. Injustiça REAL do instrumento. Consertar de verdade ⇒ capturar o sinal mental/Jóia que o Stage 1 não emite bem (volta ao gap do tipo_estrutural).
+
+## v3 com split do radii (instrumento, legítimo — 'gasolina que pensa' = Fogo+Ar)
+radii_solaris = Fogo .5 / Ar .5. Resultado (cargas+preservação):
+| | Fogo | Ar | Água | Terra | domina |
+|---|---|---|---|---|---|
+| self | 30 | 21 | 28 | 21 | Colérico |
+| daniel | 29 | 19 | 32 | 20 | Água |
+| miguel | 23 | 6 | 22 | 49 | Fleumático |
+Discrimina (self=Colérico "ferve rápido" ✓; miguel=Fleumático/visceral ✓). Fogo desinflou (self 53→30), Ar do self subiu (13→21). Ar do Miguel segue baixo = o gap acima.
+
+## PENDENTE — pesquisa `distribuicao-temperamentos-populacao.md` (termômetro)
+Founder: os 4 são ~iguais na população? viés regional/Brasil (via constituição miscigenada)? Usar SÓ como sanity-check (se der 95% colérico = instrumento quebrado), nunca pra forçar.
