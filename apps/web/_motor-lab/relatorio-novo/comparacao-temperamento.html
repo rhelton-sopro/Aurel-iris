@@ -1,0 +1,177 @@
+<meta charset="utf-8">
+<title>Comparação — Temperamento (antigo) × Mente·Coração·Corpo (novo)</title>
+<style>
+  :root{
+    --paper:#fff;--panel:#f7f3ea;--panel-2:#ece5d5;
+    --ink:#1f3a3c;--ink-soft:#5a6f6e;--ink-faint:#8a9695;
+    --line:#e6ded0;--line-strong:#d6cbb6;
+    --teal:#0a7d84;--teal-deep:#0d5c63;--amber:#b5701a;--amber-soft:#cf8636;--good:#2f7a54;--good-soft:#5fae86;
+    --mente:#2c6480;
+    --serif:"Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#e9e2d3;color:var(--ink);font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased;}
+  .display{font-family:var(--serif);font-weight:600;letter-spacing:-.01em;}
+  .wrap{max-width:1500px;margin:20px auto;padding:0 16px;}
+  .topbar{text-align:center;margin-bottom:16px;}
+  .topbar h1{font-family:var(--serif);font-size:22px;margin:0 0 4px;}
+  .topbar p{font-size:13px;color:var(--ink-soft);margin:0;}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;}
+  @media(max-width:900px){.cols{grid-template-columns:1fr;}}
+  .col{background:var(--paper);border:1px solid var(--line);border-radius:10px;box-shadow:0 3px 18px rgba(30,45,45,.09);overflow:hidden;}
+  .col.new{border-color:color-mix(in srgb,var(--teal) 30%,var(--line));}
+  .col-tag{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;padding:11px 22px;border-bottom:1px solid var(--line);}
+  .col.old .col-tag{color:var(--ink-faint);background:var(--panel);}
+  .col.new .col-tag{color:var(--teal-deep);background:color-mix(in srgb,var(--teal) 7%,var(--paper));}
+  .pad{padding:24px 26px 30px;}
+  h2{font-size:20px;margin:0 0 12px;line-height:1.15;}
+
+  /* --- barras 4 elementos (antigo) --- */
+  .four{display:flex;flex-direction:column;gap:4px;margin:0 0 14px;font-size:12.5px;color:var(--ink-soft);}
+  .f4{display:flex;align-items:center;gap:8px;} .f4 .d4{width:11px;height:11px;border-radius:50%;flex:none;}
+  .tbar{display:grid;grid-template-columns:1fr 3px;gap:8px;align-items:center;margin:0 0 9px;grid-template-columns:150px 1fr 40px;}
+  .tname{font-size:12.5px;font-weight:600;line-height:1.15;}
+  .tname .tsub{display:block;font-size:10.5px;color:var(--ink-faint);font-weight:500;}
+  .ttrack{height:15px;background:var(--panel-2);border-radius:100px;overflow:hidden;}
+  .tfill{height:100%;border-radius:100px;display:block;}
+  .tfill.col{background:linear-gradient(90deg,#d0a017,#edc23a);} .tfill.mel{background:linear-gradient(90deg,#159d90,#45c2b4);}
+  .tfill.fle{background:linear-gradient(90deg,#c0552a,#e07d48);} .tfill.san{background:linear-gradient(90deg,#1e6fa8,#3f9bd4);}
+  .tpct{font-family:var(--serif);font-size:16px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums;}
+  .mut{opacity:.9;}
+
+  /* --- 3 centros (novo) --- */
+  .ctr{padding:13px 0;border-top:1px solid var(--line-strong);}
+  .ctr:first-child{border-top:0;padding-top:2px;}
+  .ctr-head{display:flex;align-items:baseline;gap:9px;margin-bottom:9px;flex-wrap:wrap;}
+  .ctr-name{font-family:var(--serif);font-size:18px;font-weight:700;}
+  .ctr-name.mente{color:var(--mente);} .ctr-name.coracao{color:var(--good);} .ctr-name.corpo{color:var(--amber);}
+  .ctr-fn{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:100px;}
+  .ctr-fn.mente{color:var(--mente);background:color-mix(in srgb,var(--mente) 9%,var(--paper));}
+  .ctr-fn.coracao{color:var(--good);background:color-mix(in srgb,var(--good) 9%,var(--paper));}
+  .ctr-fn.corpo{color:var(--amber);background:color-mix(in srgb,var(--amber) 9%,var(--paper));}
+  .dv{display:grid;grid-template-columns:46px 1fr 40px;align-items:center;gap:8px;margin:0 0 9px;}
+  .dv-lab{font-size:9px;letter-spacing:.05em;text-transform:uppercase;font-weight:700;}
+  .dv-lab.a{color:var(--amber);text-align:right;} .dv-lab.b{color:var(--good);}
+  .dv-track{position:relative;height:9px;border-radius:100px;background:linear-gradient(90deg,var(--amber),var(--amber-soft) 30%,#e7dcc6 50%,var(--good-soft) 70%,var(--good));}
+  .dv-needle{position:absolute;top:50%;width:15px;height:15px;border-radius:50%;background:#fff;border:2.5px solid var(--ink-soft);transform:translate(-50%,-50%);box-shadow:0 1px 3px rgba(0,0,0,.22);}
+  .ctr-txt{font-family:var(--serif);font-size:14px;line-height:1.5;color:#28403f;margin:0;}
+  .ctr-txt .ten{color:var(--amber);font-weight:600;} .ctr-txt .liv{color:var(--good);font-weight:600;}
+
+  /* --- compartilhado (descrições) --- */
+  .tension{font-family:var(--serif);font-size:14.5px;line-height:1.55;color:#26403f;background:var(--panel);border-left:3px solid var(--amber);border-radius:0 8px 8px 0;padding:12px 15px;margin:16px 0;}
+  .tension b{font-weight:600;}
+  .lab{font-size:11px;letter-spacing:.09em;text-transform:uppercase;font-weight:800;color:var(--amber);margin:20px 0 9px;}
+  .col.new .lab{color:var(--teal-deep);}
+  .facet{margin:0 0 9px;}
+  .fk{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--ink-faint);margin-bottom:1px;}
+  .fk.mente{color:var(--mente);} .fk.coracao{color:var(--good);} .fk.corpo{color:var(--amber);}
+  .fv{font-family:var(--serif);font-size:14px;line-height:1.5;color:#28403f;}
+  .fv b{font-weight:600;color:var(--teal-deep);}
+  .root{font-family:var(--serif);font-size:13.5px;line-height:1.5;padding:8px 0;border-bottom:1px dashed var(--line);}
+  .gift{color:var(--good);font-weight:600;} .cost{color:var(--amber);font-weight:600;}
+  .serif{font-family:var(--serif);font-size:14px;line-height:1.58;color:#28403f;margin:0 0 10px;}
+  .serif b{font-weight:600;color:var(--teal-deep);}
+  .drains{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px;}
+  .drain{border-radius:9px;padding:11px 13px;font-size:12.5px;}
+  .drain h4{margin:0 0 6px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;}
+  .drain ul{margin:0;padding-left:15px;line-height:1.4;color:#3a4f4e;}
+  .drain.up{background:color-mix(in srgb,var(--good) 8%,var(--paper));border:1px solid color-mix(in srgb,var(--good) 22%,var(--line));} .drain.up h4{color:var(--good);}
+  .drain.down{background:color-mix(in srgb,var(--amber) 8%,var(--paper));border:1px solid color-mix(in srgb,var(--amber) 22%,var(--line));} .drain.down h4{color:var(--amber);}
+  .note{font-size:11.5px;color:var(--ink-faint);border-top:1px solid var(--line);margin-top:20px;padding-top:12px;}
+</style>
+<div class="wrap">
+  <div class="topbar">
+    <h1 class="display">Comparação — o mesmo retrato, dois conceitos</h1>
+    <p>À esquerda: temperamento (4 elementos, o que você aprovou ontem). À direita: <b>Mente · Coração · Corpo</b>, com as mesmas descrições reancoradas. Exemplo: Rhelton.</p>
+  </div>
+  <div class="cols">
+
+    <!-- ============ ANTIGO ============ -->
+    <div class="col old"><div class="col-tag">Antes · Temperamento (4 elementos)</div><div class="pad">
+      <h2 class="display">Como você funciona por dentro</h2>
+      <div class="four">
+        <div class="f4"><span class="d4" style="background:#d0a017"></span><b>Colérico</b> · Fogo — decide e age</div>
+        <div class="f4"><span class="d4" style="background:#159d90"></span><b>Melancólico</b> · Água — sente e guarda</div>
+        <div class="f4"><span class="d4" style="background:#1e6fa8"></span><b>Sanguíneo</b> · Ar — anima e conecta</div>
+        <div class="f4"><span class="d4" style="background:#c0552a"></span><b>Fleumático</b> · Terra — acalma e sustenta</div>
+      </div>
+      <div class="tbar"><span class="tname">Colérico<span class="tsub">predominante</span></span><span class="ttrack"><span class="tfill col" style="width:42%"></span></span><span class="tpct">42%</span></div>
+      <div class="tbar"><span class="tname">Melancólico<span class="tsub">secundário</span></span><span class="ttrack"><span class="tfill mel" style="width:37%"></span></span><span class="tpct">37%</span></div>
+      <div class="tbar mut"><span class="tname">Fleumático<span class="tsub">terra</span></span><span class="ttrack"><span class="tfill fle" style="width:16%"></span></span><span class="tpct">16%</span></div>
+      <div class="tbar mut"><span class="tname">Sanguíneo<span class="tsub">ar</span></span><span class="ttrack"><span class="tfill san" style="width:5%"></span></span><span class="tpct">5%</span></div>
+
+      <p class="tension">Uma tensão que te define: uma parte quer <b>decidir e resolver agora</b> (colérico); a outra <b>revisa, prevê e remói</b> antes de fechar (melancólico). É o que te faz potente — e o que te cansa.</p>
+
+      <p class="lab">Como isso aparece no seu dia a dia</p>
+      <div class="facet"><span class="fk">Como pensa</span><span class="fv">Em objetivo e rota — vê o alvo antes das pessoas. Mas não dispara no escuro: analisa fundo e prevê o que pode dar errado.</span></div>
+      <div class="facet"><span class="fk">Como sente</span><span class="fv">A raiva não vira desabafo — vira <b>combustível</b>. O que magoa, você guarda, revisita, remói. Sente intenso, por dentro.</span></div>
+      <div class="facet"><span class="fk">Como realiza</span><span class="fv">Movido a resultado. Atravessa o obstáculo sozinho e carrega o projeto nas costas quando todos desistiram.</span></div>
+      <div class="facet"><span class="fk">Nas relações</span><span class="fv">Escolhe por competência e lealdade. Ama protegendo e resolvendo — às vezes traz solução quando o outro só queria ser ouvido.</span></div>
+
+      <p class="lab">A mesma raiz, dois lados</p>
+      <div class="root"><span class="gift">A entrega intensa</span> faz confiarem em você — e é <span class="cost">a mesma coisa que te esgota</span> quando ninguém retribui.</div>
+      <div class="root"><span class="gift">A rapidez pra resolver</span> tira todos do atoleiro — e <span class="cost">atropela quem precisava de um tempo</span> pra sentir.</div>
+      <div class="root"><span class="gift">O olhar que analisa a fundo</span> te faz certeiro — e é <span class="cost">o perfeccionismo que te trava</span>.</div>
+
+      <p class="lab">O mal-entendido sobre você</p>
+      <p class="serif">Chamam de <b>dureza</b> o que é você <b>se protegendo</b> de decepção. Leem como <b>impaciência</b> a sua cabeça três passos à frente. Confundem o silêncio com frieza — quando você está <b>remoendo</b>, não indiferente.</p>
+
+      <p class="lab">Quando aperta, você vira…</p>
+      <p class="serif">Sob pressão, o lado que resolve <b>sobe o tom</b>; se não resolve, o que sente <b>desaba pra dentro</b>. O sinal de que passou do limite não é gritar — é <b>parar de falar</b>.</p>
+
+      <p class="lab">Te acende · te apaga</p>
+      <div class="drains">
+        <div class="drain up"><h4>Te acende</h4><ul><li>Vencer um desafio difícil</li><li>Ver de pé o que construiu</li><li>Clareza e propósito</li><li>Poucas relações, leais</li></ul></div>
+        <div class="drain down"><h4>Te apaga</h4><ul><li>Enrolação, lentidão</li><li>Ter que agradar</li><li>Entregar e não ser retribuído</li><li>Parar sem "terminar"</li></ul></div>
+      </div>
+      <p class="note">⚠️ Problema: os rótulos (Colérico etc.) são jargão; e no Brasil quase todo mundo dá Colérico (fígado/raiva).</p>
+    </div></div>
+
+    <!-- ============ NOVO ============ -->
+    <div class="col new"><div class="col-tag">Depois · Mente · Coração · Corpo</div><div class="pad">
+      <h2 class="display">Como você funciona por dentro</h2>
+      <div class="ctr">
+        <div class="ctr-head"><span class="ctr-name mente">Mente</span><span class="ctr-fn mente">modo de pensar</span></div>
+        <div class="dv"><span class="dv-lab a">tensão</span><div class="dv-track"><i class="dv-needle" style="left:26%"></i></div><span class="dv-lab b">livre</span></div>
+        <p class="ctr-txt">Vive <span class="ten">ligada</span> — analisa, antecipa, rumina. Raramente desliga.</p>
+      </div>
+      <div class="ctr">
+        <div class="ctr-head"><span class="ctr-name coracao">Coração</span><span class="ctr-fn coracao">modo de sentir</span></div>
+        <div class="dv"><span class="dv-lab a">tensão</span><div class="dv-track"><i class="dv-needle" style="left:83%"></i></div><span class="dv-lab b">livre</span></div>
+        <p class="ctr-txt"><span class="liv">Livre e inteiro</span>. O afeto não está ferido — quando você desacelera, sentir flui. Sua área mais leve.</p>
+      </div>
+      <div class="ctr">
+        <div class="ctr-head"><span class="ctr-name corpo">Corpo</span><span class="ctr-fn corpo">modo de agir</span></div>
+        <div class="dv"><span class="dv-lab a">tensão</span><div class="dv-track"><i class="dv-needle" style="left:21%"></i></div><span class="dv-lab b">livre</span></div>
+        <p class="ctr-txt"><span class="ten">Reage rápido</span> — gatilho curto, resposta na hora, às vezes antes do pensamento.</p>
+      </div>
+
+      <p class="tension">A sua tensão vive entre a <b>mente e o corpo</b>: uma parte quer <b>resolver e agir agora</b> (corpo), a outra <b>revisa, prevê e remói</b> antes (mente). O <b>coração</b> fica em segundo plano — livre, mas menos ouvido.</p>
+
+      <p class="lab">Como cada centro aparece no seu dia a dia</p>
+      <div class="facet"><span class="fk mente">Mente — como pensa</span><span class="fv">Em objetivo e rota — vê o alvo antes das pessoas. Não dispara no escuro: analisa fundo e prevê o que pode dar errado.</span></div>
+      <div class="facet"><span class="fk coracao">Coração — como sente</span><span class="fv">Sente intenso, mas <b>por dentro</b>: o que magoa você guarda, revisita, remói — em vez de mostrar. O afeto é inteiro; só fica quieto.</span></div>
+      <div class="facet"><span class="fk corpo">Corpo — como age</span><span class="fv">Movido a resultado, reage e realiza. Atravessa o obstáculo sozinho e carrega o projeto nas costas. A raiva vira <b>combustível</b>, não desabafo.</span></div>
+      <div class="facet"><span class="fk">Nas relações</span><span class="fv">Escolhe por competência e lealdade. Ama protegendo e resolvendo — às vezes traz solução quando o outro só queria ser ouvido.</span></div>
+
+      <p class="lab">A mesma raiz, dois lados</p>
+      <div class="root"><span class="gift">A entrega intensa</span> faz confiarem em você — e é <span class="cost">a mesma coisa que te esgota</span> quando ninguém retribui.</div>
+      <div class="root"><span class="gift">A rapidez do corpo pra resolver</span> tira todos do atoleiro — e <span class="cost">atropela quem precisava de um tempo</span> pra sentir.</div>
+      <div class="root"><span class="gift">A mente que analisa a fundo</span> te faz certeiro — e é <span class="cost">o perfeccionismo que te trava</span>.</div>
+
+      <p class="lab">O mal-entendido sobre você</p>
+      <p class="serif">Chamam de <b>dureza</b> o que é você <b>se protegendo</b>. Leem como <b>impaciência</b> a sua mente três passos à frente. Confundem o silêncio com frieza — quando o seu coração está <b>remoendo</b>, não indiferente.</p>
+
+      <p class="lab">Quando aperta, você vira…</p>
+      <p class="serif">Sob pressão, o <b>corpo sobe o tom</b> e quer resolver na marra; se não resolve, o <b>coração desaba pra dentro</b> — você se fecha e para de falar. O sinal do limite não é gritar: é o silêncio.</p>
+
+      <p class="lab">Te acende · te apaga</p>
+      <div class="drains">
+        <div class="drain up"><h4>Te acende</h4><ul><li>Vencer um desafio difícil</li><li>Ver de pé o que construiu</li><li>Clareza e propósito</li><li>Poucas relações, leais</li></ul></div>
+        <div class="drain down"><h4>Te apaga</h4><ul><li>Enrolação, lentidão</li><li>Ter que agradar</li><li>Entregar e não ser retribuído</li><li>Parar sem "terminar"</li></ul></div>
+      </div>
+      <p class="note">✅ Sem jargão, sem rótulo. Discrimina (o Miguel racional daria "Mente clara/livre"). Sai do dado que já existe, sem tocar o Stage 1. Mesmas descrições, agora ancoradas nos 3 centros.</p>
+    </div></div>
+
+  </div>
+</div>
