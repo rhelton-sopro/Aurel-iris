@@ -160,3 +160,10 @@ Discrimina (self=Colérico "ferve rápido" ✓; miguel=Fleumático/visceral ✓)
 
 ## PENDENTE — pesquisa `distribuicao-temperamentos-populacao.md` (termômetro)
 Founder: os 4 são ~iguais na população? viés regional/Brasil (via constituição miscigenada)? Usar SÓ como sanity-check (se der 95% colérico = instrumento quebrado), nunca pra forçar.
+
+---
+
+## 🎯 VALIDAÇÃO DE CAMPO (founder conhece Miguel, 2026-07-22): INSTRUMENTO ERROU
+Founder: "Miguel é extremamente RACIONAL, pouco intuitivo." → deveria ser 💨 Ar ALTO (tipo Jóia = mente analítica). Instrumento deu **Ar 6, Terra 49** (Fleumático). **ERRO claro num caso real.**
+**Prova decisiva:** a abordagem por CARGA, sozinha, é cega ao elemento quando ele é FORÇA/qualidade. Mente racional do Miguel = força (sem carga de ruminação) → instrumento lê "sem Ar". O pigmento/âmbar dele é igual aos outros 2 → dado atual NÃO separa o racional.
+**⇒ NECESSÁRIO (não mais opcional): capturar o sinal ESTRUTURAL (tipo Jóia/Flor/Corrente, gestalt) que o Stage 1 não emite.** Sem ele, erramos gente real. Isto reabre a decisão da MENOR EXTENSÃO do Stage 1 (campo `tipo_estrutural`) — agora com evidência de campo a favor.
