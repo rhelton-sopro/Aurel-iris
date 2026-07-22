@@ -1,6 +1,8 @@
 # Score Emocional — especificação de cálculo (vira o prompt do Stage 2)
 
-Como transformar o output do **Stage 1** (achados) no **mapa emocional** do cliente (barras + nível). Determinístico, não-aleatório, único por pessoa. Display qualitativo (alta/média/baixa/livre) — o número existe por baixo, mas NÃO é impresso (evita falsa precisão / Forer).
+Como transformar o output do **Stage 1** (achados) no relatório novo (doc do cliente). Determinístico, não-aleatório, único por pessoa. Display qualitativo (alta/média/baixa/livre) — o número existe por baixo, mas NÃO é impresso (evita falsa precisão / Forer).
+
+> **📐 ORDEM DOS BLOCOS (6, final — 2026-07-22):** 1 Em poucas palavras · **2 Como você funciona por dentro** (Mente·Coração·Corpo, topográfico) · 3 Linha do tempo emocional · 4 Heranças transgeracionais · 5 Mapa emocional (pêndulos) · 6 Perguntas para a sua sessão. O antigo bloco de **temperamento (4 elementos Bardon)** foi **fundido** no bloco 2 e os elementos **arquivados** (ver seções abaixo). Este SPEC cobre o cálculo dos blocos 2 e 5 e o craft do bloco 6; os blocos 1/3/4 são de craft de prosa (mockups no `relatorio-novo/`).
 
 ## ⭐ REGRAS OBRIGATÓRIAS DO PROMPT (não podem ficar de fora — decisão founder)
 1. **FORÇA das DUAS fontes, sempre:** `sistemas_preservados` **E** `constituicao_base` (pupila centrada = centramento · trama compacta = vitalidade · bordas regulares = estabilidade). NUNCA mostrar só os preservados — a força ficaria subrepresentada. Varrer as duas em toda leitura.
@@ -9,14 +11,45 @@ Como transformar o output do **Stage 1** (achados) no **mapa emocional** do clie
 4. **ZERO iridologia** no texto do cliente; voz 2ª pessoa, 8ª série, envolvente.
 5. **NÃO inventar força** além do que a íris mostra (preservado + constituição) = falso conforto/Forer-positivo proibido.
 
-## TEMPERAMENTO (Bardon, bloco 3) — cálculo do % (soma 100)
-⚠️ HONESTIDADE: o 40/30/20/10 do Helton foi ESTIMADO à mão no mockup; a DIREÇÃO (colérico dom + melancólico sec) é real. Fórmula definitiva pro prompt:
-1. Cada achado → emoção → BALDE de elemento: raiva/irritação/impulso→**Colérico(Fogo)** · tristeza/medo/ressentimento/contenção→**Melancólico(Água)** · alegria/vínculo/expansão→**Sanguíneo(Ar)** · apego/calma/estabilidade/ruminação-lenta→**Fleumático(Terra)**.
-2. Peso = `intensidade` (1-5) de cada achado.
-3. Soma por balde → **normaliza pra 100%** (≠ dos 3 centros, que são independentes). Dominante + secundário = os 2 maiores.
-**⭐ EXIBIÇÃO DO % (founder pegou "40/30/20/10 redondo demais = parece template/Forer"): mostrar INTEIROS CALCULADOS que somam 100 e VARIAM por pessoa (ex. Helton 42/37/16/5), NUNCA dezenas redondas (40/30) NEM decimais (42,7% = falsa precisão). Isto SUPERA a decisão antiga "múltiplos de 5" (que veio do estudo de formato, mas parece fake).** Número redondo = dedo-duro de chute; número quebrado único = parece e É real.
-Ex. Helton: Colérico(fígado4+radii4=8) · Melancólico(nervoso3+rim2+contenção≈7) · Fleumático(intestino3) · Sanguíneo(coração livre≈1) → ~Col 40 / Mel 35 / Fleu 15 / San 5.
-**⚠️ 2 DECISÕES ABERTAS (founder decide antes do prompt):** (a) TABELA DE-PARA definitiva achado→elemento — resolver os ambíguos (anel_interno, sist_nervoso_autonomico podem ir p/ Melancólico OU Fleumático); (b) o **Sanguíneo** conta o coração PRESERVADO/vital (pessoa É calorosa/alegre → sobe sanguíneo) ou só a CARGA (hoje só carga → sanguíneo baixo)? Mesma dúvida do coração médio no bloco 2.
+## ⛔ TEMPERAMENTO (4 ELEMENTOS BARDON) — ARQUIVADO, NÃO ENTRA
+**DECISÃO FINAL 2026-07-22 (saga do temperamento encerrada).** Largamos os rótulos Colérico/Sanguíneo/Melancólico/Fleumático e o cálculo por % de elemento. Motivos provados no laboratório:
+1. **Por CARGA emoção→elemento não discrimina** e ERRA gente real: os 3 exames reais saem quase idênticos (Ar/Fogo co-dominantes, Água no piso) e o Miguel — racional confirmado pelo founder = 💨Ar alto — deu Ar 6 / Terra 49 (Fleumático). Ver `temperamento-v2-DADOS-REAIS.md`.
+2. **Por ESTRUTURA (Rayid Jóia/Flor/Corrente) não é confiável de capturar:** 5 rodadas Sonnet na mesma foto self = 4 respostas diferentes (Jóia2/Flor1/Corrente1/Mista1, nenhuma "alta"). Precisaria +1-2 campos novos no Stage 1 (`tipo_estrutural`, `orientacao_colarete`) + foto de alta qualidade — não temos.
+3. **Viés Brasil:** fígado/raiva se repete → quase todo mundo vira Colérico (sem sentido discriminante).
+
+O bloco de temperamento vira o retrato pelos **3 CENTROS topográficos** (abaixo). A viz dos 4 elementos foi guardada (não deletada) em `relatorio-novo/_ARQUIVO-relatorio-temperamento-4elementos.html`, caso volte no futuro com Stage 1 estendido.
+
+## ⭐ BLOCO 2 — "Como você funciona por dentro" (Mente · Coração · Corpo) — TOPOGRÁFICO
+Fusão dos antigos bloco 2 (retrato 10s / 3 centros) + bloco 3 (temperamento) — diziam a mesma coisa. Mockup aprovado (founder: "fechou, vamos pra cima") = `relatorio-novo/b2-retrato-completo.html`. Cliente lê **Mente / Coração / Corpo** (modo de pensar / sentir / agir); "Instinto" = nome INTERNO do centro corporal.
+
+### Fonte do score = TOPOGRAFIA (zona da íris), não emoção→elemento
+O que discrimina é ONDE a carga mora (distribuição espacial), não o TIPO de achado. Prova nos 3 reais: self M41/C0/I59 · daniel 35/13/52 · miguel 16/11/74 — três perfis nitidamente diferentes, usando a ZONA que o Stage 1 **JÁ captura** → ZERO mudança no Stage 1, sem Rayid, sem foto perfeita. Lastro: Método Vetorial (Dias) — superior=Mente · temporal/medial=Coração · inferior/visceral=Instinto — convergente com Eneagrama (3 centros de inteligência).
+
+### Cada achado → CENTRO (mapa canônico)
+Cada `campo` do Stage 1 carrega uma **componente de centro** — coluna "Componente de CENTRO" da `tabela-achado-emocao-COMPLETA.md` (artefato canônico, os 42 campos). Resumo do de-para:
+- **MENTE** (mental/analítico, topo ~11-1h): `pineal_hipotalamica`, `sistema_nervoso_autonomico`/anel nervoso, `cerebrum`, e o *modo Mente* (ruminação/análise/controle/antecipação, que muitos campos carregam como componente secundária).
+- **CORAÇÃO** (afeto/vínculo, medial/temporal): `coracao`, `pulmoes`/peito, `boca_garganta`/expressão, `linfatico` (empatia sem limite).
+- **CORPO/INSTINTO** (visceral/sobrevivência, inferior ~4-8h): `figado_vesicula`, `radii_solaris`, `coroa_simpatica`, `estomago`, `intestino_grosso`, `rim`, `adrenal`/`eixo_pituitario_adrenal`, `sacro_coccyx`, `sistema_reprodutor`, `sistema_urinario`, `musculoesqueletico`.
+Campos de dupla componente (ex. `estomago` = Mente-Instinto; `figado` = Coração-Instinto) **dividem o peso** entre os dois centros (0.5/0.5, ou a proporção que a tabela indicar). Campos estruturais (pupila, trama, bordas) NÃO entram aqui — são recurso/constituição (ver "livre").
+
+### Cada centro tem DOIS lados: TENSÃO e LIVRE (a correção que acerta o Miguel)
+⚠️ Zona quieta ≠ ausência do centro. Coração 0% de carga do self = coração **PRESERVADO** (recurso), não "sem coração". Mente clara do Miguel (racional, sem ruminação) = mente **LIVRE** (força visível), não "sem mente". Por isso o motor pontua **preservação + tensão**, não só tensão — senão a força vira invisível e erramos gente real.
+- **TENSÃO do centro** = Σ (`intensidade` dos achados atribuídos ao centro), modulada por `natureza_da_carga` (mesma regra do Passo 2 abaixo).
+- **LIVRE do centro** = sinal de recurso na zona: (a) `sistemas_preservados` cujo campo cai no centro (`vital_ativo` > `neutro`); (b) **ausência de carga** na zona (zona quieta = preservada); (c) `constituicao_base` que reforça o centro (pupila centrada → Mente/eixo organizado; trama compacta → Corpo/vitalidade).
+
+### DISPLAY = agulha na barra tensão ⟷ livre (por centro)
+Não é % que soma 100 (isso era o Bardon, arquivado). Cada centro = **uma agulha** numa barra bipolar: extremo esquerdo = TENSÃO cheia, extremo direito = LIVRE cheio. Posição da agulha = quanto o centro pende pra livre vs tensão:
+`posicao_livre (0-100) = livre / (tensão + livre)` (mais tensão → agulha à esquerda/âmbar; mais livre/preservado → à direita/verde). Ex. mockup Helton: Mente 26% (tensão-heavy: rumina) · Coração 83% (livre: afeto intacto) · Corpo 21% (tensão-heavy: reage rápido). Os 3 centros são **independentes** (pode-se ser tenso ou livre em vários ao mesmo tempo).
+**Cada nível DIZ algo** (o gráfico tem que comunicar): tensão-Mente="cabeça que não desliga, rumina/antecipa"; livre-Mente="pensa claro, sem ruminar"; tensão-Corpo="reage rápido, gatilho curto"; livre-Coração="afeto inteiro, se liga com facilidade". O texto muda com o SABOR do Corpo/Instinto (⚠️ 2 motores): **raiva/luta** (`figado`,`radii`,`coroa_simpatica`) → "ferve rápido"; **medo/fuga** (`rim`,`adrenal`,`sacro`,`sist_nervoso_autonomico`) → "reage se protegendo, em alerta".
+
+### O TEXTO RICO (herdado do temperamento, ancorado nos centros) — ordem do mockup
+Antes de ler (enquadramento objetivo: "você não respondeu nada, foi lido no que seus olhos carregam") → 3 centros com barra + parágrafo → **caixa "Em resumo"** → **tensão dominante × secundário** (peça central: os dois centros que puxam pra lados diferentes) → **facetas** (Mente·como pensa / Coração·como sente / Corpo·como age / Como planeja / Nas relações) → **"A mesma raiz, dois lados"** (força↔sombra pareadas — onde mora o "tá falando comigo") → **"O mal-entendido sobre você"** (pico emocional) → **"Quando aperta, você vira…"** (sob estresse, comportamental) → **"O que te acende · o que te apaga"** (2 colunas) → fecho ligando o padrão ("o corpo dispara, mente e coração seguram → você acumula; não é falta de força, é força segurada").
+
+### Regra de caso EQUILIBRADO (anti-Forer, herdada do estudo de formato)
+Sem rótulo de tipo. Se os 3 centros ficam parecidos, NÃO dizer "você tem um pouco de tudo" (Forer) → discriminar pela DINÂMICA ("seu corpo dispara mas a cabeça segura", "seu fogo sai no trabalho, sua água em casa"), nunca por rótulo genérico. A régua de sempre: toda frase passa no teste "serviria pra qualquer um? → cortar/ancorar no dado específico".
+
+### CORES dos 3 centros (fixas, identidade — iguais p/ todos)
+Mente = **azul** `#2c6480` · Coração = **verde** `#2f7a54` · Corpo/Instinto = **âmbar/laranja** `#b5701a`. Barra tensão⟷livre = gradiente âmbar (tensão) → verde (livre). (Os eixos/agulhas variam por pessoa; as cores dos centros, não.)
 
 ## Entradas (do Stage 1, sem tocar nele)
 - `achados_de_atencao[]`: `{ campo, intensidade (1-5), natureza_da_carga, lateralidade }`
@@ -79,34 +112,19 @@ Achados: fígado I4 crônica · radii I4 · anel_interno I4 · intestino_grosso 
 
 ---
 
-# MAPA DE 10 SEGUNDOS (bloco de ABERTURA, vai em CIMA) — cálculo
+# MAPA DE 10 SEGUNDOS — ⛔ SUPERSEDED (fundido no BLOCO 2 acima)
+Este bloco era um "retrato em 10s" SEPARADO do temperamento. **Foi fundido** com o temperamento no bloco único **"Como você funciona por dentro"** (ver "⭐ BLOCO 2" no topo). Motivo: os dois diziam a mesma coisa (3 centros × 4 elementos = redundância). O que sobreviveu está na receita topográfica do bloco 2.
 
-## 3 centros (Mente / Coração / Instinto) — lastro: Eneagrama (3 centros de inteligência) + Rayid + Método Vetorial
-⚠️ **REVISADO (founder pegou 2x):** os 3 centros = **MODO de PROCESSAR (personalidade)**, definido pelos SINAIS EMOCIONAIS/COMPORTAMENTAIS que dominam, NÃO pela zona do órgão carregado. Chave = qual TRÍADE do Eneagrama:
-- **Instinto (gut/sobrevivência/reação):** o corpo reagindo ANTES do pensamento — DOIS motores (⚠️ founder pegou: NÃO é só raiva): **(a) RAIVA/luta** = figado_vesicula, radii_solaris (irritação que sobe), coroa_simpatica → "ferve, ataca"; **(b) MEDO/fuga/sobrevivência** = rim (medo), adrenal/eixo_pituitario_adrenal (luta-ou-fuga), sacro_coccyx (sobrevivência), sistema_nervoso_autonomico (hipervigilância corporal) → "se protege, fica em alerta, sente o perigo antes". Instinto alto = reage por impulso. **O TEXTO muda com o SABOR:** cliente raiva-dominante → "ferve rápido"; cliente medo-dominante → "reage se protegendo/em alerta". Helton = instinto alto MOVIDO A RAIVA (fígado). NÃO é "corpo carrega carga" (isso é o mapa emocional).
-- **Mente (análise/ruminação):** sinais MENTAIS — anel_nervoso (alerta/hipervigilância), cerebrum_motor, ruminação, pigmento concentrado (Jóia). Mente alta = analisa, antecipa, rumina.
-- **Coração (afeto/vínculo):** sinais AFETIVOS — coracao, pulmoes, boca_garganta, aberturas/lacunas (Flor). Coração alto = sente forte, se vincula.
-**ESCALAS INDEPENDENTES** (0-100 CADA, NÃO somam 100 — founder: "pode ser mente E coração grandes juntos"). Diferente do temperamento Bardon (que soma 100).
-**CADA nível DIZ o que significa** (o gráfico tem que comunicar): instinto alto=reage rápido/ferve · mente alta=pensa/rumina · coração médio=sente mas afeto flui leve.
-**ORIGEM na íris VISÍVEL** (founder exigiu): cada centro mostra o sinal que o gerou (◦ da íris: …) — no doc do cliente a linha some (lastro interno), mas o SCORE é análise real de dado da íris.
-Ex. Helton: Instinto ALTO (fígado I4 + radii I4 = ferve rápido) · Mente ALTA (anel nervoso + rumina) · Coração MÉDIO (afeto livre). = "gasolina que pensa: instinto dispara, cabeça segura".
-
-## Pares de tensão (os eixos)
-- **Interior ⟷ Exterior** (introv/extrov) — LASTREADO: distância collarete↔pupila (Método Vetorial). Derivar da constituição.
-- **Mente ⟷ Instinto** — eixo vertical superior↔inferior (Método Vetorial): peso dos achados de cérebro/nervo vs vísceras.
-- **Analisar ⟷ Sentir** — razão carga-Mente vs carga-Coração.
-- **Acelerar ⟷ Parar** — achados de alerta/hipervigilância (nervoso, anel de stress) → puxa p/ Acelerar.
-- **Controlar ⟷ Confiar** — colérico% + achados de controle → puxa p/ Controlar.
-Cada par = agulha (0-100) derivada dos dados. NÃO repetir eixos que já estão no mapa emocional (ex.: segurar↔soltar = já é apego↔soltar lá).
-Display: voz do cliente, "collarete-pupila" NÃO aparece impresso (é só lastro). Promptável e único por pessoa.
+**Descartado na fusão:** a fileira de **"pares de tensão" como eixos separados** (Interior⟷Exterior, Analisar⟷Sentir, Acelerar⟷Parar, Controlar⟷Confiar). No mockup final a tensão virou UMA frase — "dominante × secundário" entre os centros (ex.: "a sua tensão vive entre a mente e o corpo") — mais limpa e sem repetir o mapa emocional (bloco 5). Se algum dia o founder quiser os eixos de volta, o lastro deles era: distância collarete↔pupila (Interior⟷Exterior, Método Vetorial) e razão de carga entre centros para os demais.
 
 ---
 
-# BLOCO 7 (FECHO) — "Perguntas para sua sessão" — cálculo/craft
+# BLOCO 6 (FECHO) — "Perguntas para sua sessão" — cálculo/craft
+> Numeração atualizada: com o temperamento fundido no bloco 2, o relatório tem **6 blocos** (1 Em poucas palavras · 2 Como você funciona · 3 Linha do tempo · 4 Heranças · 5 Mapa emocional · 6 Perguntas). Este era "bloco 7" na numeração antiga.
 Nome escolhido pelo founder (era "roteiro de anamnese"; "anamnese" = jargão, fere 8ª série). Fecha o relatório (fecho ATIVO: manda a pessoa adiante com as perguntas, em vez de mensagem genérica). Lastro = §12 REAL de produção (`system.md`) + relatório do Miguel (`Leitura-Miguel-Reis-2026-07-19.pdf`).
 
 ## Fonte das perguntas (promptável)
-Cada pergunta ANCORA numa emoção CARREGADA do mapa de pêndulos (bloco 6) — NÃO no órgão/idade (o Miguel de produção ancora em "fígado/vesícula/pâncreas" = JARGÃO, proibido no doc novo; e usa "pontas de fio" = "fio" BANIDO). Aqui a âncora é a emoção. Seleção: top ~4-5 cargas do mapa + **1 pergunta ancorada numa FORÇA/recurso** (equilibra o bloco; move do Miguel Q8: "vira a mesma determinação pra dentro") + 1 pergunta-fecho personificada.
+Cada pergunta ANCORA numa emoção CARREGADA do mapa de pêndulos (bloco 5) — NÃO no órgão/idade (o Miguel de produção ancora em "fígado/vesícula/pâncreas" = JARGÃO, proibido no doc novo; e usa "pontas de fio" = "fio" BANIDO). Aqui a âncora é a emoção. Seleção: top ~4-5 cargas do mapa + **1 pergunta ancorada numa FORÇA/recurso** (equilibra o bloco; move do Miguel Q8: "vira a mesma determinação pra dentro") + 1 pergunta-fecho personificada.
 
 ## Estrutura de CADA pergunta (3 tempos — do §12 real, confirmado no Miguel)
 1. **Âncora hedge da leitura** ("A leitura mostra/aponta/sugere…") em cima da emoção.
@@ -134,14 +152,15 @@ Cada pergunta deixa de ser um convite de 1 linha e vira um **PROCESSO SOMÁTICO 
 ---
 
 # MOTOR DE NÚMEROS — decisões acumuladas (2026-07-22)
-**TABELA CANÔNICA DE-PARA** = `achado → emoções → elementos`. É o artefato que MAIS decide o resultado (pesquisa: ~80%). **Mora ENTRE Stage 1 e Stage 2** (lastro/referência): Stage 1 SCAN intocado (emite achados); a tabela mapeia; **Stage 2 CONSULTA a tabela (piso determinístico) E INTUI emoções extras por cima** (= o híbrido). NÃO colar no prompt do S1. Arquivos: `tabela-achado-emocao-COMPLETA.md` (emoções enriquecidas + fonte, em construção — agente) + `tabela-emocao-elemento-PROPOSTA.md` (elementos) + `tabela-cadeia.html` (visual). Órgão→emoção sai do lastro (Bradley/Hay/MTC/Dias/nativo); emoção→elemento é a proposta.
-**⚠️ 42 CAMPOS no glossary** (não 38 — era aproximado). `tabela-cadeia.html` cobriu só ~29 (agrupei + tratei estruturais como moduladores + ESQUECI 4 emocionais: `coroa_simpatica`, `lacuna_estrutural`, `sistema_reprodutor`, `sistema_urinario`). Tabela final DEVE listar os 42 (moduladores marcados).
-**MEDO = 💧 Água — LOCKED** (pesquisa `temperamentos-elementos-fontes.md`): manter Bardon (Melancólico=Água, Fleumático=Terra). Grego/Steiner usam inverso (Melancólico=Terra→medo=Terra) mas Bardon casa c/ MTC (rim=água=medo) + nosso rim→medo + 8ª série. **Segurança/chão/base = 🌍 Terra como RECURSO** (polo +); **insegurança = medo-água sobre déficit de terra** → ansiedade fica meio-a-meio (já é assim na proposta).
-**⚠️ DESEQUILÍBRIO DE ELEMENTOS (founder pegou 2026-07-22):** o de-para EMOÇÃO→elemento é carga/sombra-heavy → medi a soma: 💧Água 40% · 🔥Fogo 23% · 🌍Terra 23% · 💨Ar 13% (Água 3× Ar). Provado que NÃO dá pra equilibrar sourceando (mesmo puxando toda a sombra sanguínea do Bardon, Ar só foi 13→14%) — porque alegria não é "carga". É honesto/verdadeiro, não bug.
+**ⓘ ESTADO:** a saga elemento/temperamento (abaixo) foi **encerrada** — os 4 elementos saíram (ver "⛔ TEMPERAMENTO ARQUIVADO" no topo). Estas notas ficam como HISTÓRICO do porquê. O de-para que AINDA vale é `campo → emoção` (alimenta o **mapa emocional**, bloco 5) e `campo → CENTRO` (alimenta o **bloco 2** topográfico). O de-para `emoção → elemento` **não é mais usado** (era a fonte do temperamento, que foi arquivado).
+**TABELA CANÔNICA DE-PARA (o que sobrevive)** = `achado → emoções` (+ componente de CENTRO). Artefato que MAIS decide o resultado (~80%). **Mora ENTRE Stage 1 e Stage 2**: Stage 1 SCAN intocado (emite achados); a tabela mapeia; **Stage 2 CONSULTA a tabela (piso determinístico) E INTUI emoções extras por cima** (= o híbrido). Arquivo canônico: `tabela-achado-emocao-COMPLETA.md` (42 campos, emoções + fonte + componente de centro). Órgão→emoção sai do lastro (Bradley/Hay/MTC/Dias/nativo).
+**⚠️ 42 CAMPOS no glossary** (não 38). Tabela final lista os 42 (estruturais marcados como recurso/constituição, não carga).
 
-## ⭐⭐ PIVÔ (DECISÃO founder 2026-07-22): TEMPERAMENTO SAI DA ESTRUTURA, NÃO DAS EMOÇÕES
-Temperamento = **quem a pessoa É** → lê-se da **ESTRUTURA/CONSTITUIÇÃO da íris** (equilibrada por natureza, lê o positivo), NÃO das cargas emocionais. Ex. do founder: "cerebral/racionalista = mais Ar" = estrutura **JÓIA** (pigmento/pontos = mente analítica) → 💨Ar (Bardon: Ar=intelecto). **Flor**(fibras abertas/emocional)→💧Água · **Corrente**(social)→💨Ar/🔥 · **trama densa**→🌍Terra · **radiais/vontade**→🔥Fogo. **Os dados JÁ estão no Stage 1** — os campos que eu tratava como "moduladores" (`trama_fibras`, `cor_predominante`, `pigmento_amber`, `bordas_pupilares`, `pupila`) VIRAM a fonte do temperamento.
-**NOVA ARQUITETURA:** (a) **Temperamento (bloco 3, 4 elementos)** ← ESTRUTURA/constituição (Rayid Flor/Jóia/Corrente + trama+cor+pigmento). (b) **Mapa emocional (bloco 6, pêndulos)** ← cargas/achados (INALTERADO). Duas leituras, fontes certas. A tabela emoção→elemento NÃO se perde — vira só a camada emocional (coloração), não a fonte do temperamento. → some o problema do desequilíbrio (estrutura é balanceada). Motivo: o relatório trabalha temperamento/comportamento/visão-de-vida/relacionamentos, não só emoção. Pesquisa GROUNDED rodando → `temperamento-por-estrutura.md` (Rayid/Dias + constituição + Bardon; sem inventar).
+## ⛔ HISTÓRICO — elemento/temperamento (2 tentativas, ambas descartadas)
+Guardado só pra não re-litigar. **Nada disto entra no relatório.**
+1. **Temperamento por EMOÇÃO→elemento (1ª tentativa):** `intensidade → emoção → elemento → % Bardon`. MEDO=💧Água (Bardon+MTC). Problema: de-para carga/sombra-heavy → soma desbalanceada (Água 40% · Fogo 23% · Terra 23% · Ar 13%) que NÃO dá pra equilibrar sourceando (alegria não é "carga"). E não discrimina (3 exames ≈ iguais).
+2. **Temperamento por ESTRUTURA (pivô, 2ª tentativa):** ler da constituição (Rayid Jóia→Ar, Flor→Água, Corrente→Fogo/Ar, trama densa→Terra). Problema: os enums estruturais do Stage 1 saem invariantes (media/centrada/regular em 3/3) e o tipo Rayid não é confiável de capturar (5 rodadas Sonnet = 4 respostas). Precisaria +campos no Stage 1 = mexer no canônico.
+→ **AMBAS morreram. Solução final = TOPOGRÁFICA** (soma por CENTRO/zona, com tensão+livre) — ver bloco 2 no topo. Discrimina, usa dado existente, sem tocar o Stage 1, sem rótulo de elemento.
 
 # PROMPT (Stage 2 novo) — FONTE DA VERDADE (diretiva founder 2026-07-21)
 O novo prompt Stage 2 é ancorado no **MOCKUP** (os 7 blocos em `relatorio-novo/`, a VOZ, a premissa **8ª série — uma pessoa da 8ª série entende tudo**) + este SPEC. Do **prompt de produção atual** (`apps/web/prompts/system.md`) pegar **SÓ o que presta e serve**: anti-Forer, "sai da íris não do achismo", guardrails não-médicos/LGPD, como ele LÊ/aterra o achado. **NÃO** herdar a estrutura nem a voz clínica/jargão do prompt de produção — é justamente o que estamos substituindo (o founder: "o prompt atual não tem essas coisas"). Arquitetura = **HÍBRIDO ENXUTO**: código calcula os números (ver `motor-numeros-metodologia.md`), LLM escreve a prosa + os 6 Caminhos.
