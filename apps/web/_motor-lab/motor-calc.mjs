@@ -68,21 +68,24 @@ function parseLastro() {
     if (/Cora[çc][ãa]o/i.test(centroLine)) centros.push('coracao')
     if (/Instinto|Corpo/i.test(centroLine)) centros.push('corpo')
     // (B) emoções do lastro: 🔴 (carga) e 🟢 (recurso), agregando todos os blocos de elemento
-    // Pega só as ~4 PRIMEIRAS de cada bloco (o NÚCLEO) — corta a cauda de
-    // paleta genérica que, somada entre campos, inflava Forer (ex.: "culpa"
-    // subia acima da "raiva contida"). Núcleo = específico = discriminante.
+    // Emoções POR ELEMENTO (não só flat) — o founder: o órgão carrega 2+
+    // elementos e cada um tem sua emoção (fígado = 🔥raiva + 💧guardar). Núcleo
+    // = as ~4 primeiras de cada bloco (corta paleta genérica/Forer).
     const NUCLEO_CAP = 4
-    const emos = (emoji) => {
-      const out = []
-      const re = new RegExp(`${emoji} emoções:\\*\\*\\s*(.*)`, 'g')
-      let m
-      while ((m = re.exec(b))) {
-        const phrases = m[1].split('·').map((p) => p.replace(/\([^)]*\)/g, '').replace(/[*_`]/g, '').trim()).filter((p) => p && p.length > 2)
-        out.push(...phrases.slice(0, NUCLEO_CAP))
-      }
-      return out
+    const clean = (p) => p.replace(/\([^)]*\)/g, '').replace(/[*_`]/g, '').trim()
+    const cargaByElem = { fogo: [], agua: [], terra: [], ar: [] }
+    const recursoByElem = { fogo: [], agua: [], terra: [], ar: [] }
+    let curE = null
+    for (const line of b.split('\n')) {
+      const em = line.match(/^- \*\*(🔥|💧|🌍|💨)/)
+      if (em) curE = ELEM_KEY[em[1]]
+      const cm = line.match(/🔴 emoções:\*\*\s*(.*)/)
+      const rm = line.match(/🟢 emoções:\*\*\s*(.*)/)
+      if (cm && curE) cargaByElem[curE].push(...cm[1].split('·').map(clean).filter((p) => p.length > 2).slice(0, NUCLEO_CAP))
+      if (rm && curE) recursoByElem[curE].push(...rm[1].split('·').map(clean).filter((p) => p.length > 2).slice(0, NUCLEO_CAP))
     }
-    map[name] = { elem, centros: centros.length ? centros : ['corpo'], carga: emos('🔴'), recurso: emos('🟢') }
+    const flat = (o) => Object.values(o).flat()
+    map[name] = { elem, centros: centros.length ? centros : ['corpo'], carga: flat(cargaByElem), recurso: flat(recursoByElem), cargaByElem, recursoByElem }
   }
   return map
 }
@@ -120,9 +123,11 @@ function calc(name, lastro) {
     const cw = w / cs.length
     for (const c of cs) centro[c].t += cw
     for (const e of t.carga) emoCarga[e] = (emoCarga[e] || 0) + w // (B) leque de carga
-    // cada achado evidenciado com seu elemento dominante + emoção-núcleo
-    const elemDom = ['fogo', 'agua', 'terra', 'ar'].sort((x, y) => (t.elem[y] || 0) - (t.elem[x] || 0))[0]
-    achadoList.push({ campo: a.campo, int: a.intensidade, elem: elemDom, emo: t.carga[0] || '?', w })
+    // cada achado com sua COMPOSIÇÃO (2 elementos: predominante + secundário),
+    // cada elemento com sua emoção-núcleo — o órgão não colapsa em 1 (founder).
+    const els = ['fogo', 'agua', 'terra', 'ar'].filter((e) => (t.elem[e] || 0) > 0).sort((x, y) => t.elem[y] - t.elem[x])
+    const breakdown = els.slice(0, 2).map((e) => ({ e, pct: Math.round((t.elem[e] || 0) * 100), emo: (t.cargaByElem[e] || [])[0] || (t.carga[0] || '?') }))
+    achadoList.push({ campo: a.campo, int: a.intensidade, breakdown, w })
   }
   // PRESERVADOS → recurso (elemento) + livre (centro)
   for (const p of preservados) {
@@ -166,13 +171,14 @@ function fmt(r) {
     const bar = '█'.repeat(Math.round((c / maxC) * 20)).padEnd(20)
     L.push(`  ${i === 0 ? '★' : ' '} ${emoji[e]} ${e.padEnd(6)} ${bar} ${c.toFixed(1)}${i === 0 ? '  ← PRINCIPAL' : ''}`)
   })
-  L.push('\nTODOS OS ACHADOS EVIDENCIADOS (nada colapsa — cada um vira fio da narrativa):')
+  L.push('\nTODOS OS ACHADOS EVIDENCIADOS (cada órgão com seus 2 elementos — nada colapsa):')
   r.achadoList.forEach((a, i) => {
-    const tag = i === 0 ? 'PRINCIPAL' : i === 1 ? 'secundário' : i === 2 ? 'terciário' : ''
-    L.push(`  ${i === 0 ? '★' : '·'} I${a.int} ${emoji[a.elem]} ${a.campo.padEnd(28)} → "${a.emo}"  ${tag}`)
+    const tag = i === 0 ? 'PRINCIPAL' : i === 1 ? '2º' : i === 2 ? '3º' : ''
+    const comp = a.breakdown.map((x) => `${emoji[x.e]}${x.pct}% "${x.emo}"`).join('  +  ')
+    L.push(`  ${i === 0 ? '★' : '·'} I${a.int} ${a.campo.padEnd(26)} ${comp}  ${tag}`)
   })
-  const elems3 = [...new Set(r.achadoList.slice(0, 4).map((a) => a.elem))]
-  L.push(`  → narrativa dos elementos: ${elems3.map((e) => emoji[e] + e).join(' + ')}`)
+  const elems3 = [...new Set(r.achadoList.slice(0, 4).flatMap((a) => a.breakdown.map((x) => x.e)))]
+  L.push(`  → elementos na narrativa: ${elems3.map((e) => emoji[e] + e).join(' + ')}`)
 
   L.push('\nFORÇA / RECURSOS (trilho separado — dos preservados, NÃO entra no elemento):')
   for (const p of r.pres) L.push(`    ✓ ${p.campo}${p.pol === 'vital_ativo' ? ' (vital)' : ''}`)
