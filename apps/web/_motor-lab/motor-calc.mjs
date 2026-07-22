@@ -67,7 +67,22 @@ function parseLastro() {
     if (/Mente/i.test(centroLine)) centros.push('mente')
     if (/Cora[çc][ãa]o/i.test(centroLine)) centros.push('coracao')
     if (/Instinto|Corpo/i.test(centroLine)) centros.push('corpo')
-    map[name] = { elem, centros: centros.length ? centros : ['corpo'] }
+    // (B) emoções do lastro: 🔴 (carga) e 🟢 (recurso), agregando todos os blocos de elemento
+    // Pega só as ~4 PRIMEIRAS de cada bloco (o NÚCLEO) — corta a cauda de
+    // paleta genérica que, somada entre campos, inflava Forer (ex.: "culpa"
+    // subia acima da "raiva contida"). Núcleo = específico = discriminante.
+    const NUCLEO_CAP = 4
+    const emos = (emoji) => {
+      const out = []
+      const re = new RegExp(`${emoji} emoções:\\*\\*\\s*(.*)`, 'g')
+      let m
+      while ((m = re.exec(b))) {
+        const phrases = m[1].split('·').map((p) => p.replace(/\([^)]*\)/g, '').replace(/[*_`]/g, '').trim()).filter((p) => p && p.length > 2)
+        out.push(...phrases.slice(0, NUCLEO_CAP))
+      }
+      return out
+    }
+    map[name] = { elem, centros: centros.length ? centros : ['corpo'], carga: emos('🔴'), recurso: emos('🟢') }
   }
   return map
 }
@@ -88,6 +103,7 @@ function calc(name, lastro) {
 
   const elem = { carga: { fogo: 0, agua: 0, terra: 0, ar: 0 }, recurso: { fogo: 0, agua: 0, terra: 0, ar: 0 } }
   const centro = { mente: { t: 0, l: 0 }, coracao: { t: 0, l: 0 }, corpo: { t: 0, l: 0 } }
+  const emoCarga = {}, emoRecurso = {} // (B) mapa emocional — acumula score por emoção
   const skipped = [], adjuvantes = []
 
   // ACHADOS → carga (elemento) + tensão (centro)
@@ -102,6 +118,7 @@ function calc(name, lastro) {
     const cs = TOPO_CENTRO[key] || t.centros // centro por ZONA topográfica (decisão founder)
     const cw = w / cs.length
     for (const c of cs) centro[c].t += cw
+    for (const e of t.carga) emoCarga[e] = (emoCarga[e] || 0) + w // (B) leque de carga
   }
   // PRESERVADOS → recurso (elemento) + livre (centro)
   for (const p of preservados) {
@@ -113,13 +130,18 @@ function calc(name, lastro) {
       const cs = TOPO_CENTRO[key] || t.centros
       const cw = w / cs.length
       for (const c of cs) centro[c].l += cw
+      for (const e of t.recurso) emoRecurso[e] = (emoRecurso[e] || 0) + w // (B) leque de recurso
     }
   }
   // ZONA QUIETA: centro sem tensão nenhuma = preservado (livre)
   for (const c of ['mente', 'coracao', 'corpo']) if (centro[c].t === 0) centro[c].l += 1.0
 
   const pres = preservados.map((p) => ({ campo: p.campo, pol: p.polaridade_funcional }))
-  return { name, elem, centro, pres, skipped, adjuvantes, nAch: achados.length, nPres: preservados.length }
+  // (E) seleção top-N do leque
+  const top = (obj, n) => Object.entries(obj).sort((a, b) => b[1] - a[1]).slice(0, n)
+  const mapaCarga = top(emoCarga, 8)
+  const mapaRecurso = top(emoRecurso, 5)
+  return { name, elem, centro, pres, mapaCarga, mapaRecurso, skipped, adjuvantes, nAch: achados.length, nPres: preservados.length }
 }
 
 function fmt(r) {
@@ -140,7 +162,18 @@ function fmt(r) {
     L.push(`  ${i === 0 ? '★' : ' '} ${emoji[e]} ${e.padEnd(6)} ${bar} ${c.toFixed(1)}${i === 0 ? '  ← PRINCIPAL' : ''}`)
   })
   L.push('FORÇA / RECURSOS (trilho separado — dos preservados, NÃO entra no elemento):')
-  for (const p of r.pres) L.push(`    ✓ ${p.campo}${p.pol === 'vital_ativo' ? ' (vital)' : ''}  → emoções 🟢 do lastro`)
+  for (const p of r.pres) L.push(`    ✓ ${p.campo}${p.pol === 'vital_ativo' ? ' (vital)' : ''}`)
+
+  // (B) mapa emocional — o leque que o prompt seleciona
+  const nivel = (s) => (s >= 8 ? 'muito alta' : s >= 5 ? 'alta' : s >= 3 ? 'média' : 'baixa')
+  const maxE = (r.mapaCarga[0] || [0, 1])[1] || 1
+  L.push('\n(B) MAPA EMOCIONAL — leque de CARGA (score=Σ intensidade^γ · o prompt seleciona):')
+  for (const [emo, s] of r.mapaCarga) {
+    const bar = '▓'.repeat(Math.round((s / maxE) * 16)).padEnd(16)
+    L.push(`    ${bar} ${s.toFixed(1).padStart(4)} ${nivel(s).padEnd(9)} ${emo}`)
+  }
+  L.push('   leque de RECURSO (força — dos preservados):')
+  for (const [emo, s] of r.mapaRecurso) L.push(`    · ${s.toFixed(1).padStart(4)}  ${emo}`)
   L.push('\n3 CENTROS (agulha 0=tensão ⟷ 100=livre):')
   for (const c of ['mente', 'coracao', 'corpo']) {
     const { t, l } = r.centro[c]
