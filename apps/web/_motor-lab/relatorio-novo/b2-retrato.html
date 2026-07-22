@@ -1,0 +1,98 @@
+<meta charset="utf-8">
+<title>Um retrato em 10 segundos — Mente · Coração · Corpo</title>
+<style>
+  :root{
+    --paper:#fff;--panel:#f7f3ea;--panel-2:#ece5d5;
+    --ink:#1f3a3c;--ink-soft:#5a6f6e;--ink-faint:#8a9695;
+    --line:#e6ded0;--line-strong:#d6cbb6;
+    --teal:#0a7d84;--teal-deep:#0d5c63;--amber:#b5701a;--amber-soft:#cf8636;--good:#2f7a54;--good-soft:#5fae86;
+    --serif:"Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#e9e2d3;color:var(--ink);font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .display{font-family:var(--serif);font-weight:600;letter-spacing:-.01em;}
+  .sheet{max-width:820px;margin:26px auto;background:var(--paper);border:1px solid var(--line);border-radius:6px;box-shadow:0 4px 24px rgba(30,45,45,.10);overflow:hidden;}
+  .pad{padding:clamp(28px,5vw,52px);}
+  .ctx{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);font-weight:700;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:26px;}
+  .eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);font-weight:700;margin:0 0 5px;}
+  .secnum{font-family:var(--serif);font-size:13px;color:var(--ink-faint);font-weight:600;}
+  h2{font-size:clamp(21px,2.9vw,26px);margin:2px 0 8px;line-height:1.14;}
+  .lead{font-size:14.5px;line-height:1.55;color:var(--ink-soft);margin:0 0 4px;max-width:64ch;}
+  .lead b{color:var(--ink);font-weight:600;}
+  .legend{display:flex;gap:18px;font-size:11.5px;color:var(--ink-faint);margin:14px 0 4px;}
+  .legend .dot{display:inline-block;width:9px;height:9px;border-radius:50%;vertical-align:middle;margin-right:5px;}
+  .legend .a .dot{background:var(--amber);} .legend .b .dot{background:var(--good);}
+
+  .card{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:8px 24px 20px;margin-top:16px;}
+  .ctr{padding:18px 0;border-top:1px solid var(--line-strong);}
+  .ctr:first-child{border-top:0;}
+  .ctr-head{display:flex;align-items:baseline;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+  .ctr-name{font-family:var(--serif);font-size:20px;font-weight:700;}
+  .ctr-name.mente{color:#2c6480;} .ctr-name.coracao{color:var(--good);} .ctr-name.corpo{color:var(--amber);}
+  .ctr-fn{font-size:12.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 9px;border-radius:100px;}
+  .ctr-fn.mente{color:#2c6480;background:color-mix(in srgb,#2c6480 8%,var(--paper));}
+  .ctr-fn.coracao{color:var(--good);background:color-mix(in srgb,var(--good) 9%,var(--paper));}
+  .ctr-fn.corpo{color:var(--amber);background:color-mix(in srgb,var(--amber) 9%,var(--paper));}
+
+  .dv{display:grid;grid-template-columns:58px 1fr 58px;align-items:center;gap:10px;margin:0 0 11px;}
+  .dv-lab{font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;}
+  .dv-lab.a{color:var(--amber);text-align:right;} .dv-lab.b{color:var(--good);}
+  .dv-track{position:relative;height:10px;border-radius:100px;background:linear-gradient(90deg,var(--amber) 0%,var(--amber-soft) 30%,#e7dcc6 50%,var(--good-soft) 70%,var(--good) 100%);box-shadow:inset 0 1px 2px rgba(20,40,40,.10);}
+  .dv-needle{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid var(--ink-soft);transform:translate(-50%,-50%);box-shadow:0 1px 4px rgba(0,0,0,.22);}
+  .ctr-txt{font-family:var(--serif);font-size:15.5px;line-height:1.58;color:#28403f;margin:0;}
+  .ctr-txt b{font-weight:600;}
+  .ctr-txt .ten{color:var(--amber);} .ctr-txt .liv{color:var(--good);}
+
+  .resumo{margin:22px 0 0;padding:18px 20px;background:color-mix(in srgb,var(--teal) 6%,var(--paper));border:1px solid color-mix(in srgb,var(--teal) 22%,var(--line));border-radius:12px;}
+  .resumo-lab{font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--teal-deep);margin:0 0 7px;}
+  .resumo p{font-family:var(--serif);font-size:16.5px;line-height:1.6;color:#26403f;margin:0;}
+  .resumo b{color:var(--teal-deep);font-weight:600;}
+
+  .rico{margin-top:20px;}
+  .rico-lab{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--amber);margin:0 0 8px;}
+  .rico p{font-family:var(--serif);font-size:16px;line-height:1.66;color:#28403f;margin:0 0 12px;}
+  .rico p b{color:var(--teal-deep);font-weight:600;}
+
+  .foot{font-size:12px;color:var(--ink-faint);border-top:1px solid var(--line);margin-top:28px;padding-top:16px;max-width:74ch;}
+</style>
+<div class="sheet"><div class="pad">
+  <div class="ctx">Bloco 2 (reformulado) · 3 centros Mente·Coração·Corpo · 2 lados tensão/livre · exemplo: Rhelton</div>
+
+  <p class="eyebrow"><span class="secnum">2</span> &nbsp;Um retrato em 10 segundos</p>
+  <h2 class="display">Como você funciona por dentro</h2>
+  <p class="lead">Você tem três lugares de onde vive a vida — a <b>mente</b>, o <b>coração</b> e o <b>corpo</b>. O que muda de pessoa pra pessoa é onde você <b>carrega tensão</b> e onde você está <b>livre</b>.</p>
+  <div class="legend"><span class="a"><span class="dot"></span>onde carrega tensão</span><span class="b"><span class="dot"></span>onde está livre / claro</span></div>
+
+  <div class="card">
+    <div class="ctr">
+      <div class="ctr-head"><span class="ctr-name mente">Mente</span><span class="ctr-fn mente">modo de pensar</span></div>
+      <div class="dv"><span class="dv-lab a">tensão</span><div class="dv-track"><i class="dv-needle" style="left:26%"></i></div><span class="dv-lab b">livre</span></div>
+      <p class="ctr-txt">A sua mente vive <b class="ten">ligada</b> — analisa, antecipa, rumina. É uma cabeça que raramente desliga: pensa muito antes (e depois) de decidir.</p>
+    </div>
+
+    <div class="ctr">
+      <div class="ctr-head"><span class="ctr-name coracao">Coração</span><span class="ctr-fn coracao">modo de sentir</span></div>
+      <div class="dv"><span class="dv-lab a">tensão</span><div class="dv-track"><i class="dv-needle" style="left:83%"></i></div><span class="dv-lab b">livre</span></div>
+      <p class="ctr-txt">Aqui você está <b class="liv">livre e inteiro</b>. O afeto não está ferido nem travado — quando você desacelera, sentir e se ligar às pessoas flui com facilidade. É a sua área mais leve.</p>
+    </div>
+
+    <div class="ctr">
+      <div class="ctr-head"><span class="ctr-name corpo">Corpo</span><span class="ctr-fn corpo">modo de agir</span></div>
+      <div class="dv"><span class="dv-lab a">tensão</span><div class="dv-track"><i class="dv-needle" style="left:21%"></i></div><span class="dv-lab b">livre</span></div>
+      <p class="ctr-txt">O seu corpo <b class="ten">reage rápido</b> — o gatilho é curto, a resposta vem na hora, às vezes antes do pensamento. É energia pronta pra agir, que também precisa aprender a descansar.</p>
+    </div>
+
+    <div class="resumo">
+      <p class="resumo-lab">Em resumo</p>
+      <p>Você vive na <b>cabeça e no corpo</b>: pensa muito e reage rápido. O <b>coração</b>, esse, está livre e leve — só costuma ficar em segundo plano, atrás do que a mente e o corpo tomam.</p>
+    </div>
+  </div>
+
+  <div class="rico">
+    <p class="rico-lab">Como isso aparece nas suas relações</p>
+    <p>No dia a dia e com as pessoas, você entra pela <b>cabeça e pela reação</b>: lê a situação rápido e responde na hora — e o corpo, às vezes, dispara antes de você sentir. Isso te faz ágil e presente, mas pode fazer o outro sentir que levou uma resposta antes de ser realmente escutado.</p>
+    <p>O seu <b>coração livre</b> é o seu trunfo aqui: quando você baixa o ritmo, o afeto aparece inteiro e a ligação acontece sem esforço. O ponto de virada é simples de nomear e valioso de treinar — <b>dar ao coração o mesmo espaço que a mente e o corpo já tomam</b>. Sentir tanto quanto você pensa e reage.</p>
+  </div>
+
+  <p class="foot"><b>Bloco 2 reformulado (era "temperamento").</b> Larga os 4 elementos/rótulos (Colérico etc.) → 3 centros <b>Mente · Coração · Corpo</b>, cada um em 2 lados: tensão (carga) ⟷ livre (preservado). Vem do dado TOPOGRÁFICO que já existe (achados+preservação por zona) — discrimina, sem Rayid, sem mexer no Stage 1. A agulha = posição derivada de tensão×preservação daquele centro. "Coração livre" = preservado (o Miguel racional daria "Mente clara/livre" = força visível, não ausência). Texto rico (relações/comportamento) ancorado no blend. Zero jargão, 8ª série.</p>
+</div></div>
