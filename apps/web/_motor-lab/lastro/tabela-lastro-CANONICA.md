@@ -77,7 +77,7 @@ Esta é a tabela-mestra. O 🔴 de um campo é a carga daquele elemento; o 🟢 
   - **🔴 crenças:** "não tenho reserva pra aguentar um baque" · "não posso confiar que vão me segurar se eu cair"
 
 ### `pulmoes` — temporal superior (3h OE / 9h OD)
-- **Elemento(s):** 💧Água 100% (carga) · 💨Ar (face-recurso: respiração/fôlego). **Derivação:** tristeza(💧1.0) + luto/pesar(💧1.0) + desânimo(💧1.0) + auto-rejeição(💧1.0) → 💧puro na carga. O 💨Ar aparece HONESTAMENTE no polo 🟢 (respiração/receber a vida = Ar), não como carga. Lock tristeza/luto=Água.
+- **Elemento(s):** 💧Água 60% · 💨Ar 40%. **Derivação:** luto/tristeza = 💧Água (carga); **respiração/pneuma = 💨Ar** (função do órgão — correção Ar-funcional, Bardon: tórax/Anahata=Ar). O Ar do pulmão deixa de ser só polo 🟢 e vira elemento real (o pulmão é o órgão do ar).
 - **Centro:** Coração (luto, valor pessoal).
 - **💧 Água**
   - **🟢 emoções:** leveza depois de elaborar a perda, "respirar aliviado" (MTC — pulmão em harmonia) · sentir fundo e soltar a dor (assinatura Água+) · compaixão consigo
@@ -92,7 +92,7 @@ Esta é a tabela-mestra. O 🔴 de um campo é a carga daquele elemento; o 🟢 
 - **Nota:** a CARGA do pulmão é 💧Água (luto/valor); o 💨Ar é a face-recurso (respirar, receber a vida). O Ar aqui aparece no polo saudável, não como carga — sem forçar.
 
 ### `estomago` — anel interno pericentral
-- **Elemento(s):** 🌍Terra 60% · 💧Água 40%. **Derivação:** ansiedade(🌍0.5/💧0.5) + preocupação(🌍0.5/💧0.5) + não-digerir/não-assimilar(🌍0.8/💧0.2) → 🌍=1.8 · 💧=1.2 sobre 3.0 → **🌍60 · 💧40**. Lock preocupação/ruminação=Terra + medo=Água.
+- **Elemento(s):** 🌍Terra 60% · 💧Água 40%. **Derivação:** preocupação/ruminação/não-assimilar = 🌍Terra; ansiedade/medo antecipatório = 💧Água.
 - **Centro:** Mente-Instinto (ansiedade antecipatória; "não digerir"). Forte Mente.
 - **🌍 Terra**
   - **🟢 emoções:** curiosidade e apetite pelo novo, "digerir a vida com gosto" (MTC — Terra em harmonia) · acolhimento/nutrição de si e dos outros (MTC — Terra=centro/cuidado) · praticidade, resolver no próprio tempo (assinatura Terra+)
@@ -106,7 +106,7 @@ Esta é a tabela-mestra. O 🔴 de um campo é a carga daquele elemento; o 🟢 
   - **🔴 crenças:** "preciso ficar de olho, pode dar tudo errado" · "não sei se vou dar conta do que vem" · "se eu não me preocupar, algo vai escapar"
 
 ### `intestino_delgado` — estroma intermediário
-- **Elemento(s):** 🌍Terra 83% · 🔥Fogo 10% · 💧Água 7%. **Derivação:** rigidez/intolerância(🌍0.7/🔥0.3) + não-assimilar(🌍0.8/💧0.2) + primeira infância/retenção(🌍1.0=apego) → 🌍=2.5 · 🔥=0.3 · 💧=0.2 sobre 3.0 → **🌍83 · 🔥10 · 💧7**. Lock retenção/rigidez=Terra.
+- **Elemento(s):** 🌍Terra 83% · 🔥Fogo 10% · 💧Água 7%. **Derivação:** rigidez/intolerância + não-assimilar + primeira infância/retenção → 🌍Terra (retenção=apego=Terra); 🔥Fogo intolerância; 💧Água mínima.
 - **Centro:** Instinto (retenção; primeira infância).
 - **🌍 Terra**
   - **🟢 emoções:** capacidade de assimilar/aproveitar o que serve — separar o puro do impuro (MTC) · maleabilidade, soltar aos poucos (assinatura Terra+) · paciência
@@ -125,7 +125,7 @@ Esta é a tabela-mestra. O 🔴 de um campo é a carga daquele elemento; o 🟢 
   - **🔴 crenças:** "mudança me deixa contraído"
 
 ### `intestino_grosso` — periferia/borda externa
-- **Elemento(s):** 🌍Terra 95% · 💧Água 5%. **Derivação:** dificuldade de soltar(🌍1.0) + apego ao passado(🌍1.0) + retenção(🌍1.0) → 🌍puro; a fatia 💧Água mínima vem do "medo de soltar". Lock apego/retenção=Terra.
+- **Elemento(s):** 🌍Terra 95% · 💧Água 5%. **Derivação:** dificuldade de soltar + apego ao passado + retenção → 🌍Terra (retenção/segurar); 💧Água mínima do "medo de soltar".
 - **Centro:** Instinto (soltar × segurar).
 - **🌍 Terra**
   - **🟢 emoções:** capacidade de soltar/deixar fluir — eliminar o que não serve (MTC — intestino grosso em harmonia) · desapego leve, confiança de que o novo chega (assinatura Terra+) · constância sem apego
@@ -221,7 +221,7 @@ Esta é a tabela-mestra. O 🔴 de um campo é a carga daquele elemento; o 🟢 
 - **Nota:** distingue-se do adrenal — aqui domina o drive/urgência (Fogo), não a exaustão.
 
 ### `tireoide` — cervical (2-3h OE / 9-10h OD)
-- **Elemento(s):** 💧Água 57% · 🌍Terra 30% · 🔥Fogo 13%. **Derivação:** humilhação engolida(💧0.6/🌍0.4) + voz sufocada/ressentimento(💧0.6/🔥0.4) + servilismo/não dizer não(🌍0.5/💧0.5) → 💧=1.7 · 🌍=0.9 · 🔥=0.4 sobre 3.0 → **💧57 · 🌍30 · 🔥13**. O 🔥Fogo vem da raiva engolida.
+- **Elemento(s):** 💧Água 50% · 💨Ar 25% · 🌍Terra 15% · 🔥Fogo 10%. **Derivação:** humilhação engolida/voz sufocada = 💧Água; **voz/comunicação = 💨Ar** (função — correção Ar-funcional, glossário: "voz/expressão"); servilismo/resignação = 🌍Terra; raiva engolida = 🔥Fogo.
 - **Centro:** Coração-expressão (voz engolida).
 - **💧 Água**
   - **🟢 emoções:** voz que sente e se deixa ouvir sem medo (assinatura Água+) · confiança de que a própria voz importa
@@ -358,7 +358,7 @@ Esta é a tabela-mestra. O 🔴 de um campo é a carga daquele elemento; o 🟢 
 # 4. Coluna / topografia / estrutura
 
 ### `coluna_cervical` — 10-11h
-- **Elemento(s):** 🌍Terra 60% · 💧Água 20% · 🔥Fogo 20%. **Derivação:** contenção da voz(💧0.6/🌍0.4) + inflexibilidade/rigidez(🌍0.7/🔥0.3) + teimosia(🌍0.7/🔥0.3) → 🌍=1.8 · 💧=0.6 · 🔥=0.6 sobre 3.0 → **🌍60 · 💧20 · 🔥20**. Lock teimosia/rigidez=Terra.
+- **Elemento(s):** 🌍Terra 45% · 💧Água 25% · 💨Ar 20% · 🔥Fogo 10%. **Derivação:** teimosia/inflexibilidade/rigidez = 🌍Terra; contenção da voz = 💧Água; **voz/expressão = 💨Ar** (função — correção Ar-funcional, glossário: "voz, contenção verbal"); raiva teimosa = 🔥Fogo.
 - **Centro:** Coração-expressão (voz, flexibilidade).
 - **🌍 Terra**
   - **🟢 emoções:** flexibilidade — capacidade de considerar outros pontos de vista (assinatura Terra+ como constância maleável) · presença firme e serena
@@ -444,7 +444,7 @@ Esta é a tabela-mestra. O 🔴 de um campo é a carga daquele elemento; o 🟢 
   - **🔴 crenças:** "a vida foi injusta comigo" (vitimização — Hay reumatismo) · "no fundo, me sinto não-amado" (Hay articulações)
 
 ### `boca_garganta` — orofaríngea (1-2h OE / 10-11h OD)
-- **Elemento(s):** 💧Água 53% · 🔥Fogo 17% · 💨Ar 17% · 🌍Terra 13%. **Derivação:** raiva engolida/não falar por si(🔥0.5/💧0.5) + criatividade bloqueada(💨0.5/💧0.5) + expressão reprimida(💧0.6/🌍0.4) → 💧=1.6 · 🔥=0.5 · 💨=0.5 · 🌍=0.4 sobre 3.0 → **💧53 · 🔥17 · 💨17 · 🌍13**. 🔥=raiva engolida; 💨=criatividade/voz (recurso quando liberada).
+- **Elemento(s):** 💧Água 45% · 💨Ar 30% · 🔥Fogo 15% · 🌍Terra 10%. **Derivação:** expressão reprimida/engolir = 💧Água; **voz/comunicação/criatividade = 💨Ar** (função do órgão — correção Ar-funcional, glossário: "eixo verbal"); raiva engolida = 🔥Fogo; contenção = 🌍Terra.
 - **Centro:** Coração-expressão (voz por si).
 - **💧 Água**
   - **🟢 emoções:** dizer o que sente, voz própria (assinatura Água+) · deixar a emoção passar em palavra
@@ -510,7 +510,7 @@ Esta é a tabela-mestra. O 🔴 de um campo é a carga daquele elemento; o 🟢 
   - **🔴 crenças:** "preciso me proteger o tempo todo"
 
 ### `sistema_circulatorio` / `anel_sodico` — coroa + anel periférico
-- **Elemento(s):** 🌍Terra 60% · 💧Água 27% · 🔥Fogo 13%. **Derivação:** rigidez afetiva/"endurecer para aguentar"(🌍0.6/🔥0.4) + medo do futuro(💧0.8/🌍0.2) + fixação no passado(🌍1.0=apego) → 🌍=1.8 · 💧=0.8 · 🔥=0.4 sobre 3.0 → **🌍60 · 💧27 · 🔥13**. Lock apego/rigidez=Terra + medo(do futuro)=Água.
+- **Elemento(s):** 🌍Terra 60% · 💧Água 27% · 🔥Fogo 13%. **Derivação:** rigidez afetiva/endurecer + fixação no passado = 🌍Terra (apego=Terra); medo do futuro = 💧Água; endurecer-quente = 🔥Fogo.
 - **Centro:** Coração-Mente (endurecer para aguentar).
 - **🌍 Terra**
   - **🟢 emoções:** abertura que se mantém firme sem endurecer (assinatura Terra+ — base flexível)
@@ -592,7 +592,7 @@ Esta é a tabela-mestra. O 🔴 de um campo é a carga daquele elemento; o 🟢 
   - **🔴 crenças:** "carrego vergonha/culpa na área da sexualidade" (Hay/Dias)
 
 ### `sistema_urinario` — inferior (rim → ureter → bexiga)
-- **Elemento(s):** 🌍Terra 53% · 💧Água 47%. **Derivação:** medo/ansiedade(💧0.6/🌍0.4) + insegurança(💧0.8/🌍0.2) + retenção/"segurar o que deveria fluir"(🌍1.0) → 🌍=1.6 · 💧=1.4 sobre 3.0 → **🌍53 · 💧47**. Converge com `rim` (medo=Água) mas a retenção da bexiga puxa 🌍Terra.
+- **Elemento(s):** 🌍Terra 53% · 💧Água 47%. **Derivação:** medo/insegurança = 💧Água; retenção/"segurar o que deveria fluir" = 🌍Terra (apego=Terra). Converge com `rim` no medo.
 - **Centro:** Instinto (medo, retenção). Converge com `rim`.
 - **🌍 Terra**
   - **🟢 emoções:** capacidade de deixar fluir o que já não serve (assinatura Terra+ — soltar sem apego) · descarga saudável, abrir espaço
