@@ -1,0 +1,95 @@
+<meta charset="utf-8">
+<title>Estudo de cálculo — relatório novo</title>
+<style>
+:root{--paper:#fff;--ink:#1f3a3c;--soft:#5a6f6e;--faint:#8a9695;--line:#e6ded0;--line2:#d6cbb6;--teal:#0a7d84;--teal-deep:#0d5c63;--amber:#b5701a;--serif:"Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;}
+*{box-sizing:border-box;}
+body{margin:0;background:#ece5d6;color:var(--ink);font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.6;}
+.wrap{max-width:900px;margin:0 auto;padding:30px 20px 90px;}
+h1{font-family:var(--serif);font-size:27px;color:var(--teal-deep);line-height:1.15;margin:0 0 18px;}
+h2{font-family:var(--serif);font-size:21px;color:var(--teal-deep);border-bottom:2px solid var(--line2);padding-bottom:6px;margin:34px 0 12px;}
+h3{font-family:var(--serif);font-size:17px;color:var(--ink);margin:22px 0 8px;}
+h4{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--amber);margin:16px 0 6px;}
+p{margin:9px 0;} strong{color:var(--ink);} em{color:var(--teal-deep);font-style:italic;}
+code{font-family:ui-monospace,"Cascadia Code",monospace;font-size:.88em;background:#f2ede2;padding:1px 5px;border-radius:4px;color:#4a5f5e;}
+pre{background:#1f3a3c;color:#e9e2d3;border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:12.5px;line-height:1.5;}
+pre code{background:none;color:inherit;padding:0;font-size:inherit;}
+blockquote{border-left:3px solid var(--teal);background:color-mix(in srgb,var(--teal) 5%,#fff);margin:14px 0;padding:10px 16px;border-radius:0 8px 8px 0;color:#26403f;}
+blockquote strong{color:var(--teal-deep);}
+.tw{overflow-x:auto;margin:12px 0;}
+table{width:100%;border-collapse:collapse;font-size:13px;background:#fff;border:1px solid var(--line);border-radius:8px;}
+th{text-align:left;font-size:11px;color:var(--soft);background:#faf8f2;border-bottom:1.5px solid var(--line2);padding:8px 11px;font-weight:700;}
+td{padding:8px 11px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.5;}
+td.k{font-weight:600;white-space:nowrap;color:var(--ink);}
+ul,ol{margin:9px 0;padding-left:22px;} li{margin:4px 0;}
+hr{border:0;border-top:1px solid var(--line2);margin:24px 0;}
+</style>
+<div class="wrap"><h1>Estudo de CÁLCULO do relatório novo — o que o motor precisa computar</h1>
+<p><strong>Data:</strong> 2026-07-22. <strong>Objetivo:</strong> mapear, para cada bloco do relatório aprovado, O QUE precisa ser calculado e COM QUAL metodologia — o "motor de números" (a metade determinística do híbrido; a outra metade é o LLM escrevendo a prosa). Base: os 6 blocos aprovados + a <code>tabela-lastro-CANONICA.md</code> (travada, auditada).</p>
+<blockquote><strong>Arquitetura híbrida:</strong> o CÓDIGO calcula tudo que é número (centros, scores, perfil de elementos, seleção) de forma determinística e única por pessoa; o LLM recebe esses números + o leque de emoções/crenças e ESCREVE os 6 blocos na voz do cliente (8ª série, anti-Forer). O LLM não inventa número; o código não escreve prosa.</blockquote>
+<hr>
+<h2>VISÃO GERAL DO FLUXO</h2>
+<pre><code>Stage 1 (achados + preservados + constituição)
+        │
+        ▼
+  PASSO 0 — o LEQUE: cada campo → tabela-lastro → {elemento(s)%, centro, emoções(polo), crenças}
+        │
+        ├──▶ (A) SCORE por intensidade ......... base de tudo
+        ├──▶ (B) EMOÇÕES (mapa emocional) ....... agregação por família + squash
+        ├──▶ (C) 3 CENTROS (topográfico) ........ tensão/livre por zona → agulha
+        ├──▶ (D) PERFIL DE ELEMENTOS (interno) .. 2 somatórios → magnitude + balanço
+        └──▶ (E) SELEÇÃO top-N .................. o que entra em cada bloco
+        │
+        ▼
+  LLM escreve os 6 blocos consumindo os números + o leque</code></pre>
+<hr>
+<h2>PASSO 0 — O LEQUE (campo → lastro)</h2>
+<p>Para CADA achado e CADA preservado, o motor resolve o <code>campo</code> na tabela-lastro e puxa: <strong>elemento(s) + %</strong>, <strong>centro</strong> (Mente/Coração/Corpo), <strong>emoções</strong> (no polo certo: achado→🔴 desequilíbrio, preservado→🟢 equilíbrio) e <strong>crenças</strong>. É a matéria-prima de todos os cálculos e da prosa. <strong>Por isso a tabela tem que ser exaustiva.</strong></p>
+<p><strong>⚠️ REQUISITO — o motor precisa CLASSIFICAR cada campo antes de calcular:</strong></p>
+<ol><li><strong>Sinais EXTRA-IRIDOLÓGICOS (médicos, NÃO emocionais) → PULAR no motor emocional.</strong> Regra já existente (<code>docs/system-niveis-atencao.md</code>): <code>{vascularizacao_escleral, arco_senil_periferico}</code> (e <code>anel_sodico</code> quando I≥4) são <strong>sinais sistêmicos/médicos</strong> (ícone 🔬), disparados por <code>intensidade≥4</code> OU descrição com "icterícia/amarelado/amarelo-âmbar" (o <strong>amarelo</strong> = eixo hepatobiliar). <strong>Eles NÃO têm leitura emocional</strong> e NÃO entram no leque/elementos/centros. Estão corretamente FORA da tabela-lastro. (Ex.: o <code>vascularizacao_escleral I5</code> do Helton — o achado "mais gritante" do exame — é justamente esse caso: <strong>excluído de propósito</strong>, não é lacuna.) No máximo viram uma nota médica no <strong>dossiê do terapeuta</strong> — nunca no doc emocional do cliente. ⚠️ <code>anel_sodico</code> é DUPLO: tem leitura emocional (via <code>sistema_circulatorio</code> = rigidez/apego) E pode disparar o flag médico quando I≥4 — mantém o emocional.</li><li><strong>Alias / chave diferente</strong> (ex.: Stage 1 emite <code>manchas_psoricas</code>; a tabela guarda sob <code>sistema_imune</code>). → tabela de aliases campo→campo.</li><li><strong>Marcadores / localizadores</strong> (<code>anel_interno</code>, <code>pigmento_amber</code>, <code>lacuna_estrutural</code>, <code>cripta</code>): NÃO carregam elemento próprio — herdam da ÁREA e/ou marcam o QUANDO (linha do tempo). → <strong>não entram no somatório de elementos</strong>; alimentam a linha do tempo e o tema da área.</li></ol>
+<p><strong>Classificação do campo (Passo 0):</strong> <code>emocional</code> (→ leque completo) · <code>extra-iridológico/médico</code> (→ pula no emocional; dossiê só) · <code>marcador/localizador</code> (→ linha do tempo + tema da área, sem elemento) · <code>modulador constitucional</code> (→ recurso/lente).</p>
+<hr>
+<h2>METODOLOGIA DOS CÁLCULOS-NÚCLEO</h2>
+<h3>(A) Score por intensidade — a base</h3>
+<p>O Stage 1 dá <code>intensidade</code> 1-5 por achado. É o único número objetivo da íris. Todo score deriva dele. Já é uma compressão perceptual (o próprio Sonnet comprime), então <strong>NÃO</strong> empilhamos Stevens/Fechner por cima — usamos peso quase-linear <code>intensidade^γ</code>, <strong>γ ≈ 1,1</strong> (1,0 = linear puro; 1,3 = dá mais destaque aos gritantes). Modulação por <code>natureza_da_carga</code>: <code>em_reorganizacao_ativa</code> desce 1 nível (já caminha pro livre); <code>indeterminada</code> não gera; demais mantêm.</p>
+<h3>(B) Emoções — agregação por FAMÍLIA (mapa emocional, bloco 5)</h3>
+<p>Uma emoção não vem de um órgão só — vem da <strong>família de campos</strong> que a alimentam. Por isso ela discrimina mesmo quando um campo é igual entre pessoas.</p>
+<pre><code>score(emoção) = squash( Σ_campos-da-família  intensidade^γ )
+squash(S) = S / (S + k)      // satura perto do topo: 1 achado gritante não engole os outros</code></pre>
+<p>Ex.: <strong>raiva</strong> = família {fígado, radii, coroa_simpática}. No Helton: fígado I4 + radii I4 → raiva ALTA. No Miguel: fígado I4 + radii I3 → raiva média-alta. <strong>Mesmo fígado, radii separa</strong> — é o DNA.</p>
+<p>Lado: veio de <strong>achado</strong> → carga (polo 🔴); veio de <strong>preservado</strong> → recurso (polo 🟢).</p>
+<h3>(C) 3 Centros topográficos (bloco 2 — Mente·Coração·Corpo)</h3>
+<p>Cada campo tem um <code>centro</code> (Mente/Coração/Corpo; se duplo, divide o peso 0,5/0,5).</p>
+<pre><code>tensão(centro)  = Σ_achados-do-centro   ( intensidade^γ × peso_centro )   [modulado por natureza]
+livre(centro)   = Σ_preservados-do-centro ( peso_pres × peso_centro ) + zona_quieta
+agulha(centro)  = livre / (tensão + livre)      // 0 = tudo tensão (esquerda/âmbar) · 1 = tudo livre (direita/verde)</code></pre>
+<p><code>peso_pres</code>: vital_ativo = 2,0 · neutro = 1,5. <code>zona_quieta</code>: centro sem nenhum achado = preservado (conta como livre) — foi o que acertou o Miguel (mente clara = força, não ausência).</p>
+<h3>(D) Perfil de elementos — INTERNO (o que colore a prosa)</h3>
+<p>Dois somatórios por elemento, usando o elemento% de cada campo:</p>
+<pre><code>carga⁻(elem)   = Σ_achados      ( intensidade^γ × fração_elem )
+recurso⁺(elem) = Σ_preservados  ( peso_pres     × fração_elem ) + constituição
+magnitude(elem) = squash( carga⁻ + recurso⁺ )        // quanto o elemento está presente
+balanço(elem)   = recurso⁺ / (carga⁻ + recurso⁺)     // 0 = puro desequilíbrio · 1 = puro recurso</code></pre>
+<p><strong>Escalas independentes</strong> (NÃO somam 100 — forçar 100 achata todo mundo). Cada elemento = um mostrador (magnitude + balanço). É <strong>interno</strong>: a IA lê "Fogo forte e carregado / Água forte e equilibrada" e COLORE o texto — o cliente nunca vê "X% Fogo". Constituição entra no recurso: pupila centrada → Terra (centramento); trama compacta → Terra (vitalidade); bordas regulares → Terra (estabilidade).</p>
+<h3>(E) Seleção top-N</h3>
+<ul><li><strong>Emoções (mapa):</strong> top ~6 cargas (por score) + ~4 recursos. Nunca as 60.</li><li><strong>Achados protagonistas (bloco 1):</strong> top 3 por intensidade.</li><li><strong>Linha do tempo (bloco 3):</strong> todos os nós de <code>linha_temporal</code>, ordenados por idade; status (a_resolver/em_processo/resolvido) decide cor e se ganha "Chaves".</li><li><strong>Heranças (bloco 4):</strong> 1-2 padrões dos achados <code>herdada_constitucional</code> + fecho de resiliência.</li><li><strong>Perguntas (bloco 6):</strong> top ~4-5 cargas do mapa + 1 recurso.</li></ul>
+<hr>
+<h2>O QUE CADA BLOCO PRECISA CALCULAR</h2>
+<div class="tw"><table><thead><tr><th>#</th><th>Bloco</th><th>Consome</th><th>Cálculo (código)</th><th>O que o LLM faz</th></tr></thead><tbody><tr><td class="k">1</td><td class="">Em poucas palavras</td><td class="">top 3 achados</td><td class="">(E) seleção top-3 por intensidade → suas emoções (A/B)</td><td class="">tece os 3 achados como emoção + 1 pergunta maiêutica</td></tr><tr><td class="k">2</td><td class="">Como você funciona (Mente·Coração·Corpo)</td><td class="">achados + preservados + constituição por centro</td><td class=""><strong>(C) 3 centros</strong> + agulha; tensão dominante×secundário; <strong>(D) perfil de elementos</strong> p/ colorir</td><td class="">escreve os 3 centros, facetas, "mesma raiz 2 lados", etc., ancorado nos números</td></tr><tr><td class="k">3</td><td class="">Linha do tempo emocional</td><td class=""><code>linha_temporal[]</code></td><td class="">ordena por idade; mapeia status→cor; nó→emoção (B)</td><td class="">narra cada nó (emoção+comportamento+situação) + Chaves</td></tr><tr><td class="k">4</td><td class="">Heranças transgeracionais</td><td class="">achados <code>herdada_constitucional</code> + tema</td><td class="">(E) escolhe 1-2 padrões; fecho resiliência</td><td class="">monta a corrente + hipótese + frase + ritual</td></tr><tr><td class="k">5</td><td class="">Mapa emocional (pêndulos)</td><td class="">achados + preservados</td><td class=""><strong>(B) score das emoções</strong> por família + squash; (E) top 6 cargas + 4 recursos</td><td class="">escreve os pêndulos carga⟷antídoto + fecho (recurso=remédio)</td></tr><tr><td class="k">6</td><td class="">Perguntas p/ a sessão</td><td class="">mapa do bloco 5</td><td class="">(E) top 4-5 cargas + 1 recurso</td><td class="">escreve os "Caminhos" (processo somático 5 tempos)</td></tr></tbody></table></div>
+<p>O <strong>perfil de elementos (D)</strong> e o <strong>leque de crenças</strong> atravessam TODOS os blocos como coloração interna (a IA "sabe" que o Fogo do Helton está inflamado e escreve com esse tom), mas nunca viram "X% Fogo" no texto.</p>
+<hr>
+<h2>EXEMPLO COMPLETO — Helton (self), computado dos dados reais</h2>
+<p><strong>Achados:</strong> <strong>vascularizacao_escleral I5 → EXTRA-IRIDOLÓGICO/médico, pulado no emocional (correto — não é lacuna)</strong> · figado I4 · radii I4 · anel_interno I4 (marcador→só linha do tempo) · intestino_grosso I3 · sist_nervoso_autonomico I3 · rim I2 · eixo_pituitario_adrenal I1.</p>
+<p>→ <strong>Achados emocionais reais que entram no motor:</strong> figado I4 · radii I4 · intestino_grosso I3 · nervoso I3 · rim I2 · eixo I1 (o "mais forte" da leitura emocional passa a ser o <strong>fígado I4</strong>, não o vascular).</p>
+<p><strong>Preservados:</strong> coração(neutro) · pulmões(neutro) · linfático(neutro) · musculoesquelético(<strong>vital</strong>).</p>
+<h3>Perfil de elementos (D) — γ=1 (ilustrativo), k a calibrar</h3>
+<div class="tw"><table><thead><tr><th>elemento</th><th>carga⁻</th><th>recurso⁺</th><th>magnitude (bruta)</th><th><strong>balanço</strong></th><th>leitura</th></tr></thead><tbody><tr><td class="k">🔥 Fogo</td><td class="">5,6</td><td class="">1,0</td><td class="">6,6</td><td class=""><strong>16% livre</strong></td><td class="">forte e <strong>bem carregado</strong> (raiva contida, ferve)</td></tr><tr><td class="k">💧 Água</td><td class="">4,5</td><td class="">3,4</td><td class="">8,0</td><td class=""><strong>43%</strong></td><td class="">forte, mais equilibrada (sente e tem recurso)</td></tr><tr><td class="k">🌍 Terra</td><td class="">4,3</td><td class="">3,6</td><td class="">7,9</td><td class=""><strong>45%</strong></td><td class="">forte e equilibrada (base sólida)</td></tr><tr><td class="k">💨 Ar</td><td class="">2,6</td><td class="">1,0</td><td class="">3,5</td><td class=""><strong>28%</strong></td><td class="">baixo e carregado (mente que rumina)</td></tr></tbody></table></div>
+<p>→ Leitura interna que a IA usa: <em>"Fogo dominante e inflamado; Água e Terra fortes mas com recurso; Ar baixo."</em> Bate com "ferve rápido, guarda a raiva, tem base". <strong>Discrimina</strong> (o Miguel racional daria Ar mais alto e mais livre).</p>
+<h3>3 Centros (C) — ilustrativo</h3>
+<ul><li><strong>Corpo/Instinto:</strong> tensão alta (fígado+radii+intestino+rim) → agulha à esquerda (reage rápido).</li><li><strong>Mente:</strong> tensão média (nervoso autônomo) → meio.</li><li><strong>Coração:</strong> achados ~0 + coração preservado(neutro) → <strong>agulha à direita (livre/inteiro)</strong>.</li></ul>
+<p>Bate com o mockup aprovado (Mente 26 / Coração 83 / Corpo 21).</p>
+<hr>
+<h2>LACUNAS E DECISÕES ABERTAS (pra você bater o martelo)</h2>
+<ol><li><strong>Lista de classificação dos campos</strong> — o motor precisa da lista canônica de quais campos do Stage 1 são <code>emocional</code> vs <code>extra-iridológico/médico</code> vs <code>marcador</code> vs <code>modulador</code>. A base já existe (<code>system-niveis-atencao.md</code> dá o set médico: vascularizacao_escleral, arco_senil_periferico, anel_sodico≥I4). → montar a lista fechada dos ~42 campos do glossário do Stage 1 marcados por classe (rápido; garante que nenhum sinal físico vaze pro emocional e nenhum emocional seja pulado). <strong>NÃO</strong> dar leitura emocional aos médicos — o <code>vascularizacao_escleral</code> fica fora de propósito.</li><li><strong>Aliases</strong> (<code>manchas_psoricas</code>→<code>sistema_imune</code>): fazer a tabela de aliases (rápido).</li><li><strong>Parâmetros</strong> (sua chamada): <strong>γ</strong> (1,0–1,3; proponho 1,1) · <strong>k</strong> da saturação (calibrar nos 3 exames reais pra os números "fazerem sentido") · <strong>pesos preservado</strong> (vital 2,0 / neutro 1,5).</li><li><strong>Ranking de preservados</strong> (1º/2º/3º mais preservado que você pediu): o Stage 1 só dá 2 níveis (vital_ativo/neutro). Ranking fino exigiria campo novo no Stage 1 = mexer no canônico (ASK).</li><li><strong>pulmões no recurso</strong>: hoje elemento% = 💧Água (carga=tristeza); o polo recurso é respiração/leveza, que você associou a Ar. Decidir se o recurso puxa Ar (precisa marcar o elemento do POLO, não só do campo).</li></ol>
+<hr>
+<h2>PRÓXIMO (depois que você validar a metodologia)</h2>
+<ol><li>Completar a tabela com os campos físicos + aliases (agente).</li><li>Escrever o <strong>motor</strong> (código que faz A–E) e rodar nos 3 exames reais pra calibrar γ e k.</li><li>Escrever o <strong>prompt Stage 2</strong> que consome os números + o leque. ⛔ calibrar Sonnet = ASK antes.</li></ol></div>
