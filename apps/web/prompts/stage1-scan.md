@@ -207,9 +207,19 @@ Pergunta 1: "Há CARGA visível? (pigmento, opacidade, lacuna, abertura
 ```
 
 **Saída esperada:** 3-15 achados de atenção típicos (varia por íris),
-3-8 sistemas preservados, 0-4 correlações observadas, 0-6 marcadores
-temporais. Arrays vazios são VÁLIDOS e preferíveis a inflação
-especulativa.
+**4-8 sistemas preservados**, 0-4 correlações observadas, 0-6 marcadores
+temporais. Arrays vazios de achados/correlações/marcadores são VÁLIDOS e
+preferíveis a inflação especulativa.
+
+**Sobre os preservados (mire ≥4 GENUÍNOS):** a maioria das íris tem ao
+menos 4 zonas genuinamente íntegras — PROCURE ATIVAMENTE o lado
+preservado (o relatório integrativo precisa da face positiva/recurso, não
+só da carga). PORÉM o critério rigoroso acima e o skip-rather-than-
+fabricate continuam ABSOLUTOS: só emita preservado com sinal positivo
+visível REAL; se a íris genuinamente mostra menos de 4, emita menos —
+NUNCA fabrique preservado pra bater a meta. Ausência de carga ≠ evidência
+de saúde. A meta de 4 é um convite a olhar melhor o positivo, não licença
+pra inflar.
 
 <!-- GLOSSARY-START
      Bloco GERADO a partir de GLOSSARY[] em
