@@ -27,6 +27,27 @@ const MODULADOR = new Set(['cor_predominante', 'trama_fibras', 'pupila', 'bordas
 // VISTO/extra-iridológico → sem peso, ADJUVANTE do órgão-alvo
 const VISTO = { vascularizacao_escleral: 'figado_vesicula', arco_senil_periferico: 'sistema_circulatorio' }
 
+// ---------- CENTRO por ZONA topográfica (decisão founder — bloco 2 é topográfico) ----------
+// Fonte: coluna "zona iridológica" do glossário de produção. Superior=Mente ·
+// temporal/medial=Coração · inferior/visceral/estrutura=Corpo. Separado da
+// componente EMOCIONAL da tabela-lastro (que descreve como a emoção SE SENTE).
+const TOPO_CENTRO = {
+  // Mente (superior 11-1h + cerebral/nervoso)
+  cerebrum_motor: ['mente'], cerebellum_sensory: ['mente'], pineal_hipotalamica: ['mente'],
+  sistema_nervoso_autonomico: ['mente'], eixo_pituitario_adrenal: ['mente'],
+  // Coração (temporal/medial 2-4h · 8-10h + expressão/peito)
+  coracao: ['coracao'], pulmoes: ['coracao'], tireoide: ['coracao'], boca_garganta: ['coracao'],
+  coluna_cervical: ['coracao'], coluna_toracica: ['coracao'], sistema_linfatico: ['coracao'],
+  sistema_circulatorio: ['coracao'],
+  // Corpo (inferior 4-8h + víscera/estrutura/periferia física)
+  figado_vesicula: ['corpo'], rim: ['corpo'], adrenal: ['corpo'], estomago: ['corpo'],
+  intestino_delgado: ['corpo'], intestino_grosso: ['corpo'], pancreas: ['corpo'],
+  sistema_reprodutor: ['corpo'], sistema_urinario: ['corpo'], sistema_musculoesqueletico: ['corpo'],
+  pele_tegumentar: ['corpo'], sacro_coccyx: ['corpo'], coluna_lombar: ['corpo'], coroa_simpatica: ['corpo'],
+  // splits (víscera→cérebro / defesa)
+  radii_solaris: ['mente', 'corpo'], sistema_imune: ['coracao', 'corpo'],
+}
+
 // ---------- parse da tabela-lastro: campo → {elem:{fogo,agua,terra,ar}, centros:[...]} ----------
 const ELEM_KEY = { '🔥': 'fogo', '💧': 'agua', '🌍': 'terra', '💨': 'ar' }
 function parseLastro() {
@@ -78,8 +99,9 @@ function calc(name, lastro) {
     if (!t) { skipped.push(`${a.campo}(SEM-LASTRO)`); continue }
     const w = Math.pow(a.intensidade || 0, GAMMA)
     for (const e of ['fogo', 'agua', 'terra', 'ar']) elem.carga[e] += w * (t.elem[e] || 0)
-    const cw = w / t.centros.length
-    for (const c of t.centros) centro[c].t += cw
+    const cs = TOPO_CENTRO[key] || t.centros // centro por ZONA topográfica (decisão founder)
+    const cw = w / cs.length
+    for (const c of cs) centro[c].t += cw
   }
   // PRESERVADOS → recurso (elemento) + livre (centro)
   for (const p of preservados) {
@@ -88,8 +110,9 @@ function calc(name, lastro) {
     const w = W_PRES[p.polaridade_funcional] || W_PRES.neutro
     if (t) {
       for (const e of ['fogo', 'agua', 'terra', 'ar']) elem.recurso[e] += w * (t.elem[e] || 0)
-      const cw = w / t.centros.length
-      for (const c of t.centros) centro[c].l += cw
+      const cs = TOPO_CENTRO[key] || t.centros
+      const cw = w / cs.length
+      for (const c of cs) centro[c].l += cw
     }
   }
   // ZONA QUIETA: centro sem tensão nenhuma = preservado (livre)
@@ -104,14 +127,23 @@ function fmt(r) {
   L.push(`achados=${r.nAch} preservados=${r.nPres}`)
   if (r.adjuvantes.length) L.push(`adjuvantes (sem peso): ${r.adjuvantes.join(', ')}`)
   if (r.skipped.length) L.push(`pulados: ${r.skipped.join(', ')}`)
-  L.push('\nPERFIL DE ELEMENTOS (magnitude 0-100 · balanço 0-100% livre):')
-  for (const e of ['fogo', 'agua', 'terra', 'ar']) {
-    const c = r.elem.carga[e], rc = r.elem.recurso[e], tot = c + rc
-    const mag = Math.round(squash(tot) * 100)
-    const bal = tot ? Math.round((rc / tot) * 100) : 0
-    const bar = '█'.repeat(Math.round(mag / 5)).padEnd(20)
-    const emoji = { fogo: '🔥', agua: '💧', terra: '🌍', ar: '💨' }[e]
-    L.push(`  ${emoji} ${e.padEnd(6)} ${bar} mag ${String(mag).padStart(3)}  balanço ${String(bal).padStart(3)}% livre  (carga ${c.toFixed(1)} · recurso ${rc.toFixed(1)})`)
+  const emoji = { fogo: '🔥', agua: '💧', terra: '🌍', ar: '💨' }
+  // PRINCIPAL = ranking pela CARGA (o que pesa) — NÃO pela magnitude somada
+  // (somar recurso enterrava o elemento dominante da carga; erro pego pelo founder).
+  const byCarga = ['fogo', 'agua', 'terra', 'ar'].sort((a, b) => r.elem.carga[b] - r.elem.carga[a])
+  const maxC = Math.max(...['fogo', 'agua', 'terra', 'ar'].map((e) => r.elem.carga[e])) || 1
+  const maxR = Math.max(...['fogo', 'agua', 'terra', 'ar'].map((e) => r.elem.recurso[e])) || 1
+  L.push('\nCARGA — o que PESA (define o elemento PRINCIPAL):')
+  byCarga.forEach((e, i) => {
+    const c = r.elem.carga[e]
+    const bar = '█'.repeat(Math.round((c / maxC) * 20)).padEnd(20)
+    L.push(`  ${i === 0 ? '★' : ' '} ${emoji[e]} ${e.padEnd(6)} ${bar} ${c.toFixed(1)}${i === 0 ? '  ← PRINCIPAL' : ''}`)
+  })
+  L.push('RECURSO — a FORÇA (do lado preservado):')
+  for (const e of ['fogo', 'agua', 'terra', 'ar'].sort((a, b) => r.elem.recurso[b] - r.elem.recurso[a])) {
+    const rc = r.elem.recurso[e]
+    const bar = '█'.repeat(Math.round((rc / maxR) * 20)).padEnd(20)
+    L.push(`    ${emoji[e]} ${e.padEnd(6)} ${bar} ${rc.toFixed(1)}`)
   }
   L.push('\n3 CENTROS (agulha 0=tensão ⟷ 100=livre):')
   for (const c of ['mente', 'coracao', 'corpo']) {
