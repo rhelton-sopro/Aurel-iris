@@ -1,5 +1,5 @@
 <meta charset="utf-8">
-<title>Cadeia órgão → emoção → elemento</title>
+<title>Cadeia órgão → emoção → elemento (42 campos)</title>
 <style>
   :root{
     --paper:#fff;--panel:#f7f3ea;--ink:#1f3a3c;--ink-soft:#5a6f6e;--ink-faint:#8a9695;
@@ -9,160 +9,428 @@
   }
   *{box-sizing:border-box;}
   body{margin:0;background:#e9e2d3;color:var(--ink);font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;}
-  .sheet{max-width:920px;margin:24px auto;background:var(--paper);border:1px solid var(--line);border-radius:6px;box-shadow:0 4px 24px rgba(30,45,45,.10);overflow:hidden;}
-  .pad{padding:clamp(24px,4vw,44px);}
-  h1{font-family:var(--serif);font-size:clamp(22px,3vw,28px);margin:0 0 4px;color:var(--ink);}
-  .sub{font-size:13px;color:var(--ink-soft);margin:0 0 6px;}
-  .chain{font-family:var(--serif);font-size:15px;color:var(--agua);margin:0 0 18px;font-style:italic;}
-  .legend{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 22px;padding:12px 14px;background:var(--panel);border:1px solid var(--line);border-radius:10px;}
-  .legend .el{cursor:default;}
-  h3{font-family:var(--serif);font-size:16px;margin:26px 0 8px;color:var(--ink);border-bottom:2px solid var(--line-strong);padding-bottom:5px;}
-  table{width:100%;border-collapse:collapse;font-size:13.5px;}
-  td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:middle;}
-  tr.campo td{background:color-mix(in srgb,var(--agua) 8%,var(--paper));font-weight:700;color:var(--agua);font-size:12.5px;letter-spacing:.02em;padding-top:10px;padding-bottom:10px;border-bottom:1px solid var(--line-strong);}
-  tr.campo .zona{color:var(--ink-faint);font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;margin-left:6px;}
-  td.emo{font-family:var(--serif);font-size:14.5px;color:#28403f;width:44%;}
-  td.els{white-space:nowrap;}
-  .el{display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:700;border-radius:100px;padding:2px 9px;margin:2px 3px 2px 0;border:1.5px solid;}
-  .el b{font-variant-numeric:tabular-nums;font-weight:800;}
+  .sheet{max-width:940px;margin:24px auto;background:var(--paper);border:1px solid var(--line);border-radius:6px;box-shadow:0 4px 24px rgba(30,45,45,.10);overflow:hidden;}
+  .pad{padding:clamp(22px,4vw,42px);}
+  h1{font-family:var(--serif);font-size:clamp(21px,3vw,27px);margin:0 0 4px;}
+  .sub{font-size:13px;color:var(--ink-soft);margin:0 0 4px;}
+  .chain{font-family:var(--serif);font-size:15px;color:var(--agua);margin:0 0 16px;font-style:italic;}
+  .legend{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 8px;padding:11px 13px;background:var(--panel);border:1px solid var(--line);border-radius:10px;align-items:center;}
+  .note{font-size:12px;color:var(--ink-faint);margin:0 0 20px;}
+  h3{font-family:var(--serif);font-size:16px;margin:26px 0 10px;border-bottom:2px solid var(--line-strong);padding-bottom:5px;}
+
+  .campo{border:1px solid var(--line);border-radius:11px;padding:12px 15px;margin:0 0 11px;background:var(--paper);}
+  .chead{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin-bottom:9px;padding-bottom:8px;border-bottom:1px dashed var(--line);}
+  .cname{font-family:var(--serif);font-size:15.5px;font-weight:700;color:var(--ink);}
+  .zona{font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;}
+  .comp{font-size:10.5px;color:var(--agua);font-weight:700;background:color-mix(in srgb,var(--agua) 8%,var(--paper));border:1px solid color-mix(in srgb,var(--agua) 22%,var(--line));border-radius:100px;padding:1px 8px;margin-left:auto;}
+  .badge{font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;border-radius:100px;padding:2px 9px;}
+  .badge.mod{color:var(--ink-faint);background:var(--panel);border:1px solid var(--line-strong);}
+  .badge.loc{color:var(--terra);background:color-mix(in srgb,var(--terra) 8%,var(--paper));border:1px solid color-mix(in srgb,var(--terra) 25%,var(--line));}
+
+  .row{display:grid;grid-template-columns:56px 1fr;gap:10px;padding:5px 0;align-items:start;}
+  .rlab{font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:800;color:var(--ink-faint);padding-top:4px;}
+  .row.ar{background:color-mix(in srgb,var(--ar) 5%,var(--paper));border-radius:8px;padding:6px 8px;margin:2px 0;}
+  .row.ar .rlab{color:var(--ar);}
+  .emos{display:flex;flex-wrap:wrap;gap:5px 12px;}
+  .emo{font-family:var(--serif);font-size:14px;color:#28403f;display:inline-flex;align-items:center;gap:5px;}
+  .palist{font-size:12.5px;color:var(--ink-faint);line-height:1.55;}
+  .el{display:inline-flex;align-items:center;font-size:10.5px;font-weight:800;border-radius:100px;padding:1px 6px;border:1.5px solid;font-variant-numeric:tabular-nums;}
   .el.f{color:var(--fogo);border-color:color-mix(in srgb,var(--fogo) 45%,var(--line));background:color-mix(in srgb,var(--fogo) 8%,var(--paper));}
   .el.r{color:var(--ar);border-color:color-mix(in srgb,var(--ar) 45%,var(--line));background:color-mix(in srgb,var(--ar) 8%,var(--paper));}
   .el.g{color:var(--agua);border-color:color-mix(in srgb,var(--agua) 45%,var(--line));background:color-mix(in srgb,var(--agua) 8%,var(--paper));}
   .el.t{color:var(--terra);border-color:color-mix(in srgb,var(--terra) 45%,var(--line));background:color-mix(in srgb,var(--terra) 8%,var(--paper));}
-  .rec h3{color:var(--terra);}
   .foot{font-size:12px;color:var(--ink-faint);border-top:1px solid var(--line);margin-top:26px;padding-top:14px;}
 </style>
 <div class="sheet"><div class="pad">
   <h1>Cadeia: órgão → emoção → elemento</h1>
-  <p class="sub">Motor de números do temperamento (Bardon 4 elementos). Tabela interna do lastro — não é o que o cliente lê.</p>
-  <p class="chain">campo do Stage 1 (onde procura) &nbsp;→&nbsp; emoção(ões) &nbsp;→&nbsp; elemento(s) + peso</p>
+  <p class="sub">42 campos do Stage 1 · emoções enriquecidas (de-para canônico) · elemento no núcleo. Tabela interna do lastro — não é o que o cliente lê.</p>
+  <p class="chain">campo (onde procura) &nbsp;→&nbsp; emoções &nbsp;→&nbsp; elemento(s) + peso</p>
   <div class="legend">
-    <span class="el f">🔥 Fogo <b>Colérico</b></span>
-    <span class="el r">💨 Ar <b>Sanguíneo</b></span>
-    <span class="el g">💧 Água <b>Melancólico</b></span>
-    <span class="el t">🌍 Terra <b>Fleumático</b></span>
-    <span style="font-size:12px;color:var(--ink-faint);align-self:center;">peso = fração do elemento na emoção (soma 1.0)</span>
+    <span class="el f">🔥</span> Fogo/Colérico <span class="el r">💨</span> Ar/Sanguíneo <span class="el g">💧</span> Água/Melancólico <span class="el t">🌍</span> Terra/Fleumático
+    <span style="font-size:11.5px;color:var(--ink-faint);">· <b>Núcleo</b> = as centrais (o motor prioriza) · <b>⚡Ar</b> = lado recurso/expansivo · <b>Paleta</b> = as demais</span>
   </div>
+  <p class="note">Medo = 💧 Água (Bardon, travado). ⚡Ar = onde o Sanguíneo se registra (recurso/positivo) — corrige o viés. Pesos secundários = calibráveis; o predominante decide ~80%. Paleta ainda sem chip (elemento herda do núcleo/família — merge fino depois).</p>
 
   <h3>1 · Núcleo visceral</h3>
-  <table>
-    <tr class="campo"><td colspan="2">Fígado / vesícula <span class="zona">5–7h</span></td></tr>
-    <tr><td class="emo">Raiva contida</td><td class="els"><span class="el f">🔥<b>.7</b></span><span class="el g">💧<b>.3</b></span></td></tr>
-    <tr><td class="emo">Ressentimento</td><td class="els"><span class="el g">💧<b>.6</b></span><span class="el f">🔥<b>.4</b></span></td></tr>
-    <tr><td class="emo">Frustração</td><td class="els"><span class="el f">🔥<b>1.0</b></span></td></tr>
-    <tr><td class="emo">Irritação</td><td class="els"><span class="el f">🔥<b>1.0</b></span></td></tr>
-    <tr class="campo"><td colspan="2">Rim <span class="zona">6h</span></td></tr>
-    <tr><td class="emo">Medo</td><td class="els"><span class="el g">💧<b>1.0</b></span></td></tr>
-    <tr><td class="emo">Insegurança de base</td><td class="els"><span class="el g">💧<b>1.0</b></span></td></tr>
-    <tr><td class="emo">Falta de reserva</td><td class="els"><span class="el g">💧<b>.7</b></span><span class="el t">🌍<b>.3</b></span></td></tr>
-    <tr class="campo"><td colspan="2">Pulmões <span class="zona">3h / 9h</span></td></tr>
-    <tr><td class="emo">Tristeza</td><td class="els"><span class="el g">💧<b>1.0</b></span></td></tr>
-    <tr><td class="emo">Luto</td><td class="els"><span class="el g">💧<b>1.0</b></span></td></tr>
-    <tr><td class="emo">Desânimo</td><td class="els"><span class="el g">💧<b>1.0</b></span></td></tr>
-    <tr><td class="emo">Desapego difícil</td><td class="els"><span class="el t">🌍<b>.6</b></span><span class="el g">💧<b>.4</b></span></td></tr>
-    <tr class="campo"><td colspan="2">Intestino grosso <span class="zona">periferia</span></td></tr>
-    <tr><td class="emo">Dificuldade de soltar</td><td class="els"><span class="el t">🌍<b>1.0</b></span></td></tr>
-    <tr><td class="emo">Apego ao passado</td><td class="els"><span class="el t">🌍<b>1.0</b></span></td></tr>
-    <tr><td class="emo">Obstinação</td><td class="els"><span class="el t">🌍<b>.7</b></span><span class="el f">🔥<b>.3</b></span></td></tr>
-    <tr class="campo"><td colspan="2">Estômago / intestino delgado <span class="zona">pericentral · anel interno</span></td></tr>
-    <tr><td class="emo">Ansiedade</td><td class="els"><span class="el t">🌍<b>.5</b></span><span class="el g">💧<b>.5</b></span></td></tr>
-    <tr><td class="emo">Preocupação</td><td class="els"><span class="el t">🌍<b>.6</b></span><span class="el g">💧<b>.4</b></span></td></tr>
-    <tr><td class="emo">Ruminação</td><td class="els"><span class="el t">🌍<b>.6</b></span><span class="el g">💧<b>.4</b></span></td></tr>
-    <tr><td class="emo">Não "digerir" / assimilar</td><td class="els"><span class="el t">🌍<b>1.0</b></span></td></tr>
-    <tr class="campo"><td colspan="2">Pâncreas <span class="zona">7–8h OE</span></td></tr>
-    <tr><td class="emo">Carência de doçura</td><td class="els"><span class="el g">💧<b>.6</b></span><span class="el t">🌍<b>.4</b></span></td></tr>
-    <tr><td class="emo">Cuidar demais dos outros</td><td class="els"><span class="el t">🌍<b>.6</b></span><span class="el g">💧<b>.4</b></span></td></tr>
-    <tr class="campo"><td colspan="2">Coração <span class="zona">2–3h OE</span></td></tr>
-    <tr><td class="emo">Abandono</td><td class="els"><span class="el g">💧<b>1.0</b></span></td></tr>
-    <tr><td class="emo">Perda</td><td class="els"><span class="el g">💧<b>1.0</b></span></td></tr>
-    <tr><td class="emo">Amor não recebido</td><td class="els"><span class="el g">💧<b>.7</b></span><span class="el r">💨<b>.3</b></span></td></tr>
-    <tr><td class="emo">Alegria sufocada</td><td class="els"><span class="el r">💨<b>.6</b></span><span class="el g">💧<b>.4</b></span></td></tr>
-  </table>
 
-  <h3>2 · Endócrino / eixo do estresse</h3>
-  <table>
-    <tr class="campo"><td colspan="2">Adrenal / eixo HPA <span class="zona">5:30–6h · colarete 12:30h</span></td></tr>
-    <tr><td class="emo">Exaustão / esgotamento</td><td class="els"><span class="el t">🌍<b>.5</b></span><span class="el g">💧<b>.5</b></span></td></tr>
-    <tr><td class="emo">Alerta sustentado</td><td class="els"><span class="el f">🔥<b>.5</b></span><span class="el g">💧<b>.5</b></span></td></tr>
-    <tr><td class="emo">"Não posso parar"</td><td class="els"><span class="el f">🔥<b>.6</b></span><span class="el g">💧<b>.4</b></span></td></tr>
-    <tr class="campo"><td colspan="2">Tireoide <span class="zona">cervical 2–3h OE / 9–10h OD</span></td></tr>
-    <tr><td class="emo">Humilhação engolida</td><td class="els"><span class="el g">💧<b>.6</b></span><span class="el f">🔥<b>.4</b></span></td></tr>
-    <tr><td class="emo">Voz sufocada</td><td class="els"><span class="el g">💧<b>.5</b></span><span class="el f">🔥<b>.5</b></span></td></tr>
-    <tr><td class="emo">Ressentimento de "nunca ter vez"</td><td class="els"><span class="el g">💧<b>.6</b></span><span class="el f">🔥<b>.4</b></span></td></tr>
-    <tr class="campo"><td colspan="2">Pineal / hipotalâmica <span class="zona">centro ~12h</span></td></tr>
-    <tr><td class="emo">Sobrecarga mental</td><td class="els"><span class="el f">🔥<b>.6</b></span><span class="el t">🌍<b>.4</b></span></td></tr>
-    <tr><td class="emo">Desconexão de propósito</td><td class="els"><span class="el r">💨<b>.5</b></span><span class="el g">💧<b>.5</b></span></td></tr>
-    <tr><td class="emo">Desregulação sono-vigília</td><td class="els"><span class="el t">🌍<b>.6</b></span><span class="el g">💧<b>.4</b></span></td></tr>
-  </table>
-
-  <h3>3 · Sistema nervoso / cérebro</h3>
-  <table>
-    <tr class="campo"><td colspan="2">SNA / anel nervoso <span class="zona">anel concêntrico</span></td></tr>
-    <tr><td class="emo">Hipervigilância</td><td class="els"><span class="el g">💧<b>.6</b></span><span class="el f">🔥<b>.4</b></span></td></tr>
-    <tr><td class="emo">Incapacidade de relaxar</td><td class="els"><span class="el f">🔥<b>.5</b></span><span class="el g">💧<b>.5</b></span></td></tr>
-    <tr><td class="emo">Ansiedade de fundo</td><td class="els"><span class="el t">🌍<b>.5</b></span><span class="el g">💧<b>.5</b></span></td></tr>
-    <tr class="campo"><td colspan="2">Cérebro motor <span class="zona">12–1h</span></td></tr>
-    <tr><td class="emo">Autocrítica</td><td class="els"><span class="el f">🔥<b>.6</b></span><span class="el t">🌍<b>.4</b></span></td></tr>
-    <tr><td class="emo">Controle</td><td class="els"><span class="el f">🔥<b>.7</b></span><span class="el t">🌍<b>.3</b></span></td></tr>
-    <tr><td class="emo">Autocensura</td><td class="els"><span class="el t">🌍<b>.5</b></span><span class="el g">💧<b>.5</b></span></td></tr>
-    <tr class="campo"><td colspan="2">Cérebro sensorial <span class="zona">11–12h</span></td></tr>
-    <tr><td class="emo">Hipervigilância sensorial</td><td class="els"><span class="el g">💧<b>.6</b></span><span class="el f">🔥<b>.4</b></span></td></tr>
-    <tr><td class="emo">Sobressalto / ansiedade corporal</td><td class="els"><span class="el t">🌍<b>.5</b></span><span class="el g">💧<b>.5</b></span></td></tr>
-    <tr class="campo"><td colspan="2">Radii solaris <span class="zona">linhas radiais</span></td></tr>
-    <tr><td class="emo">Irritação que sobe</td><td class="els"><span class="el f">🔥<b>1.0</b></span></td></tr>
-    <tr><td class="emo">Dispersão mental</td><td class="els"><span class="el r">💨<b>.7</b></span><span class="el f">🔥<b>.3</b></span></td></tr>
-  </table>
-
-  <h3>4 · Coluna / estrutura / topografia</h3>
-  <table>
-    <tr class="campo"><td colspan="2">Coluna cervical <span class="zona">10–11h</span></td></tr>
-    <tr><td class="emo">Engolir o que quer dizer</td><td class="els"><span class="el g">💧<b>.5</b></span><span class="el f">🔥<b>.5</b></span></td></tr>
-    <tr><td class="emo">Rigidez / contenção da voz</td><td class="els"><span class="el t">🌍<b>.6</b></span><span class="el f">🔥<b>.4</b></span></td></tr>
-    <tr class="campo"><td colspan="2">Coluna torácica <span class="zona">3–5h</span></td></tr>
-    <tr><td class="emo">Peso afetivo / carregar os outros</td><td class="els"><span class="el t">🌍<b>.6</b></span><span class="el g">💧<b>.4</b></span></td></tr>
-    <tr><td class="emo">Culpa</td><td class="els"><span class="el g">💧<b>.6</b></span><span class="el t">🌍<b>.4</b></span></td></tr>
-    <tr class="campo"><td colspan="2">Coluna lombar <span class="zona">4–5h</span></td></tr>
-    <tr><td class="emo">Medo de falta de apoio</td><td class="els"><span class="el g">💧<b>.7</b></span><span class="el t">🌍<b>.3</b></span></td></tr>
-    <tr><td class="emo">Insegurança material/estrutural</td><td class="els"><span class="el g">💧<b>.6</b></span><span class="el t">🌍<b>.4</b></span></td></tr>
-    <tr class="campo"><td colspan="2">Sacro / cóccix <span class="zona">5–6h</span></td></tr>
-    <tr><td class="emo">Medo de seguir em frente</td><td class="els"><span class="el g">💧<b>.7</b></span><span class="el t">🌍<b>.3</b></span></td></tr>
-    <tr><td class="emo">Sobrevivência</td><td class="els"><span class="el g">💧<b>1.0</b></span></td></tr>
-    <tr class="campo"><td colspan="2">Musculoesquelético <span class="zona">estroma</span></td></tr>
-    <tr><td class="emo">Rigidez / resistência</td><td class="els"><span class="el t">🌍<b>.6</b></span><span class="el f">🔥<b>.4</b></span></td></tr>
-    <tr><td class="emo">Peso estrutural</td><td class="els"><span class="el t">🌍<b>1.0</b></span></td></tr>
-    <tr class="campo"><td colspan="2">Boca / garganta <span class="zona">1–2h OE</span></td></tr>
-    <tr><td class="emo">Raiva engolida</td><td class="els"><span class="el f">🔥<b>.6</b></span><span class="el g">💧<b>.4</b></span></td></tr>
-    <tr><td class="emo">Não falar por si</td><td class="els"><span class="el g">💧<b>.5</b></span><span class="el f">🔥<b>.5</b></span></td></tr>
-    <tr><td class="emo">Criatividade bloqueada</td><td class="els"><span class="el g">💧<b>.5</b></span><span class="el r">💨<b>.5</b></span></td></tr>
-  </table>
-
-  <h3>5 · Sistêmico / pele / linfa / circulação</h3>
-  <table>
-    <tr class="campo"><td colspan="2">Linfático / rosário linfático <span class="zona">drenagem</span></td></tr>
-    <tr><td class="emo">Acúmulo emocional não drenado</td><td class="els"><span class="el t">🌍<b>.5</b></span><span class="el g">💧<b>.5</b></span></td></tr>
-    <tr class="campo"><td colspan="2">Imune / manchas psóricas <span class="zona">carga inflamatória</span></td></tr>
-    <tr><td class="emo">Autoproteção exaurida</td><td class="els"><span class="el g">💧<b>.6</b></span><span class="el f">🔥<b>.4</b></span></td></tr>
-    <tr class="campo"><td colspan="2">Circulatório / anel sódico <span class="zona">—</span></td></tr>
-    <tr><td class="emo">Rigidez afetiva / "endurecer p/ aguentar"</td><td class="els"><span class="el t">🌍<b>.6</b></span><span class="el f">🔥<b>.4</b></span></td></tr>
-    <tr class="campo"><td colspan="2">Pele / tegumentar <span class="zona">fronteira c/ o mundo</span></td></tr>
-    <tr><td class="emo">Fronteira frágil / sensibilidade ao externo</td><td class="els"><span class="el g">💧<b>.6</b></span><span class="el r">💨<b>.4</b></span></td></tr>
-  </table>
-
-  <div class="rec">
-  <h3>6 · Recursos (lado preservado — peso menor: vital 2.0 · livre 1.5)</h3>
-  <table>
-    <tr class="campo"><td colspan="2">Coração preservado</td></tr>
-    <tr><td class="emo">Alegria &amp; amor</td><td class="els"><span class="el r">💨<b>.6</b></span><span class="el g">💧<b>.4</b></span></td></tr>
-    <tr class="campo"><td colspan="2">Pulmões preservados</td></tr>
-    <tr><td class="emo">Fôlego / vitalidade</td><td class="els"><span class="el r">💨<b>1.0</b></span></td></tr>
-    <tr class="campo"><td colspan="2">Musculoesquelético (trama compacta)</td></tr>
-    <tr><td class="emo">Firmeza / base vital</td><td class="els"><span class="el t">🌍<b>.6</b></span><span class="el f">🔥<b>.4</b></span></td></tr>
-    <tr class="campo"><td colspan="2">Pupila centrada</td></tr>
-    <tr><td class="emo">Centramento / eixo organizado</td><td class="els"><span class="el t">🌍<b>1.0</b></span></td></tr>
-    <tr class="campo"><td colspan="2">Linfático preservado</td></tr>
-    <tr><td class="emo">Limites saudáveis</td><td class="els"><span class="el t">🌍<b>.6</b></span><span class="el f">🔥<b>.4</b></span></td></tr>
-  </table>
+  <div class="campo">
+    <div class="chead"><span class="cname">Fígado / vesícula</span><span class="zona">5–7h</span><span class="comp">Coração-Instinto</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">raiva contida <span class="el f">🔥.7</span><span class="el g">💧.3</span></span>
+      <span class="emo">ressentimento <span class="el g">💧.6</span><span class="el f">🔥.4</span></span>
+      <span class="emo">frustração <span class="el f">🔥1</span></span>
+      <span class="emo">amargura <span class="el g">💧.5</span><span class="el f">🔥.5</span></span>
+    </div></div>
+    <div class="row ar"><span class="rlab">⚡Ar</span><div class="emos">
+      <span class="emo">motivação / ímpeto <span class="el r">💨1</span></span>
+      <span class="emo">decisão e iniciativa <span class="el r">💨1</span></span>
+      <span class="emo">assertividade saudável <span class="el r">💨.6</span><span class="el f">🔥.4</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Paleta</span><div class="palist">irritação, ira, ódio, indignação, rancor/vingança, hostilidade, crítica crônica, ciúme, inveja, possessividade, orgulho/dureza, culpa</div></div>
   </div>
 
-  <p class="foot"><b>Cadeia órgão→emoção→elemento.</b> Coluna 1 (campo·zona) + coluna 2 (emoção) = do lastro (`tabela-lastro-MASTER.md`, cobre os ~38 campos do Stage 1). Coluna 3 (elemento+peso) = da proposta (`tabela-emocao-elemento-PROPOSTA.md`). Vários campos empurram o MESMO elemento → compõem/somam. Pesos secundários = rascunho calibrável (o PREDOMINANTE decide ~80%). Temperamento % = Σ(peso_intensidade × fração_elemento) → normaliza ipsativa → arredonda Hamilton. ⛔ Interno (motor/lastro), nunca no doc do cliente.</p>
+  <div class="campo">
+    <div class="chead"><span class="cname">Rim</span><span class="zona">6h</span><span class="comp">Instinto</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">medo de base <span class="el g">💧1</span></span>
+      <span class="emo">insegurança da infância <span class="el g">💧1</span></span>
+      <span class="emo">falta de reserva/apoio <span class="el g">💧.7</span><span class="el t">🌍.3</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Paleta</span><div class="palist">pavor, terror, aversão, fobia, pânico, culpa, decepção, vergonha, falta de identidade, conflito, (com parcimônia) desesperança</div></div>
+  </div>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Pulmões</span><span class="zona">3h OE / 9h OD</span><span class="comp">Coração</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">tristeza <span class="el g">💧1</span></span>
+      <span class="emo">luto / pesar <span class="el g">💧1</span></span>
+      <span class="emo">desânimo <span class="el g">💧1</span></span>
+      <span class="emo">auto-rejeição <span class="el g">💧.7</span><span class="el f">🔥.3</span></span>
+    </div></div>
+    <div class="row ar"><span class="rlab">⚡Ar</span><div class="emos">
+      <span class="emo">inspirar / receber a vida <span class="el r">💨1</span></span>
+      <span class="emo">leveza pós-perda <span class="el r">💨.6</span><span class="el g">💧.4</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Paleta</span><div class="palist">choro, melancolia, depressão, rejeição, pesar profundo, desapego difícil, baixa autoestima, pessimismo, desproteção</div></div>
+  </div>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Estômago</span><span class="zona">anel interno pericentral</span><span class="comp">Mente-Instinto</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">ansiedade <span class="el t">🌍.5</span><span class="el g">💧.5</span></span>
+      <span class="emo">preocupação <span class="el t">🌍.6</span><span class="el g">💧.4</span></span>
+      <span class="emo">não-digerir o novo <span class="el t">🌍1</span></span>
+    </div></div>
+    <div class="row ar"><span class="rlab">⚡Ar</span><div class="emos">
+      <span class="emo">curiosidade / apetite pelo novo <span class="el r">💨1</span></span>
+      <span class="emo">acolhimento / nutrição <span class="el t">🌍.6</span><span class="el r">💨.4</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Paleta</span><div class="palist">nervosismo, ruminação <i>(modo Mente)</i>, desespero, nojo/desgosto, medo do novo, medo do fracasso, indecisão</div></div>
+  </div>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Intestino delgado</span><span class="zona">estroma intermediário</span><span class="comp">Instinto</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">rigidez / intolerância <span class="el t">🌍.6</span><span class="el f">🔥.4</span></span>
+      <span class="emo">não-assimilar <span class="el t">🌍1</span></span>
+      <span class="emo">marca de 1ª infância <span class="el t">🌍.6</span><span class="el g">💧.4</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Paleta</span><div class="palist">constrição interna, insegurança · <i>(abandono do Bradley — NÃO usado; íris lê retenção/1ª infância)</i></div></div>
+  </div>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Intestino grosso</span><span class="zona">periferia/borda</span><span class="comp">Instinto</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">dificuldade de soltar <span class="el t">🌍1</span></span>
+      <span class="emo">apego ao passado <span class="el t">🌍1</span></span>
+      <span class="emo">retenção <span class="el t">🌍1</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Paleta</span><div class="palist">medo de soltar, obstinação, acúmulo do velho, constipação emocional</div></div>
+  </div>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Pâncreas</span><span class="zona">7–8h OE</span><span class="comp">Coração-Terra</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">falta de amor-próprio <span class="el g">💧.7</span><span class="el t">🌍.3</span></span>
+      <span class="emo">carência de doçura <span class="el g">💧.6</span><span class="el t">🌍.4</span></span>
+      <span class="emo">auto-humilhação <span class="el g">💧.6</span><span class="el f">🔥.4</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Paleta</span><div class="palist">culpa, cuidar demais dos outros, tristeza "pelo que poderia ter sido", necessidade de controle</div></div>
+  </div>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Coração</span><span class="zona">2–3h OE</span><span class="comp">Coração</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">amor não recebido <span class="el g">💧.7</span><span class="el r">💨.3</span></span>
+      <span class="emo">abandono <span class="el g">💧1</span></span>
+      <span class="emo">dificuldade de vínculo <span class="el g">💧.6</span><span class="el r">💨.4</span></span>
+    </div></div>
+    <div class="row ar"><span class="rlab">⚡Ar</span><div class="emos">
+      <span class="emo">alegria / júbilo <span class="el r">💨.6</span><span class="el f">🔥.4</span></span>
+      <span class="emo">vínculo prazeroso <span class="el r">💨.5</span><span class="el g">💧.5</span></span>
+      <span class="emo">entusiasmo afetivo <span class="el r">💨1</span></span>
+      <span class="emo">segurança amorosa <span class="el r">💨.5</span><span class="el g">💧.5</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Paleta</span><div class="palist">perda, traição, desamparo, vulnerabilidade, esforço não reconhecido, angústia, coração endurecido, falta de prazer</div></div>
+  </div>
+
+  <h3>2 · Endócrino / eixo do estresse</h3>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Adrenal</span><span class="zona">5:30–6h</span><span class="comp">Instinto</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">exaustão / esgotamento <span class="el t">🌍.5</span><span class="el g">💧.5</span></span>
+      <span class="emo">alerta sustentado <span class="el f">🔥.5</span><span class="el g">💧.5</span></span>
+      <span class="emo">"não posso parar" <span class="el f">🔥.6</span><span class="el g">💧.4</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Paleta</span><div class="palist">fadiga crônica, pânico, falta de vitalidade, solidão de fundo, derrotismo, ansiedade, hipervigilância</div></div>
+  </div>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Eixo pituitário-adrenal</span><span class="zona">colarete 12:30h</span><span class="comp">Instinto-Mente</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">alerta sustentado <span class="el f">🔥.5</span><span class="el g">💧.5</span></span>
+      <span class="emo">urgência constante <span class="el f">🔥.6</span><span class="el t">🌍.4</span></span>
+      <span class="emo">"tenho de fazer mais" <span class="el f">🔥.6</span><span class="el g">💧.4</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Paleta</span><div class="palist">hiper-realização, esgotamento, autoexigência de performance <i>(Mente)</i>, incapacidade de relaxar, ansiedade de fundo</div></div>
+  </div>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Tireoide</span><span class="zona">cervical 2–3h OE / 9–10h OD</span><span class="comp">Coração-expressão</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">humilhação engolida <span class="el g">💧.6</span><span class="el f">🔥.4</span></span>
+      <span class="emo">voz sufocada / "nunca é minha vez" <span class="el g">💧.5</span><span class="el f">🔥.5</span></span>
+      <span class="emo">servilismo / não dizer não <span class="el g">💧.6</span><span class="el t">🌍.4</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Paleta</span><div class="palist">ressentimento de nunca ter vez, desistência, submissão, desvalorização, raiva engolida, resignação</div></div>
+  </div>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Pineal / hipotalâmica</span><span class="zona">centro ~12h</span><span class="comp">Mente</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">desregulação sono-vigília <span class="el t">🌍.5</span><span class="el g">💧.5</span></span>
+      <span class="emo">desconexão de propósito <span class="el r">💨.5</span><span class="el g">💧.5</span></span>
+      <span class="emo">sobrecarga mental <span class="el f">🔥.5</span><span class="el t">🌍.5</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Paleta</span><div class="palist">confusão sobre o rumo, "mente que não desliga" <i>(Mente)</i>, desconexão do sentido/missão</div></div>
+  </div>
+
+  <h3>3 · Sistema nervoso / cérebro</h3>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">SNA / anel nervoso</span><span class="zona">anel concêntrico</span><span class="comp">Mente-Instinto</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">tensão nervosa sustentada <span class="el f">🔥.5</span><span class="el g">💧.5</span></span>
+      <span class="emo">ansiedade de fundo <span class="el t">🌍.5</span><span class="el g">💧.5</span></span>
+      <span class="emo">hipervigilância <span class="el g">💧.6</span><span class="el f">🔥.4</span></span>
+    </div></div>
+    <div class="row ar"><span class="rlab">⚡Ar</span><div class="emos">
+      <span class="emo">espírito livre / não-conformismo criativo <span class="el r">💨1</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Paleta</span><div class="palist">mente que não desliga <i>(Mente)</i>, inquietação, neuroticismo, alerta crônico, sobressalto</div></div>
+  </div>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Cérebro motor</span><span class="zona">12–1h · super-ego</span><span class="comp">Mente (o mais mental)</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">autoexigência / autocrítica <span class="el f">🔥.6</span><span class="el t">🌍.4</span></span>
+      <span class="emo">perfeccionismo <span class="el f">🔥.5</span><span class="el t">🌍.5</span></span>
+      <span class="emo">hipercontrole <span class="el f">🔥.7</span><span class="el t">🌍.3</span></span>
+      <span class="emo">culpa por "não dar conta" <span class="el g">💧.6</span><span class="el t">🌍.4</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Paleta</span><div class="palist">autocensura moral, rigidez moral, medo de errar, ansiedade de performance, dificuldade de delegar, frieza defensiva, julgamento, obsessividade <i>(Mente)</i>, vergonha de não corresponder</div></div>
+  </div>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Cérebro sensorial</span><span class="zona">11–12h</span><span class="comp">Mente + somático</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">hipervigilância sensorial <span class="el g">💧.6</span><span class="el f">🔥.4</span></span>
+      <span class="emo">ansiedade corporal / sobressalto <span class="el t">🌍.5</span><span class="el g">💧.5</span></span>
+      <span class="emo">dispersão / ausência <span class="el r">💨.7</span><span class="el t">🌍.3</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Paleta</span><div class="palist">confusão, credulidade, sobrecarga sensorial, desconexão do corpo, intuição não-ancorada</div></div>
+  </div>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Radii solaris</span><span class="zona">linhas radiais</span><span class="comp">Mente-Instinto</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">irritação que "sobe" <span class="el f">🔥1</span></span>
+      <span class="emo">dispersão mental <span class="el r">💨.7</span><span class="el f">🔥.3</span></span>
+      <span class="emo">tensão intestino-cérebro <span class="el f">🔥.5</span><span class="el t">🌍.5</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Paleta</span><div class="palist">sobrecarga difusa, irritabilidade de fundo, dificuldade de concentração <i>(Mente)</i></div></div>
+  </div>
+
+  <h3>4 · Coluna / topografia / estrutura</h3>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Coluna cervical</span><span class="zona">10–11h</span><span class="comp">Coração-expressão</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">contenção da voz <span class="el g">💧.5</span><span class="el f">🔥.5</span></span>
+      <span class="emo">inflexibilidade / rigidez <span class="el t">🌍.6</span><span class="el f">🔥.4</span></span>
+      <span class="emo">teimosia <span class="el t">🌍.7</span><span class="el f">🔥.3</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Paleta</span><div class="palist">"recusa em ver os dois lados", expressão engolida, sobrecarga de responsabilidade</div></div>
+  </div>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Coluna torácica</span><span class="zona">3–5h</span><span class="comp">Coração</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">peso afetivo / "carregar nas costas" <span class="el t">🌍.6</span><span class="el g">💧.4</span></span>
+      <span class="emo">culpa <span class="el g">💧.6</span><span class="el t">🌍.4</span></span>
+      <span class="emo">carregar os outros <span class="el t">🌍.6</span><span class="el g">💧.4</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Paleta</span><div class="palist">sobrecarga por dever, mágoa acumulada, "segurar tudo sozinho", amor retido, ressentimento de quem sustenta</div></div>
+  </div>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Coluna lombar</span><span class="zona">4–5h</span><span class="comp">Instinto</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">medo de falta de apoio <span class="el g">💧.7</span><span class="el t">🌍.3</span></span>
+      <span class="emo">insegurança material <span class="el g">💧.6</span><span class="el t">🌍.4</span></span>
+      <span class="emo">insegurança estrutural <span class="el g">💧.6</span><span class="el t">🌍.4</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Paleta</span><div class="palist">medo do futuro econômico, "não ter chão", sobrecarga de sustentar a família</div></div>
+  </div>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Sacro / cóccix</span><span class="zona">5–6h</span><span class="comp">Instinto</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">medo de seguir em frente <span class="el g">💧.7</span><span class="el t">🌍.3</span></span>
+      <span class="emo">insegurança de base / sobrevivência <span class="el g">💧1</span></span>
+      <span class="emo">sexualidade e medos inatos <span class="el g">💧.6</span><span class="el f">🔥.4</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Paleta</span><div class="palist">senso de inferioridade, "fora de equilíbrio consigo", proibições internalizadas, culpa/vergonha do sexual</div></div>
+  </div>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Musculoesquelético</span><span class="zona">estroma</span><span class="comp">Mente-Coração</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">rigidez / resistência <span class="el t">🌍.6</span><span class="el f">🔥.4</span></span>
+      <span class="emo">crítica cristalizada <span class="el f">🔥.5</span><span class="el t">🌍.5</span></span>
+      <span class="emo">amargura / vitimização <span class="el g">💧.5</span><span class="el f">🔥.5</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Paleta</span><div class="palist">intolerância, preocupação somatizada, sentir-se não-amado, ressentimento endurecido, peso da vida adulta</div></div>
+  </div>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Boca / garganta</span><span class="zona">1–2h OE</span><span class="comp">Coração-expressão</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">raiva engolida / não falar por si <span class="el f">🔥.6</span><span class="el g">💧.4</span></span>
+      <span class="emo">criatividade bloqueada <span class="el g">💧.5</span><span class="el r">💨.5</span></span>
+      <span class="emo">expressão reprimida <span class="el g">💧.5</span><span class="el f">🔥.5</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Paleta</span><div class="palist">medo de se expor ao falar, engolir emoções, "não consigo dizer o que sinto", voz sufocada</div></div>
+  </div>
+
+  <h3>5 · Sistêmico / pele / linfa / circulação</h3>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Linfático / rosário linfático</span><span class="zona">coroa periférica</span><span class="comp">Coração</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">sobrecarga empática <span class="el t">🌍.5</span><span class="el g">💧.5</span></span>
+      <span class="emo">exaustão de cuidador <span class="el t">🌍.5</span><span class="el g">💧.5</span></span>
+      <span class="emo">ausência de limite eu↔mundo <span class="el g">💧.5</span><span class="el t">🌍.5</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Paleta</span><div class="palist">acúmulo não drenado, esgotamento, dificuldade de dizer não, perda do centro, sobrecarga silenciosa</div></div>
+  </div>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Imune / manchas psóricas</span><span class="zona">sistêmico / disperso</span><span class="comp">Coração-Instinto</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">baixa autoestima <span class="el g">💧1</span></span>
+      <span class="emo">autoproteção exaurida <span class="el g">💧.6</span><span class="el f">🔥.4</span></span>
+      <span class="emo">hipervigilância defensiva <span class="el g">💧.6</span><span class="el f">🔥.4</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Paleta</span><div class="palist">defesa esgotada, desilusão/trauma localizado, carga inflamatória de fundo</div></div>
+  </div>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Circulatório / anel sódico</span><span class="zona">coroa + anel</span><span class="comp">Coração-Mente</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">rigidez afetiva / "endurecer p/ aguentar" <span class="el t">🌍.6</span><span class="el f">🔥.4</span></span>
+      <span class="emo">medo do futuro <span class="el g">💧.6</span><span class="el t">🌍.4</span></span>
+      <span class="emo">fixação no passado <span class="el t">🌍1</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Paleta</span><div class="palist">intolerância, endurecimento de atitudes, resistência à mudança, afeto que "desliga", nostalgia dura</div></div>
+  </div>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Pele / tegumentar</span><span class="zona">anel periférico extremo</span><span class="comp">Instinto-Mente</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">fronteira/limite frágil <span class="el g">💧.6</span><span class="el r">💨.4</span></span>
+      <span class="emo">sensibilidade ao externo <span class="el g">💧.6</span><span class="el r">💨.4</span></span>
+      <span class="emo">busca de propósito/missão <span class="el r">💨.6</span><span class="el t">🌍.4</span></span>
+    </div></div>
+    <div class="row ar"><span class="rlab">⚡Ar</span><div class="emos">
+      <span class="emo">entusiasmo pela missão <span class="el r">💨1</span></span>
+      <span class="emo">futuro com esperança / visão que inspira <span class="el r">💨1</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Paleta</span><div class="palist">ansiedade de fundo, procrastinação da missão, medo do fracasso, culpa enterrada, sentir-se exposto/sem casca</div></div>
+  </div>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Coroa simpática</span><span class="zona">fronteira ciliar</span><span class="comp">Instinto (luta/impulso)</span><span class="badge mod">modula o tom</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">impulso / ímpeto de ação <span class="el f">🔥1</span></span>
+      <span class="emo">prontidão para luta / reatividade <span class="el f">🔥.6</span><span class="el g">💧.4</span></span>
+      <span class="emo">temperamento manifesto <span class="el f">🔥.5</span><span class="el r">💨.5</span></span>
+    </div></div>
+    <div class="row ar"><span class="rlab">⚡Ar</span><div class="emos">
+      <span class="emo">sociabilidade / carisma <span class="el r">💨1</span></span>
+      <span class="emo">iniciativa expansiva / presença <span class="el r">💨1</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Paleta</span><div class="palist">assertividade/combatividade, tensão de fronteira eu↔mundo, pares "eu" (sonhador↔controlador)</div></div>
+  </div>
+
+  <h3>6 · Reprodutor / urinário</h3>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Sistema reprodutor</span><span class="zona">inferior medial 6h</span><span class="comp">Instinto</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">sexualidade e medos inatos <span class="el g">💧.6</span><span class="el f">🔥.4</span></span>
+      <span class="emo">medo de pertencer / vincular <span class="el g">💧.6</span><span class="el r">💨.4</span></span>
+      <span class="emo">vínculo / procriação <span class="el r">💨.5</span><span class="el g">💧.5</span></span>
+    </div></div>
+    <div class="row ar"><span class="rlab">⚡Ar</span><div class="emos">
+      <span class="emo">criatividade / "fogo criador" <span class="el r">💨.6</span><span class="el f">🔥.4</span></span>
+      <span class="emo">vínculo prazeroso / intimidade viva <span class="el r">💨.5</span><span class="el g">💧.5</span></span>
+      <span class="emo">vitalidade / ímpeto generativo <span class="el r">💨.6</span><span class="el f">🔥.4</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Paleta</span><div class="palist">passividade↔dominação, humilhação/vergonha do sexual, ciúme/desvalorização no vínculo, culpa em torno do sexual</div></div>
+  </div>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Sistema urinário</span><span class="zona">rim→ureter→bexiga</span><span class="comp">Instinto (converge c/ rim)</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">medo / ansiedade <span class="el g">💧1</span></span>
+      <span class="emo">insegurança <span class="el g">💧1</span></span>
+      <span class="emo">retenção — "segurar o que deveria fluir" <span class="el t">🌍1</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Paleta</span><div class="palist">"irritação retida", apego a ideias velhas, fobias somatizadas, raiva não-dissolvida</div></div>
+  </div>
+
+  <h3>7 · Localizadores &amp; moduladores (não são "campo → emoção" 1:1)</h3>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Pigmento âmbar</span><span class="zona">depósito por zona</span><span class="badge loc">localizador de tema</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">desconsideração (área EGO) <span class="el g">💧.7</span><span class="el t">🌍.3</span></span>
+      <span class="emo">amor condicionado ao sacrifício (VONTADE) <span class="el g">💧.6</span><span class="el t">🌍.4</span></span>
+      <span class="emo">desilusão / trauma localizado <span class="el g">💧.6</span><span class="el f">🔥.4</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Nota</span><div class="palist">NÃO é emoção fixa — marca ONDE olhar; a emoção sai da função da área. Cruzar com o campo topográfico.</div></div>
+  </div>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Lacuna estrutural</span><span class="zona">carga aberta/recente</span><span class="badge loc">localizador de carência</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">carência / vazio na função da área <span class="el g">💧1</span></span>
+      <span class="emo">"não merecer" (EGO) <span class="el g">💧.7</span><span class="el t">🌍.3</span></span>
+      <span class="emo">ressentimento (PERDÃO) <span class="el g">💧.6</span><span class="el f">🔥.4</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Nota</span><div class="palist">como o pigmento, puxa a emoção da função da área. Carga mais RECENTE/aberta (vs. cripta).</div></div>
+  </div>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Cripta</span><span class="zona">carga profunda/antiga</span><span class="badge loc">localizador temporal</span></div>
+    <div class="row pal"><span class="rlab">Nota</span><div class="palist">mesma família da lacuna na mesma área, lida como mais ANTIGA/consolidada. Datação real = Cronorichio (colarete), não lacuna-vs-cripta.</div></div>
+  </div>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Anel interno / colarete</span><span class="zona">fronteira eu↔mundo</span><span class="badge loc">emoção + linha do tempo</span></div>
+    <div class="row nuc"><span class="rlab">Núcleo</span><div class="emos">
+      <span class="emo">tensão na regulação de limites <span class="el t">🌍.5</span><span class="el g">💧.5</span></span>
+      <span class="emo">intro↔extroversão (distância colarete↔pupila) <span class="el t">—</span></span>
+    </div></div>
+    <div class="row pal"><span class="rlab">Nota</span><div class="palist">função dupla: emoção de LIMITE + <b>QUANDO</b> o trauma aconteceu (nascimento a 12h; 90°≈15 anos). Insumo do gráfico Passado⟷Futuro. "A íris diz QUANDO, não o QUÊ."</div></div>
+  </div>
+
+  <div class="campo">
+    <div class="chead"><span class="cname">Padrão pupilar · Pupila · Bordas · Trama · Cor</span><span class="zona">constitucional</span><span class="badge mod">moduladores</span></div>
+    <div class="row pal"><span class="rlab">Nota</span><div class="palist">NÃO geram emoção discreta — calibram a LENTE/tom de todos os campos. Midríase = alerta/simpático (amplifica) · miose = exaustão (aplaina) · trama compacta = resiliência (<span class="el r">💨</span> recurso, aguenta antes de sinalizar) · bordas achatadas = eneatipo (viés de caráter) · cor = chão constitucional. Vão para <code>constituicao_base</code>, não para <code>achados</code>.</div></div>
+  </div>
+
+  <p class="foot"><b>Cadeia órgão→emoção→elemento — 42 campos.</b> Emoções do <code>tabela-achado-emocao-COMPLETA.md</code> (Bradley/MTC/Hay/Dias/nativo); elementos do <code>tabela-emocao-elemento-PROPOSTA.md</code> (medo=Água travado). ⚡Ar = onde o Sanguíneo se registra (recurso) — <b>corrige o viés que fazia o Ar sumir</b>. Núcleo = drivers do cálculo (chip); Paleta = repertório extra pro S2 (elemento herda da família). Localizadores (pigmento/lacuna/cripta/colarete) puxam a emoção da área. Moduladores calibram o tom. Temperamento % = Σ(peso_intensidade × fração_elemento) → normaliza ipsativa → Hamilton. ⛔ Interno, nunca no doc do cliente.</p>
 </div></div>
