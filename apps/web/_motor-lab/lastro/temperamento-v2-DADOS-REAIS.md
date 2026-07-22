@@ -119,3 +119,22 @@ A **menor extensão que torna a v2 viável = 1 campo** (`tipo_estrutural`). Para
 
 ## Anexo — por que não escalar por intensidade "salva"
 Rodando com peso ∝ intensidade (radii 5/4/3; pigmento; manchas): Daniel sobe um pouco em Fogo/motor (radii 5), Miguel ganharia Água/melancólico SE mapeássemos manchas psóricas (hoje não mapeadas). Mesmo assim os 3 permanecem **Ar/Fogo-dominantes com Água suprimida**, porque a fonte do desequilíbrio (trama sempre `media`, coroa nunca emitida, âmbar ubíquo) não muda com peso. Calibrar peso ≠ criar sinal.
+
+---
+
+## ⭐⭐ ACHADO (2026-07-22): ABORDAGEM TOPOGRÁFICA DISCRIMINA (ideia do founder)
+Em vez de emoção→elemento (que não discriminou), somar os achados por CENTRO/ZONA (peso=intensidade) DISCRIMINA nos 3 exames reais:
+
+| | Mente | Coração | Instinto |
+|---|---|---|---|
+| self | 41% | 0% | 59% |
+| daniel | 35% | 13% | 52% |
+| miguel | 16% | 11% | 74% |
+
+Diferentes de verdade (self=mental+visceral, coração=0/preservado; miguel=visceral 74%; daniel=equilibrado). Usa a ZONA que o Stage 1 JÁ captura → **ZERO mudança no Stage 1**.
+
+**Por que funciona:** a distribuição ESPACIAL (onde a carga mora) difere por pessoa, mesmo quando os TIPOS de achado são parecidos. É a leitura TOPOGRÁFICA/vetorial (Método Vetorial: superior=Mente, temporal=Coração, inferior=Instinto).
+
+**Ponto do founder (preservação):** zona quieta ≠ ausência do elemento. Coração 0% do self = coração PRESERVADO (recurso), não "sem coração". → o motor deve pontuar preservação + tensão, não só tensão.
+
+**RECEITA v3 (a construir):** (1) somar achados por centro (peso=intensidade) + somar preservados por centro → distribuição Mente/Coração/Instinto; (2) Centro→elemento: Mente→Ar · Coração→Água · Instinto→Fogo(fígado/radii/coroa)+Terra(intestino/apego/músculo); (3) o eixo ativo/passivo (colarete) e o pigmento afinam. UNIFICA com o bloco 2 (3 centros). Validar center→elemento nos 3 exames.
