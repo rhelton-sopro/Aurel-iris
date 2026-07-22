@@ -118,7 +118,8 @@ function calc(name, lastro) {
   // ZONA QUIETA: centro sem tensão nenhuma = preservado (livre)
   for (const c of ['mente', 'coracao', 'corpo']) if (centro[c].t === 0) centro[c].l += 1.0
 
-  return { name, elem, centro, skipped, adjuvantes, nAch: achados.length, nPres: preservados.length }
+  const pres = preservados.map((p) => ({ campo: p.campo, pol: p.polaridade_funcional }))
+  return { name, elem, centro, pres, skipped, adjuvantes, nAch: achados.length, nPres: preservados.length }
 }
 
 function fmt(r) {
@@ -128,23 +129,18 @@ function fmt(r) {
   if (r.adjuvantes.length) L.push(`adjuvantes (sem peso): ${r.adjuvantes.join(', ')}`)
   if (r.skipped.length) L.push(`pulados: ${r.skipped.join(', ')}`)
   const emoji = { fogo: '🔥', agua: '💧', terra: '🌍', ar: '💨' }
-  // PRINCIPAL = ranking pela CARGA (o que pesa) — NÃO pela magnitude somada
-  // (somar recurso enterrava o elemento dominante da carga; erro pego pelo founder).
+  // ELEMENTO = SÓ CARGA (achados). Preservados NÃO entram (decisão founder) —
+  // eles vão pro trilho separado da FORÇA, abaixo.
   const byCarga = ['fogo', 'agua', 'terra', 'ar'].sort((a, b) => r.elem.carga[b] - r.elem.carga[a])
   const maxC = Math.max(...['fogo', 'agua', 'terra', 'ar'].map((e) => r.elem.carga[e])) || 1
-  const maxR = Math.max(...['fogo', 'agua', 'terra', 'ar'].map((e) => r.elem.recurso[e])) || 1
-  L.push('\nCARGA — o que PESA (define o elemento PRINCIPAL):')
+  L.push('\nPERFIL DE ELEMENTOS = só CARGA (o que PESA · define o PRINCIPAL):')
   byCarga.forEach((e, i) => {
     const c = r.elem.carga[e]
     const bar = '█'.repeat(Math.round((c / maxC) * 20)).padEnd(20)
     L.push(`  ${i === 0 ? '★' : ' '} ${emoji[e]} ${e.padEnd(6)} ${bar} ${c.toFixed(1)}${i === 0 ? '  ← PRINCIPAL' : ''}`)
   })
-  L.push('RECURSO — a FORÇA (do lado preservado):')
-  for (const e of ['fogo', 'agua', 'terra', 'ar'].sort((a, b) => r.elem.recurso[b] - r.elem.recurso[a])) {
-    const rc = r.elem.recurso[e]
-    const bar = '█'.repeat(Math.round((rc / maxR) * 20)).padEnd(20)
-    L.push(`    ${emoji[e]} ${e.padEnd(6)} ${bar} ${rc.toFixed(1)}`)
-  }
+  L.push('FORÇA / RECURSOS (trilho separado — dos preservados, NÃO entra no elemento):')
+  for (const p of r.pres) L.push(`    ✓ ${p.campo}${p.pol === 'vital_ativo' ? ' (vital)' : ''}  → emoções 🟢 do lastro`)
   L.push('\n3 CENTROS (agulha 0=tensão ⟷ 100=livre):')
   for (const c of ['mente', 'coracao', 'corpo']) {
     const { t, l } = r.centro[c]
