@@ -183,3 +183,12 @@ Founder: "Miguel é extremamente RACIONAL, pouco intuitivo." → deveria ser �
 **Contagem: Jóia 2 · Flor 1 · Corrente 1 · Mista 1. Nenhuma "alta".**
 **VEREDITO: NÃO confiável nessa qualidade.** 5 rodadas → 4 respostas. Positivo FRACO: Jóia plurality (2/5) + bate com o founder (cerebral) + 2 viram pigmento no colarete → o sinal EXISTE mas é sutil, não é pego consistente. Causas: foto macia + glare + íris sem padrão Rayid gritante.
 **IMPLICAÇÃO:** adicionar `tipo_estrutural` ao Stage 1 AGORA geraria dado não-confiável — NÃO fazer ainda. Pra viabilizar: foto alta-res + luz controlada + backlight de fibras + rubrica calibrada (trabalho real, incerto). Temperamento é genuinamente DIFÍCIL: carga não discrimina (erra Miguel/Ar); estrutura não é confiável de capturar. → candidato a ADIAR e seguir os outros blocos (que não dependem dele).
+
+---
+
+## ⭐⭐⭐ DECISÃO FINAL (founder 2026-07-22): LARGAR os 4 ELEMENTOS, ir pelos 3 CENTROS
+Founder: (a) não confiar em foto de qualidade; (b) no Brasil fígado/raiva se repete → todo mundo vira Colérico (sem sentido); (c) GOSTOU da classificação Mente/Coração/Instinto e do TEXTO (como pensa, sente, se relaciona, age). Decisão: **não usar rótulos Colérico/Fleumático/Sanguíneo/Melancólico**. O "temperamento" vira o retrato pelos **3 CENTROS**.
+**Por que resolve 3 problemas:** (1) sem jargão (8ª série); (2) sem "todo mundo colérico" (mostra blend, não rótulo; eixo discriminante = Mente↔Coração, não fígado); (3) confiável — sai do dado topográfico que JÁ existe e que PROVOU discriminar (self M41/C0/I59, daniel 35/13/52, miguel 16/11/74). Sem Rayid, sem mexer no Stage 1, sem foto perfeita.
+**CORREÇÃO p/ validade (acerta o Miguel):** cada centro em DOIS lados — onde carrega TENSÃO e onde está LIVRE/CLARO (preservação). Miguel racional = mente CLARA/livre (força visível), não "sem mente". Conserta sem o sinal estrutural que falhou.
+**CONSOLIDAÇÃO:** bloco 2 "Um retrato em 10 segundos" (3 centros, já construído/aprovado) VIRA o retrato de personalidade. Bloco 3 (temperamento 4 elementos) SAI — junto com todo o problema de elemento/equilíbrio/Rayid. Manter o texto rico (relações/comportamento/visão de vida) ancorado nos centros.
+**PENDENTE:** desenhar o bloco (linguagem cliente: Mente/Coração/Instinto ou mais quente; os 2 lados tensão/livre; o texto rico) + reescrever a lógica no SPEC (dropar elementos).
