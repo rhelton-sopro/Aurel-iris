@@ -42,7 +42,15 @@ Cada emoção tem **1 elemento predominante + (opcional) 1 secundário**, com fr
 → normaliza os 4 scores pra 100 (composição ipsativa) → arredonda por **maior-resto/Hamilton** (inteiros que somam 100, únicos, sem parecer template). Dominante + secundário = os 2 maiores.
 
 ## ⚠️ DECISÕES ABERTAS (founder)
-1. **Recursos contam?** Emoções LIVRES (alegria livre, firmeza) expressam temperamento (a pessoa É alegre/firme), mas hoje só medimos intensidade nas CARGAS. Opções: (a) só cargas [mais medido]; (b) cargas + recursos com peso menor [mais fiel ao "quem a pessoa é"]. É a antiga dúvida "Sanguíneo conta o coração preservado?".
+1. ✅ **DECIDIDO (founder): RECURSOS CONTAM, com peso menor.** Temperamento = quem a pessoa É, não só as feridas. Recursos (emoções livres) não têm intensidade 1-5 → **peso FIXO**: `vital_ativo`=2.0 · `livre/neutro`=1.5 (calibrável, abaixo da carga média). Mapa recurso→elemento:
+
+| Recurso (emoção livre) | Predominante | Secundário |
+|---|---|---|
+| Alegria & amor (coração) | 💨 Ar 0.6 | 💧 Água 0.4 |
+| Fôlego / vitalidade (pulmões) | 💨 Ar 1.0 | — |
+| Firmeza / base vital (musculoesq.) | 🌍 Terra 0.6 | 🔥 Fogo 0.4 |
+| Centramento / eixo (pupila centrada) | 🌍 Terra 1.0 | — |
+| Limites saudáveis (linfático) | 🌍 Terra 0.6 | 🔥 Fogo 0.4 |
 2. **Calibração das frações secundárias** (0.3/0.4/0.5): são meu rascunho. A pesquisa diz que o PREDOMINANTE é ~80% do resultado; o secundário afina. Dá pra medir sensibilidade por Monte Carlo depois. Prioridade = acertar o predominante.
 3. **Órgão→emoção** (o 1º hop) já vive em `tabela-lastro-MASTER.md` + `iridologia-psicoemocional-extracao.md` — revisar se algum órgão precisa de emoção/elemento adicional.
 

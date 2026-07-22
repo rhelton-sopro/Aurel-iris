@@ -1,0 +1,168 @@
+<meta charset="utf-8">
+<title>Cadeia órgão → emoção → elemento</title>
+<style>
+  :root{
+    --paper:#fff;--panel:#f7f3ea;--ink:#1f3a3c;--ink-soft:#5a6f6e;--ink-faint:#8a9695;
+    --line:#e6ded0;--line-strong:#d6cbb6;
+    --fogo:#b5701a;--ar:#2c6480;--agua:#0a7d84;--terra:#c0552a;
+    --serif:"Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#e9e2d3;color:var(--ink);font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  .sheet{max-width:920px;margin:24px auto;background:var(--paper);border:1px solid var(--line);border-radius:6px;box-shadow:0 4px 24px rgba(30,45,45,.10);overflow:hidden;}
+  .pad{padding:clamp(24px,4vw,44px);}
+  h1{font-family:var(--serif);font-size:clamp(22px,3vw,28px);margin:0 0 4px;color:var(--ink);}
+  .sub{font-size:13px;color:var(--ink-soft);margin:0 0 6px;}
+  .chain{font-family:var(--serif);font-size:15px;color:var(--agua);margin:0 0 18px;font-style:italic;}
+  .legend{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 22px;padding:12px 14px;background:var(--panel);border:1px solid var(--line);border-radius:10px;}
+  .legend .el{cursor:default;}
+  h3{font-family:var(--serif);font-size:16px;margin:26px 0 8px;color:var(--ink);border-bottom:2px solid var(--line-strong);padding-bottom:5px;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:middle;}
+  tr.campo td{background:color-mix(in srgb,var(--agua) 8%,var(--paper));font-weight:700;color:var(--agua);font-size:12.5px;letter-spacing:.02em;padding-top:10px;padding-bottom:10px;border-bottom:1px solid var(--line-strong);}
+  tr.campo .zona{color:var(--ink-faint);font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;margin-left:6px;}
+  td.emo{font-family:var(--serif);font-size:14.5px;color:#28403f;width:44%;}
+  td.els{white-space:nowrap;}
+  .el{display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:700;border-radius:100px;padding:2px 9px;margin:2px 3px 2px 0;border:1.5px solid;}
+  .el b{font-variant-numeric:tabular-nums;font-weight:800;}
+  .el.f{color:var(--fogo);border-color:color-mix(in srgb,var(--fogo) 45%,var(--line));background:color-mix(in srgb,var(--fogo) 8%,var(--paper));}
+  .el.r{color:var(--ar);border-color:color-mix(in srgb,var(--ar) 45%,var(--line));background:color-mix(in srgb,var(--ar) 8%,var(--paper));}
+  .el.g{color:var(--agua);border-color:color-mix(in srgb,var(--agua) 45%,var(--line));background:color-mix(in srgb,var(--agua) 8%,var(--paper));}
+  .el.t{color:var(--terra);border-color:color-mix(in srgb,var(--terra) 45%,var(--line));background:color-mix(in srgb,var(--terra) 8%,var(--paper));}
+  .rec h3{color:var(--terra);}
+  .foot{font-size:12px;color:var(--ink-faint);border-top:1px solid var(--line);margin-top:26px;padding-top:14px;}
+</style>
+<div class="sheet"><div class="pad">
+  <h1>Cadeia: órgão → emoção → elemento</h1>
+  <p class="sub">Motor de números do temperamento (Bardon 4 elementos). Tabela interna do lastro — não é o que o cliente lê.</p>
+  <p class="chain">campo do Stage 1 (onde procura) &nbsp;→&nbsp; emoção(ões) &nbsp;→&nbsp; elemento(s) + peso</p>
+  <div class="legend">
+    <span class="el f">🔥 Fogo <b>Colérico</b></span>
+    <span class="el r">💨 Ar <b>Sanguíneo</b></span>
+    <span class="el g">💧 Água <b>Melancólico</b></span>
+    <span class="el t">🌍 Terra <b>Fleumático</b></span>
+    <span style="font-size:12px;color:var(--ink-faint);align-self:center;">peso = fração do elemento na emoção (soma 1.0)</span>
+  </div>
+
+  <h3>1 · Núcleo visceral</h3>
+  <table>
+    <tr class="campo"><td colspan="2">Fígado / vesícula <span class="zona">5–7h</span></td></tr>
+    <tr><td class="emo">Raiva contida</td><td class="els"><span class="el f">🔥<b>.7</b></span><span class="el g">💧<b>.3</b></span></td></tr>
+    <tr><td class="emo">Ressentimento</td><td class="els"><span class="el g">💧<b>.6</b></span><span class="el f">🔥<b>.4</b></span></td></tr>
+    <tr><td class="emo">Frustração</td><td class="els"><span class="el f">🔥<b>1.0</b></span></td></tr>
+    <tr><td class="emo">Irritação</td><td class="els"><span class="el f">🔥<b>1.0</b></span></td></tr>
+    <tr class="campo"><td colspan="2">Rim <span class="zona">6h</span></td></tr>
+    <tr><td class="emo">Medo</td><td class="els"><span class="el g">💧<b>1.0</b></span></td></tr>
+    <tr><td class="emo">Insegurança de base</td><td class="els"><span class="el g">💧<b>1.0</b></span></td></tr>
+    <tr><td class="emo">Falta de reserva</td><td class="els"><span class="el g">💧<b>.7</b></span><span class="el t">🌍<b>.3</b></span></td></tr>
+    <tr class="campo"><td colspan="2">Pulmões <span class="zona">3h / 9h</span></td></tr>
+    <tr><td class="emo">Tristeza</td><td class="els"><span class="el g">💧<b>1.0</b></span></td></tr>
+    <tr><td class="emo">Luto</td><td class="els"><span class="el g">💧<b>1.0</b></span></td></tr>
+    <tr><td class="emo">Desânimo</td><td class="els"><span class="el g">💧<b>1.0</b></span></td></tr>
+    <tr><td class="emo">Desapego difícil</td><td class="els"><span class="el t">🌍<b>.6</b></span><span class="el g">💧<b>.4</b></span></td></tr>
+    <tr class="campo"><td colspan="2">Intestino grosso <span class="zona">periferia</span></td></tr>
+    <tr><td class="emo">Dificuldade de soltar</td><td class="els"><span class="el t">🌍<b>1.0</b></span></td></tr>
+    <tr><td class="emo">Apego ao passado</td><td class="els"><span class="el t">🌍<b>1.0</b></span></td></tr>
+    <tr><td class="emo">Obstinação</td><td class="els"><span class="el t">🌍<b>.7</b></span><span class="el f">🔥<b>.3</b></span></td></tr>
+    <tr class="campo"><td colspan="2">Estômago / intestino delgado <span class="zona">pericentral · anel interno</span></td></tr>
+    <tr><td class="emo">Ansiedade</td><td class="els"><span class="el t">🌍<b>.5</b></span><span class="el g">💧<b>.5</b></span></td></tr>
+    <tr><td class="emo">Preocupação</td><td class="els"><span class="el t">🌍<b>.6</b></span><span class="el g">💧<b>.4</b></span></td></tr>
+    <tr><td class="emo">Ruminação</td><td class="els"><span class="el t">🌍<b>.6</b></span><span class="el g">💧<b>.4</b></span></td></tr>
+    <tr><td class="emo">Não "digerir" / assimilar</td><td class="els"><span class="el t">🌍<b>1.0</b></span></td></tr>
+    <tr class="campo"><td colspan="2">Pâncreas <span class="zona">7–8h OE</span></td></tr>
+    <tr><td class="emo">Carência de doçura</td><td class="els"><span class="el g">💧<b>.6</b></span><span class="el t">🌍<b>.4</b></span></td></tr>
+    <tr><td class="emo">Cuidar demais dos outros</td><td class="els"><span class="el t">🌍<b>.6</b></span><span class="el g">💧<b>.4</b></span></td></tr>
+    <tr class="campo"><td colspan="2">Coração <span class="zona">2–3h OE</span></td></tr>
+    <tr><td class="emo">Abandono</td><td class="els"><span class="el g">💧<b>1.0</b></span></td></tr>
+    <tr><td class="emo">Perda</td><td class="els"><span class="el g">💧<b>1.0</b></span></td></tr>
+    <tr><td class="emo">Amor não recebido</td><td class="els"><span class="el g">💧<b>.7</b></span><span class="el r">💨<b>.3</b></span></td></tr>
+    <tr><td class="emo">Alegria sufocada</td><td class="els"><span class="el r">💨<b>.6</b></span><span class="el g">💧<b>.4</b></span></td></tr>
+  </table>
+
+  <h3>2 · Endócrino / eixo do estresse</h3>
+  <table>
+    <tr class="campo"><td colspan="2">Adrenal / eixo HPA <span class="zona">5:30–6h · colarete 12:30h</span></td></tr>
+    <tr><td class="emo">Exaustão / esgotamento</td><td class="els"><span class="el t">🌍<b>.5</b></span><span class="el g">💧<b>.5</b></span></td></tr>
+    <tr><td class="emo">Alerta sustentado</td><td class="els"><span class="el f">🔥<b>.5</b></span><span class="el g">💧<b>.5</b></span></td></tr>
+    <tr><td class="emo">"Não posso parar"</td><td class="els"><span class="el f">🔥<b>.6</b></span><span class="el g">💧<b>.4</b></span></td></tr>
+    <tr class="campo"><td colspan="2">Tireoide <span class="zona">cervical 2–3h OE / 9–10h OD</span></td></tr>
+    <tr><td class="emo">Humilhação engolida</td><td class="els"><span class="el g">💧<b>.6</b></span><span class="el f">🔥<b>.4</b></span></td></tr>
+    <tr><td class="emo">Voz sufocada</td><td class="els"><span class="el g">💧<b>.5</b></span><span class="el f">🔥<b>.5</b></span></td></tr>
+    <tr><td class="emo">Ressentimento de "nunca ter vez"</td><td class="els"><span class="el g">💧<b>.6</b></span><span class="el f">🔥<b>.4</b></span></td></tr>
+    <tr class="campo"><td colspan="2">Pineal / hipotalâmica <span class="zona">centro ~12h</span></td></tr>
+    <tr><td class="emo">Sobrecarga mental</td><td class="els"><span class="el f">🔥<b>.6</b></span><span class="el t">🌍<b>.4</b></span></td></tr>
+    <tr><td class="emo">Desconexão de propósito</td><td class="els"><span class="el r">💨<b>.5</b></span><span class="el g">💧<b>.5</b></span></td></tr>
+    <tr><td class="emo">Desregulação sono-vigília</td><td class="els"><span class="el t">🌍<b>.6</b></span><span class="el g">💧<b>.4</b></span></td></tr>
+  </table>
+
+  <h3>3 · Sistema nervoso / cérebro</h3>
+  <table>
+    <tr class="campo"><td colspan="2">SNA / anel nervoso <span class="zona">anel concêntrico</span></td></tr>
+    <tr><td class="emo">Hipervigilância</td><td class="els"><span class="el g">💧<b>.6</b></span><span class="el f">🔥<b>.4</b></span></td></tr>
+    <tr><td class="emo">Incapacidade de relaxar</td><td class="els"><span class="el f">🔥<b>.5</b></span><span class="el g">💧<b>.5</b></span></td></tr>
+    <tr><td class="emo">Ansiedade de fundo</td><td class="els"><span class="el t">🌍<b>.5</b></span><span class="el g">💧<b>.5</b></span></td></tr>
+    <tr class="campo"><td colspan="2">Cérebro motor <span class="zona">12–1h</span></td></tr>
+    <tr><td class="emo">Autocrítica</td><td class="els"><span class="el f">🔥<b>.6</b></span><span class="el t">🌍<b>.4</b></span></td></tr>
+    <tr><td class="emo">Controle</td><td class="els"><span class="el f">🔥<b>.7</b></span><span class="el t">🌍<b>.3</b></span></td></tr>
+    <tr><td class="emo">Autocensura</td><td class="els"><span class="el t">🌍<b>.5</b></span><span class="el g">💧<b>.5</b></span></td></tr>
+    <tr class="campo"><td colspan="2">Cérebro sensorial <span class="zona">11–12h</span></td></tr>
+    <tr><td class="emo">Hipervigilância sensorial</td><td class="els"><span class="el g">💧<b>.6</b></span><span class="el f">🔥<b>.4</b></span></td></tr>
+    <tr><td class="emo">Sobressalto / ansiedade corporal</td><td class="els"><span class="el t">🌍<b>.5</b></span><span class="el g">💧<b>.5</b></span></td></tr>
+    <tr class="campo"><td colspan="2">Radii solaris <span class="zona">linhas radiais</span></td></tr>
+    <tr><td class="emo">Irritação que sobe</td><td class="els"><span class="el f">🔥<b>1.0</b></span></td></tr>
+    <tr><td class="emo">Dispersão mental</td><td class="els"><span class="el r">💨<b>.7</b></span><span class="el f">🔥<b>.3</b></span></td></tr>
+  </table>
+
+  <h3>4 · Coluna / estrutura / topografia</h3>
+  <table>
+    <tr class="campo"><td colspan="2">Coluna cervical <span class="zona">10–11h</span></td></tr>
+    <tr><td class="emo">Engolir o que quer dizer</td><td class="els"><span class="el g">💧<b>.5</b></span><span class="el f">🔥<b>.5</b></span></td></tr>
+    <tr><td class="emo">Rigidez / contenção da voz</td><td class="els"><span class="el t">🌍<b>.6</b></span><span class="el f">🔥<b>.4</b></span></td></tr>
+    <tr class="campo"><td colspan="2">Coluna torácica <span class="zona">3–5h</span></td></tr>
+    <tr><td class="emo">Peso afetivo / carregar os outros</td><td class="els"><span class="el t">🌍<b>.6</b></span><span class="el g">💧<b>.4</b></span></td></tr>
+    <tr><td class="emo">Culpa</td><td class="els"><span class="el g">💧<b>.6</b></span><span class="el t">🌍<b>.4</b></span></td></tr>
+    <tr class="campo"><td colspan="2">Coluna lombar <span class="zona">4–5h</span></td></tr>
+    <tr><td class="emo">Medo de falta de apoio</td><td class="els"><span class="el g">💧<b>.7</b></span><span class="el t">🌍<b>.3</b></span></td></tr>
+    <tr><td class="emo">Insegurança material/estrutural</td><td class="els"><span class="el g">💧<b>.6</b></span><span class="el t">🌍<b>.4</b></span></td></tr>
+    <tr class="campo"><td colspan="2">Sacro / cóccix <span class="zona">5–6h</span></td></tr>
+    <tr><td class="emo">Medo de seguir em frente</td><td class="els"><span class="el g">💧<b>.7</b></span><span class="el t">🌍<b>.3</b></span></td></tr>
+    <tr><td class="emo">Sobrevivência</td><td class="els"><span class="el g">💧<b>1.0</b></span></td></tr>
+    <tr class="campo"><td colspan="2">Musculoesquelético <span class="zona">estroma</span></td></tr>
+    <tr><td class="emo">Rigidez / resistência</td><td class="els"><span class="el t">🌍<b>.6</b></span><span class="el f">🔥<b>.4</b></span></td></tr>
+    <tr><td class="emo">Peso estrutural</td><td class="els"><span class="el t">🌍<b>1.0</b></span></td></tr>
+    <tr class="campo"><td colspan="2">Boca / garganta <span class="zona">1–2h OE</span></td></tr>
+    <tr><td class="emo">Raiva engolida</td><td class="els"><span class="el f">🔥<b>.6</b></span><span class="el g">💧<b>.4</b></span></td></tr>
+    <tr><td class="emo">Não falar por si</td><td class="els"><span class="el g">💧<b>.5</b></span><span class="el f">🔥<b>.5</b></span></td></tr>
+    <tr><td class="emo">Criatividade bloqueada</td><td class="els"><span class="el g">💧<b>.5</b></span><span class="el r">💨<b>.5</b></span></td></tr>
+  </table>
+
+  <h3>5 · Sistêmico / pele / linfa / circulação</h3>
+  <table>
+    <tr class="campo"><td colspan="2">Linfático / rosário linfático <span class="zona">drenagem</span></td></tr>
+    <tr><td class="emo">Acúmulo emocional não drenado</td><td class="els"><span class="el t">🌍<b>.5</b></span><span class="el g">💧<b>.5</b></span></td></tr>
+    <tr class="campo"><td colspan="2">Imune / manchas psóricas <span class="zona">carga inflamatória</span></td></tr>
+    <tr><td class="emo">Autoproteção exaurida</td><td class="els"><span class="el g">💧<b>.6</b></span><span class="el f">🔥<b>.4</b></span></td></tr>
+    <tr class="campo"><td colspan="2">Circulatório / anel sódico <span class="zona">—</span></td></tr>
+    <tr><td class="emo">Rigidez afetiva / "endurecer p/ aguentar"</td><td class="els"><span class="el t">🌍<b>.6</b></span><span class="el f">🔥<b>.4</b></span></td></tr>
+    <tr class="campo"><td colspan="2">Pele / tegumentar <span class="zona">fronteira c/ o mundo</span></td></tr>
+    <tr><td class="emo">Fronteira frágil / sensibilidade ao externo</td><td class="els"><span class="el g">💧<b>.6</b></span><span class="el r">💨<b>.4</b></span></td></tr>
+  </table>
+
+  <div class="rec">
+  <h3>6 · Recursos (lado preservado — peso menor: vital 2.0 · livre 1.5)</h3>
+  <table>
+    <tr class="campo"><td colspan="2">Coração preservado</td></tr>
+    <tr><td class="emo">Alegria &amp; amor</td><td class="els"><span class="el r">💨<b>.6</b></span><span class="el g">💧<b>.4</b></span></td></tr>
+    <tr class="campo"><td colspan="2">Pulmões preservados</td></tr>
+    <tr><td class="emo">Fôlego / vitalidade</td><td class="els"><span class="el r">💨<b>1.0</b></span></td></tr>
+    <tr class="campo"><td colspan="2">Musculoesquelético (trama compacta)</td></tr>
+    <tr><td class="emo">Firmeza / base vital</td><td class="els"><span class="el t">🌍<b>.6</b></span><span class="el f">🔥<b>.4</b></span></td></tr>
+    <tr class="campo"><td colspan="2">Pupila centrada</td></tr>
+    <tr><td class="emo">Centramento / eixo organizado</td><td class="els"><span class="el t">🌍<b>1.0</b></span></td></tr>
+    <tr class="campo"><td colspan="2">Linfático preservado</td></tr>
+    <tr><td class="emo">Limites saudáveis</td><td class="els"><span class="el t">🌍<b>.6</b></span><span class="el f">🔥<b>.4</b></span></td></tr>
+  </table>
+  </div>
+
+  <p class="foot"><b>Cadeia órgão→emoção→elemento.</b> Coluna 1 (campo·zona) + coluna 2 (emoção) = do lastro (`tabela-lastro-MASTER.md`, cobre os ~38 campos do Stage 1). Coluna 3 (elemento+peso) = da proposta (`tabela-emocao-elemento-PROPOSTA.md`). Vários campos empurram o MESMO elemento → compõem/somam. Pesos secundários = rascunho calibrável (o PREDOMINANTE decide ~80%). Temperamento % = Σ(peso_intensidade × fração_elemento) → normaliza ipsativa → arredonda Hamilton. ⛔ Interno (motor/lastro), nunca no doc do cliente.</p>
+</div></div>
