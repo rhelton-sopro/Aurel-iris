@@ -1,0 +1,604 @@
+<meta charset="utf-8">
+<title>Iris Codex — Leitura emocional · Rhelton</title>
+<style>
+  :root{
+    --paper:#ffffff;--panel:#f7f3ea;--panel-2:#efe9db;
+    --ink:#1f3a3c;--ink-soft:#5a6f6e;--ink-faint:#8a9695;
+    --line:#e6ded0;--line-strong:#d6cbb6;
+    --teal:#0a7d84;--teal-deep:#0d5c63;
+    --amber:#b5701a;--amber-soft:#d69a4e;--good:#2f7a54;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#e9e2d3;color:var(--ink);
+    font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .display{font-family:"Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;font-weight:600;letter-spacing:-.01em;}
+  .sheet{max-width:820px;margin:26px auto;background:var(--paper);border:1px solid var(--line);border-radius:6px;box-shadow:0 4px 24px rgba(40,35,25,.10);overflow:hidden;}
+  .pad{padding:clamp(28px,5vw,56px);}
+  .brand{font-size:12px;letter-spacing:.4em;font-weight:700;color:var(--teal-deep);text-align:center;}
+  .brand-sub{text-align:center;font-family:"Palatino Linotype",Palatino,Georgia,serif;font-style:italic;color:var(--ink-faint);font-size:14px;margin-top:8px;padding-bottom:26px;border-bottom:1px solid var(--line);}
+  .eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);font-weight:700;margin:0 0 6px;}
+  .secnum{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:13px;color:var(--ink-faint);font-weight:600;}
+  h2{font-size:clamp(21px,3vw,27px);margin:2px 0 14px;line-height:1.12;}
+  .block{margin:42px 0;}
+  .block:first-of-type{margin-top:34px;}
+  hr.div{border:0;border-top:1px solid var(--line);margin:0;}
+
+  .microfilme p{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:19px;line-height:1.66;color:#26403f;margin:0 0 15px;}
+  .microfilme p .voc{color:var(--teal-deep);font-weight:600;}
+  .microfilme p b{color:var(--teal-deep);font-weight:600;}
+  .maieutica{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:21px;font-style:italic;color:var(--teal-deep);border-left:3px solid var(--amber);padding:4px 0 4px 22px;margin:22px 0 0;line-height:1.5;}
+
+  .temp-note{font-size:12px;color:var(--ink-faint);font-style:italic;margin:0 0 18px;}
+  .tbar.mut{opacity:.9;}
+  .tcap{font-size:12.5px;color:var(--ink-faint);font-style:italic;margin:2px 0 22px;}
+  .tcap b{color:var(--ink-soft);font-style:normal;font-weight:600;}
+  .temp-bars{margin:8px 0 30px;}
+  .tbar{display:grid;grid-template-columns:158px 1fr 50px;align-items:center;gap:16px;margin:13px 0;}
+  .tbar .tname{font-size:15px;font-weight:600;line-height:1.18;}
+  .tbar .tname .tsub{display:block;font-size:11px;font-weight:500;color:var(--ink-faint);letter-spacing:.01em;margin-top:2px;}
+  .tbadge{display:inline-block;font-size:8.5px;letter-spacing:.07em;text-transform:uppercase;font-weight:700;padding:2px 7px;border-radius:20px;margin-left:5px;vertical-align:middle;}
+  .tbadge.d{background:var(--amber);color:#fff;} .tbadge.s{background:var(--teal-deep);color:#fff;}
+  .tbar .ttrack{height:18px;background:var(--panel-2);border-radius:100px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(20,40,40,.05);}
+  .tbar .tfill{height:100%;border-radius:100px;display:block;}
+  .tfill.col{background:linear-gradient(90deg,#d0a017,#edc23a);}   /* Fogo — amarelo vibrante */
+  .tfill.mel{background:linear-gradient(90deg,#159d90,#45c2b4);}   /* Água — verde-água vibrante */
+  .tfill.fle{background:linear-gradient(90deg,#c0552a,#e07d48);}   /* Terra — terracota vibrante */
+  .tfill.san{background:linear-gradient(90deg,#1e6fa8,#3f9bd4);}   /* Ar — azul vibrante */
+  .tbar .tpct{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:19px;font-weight:700;font-variant-numeric:tabular-nums;text-align:right;}
+  .tpct.col{color:#b58811;} .tpct.mel{color:#128276;} .tpct.fle{color:#a84a22;} .tpct.san{color:#1e6fa8;}
+  @media(max-width:560px){.tbar{grid-template-columns:124px 1fr 42px;gap:10px;}}
+  .temp-lead{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:18px;line-height:1.64;color:#243f40;margin:0 0 20px;}
+  .temp-lead b{color:var(--teal-deep);font-weight:600;}
+  .facets{margin:0 0 6px;}
+  .facet{display:grid;grid-template-columns:150px 1fr;gap:16px;padding:12px 0;border-top:1px solid var(--line);}
+  .facet:first-child{border-top:0;}
+  .facet .fk{font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--amber);font-weight:700;padding-top:2px;}
+  .facet .fv{font-size:15.5px;color:var(--ink);line-height:1.56;}
+  .facet .fv b{color:var(--teal-deep);font-weight:600;}
+  @media(max-width:560px){.facet{grid-template-columns:1fr;gap:3px;}}
+  .snote{color:var(--ink-soft);font-size:14.5px;margin:0 0 24px;max-width:62ch;}
+  .snote b{color:var(--ink);}
+  .origin{font-size:15px;color:var(--ink-soft);line-height:1.6;margin:0 0 14px;}
+  .origin b{color:var(--ink);}
+  .four{display:grid;grid-template-columns:1fr 1fr;gap:9px 20px;margin:0 0 16px;}
+  @media(max-width:540px){.four{grid-template-columns:1fr;}}
+  .f4{display:flex;gap:9px;align-items:flex-start;font-size:14px;color:var(--ink);line-height:1.4;}
+  .f4 .d4{flex:0 0 auto;width:11px;height:11px;border-radius:50%;margin-top:4px;}
+  .f4 b{color:var(--ink);font-weight:600;}
+  .f4 .el{color:var(--ink-faint);font-size:12px;}
+  .bridge{font-size:15px;color:var(--ink-soft);margin:0 0 20px;}
+  .bridge b{color:var(--ink);}
+  .objbox{background:color-mix(in srgb,var(--teal) 6%,var(--paper));border:1px solid color-mix(in srgb,var(--teal) 22%,var(--line));border-radius:12px;padding:15px 18px;margin:0 0 22px;}
+  .objbox .obj-lab{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--teal-deep);margin:0 0 6px;}
+  .objbox p.obj-txt{margin:0;font-size:15px;color:var(--ink);line-height:1.55;}
+  .objbox p.obj-txt b{color:var(--teal-deep);}
+  .tension{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:18.5px;line-height:1.6;color:#26403f;background:var(--panel);border-left:3px solid var(--amber);border-radius:0 10px 10px 0;padding:16px 20px;margin:0 0 20px;}
+  .tension b{color:var(--teal-deep);font-weight:600;}
+  .block-serif{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:16.5px;line-height:1.58;color:#26403f;margin:0 0 10px;}
+  .block-serif b{color:var(--teal-deep);font-weight:600;}
+  .stresswrap{background:color-mix(in srgb,var(--amber) 5%,var(--paper));border:1px solid color-mix(in srgb,var(--amber) 22%,var(--line));border-radius:12px;padding:16px 20px;margin:0 0 8px;}
+  .stresswrap .block-serif{margin:0;}
+  .rootlab{font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--amber);font-weight:700;margin:24px 0 10px;}
+  .roots{display:flex;flex-direction:column;gap:10px;margin:0 0 8px;}
+  .root{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:16.5px;line-height:1.5;color:#26403f;padding:13px 16px;border-radius:10px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--teal);}
+  .root .gift{color:var(--teal-deep);font-weight:600;}
+  .root .cost{color:#a35a1c;font-weight:600;}
+  .drains{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:6px 0 4px;}
+  @media(max-width:560px){.drains{grid-template-columns:1fr;}}
+  .drain{border-radius:11px;padding:16px 18px;}
+  .drain.up{background:color-mix(in srgb,var(--teal) 6%,var(--paper));border:1px solid color-mix(in srgb,var(--teal) 22%,var(--line));}
+  .drain.down{background:color-mix(in srgb,var(--amber) 6%,var(--paper));border:1px solid color-mix(in srgb,var(--amber) 22%,var(--line));}
+  .drain h4{margin:0 0 9px;font-size:12px;letter-spacing:.05em;text-transform:uppercase;}
+  .drain.up h4{color:var(--teal-deep);} .drain.down h4{color:#a35a1c;}
+  .drain ul{margin:0;padding-left:17px;} .drain li{font-size:14px;margin:6px 0;color:var(--ink);line-height:1.4;}
+
+  .rail-wrap{margin:26px 2px 34px;}
+  .rail{position:relative;display:grid;grid-template-columns:repeat(4,1fr);}
+  .rail-line{position:absolute;left:6%;right:6%;top:11px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--teal-deep),#c9b48f 55%,var(--amber));}
+  .node{position:relative;padding:0 6px;text-align:center;}
+  .node .dot{width:15px;height:15px;border-radius:50%;background:var(--paper);border:2.5px solid var(--teal-deep);margin:4px auto 10px;position:relative;z-index:1;}
+  .node.active .dot{border-color:var(--amber);background:var(--amber);box-shadow:0 0 0 4px color-mix(in srgb,var(--amber) 20%,transparent);}
+  .node.proc .dot{border-color:var(--teal);background:color-mix(in srgb,var(--teal) 30%,#ffffff);box-shadow:0 0 0 4px color-mix(in srgb,var(--teal) 13%,transparent);}
+  .node .flag.proc{background:var(--teal);}
+  .node .age{font-size:12px;font-weight:700;color:var(--ink);}
+  .node .ph{font-size:11px;color:var(--ink-faint);margin-top:2px;}
+  .node .flag{display:inline-block;margin-top:6px;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:#fff;background:var(--amber);border-radius:20px;padding:2px 8px;font-weight:700;}
+  @media(max-width:600px){.rail{grid-template-columns:1fr;gap:14px;}.rail-line{display:none;}.node{text-align:left;}.node .dot{margin:0 0 6px;}}
+  .moment{border:1px solid var(--line);border-radius:13px;padding:20px 22px;margin:14px 0;background:var(--panel);}
+  .moment.on{border-color:color-mix(in srgb,var(--amber) 45%,var(--line));background:color-mix(in srgb,var(--amber) 5%,var(--paper));}
+  .moment.proc{border-color:color-mix(in srgb,var(--teal) 40%,var(--line));background:color-mix(in srgb,var(--teal) 4%,var(--paper));}
+  .moment-h .mproc{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--teal);border-radius:20px;padding:2px 9px;font-weight:700;}
+  .mnote{font-size:12.5px;color:var(--ink-faint);font-style:italic;margin:10px 0 0;}
+  .moment-h{display:flex;align-items:center;gap:11px;flex-wrap:wrap;margin-bottom:12px;}
+  .moment-h .mage{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:19px;font-weight:600;}
+  .moment-h .mflag{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--amber);border-radius:20px;padding:2px 9px;font-weight:700;}
+  .mrow{display:grid;grid-template-columns:120px 1fr;gap:12px;padding:6px 0;border-top:1px solid var(--line);font-size:14.5px;}
+  .mrow:first-of-type{border-top:0;}
+  .mrow .k{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);font-weight:700;padding-top:2px;}
+  .mrow .v{color:var(--ink);}
+  @media(max-width:560px){.mrow{grid-template-columns:1fr;gap:2px;}}
+  .keys{margin-top:16px;padding-top:15px;border-top:1px dashed var(--line-strong);}
+  .keys-lab{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--teal-deep);margin:0 0 10px;}
+  .key{display:grid;grid-template-columns:96px 1fr;gap:12px;margin:0 0 10px;align-items:start;}
+  .key .kind{font-size:10px;letter-spacing:.05em;text-transform:uppercase;font-weight:700;padding:3px 8px;border-radius:6px;text-align:center;}
+  .key .kind.abre{background:color-mix(in srgb,var(--teal) 12%,var(--paper));color:var(--teal-deep);border:1px solid color-mix(in srgb,var(--teal) 25%,var(--line));}
+  .key .kind.res{background:color-mix(in srgb,var(--amber) 12%,var(--paper));color:var(--amber);border:1px solid color-mix(in srgb,var(--amber) 28%,var(--line));}
+  .key .q{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:16.5px;color:var(--ink);line-height:1.45;}
+  @media(max-width:560px){.key{grid-template-columns:1fr;gap:4px;}}
+
+  /* Heranças */
+  .lead{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:18.5px;line-height:1.64;color:#26403f;margin:0 0 8px;}
+  .lead b{color:var(--teal-deep);font-weight:600;}
+  .gen{display:grid;grid-template-columns:1fr 1fr 1fr;position:relative;margin:34px 0 26px;}
+  .gen-line{position:absolute;left:17%;right:17%;top:28px;height:2px;border-radius:2px;background:linear-gradient(90deg, color-mix(in srgb,var(--line-strong) 70%, transparent), var(--amber) 55%, var(--teal));z-index:0;}
+  .gcol{text-align:center;padding:0 10px;position:relative;z-index:1;}
+  .gring{width:58px;height:58px;border-radius:50%;margin:0 auto 12px;display:grid;place-items:center;font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:12.5px;font-weight:700;background:var(--paper);}
+  .gring.past{border:2px dashed var(--line-strong);color:var(--ink-faint);opacity:.72;}
+  .gring.you{border:3px solid var(--amber);background:color-mix(in srgb,var(--amber) 14%,var(--paper));color:var(--amber);box-shadow:0 0 0 5px color-mix(in srgb,var(--amber) 12%,transparent);}
+  .gring.next{border:2px solid var(--teal);background:color-mix(in srgb,var(--teal) 8%,var(--paper));color:var(--teal-deep);}
+  .glabel{font-size:12.5px;font-weight:700;color:var(--ink);}
+  .glabel.you{color:var(--amber);}
+  .gcontent{margin-top:11px;}
+  .chip{display:inline-block;font-size:12px;color:var(--ink-soft);background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:4px 11px;margin:3px 2px;line-height:1.3;}
+  .gtext{font-size:12.5px;color:var(--ink-soft);line-height:1.4;margin-top:2px;}
+  .gtext b{color:var(--ink);font-weight:600;}
+  .gcol.pastcol{opacity:.82;}
+  @media(max-width:560px){.gen{grid-template-columns:1fr;gap:22px;}.gen-line{display:none;}.gcol{text-align:left;}.gring{margin:0 0 8px;}}
+  .pattern{background:var(--panel);border-left:3px solid var(--amber);border-radius:0 10px 10px 0;padding:16px 20px;margin:0 0 16px;}
+  .pattern p{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:17px;line-height:1.6;color:#26403f;margin:0;}
+  .pattern p b{color:var(--teal-deep);font-weight:600;}
+  .turn{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:19px;line-height:1.55;color:var(--teal-deep);padding:4px 0 4px 20px;border-left:3px solid var(--teal);margin:6px 0 20px;}
+  .turn b{color:var(--amber);}
+  .subhead{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--amber);margin:22px 0 8px;}
+  .deep{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:16.5px;line-height:1.58;color:#26403f;margin:0 0 16px;}
+  .deep b{color:var(--teal-deep);font-weight:600;}
+  .saybox{background:color-mix(in srgb,var(--teal) 5%,var(--paper));border:1px solid color-mix(in srgb,var(--teal) 20%,var(--line));border-radius:12px;padding:18px 20px;margin:4px 0 0;}
+  .sayintro{font-size:13px;color:var(--ink-faint);margin:0 0 13px;}
+  .sayline{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:17px;line-height:1.5;color:var(--teal-deep);margin:0 0 10px;padding-left:15px;border-left:2px solid var(--amber);}
+  .sayline:last-child{margin-bottom:0;}
+  .rsteps{margin:0 0 13px;padding-left:20px;display:flex;flex-direction:column;gap:6px;}
+  .rsteps li{font-size:14.5px;color:var(--ink);line-height:1.4;}
+  .rsteps li b{color:var(--teal-deep);font-weight:600;}
+  .rsay{font-size:14px;color:var(--ink-soft);margin:0 0 13px;}
+  .rnote{font-size:12.5px;color:var(--ink-faint);font-style:italic;margin:14px 0 0;border-top:1px solid var(--line);padding-top:12px;}
+  .idintro{font-size:14.5px;color:var(--ink-soft);margin:0 0 14px;line-height:1.55;}
+  .idlist{display:flex;flex-direction:column;gap:10px;}
+  .idrow{border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:0 10px 10px 0;padding:12px 16px;background:var(--panel);}
+  .idpat{font-size:11px;letter-spacing:.05em;text-transform:uppercase;font-weight:700;color:var(--amber);}
+  .idq{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:16.5px;color:#26403f;margin:5px 0 0;line-height:1.45;}
+  .idnote{font-size:12.5px;color:var(--ink-faint);font-style:italic;margin:12px 0 0;}
+  .resil{background:color-mix(in srgb,var(--good) 6%,var(--paper));border:1px solid color-mix(in srgb,var(--good) 22%,var(--line));border-radius:12px;padding:16px 20px;}
+  .resil .rlab{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--good);margin:0 0 7px;}
+  .resil p{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:16.5px;line-height:1.56;color:#26403f;margin:0;}
+  .resil p b{color:var(--good);font-weight:600;}
+
+  /* Mapa emocional — pêndulos */
+  .legend{display:flex;gap:20px;flex-wrap:wrap;font-size:12px;color:var(--ink-faint);margin:16px 0 6px;}
+  .legend b{color:var(--ink-soft);}
+  .pend{margin:22px 0;}
+  .pend-labels{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px;gap:12px;}
+  .pl-carga{font-size:16px;font-weight:600;color:var(--amber);}
+  .pl-carga .lv{font-size:10.5px;color:var(--ink-faint);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-left:7px;}
+  .pl-anti{font-size:14.5px;font-weight:600;color:var(--good);text-align:right;}
+  .pl-anti::before{content:"→ ";color:var(--good);opacity:.6;}
+  .pend-track{position:relative;height:13px;border-radius:100px;background:linear-gradient(90deg,#cf8636,#e7dcc6 44%,#e7dcc6 56%,#5fae86);box-shadow:inset 0 1px 2px rgba(20,40,40,.09);}
+  .needle{position:absolute;top:50%;width:21px;height:21px;border-radius:50%;background:#fff;border:3.5px solid var(--amber);transform:translate(-50%,-50%);box-shadow:0 1px 5px rgba(0,0,0,.22);z-index:1;}
+  .grouplab{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;margin:28px 0 6px;display:flex;align-items:center;gap:9px;}
+  .grouplab .gd{width:11px;height:11px;border-radius:50%;}
+  .grouplab.carga{color:var(--amber);} .grouplab.carga .gd{background:var(--amber);}
+  .grouplab.livre{color:var(--good);} .grouplab.livre .gd{background:var(--good);}
+  .pl-shadow{font-size:14px;color:var(--ink-faint);font-weight:500;}
+  .pl-resource{font-size:16px;color:var(--good);font-weight:600;text-align:right;}
+  .pl-resource .lv{font-size:10.5px;color:var(--ink-faint);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-left:7px;}
+  .needle.free{border-color:var(--good);}
+  .medicine{margin-top:34px;background:color-mix(in srgb,var(--good) 6%,var(--paper));border:1px solid color-mix(in srgb,var(--good) 24%,var(--line));border-radius:14px;padding:20px 22px;}
+  .med-lab{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--good);margin:0 0 9px;}
+  .medicine p{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:17.5px;line-height:1.6;color:#26403f;margin:0;}
+  .medicine p b{color:var(--good);font-weight:600;}
+  .medicine p b.a{color:var(--amber);}
+
+  /* Mapa de 10 segundos */
+  .lead10{font-size:14.5px;line-height:1.55;color:var(--ink-soft);margin:0 0 6px;max-width:66ch;}
+  .lead10 b{color:var(--ink);font-weight:600;}
+  .card10{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:22px 24px;margin-top:18px;}
+  .grid10{display:grid;grid-template-columns:1.25fr 1fr;gap:30px;}
+  @media(max-width:640px){.grid10{grid-template-columns:1fr;gap:24px;}}
+  .col-lab{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--ink-faint);margin:0 0 14px;}
+  .c10{margin:0 0 17px;} .c10:last-child{margin-bottom:0;}
+  .c10-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+  .c10-name{font-size:15px;font-weight:700;color:var(--teal-deep);}
+  .c10-lv{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--amber);}
+  .c10-lv.mid{color:var(--ink-faint);}
+  .c10-track{height:9px;background:var(--panel-2);border-radius:100px;margin:6px 0 6px;overflow:hidden;}
+  .c10-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--teal-deep),var(--teal));display:block;}
+  .c10-fill.mente{background:linear-gradient(90deg,#2c6480,#4d88a4);}
+  .c10-fill.coracao{background:linear-gradient(90deg,#3f7d5c,#5faa7f);}
+  .c10-fill.instinto{background:linear-gradient(90deg,#b5432e,#cf6a44);}
+  .c10-name.mente{color:#2c6480;} .c10-name.coracao{color:#3f7d5c;} .c10-name.instinto{color:#b5432e;}
+  .c10-lv.mente{color:#2c6480;} .c10-lv.coracao{color:#3f7d5c;} .c10-lv.instinto{color:#b5432e;}
+  .c10-mean{font-size:13.5px;color:var(--ink);line-height:1.45;} .c10-mean b{color:var(--teal-deep);font-weight:600;}
+  .e10{margin:0 0 16px;} .e10:last-child{margin-bottom:0;}
+  .e10-top{display:flex;justify-content:space-between;font-size:12.5px;}
+  .e10-top .on{color:var(--teal-deep);font-weight:600;} .e10-top .off{color:var(--ink-faint);}
+  .e10-track{position:relative;height:4px;background:var(--panel-2);border-radius:4px;margin-top:6px;}
+  .e10-track .mid{position:absolute;left:50%;top:-3px;width:1px;height:10px;background:var(--line-strong);}
+  .e10-needle{position:absolute;top:50%;width:11px;height:11px;border-radius:50%;background:#fff;border:2.5px solid var(--teal);transform:translate(-50%,-50%);box-shadow:0 1px 2px rgba(0,0,0,.15);z-index:1;}
+  .e10-desc{font-size:11.5px;color:var(--ink-soft);line-height:1.35;margin-top:6px;}
+  .close10{margin:20px 0 0;padding:15px 18px;background:color-mix(in srgb,var(--teal) 7%,var(--paper));border:1px solid color-mix(in srgb,var(--teal) 24%,var(--line));border-radius:12px;}
+  .close10-lab{font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--teal-deep);margin:0 0 6px;}
+  .close10-txt{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:16px;line-height:1.56;color:#26403f;margin:0;}
+  .close10-txt b{color:var(--teal-deep);font-weight:600;}
+
+  .foot{font-size:12px;color:var(--ink-faint);border-top:1px solid var(--line);margin-top:44px;padding-top:16px;max-width:70ch;text-align:center;}
+
+  /* ===== Bloco 7 — Perguntas para a sua sessão (Método somático) ===== */
+  .method-sub{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--amber);font-weight:700;margin:-2px 0 14px;}
+  .intro{font-family:"Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;font-size:15.5px;line-height:1.62;color:var(--ink-soft);max-width:64ch;margin:0 0 8px;}
+  .intro b{color:var(--ink);font-weight:600;}
+  .qsec{padding-top:26px;margin-top:26px;border-top:1px solid var(--line);}
+  .qsec:first-of-type{border-top:0;padding-top:4px;margin-top:4px;}
+  .qhead{margin-bottom:18px;}
+  .q-eyebrow{font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:700;margin:0 0 6px;}
+  .q-eyebrow .carga{color:var(--amber);} .q-eyebrow .arw{color:var(--ink-faint);opacity:.7;} .q-eyebrow .anti{color:var(--good);} .q-eyebrow .pn{color:var(--ink-faint);}
+  .qtitle{font-family:"Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;font-size:clamp(19px,2.5vw,23px);font-weight:600;line-height:1.18;margin:0;color:var(--ink);}
+  .step{position:relative;padding:0 0 22px 44px;}
+  .step:last-child{padding-bottom:0;}
+  .step::before{content:"";position:absolute;left:13px;top:25px;bottom:-2px;width:2px;background:var(--line);}
+  .step:last-child::before{display:none;}
+  .dot{position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;background:var(--paper);border:2px solid var(--line-strong);display:flex;align-items:center;justify-content:center;font-family:"Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;font-size:13px;font-weight:700;color:var(--ink-faint);z-index:1;}
+  .step.carga .dot{border-color:var(--amber);color:var(--amber);}
+  .step.recurso .dot{border-color:var(--good);color:var(--good);}
+  .step.passo .dot{border-color:var(--teal);color:var(--teal);}
+  .st-lab{font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--ink-faint);margin:5px 0 7px;}
+  .step.carga .st-lab{color:var(--amber);}
+  .step.recurso .st-lab{color:var(--good);}
+  .step.passo .st-lab{color:var(--teal-deep);}
+  .st-txt{font-family:"Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;font-size:16px;line-height:1.64;color:#28403f;margin:0;}
+  .st-txt b{color:var(--teal-deep);font-weight:600;}
+  .step.carga .st-txt b{color:var(--amber);}
+  .card{border-radius:12px;padding:15px 18px;margin-top:2px;}
+  .step.carga .card{background:color-mix(in srgb,var(--amber) 7%,var(--paper));border:1px solid color-mix(in srgb,var(--amber) 24%,var(--line));}
+  .step.recurso .card{background:color-mix(in srgb,var(--good) 7%,var(--paper));border:1px solid color-mix(in srgb,var(--good) 26%,var(--line));}
+  .step.passo .card{background:color-mix(in srgb,var(--teal) 6%,var(--paper));border:1px solid color-mix(in srgb,var(--teal) 24%,var(--line));}
+  .b7pend{display:flex;align-items:center;gap:10px;margin:12px 0 3px;}
+  .b7pend .bar{flex:1;height:7px;border-radius:100px;background:linear-gradient(90deg,var(--amber) 0%,#c98a3d 35%,var(--good) 100%);}
+  .b7pend .pl{font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;font-weight:700;}
+  .b7pend .pl.a{color:var(--amber);} .b7pend .pl.b{color:var(--good);}
+  .closing{font-family:"Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;font-size:17px;line-height:1.6;color:var(--teal-deep);font-style:italic;text-align:center;max-width:52ch;margin:30px auto 4px;}
+</style>
+
+<div class="sheet"><div class="pad">
+  <div class="brand">IRIS CODEX</div>
+  <div class="brand-sub">Leitura emocional · Rhelton</div>
+
+  <!-- 1 -->
+  <section class="block">
+    <p class="eyebrow"><span class="secnum">1</span> &nbsp;Em poucas palavras</p>
+    <div class="microfilme">
+      <p><span class="voc">Rhelton,</span> tem uma coisa que te define: você <b>guarda tudo por dentro</b>. Desde cedo você aprendeu que mostrar o que sente dava problema — então foi engolindo. A raiva que não vira briga. A mágoa que você não conta pra ninguém. O cansaço que você esconde atrás de um "tá tudo bem".</p>
+      <p>O seu corpo, esse, <b>nunca desliga</b>. Mesmo quando você senta pra descansar, tem uma parte de você ligada, achando que devia estar fazendo alguma coisa. Ficar parado te dá culpa.</p>
+      <p>E tem uma terceira coisa: você <b>tem dificuldade de largar</b>. Segura mágoa antiga, guarda situação que já podia ter passado, fica remoendo o que ficou pra trás. Você não solta fácil — nem as pessoas, nem as histórias.</p>
+      <p>Nada disso é fraqueza. É o contrário: é força demais, trancada num lugar que quase ninguém abre.</p>
+    </div>
+    <p class="maieutica">Quando foi a última vez que você deixou sair o que sentiu, na hora — em vez de guardar pra depois?</p>
+  </section>
+
+  <hr class="div">
+
+  <!-- 2 · MAPA DE 10 SEGUNDOS -->
+  <section class="block">
+    <p class="eyebrow"><span class="secnum">2</span> &nbsp;Um retrato em 10 segundos</p>
+    <h2 class="display">De onde vem a sua energia</h2>
+    <p class="lead10">O essencial num relance: <b>como você funciona</b> por dentro — e <b>pra que lado você pende</b>.</p>
+    <div class="card10">
+      <div class="grid10">
+        <div>
+          <p class="col-lab">Como você funciona</p>
+          <div class="c10"><div class="c10-top"><span class="c10-name mente">Mente</span><span class="c10-lv mente">alta</span></div><div class="c10-track"><span class="c10-fill mente" style="width:80%"></span></div><p class="c10-mean">Você <b>processa pensando</b>: analisa, antecipa, rumina — quer entender antes de fechar.</p></div>
+          <div class="c10"><div class="c10-top"><span class="c10-name coracao">Coração</span><span class="c10-lv coracao">médio</span></div><div class="c10-track"><span class="c10-fill coracao" style="width:52%"></span></div><p class="c10-mean">Você <b>sente e se vincula</b>, e esse lado está inteiro e solto — só não é o que faz mais barulho em você.</p></div>
+          <div class="c10"><div class="c10-top"><span class="c10-name instinto">Instinto</span><span class="c10-lv instinto">alto</span></div><div class="c10-track"><span class="c10-fill instinto" style="width:85%"></span></div><p class="c10-mean">Você <b>reage rápido</b>: ferve fácil, o gatilho é curto — a raiva sobe antes do pensamento.</p></div>
+        </div>
+        <div>
+          <p class="col-lab">Pra que lado você pende</p>
+          <div class="e10"><div class="e10-top"><span class="on">Interior</span><span class="off">Exterior</span></div><div class="e10-track"><span class="mid"></span><span class="e10-needle" style="left:27%"></span></div><p class="e10-desc">Você recarrega mais por dentro do que na agitação de fora.</p></div>
+          <div class="e10"><div class="e10-top"><span class="on">Analisar</span><span class="off">Sentir</span></div><div class="e10-track"><span class="mid"></span><span class="e10-needle" style="left:41%"></span></div><p class="e10-desc">Pesa a razão — mas sente junto, quase no mesmo peso.</p></div>
+          <div class="e10"><div class="e10-top"><span class="on">Acelerar</span><span class="off">Parar</span></div><div class="e10-track"><span class="mid"></span><span class="e10-needle" style="left:24%"></span></div><p class="e10-desc">Vive com o pé no acelerador; parar custa e dá culpa.</p></div>
+          <div class="e10"><div class="e10-top"><span class="on">Controlar</span><span class="off">Confiar</span></div><div class="e10-track"><span class="mid"></span><span class="e10-needle" style="left:29%"></span></div><p class="e10-desc">Prefere manter o controle a soltar e deixar acontecer.</p></div>
+        </div>
+      </div>
+      <div class="close10">
+        <p class="close10-lab">Em resumo</p>
+        <p class="close10-txt">Por dentro, você reage rápido — mas a sua cabeça entra na frente e <b>segura a reação</b>. Por isso você sente muito por dentro e mostra pouco por fora. O coração, esse, está mais tranquilo.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <!-- 3 · TEMPERAMENTO -->
+  <section class="block">
+    <p class="eyebrow"><span class="secnum">3</span> &nbsp;Temperamento</p>
+    <h2 class="display">Como você funciona por dentro</h2>
+    <div class="objbox">
+      <p class="obj-lab">Antes de ler</p>
+      <p class="obj-txt">Você já deve ter feito algum teste de temperamento — respondeu perguntas, marcou opções, ganhou um rótulo. Aqui é diferente: <b>você não respondeu nada</b>. Isto foi lido no que os seus olhos carregam. Por isso, pode aparecer um lado seu que nem você costuma admitir.</p>
+    </div>
+    <p class="origin"><b>De onde vem.</b> A ideia de temperamento é uma das leituras mais antigas sobre as pessoas — nasceu na Grécia antiga, há mais de dois mil anos, da observação de que cada um traz de berço uma mistura de quatro forças. Essa mistura molda o jeito de sentir, decidir e se relacionar.</p>
+    <div class="four">
+      <div class="f4"><span class="d4" style="background:#d0a017"></span><span><b>Colérico</b> <span class="el">· Fogo</span> — a força que decide e age.</span></div>
+      <div class="f4"><span class="d4" style="background:#159d90"></span><span><b>Melancólico</b> <span class="el">· Água</span> — a profundidade que sente e guarda.</span></div>
+      <div class="f4"><span class="d4" style="background:#1e6fa8"></span><span><b>Sanguíneo</b> <span class="el">· Ar</span> — a leveza que anima e conecta.</span></div>
+      <div class="f4"><span class="d4" style="background:#c0552a"></span><span><b>Fleumático</b> <span class="el">· Terra</span> — a calma que acalma e sustenta.</span></div>
+    </div>
+    <p class="bridge">Ninguém é de um tipo só — o que muda é a <b>proporção</b> (uma leitura da sua forma de ser, não uma medida exata). A sua está aqui:</p>
+    <div class="temp-bars">
+      <div class="tbar"><span class="tname">Colérico <span class="tbadge d">predominante</span><span class="tsub">Fogo · decide e realiza</span></span><span class="ttrack"><span class="tfill col" style="width:42%"></span></span><span class="tpct col">42%</span></div>
+      <div class="tbar"><span class="tname">Melancólico <span class="tbadge s">secundário</span><span class="tsub">Água · sente fundo e guarda</span></span><span class="ttrack"><span class="tfill mel" style="width:37%"></span></span><span class="tpct mel">37%</span></div>
+      <div class="tbar mut"><span class="tname">Fleumático <span class="tsub">Terra · acalma e sustenta</span></span><span class="ttrack"><span class="tfill fle" style="width:16%"></span></span><span class="tpct fle">16%</span></div>
+      <div class="tbar mut"><span class="tname">Sanguíneo <span class="tsub">Ar · anima e conecta</span></span><span class="ttrack"><span class="tfill san" style="width:5%"></span></span><span class="tpct san">5%</span></div>
+    </div>
+    <p class="tcap">O que te define são os dois primeiros — <b>predominante</b> e <b>secundário</b>. Os outros dois aparecem só pra fechar os 100%.</p>
+    <p class="tension">O seu caso tem uma tensão que te define: uma parte de você quer <b>decidir e resolver agora</b>; a outra <b>revisa, prevê e remói</b> antes de fechar. As duas são você, ao mesmo tempo — e vivem puxando pra lados diferentes. É o que te faz potente. E é o que te cansa.</p>
+    <p class="temp-lead" style="margin-bottom:8px">Veja como isso aparece no seu dia a dia:</p>
+    <div class="facets">
+      <div class="facet"><span class="fk">Como pensa</span><span class="fv">Em objetivo e rota — você vê o alvo antes de ver as pessoas, e detesta reunião que não termina em ação. Mas não dispara no escuro: você analisa fundo e prevê o que pode dar errado antes de fechar.</span></div>
+      <div class="facet"><span class="fk">Como sente</span><span class="fv">A raiva não vira desabafo — vira <b>combustível</b>. E o que te magoa você não solta na hora: guarda, revisita, remói. Sente intenso, mas por dentro, longe dos olhos dos outros.</span></div>
+      <div class="facet"><span class="fk">Como realiza</span><span class="fv">Movido a resultado. Atravessa o obstáculo mesmo sozinho e carrega o projeto nas costas quando todo mundo já desistiu.</span></div>
+      <div class="facet"><span class="fk">Como planeja</span><span class="fv">Você planeja, documenta, refina o detalhe que ninguém vê. É o que te faz <b>eficiente e exigente</b> ao mesmo tempo — e, às vezes, o que te trava esperando o "perfeito".</span></div>
+      <div class="facet"><span class="fk">Nas relações</span><span class="fv">Escolhe as pessoas por competência e lealdade, não por simpatia. Ama protegendo e resolvendo — e às vezes traz solução quando o outro só queria ser ouvido.</span></div>
+    </div>
+    <p class="rootlab">A mesma raiz, dois lados</p>
+    <div class="roots">
+      <div class="root"><span class="gift">A sua entrega intensa</span> é o que faz as pessoas confiarem em você — e é <span class="cost">a mesma coisa que te esgota</span> quando ninguém retribui.</div>
+      <div class="root"><span class="gift">A rapidez pra decidir e resolver</span> tira todo mundo do atoleiro — e <span class="cost">atropela quem precisava de um tempo</span> pra sentir.</div>
+      <div class="root"><span class="gift">O olhar que analisa tudo a fundo</span> te faz certeiro — e é <span class="cost">o perfeccionismo que te trava</span> e a autocrítica que te machuca primeiro.</div>
+      <div class="root"><span class="gift">A lealdade de quem não larga</span> faz de você um porto seguro — e é <span class="cost">o que te faz remoer mágoa</span> que já podia ter ido embora.</div>
+    </div>
+    <p class="rootlab">O mal-entendido sobre você</p>
+    <p class="block-serif">O que as pessoas veem e entendem errado: chamam de <b>dureza</b> o que muitas vezes é você <b>se protegendo</b> de decepção. Leem como <b>impaciência</b> a sua cabeça já três passos à frente. E confundem o seu silêncio com frieza — quando, por dentro, você está <b>remoendo</b>, não indiferente. Você não é frio. Você é intenso num lugar que quase ninguém alcança.</p>
+    <p class="rootlab">Quando aperta, você vira…</p>
+    <div class="stresswrap">
+      <p class="block-serif">Sob pressão, o seu lado que resolve <b>sobe o tom e quer resolver na marra</b>. E se não resolve, o lado que sente <b>desaba pra dentro</b>: você se fecha, remói, se cobra. O sinal de que você passou do limite não é gritar — é <b>parar de falar</b>. É quando os outros acham que "está tudo bem" que você está mais sozinho.</p>
+    </div>
+    <p class="rootlab">O que te acende &nbsp;·&nbsp; o que te apaga</p>
+    <div class="drains">
+      <div class="drain up"><h4>Te acende</h4><ul><li>Vencer um desafio difícil</li><li>Ver de pé o que você construiu</li><li>Clareza, ordem e um propósito que valha a intensidade</li><li>Poucas relações, profundas e leais</li></ul></div>
+      <div class="drain down"><h4>Te apaga</h4><ul><li>Enrolação, lentidão, gente que "enrola"</li><li>Ter que agradar ou ser avaliado</li><li>Entregar muito e ninguém retribuir</li><li>Parar sem sentir que "terminou"</li></ul></div>
+    </div>
+    <p class="temp-lead" style="margin-top:16px">Junte tudo e entende o seu padrão: a raiva do colérico, sozinha, explodiria e passaria. Mas o melancólico <b>segura e remói</b> — por isso você acumula. Não é falta de força. É força demais, segurada.</p>
+  </section>
+
+  <hr class="div">
+
+  <!-- 3 -->
+  <section class="block">
+    <p class="eyebrow"><span class="secnum">4</span> &nbsp;Linha do tempo emocional</p>
+    <h2 class="display">O que cada tempo deixou em você</h2>
+    <p class="snote">Só a <b>emoção</b> que cada época deixou, o <b>comportamento</b> que ela pode ter criado, e as <b>situações</b> que talvez você tenha vivido. A íris mostra o estado de cada uma: o que já <b style="color:var(--teal-deep)">fechou</b>, o que está <b style="color:var(--teal-deep)">em processo</b> (teal), e o que segue <b style="color:var(--amber)">ativo hoje</b> (laranja). No seu caso, <b>nada fechou ainda</b>: 3 ativos e 1 em processo.</p>
+    <div class="rail-wrap">
+      <div class="rail">
+        <div class="rail-line"></div>
+        <div class="node proc"><div class="dot"></div><div class="age">~4–7 anos</div><div class="ph">o terreno</div><span class="flag proc">em processo</span></div>
+        <div class="node active"><div class="dot"></div><div class="age">~13–17 anos</div><div class="ph">identidade</div><span class="flag">ainda ativo</span></div>
+        <div class="node active"><div class="dot"></div><div class="age">~28–35 anos</div><div class="ph">o que ficou</div><span class="flag">ainda ativo</span></div>
+        <div class="node active"><div class="dot"></div><div class="age">~40–45 anos</div><div class="ph">o agora</div><span class="flag">ainda ativo</span></div>
+      </div>
+    </div>
+    <div class="moment proc">
+      <div class="moment-h"><span class="mage display">~4–7 anos</span><span class="mproc">em processo</span></div>
+      <div class="mrow"><span class="k">Emoção</span><span class="v">Contenção que virou jeito de ser — aprender a segurar antes de sentir.</span></div>
+      <div class="mrow"><span class="k">Comportamento</span><span class="v">Não incomodar, dar conta sozinho, minimizar a própria necessidade diante do conflito.</span></div>
+      <div class="mrow"><span class="k">Situações</span><span class="v">Um ambiente que pediu maturidade antes da hora, onde reagir não parecia seguro.</span></div>
+      <p class="mnote">Ainda em reorganização — não é ferida aberta, mas também não fechou de todo. Está se integrando.</p>
+    </div>
+    <div class="moment on">
+      <div class="moment-h"><span class="mage display">~13–17 anos</span><span class="mflag">ainda ativo</span></div>
+      <div class="mrow"><span class="k">Emoção</span><span class="v">Um abalo na identidade que não chegou a fechar — a pergunta "quem eu sou" ficou em aberto.</span></div>
+      <div class="mrow"><span class="k">Comportamento</span><span class="v">Buscar se definir pelo que entrega e resolve, mais do que pelo que sente.</span></div>
+      <div class="mrow"><span class="k">Situações</span><span class="v">Uma rejeição (no amor, na amizade ou no grupo), uma mudança de escola ou de cidade, a cobrança de corresponder a uma expectativa — ou o momento em que você assumiu um papel ("o responsável", "o que não dá trabalho", "o forte") que acabou colando em você e virou obrigação.</span></div>
+      <div class="keys">
+        <p class="keys-lab">Chaves do tempo</p>
+        <div class="key"><span class="kind abre">Abre o estado</span><span class="q">Quem você sentia que precisava ser, naquela época, pra ser aceito?</span></div>
+        <div class="key"><span class="kind res">Resolução</span><span class="q">O que mudaria, hoje, se você se permitisse largar aquele personagem?</span></div>
+      </div>
+    </div>
+    <div class="moment on">
+      <div class="moment-h"><span class="mage display">~28–35 anos</span><span class="mflag">ainda ativo</span></div>
+      <div class="mrow"><span class="k">Emoção</span><span class="v">Ressentimento e frustração que foram sedimentando — mágoas guardadas que nunca viraram conversa.</span></div>
+      <div class="mrow"><span class="k">Comportamento</span><span class="v">Carregar sem reclamar, guardar episódios, comentar tarde o que magoou.</span></div>
+      <div class="mrow"><span class="k">Situações</span><span class="v">Um período de muita responsabilidade e pouco espaço pra si — trabalho, sustento, os outros primeiro.</span></div>
+      <div class="keys">
+        <p class="keys-lab">Chaves do tempo</p>
+        <div class="key"><span class="kind abre">Abre o estado</span><span class="q">Que mágoa daquela época você nunca contou pra ninguém?</span></div>
+        <div class="key"><span class="kind res">Resolução</span><span class="q">O que precisaria acontecer pra você finalmente deixar isso ir?</span></div>
+      </div>
+    </div>
+    <div class="moment on">
+      <div class="moment-h"><span class="mage display">~40–45 anos</span><span class="mflag">ainda ativo</span></div>
+      <div class="mrow"><span class="k">Emoção</span><span class="v">Algo represado, agora — uma pressão viva que ainda não achou por onde sair.</span></div>
+      <div class="mrow"><span class="k">Comportamento</span><span class="v">Dar conta por fora enquanto pressiona por dentro; chegar no limite sem válvula.</span></div>
+      <div class="mrow"><span class="k">Situações</span><span class="v">Um processo atual não resolvido — uma indignação, uma sobrecarga ou uma virada que segue em aberto.</span></div>
+      <div class="keys">
+        <p class="keys-lab">Chaves do tempo</p>
+        <div class="key"><span class="kind abre">Abre o estado</span><span class="q">Qual foi a última vez que você engoliu o que queria dizer — e o que era?</span></div>
+        <div class="key"><span class="kind res">Resolução</span><span class="q">Se soltar isso não fizesse o mundo desabar, o que você diria — e pra quem?</span></div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <!-- 4 -->
+  <section class="block">
+    <p class="eyebrow"><span class="secnum">5</span> &nbsp;Heranças transgeracionais</p>
+    <h2 class="display">O que talvez não tenha começado em você</h2>
+    <p class="lead">Nem tudo o que você carrega nasceu com você. Algumas formas de sentir e de se proteger a gente aprende sem perceber, dentro de casa — e elas vêm passando adiante, de geração em geração, muito antes de você existir.</p>
+    <div class="gen">
+      <div class="gen-line"></div>
+      <div class="gcol pastcol">
+        <div class="gring past">antes</div>
+        <div class="glabel">O que veio de trás</div>
+        <div class="gcontent">
+          <span class="chip">O silêncio sobre a dor</span>
+          <span class="chip">Resolver tudo sozinho</span>
+          <span class="chip">A força como valor</span>
+        </div>
+      </div>
+      <div class="gcol">
+        <div class="gring you">você</div>
+        <div class="glabel you">Em você — e só aqui muda</div>
+        <div class="gcontent"><p class="gtext">vive como <b>engolir o que sente</b> e dar conta calado — e é <b>em você</b> que a corrente pode parar.</p></div>
+      </div>
+      <div class="gcol">
+        <div class="gring next">depois</div>
+        <div class="glabel">Quem você liberta</div>
+        <div class="gcontent"><p class="gtext">ao mudar em si, você <b>tira esse peso</b> de quem vem depois.</p></div>
+      </div>
+    </div>
+    <div class="pattern">
+      <p>O <b>silêncio sobre a dor</b> e o <b>resolver sozinho</b> quase nunca começam numa pessoa só. Costumam vir de uma casa — e da casa antes dela — onde sentir parecia perigoso e cada um segurava o seu, calado. E aqui está o que dissolve qualquer culpa: <b>quem te ensinou a engolir provavelmente também teve que engolir pra sobreviver.</b> Ninguém escolheu carregar isso — foi passado adiante como quem passa a cor dos olhos.</p>
+    </div>
+    <p class="subhead">Por que às vezes é difícil largar</p>
+    <p class="deep">Tem uma coisa estranha aqui: <b>ficar bem pode dar culpa</b> — como se você traísse os seus por sofrer menos do que eles sofreram. Mas repetir a dor não é lealdade. <b>A lealdade mais bonita é viver de verdade aquilo que eles não tiveram chance de viver.</b></p>
+    <p class="turn">Em quase toda família existe uma pessoa em quem um padrão antigo <b>para</b> — não por ser mais forte que os outros, mas por escolher não repassar. E aqui está o ponto: você não muda a sua família nem controla quem vem depois — muda só uma coisa, <b>você mesmo</b>. É exatamente isso que interrompe a corrente. Ao parar de carregar, você não passa adiante — e é assim, e só assim, que se protege quem ainda vem.</p>
+    <div class="resil">
+      <p class="rlab">E não é só o peso</p>
+      <p>Da mesma linhagem que passou o silêncio veio também a <b>força de quem recomeçou</b> — a lealdade, o trabalho, a coragem de aguentar. Você recebeu a ferida e também o que é preciso pra cuidar dela.</p>
+    </div>
+    <p class="subhead">De quem isso pode ter vindo?</p>
+    <p class="idintro">Antes de soltar, olhe pra trás. Para cada padrão, veja se reconhece alguém — um pai, uma avó, alguém que você talvez nem tenha conhecido:</p>
+    <div class="idlist">
+      <div class="idrow"><span class="idpat">Silêncio sobre a dor</span><p class="idq">Quem, na sua família, também guardava tudo por dentro?</p></div>
+      <div class="idrow"><span class="idpat">Resolver tudo sozinho</span><p class="idq">Quem carregava o mundo nas costas, sem pedir ajuda?</p></div>
+      <div class="idrow"><span class="idpat">A força como valor</span><p class="idq">Quem era o &ldquo;forte&rdquo; da casa, que não podia desabar?</p></div>
+    </div>
+    <p class="idnote">Não precisa de certeza — às vezes um nome já vem. Dar um rosto ao padrão é o primeiro passo pra devolvê-lo a quem ele pertence.</p>
+    <p class="subhead" style="color:var(--teal-deep)">Uma frase para dizer em voz alta</p>
+    <div class="saybox">
+      <p class="sayintro">Uma frase muda mais quando o corpo entra antes da fala. Antes de dizer, se dê um instante:</p>
+      <ol class="rsteps">
+        <li>Faça <b>três respirações fundas</b>, bem devagar.</li>
+        <li>Leve a <b>atenção ao centro do peito</b>.</li>
+        <li>Apoie a <b>mão dominante</b> ali, sobre o peito.</li>
+      </ol>
+      <p class="rsay">Então, lentamente, diga — a que ressoar com você:</p>
+      <p class="sayline">&ldquo;Eu vejo o que vocês carregaram calados — e agradeço a força que chegou até mim.&rdquo;</p>
+      <p class="sayline">&ldquo;O peso que não começou em mim, eu devolvo com respeito.&rdquo;</p>
+      <p class="sayline">&ldquo;Isto para em mim. O que segue, segue mais leve.&rdquo;</p>
+      <p class="rnote">Na sessão, o seu terapeuta conduz esse momento. Em casa, você pode repetir do seu jeito — sempre sem pressa.</p>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <!-- 5 -->
+  <section class="block">
+    <p class="eyebrow"><span class="secnum">6</span> &nbsp;Mapa emocional</p>
+    <h2 class="display">Onde você está — e pra onde dá pra ir</h2>
+    <p class="lead">Cada emoção tem dois lados. De um, o que está <b>carregado</b>; do outro, o <b>alívio</b> que é a saída dela. A bolinha mostra onde você está hoje — e o lado direito mostra <b>a direção</b>.</p>
+    <div class="legend"><span>● <b>Bolinha</b> = onde você está</span><span><b style="color:var(--amber)">Esquerda</b> = carregado</span><span><b style="color:var(--good)">Direita</b> = a saída</span></div>
+    <p class="grouplab carga"><span class="gd"></span>O que pesa hoje</p>
+    <div class="pend"><div class="pend-labels"><span class="pl-carga">Raiva contida <span class="lv">alta</span></span><span class="pl-anti">Serenidade</span></div><div class="pend-track"><i class="needle" style="left:17%"></i></div></div>
+    <div class="pend"><div class="pend-labels"><span class="pl-carga">Contenção aprendida <span class="lv">alta</span></span><span class="pl-anti">Expressão que flui</span></div><div class="pend-track"><i class="needle" style="left:21%"></i></div></div>
+    <div class="pend"><div class="pend-labels"><span class="pl-carga">Irritação que sobe <span class="lv">alta</span></span><span class="pl-anti">Calma</span></div><div class="pend-track"><i class="needle" style="left:25%"></i></div></div>
+    <div class="pend"><div class="pend-labels"><span class="pl-carga">Apego · dificuldade de largar <span class="lv">média</span></span><span class="pl-anti">Soltar</span></div><div class="pend-track"><i class="needle" style="left:33%"></i></div></div>
+    <div class="pend"><div class="pend-labels"><span class="pl-carga">Alerta que não desliga <span class="lv">média</span></span><span class="pl-anti">Descanso</span></div><div class="pend-track"><i class="needle" style="left:35%"></i></div></div>
+    <div class="pend"><div class="pend-labels"><span class="pl-carga">Medo de base <span class="lv">baixa</span></span><span class="pl-anti">Segurança</span></div><div class="pend-track"><i class="needle" style="left:42%"></i></div></div>
+    <p class="grouplab livre"><span class="gd"></span>O que está leve — a sua força</p>
+    <div class="pend"><div class="pend-labels"><span class="pl-shadow">Fragilidade</span><span class="pl-resource">Firmeza · base vital <span class="lv">vital</span></span></div><div class="pend-track"><i class="needle free" style="left:90%"></i></div></div>
+    <div class="pend"><div class="pend-labels"><span class="pl-shadow">Dispersão</span><span class="pl-resource">Centramento · eixo organizado <span class="lv">livre</span></span></div><div class="pend-track"><i class="needle free" style="left:84%"></i></div></div>
+    <div class="pend"><div class="pend-labels"><span class="pl-shadow">Desamor</span><span class="pl-resource">Alegria &amp; amor <span class="lv">livre</span></span></div><div class="pend-track"><i class="needle free" style="left:82%"></i></div></div>
+    <div class="pend"><div class="pend-labels"><span class="pl-shadow">Sufoco</span><span class="pl-resource">Fôlego · vitalidade <span class="lv">livre</span></span></div><div class="pend-track"><i class="needle free" style="left:80%"></i></div></div>
+    <div class="pend"><div class="pend-labels"><span class="pl-shadow">Sobrecarga do outro</span><span class="pl-resource">Limites saudáveis <span class="lv">livre</span></span></div><div class="pend-track"><i class="needle free" style="left:78%"></i></div></div>
+    <div class="medicine">
+      <p class="med-lab">O que já está livre é o seu remédio</p>
+      <p>Você não precisa buscar a saída longe. O que já está <b>livre</b> em você é exatamente o que move essas agulhas: a sua <b>firmeza</b> e o seu <b>centramento</b> são o chão pra sustentar o trabalho na <b class="a">raiva guardada</b>; a sua <b>alegria</b> livre é o combustível pra afrouxar o <b class="a">alerta que não para</b>. Você carrega, no mesmo corpo, a dor <b class="a">e</b> a cura.</p>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow"><span class="secnum">7</span> &nbsp;Perguntas para a sua sessão</p>
+    <p class="method-sub">Método somático · Sopro da Origem</p>
+    <p class="intro">Cada pergunta abaixo é um pequeno caminho pra fazer <b>sozinho</b>, no seu tempo — <b>uma de cada vez</b>, sem pressa. Você está no comando: se algo tocar forte, não precisa ter resposta, basta notar onde chegou.</p>
+<div class="qsec">
+    <div class="qhead">
+      <p class="q-eyebrow"><span class="pn">Caminho 1 · </span><span class="carga">Raiva contida</span> <span class="arw">→</span> <span class="anti">Serenidade</span></p>
+      <p class="qtitle display">Da raiva guardada a uma serenidade que também é sua</p>
+    </div>
+    <div class="step"><span class="dot">1</span><p class="st-lab">Chegar</p><p class="st-txt">Antes de começar, uma coisa: aqui você não precisa acertar nada nem chegar a lugar nenhum. É só um tempo seu, com você. Faça uma respiração um pouco mais longa que o normal e solte o ar bem devagar — e, se quiser, mais uma. Você está no comando: o que tocar mais forte, basta notar onde chegou. Quando sentir que chegou, siga.</p></div>
+    <div class="step carga"><span class="dot">2</span><p class="st-lab">Tocar — onde isso mora no corpo</p><div class="card"><p class="st-txt">A sua leitura mostra uma <b>raiva que você mais guarda do que mostra</b> — ela encontra o caminho de dentro antes de chegar na superfície. Pensa numa vez recente em que você quis dizer algo e engoliu. Você pode notar se ficou alguma marca disso no corpo agora — se em algum lugar. Um cantinho já basta. Se essa marca tivesse um jeito — peso, temperatura, tamanho — qual seria? Se nada vier, tudo bem.</p></div></div>
+    <div class="step"><span class="dot">3</span><p class="st-lab">Deixar falar</p><p class="st-txt">Fica um instante só com isso. Se essa raiva guardada pudesse falar, o que ela queria ter dito e não disse? Deixa vir a frase, mesmo solta. Tem mais alguma coisa junto?</p></div>
+    <div class="step recurso"><span class="dot">4</span><p class="st-lab">Trazer o outro lado</p><div class="card"><p class="st-txt">Agora lembra de uma vez em que você <b>conseguiu</b> dizer o que precisava — com firmeza, sem explodir — e foi ouvido. Ou traz só a sua firmeza, esse chão que a leitura mostrou forte em você. Onde no corpo aparece esse "aqui eu me sustento"? Fica aí um pouco.</p><div class="b7pend"><span class="pl a">raiva guardada</span><span class="bar"></span><span class="pl b">firmeza serena</span></div><p class="st-txt">Vai devagar de um lado pro outro: da raiva presa pra essa firmeza, e de volta. Os dois cabem em você.</p></div></div>
+    <div class="step passo"><span class="dot">5</span><p class="st-lab">O que isso pede — pra levar pra sua sessão</p><div class="card"><p class="st-txt">Tem uma coisa pequena, hoje, que você anda engolindo e que já poderia dizer — com calma, no tamanho certo? Pra quem, e o que exatamente? Leva isso pra sua sessão.</p></div></div>
+  </div>
+
+  <!-- ══════════ 2 · CONTENÇÃO APRENDIDA ══════════ -->
+  <div class="qsec">
+    <div class="qhead">
+      <p class="q-eyebrow"><span class="pn">Caminho 2 · </span><span class="carga">Contenção aprendida</span> <span class="arw">→</span> <span class="anti">Expressão que flui</span></p>
+      <p class="qtitle display">De dar conta sozinho a deixar a expressão fluir</p>
+    </div>
+    <div class="step"><span class="dot">1</span><p class="st-lab">Chegar</p><p class="st-txt">Chega primeiro. Você não precisa dar conta de nada nesta página — é o contrário do que você costuma fazer. Respire fundo uma vez, solte o ar sem pressa, e sinta o corpo apoiado onde você está. Nada aqui é urgente, e ninguém está esperando resposta. Quando estiver pronto, siga no seu ritmo.</p></div>
+    <div class="step carga"><span class="dot">2</span><p class="st-lab">Tocar — onde isso mora no corpo</p><div class="card"><p class="st-txt">A leitura sugere que <b>muito cedo você aprendeu a se segurar</b> — a dar conta por dentro antes de mostrar o que sente. Lembra de uma vez recente em que você segurou o que sentia pra não incomodar. Você pode notar onde, no corpo, mora esse "segurar"? Peito, garganta, ombros — se em algum lugar. Que forma tem? Se nada aparecer, tudo bem também.</p></div></div>
+    <div class="step"><span class="dot">3</span><p class="st-lab">Deixar falar</p><p class="st-txt">Fica um momento aí. Esse jeito de se segurar — quando ele começou, na sua vida? O que ele te ajudou a evitar, lá atrás? Deixa vir o que vier, sem cobrar sentido.</p></div>
+    <div class="step recurso"><span class="dot">4</span><p class="st-lab">Trazer o outro lado</p><div class="card"><p class="st-txt">Agora lembra de uma vez em que você se abriu — falou o que sentia — e foi acolhido, não punido. Traz essa cena com o que tiver: rosto, voz, lugar. Onde no corpo aparece esse alívio de ter sido recebido? Fica aí.</p><div class="b7pend"><span class="pl a">me segurar</span><span class="bar"></span><span class="pl b">ser recebido</span></div><p class="st-txt">Alterna devagar: do "me segurar" pra esse "fui recebido", e de volta. Sem pressa.</p></div></div>
+    <div class="step passo"><span class="dot">5</span><p class="st-lab">O que isso pede — pra levar pra sua sessão</p><div class="card"><p class="st-txt">Com quem, na sua vida hoje, seria mais seguro mostrar um pouco mais do que você sente? Qual seria o primeiro passo pequeno nisso? Leva pra sua sessão.</p></div></div>
+  </div>
+
+  <!-- ══════════ 3 · IRRITAÇÃO QUE SOBE ══════════ -->
+  <div class="qsec">
+    <div class="qhead">
+      <p class="q-eyebrow"><span class="pn">Caminho 3 · </span><span class="carga">Irritação que sobe</span> <span class="arw">→</span> <span class="anti">Calma</span></p>
+      <p class="qtitle display">Da irritação que sobe rápido a uma calma que você alcança</p>
+    </div>
+    <div class="step"><span class="dot">1</span><p class="st-lab">Chegar</p><p class="st-txt">Antes de tudo, desacelera um pouco. Faça duas respirações mais longas, soltando o ar bem devagar — como quando a gente esvazia algo sem pressa. Você conduz o ritmo aqui; não tem nada pra provar e nada pra resolver agora. Quando o corpo der um sinal de que baixou uma marcha, siga.</p></div>
+    <div class="step carga"><span class="dot">2</span><p class="st-lab">Tocar — onde isso mora no corpo</p><div class="card"><p class="st-txt">A leitura aponta uma <b>irritação que sobe rápido</b> — o pavio às vezes curto, a reação que vem antes do pensamento. Sem brigar com isso: você pode notar como o seu corpo avisa que a irritação está subindo? É onde — barriga, peito, mandíbula, mãos? Que sinal é esse? Um cantinho já basta.</p></div></div>
+    <div class="step"><span class="dot">3</span><p class="st-lab">Deixar falar</p><p class="st-txt">Fica com esse sinal um instante. Na maioria das vezes, o que está por baixo da irritação? Cansaço, pressa, algo que não foi respeitado? Deixa vir a resposta que aparecer.</p></div>
+    <div class="step recurso"><span class="dot">4</span><p class="st-lab">Trazer o outro lado</p><div class="card"><p class="st-txt">Agora traz uma imagem de quando você esteve realmente em paz — um lugar, um momento de fôlego. Onde no corpo aparece essa calma? Fica aí, e respira mais uma vez dentro dela.</p><div class="b7pend"><span class="pl a">irritação</span><span class="bar"></span><span class="pl b">fôlego calmo</span></div><p class="st-txt">Vai devagar de um lado pro outro: do ponto onde a irritação sobe pra esse fôlego, e de volta. Você consegue visitar os dois.</p></div></div>
+    <div class="step passo"><span class="dot">5</span><p class="st-lab">O que isso pede — pra levar pra sua sessão</p><div class="card"><p class="st-txt">Qual é o <b>primeiro</b> sinal, no seu corpo, de que a irritação vai subir — aquele que, se você notasse a tempo, te daria um segundo pra respirar antes de reagir? Leva essa observação pra sua sessão.</p></div></div>
+  </div>
+
+  <!-- ══════════ 4 · APEGO ══════════ -->
+  <div class="qsec">
+    <div class="qhead">
+      <p class="q-eyebrow"><span class="pn">Caminho 4 · </span><span class="carga">Apego · dificuldade de largar</span> <span class="arw">→</span> <span class="anti">Soltar</span></p>
+      <p class="qtitle display">Do que você segura ao que dá pra soltar</p>
+    </div>
+    <div class="step"><span class="dot">1</span><p class="st-lab">Chegar</p><p class="st-txt">Chega com calma. Você não precisa soltar nada agora, nem decidir nada — é só olhar, por enquanto. Faça uma respiração mais longa que o normal e solte o ar devagar. Sinta o peso do seu corpo na cadeira ou na cama, esse apoio que segura você. Quando sentir que chegou, siga no seu tempo.</p></div>
+    <div class="step carga"><span class="dot">2</span><p class="st-lab">Tocar — onde isso mora no corpo</p><div class="card"><p class="st-txt">A leitura sugere que <b>você segura o que já podia ter ido</b> — mágoas, assuntos, coisas sem encerrar. Pensa em algo antigo que você ainda carrega. Você pode notar se isso tem um peso no corpo agora — onde? Que tamanho? Se nada vier, tudo bem também.</p></div></div>
+    <div class="step"><span class="dot">3</span><p class="st-lab">Deixar falar</p><p class="st-txt">Fica um instante com esse peso. O que ele te dá, que faz valer a pena continuar carregando? (Quase sempre tem algo — proteção, memória, uma justiça.) Deixa a resposta aparecer.</p></div>
+    <div class="step recurso"><span class="dot">4</span><p class="st-lab">Trazer o outro lado</p><div class="card"><p class="st-txt">Agora lembra de uma vez em que você <b>conseguiu</b> soltar algo — e no fim veio um alívio, uma leveza. Traz essa sensação. Onde no corpo ela mora? Fica aí um pouco.</p><div class="b7pend"><span class="pl a">segurar</span><span class="bar"></span><span class="pl b">leveza de soltar</span></div><p class="st-txt">Alterna devagar entre o peso e essa leveza, e de volta. Você já soltou antes — o seu corpo sabe o caminho.</p></div></div>
+    <div class="step passo"><span class="dot">5</span><p class="st-lab">O que isso pede — pra levar pra sua sessão</p><div class="card"><p class="st-txt">Tem uma coisa pequena que você carrega e que, se soltasse, ninguém perderia nada — só você ganharia leveza? Qual seria? Leva pra sua sessão.</p></div></div>
+  </div>
+
+  <!-- ══════════ 5 · ALERTA QUE NÃO DESLIGA ══════════ -->
+  <div class="qsec">
+    <div class="qhead">
+      <p class="q-eyebrow"><span class="pn">Caminho 5 · </span><span class="carga">Alerta que não desliga</span> <span class="arw">→</span> <span class="anti">Descanso</span></p>
+      <p class="qtitle display">Do alerta ligado ao chão que também cabe em você</p>
+    </div>
+    <div class="step"><span class="dot">1</span><p class="st-lab">Chegar</p><p class="st-txt">Antes de tudo: você não precisa resolver nada aqui — é só um exercício com você mesmo, no seu tempo. Você está no comando; o que tocar mais forte, basta notar onde chegou. Se quiser, faça uma respiração um pouco mais longa que o normal e solte o ar devagar. Quando sentir que chegou, siga.</p></div>
+    <div class="step carga"><span class="dot">2</span><p class="st-lab">Tocar — onde isso mora no corpo</p><div class="card"><p class="st-txt">A sua leitura aponta um <b>alerta que quase não desliga</b> — uma prontidão de fundo, ligada mesmo quando nada está acontecendo. Você pode notar se algo no corpo responde a isso agora — se em algum lugar. Pode ser bem sutil; um cantinho já basta. Se essa sensação tivesse um jeito — tamanho, forma, quem sabe uma cor — qual seria? Se nada vier, tudo bem.</p></div></div>
+    <div class="step"><span class="dot">3</span><p class="st-lab">Deixar falar</p><p class="st-txt">Fica mais alguns segundos só ali, sem tentar mudar nada. Se essa prontidão pudesse falar, o que ela estaria tentando fazer por você? Deixa vir a palavra, ou a imagem, que aparecer. Tem mais alguma coisa nesse lugar?</p></div>
+    <div class="step recurso"><span class="dot">4</span><p class="st-lab">Trazer o outro lado</p><div class="card"><p class="st-txt">Agora, com calma, lembra de um lugar, uma pessoa ou um momento em que você pôde baixar a guarda — em que sentiu "aqui eu estou seguro". Pode ser também a sua própria firmeza, esse chão da sua leitura. Onde no corpo aparece essa sensação de poder descansar? Fica um pouco aí.</p><div class="b7pend"><span class="pl a">alerta</span><span class="bar"></span><span class="pl b">descanso</span></div><p class="st-txt">Vai devagar de um lugar pro outro: da tensão pra esse descanso, e de volta. Você tocou o alerta <b>e voltou</b> — isso, por si só, já é uma força sua.</p></div></div>
+    <div class="step passo"><span class="dot">5</span><p class="st-lab">O que isso pede — pra levar pra sua sessão</p><div class="card"><p class="st-txt">Essa prontidão te protegeu de alguma coisa, um dia. Hoje, ela ainda precisa estar ligada o tempo todo? Ou já existem momentos, lugares, pessoas com quem é seguro deixar ela descansar? Se fosse um passo pequeno nessa direção, qual exatamente seria? Leva pra sessão.</p></div></div>
+  </div>
+
+  <!-- ══════════ 6 · MEDO DE BASE ══════════ -->
+  <div class="qsec">
+    <div class="qhead">
+      <p class="q-eyebrow"><span class="pn">Caminho 6 · </span><span class="carga">Medo de base</span> <span class="arw">→</span> <span class="anti">Segurança</span></p>
+      <p class="qtitle display">Do medo de faltar à segurança que dá pra construir</p>
+    </div>
+    <div class="step"><span class="dot">1</span><p class="st-lab">Chegar</p><p class="st-txt">Chega devagar, com um cuidado extra nesta. Faça uma respiração mais funda e solte o ar bem devagar. Sinta os pés no chão, ou as costas apoiadas — algo firme te sustentando agora. Aqui você está seguro, e pode ir só até onde for confortável; se em algum ponto pesar demais, é só parar. Quando sentir que chegou, siga.</p></div>
+    <div class="step carga"><span class="dot">2</span><p class="st-lab">Tocar — onde isso mora no corpo</p><div class="card"><p class="st-txt">No fundo da leitura aparece um <b>medo antigo — de que o que você tem possa faltar</b>. Não é o medo do dia a dia; é mais de base. Você pode notar, de leve, se ele tem um lugar no corpo — a boca do estômago, o peito, as costas? Se em algum lugar. Que forma tem? Um cantinho basta — não precisa ir fundo agora.</p></div></div>
+    <div class="step"><span class="dot">3</span><p class="st-lab">Deixar falar</p><p class="st-txt">Fica um momento com isso, com cuidado. Do que exatamente esse medo diz que vai faltar? E — sem pressa de responder — esse medo parece seu, ou parece que já veio pronto, de antes de você? Deixa vir o que vier.</p></div>
+    <div class="step recurso"><span class="dot">4</span><p class="st-lab">Trazer o outro lado</p><div class="card"><p class="st-txt">Agora lembra de um momento em que você teve o suficiente — em que esteve amparado, em que não faltou. Ou traz a sua firmeza, essa base vital que a leitura mostrou forte em você. Onde no corpo aparece esse "eu tenho chão"? Fica aí.</p><div class="b7pend"><span class="pl a">medo de faltar</span><span class="bar"></span><span class="pl b">eu tenho chão</span></div><p class="st-txt">Vai bem devagar do medo pra esse chão, e de volta. Dose pequena. Os dois cabem em você — e o chão é real, está na sua leitura.</p></div></div>
+    <div class="step passo"><span class="dot">5</span><p class="st-lab">O que isso pede — pra levar pra sua sessão</p><div class="card"><p class="st-txt">Qual é uma prova concreta, da sua vida real, de que você tem mais chão do que o medo diz? Guarda ela. Se quiser, leva pra sua sessão pra olhar junto — esse é um bom pra não caminhar sozinho.</p></div></div>
+  </div>
+
+  <p class="closing">Nenhuma dessas perguntas é um veredito. Cada uma é uma porta — você abre no seu tempo, e o que encontrar do outro lado é seu.</p>
+  </section>
+
+  <p class="foot">Iris Codex · Leitura emocional · rascunho de sequência (blocos 1–7) — bloco 7 = Método somático Sopro da Origem (à parte, o dossiê técnico do terapeuta).</p>
+</div></div>

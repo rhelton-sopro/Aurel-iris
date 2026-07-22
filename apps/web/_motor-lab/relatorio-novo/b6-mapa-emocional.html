@@ -1,0 +1,116 @@
+<meta charset="utf-8">
+<title>Mapa emocional — pêndulos</title>
+<style>
+  :root{
+    --paper:#ffffff;--panel:#f7f3ea;--panel-2:#ece5d5;
+    --ink:#1f3a3c;--ink-soft:#5a6f6e;--ink-faint:#8a9695;
+    --line:#e6ded0;--line-strong:#d6cbb6;
+    --teal:#0a7d84;--teal-deep:#0d5c63;--amber:#b5701a;--amber-soft:#d69a4e;--good:#2f7a54;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#e9e2d3;color:var(--ink);font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .display{font-family:"Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;font-weight:600;letter-spacing:-.01em;}
+  .sheet{max-width:820px;margin:26px auto;background:var(--paper);border:1px solid var(--line);border-radius:6px;box-shadow:0 4px 24px rgba(30,45,45,.10);overflow:hidden;}
+  .pad{padding:clamp(28px,5vw,52px);}
+  .ctx{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);font-weight:700;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:30px;}
+  .eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);font-weight:700;margin:0 0 6px;}
+  .secnum{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:13px;color:var(--ink-faint);font-weight:600;}
+  h2{font-size:clamp(22px,3vw,28px);margin:2px 0 14px;line-height:1.1;}
+  .lead{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:18px;line-height:1.62;color:#26403f;margin:0 0 6px;}
+  .lead b{color:var(--teal-deep);font-weight:600;}
+  .legend{display:flex;gap:20px;flex-wrap:wrap;font-size:12px;color:var(--ink-faint);margin:16px 0 6px;}
+  .legend b{color:var(--ink-soft);}
+
+  .pend{margin:22px 0;}
+  .pend-labels{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px;gap:12px;}
+  .pl-carga{font-size:16px;font-weight:600;color:var(--amber);}
+  .pl-carga .lv{font-size:10.5px;color:var(--ink-faint);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-left:7px;}
+  .pl-anti{font-size:14.5px;font-weight:600;color:var(--good);text-align:right;}
+  .pl-anti::before{content:"→ ";color:var(--good);opacity:.6;}
+  .pend-track{position:relative;height:13px;border-radius:100px;
+    background:linear-gradient(90deg,#cf8636,#e7dcc6 44%,#e7dcc6 56%,#5fae86);box-shadow:inset 0 1px 2px rgba(20,40,40,.09);}
+  .needle{position:absolute;top:50%;width:21px;height:21px;border-radius:50%;background:#fff;border:3.5px solid var(--amber);transform:translate(-50%,-50%);box-shadow:0 1px 5px rgba(0,0,0,.22);z-index:1;}
+  .pend-hint{display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink-faint);margin-top:5px;}
+  .grouplab{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;margin:28px 0 6px;display:flex;align-items:center;gap:9px;}
+  .grouplab .gd{width:11px;height:11px;border-radius:50%;}
+  .grouplab.carga{color:var(--amber);} .grouplab.carga .gd{background:var(--amber);}
+  .grouplab.livre{color:var(--good);} .grouplab.livre .gd{background:var(--good);}
+  .pl-shadow{font-size:14px;color:var(--ink-faint);font-weight:500;}
+  .pl-resource{font-size:16px;color:var(--good);font-weight:600;text-align:right;}
+  .pl-resource .lv{font-size:10.5px;color:var(--ink-faint);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-left:7px;}
+  .needle.free{border-color:var(--good);}
+
+  .medicine{margin-top:34px;background:color-mix(in srgb,var(--good) 6%,var(--paper));border:1px solid color-mix(in srgb,var(--good) 24%,var(--line));border-radius:14px;padding:20px 22px;}
+  .med-lab{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--good);margin:0 0 9px;}
+  .medicine p{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:17.5px;line-height:1.6;color:#26403f;margin:0;}
+  .medicine p b{color:var(--good);font-weight:600;}
+  .medicine p b.a{color:var(--amber);}
+
+  .foot{font-size:12px;color:var(--ink-faint);border-top:1px solid var(--line);margin-top:30px;padding-top:16px;max-width:70ch;}
+</style>
+
+<div class="sheet"><div class="pad">
+  <div class="ctx">Bloco — Mapa emocional · versão PÊNDULO (carga ⟷ antídoto) · exemplo: Rhelton</div>
+
+  <p class="eyebrow"><span class="secnum">5</span> &nbsp;Mapa emocional</p>
+  <h2 class="display">Onde você está — e pra onde dá pra ir</h2>
+  <p class="lead">Cada emoção tem dois lados. De um, o que está <b>carregado</b>; do outro, o <b>alívio</b> que é a saída dela. A bolinha mostra onde você está hoje — e o lado direito mostra <b>a direção</b>.</p>
+  <div class="legend"><span>● <b>Bolinha</b> = onde você está</span><span><b style="color:var(--amber)">Esquerda</b> = carregado</span><span><b style="color:var(--good)">Direita</b> = a saída</span></div>
+
+  <p class="grouplab carga"><span class="gd"></span>O que pesa hoje</p>
+
+  <div class="pend">
+    <div class="pend-labels"><span class="pl-carga">Raiva contida <span class="lv">alta</span></span><span class="pl-anti">Serenidade</span></div>
+    <div class="pend-track"><i class="needle" style="left:17%"></i></div>
+  </div>
+  <div class="pend">
+    <div class="pend-labels"><span class="pl-carga">Contenção aprendida <span class="lv">alta</span></span><span class="pl-anti">Expressão que flui</span></div>
+    <div class="pend-track"><i class="needle" style="left:21%"></i></div>
+  </div>
+  <div class="pend">
+    <div class="pend-labels"><span class="pl-carga">Irritação que sobe <span class="lv">alta</span></span><span class="pl-anti">Calma</span></div>
+    <div class="pend-track"><i class="needle" style="left:25%"></i></div>
+  </div>
+  <div class="pend">
+    <div class="pend-labels"><span class="pl-carga">Apego · dificuldade de largar <span class="lv">média</span></span><span class="pl-anti">Soltar</span></div>
+    <div class="pend-track"><i class="needle" style="left:33%"></i></div>
+  </div>
+  <div class="pend">
+    <div class="pend-labels"><span class="pl-carga">Alerta que não desliga <span class="lv">média</span></span><span class="pl-anti">Descanso</span></div>
+    <div class="pend-track"><i class="needle" style="left:35%"></i></div>
+  </div>
+  <div class="pend">
+    <div class="pend-labels"><span class="pl-carga">Medo de base <span class="lv">baixa</span></span><span class="pl-anti">Segurança</span></div>
+    <div class="pend-track"><i class="needle" style="left:42%"></i></div>
+  </div>
+
+  <p class="grouplab livre"><span class="gd"></span>O que está leve — a sua força</p>
+
+  <div class="pend">
+    <div class="pend-labels"><span class="pl-shadow">Fragilidade</span><span class="pl-resource">Firmeza · base vital <span class="lv">vital</span></span></div>
+    <div class="pend-track"><i class="needle free" style="left:90%"></i></div>
+  </div>
+  <div class="pend">
+    <div class="pend-labels"><span class="pl-shadow">Dispersão</span><span class="pl-resource">Centramento · eixo organizado <span class="lv">livre</span></span></div>
+    <div class="pend-track"><i class="needle free" style="left:84%"></i></div>
+  </div>
+  <div class="pend">
+    <div class="pend-labels"><span class="pl-shadow">Desamor</span><span class="pl-resource">Alegria &amp; amor <span class="lv">livre</span></span></div>
+    <div class="pend-track"><i class="needle free" style="left:82%"></i></div>
+  </div>
+  <div class="pend">
+    <div class="pend-labels"><span class="pl-shadow">Sufoco</span><span class="pl-resource">Fôlego · vitalidade <span class="lv">livre</span></span></div>
+    <div class="pend-track"><i class="needle free" style="left:80%"></i></div>
+  </div>
+  <div class="pend">
+    <div class="pend-labels"><span class="pl-shadow">Sobrecarga do outro</span><span class="pl-resource">Limites saudáveis <span class="lv">livre</span></span></div>
+    <div class="pend-track"><i class="needle free" style="left:78%"></i></div>
+  </div>
+
+  <div class="medicine">
+    <p class="med-lab">O pulo do gato — o seu remédio já está em você</p>
+    <p>Você não precisa buscar a saída longe. O que já está <b>livre</b> em você é exatamente o que move essas agulhas: a sua <b>firmeza</b> e o seu <b>centramento</b> são o chão pra sustentar o trabalho na <b class="a">raiva guardada</b>; a sua <b>alegria</b> livre é o combustível pra afrouxar o <b class="a">alerta que não para</b>. Você carrega, no mesmo corpo, a dor <b class="a">e</b> a cura.</p>
+  </div>
+
+  <p class="foot"><b>Bloco Mapa emocional — versão pêndulo.</b> Cada emoção vira um eixo carga⟷antídoto; a bolinha (do score da intensidade) mostra onde a pessoa está; o polo direito é a direção do trabalho (raiva→serenidade, apego→soltar). O fecho liga os RECURSOS livres às CARGAS (recurso = remédio) — insight clínico pro terapeuta. Só os principais, voz do cliente, zero iridologia. Compare com a versão de barras.</p>
+</div></div>

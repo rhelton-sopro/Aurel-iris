@@ -1,0 +1,154 @@
+<meta charset="utf-8">
+<title>Perguntas do Sopro da Origem — Rhelton</title>
+<style>
+  :root{
+    --paper:#ffffff;--panel:#f7f3ea;--panel-2:#ece5d5;
+    --ink:#1f3a3c;--ink-soft:#5a6f6e;--ink-faint:#8a9695;
+    --line:#e6ded0;--line-strong:#d6cbb6;
+    --teal:#0a7d84;--teal-deep:#0d5c63;--amber:#b5701a;--amber-soft:#c98a3d;--good:#2f7a54;
+    --serif:"Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#e9e2d3;color:var(--ink);font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .display{font-family:var(--serif);font-weight:600;letter-spacing:-.01em;}
+  .sheet{max-width:760px;margin:26px auto;background:var(--paper);border:1px solid var(--line);border-radius:6px;box-shadow:0 4px 24px rgba(30,45,45,.10);overflow:hidden;}
+  .pad{padding:clamp(28px,5vw,54px);}
+  .ctx{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);font-weight:700;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:28px;}
+
+  .mast{text-align:center;margin:0 0 24px;}
+  .mast .secmark{font-family:var(--serif);font-size:14px;color:var(--ink-faint);font-weight:600;letter-spacing:.03em;margin:0 0 3px;}
+  .mast .name{font-family:var(--serif);font-size:clamp(23px,3.4vw,30px);font-weight:600;color:var(--teal-deep);letter-spacing:-.01em;margin:0;}
+  .mast .sub{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);font-weight:700;margin:9px 0 0;}
+  .mast .rule{width:46px;height:2px;background:var(--line-strong);border:0;margin:16px auto 0;}
+  .intro{font-family:var(--serif);font-size:15.5px;line-height:1.62;color:var(--ink-soft);text-align:center;max-width:60ch;margin:0 auto 8px;}
+  .intro b{color:var(--ink);font-weight:600;}
+
+  .qsec{padding-top:30px;margin-top:32px;border-top:1px solid var(--line);}
+  .qhead{margin-bottom:20px;}
+  .q-eyebrow{font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:700;margin:0 0 6px;}
+  .q-eyebrow .carga{color:var(--amber);} .q-eyebrow .arw{color:var(--ink-faint);opacity:.7;} .q-eyebrow .anti{color:var(--good);}
+  .q-eyebrow .pn{color:var(--ink-faint);}
+  .qtitle{font-family:var(--serif);font-size:clamp(19px,2.5vw,23px);font-weight:600;line-height:1.18;margin:0;color:var(--ink);}
+
+  .step{position:relative;padding:0 0 22px 44px;}
+  .step:last-child{padding-bottom:0;}
+  .step::before{content:"";position:absolute;left:13px;top:25px;bottom:-2px;width:2px;background:var(--line);}
+  .step:last-child::before{display:none;}
+  .dot{position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;background:var(--paper);border:2px solid var(--line-strong);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:13px;font-weight:700;color:var(--ink-faint);z-index:1;}
+  .step.carga .dot{border-color:var(--amber);color:var(--amber);}
+  .step.recurso .dot{border-color:var(--good);color:var(--good);}
+  .step.passo .dot{border-color:var(--teal);color:var(--teal);}
+  .st-lab{font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--ink-faint);margin:5px 0 7px;}
+  .step.carga .st-lab{color:var(--amber);}
+  .step.recurso .st-lab{color:var(--good);}
+  .step.passo .st-lab{color:var(--teal-deep);}
+  .st-txt{font-family:var(--serif);font-size:16px;line-height:1.64;color:#28403f;margin:0;}
+  .st-txt b{color:var(--teal-deep);font-weight:600;}
+  .step.carga .st-txt b{color:var(--amber);}
+
+  .card{border-radius:12px;padding:15px 18px;margin-top:2px;}
+  .step.carga .card{background:color-mix(in srgb,var(--amber) 7%,var(--paper));border:1px solid color-mix(in srgb,var(--amber) 24%,var(--line));}
+  .step.recurso .card{background:color-mix(in srgb,var(--good) 7%,var(--paper));border:1px solid color-mix(in srgb,var(--good) 26%,var(--line));}
+  .step.passo .card{background:color-mix(in srgb,var(--teal) 6%,var(--paper));border:1px solid color-mix(in srgb,var(--teal) 24%,var(--line));}
+
+  .pend{display:flex;align-items:center;gap:10px;margin:12px 0 3px;}
+  .pend .bar{flex:1;height:7px;border-radius:100px;background:linear-gradient(90deg,var(--amber) 0%,var(--amber-soft) 35%,var(--good) 100%);}
+  .pend .pl{font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;font-weight:700;}
+  .pend .pl.a{color:var(--amber);} .pend .pl.b{color:var(--good);}
+
+  .closing{font-family:var(--serif);font-size:17px;line-height:1.6;color:var(--teal-deep);font-style:italic;text-align:center;max-width:52ch;margin:34px auto 0;}
+  .method-foot{text-align:center;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-faint);font-weight:700;border-top:1px solid var(--line);margin-top:26px;padding-top:18px;}
+</style>
+
+<div class="sheet"><div class="pad">
+  <div class="ctx">bancada · bloco 7 completo · uma pergunta-processo por pêndulo · exemplo: Rhelton</div>
+
+  <div class="mast">
+    <p class="secmark display">7</p>
+    <p class="name display">Perguntas para a sua sessão</p>
+    <p class="sub">Método somático · Sopro da Origem</p>
+    <hr class="rule">
+  </div>
+  <p class="intro">Cada pergunta abaixo é um pequeno caminho pra fazer <b>sozinho</b>, no seu tempo — <b>uma de cada vez</b>, sem pressa. Você está no comando: se algo tocar forte, não precisa ter resposta, basta notar onde chegou.</p>
+
+  <!-- ══════════ 1 · RAIVA CONTIDA ══════════ -->
+  <div class="qsec">
+    <div class="qhead">
+      <p class="q-eyebrow"><span class="pn">Caminho 1 · </span><span class="carga">Raiva contida</span> <span class="arw">→</span> <span class="anti">Serenidade</span></p>
+      <p class="qtitle display">Da raiva guardada a uma serenidade que também é sua</p>
+    </div>
+    <div class="step"><span class="dot">1</span><p class="st-lab">Chegar</p><p class="st-txt">Antes de começar, uma coisa: aqui você não precisa acertar nada nem chegar a lugar nenhum. É só um tempo seu, com você. Faça uma respiração um pouco mais longa que o normal e solte o ar bem devagar — e, se quiser, mais uma. Você está no comando: o que tocar mais forte, basta notar onde chegou. Quando sentir que chegou, siga.</p></div>
+    <div class="step carga"><span class="dot">2</span><p class="st-lab">Tocar — onde isso mora no corpo</p><div class="card"><p class="st-txt">A sua leitura mostra uma <b>raiva que você mais guarda do que mostra</b> — ela encontra o caminho de dentro antes de chegar na superfície. Pensa numa vez recente em que você quis dizer algo e engoliu. Você pode notar se ficou alguma marca disso no corpo agora — se em algum lugar. Um cantinho já basta. Se essa marca tivesse um jeito — peso, temperatura, tamanho — qual seria? Se nada vier, tudo bem.</p></div></div>
+    <div class="step"><span class="dot">3</span><p class="st-lab">Deixar falar</p><p class="st-txt">Fica um instante só com isso. Se essa raiva guardada pudesse falar, o que ela queria ter dito e não disse? Deixa vir a frase, mesmo solta. Tem mais alguma coisa junto?</p></div>
+    <div class="step recurso"><span class="dot">4</span><p class="st-lab">Trazer o outro lado</p><div class="card"><p class="st-txt">Agora lembra de uma vez em que você <b>conseguiu</b> dizer o que precisava — com firmeza, sem explodir — e foi ouvido. Ou traz só a sua firmeza, esse chão que a leitura mostrou forte em você. Onde no corpo aparece esse "aqui eu me sustento"? Fica aí um pouco.</p><div class="pend"><span class="pl a">raiva guardada</span><span class="bar"></span><span class="pl b">firmeza serena</span></div><p class="st-txt">Vai devagar de um lado pro outro: da raiva presa pra essa firmeza, e de volta. Os dois cabem em você.</p></div></div>
+    <div class="step passo"><span class="dot">5</span><p class="st-lab">O que isso pede — pra levar pra sua sessão</p><div class="card"><p class="st-txt">Tem uma coisa pequena, hoje, que você anda engolindo e que já poderia dizer — com calma, no tamanho certo? Pra quem, e o que exatamente? Leva isso pra sua sessão.</p></div></div>
+  </div>
+
+  <!-- ══════════ 2 · CONTENÇÃO APRENDIDA ══════════ -->
+  <div class="qsec">
+    <div class="qhead">
+      <p class="q-eyebrow"><span class="pn">Caminho 2 · </span><span class="carga">Contenção aprendida</span> <span class="arw">→</span> <span class="anti">Expressão que flui</span></p>
+      <p class="qtitle display">De dar conta sozinho a deixar a expressão fluir</p>
+    </div>
+    <div class="step"><span class="dot">1</span><p class="st-lab">Chegar</p><p class="st-txt">Chega primeiro. Você não precisa dar conta de nada nesta página — é o contrário do que você costuma fazer. Respire fundo uma vez, solte o ar sem pressa, e sinta o corpo apoiado onde você está. Nada aqui é urgente, e ninguém está esperando resposta. Quando estiver pronto, siga no seu ritmo.</p></div>
+    <div class="step carga"><span class="dot">2</span><p class="st-lab">Tocar — onde isso mora no corpo</p><div class="card"><p class="st-txt">A leitura sugere que <b>muito cedo você aprendeu a se segurar</b> — a dar conta por dentro antes de mostrar o que sente. Lembra de uma vez recente em que você segurou o que sentia pra não incomodar. Você pode notar onde, no corpo, mora esse "segurar"? Peito, garganta, ombros — se em algum lugar. Que forma tem? Se nada aparecer, tudo bem também.</p></div></div>
+    <div class="step"><span class="dot">3</span><p class="st-lab">Deixar falar</p><p class="st-txt">Fica um momento aí. Esse jeito de se segurar — quando ele começou, na sua vida? O que ele te ajudou a evitar, lá atrás? Deixa vir o que vier, sem cobrar sentido.</p></div>
+    <div class="step recurso"><span class="dot">4</span><p class="st-lab">Trazer o outro lado</p><div class="card"><p class="st-txt">Agora lembra de uma vez em que você se abriu — falou o que sentia — e foi acolhido, não punido. Traz essa cena com o que tiver: rosto, voz, lugar. Onde no corpo aparece esse alívio de ter sido recebido? Fica aí.</p><div class="pend"><span class="pl a">me segurar</span><span class="bar"></span><span class="pl b">ser recebido</span></div><p class="st-txt">Alterna devagar: do "me segurar" pra esse "fui recebido", e de volta. Sem pressa.</p></div></div>
+    <div class="step passo"><span class="dot">5</span><p class="st-lab">O que isso pede — pra levar pra sua sessão</p><div class="card"><p class="st-txt">Com quem, na sua vida hoje, seria mais seguro mostrar um pouco mais do que você sente? Qual seria o primeiro passo pequeno nisso? Leva pra sua sessão.</p></div></div>
+  </div>
+
+  <!-- ══════════ 3 · IRRITAÇÃO QUE SOBE ══════════ -->
+  <div class="qsec">
+    <div class="qhead">
+      <p class="q-eyebrow"><span class="pn">Caminho 3 · </span><span class="carga">Irritação que sobe</span> <span class="arw">→</span> <span class="anti">Calma</span></p>
+      <p class="qtitle display">Da irritação que sobe rápido a uma calma que você alcança</p>
+    </div>
+    <div class="step"><span class="dot">1</span><p class="st-lab">Chegar</p><p class="st-txt">Antes de tudo, desacelera um pouco. Faça duas respirações mais longas, soltando o ar bem devagar — como quando a gente esvazia algo sem pressa. Você conduz o ritmo aqui; não tem nada pra provar e nada pra resolver agora. Quando o corpo der um sinal de que baixou uma marcha, siga.</p></div>
+    <div class="step carga"><span class="dot">2</span><p class="st-lab">Tocar — onde isso mora no corpo</p><div class="card"><p class="st-txt">A leitura aponta uma <b>irritação que sobe rápido</b> — o pavio às vezes curto, a reação que vem antes do pensamento. Sem brigar com isso: você pode notar como o seu corpo avisa que a irritação está subindo? É onde — barriga, peito, mandíbula, mãos? Que sinal é esse? Um cantinho já basta.</p></div></div>
+    <div class="step"><span class="dot">3</span><p class="st-lab">Deixar falar</p><p class="st-txt">Fica com esse sinal um instante. Na maioria das vezes, o que está por baixo da irritação? Cansaço, pressa, algo que não foi respeitado? Deixa vir a resposta que aparecer.</p></div>
+    <div class="step recurso"><span class="dot">4</span><p class="st-lab">Trazer o outro lado</p><div class="card"><p class="st-txt">Agora traz uma imagem de quando você esteve realmente em paz — um lugar, um momento de fôlego. Onde no corpo aparece essa calma? Fica aí, e respira mais uma vez dentro dela.</p><div class="pend"><span class="pl a">irritação</span><span class="bar"></span><span class="pl b">fôlego calmo</span></div><p class="st-txt">Vai devagar de um lado pro outro: do ponto onde a irritação sobe pra esse fôlego, e de volta. Você consegue visitar os dois.</p></div></div>
+    <div class="step passo"><span class="dot">5</span><p class="st-lab">O que isso pede — pra levar pra sua sessão</p><div class="card"><p class="st-txt">Qual é o <b>primeiro</b> sinal, no seu corpo, de que a irritação vai subir — aquele que, se você notasse a tempo, te daria um segundo pra respirar antes de reagir? Leva essa observação pra sua sessão.</p></div></div>
+  </div>
+
+  <!-- ══════════ 4 · APEGO ══════════ -->
+  <div class="qsec">
+    <div class="qhead">
+      <p class="q-eyebrow"><span class="pn">Caminho 4 · </span><span class="carga">Apego · dificuldade de largar</span> <span class="arw">→</span> <span class="anti">Soltar</span></p>
+      <p class="qtitle display">Do que você segura ao que dá pra soltar</p>
+    </div>
+    <div class="step"><span class="dot">1</span><p class="st-lab">Chegar</p><p class="st-txt">Chega com calma. Você não precisa soltar nada agora, nem decidir nada — é só olhar, por enquanto. Faça uma respiração mais longa que o normal e solte o ar devagar. Sinta o peso do seu corpo na cadeira ou na cama, esse apoio que segura você. Quando sentir que chegou, siga no seu tempo.</p></div>
+    <div class="step carga"><span class="dot">2</span><p class="st-lab">Tocar — onde isso mora no corpo</p><div class="card"><p class="st-txt">A leitura sugere que <b>você segura o que já podia ter ido</b> — mágoas, assuntos, coisas sem encerrar. Pensa em algo antigo que você ainda carrega. Você pode notar se isso tem um peso no corpo agora — onde? Que tamanho? Se nada vier, tudo bem também.</p></div></div>
+    <div class="step"><span class="dot">3</span><p class="st-lab">Deixar falar</p><p class="st-txt">Fica um instante com esse peso. O que ele te dá, que faz valer a pena continuar carregando? (Quase sempre tem algo — proteção, memória, uma justiça.) Deixa a resposta aparecer.</p></div>
+    <div class="step recurso"><span class="dot">4</span><p class="st-lab">Trazer o outro lado</p><div class="card"><p class="st-txt">Agora lembra de uma vez em que você <b>conseguiu</b> soltar algo — e no fim veio um alívio, uma leveza. Traz essa sensação. Onde no corpo ela mora? Fica aí um pouco.</p><div class="pend"><span class="pl a">segurar</span><span class="bar"></span><span class="pl b">leveza de soltar</span></div><p class="st-txt">Alterna devagar entre o peso e essa leveza, e de volta. Você já soltou antes — o seu corpo sabe o caminho.</p></div></div>
+    <div class="step passo"><span class="dot">5</span><p class="st-lab">O que isso pede — pra levar pra sua sessão</p><div class="card"><p class="st-txt">Tem uma coisa pequena que você carrega e que, se soltasse, ninguém perderia nada — só você ganharia leveza? Qual seria? Leva pra sua sessão.</p></div></div>
+  </div>
+
+  <!-- ══════════ 5 · ALERTA QUE NÃO DESLIGA ══════════ -->
+  <div class="qsec">
+    <div class="qhead">
+      <p class="q-eyebrow"><span class="pn">Caminho 5 · </span><span class="carga">Alerta que não desliga</span> <span class="arw">→</span> <span class="anti">Descanso</span></p>
+      <p class="qtitle display">Do alerta ligado ao chão que também cabe em você</p>
+    </div>
+    <div class="step"><span class="dot">1</span><p class="st-lab">Chegar</p><p class="st-txt">Antes de tudo: você não precisa resolver nada aqui — é só um exercício com você mesmo, no seu tempo. Você está no comando; o que tocar mais forte, basta notar onde chegou. Se quiser, faça uma respiração um pouco mais longa que o normal e solte o ar devagar. Quando sentir que chegou, siga.</p></div>
+    <div class="step carga"><span class="dot">2</span><p class="st-lab">Tocar — onde isso mora no corpo</p><div class="card"><p class="st-txt">A sua leitura aponta um <b>alerta que quase não desliga</b> — uma prontidão de fundo, ligada mesmo quando nada está acontecendo. Você pode notar se algo no corpo responde a isso agora — se em algum lugar. Pode ser bem sutil; um cantinho já basta. Se essa sensação tivesse um jeito — tamanho, forma, quem sabe uma cor — qual seria? Se nada vier, tudo bem.</p></div></div>
+    <div class="step"><span class="dot">3</span><p class="st-lab">Deixar falar</p><p class="st-txt">Fica mais alguns segundos só ali, sem tentar mudar nada. Se essa prontidão pudesse falar, o que ela estaria tentando fazer por você? Deixa vir a palavra, ou a imagem, que aparecer. Tem mais alguma coisa nesse lugar?</p></div>
+    <div class="step recurso"><span class="dot">4</span><p class="st-lab">Trazer o outro lado</p><div class="card"><p class="st-txt">Agora, com calma, lembra de um lugar, uma pessoa ou um momento em que você pôde baixar a guarda — em que sentiu "aqui eu estou seguro". Pode ser também a sua própria firmeza, esse chão da sua leitura. Onde no corpo aparece essa sensação de poder descansar? Fica um pouco aí.</p><div class="pend"><span class="pl a">alerta</span><span class="bar"></span><span class="pl b">descanso</span></div><p class="st-txt">Vai devagar de um lugar pro outro: da tensão pra esse descanso, e de volta. Você tocou o alerta <b>e voltou</b> — isso, por si só, já é uma força sua.</p></div></div>
+    <div class="step passo"><span class="dot">5</span><p class="st-lab">O que isso pede — pra levar pra sua sessão</p><div class="card"><p class="st-txt">Essa prontidão te protegeu de alguma coisa, um dia. Hoje, ela ainda precisa estar ligada o tempo todo? Ou já existem momentos, lugares, pessoas com quem é seguro deixar ela descansar? Se fosse um passo pequeno nessa direção, qual exatamente seria? Leva pra sessão.</p></div></div>
+  </div>
+
+  <!-- ══════════ 6 · MEDO DE BASE ══════════ -->
+  <div class="qsec">
+    <div class="qhead">
+      <p class="q-eyebrow"><span class="pn">Caminho 6 · </span><span class="carga">Medo de base</span> <span class="arw">→</span> <span class="anti">Segurança</span></p>
+      <p class="qtitle display">Do medo de faltar à segurança que dá pra construir</p>
+    </div>
+    <div class="step"><span class="dot">1</span><p class="st-lab">Chegar</p><p class="st-txt">Chega devagar, com um cuidado extra nesta. Faça uma respiração mais funda e solte o ar bem devagar. Sinta os pés no chão, ou as costas apoiadas — algo firme te sustentando agora. Aqui você está seguro, e pode ir só até onde for confortável; se em algum ponto pesar demais, é só parar. Quando sentir que chegou, siga.</p></div>
+    <div class="step carga"><span class="dot">2</span><p class="st-lab">Tocar — onde isso mora no corpo</p><div class="card"><p class="st-txt">No fundo da leitura aparece um <b>medo antigo — de que o que você tem possa faltar</b>. Não é o medo do dia a dia; é mais de base. Você pode notar, de leve, se ele tem um lugar no corpo — a boca do estômago, o peito, as costas? Se em algum lugar. Que forma tem? Um cantinho basta — não precisa ir fundo agora.</p></div></div>
+    <div class="step"><span class="dot">3</span><p class="st-lab">Deixar falar</p><p class="st-txt">Fica um momento com isso, com cuidado. Do que exatamente esse medo diz que vai faltar? E — sem pressa de responder — esse medo parece seu, ou parece que já veio pronto, de antes de você? Deixa vir o que vier.</p></div>
+    <div class="step recurso"><span class="dot">4</span><p class="st-lab">Trazer o outro lado</p><div class="card"><p class="st-txt">Agora lembra de um momento em que você teve o suficiente — em que esteve amparado, em que não faltou. Ou traz a sua firmeza, essa base vital que a leitura mostrou forte em você. Onde no corpo aparece esse "eu tenho chão"? Fica aí.</p><div class="pend"><span class="pl a">medo de faltar</span><span class="bar"></span><span class="pl b">eu tenho chão</span></div><p class="st-txt">Vai bem devagar do medo pra esse chão, e de volta. Dose pequena. Os dois cabem em você — e o chão é real, está na sua leitura.</p></div></div>
+    <div class="step passo"><span class="dot">5</span><p class="st-lab">O que isso pede — pra levar pra sua sessão</p><div class="card"><p class="st-txt">Qual é uma prova concreta, da sua vida real, de que você tem mais chão do que o medo diz? Guarda ela. Se quiser, leva pra sua sessão pra olhar junto — esse é um bom pra não caminhar sozinho.</p></div></div>
+  </div>
+
+  <p class="closing">Nenhuma dessas perguntas é um veredito. Cada uma é uma porta — você abre no seu tempo, e o que encontrar do outro lado é seu.</p>
+  <p class="method-foot">Método somático do Sopro da Origem</p>
+</div></div>

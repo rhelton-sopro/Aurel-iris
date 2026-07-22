@@ -1,0 +1,108 @@
+<meta charset="utf-8">
+<title>Perguntas do Sopro da Origem — Rhelton</title>
+<style>
+  :root{
+    --paper:#ffffff;--panel:#f7f3ea;--panel-2:#ece5d5;
+    --ink:#1f3a3c;--ink-soft:#5a6f6e;--ink-faint:#8a9695;
+    --line:#e6ded0;--line-strong:#d6cbb6;
+    --teal:#0a7d84;--teal-deep:#0d5c63;--amber:#b5701a;--amber-soft:#c98a3d;--good:#2f7a54;
+    --serif:"Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#e9e2d3;color:var(--ink);font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .display{font-family:var(--serif);font-weight:600;letter-spacing:-.01em;}
+  .sheet{max-width:760px;margin:26px auto;background:var(--paper);border:1px solid var(--line);border-radius:6px;box-shadow:0 4px 24px rgba(30,45,45,.10);overflow:hidden;}
+  .pad{padding:clamp(28px,5vw,54px);}
+  .ctx{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);font-weight:700;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:28px;}
+
+  /* masthead do método */
+  .mast{text-align:center;margin:0 0 30px;}
+  .mast .name{font-family:var(--serif);font-size:clamp(23px,3.4vw,30px);font-weight:600;color:var(--teal-deep);letter-spacing:-.01em;margin:0;}
+  .mast .sub{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);font-weight:700;margin:9px 0 0;}
+  .mast .rule{width:46px;height:2px;background:var(--line-strong);border:0;margin:16px auto 0;}
+
+  .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);font-weight:700;margin:0 0 5px;}
+  h2{font-size:clamp(20px,2.7vw,25px);margin:2px 0 24px;line-height:1.16;}
+
+  /* PROCESSO — 5 tempos */
+  .step{position:relative;padding:0 0 26px 46px;}
+  .step:last-child{padding-bottom:0;}
+  .step::before{content:"";position:absolute;left:13px;top:26px;bottom:-2px;width:2px;background:var(--line);}
+  .step:last-child::before{display:none;}
+  .dot{position:absolute;left:0;top:1px;width:28px;height:28px;border-radius:50%;background:var(--paper);border:2px solid var(--line-strong);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:13px;font-weight:700;color:var(--ink-faint);z-index:1;}
+  .step.carga .dot{border-color:var(--amber);color:var(--amber);}
+  .step.recurso .dot{border-color:var(--good);color:var(--good);}
+  .step.passo .dot{border-color:var(--teal);color:var(--teal);}
+  .st-lab{font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;font-weight:700;color:var(--ink-faint);margin:5px 0 8px;}
+  .step.carga .st-lab{color:var(--amber);}
+  .step.recurso .st-lab{color:var(--good);}
+  .step.passo .st-lab{color:var(--teal-deep);}
+  .st-txt{font-family:var(--serif);font-size:16.5px;line-height:1.66;color:#28403f;margin:0;}
+  .st-txt b{color:var(--teal-deep);font-weight:600;}
+  .step.carga .st-txt b{color:var(--amber);}
+
+  .card{border-radius:12px;padding:16px 19px;margin-top:2px;}
+  .step.carga .card{background:color-mix(in srgb,var(--amber) 7%,var(--paper));border:1px solid color-mix(in srgb,var(--amber) 24%,var(--line));}
+  .step.recurso .card{background:color-mix(in srgb,var(--good) 7%,var(--paper));border:1px solid color-mix(in srgb,var(--good) 26%,var(--line));}
+  .step.passo .card{background:color-mix(in srgb,var(--teal) 6%,var(--paper));border:1px solid color-mix(in srgb,var(--teal) 24%,var(--line));}
+
+  .pend{display:flex;align-items:center;gap:10px;margin:14px 0 4px;}
+  .pend .bar{flex:1;height:7px;border-radius:100px;background:linear-gradient(90deg,var(--amber) 0%,var(--amber-soft) 35%,var(--good) 100%);}
+  .pend .pl{font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;}
+  .pend .pl.a{color:var(--amber);} .pend .pl.b{color:var(--good);}
+
+  .method-foot{text-align:center;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-faint);font-weight:700;border-top:1px solid var(--line);margin-top:34px;padding-top:18px;}
+</style>
+
+<div class="sheet"><div class="pad">
+  <div class="ctx">bancada · exemplo: Rhelton · pêndulo: alerta que não desliga</div>
+
+  <div class="mast">
+    <p class="name display">Perguntas para a sua sessão</p>
+    <p class="sub">Método somático · Sopro da Origem</p>
+    <hr class="rule">
+  </div>
+
+  <p class="eyebrow">Caminho · alerta que não desliga</p>
+  <h2 class="display">Do alerta ligado ao chão que também cabe em você</h2>
+
+  <div class="step">
+    <span class="dot">1</span>
+    <p class="st-lab">Chegar</p>
+    <p class="st-txt">Antes de tudo: você não precisa resolver nada aqui — é só um exercício com você mesmo, no seu tempo. <b>Você está no comando</b>: o que tocar mais forte, basta notar onde chegou. Se quiser, faça uma respiração um pouco mais longa que o normal e solte o ar devagar. Quando sentir que chegou, siga.</p>
+  </div>
+
+  <div class="step carga">
+    <span class="dot">2</span>
+    <p class="st-lab">Tocar — onde isso mora no corpo</p>
+    <div class="card">
+      <p class="st-txt">A sua leitura aponta um <b>alerta que quase não desliga</b> — uma prontidão de fundo, ligada mesmo quando nada está acontecendo. Você pode notar se algo no corpo responde a isso agora — se em algum lugar. Pode ser bem sutil; um cantinho já basta. E, se quiser ficar com isso: caso essa sensação tivesse um jeito — um tamanho, uma forma, quem sabe uma cor — qual seria? Se nada vier, tudo bem também.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <span class="dot">3</span>
+    <p class="st-lab">Deixar falar</p>
+    <p class="st-txt">Fica mais alguns segundos só ali, sem tentar mudar nada. Se essa prontidão pudesse falar, o que ela estaria tentando fazer por você? Não precisa fazer sentido — deixa vir a palavra, ou a imagem, que aparecer. E, se vier: tem mais alguma coisa nesse lugar?</p>
+  </div>
+
+  <div class="step recurso">
+    <span class="dot">4</span>
+    <p class="st-lab">Trazer o outro lado</p>
+    <div class="card">
+      <p class="st-txt">Agora, com calma, lembra de um lugar, uma pessoa ou um momento em que você pôde baixar a guarda — em que sentiu "aqui eu estou seguro". Pode ser também a sua própria firmeza, esse chão que a leitura mostrou em você. Traz isso com cor, som, o que tiver. Onde no corpo aparece essa sensação de poder descansar? Fica um pouco aí.</p>
+      <div class="pend"><span class="pl a">alerta</span><span class="bar"></span><span class="pl b">descanso</span></div>
+      <p class="st-txt">E, se der, vai devagar de um lugar pro outro: da tensão pra esse descanso, e de volta. Sem pressa. Você tocou o alerta <b>e voltou</b> pro descanso — isso, por si só, já é uma força sua. Repara que os dois cabem em você.</p>
+    </div>
+  </div>
+
+  <div class="step passo">
+    <span class="dot">5</span>
+    <p class="st-lab">O que isso pede — pra levar pra sua sessão</p>
+    <div class="card">
+      <p class="st-txt">Essa prontidão te protegeu de alguma coisa, um dia — ela aprendeu cedo que precisava ficar ligada. Hoje, ela ainda precisa estar ligada o tempo todo? Ou já existem momentos, lugares, pessoas com quem é seguro deixar ela descansar um pouco? Se fosse um passo pequeno nessa direção, qual exatamente seria?</p>
+    </div>
+  </div>
+
+  <p class="method-foot">Método somático do Sopro da Origem</p>
+</div></div>
