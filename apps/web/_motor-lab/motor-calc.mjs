@@ -104,6 +104,7 @@ function calc(name, lastro) {
   const elem = { carga: { fogo: 0, agua: 0, terra: 0, ar: 0 }, recurso: { fogo: 0, agua: 0, terra: 0, ar: 0 } }
   const centro = { mente: { t: 0, l: 0 }, coracao: { t: 0, l: 0 }, corpo: { t: 0, l: 0 } }
   const emoCarga = {}, emoRecurso = {} // (B) mapa emocional — acumula score por emoção
+  const achadoList = [] // TODOS os achados evidenciados (decisão founder: nada de colapsar em 1)
   const skipped = [], adjuvantes = []
 
   // ACHADOS → carga (elemento) + tensão (centro)
@@ -119,6 +120,9 @@ function calc(name, lastro) {
     const cw = w / cs.length
     for (const c of cs) centro[c].t += cw
     for (const e of t.carga) emoCarga[e] = (emoCarga[e] || 0) + w // (B) leque de carga
+    // cada achado evidenciado com seu elemento dominante + emoção-núcleo
+    const elemDom = ['fogo', 'agua', 'terra', 'ar'].sort((x, y) => (t.elem[y] || 0) - (t.elem[x] || 0))[0]
+    achadoList.push({ campo: a.campo, int: a.intensidade, elem: elemDom, emo: t.carga[0] || '?', w })
   }
   // PRESERVADOS → recurso (elemento) + livre (centro)
   for (const p of preservados) {
@@ -141,7 +145,8 @@ function calc(name, lastro) {
   const top = (obj, n) => Object.entries(obj).sort((a, b) => b[1] - a[1]).slice(0, n)
   const mapaCarga = top(emoCarga, 8)
   const mapaRecurso = top(emoRecurso, 5)
-  return { name, elem, centro, pres, mapaCarga, mapaRecurso, skipped, adjuvantes, nAch: achados.length, nPres: preservados.length }
+  achadoList.sort((a, b) => b.w - a.w)
+  return { name, elem, centro, pres, mapaCarga, mapaRecurso, achadoList, skipped, adjuvantes, nAch: achados.length, nPres: preservados.length }
 }
 
 function fmt(r) {
@@ -161,7 +166,15 @@ function fmt(r) {
     const bar = '█'.repeat(Math.round((c / maxC) * 20)).padEnd(20)
     L.push(`  ${i === 0 ? '★' : ' '} ${emoji[e]} ${e.padEnd(6)} ${bar} ${c.toFixed(1)}${i === 0 ? '  ← PRINCIPAL' : ''}`)
   })
-  L.push('FORÇA / RECURSOS (trilho separado — dos preservados, NÃO entra no elemento):')
+  L.push('\nTODOS OS ACHADOS EVIDENCIADOS (nada colapsa — cada um vira fio da narrativa):')
+  r.achadoList.forEach((a, i) => {
+    const tag = i === 0 ? 'PRINCIPAL' : i === 1 ? 'secundário' : i === 2 ? 'terciário' : ''
+    L.push(`  ${i === 0 ? '★' : '·'} I${a.int} ${emoji[a.elem]} ${a.campo.padEnd(28)} → "${a.emo}"  ${tag}`)
+  })
+  const elems3 = [...new Set(r.achadoList.slice(0, 4).map((a) => a.elem))]
+  L.push(`  → narrativa dos elementos: ${elems3.map((e) => emoji[e] + e).join(' + ')}`)
+
+  L.push('\nFORÇA / RECURSOS (trilho separado — dos preservados, NÃO entra no elemento):')
   for (const p of r.pres) L.push(`    ✓ ${p.campo}${p.pol === 'vital_ativo' ? ' (vital)' : ''}`)
 
   // (B) mapa emocional — o leque que o prompt seleciona
