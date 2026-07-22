@@ -167,3 +167,19 @@ Founder: os 4 são ~iguais na população? viés regional/Brasil (via constitui�
 Founder: "Miguel é extremamente RACIONAL, pouco intuitivo." → deveria ser 💨 Ar ALTO (tipo Jóia = mente analítica). Instrumento deu **Ar 6, Terra 49** (Fleumático). **ERRO claro num caso real.**
 **Prova decisiva:** a abordagem por CARGA, sozinha, é cega ao elemento quando ele é FORÇA/qualidade. Mente racional do Miguel = força (sem carga de ruminação) → instrumento lê "sem Ar". O pigmento/âmbar dele é igual aos outros 2 → dado atual NÃO separa o racional.
 **⇒ NECESSÁRIO (não mais opcional): capturar o sinal ESTRUTURAL (tipo Jóia/Flor/Corrente, gestalt) que o Stage 1 não emite.** Sem ele, erramos gente real. Isto reabre a decisão da MENOR EXTENSÃO do Stage 1 (campo `tipo_estrutural`) — agora com evidência de campo a favor.
+
+---
+
+## 🧪 TESTE DE CONFIABILIDADE — classificar tipo Rayid (Jóia/Flor/Corrente) na íris self (2026-07-22)
+5 rodadas Sonnet independentes, mesma foto (`scripts/output/crops/right_frontal_crop.jpg`, íris verde self):
+| rodada | tipo | confiança | legível |
+|---|---|---|---|
+| 1 | Flor | média | sim |
+| 2 | Corrente | média | sim |
+| 3 | Jóia | média | sim |
+| 4 | Mista | baixa | NÃO |
+| 5 | Jóia | média | sim |
+(+ Opus: Jóia)
+**Contagem: Jóia 2 · Flor 1 · Corrente 1 · Mista 1. Nenhuma "alta".**
+**VEREDITO: NÃO confiável nessa qualidade.** 5 rodadas → 4 respostas. Positivo FRACO: Jóia plurality (2/5) + bate com o founder (cerebral) + 2 viram pigmento no colarete → o sinal EXISTE mas é sutil, não é pego consistente. Causas: foto macia + glare + íris sem padrão Rayid gritante.
+**IMPLICAÇÃO:** adicionar `tipo_estrutural` ao Stage 1 AGORA geraria dado não-confiável — NÃO fazer ainda. Pra viabilizar: foto alta-res + luz controlada + backlight de fibras + rubrica calibrada (trabalho real, incerto). Temperamento é genuinamente DIFÍCIL: carga não discrimina (erra Miguel/Ar); estrutura não é confiável de capturar. → candidato a ADIAR e seguir os outros blocos (que não dependem dele).
