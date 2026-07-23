@@ -14,7 +14,7 @@ const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY })
 
 const name = process.argv[2] || 'self'
 const model = process.argv[3] || 'claude-sonnet-5'
-const NOME = { self: 'Helton', daniel: 'Daniel', miguel: 'Miguel' }[name] || name
+const NOME = { self: 'Rhelton', daniel: 'Daniel', miguel: 'Miguel' }[name] || name
 
 const SYSTEM = readFileSync('apps/web/_motor-lab/prompts/stage2-relatorio-novo-DRAFT.md', 'utf8')
 const exame = JSON.parse(readFileSync(EXAM(name), 'utf8'))

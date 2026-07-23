@@ -10,7 +10,7 @@ const name = process.argv[2] || 'self'
 const MD = readFileSync(`apps/web/_motor-lab/out/novo-${name}--sonnet-5.md`, 'utf8')
 const MOCK = readFileSync('apps/web/_motor-lab/relatorio-novo/relatorio-completo.html', 'utf8')
 const STYLE = MOCK.slice(MOCK.indexOf('<style>') + 7, MOCK.indexOf('</style>'))
-const NOME = { self: 'Helton', daniel: 'Daniel', miguel: 'Miguel' }[name] || name
+const NOME = { self: 'Rhelton', daniel: 'Daniel', miguel: 'Miguel' }[name] || name
 
 // ---------- números do motor ----------
 const α = BASELINE_LIVRE

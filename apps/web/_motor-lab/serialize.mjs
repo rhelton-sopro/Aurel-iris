@@ -25,7 +25,7 @@ function serialize(name) {
   const lastro = parseLastro()
   const r = calc(name, lastro)
   const d = JSON.parse(fs.readFileSync(EXAM(name), 'utf8'))
-  const NOME = { self: 'Helton', daniel: 'Daniel', miguel: 'Miguel' }[name] || name
+  const NOME = { self: 'Rhelton', daniel: 'Daniel', miguel: 'Miguel' }[name] || name
 
   // sabor do Corpo (2 motores): raiva/luta vs medo/fuga — pelo elemento de carga dominante
   const sabor = r.elem.carga.fogo >= r.elem.carga.agua ? 'raiva' : 'medo'
