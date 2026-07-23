@@ -31,11 +31,11 @@ const short = model.replace('claude-', '')
 const t0 = Date.now()
 console.log(`rodando ${name} [${short}]… (system ${SYSTEM.length} chars · B+C ${blocosBC.length} chars)`)
 try {
-  const msg = await client.messages.create({
-    model, max_tokens: 12000,
+  const msg = await client.messages.stream({ // streaming: exigido pra outputs longos (>10min possíveis)
+    model, max_tokens: 24000,
     system: [{ type: 'text', text: SYSTEM, cache_control: { type: 'ephemeral' } }],
     messages: [{ role: 'user', content: userContent }],
-  }, { maxRetries: 1 })
+  }).finalMessage()
   const text = msg.content.filter((b) => b.type === 'text').map((b) => b.text).join('')
   const out = `apps/web/_motor-lab/out/novo-${name}--${short}.md`
   writeFileSync(out, text)
