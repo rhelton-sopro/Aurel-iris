@@ -1,52 +1,63 @@
-# Maiêutica Evoluída — método das perguntas de abertura (bloco 1 + Chaves do bloco 3)
+# Maiêutica Evoluída — método + MAPA de rotação da pergunta de fechamento
 
-> Síntese de 2 estudos (Satir + PNL na web · lastro local `motor-perguntas-processo.md` + método de produção `analyze-direct.ts`). **Autores SEMPRE escondidos no output** (regra 8). Objetivo: a pessoa lê e pensa *"caraca, é sobre mim"* e SENTE no corpo. Sai da íris (do achado), nunca do achismo.
+> Síntese de 3 estudos (Satir/PNL na RAIZ, lidos dos livros · perguntas poderosas multi-tradição · lastro local). **Autores SEMPRE escondidos no output** (regra 8). Objetivo: a pessoa lê e pensa *"caraca, é sobre mim"* e SENTE no corpo AGORA. Sai da íris (do achado), nunca do achismo.
 
-## Regra-mãe (o que faz a pergunta funcionar)
-Toda pergunta de abertura nasce de DOIS ingredientes do próprio relatório:
-- **EMOÇÃO recorrente** (o que o mapa apontou — ex.: raiva engolida, vontade de discordar contida).
-- **COMPORTAMENTO que a pessoa teve com ela** (o verbo: engoliu / deixou fluir / adiou / disfarçou / segurou).
-A pergunta cruza os dois e pede uma ESCOLHA concreta OU um ENDEREÇO no corpo. **O punch vem da ESPECIFICIDADE**, não da profundidade. Se serviria pra qualquer pessoa → reancore no achado.
+## ⭐ O DESENHO — DOIS TEMPOS (com respiro)
+A pergunta de fechamento NÃO é uma frase corrida. É **dois tempos**, com uma pausa no meio:
+1. **TEMPO 1 — a pergunta de PUNCH** (escolhe/rotaciona uma família do mapa abaixo). Ancora na emoção do MAIOR achado + o comportamento da pessoa com ela.
+2. **`*(respira)*`** — a pausa. A pessoa respira antes do 2º tempo.
+3. **TEMPO 2 — o CORPO NO AGORA** (SEMPRE presente, com UMA textura). Onde no corpo · quente/frio · parado/se-movendo · o que muda agora.
 
-## As 6 FAMÍLIAS (rotacione — varie a forma a cada relatório; NUNCA repita a mesma em sequência)
-Cada família = ESTRUTURA + quando usar + 1 exemplo ILUSTRATIVO (só molde — copiar literal vaza = Forer).
+**Regra de ouro (o founder sentiu no olho):** SEMPRE no **PRESENTE** ("agora, falando disso", "enquanto você lê isto"). ⛔ NUNCA passado ("da última vez que…", "onde isso ficou") — "ficou" **congela o sentimento como evento acabado** (é a armadilha da "nominalização" que a PNL manda DESFAZER: "a raiva" [objeto parado] → "quando você fica com raiva" [processo vivo]).
 
-**F1 · Escolha Honesta** — `Da última vez que [EMOÇÃO], você [verbo-conteve] ou [verbo-expressou]?`
-- Quando: a emoção tem dois destinos claros (guardar vs soltar). Ilustração: *"Da última vez que a raiva subiu, você deixou fluir ou engoliu?"*
+## 🗺️ MAPA DE ROTAÇÃO
 
-**F2 · Endereço no Corpo** — `Quando você [contém] [EMOÇÃO], onde no corpo isso fica?`
-- Quando: padrão de contenção; quer punch somático direto. Ilustração: *"Quando você segura a vontade de discordar, onde no corpo isso fica preso?"*
+### TEMPO 1 — famílias de punch (rotacione; nunca a mesma em sequência)
+- **Escolha honesta:** *"Quando [emoção] aperta, você [conteve] ou [deixou sair]?"* (o "ou/ou" sem culpa — Satir)
+- **Ganho oculto:** *"O que você ganhou, todos esses anos, [mantendo o padrão]?"* (Paulo Vieira)
+- **Virada da crença:** *"Você tem certeza de que [crença da tabela]? Ou o perigoso é [o oposto]?"* (Byron Katie — puxa a CRENÇA do lastro)
+- **Tipo-e-mais (anti-Forer nativo):** *"Que tipo de [emoção] é essa que você [comportamento]? Tem mais alguma coisa nela?"* (Clean/Grove — usa as palavras do achado)
+- **Suposição libertadora:** *"Se você soubesse que [oposto libertador], o que faria — e pra quem?"* (Kline)
+- **Intenção positiva:** *"Se essa [emoção] estivesse do seu lado, o que ela estaria protegendo?"* (Focusing)
+- **Precisão (PNL metamodelo):** *"[Emoção] de quem, exatamente?"* · *"O que te impede de [deixar sair]?"* · *"O que você acha que aconteceria se [deixasse sair]?"*
 
-**F3 · Custo do Padrão** — `Você [padrão] tantas vezes — o que você fez com [o que sobrou / a conta]?`
-- Quando: o mapa mostra acúmulo (adiar, absorver, dar conta de tudo). Ilustração: *"Você segurou a barra por todos tantas vezes. E com o seu cansaço, o que você fez?"*
+### TEMPO 2 — corpo no AGORA (SEMPRE fecha aqui; rotacione a textura)
+- *"E agora, falando disso, onde você sente que seu corpo se fecha?"*
+- *"…e esse aperto está quente ou frio?"*
+- *"…está parado ou se mexendo dentro de você?"*
+- *"Repara no seu corpo agora: o que muda só de imaginar [a virada]?"*
+- *"Sente agora, enquanto lê isto: [essa emoção guardada] tem um lugar? Qual?"*
 
-**F4 · Exceção que Devolve o Poder** — `[Padrão "sempre"]. Teve uma vez em que foi diferente? O que mudou ali?`
-- Quando: o achado é generalização rígida; abre agência em vez de fechar sentença. Ilustração: *"Parece que você fica sempre por último. Teve um dia em que você veio primeiro?"*
+## As 3 VERSÕES aprovadas (o founder travou — rotacionam)
+**V1 — Escolha honesta + corpo:**
+> Quando a raiva aperta, você segura ou deixa sair?
+> *(respira)*
+> E agora, falando disso, onde você sente que seu corpo se fecha — e isso está quente ou frio?
 
-**F5 · Espelho do Ler** — `O que aparece em você ao ler que [achado central] é seu?`
-- Quando: achado forte e íntimo; a pessoa sente o reconhecimento em tempo real. Ilustração: *"Lendo que a sua calma é feita de muita coisa engolida — o que aparece aí agora?"*
+**V2 — Virada da crença + corpo:**
+> Você tem certeza de que mostrar a raiva é o perigoso — ou o perigoso é continuar engolindo?
+> *(respira)*
+> Repara no seu corpo agora: o que muda só de imaginar deixar ela sair?
 
-**F6 · Convite pra Frente** — `Da próxima vez que [EMOÇÃO] chegar, o que você gostaria de fazer com ela?`
-- Quando: fecho de esperança; a pessoa sai com agência, não com peso. Ilustração: *"Da próxima vez que a vontade de dizer não aparecer, o que você quer fazer com ela?"*
+**V3 — Ganho oculto + corpo:**
+> O que você ganhou, todos esses anos, segurando essa raiva lá dentro?
+> *(respira)*
+> Agora, falando disso aqui — onde ela aperta, e está parada ou se mexendo?
 
-**⭐ Combinação-ouro:** F1 (escolha) **+** F2 (micro-convite ao corpo). Ex. de FORMA: *"…você guardou ou soltou? Repara onde, no corpo, essa resposta aparece agora."*
+> ⚠️ As versões e templates são **MOLDE de ESTRUTURA/TOM** — reescreva no vocabulário DESTA leitura (a emoção do maior achado, com as palavras da tabela). Copiar literal vaza = Forer.
 
-## Craft — 2 motores por baixo (escondidos)
-- **Precisão que fura a névoa (metamodelo):** desafie o vago — "[emoção] de quê, exatamente? com quem aparece?"; desafie o "sempre/nunca" com a exceção; devolva o verbo/agência ("quando você se ansiar…" no lugar de "a sua ansiedade"). É o antídoto anti-Forer.
-- **Chão de não-culpa (postura acolhedora):** comportamento = REAÇÃO a algo, nunca caráter ("você engoliu" ✓, "você é reprimido" ✗). Pergunta de esperança, não de defeito. A pessoa é dona da resposta.
-- **Endereço somático (submodalidades):** onde no corpo · que tamanho/forma · quente ou frio · pesa ou é leve · parado ou se move. Descrever a sensação já titra (transforma "demais" em observável).
+## As RAÍZES (por baixo — escondidas no output)
+- **Satir (das palavras dela em *A Estrutura da Magia* + transcrições):** o corpo é a ferramenta no presente; ela CHECA em vez de decretar ("é assim pra você?" = anti-Forer nativo); não-culpa, pede permissão ("você está disposto a sentir, só um instante?"); nomeia a verdade somática ("você aperta nos dentes").
+- **PNL (metamodelo, verbatim do livro):** reverter nominalização (nome parado → processo vivo); "quem/o quê, especificamente?"; "o que te impede?"; submodalidades pro corpo AGORA (onde · quente/frio · parado/movendo · peso).
+- **Byron Katie (The Work):** interroga a CRENÇA + a virada (o oposto é tão verdadeiro?) — encaixa nas crenças da tabela.
+- **Paulo Vieira:** ganho oculto ("o que você ganha mantendo isso?"). **Kline:** suposição libertadora. **Grove/Clean:** usa a palavra exata (anti-Forer estrutural). **Gendlin/Focusing:** o corpo-no-agora + intenção positiva.
 
 ## Guardrails (travas de output)
-- **8ª série** — uma criança de 13 entende sem perguntar. ZERO jargão ("somatizar", "reprimir", "gatilho" técnico, "energia").
-- **Nenhum nome de autor/escola** no output — técnicas só no raciocínio.
-- **Anti-Forer (trava dura):** a pergunta TEM que conter ≥1 elemento específico DESTE relatório (a emoção nomeada + o comportamento observado). Teste: "serve pra qualquer 35-40? → apague e reancore."
-- **Não-médico:** sensação/emoção, nunca sintoma/diagnóstico/órgão-doente. "Aperto no peito" (experiência) ✓, nunca "problema cardíaco".
-- **UMA pergunta** aberta e honesta (não retórica, sem resposta embutida, não culpabiliza), termina em `?`.
-
-## Herança do método de produção (as 3 famílias — subsumidas nas 6 acima)
-Espelho (pega o último elemento da história e devolve como pergunta) · Testemunho (aponta ausência viva: quem nunca te perguntou como você está) · Virada simples (traz pro presente, sem ornamento). Critérios de produção mantidos: emerge desta pessoa · não pressupõe nada não estabelecido · nunca coach-instagram ("será que você já se permitiu…?").
+- **PRESENTE sempre** no tempo 2 (nunca "ficou"/passado). **8ª série** (criança de 13 entende sem perguntar), ZERO jargão ("somatizar", "reprimir", "gatilho" técnico).
+- **Nenhum nome de autor/escola** no output. **Anti-Forer:** cita o achado específico com as palavras da pessoa. **Não-médico:** sensação/emoção, nunca sintoma/diagnóstico/órgão-doente.
+- **Aberta** (não sim/não fechado; o "ou/ou" da escolha honesta é degrau, não resposta). Termina em `?`.
 
 ## Onde aplica
-- **Bloco 1 (`@PERGUNTA`):** a maiêutica de fechamento. Rotaciona as 6 famílias; ancora na emoção do MAIOR achado.
-- **Bloco 3 (Chaves `abre`/`resolução`):** mesmas 6 famílias, ancoradas na natureza do marco.
-- **Bloco 6** continua com o processo somático de 5 tempos (é onde o trabalho de corpo profundo acontece) — não confundir.
+- **Bloco 1 (`@PERGUNTA`):** a maiêutica de fechamento, em 2 tempos, rotacionando o mapa. Ancora no MAIOR achado.
+- **Bloco 3 (Chaves `abre`/`resolução`):** mesmas famílias, ancoradas na natureza do marco (pode ser 1 tempo, mais enxuto).
+- **Bloco 6** segue com o processo somático de 5 tempos (trabalho de corpo profundo) — não confundir.

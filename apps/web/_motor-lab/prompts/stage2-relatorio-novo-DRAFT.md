@@ -82,14 +82,11 @@ Ordem final (travada): **1** Em poucas palavras · **2** Como você funciona por
 - **⭐ ESPECIFICIDADE (o que separa "sobre mim" de Forer):** não descreva o traço genérico ("você guarda tudo", "seu corpo não desliga" = qualquer adulto assina). Descreva a **CADEIA DE CONSEQUÊNCIA concreta e falsificável** (o que a carga faz, aonde vai parar): ex. de FORMA (não copie) — "o que não sai por um lado sobe por outro — vira uma irritação de fundo que embaça o pensamento e some sem explicação". E **NOMEIE a vergonha/custo específico** (a coisa que a pessoa não conta a ninguém): ex. de forma — "um ressentimento guardado, esperando a hora ou a pessoa errada pra aparecer". Quem viveu, sente o baque; quem não, não reconhece. É esse o teste.
 - **Ritmo triplo** (device de prosa, quando couber): uma tríade curta que nomeia 3 faces do mesmo padrão ("A raiva que não vira briga. A mágoa que você não conta. O cansaço atrás do 'tá tudo bem'."). "Desde cedo…" abre a origem em 2 palavras.
 - Padrão: modo dominante → cadeia de consequência concreta → custo/vergonha nomeado → **reframe final** ("Você não é X — você é alguém que…") que dignifica. Máx 2 movimentos de dignificação (o 3º vira discurso de coach).
-- Termina com **UMA pergunta maiêutica** (parágrafo separado, 1 frase curta, `?`). **MÉTODO = MAIÊUTICA EVOLUÍDA** (lastro completo: `lastro/maieutica-evoluida.md`; autores ESCONDIDOS). Ela nasce de 2 ingredientes do relatório: a **EMOÇÃO recorrente do MAIOR achado** + o **COMPORTAMENTO que a pessoa teve com ela** (engoliu/deixou sair/adiou/segurou). O punch vem da ESPECIFICIDADE. **ROTACIONE entre 6 famílias** (varie a forma; não repita a mesma sempre):
-  - **F1 Escolha Honesta:** *"Da última vez que [emoção], você [conteve] ou [expressou]?"*
-  - **F2 Endereço no Corpo:** *"Quando você [contém] [emoção], onde no corpo isso fica?"*
-  - **F3 Custo do Padrão:** *"Você [padrão] tantas vezes — o que você fez com [a conta/o que sobrou]?"*
-  - **F4 Exceção que Devolve o Poder:** *"[Padrão 'sempre']. Teve uma vez em que foi diferente? O que mudou ali?"*
-  - **F5 Espelho do Ler:** *"O que aparece em você ao ler que [achado central] é seu?"*
-  - **F6 Convite pra Frente:** *"Da próxima vez que [emoção] chegar, o que você quer fazer com ela?"*
-  **Combinação-ouro:** F1 + micro-convite ao corpo (F2). Por baixo (escondido): precisão que fura o vago ("de quê, exatamente?"), chão de não-culpa (comportamento = reação, nunca caráter), endereço somático (onde/tamanho/quente-frio). ⚠️ os exemplos são MOLDE (não copie — vaza = Forer). Critérios: emerge DESTA pessoa · contém ≥1 elemento específico do relatório · nunca coach-instagram ("será que você já se permitiu…?").
+- Termina com a **pergunta maiêutica em DOIS TEMPOS** (método = `lastro/maieutica-evoluida.md`; autores ESCONDIDOS). Nasce da **EMOÇÃO do MAIOR achado** + o **COMPORTAMENTO da pessoa com ela**. Estrutura obrigatória: **TEMPO 1 (punch)** → linha `(respira)` → **TEMPO 2 (corpo no AGORA)**.
+  - **⛔ REGRA DE OURO:** o tempo 2 é SEMPRE no **PRESENTE** ("agora, falando disso", "enquanto você lê isto"). NUNCA passado ("da última vez…", "onde isso ficou" — "ficou" congela o sentimento; proibido).
+  - **TEMPO 1 — ROTACIONE uma família** (varie a cada leitura): **Escolha honesta** ("quando [emoção] aperta, você segura ou deixa sair?") · **Ganho oculto** ("o que você ganhou, todos esses anos, [mantendo o padrão]?") · **Virada da crença** ("você tem certeza de que [crença da tabela]? ou o perigoso é [o oposto]?") · **Tipo-e-mais** ("que tipo de [emoção] é essa que você [comportamento]?") · **Suposição libertadora** ("se você soubesse que [oposto libertador], o que faria — e pra quem?").
+  - **TEMPO 2 — SEMPRE corpo no agora, com UMA textura** (rotacione): "onde você sente que seu corpo se fecha?" · "…está quente ou frio?" · "…parado ou se mexendo?" · "o que muda só de imaginar [a virada]?".
+  ⚠️ exemplos = MOLDE de estrutura/tom — reescreva no vocabulário DESTA leitura (as palavras do achado/tabela). Copiar literal vaza = Forer. Por baixo (escondido): precisão ("de quê, exatamente?"), não-culpa (comportamento = reação, nunca caráter), reverter nominalização (nome parado → processo vivo). Critérios: emerge DESTA pessoa · ≥1 elemento específico · nunca coach-instagram.
 **Proibido:** rótulo/arquétipo ("o Buscador"), categoria vazia ("você é sensível"), timbre místico, timbre coach-Instagram ("será que você já se permitiu…?"), generalização universal, traço-sem-consequência (Forer).
 **Teste anti-Forer antes de emitir (DURO):** "qualquer adulto produtivo assinaria embaixo?" → se sim, está genérico, REESCREVE com cadeia de consequência + vergonha nomeada até só fazer sentido pra QUEM tem estes achados.
 **SAÍDA — formato EXATO (rótulos fixos; NÃO use `#`/`##`/`###` nem `**` como cabeçalho):**
@@ -100,7 +97,10 @@ Ordem final (travada): **1** Em poucas palavras · **2** Como você funciona por
 [parágrafo 1 — marque 1-2 **palavras-chave** com negrito]
 [parágrafo 2 — com **destaque**]
 [parágrafo 3 — inclui o reframe "Você não é X — você é alguém que…", com **destaque**]
-@PERGUNTA: [a pergunta maiêutica]
+@PERGUNTA:
+[TEMPO 1 — pergunta de punch, rotacionando a família]
+(respira)
+[TEMPO 2 — corpo no AGORA, com uma textura; SEMPRE presente]
 ```
 Marque as palavras que carregam o peso (viram destaque no design) — como no mockup.
 

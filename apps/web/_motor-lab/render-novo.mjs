@@ -83,7 +83,10 @@ function block1(body) {
     if (i === 0 && voc) h = h.replace(new RegExp(`^(${voc.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')},?)`), '<span class="voc">$1</span>') // envolve o vocativo depois
     return `<p>${h}</p>`
   }).join('')
-  return `<div class="microfilme">${micro}</div>${f.PERGUNTA ? `<p class="maieutica">${inl(f.PERGUNTA)}</p>` : ''}`
+  // pergunta em 2 tempos: tempo1 / (respira) / tempo2
+  const perg = (f.PERGUNTA || '').split('\n').map((l) => l.trim()).filter(Boolean).map((l) =>
+    /^\(?respira/i.test(l) ? '<p class="respira">— respira —</p>' : `<p class="maieutica">${inl(l)}</p>`).join('')
+  return `<div class="microfilme">${micro}</div>${perg}`
 }
 
 // ---------- BLOCO 2 — pcard(agulhas) + facetas/raízes/drains ----------
@@ -231,6 +234,8 @@ const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><met
 .qfecho{margin:16px 0;font-style:italic;color:var(--ink-soft)}
 .sheet .pcard{margin-bottom:18px} .sheet .resumo{margin-bottom:2px} .microfilme p b{color:var(--teal-deep);font-weight:600}
 .facet .fk.tenso{color:#b5701a} .facet .fk.livre{color:#2f7a54} .facet .fk.meio{color:#8a7d63}
+.respira{text-align:center;font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint,#a99);margin:2px 0 6px}
+.maieutica + .maieutica{margin-top:2px}
 </style></head><body>
 <div class="sheet"><div class="pad">
   <div class="brand">IRIS CODEX</div>
