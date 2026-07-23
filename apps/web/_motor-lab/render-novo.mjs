@@ -219,6 +219,7 @@ const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><met
 .mdul{margin:6px 0 14px 0;padding-left:20px} .mdul li{margin:4px 0} .minih{font-weight:600;margin:16px 0 4px}
 .chave{margin:6px 0;padding:8px 14px;border-left:3px solid var(--amber);background:#faf6ee;font-style:italic}
 .qfecho{margin:16px 0;font-style:italic;color:var(--ink-soft)}
+.sheet .pcard{margin-bottom:18px} .sheet .resumo{margin-bottom:2px} .microfilme p b{color:var(--teal-deep);font-weight:600}
 </style></head><body>
 <div class="sheet"><div class="pad">
   <div class="brand">IRIS CODEX</div>

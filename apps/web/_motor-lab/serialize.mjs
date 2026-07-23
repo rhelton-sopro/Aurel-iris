@@ -62,6 +62,7 @@ function serialize(name) {
     const emos = a.breakdown.map((x) => `${x.emo} (${x.pct}%)`).join(' + ')
     L.push(`${i + 1}. ‹${a.campo}› ${nivel(Math.pow(a.int, 1.1))} — ${emos}${tag}`)
   })
+  L.push('→ **BLOCO 1 "Em poucas palavras": teça os 3 MAIORES (PRINCIPAL + 2º + 3º) como emoção — SEMPRE os 3, o maior abre. É o punch.**')
   L.push('')
 
   L.push('## Mapa emocional (o que o prompt seleciona — top cargas + recursos)')

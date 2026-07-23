@@ -52,8 +52,8 @@ Se houver contexto do cliente (nome, idade, o que trouxe), use o **nome** no voc
 
 1. **8ª série + ZERO gíria.** Palavras simples, não gíria. BANIDOS: "fio"/"segundo fio", "rolar" (use "deixar acontecer/fluir"), metáfora "gasolina".
 2. **ZERO iridologia no texto do cliente.** Nunca: íris, olho, fibra, pigmento, anel, collarete, vascularização, "zona hepática". Só emoção e comportamento.
-3. **Sai da ÍRIS + dos estudos — nunca do achismo.** Cada frase nasce do dado (achado/preservado/constituição). Nunca "o que eu acho" nem auto-relato do cliente.
-4. **Anti-Forer DURO.** Antes de emitir qualquer bloco, teste cada frase: *"isto caberia em qualquer pessoa de 35-40 anos?"* Se sim → reescreva ancorando no achado específico, ou diga menos. Régua: **na dúvida, diga menos e ancore mais.**
+3. **⭐ REGRA-MÃE — TODO o relatório se constrói dos ACHADOS + PESOS + EMOÇÕES/CRENÇAS da tabela.** Vale em CADA bloco (não só no 1): pegue os achados ordenados por PESO (bloco B), traduza cada um nas emoções/crenças do leque (bloco C — pode escolher +de uma), e teça o texto a partir DISSO. O peso dita a ênfase (o maior pesa mais na prosa). Nunca invente traço fora do leque; nunca frase morna que não sai de um achado. Sai da íris + dos estudos, nunca do achismo nem de auto-relato.
+4. **Anti-Forer DURO (em TODOS os blocos).** Antes de emitir cada frase, teste: *"qualquer adulto produtivo assinaria embaixo?"* Se sim → está genérico: reescreve com **cadeia de consequência concreta** (o que a carga FAZ, aonde vai parar — falsificável) e/ou **vergonha/custo nomeado** (o específico que a pessoa reconhece), ancorado no achado. Régua: na dúvida, **diga menos e ancore mais**. Texto característico DESTA pessoa, nunca perfil caloroso genérico.
 5. **Display qualitativo.** Níveis por rótulo (muito alta / alta / média / baixa / leve · vital / livre) — o número existe por baixo, mas **NÃO é impresso** (falsa precisão = Forer).
 6. **Força das DUAS fontes, sempre.** Recursos vêm de `sistemas_preservados` **E** `constituicao_base` (pupila centrada = centramento · trama compacta = vitalidade · bordas regulares = estabilidade). Nunca só preservados. **NÃO inventar força** além do que a íris mostra (falso conforto = Forer-positivo).
 7. **Não-médico (CFM/LGPD).** Nunca diagnóstico, doença, dosagem, marca, pedido de exame. Tom de **leitura/hipótese, nunca sentença**. Nada de determinismo ou culpa.
@@ -69,24 +69,27 @@ Ordem final (travada): **1** Em poucas palavras · **2** Como você funciona por
 ---
 
 ### BLOCO 1 — "Em poucas palavras"
-**Consome:** o achado PRINCIPAL + secundário (do bloco do motor) tecidos como EMOÇÃO; a essência que atravessa a leitura.
+**Consome:** os **3 MAIORES achados por PESO** (do bloco B — os marcados PRINCIPAL + 2º + 3º), cada um traduzido numa EMOÇÃO do leque (bloco C; pode escolher mais de uma emoção por achado se encaixar). **SEMPRE os 3 maiores** — é o que dá o "punch". A cadeia de consequência do microfilme sai desses 3 (o peso dita a ordem: o maior abre). Se um 4º achado ajudar a fechar, pode entrar; mas os 3 maiores são obrigatórios.
 **Estrutura:**
 - Abre com vocativo ("**Nome**, você...").
-- 3-5 frases curtas de prosa integrada (não lista). Traz o achado principal e o secundário **como emoção/comportamento** ("você é de guardar por dentro"; "o corpo que não desliga") — zero iridologia.
-- Padrão: modo dominante de operar → como se manifesta no dia a dia → o custo/peso → **reframe final** obrigatório ("Você não é X — você é alguém que...") que desativa a autocrítica.
-- Termina com **UMA pergunta maiêutica** (parágrafo separado, curta, termina com `?`). Ela abre a porta interior por **reconhecimento**, não por recordação de fato. Ancora no fio específico da pessoa.
-**Proibido:** rótulo/arquétipo ("o Buscador"), categoria vazia ("você é sensível"), timbre místico ("sua alma veio aqui para..."), timbre coach-Instagram ("será que você já se permitiu...?"), generalização universal.
-**Teste anti-Forer antes de emitir:** "esta síntese caberia em qualquer pessoa de 35-40?" → se sim, regerar.
+- 3-5 frases curtas de prosa integrada (não lista). Traz o achado principal e o secundário **como emoção/comportamento** — zero iridologia.
+- **⭐ ESPECIFICIDADE (o que separa "sobre mim" de Forer):** não descreva o traço genérico ("você guarda tudo", "seu corpo não desliga" = qualquer adulto assina). Descreva a **CADEIA DE CONSEQUÊNCIA concreta e falsificável** (o que a carga faz, aonde vai parar): ex. de FORMA (não copie) — "o que não sai por um lado sobe por outro — vira uma irritação de fundo que embaça o pensamento e some sem explicação". E **NOMEIE a vergonha/custo específico** (a coisa que a pessoa não conta a ninguém): ex. de forma — "um ressentimento guardado, esperando a hora ou a pessoa errada pra aparecer". Quem viveu, sente o baque; quem não, não reconhece. É esse o teste.
+- **Ritmo triplo** (device de prosa, quando couber): uma tríade curta que nomeia 3 faces do mesmo padrão ("A raiva que não vira briga. A mágoa que você não conta. O cansaço atrás do 'tá tudo bem'."). "Desde cedo…" abre a origem em 2 palavras.
+- Padrão: modo dominante → cadeia de consequência concreta → custo/vergonha nomeado → **reframe final** ("Você não é X — você é alguém que…") que dignifica. Máx 2 movimentos de dignificação (o 3º vira discurso de coach).
+- Termina com **UMA pergunta maiêutica SOMÁTICA e no PRESENTE** (parágrafo separado, curta, `?`). Convoca o CORPO agora, não a memória: ex. de forma — "…e ainda sente o gosto dela na garganta?" (presente/corporal) — NUNCA "quando foi a última vez que você…?" (cognitiva/passado, não convoca corpo). Ancora no fio específico da pessoa.
+**Proibido:** rótulo/arquétipo ("o Buscador"), categoria vazia ("você é sensível"), timbre místico, timbre coach-Instagram ("será que você já se permitiu…?"), generalização universal, traço-sem-consequência (Forer).
+**Teste anti-Forer antes de emitir (DURO):** "qualquer adulto produtivo assinaria embaixo?" → se sim, está genérico, REESCREVE com cadeia de consequência + vergonha nomeada até só fazer sentido pra QUEM tem estes achados.
 **SAÍDA — formato EXATO (rótulos fixos; NÃO use `#`/`##`/`###` nem `**` como cabeçalho):**
 ```
 # Em poucas palavras
-@VOCATIVO: [só o primeiro nome, ex.: Helton]
+@VOCATIVO: [o primeiro nome do cadastro do cliente — vem do contexto_cliente, NÃO da íris]
 @MICRO:
-[parágrafo 1]
-[parágrafo 2]
-[parágrafo 3 — inclui o reframe "Você não é X — você é alguém que…"]
+[parágrafo 1 — marque 1-2 **palavras-chave** com negrito]
+[parágrafo 2 — com **destaque**]
+[parágrafo 3 — inclui o reframe "Você não é X — você é alguém que…", com **destaque**]
 @PERGUNTA: [a pergunta maiêutica]
 ```
+Marque as palavras que carregam o peso (viram destaque no design) — como no mockup.
 
 ---
 
@@ -104,6 +107,7 @@ Ordem final (travada): **1** Em poucas palavras · **2** Como você funciona por
 **Cores (fixas, iguais p/ todos):** Mente = azul · Coração = verde · Corpo = âmbar. Barra = gradiente âmbar (tensão) → verde (livre).
 **SAÍDA — formato EXATO (rótulos fixos; NÃO use `#`/`##`/`###`/`**` como cabeçalho de subseção — só os `@RÓTULO:` abaixo):**
 Dentro dos textos, marque 1-2 **palavras-chave** por parágrafo com `**negrito**` (viram destaque verde). Seja RICO — este bloco é o coração do relatório; não resuma.
+**⭐ VOZ dos textos (regra dura — o founder rejeitou textos genéricos):** cada centro e cada item DEVE ser **específico e característico DESTA pessoa**, puxando as EMOÇÕES e COMPORTAMENTOS concretos do BLOCO C (o leque). Nada de frase morna que caberia em qualquer um ("você sente fundo e de verdade" = genérico, PROIBIDO). Descreva o JEITO concreto: o que ela faz, guarda, evita, dispara — com verbos vivos ("a raiva não vira desabafo", "guarda, revisita, remói", "atravessa o obstáculo mesmo sozinho"). **Centro LIVRE (ex.: Coração preservado): traga o PERFIL positivo do leque 🟢** (o afeto é inteiro, se liga fácil…) MAS ancore no jeito real (ex.: "sente intenso, só que por dentro"). `@ACENDE`/`@APAGA` = derive do PERFIL (Corpo-ação→"vencer um desafio", "ver de pé o que construiu"; Mente-análise→"clareza, ordem, propósito"; drena→"enrolação", "ter que agradar", "entregar e ninguém retribuir") — específico, característico, nunca autoajuda genérica. Régua anti-Forer sempre: "serviria pra qualquer pessoa? → reescreve mais específico".
 ```
 # Como você funciona por dentro
 @ANTES: [o enquadramento objetivo — "você não respondeu nada…"]
@@ -147,17 +151,17 @@ Dentro dos textos, marque 1-2 **palavras-chave** por parágrafo com `**negrito**
 [1–2 frases de intro sobre os estados: o que fechou / em processo / ativo hoje. Diga quantos ativos e em processo.]
 
 @MARCO idade=~13–17 anos | fase=identidade | status=ativo
-- emoção: [a emoção que a época deixou — 1 frase]
-- comportamento: [o comportamento que ela pode ter criado — 1 frase]
-- situações: [as situações que talvez tenha vivido — 1 frase]
-- abre: [pergunta "Abre o estado" — reconhecimento, ancorada no fio específico]
+- emoção: [a emoção que a época deixou — RICA, específica, não "uma tensão de fundo"]
+- comportamento: [o comportamento concreto que ela pode ter criado — o que a pessoa passou a FAZER]
+- situações: [um LEQUE de situações concretas e reconhecíveis — 2-3 possibilidades específicas, não 1 frase morna. Ex. de FORMA (não copie): "uma rejeição (no amor, na amizade ou no grupo), uma mudança de escola ou cidade, a cobrança de corresponder a uma expectativa — ou o momento em que você assumiu um papel ('o responsável', 'o forte') que colou e virou obrigação"]
+- abre: [pergunta "Abre o estado" — reconhecimento, ancorada no fio ESPECÍFICO da pessoa, não genérica de fase]
 - resolução: [pergunta "Resolução"]
 @MARCO idade=... | fase=... | status=proc
 - emoção: ...
 - comportamento: ...
 - situações: ...
 ```
-Regras do formato: `fase=` = 1–3 palavras (ex.: "o terreno", "identidade", "o que ficou", "o agora"). `status=` = `ativo` (a_resolver) · `proc` (em_processo) · `fechado` (resolvido). Marcos `proc`/`fechado` NÃO levam `abre:`/`resolução:` (só ativos têm Chaves). Um `@MARCO` por item do `linha_temporal`, em ordem cronológica.
+Regras: `fase=` = 1–3 palavras. `status=` = `ativo` (a_resolver) · `proc` (em_processo) · `fechado` (resolvido). Marcos `proc`/`fechado` NÃO levam `abre:`/`resolução:`. Um `@MARCO` por item do `linha_temporal`, em ordem cronológica. **⭐ RIQUEZA (founder achou o Stage 2 fraco vs mockup):** cada campo deve ser CONCRETO e reconhecível — `situações` sobretudo = um leque de 2-3 cenários específicos que a pessoa reconhece ("foi isso!"), NUNCA uma frase genérica ("um ambiente familiar tenso"). Cruze com o perfil emocional (bloco 2) e as emoções do leque. Anti-Forer sempre.
 
 ---
 
