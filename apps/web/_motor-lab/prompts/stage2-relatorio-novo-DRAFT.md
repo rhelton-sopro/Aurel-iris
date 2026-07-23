@@ -103,27 +103,32 @@ Ordem final (travada): **1** Em poucas palavras · **2** Como você funciona por
 **Caso equilibrado (anti-Forer):** se os 3 centros ficam parecidos, NUNCA "você tem um pouco de tudo" → discrimine pela DINÂMICA ("seu corpo dispara mas a cabeça segura", "seu fogo sai no trabalho, sua água em casa").
 **Cores (fixas, iguais p/ todos):** Mente = azul · Coração = verde · Corpo = âmbar. Barra = gradiente âmbar (tensão) → verde (livre).
 **SAÍDA — formato EXATO (rótulos fixos; NÃO use `#`/`##`/`###`/`**` como cabeçalho de subseção — só os `@RÓTULO:` abaixo):**
+Dentro dos textos, marque 1-2 **palavras-chave** por parágrafo com `**negrito**` (viram destaque verde). Seja RICO — este bloco é o coração do relatório; não resuma.
 ```
 # Como você funciona por dentro
 @ANTES: [o enquadramento objetivo — "você não respondeu nada…"]
 @INTRO: [1 frase: todo mundo vive de três lugares — mente, coração, corpo…]
-@MENTE: [parágrafo do centro Mente — o que a agulha diz]
+@MENTE: [parágrafo do centro Mente — o que a agulha diz, com **destaque**]
 @CORACAO: [parágrafo do centro Coração]
 @CORPO: [parágrafo do centro Corpo — use o sabor que o motor indicou]
 @RESUMO: [a caixa "Em resumo" — 1 frase]
 @TENSAO: [tensão dominante × secundário — os dois centros que puxam pra lados diferentes]
 @FACETAS:
-- Como pensa | [texto]
-- Como sente | [texto]
-- Como age | [texto]
-- Como planeja | [texto]
-- Nas relações | [texto]
-@RAIZ: [a mesma raiz, dois lados — força↔sombra]
-@MALENTENDIDO: [o mal-entendido sobre você]
-@APERTA: [quando aperta, você vira…]
-@ACENDE: item | item | item
-@APAGA: item | item | item
-@FECHO: [fecho ligando o padrão]
+- Como pensa | [1-2 frases RICAS, com **destaque** — como a mente aparece no dia a dia]
+- Como sente | [1-2 frases ricas com **destaque**]
+- Como age | [idem]
+- Como planeja | [idem]
+- Nas relações | [idem]
+@RAIZ:
+- [par força↔sombra da MESMA raiz. Marque a FORÇA com {{...}} e a SOMBRA com [[...]]. Ex.: {{A sua entrega intensa}} faz as pessoas confiarem em você — e é a mesma coisa que [[te esgota quando ninguém retribui]].]
+- [2º par]
+- [3º par]
+- [4º par — 4 pares no total, cada um um dom que é também um custo]
+@MALENTENDIDO: [o mal-entendido sobre você — 3-4 frases, o que as pessoas leem errado × a verdade por dentro, com **destaques**. NÃO resuma.]
+@APERTA: [quando aperta, você vira… — 3-4 frases sobre o comportamento SOB PRESSÃO/estresse: o que dispara primeiro, o sinal de que passou do limite, com **destaques**.]
+@ACENDE: item | item | item | item   (4-5 coisas que te dão energia)
+@APAGA: item | item | item | item   (4-5 coisas que te drenam)
+@FECHO: [fecho ligando o padrão inteiro — 2-3 frases, "junte tudo e entende o seu padrão…", com **destaque**]
 ```
 
 ---

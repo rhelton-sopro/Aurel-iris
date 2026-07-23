@@ -89,26 +89,36 @@ function centerParas(block) {
   }
   return p
 }
-function pcard(paras) {
+function pcard(paras, resumoHtml = '') {
   const nomes = { mente: ['Mente', 'modo de pensar'], coracao: ['Coração', 'modo de sentir'], corpo: ['Corpo', 'modo de agir'] }
   const ctr = (c) => `<div class="ctr"><div class="ctr-head"><span class="ctr-name ${c}">${nomes[c][0]}</span><span class="ctr-fn ${c}">${nomes[c][1]}</span></div>
     <div class="dv"><span class="dv-lab a">tensão</span><div class="dv-track"><i class="dv-needle" style="left:${AG[c]}%"></i></div><span class="dv-lab b">livre</span></div>
     <p class="ctr-txt">${inl(paras[c] || '')}</p></div>`
-  return `<div class="pcard">${ctr('mente')}${ctr('coracao')}${ctr('corpo')}</div>`
+  return `<div class="pcard">${ctr('mente')}${ctr('coracao')}${ctr('corpo')}${resumoHtml}</div>` // resumo DENTRO do pcard (igual mockup)
 }
+// facetas coloridas por centro + destaque {{gift}}/[[cost]] nas raízes
+const facetKey = (label) => {
+  const l = label.toLowerCase()
+  if (/pensa/.test(l)) return { cls: 'mente', disp: 'Mente · como pensa' }
+  if (/sente/.test(l)) return { cls: 'coracao', disp: 'Coração · como sente' }
+  if (/age/.test(l)) return { cls: 'corpo', disp: 'Corpo · como age' }
+  return { cls: 'n', disp: label }
+}
+const rootInl = (s) => inl(s).replace(/\{\{(.+?)\}\}/g, '<span class="gift">$1</span>').replace(/\[\[(.+?)\]\]/g, '<span class="cost">$1</span>')
 function block2(body) {
   const f = fields(body)
   const facetas = (f.FACETAS || '').split('\n').map((l) => l.replace(/^-\s*/, '').trim()).filter((l) => l.includes('|')).map((l) => { const [k, v] = l.split('|'); return { k: k.trim(), v: v.trim() } })
   const acende = (f.ACENDE || '').split('|').map((s) => s.trim()).filter(Boolean)
   const apaga = (f.APAGA || '').split('|').map((s) => s.trim()).filter(Boolean)
+  const roots = (f.RAIZ || '').split('\n').map((l) => l.replace(/^-\s*/, '').trim()).filter(Boolean).map((l) => `<div class="root">${rootInl(l)}</div>`).join('')
+  const resumoHtml = f.RESUMO ? `<div class="resumo"><p class="resumo-lab">Em resumo</p><p>${inl(f.RESUMO)}</p></div>` : ''
   return [
     f.ANTES ? `<div class="objbox"><p class="obj-lab">Antes de ler</p><p class="obj-txt">${inl(f.ANTES)}</p></div>` : '',
     f.INTRO ? `<p class="pintro">${inl(f.INTRO)}</p>` : '',
-    pcard({ mente: f.MENTE, coracao: f.CORACAO, corpo: f.CORPO }),
-    f.RESUMO ? `<div class="resumo"><p class="resumo-lab">Em resumo</p><p>${inl(f.RESUMO)}</p></div>` : '',
+    pcard({ mente: f.MENTE, coracao: f.CORACAO, corpo: f.CORPO }, resumoHtml),
     f.TENSAO ? `<p class="tension">${inl(f.TENSAO)}</p>` : '',
-    facetas.length ? `<p class="rootlab">Veja como cada centro aparece no seu dia a dia</p><div class="facets">${facetas.map((x) => `<div class="facet"><span class="fk n">${esc(x.k)}</span><span class="fv">${inl(x.v)}</span></div>`).join('')}</div>` : '',
-    f.RAIZ ? `<p class="rootlab">A mesma raiz, dois lados</p><div class="roots"><div class="root">${inl(f.RAIZ)}</div></div>` : '',
+    facetas.length ? `<p class="rootlab">Veja como cada centro aparece no seu dia a dia</p><div class="facets">${facetas.map((x) => { const fk = facetKey(x.k); return `<div class="facet"><span class="fk ${fk.cls}">${esc(fk.disp)}</span><span class="fv">${inl(x.v)}</span></div>` }).join('')}</div>` : '',
+    roots ? `<p class="rootlab">A mesma raiz, dois lados</p><div class="roots">${roots}</div>` : '',
     f.MALENTENDIDO ? `<p class="rootlab">O mal-entendido sobre você</p><p class="block-serif">${inl(f.MALENTENDIDO)}</p>` : '',
     f.APERTA ? `<p class="rootlab">Quando aperta, você vira…</p><div class="stresswrap"><p class="block-serif">${inl(f.APERTA)}</p></div>` : '',
     (acende.length || apaga.length) ? `<p class="rootlab">O que te acende &nbsp;·&nbsp; o que te apaga</p><div class="drains"><div class="drain up"><h4>Te acende</h4><ul>${acende.map((x) => `<li>${inl(x)}</li>`).join('')}</ul></div><div class="drain down"><h4>Te apaga</h4><ul>${apaga.map((x) => `<li>${inl(x)}</li>`).join('')}</ul></div></div>` : '',
