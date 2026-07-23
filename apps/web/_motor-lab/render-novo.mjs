@@ -97,11 +97,13 @@ function pcard(paras, resumoHtml = '') {
   return `<div class="pcard">${ctr('mente')}${ctr('coracao')}${ctr('corpo')}${resumoHtml}</div>` // resumo DENTRO do pcard (igual mockup)
 }
 // facetas coloridas por centro + destaque {{gift}}/[[cost]] nas raízes
+// cor da faceta = ESTADO no termostato (agulha): tenso=âmbar · livre=verde · meio=neutro
+const tensCls = (c) => { const a = AG[c]; return a < 45 ? 'tenso' : a > 55 ? 'livre' : 'meio' }
 const facetKey = (label) => {
   const l = label.toLowerCase()
-  if (/pensa/.test(l)) return { cls: 'mente', disp: 'Mente · como pensa' }
-  if (/sente/.test(l)) return { cls: 'coracao', disp: 'Coração · como sente' }
-  if (/age/.test(l)) return { cls: 'corpo', disp: 'Corpo · como age' }
+  if (/pensa/.test(l)) return { cls: tensCls('mente'), disp: 'Mente · como pensa' }
+  if (/sente/.test(l)) return { cls: tensCls('coracao'), disp: 'Coração · como sente' }
+  if (/age/.test(l)) return { cls: tensCls('corpo'), disp: 'Corpo · como age' }
   return { cls: 'n', disp: label }
 }
 const rootInl = (s) => inl(s).replace(/\{\{(.+?)\}\}/g, '<span class="gift">$1</span>').replace(/\[\[(.+?)\]\]/g, '<span class="cost">$1</span>')
@@ -220,6 +222,7 @@ const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><met
 .chave{margin:6px 0;padding:8px 14px;border-left:3px solid var(--amber);background:#faf6ee;font-style:italic}
 .qfecho{margin:16px 0;font-style:italic;color:var(--ink-soft)}
 .sheet .pcard{margin-bottom:18px} .sheet .resumo{margin-bottom:2px} .microfilme p b{color:var(--teal-deep);font-weight:600}
+.facet .fk.tenso{color:#b5701a} .facet .fk.livre{color:#2f7a54} .facet .fk.meio{color:#8a7d63}
 </style></head><body>
 <div class="sheet"><div class="pad">
   <div class="brand">IRIS CODEX</div>
