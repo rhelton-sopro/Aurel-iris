@@ -117,5 +117,9 @@ function serialize(name) {
   return L.join('\n')
 }
 
-const name = process.argv[2] || 'self'
-console.log(serialize(name))
+export { serialize }
+
+import { pathToFileURL } from 'node:url'
+if (import.meta.url === pathToFileURL(process.argv[1] || '').href) {
+  console.log(serialize(process.argv[2] || 'self'))
+}
