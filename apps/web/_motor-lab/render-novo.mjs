@@ -30,6 +30,8 @@ const ANTIDOTO = {
   frustração: 'Fluidez', 'irritabilidade de fundo': 'Serenidade', 'medo estrutural de base': 'Segurança',
   'apego ao passado': 'Presença', 'baixa autoestima': 'Autovalor', ressentimento: 'Perdão',
   'desilusão/trauma localizado': 'Sentido', 'rigidez/intolerância': 'Flexibilidade',
+  'urgência constante': 'Ritmo próprio', 'dispersão mental': 'Foco', ressentimento: 'Perdão',
+  'medo de soltar': 'Confiança', 'tensão nervosa sustentada': 'Descanso',
 }
 const SHADOW = [['firmeza', 'Fragilidade'], ['flexibilidade', 'Rigidez'], ['centr', 'Dispersão'], ['alegria', 'Desamor'], ['fôlego', 'Sufoco'], ['leveza', 'Peso'], ['empatia', 'Sobrecarga do outro'], ['limite', 'Sobrecarga do outro'], ['segur', 'Medo']]
 const shadowOf = (e) => (SHADOW.find(([k]) => e.toLowerCase().includes(k)) || [null, '—'])[1]
