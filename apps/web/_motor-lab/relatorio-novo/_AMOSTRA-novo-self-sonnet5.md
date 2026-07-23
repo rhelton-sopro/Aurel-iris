@@ -1,117 +1,138 @@
 # Em poucas palavras
 @VOCATIVO: Rhelton
 @MICRO:
-Rhelton, você segura por dentro o que deveria sair na hora — a raiva não vira discussão, vira um **silêncio** que fica te roendo por dias. É a mágoa que se acumula, não porque você escolhe guardar, mas porque explodir sempre pareceu pior do que engolir.
+Rhelton, você **segura a raiva** antes que ela vire discussão — engole, guarda, e ela não desaparece: sobe da boca do estômago pra cabeça, vira uma **irritação sem nome** que embaça o que você ia pensar ou dizer.
 
-O que não sai pela raiva sobe de outro jeito: vira uma **irritação de fundo** que embaça a cabeça, faz você perder o fio do que estava pensando, ficar curto com quem nem tem nada a ver com aquilo. E por baixo disso, tem coisa que você não larga — uma mágoa antiga, um jeito de fazer as coisas, um controle que você não abre mão porque soltar parece perder. A raiva que não vira briga. A irritação que ninguém entende de onde vem. O controle que você não solta nem quando cansa de segurar.
+A raiva que você não deixa sair. A mágoa que você não solta. A cabeça que gira em cima do que já passou, tentando entender o que não devia ter engolido. Desde cedo você aprendeu que dar conta sozinho era mais seguro do que pedir ajuda — e isso ficou.
 
-Você não é uma pessoa difícil — você é alguém que **aprendeu a engolir** tanto que hoje sente tudo por dentro antes de sentir por fora.
-@PERGUNTA: E esse nó que aperta quando você engole o que ia dizer — você sente ele ainda hoje?
+O custo é este: quando enche demais, **explode em pouco** — descarrega em quem nem tinha nada a ver, e depois carrega a culpa disso também. Você não é uma pessoa sem paciência — **você é alguém que segura por tempo demais**, até que qualquer coisa pequena vira o estopim de algo que já vinha de muito antes.
+
+@PERGUNTA: E ainda hoje, quando engole o que queria dizer, você sente esse aperto subir do estômago pro peito?
+
+---
 
 # Como você funciona por dentro
-@ANTES: Você não respondeu nenhuma pergunta pra chegar até aqui — isto foi lido no que os seus olhos carregam.
-@INTRO: Todo mundo vive de três lugares por dentro: a mente que pensa, o coração que sente, o corpo que age — e em você, esses três lugares não pesam igual.
-@MENTE: Sua cabeça não sossega fácil. Ela **gira** em cima do que já passou e do que ainda pode vir — uma frase que alguém disse, uma decisão que você já tomou mas continua revisando. Não é falta de foco: é o incômodo de baixo subindo direto pro pensamento e embaçando o que era simples.
-@CORACAO: Aqui você é **inteiro**. Quando se abre com alguém, se abre de verdade — o afeto chega rápido e chega quente, sem cálculo. É a parte de você que ainda confia que vale a pena se aproximar, mesmo depois de tudo que já guardou.
-@CORPO: É onde a coisa **acende primeiro**. Quando algo te atravessa, o corpo reage antes da cabeça decidir — o gatilho é curto, a raiva sobe rápido. Só que ela raramente sai na hora: fica ali, contida, virando um **ressentimento** que você carrega sem perceber o peso.
-@RESUMO: Corpo que dispara rápido, mente que gira em cima do que o corpo não descarregou, coração que ainda se abre — mesmo cansado de segurar tanta coisa.
-@TENSAO: O corpo é onde mais aperta em você — a raiva que ferve rápido e não encontra saída. A mente vem logo atrás, girando em cima do que o corpo não resolveu. O coração puxa pro lado contrário: ele ainda quer se abrir, se ligar, sentir — e é esse contraste que cansa: uma parte de você quer confiar, outra já está pronta pra brigar.
+@ANTES: Você não respondeu nenhuma pergunta pra chegar até aqui — tudo isto foi lido no que os seus olhos carregam. É um retrato de dentro pra fora.
+@INTRO: Todo mundo vive de três lugares por dentro — a mente que pensa, o coração que sente, o corpo que age. Em você, eles não puxam parecido.
+@MENTE: A sua mente **não desliga fácil**. Ela roda, antecipa, revisita o que já passou tentando entender o que não devia ter engolido — uma espécie de tagarelice interna que não pede licença pra aparecer, principalmente quando alguma coisa fica sem resposta.
+@CORACAO: Aqui está a sua força mais visível: o **afeto inteiro**, que se liga fácil e chega quente. Você se abre e se conecta sem esforço — mas sente intenso por dentro, mais do que costuma mostrar. É comum que essa entrega vire o lugar de onde você tira energia pras pessoas ao redor, mesmo quando o resto está pesado.
+@CORPO: É aqui que a **tensão vira ação mais rápido**. Quando alguma coisa trava, o corpo reage quase sem intervalo entre sentir e agir — a raiva sai antes de ser pensada. É o centro mais apertado dos três: o que devia ter sido dito antes acaba saindo de outro jeito, no calor da hora.
+@RESUMO: O seu corpo dispara primeiro, a sua mente segura logo atrás remoendo — e o coração aberto sustenta os dois, mesmo cansado.
+@TENSAO: O corpo é o que mais aperta — reage rápido, sem intervalo. A mente vem logo atrás, girando por baixo no que o corpo já descarregou. Os dois puxam pra lados diferentes: um age antes de pensar, o outro pensa demais depois de agir.
 @FACETAS:
-- Como pensa | Sua mente não para no "já entendi" — ela **volta**, revisita, monta cenário de novo, principalmente quando alguma coisa te irritou e você não descarregou.
-- Como sente | Você sente fundo, mas guarda a raiva pra dentro — o **ressentimento** fica ali, quieto, esperando a hora errada de aparecer.
-- Como age | Quando o limite estoura, você reage rápido e forte — o corpo age antes de você decidir, e depois vem a cobrança de "por que reagi assim".
-- Como planeja | Você tende a decidir e carregar **sozinho** — soltar o controle das coisas te dá a sensação de perder o que é seu.
-- Nas relações | Você se conecta fácil e de verdade — mas guarda o que te machucou, e isso vai formando uma distância que o outro nem percebe de onde vem.
+- Como pensa | Você **revisita** o que já aconteceu tentando entender onde errou ou o que devia ter dito — a cabeça não solta com facilidade uma situação mal resolvida.
+- Como sente | Sente **fundo e rápido**, mas nem sempre mostra na hora — o que sobra vira ressentimento se ninguém percebe.
+- Como age | Reage **rápido demais** quando algo trava — a ação vem antes da reflexão, e depois vem a conta.
+- Como planeja | Prefere **resolver com as próprias mãos** a esperar ajuda — dar conta sozinho parece mais confiável do que contar com alguém.
+- Nas relações | É **caloroso e presente**, mas guarda o que incomoda até parar de aguentar — aí a franqueza vira explosão em vez de conversa.
 @RAIZ:
-- {{A sua entrega afetiva}} faz as pessoas se sentirem realmente vistas por você — e é a mesma coisa que [[te deixa guardando o que elas fizeram de errado sem nunca cobrar]].
-- {{A sua capacidade de decidir rápido e agir}} resolve o que ninguém mais resolveria — e é a mesma coisa que [[te deixa sozinho quando seria hora de pedir ajuda]].
-- {{A sua mente que não para}} te faz antecipar problema antes de acontecer — e é a mesma coisa que [[te rouba o sossego até nas horas de descanso]].
-- {{O seu jeito de segurar a raiva}} evita brigas que não valiam a pena — e é a mesma coisa que [[transforma em ressentimento o que podia ter virado uma conversa]].
-@MALENTENDIDO: As pessoas costumam ler você como alguém tranquilo, resolvido, que não se afeta com nada — porque você raramente **explode** na frente de todo mundo. Só que por dentro é diferente: a raiva existe, ela só não sai na hora. Quem convive mais de perto às vezes se surpreende quando você finalmente fala o que sentia há semanas — porque de fora, parecia que **estava tudo bem**.
-@APERTA: Quando você passa do seu limite, o primeiro sinal é a irritação curta — respostas secas, pouca paciência com coisa pequena. Se continua apertando, vem a cabeça girando sem parar, revisitando tudo o que te incomodou. E o ponto de virada é quando o que estava contido finalmente **sai** — geralmente maior do que a situação pedia, porque não era só daquele momento.
-@ACENDE: resolver algo sozinho e ver funcionar | uma conversa sincera, sem rodeio | se conectar de verdade com alguém | sentir que fez o que tinha que ser feito
-@APAGA: ter que engolir algo errado calado | enrolação e conversa sem fim | carregar nas costas o que não é seu | ser mal interpretado por estar quieto
-@FECHO: Junte tudo e o padrão fica claro: o corpo dispara rápido, a mente gira em cima do que ficou sem solução, e o coração — que ainda quer se abrir — vai guardando o troco. Não é falta de força. É **força contida demais**, esperando um jeito seguro de sair.
+- {{A sua lealdade com quem confia}} faz as pessoas contarem com você — e é a mesma coisa que [[guarda a mágoa quando sente que foi tratado sem justiça]].
+- {{A sua energia rápida pra resolver}} tira as coisas do lugar quando ninguém mais se mexe — e é a mesma coisa que [[explode antes de pensar quando algo te trava]].
+- {{O seu coração que se abre fácil}} puxa as pessoas pra perto — e é a mesma coisa que [[vira intensidade que consome quando não é retribuída do mesmo jeito]].
+- {{A sua mente que analisa tudo}} entende o que passou com profundidade — e é a mesma coisa que [[gira em cima do mesmo pensamento até cansar, sem soltar]].
+@MALENTENDIDO: As pessoas te leem como alguém tranquilo, que resolve tudo sem drama — porque o seu coração aberto passa essa calma. Só que por dentro tem uma raiva engolida há muito tempo, e uma cabeça que não solta o que ficou sem resposta. O que parece paciência é, muitas vezes, **raiva contida à espera de hora certa**.
+@APERTA: Quando aperta, o corpo dispara primeiro — a irritação sai rápido, sem intervalo. Depois vem a culpa e o ressentimento de ter reagido daquele jeito, e a mente entra em modo de repetição, revisando a cena várias vezes. O sinal de que passou do limite: uma **irritação de fundo** que não tem endereço certo — descontada em quem nem tinha nada a ver.
+@ACENDE: resolver algo com as próprias mãos | ver o progresso do que construiu | uma conversa franca sem rodeio | espaço pra dizer o que incomoda na hora
+@APAGA: engolir desaforo | sentir que tem que dar conta sozinho | mágoa antiga que não se resolve | cobrança constante sem pausa
+@FECHO: Junte tudo e entende o seu padrão: o corpo reage rápido e descarrega, a mente segura por baixo remoendo o que ficou pra trás — e é por isso que o que devia sair como conversa **sai como explosão guardada**. Não é falta de paciência. É paciência gasta demais, por tempo demais.
+
+---
 
 # Linha do tempo emocional
-Sua linha guarda quatro momentos: um em processo de se acomodar e três que ainda pedem atenção hoje. Nenhum deles é uma sentença — são marcas de percurso, e todas podem se mover.
+Na sua linha, três marcos ainda seguem ativos e um está em processo de se reorganizar. Isso não é sentença — é um mapa de onde o corpo ainda guarda tensão sem ter encontrado saída.
 
-@MARCO idade=primeira infância (~4-7 anos) | fase=adaptação | status=proc
-- emoção: uma tensão aprendida cedo — a sensação de precisar se ajustar ao clima de onde você estava
-- comportamento: aprender a se moldar, a não incomodar, talvez segurar o que sentia pra manter as coisas em ordem
-- situações: um ambiente com tensão de fundo (brigas silenciosas, expectativa alta, ou um adulto que também engolia tudo); a sensação de ter que "dar conta" mesmo pequeno; o momento em que você aprendeu que sentir demais não era bem-vindo
-@MARCO idade=adolescência (~13-17 anos) | fase=identidade | status=ativo
-- emoção: uma marca de reorganização — algo que não fechou, ligado a quem você estava se tornando
-- comportamento: assumir um papel que colou (o responsável, o que não reclama) ou endurecer uma defesa pra atravessar aquele período
-- situações: uma mudança grande (escola, cidade, grupo); uma decepção com alguém importante; um momento em que precisou provar quem era e não teve ninguém pra sustentar isso; ou a cobrança de corresponder a uma expectativa que não era sua
-- abre: tem uma versão sua, de adolescente, que decidiu que seria melhor não contar tudo o que sentia — você reconhece ela?
-- resolução: o que essa parte de você, ainda hoje, precisaria ouvir pra parar de se defender sozinha?
-@MARCO idade=adulto jovem (~28-35 anos) | fase=acúmulo | status=ativo
-- emoção: o momento em que a raiva contida começou a se acumular de forma mais constante — não uma raiva pontual, uma carga indo pro fundo
-- comportamento: engolir desconforto no trabalho ou nos vínculos pra manter a estabilidade, focar em resolver e produzir, deixando a própria irritação de lado
-- situações: uma fase de muita responsabilidade (trabalho, família, dinheiro) onde não dava pra parar; uma injustiça ou sobrecarga que você aceitou "pra não complicar"; hábitos que foi empilhando pra aguentar o ritmo — trabalhar demais, comer mal, não descansar
-- abre: tem alguma coisa que você aceitou engolir naquela fase — só pra manter tudo funcionando — que talvez ainda esteja pesando?
-- resolução: o que mudaria se você desse valor pro seu próprio limite, do mesmo jeito que deu valor pra manter tudo de pé?
-@MARCO idade=período recente (~40-45 anos) | fase=presente | status=ativo
-- emoção: a irritação que está ativa agora — não é uma marca antiga, é algo que ainda está em movimento
-- comportamento: o corpo respondendo rápido demais a pequenas coisas, o gatilho curto no dia a dia
-- situações: um momento atual de pressão (trabalho, saúde, relação) cobrando um preço; a sensação de estar sempre um passo atrás de descansar; um conflito recente que ainda não fechou
-- abre: esse aperto que sobe rápido quando algo te contraria — você sente ele com mais frequência ultimamente?
-- resolução: o que precisaria acontecer pra essa irritação encontrar uma saída, antes de virar de novo ressentimento guardado?
+@MARCO idade=~4-7 anos | fase=adaptação | status=proc
+- emoção: uma tensão de base instalada cedo — a sensação de precisar se ajustar antes de entender por quê
+- comportamento: aprender a se adaptar rápido, sem espaço pra reclamar ou questionar
+- situações: um ambiente familiar tenso, uma mudança precoce que exigiu se virar sozinho, ou ter aprendido cedo que era mais seguro se acomodar do que discordar
+
+@MARCO idade=~13-17 anos | fase=identidade | status=ativo
+- emoção: raiva de não ser visto como quem realmente era, e o ressentimento de ter que se encaixar num molde
+- comportamento: engolir o que sentia pra não causar confusão, e aprender a controlar a raiva por fora — mesmo fervendo por dentro
+- situações: a cobrança de corresponder a um papel ("o forte", "o que dá conta"), uma rejeição que abalou identidade, ou o momento de decidir sozinho quem seria, sem muito apoio
+- abre: e quando você segurava a vontade de discordar naquela época, onde no corpo isso ficava preso?
+- resolução: o que mudaria hoje se você pudesse dizer, agora, o que não pôde dizer então?
+
+@MARCO idade=~28-35 anos | fase=sobrecarga | status=ativo
+- emoção: frustração acumulada e a sensação de carregar peso demais sozinho
+- comportamento: compensar com trabalho ou hábitos que davam alívio rápido, guardando a raiva no corpo em vez de resolver
+- situações: uma rotina de excesso (trabalho, hábito, responsabilidade), uma decisão importante tomada sob pressão sem tempo de processar, ou o acúmulo de coisas engolidas indo direto pro corpo
+- abre: nessa fase, o que você foi engolindo achando que dava conta sozinho?
+- resolução: e se dar conta não precisasse ser sempre sozinho?
+
+@MARCO idade=~40-45 anos | fase=sobrecarga atual | status=ativo
+- emoção: irritação de fundo constante, a sensação de estar sempre no limite
+- comportamento: reagir rápido no calor da hora, e sentir o corpo tenso mesmo sem motivo aparente
+- situações: um conflito recorrente que nunca se resolve de verdade, uma cobrança dobrada (trabalho e casa ao mesmo tempo), ou o próprio corpo dando sinais de que precisa de pausa
+- abre: hoje, o que ainda te tira do sério antes mesmo de você perceber?
+- resolução: o que aconteceria se, na próxima vez, você desse um passo antes de reagir?
+
+---
 
 # Heranças transgeracionais
-@LEAD: Nem tudo o que você carrega nasceu com você, Rhelton. Alguns jeitos de reagir vêm de mais longe — aprendidos, copiados, herdados de quem veio antes.
-@PADROES: Engolir para manter a paz | Resolver tudo sozinho
-@VOCE: hoje isso aparece em você como a raiva que não sai na hora e o hábito de carregar peso sem pedir ajuda.
-@DEPOIS: ao aprender a dizer o que sente na hora certa, você já quebra esse ciclo pra quem vem depois de você.
-@PADRAO_DETALHE: Esse jeito de engolir o que incomoda pra manter tudo funcionando raramente nasce numa pessoa só. Alguém antes de você também aprendeu que expressar era arriscado, que sustentar tudo calado era mais seguro — e passou isso adiante sem nem perceber, do mesmo jeito que você pode estar passando, sem querer, pra quem vem depois. Não é culpa de ninguém. É um jeito de sobreviver que foi se repetindo.
-@DIFICIL: Pode parecer, por dentro, que ficar bem — soltar o que te incomoda, descansar sem culpa — é meio que trair quem sempre segurou tudo. Mas repetir a dor não é lealdade. Lealdade de verdade é viver o que quem veio antes de você não teve chance de viver.
-@VIRADA: A mudança não precisa ser grande nem em todo mundo — precisa ser em você. Você não controla o que quem veio antes engoliu, mas controla o que engole hoje. É assim que a corrente muda de direção: alguém decide, no meio do caminho, sentir diferente. Essa pessoa pode ser você.
-@RESILIENCIA: A mesma linhagem que te ensinou a engolir tanto também te deu a força de segurar as pontas sozinho quando precisou. A ferida e a força vieram do mesmo lugar — e agora você escolhe o que fazer com as duas.
+@LEAD: Nem tudo o que você carrega nasceu com você. Alguns jeitos de sentir e se proteger vêm de antes — aprendidos, não escolhidos.
+@PADROES: Segurar em silêncio | Dar conta sozinho
+@VOCE: hoje isso aparece em você como engolir o que incomoda até virar irritação de fundo, e insistir em resolver tudo com as próprias mãos, mesmo quando pesa demais.
+@DEPOIS: ao aprender a soltar o que carrega e a pedir ajuda quando precisa, você já tira de quem vem depois o peso de repetir o mesmo silêncio.
+@PADRAO_DETALHE: Esse jeito de segurar e resolver sozinho não começou em você — provavelmente veio de quem, antes de você, também aprendeu que mostrar raiva ou pedir ajuda não era seguro. Não é uma falha sua. É um aprendizado que passou de mão em mão, silenciosamente, até chegar aqui.
+@DIFICIL: Existe um nó difícil aqui: parecer estar bem pode dar a sensação de estar traindo quem sofreu tanto. Mas repetir a dor não é lealdade — lealdade de verdade é viver o que quem veio antes não conseguiu viver.
+@VIRADA: A virada não precisa ser grande nem em todo mundo — muda só em você. Você é o ponto onde a corrente pode mudar de direção. Isso para em mim: é essa a frase.
+@RESILIENCIA: A mesma linhagem que te deu a raiva engolida também te deu a capacidade de aguentar, de se adaptar, de seguir mesmo quando pesava. A ferida e a força vieram do mesmo lugar.
 @IDENTIFICACAO:
-- Engolir para manter a paz | quem na sua família também guardava a raiva pra não criar caso?
-- Resolver tudo sozinho | quem antes de você também carregou peso demais sem pedir ajuda?
+- Segurar em silêncio | quem na sua família também engolia o que sentia pra manter a paz?
+- Dar conta sozinho | quem antes de você aprendeu que pedir ajuda parecia fraqueza?
 @FRASES:
-- "Eu reconheço o que aprendi com vocês, e agradeço a força que isso me deu."
-- "O que não é meu, devolvo com respeito — sem carregar mais do que preciso."
-- "Isto para em mim; o que segue, segue mais leve."
-@RITUAL: Feche os olhos e respire fundo três vezes. Leve a atenção pro centro do peito. Coloque a mão que você usa mais no peito. Diga bem devagar a frase que mais tocar em você. Depois, fique em silêncio um tempo, só sentindo.
+- Eu reconheço o que carrego — e agradeço a força de quem me trouxe até aqui.
+- Devolvo o que não é meu, com respeito por quem me ensinou do jeito que pôde.
+- Isto para em mim; o que segue, segue mais leve.
+@RITUAL: Faça três respirações fundas. Leve a atenção ao centro do peito. Coloque a mão que você mais usa sobre o peito. Diga devagar a frase que mais ressoar em você. Depois, fique em silêncio por um tempo, sem pressa de sair dele.
+
+---
 
 # Mapa emocional
-@LEAD: Cada emoção que você carrega tem dois lados — o que pesa hoje e o alívio que já existe em você, só esperando espaço pra aparecer.
-@REMEDIO: A sua raiva contida — a mais pesada de todas — encontra remédio na sua firmeza e no seu centramento: a mesma base que te sustenta sem endurecer é o que pode segurar a raiva sem deixar que ela vire ressentimento. E a leveza que você já sabe sentir depois de elaborar uma perda mostra que soltar é possível — só falta aplicar isso na raiva do dia a dia, não só nas perdas grandes.
+@LEAD: Cada emoção que você carrega tem dois lados — o que pesa hoje, e o alívio que já existe em você, esperando espaço pra aparecer.
+@REMEDIO: A mesma flexibilidade que já vive em você — a capacidade de mudar de direção quando precisa — é o que amolece a raiva contida: ela lembra seu corpo que dá pra soltar o controle sem perder o rumo, sem precisar endurecer pra se proteger.
+
+---
 
 # Perguntas para a sua sessão
-### Método somático · Sopro da Origem
+> Método somático · Sopro da Origem
+
 @INTRO: Se algo vier forte ao corpo enquanto você lê, não precisa ter resposta — basta notar onde chegou.
+
 @CAMINHO nome=Raiva contida → Serenidade
-- chegar: Quando quiser, e só se fizer sentido, deixe a atenção descer até o peito ou a barriga, sem pressa.
-- tocar: Perceba se existe algum aperto ali — um calor, um nó, um peso. Um cantinho já basta; se nada vier, tudo bem.
-- deixar: Se esse aperto pudesse falar, o que ele diria? Deixe a resposta vir em aberto — tem mais alguma coisa por trás dela?
-- outro: Agora traga a lembrança de um momento em que você conseguiu ficar calmo mesmo irritado — onde no corpo essa calma mora? Tocou e voltou — isso já é força.
-- passo: Escolha uma pequena situação da semana onde você pode dar uma saída pra essa raiva antes que ela se acumule — leve essa ideia pra sua sessão.
-@CAMINHO nome=Irritação que sobe → Clareza
-- chegar: Se fizer sentido, note como está sua cabeça agora — girando ou quieta.
-- tocar: Sinta se existe uma irritação de fundo, mesmo pequena, subindo de algum lugar do corpo pra cabeça. Não precisa nomear a causa.
-- deixar: Deixe essa sensação mostrar até onde ela sobe — para na garganta? Chega na cabeça? Veja o que aparece, sem forçar resposta.
-- outro: Lembre de um momento recente em que sua mente ficou clara, mesmo por pouco tempo — como foi sentir isso? Essa clareza também é sua.
-- passo: Antes de decidir algo importante essa semana, note se a irritação está falando mais alto que você — leve essa observação pra sua sessão.
+- chegar: quando quiser, e só se fizer sentido, deixe a atenção descer devagar até onde a raiva costuma morar no seu corpo.
+- tocar: um cantinho já basta — talvez um aperto no peito, um calor na garganta. Se nada vier agora, tudo bem, não force.
+- deixar: fique só notando essa sensação, sem tentar mudar nada. Tem mais alguma coisa ali, além do que você já sentiu?
+- outro: agora, sem pressa, veja se existe também em você uma sensação de calma — mesmo pequena. Tocou nela e voltou? Isso já é força.
+- passo: leve essa dupla sensação — a raiva e a calma que também existe — pra conversar na sua sessão.
+
+@CAMINHO nome=Irritação que sobe do corpo à mente → Clareza mental
+- chegar: quando estiver à vontade, repare se existe uma irritação de fundo que parece subir de algum lugar do corpo até a cabeça.
+- tocar: perceba onde ela começa — pode ser sutil, um cantinho já basta. Se não vier nada, siga sem se cobrar.
+- deixar: só observe essa sensação subindo, sem julgar. Ela tem um caminho? Um ponto onde parece travar?
+- outro: agora note se existe, ao lado dessa irritação, algum momento em que sua cabeça já ficou clara — mesmo que raro. Tocou nele?
+- passo: guarde essa percepção — onde a tensão sobe e onde a clareza aparece — pra levar à sessão.
+
 @CAMINHO nome=Dificuldade de soltar → Leveza
-- chegar: Quando estiver à vontade, pense em algo que você sabe que já não serve mais, mas ainda guarda.
-- tocar: Note se existe um peso físico associado a isso — nas mãos, no peito, nos ombros. Um pouco de sensação já é suficiente.
-- deixar: Pergunte por dentro: o que esse peso está protegendo? Deixe a resposta vir sem forçar — pode ser só uma sensação, sem palavra.
-- outro: Lembre de algo que você já conseguiu soltar de verdade, no passado — como foi o alívio depois? Esse alívio também mora em você.
-- passo: Escolha uma coisa pequena pra soltar essa semana — e leve o que sentir com isso pra sua sessão.
-@CAMINHO nome=Mente que não desliga → Calma
-- chegar: Se quiser, feche os olhos por um instante e note a velocidade dos seus pensamentos agora.
-- tocar: Sinta onde no corpo essa agitação mental parece morar — testa, nuca, peito. Um sinal pequeno já conta.
-- deixar: Deixe essa agitação "falar" — ela está tentando resolver o quê? Fique em aberto, sem precisar concluir.
-- outro: Traga uma lembrança de um momento em que sua mente ficou quieta, mesmo que por segundos — talvez perto de alguém, ou num silêncio bom. Esse silêncio também é seu.
-- passo: Escolha um momento do dia pra praticar esse silêncio de propósito — leve o que notar pra sua sessão.
-@CAMINHO nome=Sobrecarga guardada → Firmeza que já é sua
-- chegar: Quando fizer sentido, sinta o apoio dos seus pés no chão ou do corpo na cadeira.
-- tocar: Note se existe, junto com o cansaço, também uma sensação de base — algo que te sustenta mesmo cansado. Basta um traço disso.
-- deixar: Deixe essa sensação de base se expandir um pouco, sem forçar — o que ela permite que você sinta?
-- outro: Lembre de uma vez em que precisou ser firme e conseguiu, mesmo sem ninguém perceber o esforço. Essa firmeza já é sua — ela não precisa ser criada, só lembrada.
-- passo: Nessa semana, note um momento em que sua firmeza apareceu sem esforço — leve essa observação pra sua sessão.
-@FECHO: E o que, dentro de você, ainda está esperando que você pergunte como ele está? Se isso tivesse um corpo, onde estaria — e o que estaria pedindo pra você fazer?
+- chegar: quando fizer sentido, pense em algo que você sabe que já cumpriu seu papel, mas ainda segura.
+- tocar: note onde isso mora no corpo — um peso no peito, um aperto na mão. Um pouco já é suficiente.
+- deixar: fique só com essa sensação de segurar, sem tentar soltar ainda. Tem mais alguma coisa junto dela?
+- outro: agora veja se existe, mesmo pequena, uma sensação de alívio ao imaginar deixar ir. Ela toca e volta?
+- passo: leve essa dupla sensação — o segurar e o alívio possível — pra sua sessão.
+
+@CAMINHO nome=Mente que não desliga → Calma que assenta
+- chegar: quando puder, note como sua mente costuma girar quando alguma coisa fica sem resposta.
+- tocar: perceba onde esse girar aparece no corpo — talvez na cabeça, talvez no peito. Um pouco já basta.
+- deixar: só observe esse movimento, sem tentar pará-lo. Ele muda de intensidade enquanto você presta atenção?
+- outro: agora veja se existe, mesmo que discreta, uma sensação de assentar — o corpo mais quieto. Ela aparece e some?
+- passo: guarde essa percepção do girar e do assentar pra trazer à sessão.
+
+@CAMINHO nome=Medo estrutural de base → Segurança de base
+- chegar: quando fizer sentido, note se existe uma sensação de que o chão pode faltar, mesmo sem motivo claro agora.
+- tocar: perceba onde isso mora — talvez nas pernas, talvez na barriga. Um cantinho já é o suficiente.
+- deixar: fique só com essa sensação, sem tentar resolvê-la. Ela tem peso, tem cor, tem lugar?
+- outro: agora busque, mesmo que pequena, uma sensação de apoio — algo ou alguém que já te sustentou antes. Ela toca e volta?
+- passo: leve essa dupla sensação — o medo do chão e o apoio que já existe — pra sua sessão.
+
+@FECHO: O que, dentro de você, ainda está esperando que você pergunte como está? Se isso tivesse um corpo, onde estaria — e o que estaria pedindo?
