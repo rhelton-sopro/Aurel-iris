@@ -9,11 +9,19 @@ import path from 'node:path'
 const LASTRO = path.resolve('apps/web/_motor-lab/lastro/tabela-lastro-CANONICA.md')
 const EXAM = (n) => path.resolve(`apps/web/_exame-${n}.json`)
 
-// ---------- parâmetros (calibráveis) ----------
+// ---------- parâmetros (calibráveis — calibração 2026-07-22) ----------
 const GAMMA = 1.1
 const K = 6 // saturação squash S/(S+k)
 const W_PRES = { vital_ativo: 2.0, neutro: 1.5 }
 const squash = (s) => s / (s + K)
+// AGULHA dos centros: prior de suavização (Laplace) que tira os extremos 0/100.
+// posicao_livre = (livre + α) / (tensão + livre + 2α). Ajustado p/ bater o
+// mockup aprovado (Helton ~26/83/21) sem cravar 0 nem 100.
+const BASELINE_LIVRE = 1.2 // α
+// MAPA emocional: decaimento por rank DENTRO do campo — a emoção-núcleo do
+// órgão domina, a paleta genérica cai (quebra o empate 4.6 sem mapa de família
+// frágil, que reintroduziria o Forer da emoção ubíqua). rank0=1 · r1=.6 · r2=.36…
+const DECAY = 0.6
 
 // ---------- classificação dos campos (de classificacao-campos.md) ----------
 const ALIAS = {
@@ -84,7 +92,10 @@ function parseLastro() {
       if (cm && curE) cargaByElem[curE].push(...cm[1].split('·').map(clean).filter((p) => p.length > 2).slice(0, NUCLEO_CAP))
       if (rm && curE) recursoByElem[curE].push(...rm[1].split('·').map(clean).filter((p) => p.length > 2).slice(0, NUCLEO_CAP))
     }
-    const flat = (o) => Object.values(o).flat()
+    // ordena o leque pela PREDOMINÂNCIA do elemento no campo → a emoção-núcleo
+    // do elemento dominante fica no rank 0 (recebe o peso cheio no decaimento).
+    const order = ['fogo', 'agua', 'terra', 'ar'].sort((a, b) => (elem[b] || 0) - (elem[a] || 0))
+    const flat = (o) => order.flatMap((e) => o[e] || [])
     map[name] = { elem, centros: centros.length ? centros : ['corpo'], carga: flat(cargaByElem), recurso: flat(recursoByElem), cargaByElem, recursoByElem }
   }
   return map
@@ -122,7 +133,7 @@ function calc(name, lastro) {
     const cs = TOPO_CENTRO[key] || t.centros // centro por ZONA topográfica (decisão founder)
     const cw = w / cs.length
     for (const c of cs) centro[c].t += cw
-    for (const e of t.carga) emoCarga[e] = (emoCarga[e] || 0) + w // (B) leque de carga
+    t.carga.forEach((e, i) => { emoCarga[e] = (emoCarga[e] || 0) + w * Math.pow(DECAY, i) }) // (B) leque de carga com decaimento por rank
     // cada achado com sua COMPOSIÇÃO (2 elementos: predominante + secundário),
     // cada elemento com sua emoção-núcleo — o órgão não colapsa em 1 (founder).
     const els = ['fogo', 'agua', 'terra', 'ar'].filter((e) => (t.elem[e] || 0) > 0).sort((x, y) => t.elem[y] - t.elem[x])
@@ -139,9 +150,15 @@ function calc(name, lastro) {
       const cs = TOPO_CENTRO[key] || t.centros
       const cw = w / cs.length
       for (const c of cs) centro[c].l += cw
-      for (const e of t.recurso) emoRecurso[e] = (emoRecurso[e] || 0) + w // (B) leque de recurso
+      t.recurso.forEach((e, i) => { emoRecurso[e] = (emoRecurso[e] || 0) + w * Math.pow(DECAY, i) }) // (B) leque de recurso com decaimento
     }
   }
+  // CONSTITUIÇÃO → livre (recursos constitucionais — SPEC passo 3b; a força NÃO
+  // vem só dos preservados). Liga a "constituicao_base" do Stage 1 aos centros.
+  const CB = d.constituicao_base || {}
+  if (CB.pupila === 'centrada_regular') centro.mente.l += 1.5 // centramento / eixo organizado
+  if (CB.trama_fibras === 'compacta_densa') centro.corpo.l += 1.5 // vitalidade constitucional
+  if (CB.bordas_pupilares === 'regulares') for (const c of ['mente', 'coracao', 'corpo']) centro[c].l += 0.3 // estabilidade
   // ZONA QUIETA: centro sem tensão nenhuma = preservado (livre)
   for (const c of ['mente', 'coracao', 'corpo']) if (centro[c].t === 0) centro[c].l += 1.0
 
@@ -184,7 +201,9 @@ function fmt(r) {
   for (const p of r.pres) L.push(`    ✓ ${p.campo}${p.pol === 'vital_ativo' ? ' (vital)' : ''}`)
 
   // (B) mapa emocional — o leque que o prompt seleciona
-  const nivel = (s) => (s >= 8 ? 'muito alta' : s >= 5 ? 'alta' : s >= 3 ? 'média' : 'baixa')
+  // limiares alinhados ao SPEC (intensidade→nível): I5≈5.9→muito alta · I4≈4.6→alta ·
+  // I3≈3.3→média · abaixo→baixa. (reforço entre campos da mesma emoção sobe o nível.)
+  const nivel = (s) => (s >= 6 ? 'muito alta' : s >= 4 ? 'alta' : s >= 2.5 ? 'média' : 'baixa')
   const maxE = (r.mapaCarga[0] || [0, 1])[1] || 1
   L.push('\n(B) MAPA EMOCIONAL — leque de CARGA (score=Σ intensidade^γ · o prompt seleciona):')
   for (const [emo, s] of r.mapaCarga) {
@@ -196,7 +215,7 @@ function fmt(r) {
   L.push('\n3 CENTROS (agulha 0=tensão ⟷ 100=livre):')
   for (const c of ['mente', 'coracao', 'corpo']) {
     const { t, l } = r.centro[c]
-    const agulha = t + l ? Math.round((l / (t + l)) * 100) : 50
+    const agulha = Math.round(((l + BASELINE_LIVRE) / (t + l + 2 * BASELINE_LIVRE)) * 100) // suavizado (prior Laplace α)
     const pos = Math.round(agulha / 5)
     const track = ('·'.repeat(pos) + '◉' + '·'.repeat(20 - pos)).slice(0, 21)
     L.push(`  ${c.padEnd(8)} tensão${track}livre   agulha=${agulha}  (t ${t.toFixed(1)} / l ${l.toFixed(1)})`)
