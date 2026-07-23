@@ -173,9 +173,23 @@ function calc(name, lastro) {
   for (const c of ['mente', 'coracao', 'corpo']) if (centro[c].t === 0) centro[c].l += 1.0
 
   const pres = preservados.map((p) => ({ campo: p.campo, pol: p.polaridade_funcional }))
-  // (E) seleção top-N do leque
+  // (E) seleção: todo achado GARANTE seu núcleo (todo achado ruim aparece — decisão
+  // founder); achado FORTE (w≥4 = I4/I5) ganha a 2ª emoção também (a pessoa se
+  // identifica forte → "raiva E ressentimento"). Depois preenche os slots restantes.
   const top = (obj, n) => Object.entries(obj).sort((a, b) => b[1] - a[1]).slice(0, n)
-  const mapaCarga = top(emoCarga, 8)
+  const garantidas = new Set()
+  for (const a of achadoList) {
+    if (a.breakdown[0]?.emo) garantidas.add(a.breakdown[0].emo) // núcleo (sempre)
+    if (a.w >= 4 && a.breakdown[1]?.emo) { // 2ª emoção se forte (a pessoa se identifica com as duas)
+      garantidas.add(a.breakdown[1].emo)
+      emoCarga[a.breakdown[1].emo] = Math.max(emoCarga[a.breakdown[1].emo] || 0, a.w * 0.6) // lê ~1 nível abaixo do núcleo, não "baixa"
+    }
+  }
+  const rankedCarga = Object.entries(emoCarga).sort((a, b) => b[1] - a[1])
+  const mapaCarga = rankedCarga.filter(([e]) => garantidas.has(e)) // 1º: as garantidas
+  const N = Math.max(8, mapaCarga.length)
+  for (const row of rankedCarga) { if (mapaCarga.length >= N) break; if (!garantidas.has(row[0])) mapaCarga.push(row) } // 2º: preenche
+  mapaCarga.sort((a, b) => b[1] - a[1])
   const mapaRecurso = top(emoRecurso, 5)
   achadoList.sort((a, b) => b.w - a.w)
   return { name, elem, centro, pres, mapaCarga, mapaRecurso, achadoList, skipped, adjuvantes, nAch: achados.length, nPres: preservados.length }

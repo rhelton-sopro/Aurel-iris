@@ -19,8 +19,11 @@ const r = calc(name, lastro)
 const agu = (c) => Math.round(((r.centro[c].l + α) / (r.centro[c].t + r.centro[c].l + 2 * α)) * 100)
 const AG = { mente: agu('mente'), coracao: agu('coracao'), corpo: agu('corpo') }
 const nivel = (s) => (s >= 6 ? 'muito alta' : s >= 4 ? 'alta' : s >= 2.5 ? 'média' : 'baixa')
-// posição da agulha por NÍVEL (como o mockup): alta parece alta (não no meio)
-const leftCarga = (s) => (s >= 6 ? 13 : s >= 4 ? 19 : s >= 2.5 ? 31 : 42)
+// régua BIPOLAR −50 (totalmente carregado) ⟷ 0 (neutro) ⟷ +50 (antídoto/livre),
+// mesmo modelo dos 3 centros. carga = negativo · recurso = positivo. track% = 50 + bip.
+const bipCarga = (s) => (s >= 6 ? -42 : s >= 4 ? -32 : s >= 2.5 ? -20 : -10)
+const bipRecurso = (s) => (s >= 2 ? 38 : 28)
+const leftCarga = (s) => 50 + bipCarga(s)
 const ANTIDOTO = {
   'raiva contida': 'Serenidade', 'irritação que "sobe" do visceral ao mental': 'Calma',
   'dificuldade de soltar': 'Leveza', '"tagarelice mental rotativa" — mente que não desliga': 'Calma mental',
@@ -175,8 +178,8 @@ function block4(body) {
 // ---------- BLOCO 5 — pêndulos + legenda + remédio ----------
 function block5(body) {
   const f = fields(body)
-  const carga = r.mapaCarga.slice(0, 6).map(([e, s]) => `<div class="pend"><div class="pend-labels"><span class="pl-carga">${esc(short(e))} <span class="lv">${nivel(s)}</span></span><span class="pl-anti">${ANTIDOTO[e] || '—'}</span></div><div class="pend-track"><i class="needle" style="left:${leftCarga(s)}%"></i></div></div>`).join('')
-  const rec = r.mapaRecurso.slice(0, 5).map(([e, s], i) => `<div class="pend"><div class="pend-labels"><span class="pl-shadow">${esc(shadowOf(e))}</span><span class="pl-resource">${esc(short(e))} <span class="lv">${s >= 2 ? 'vital' : 'livre'}</span></span></div><div class="pend-track"><i class="needle free" style="left:${90 - i * 3}%"></i></div></div>`).join('')
+  const carga = r.mapaCarga.slice(0, 9).map(([e, s]) => `<div class="pend"><div class="pend-labels"><span class="pl-carga">${esc(short(e))} <span class="lv">${nivel(s)}</span></span><span class="pl-anti">${ANTIDOTO[e] || '—'}</span></div><div class="pend-track"><i class="needle" style="left:${leftCarga(s)}%"></i></div></div>`).join('')
+  const rec = r.mapaRecurso.slice(0, 5).map(([e, s], i) => `<div class="pend"><div class="pend-labels"><span class="pl-shadow">${esc(shadowOf(e))}</span><span class="pl-resource">${esc(short(e))} <span class="lv">${s >= 2 ? 'vital' : 'livre'}</span></span></div><div class="pend-track"><i class="needle free" style="left:${50 + bipRecurso(s) - i * 2}%"></i></div></div>`).join('')
   return `${f.LEAD ? `<p class="lead">${inl(f.LEAD)}</p>` : ''}
     <div class="legend"><span>● <b>Bolinha</b> = onde você está</span><span><b style="color:var(--amber)">Esquerda</b> = carregado</span><span><b style="color:var(--good)">Direita</b> = a saída</span></div>
     <p class="grouplab carga"><span class="gd"></span>O que pesa hoje</p>${carga}

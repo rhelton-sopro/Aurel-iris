@@ -65,11 +65,14 @@ function serialize(name) {
   L.push('→ **BLOCO 1 "Em poucas palavras": teça os 3 MAIORES (PRINCIPAL + 2º + 3º) como emoção — SEMPRE os 3, o maior abre. É o punch.**')
   L.push('')
 
-  L.push('## Mapa emocional (o que o prompt seleciona — top cargas + recursos)')
+  // régua bipolar −50 (carregado) ⟷ 0 ⟷ +50 (livre), mesmo modelo dos centros
+  const bipC = (s) => (s >= 6 ? -42 : s >= 4 ? -32 : s >= 2.5 ? -20 : -10)
+  const bipR = (s) => (s >= 2 ? 38 : 28)
+  L.push('## Mapa emocional (escala −50 carregado ⟷ 0 ⟷ +50 livre — todo achado ruim representado)')
   L.push('**O que pesa hoje (cargas):**')
-  for (const [emo, s] of r.mapaCarga) L.push(`- ${emo} — ${nivel(s)}`)
+  for (const [emo, s] of r.mapaCarga) L.push(`- ${emo} — ${nivel(s)} (${bipC(s)})`)
   L.push('**O que está leve — força (recursos, das DUAS fontes):**')
-  for (const [emo, s] of r.mapaRecurso) L.push(`- ${emo} — ${s >= 2 ? 'vital' : 'livre'}`)
+  for (const [emo, s] of r.mapaRecurso) L.push(`- ${emo} — ${s >= 2 ? 'vital' : 'livre'} (+${bipR(s)})`)
   L.push('')
 
   L.push('## Força / recursos preservados')
