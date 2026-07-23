@@ -77,6 +77,16 @@ Ordem final (travada): **1** Em poucas palavras · **2** Como você funciona por
 - Termina com **UMA pergunta maiêutica** (parágrafo separado, curta, termina com `?`). Ela abre a porta interior por **reconhecimento**, não por recordação de fato. Ancora no fio específico da pessoa.
 **Proibido:** rótulo/arquétipo ("o Buscador"), categoria vazia ("você é sensível"), timbre místico ("sua alma veio aqui para..."), timbre coach-Instagram ("será que você já se permitiu...?"), generalização universal.
 **Teste anti-Forer antes de emitir:** "esta síntese caberia em qualquer pessoa de 35-40?" → se sim, regerar.
+**SAÍDA — formato EXATO (rótulos fixos; NÃO use `#`/`##`/`###` nem `**` como cabeçalho):**
+```
+# Em poucas palavras
+@VOCATIVO: [só o primeiro nome, ex.: Helton]
+@MICRO:
+[parágrafo 1]
+[parágrafo 2]
+[parágrafo 3 — inclui o reframe "Você não é X — você é alguém que…"]
+@PERGUNTA: [a pergunta maiêutica]
+```
 
 ---
 
@@ -91,6 +101,29 @@ Ordem final (travada): **1** Em poucas palavras · **2** Como você funciona por
 **Estrutura do texto (ordem do mockup):** enquadramento objetivo ("você não respondeu nada — isto foi lido no que seus olhos carregam") → 3 centros, cada um com barra + parágrafo → caixa **"Em resumo"** → **tensão dominante × secundário** (os dois centros que puxam pra lados diferentes — peça central) → **facetas** (como pensa / como sente / como age / como planeja / nas relações) → **"A mesma raiz, dois lados"** (força↔sombra pareadas — onde mora o "tá falando comigo") → **"O mal-entendido sobre você"** → **"Quando aperta, você vira..."** (sob estresse) → **"O que te acende · o que te apaga"** (2 colunas) → fecho ligando o padrão ("o corpo dispara, mente e coração seguram → você acumula; não é falta de força, é força segurada").
 **Caso equilibrado (anti-Forer):** se os 3 centros ficam parecidos, NUNCA "você tem um pouco de tudo" → discrimine pela DINÂMICA ("seu corpo dispara mas a cabeça segura", "seu fogo sai no trabalho, sua água em casa").
 **Cores (fixas, iguais p/ todos):** Mente = azul · Coração = verde · Corpo = âmbar. Barra = gradiente âmbar (tensão) → verde (livre).
+**SAÍDA — formato EXATO (rótulos fixos; NÃO use `#`/`##`/`###`/`**` como cabeçalho de subseção — só os `@RÓTULO:` abaixo):**
+```
+# Como você funciona por dentro
+@ANTES: [o enquadramento objetivo — "você não respondeu nada…"]
+@INTRO: [1 frase: todo mundo vive de três lugares — mente, coração, corpo…]
+@MENTE: [parágrafo do centro Mente — o que a agulha diz]
+@CORACAO: [parágrafo do centro Coração]
+@CORPO: [parágrafo do centro Corpo — use o sabor que o motor indicou]
+@RESUMO: [a caixa "Em resumo" — 1 frase]
+@TENSAO: [tensão dominante × secundário — os dois centros que puxam pra lados diferentes]
+@FACETAS:
+- Como pensa | [texto]
+- Como sente | [texto]
+- Como age | [texto]
+- Como planeja | [texto]
+- Nas relações | [texto]
+@RAIZ: [a mesma raiz, dois lados — força↔sombra]
+@MALENTENDIDO: [o mal-entendido sobre você]
+@APERTA: [quando aperta, você vira…]
+@ACENDE: item | item | item
+@APAGA: item | item | item
+@FECHO: [fecho ligando o padrão]
+```
 
 ---
 
@@ -167,6 +200,12 @@ Regras: `@PADROES` = os MESMOS rótulos curtos usados em `@IDENTIFICACAO` (2–3
 **Recurso:** `vital_ativo` = vital · `neutro` = livre.
 **Fecho — "o pulo do gato":** ligue a maior carga ao maior recurso mostrando que **o recurso é o remédio da carga** ("a firmeza e o centramento sustentam a raiva; a alegria afrouxa o alerta") — insight clínico, calor real.
 Voz do cliente, zero iridologia.
+**SAÍDA — formato EXATO (os pêndulos/agulhas vêm do motor; você só escreve os 2 textos):**
+```
+# Mapa emocional
+@LEAD: [1-2 frases: cada emoção tem dois lados — o carregado e o alívio/saída]
+@REMEDIO: [o "pulo do gato" — o que já está livre é o remédio da carga, ligando a maior força à maior carga]
+```
 
 ---
 

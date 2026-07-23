@@ -1,174 +1,122 @@
 # Em poucas palavras
+@VOCATIVO: Helton
+@MICRO:
+Helton, você é de segurar por dentro o que incomoda. Não é frieza — é treino: você aprendeu a engolir a raiva antes que ela vire discussão, e o corpo aceitou a tarefa. O problema é que o que não sai por um lado sobe por outro — vira uma irritação de fundo que embaça o pensamento, tira o foco bem na hora em que você mais precisa dele, e some sem explicação.
 
-Helton, você é alguém que segura muita coisa por dentro antes de deixar aparecer. A raiva não sai na hora — ela fica guardada, quieta, e vira um peso que você carrega sozinho. Junto com isso, tem uma irritação que começa lá no fundo do corpo e sobe até a cabeça, tirando o foco e deixando os pensamentos espalhados quando menos precisa. É como se o corpo avisasse antes da mente conseguir organizar o que está sentindo.
+Por fora você segue dando conta, resolvendo, sustentando. Por dentro fica uma conta que nunca fecha de verdade — um ressentimento antigo, guardado, esperando a hora (ou a pessoa) errada pra finalmente aparecer.
 
-Você não é uma pessoa "estourada" — você é alguém que aprendeu a engolir para não complicar, e que paga um preço alto por isso: a raiva não desaparece, ela se acumula. Você não é alguém sem paciência — você é alguém que segura tanto, por tanto tempo, que quando a irritação finalmente sobe, parece maior do que realmente é.
+Você não é alguém "estressado demais" ou "que exagera". Você é alguém que aprendeu a se controlar tão bem que esqueceu de descarregar — e carrega sozinho o que merecia ter sido dito, dividido ou solto há muito tempo.
 
-Da próxima vez que sentir aquela irritação subindo sem motivo claro, você consegue perceber o momento exato em que ela deixou de ser incômodo e virou peso guardado?
-
----
+@PERGUNTA: Quando foi a última vez que você engoliu uma resposta que merecia sair — e ainda sente o gosto dela na garganta?
 
 # Como você funciona por dentro
-
-Você não respondeu nenhuma pergunta para chegar até aqui. Tudo o que você vai ler agora foi lido diretamente no que os seus olhos carregam — no jeito como a sua mente, o seu coração e o seu corpo funcionam por dentro, sem filtro.
-
-### Mente — como você pensa
-Sua mente pende para o lado da tensão. É uma cabeça que não desliga fácil: ela rumina, revisita, antecipa o que ainda nem aconteceu. Mesmo quando o corpo está parado, o pensamento continua girando.
-
-### Coração — como você sente
-Aqui o quadro muda completamente: seu coração está do lado livre, e forte. Você tem um afeto inteiro, capaz de se ligar com facilidade nas pessoas e nas coisas que importam. Isso não é fraqueza nem ingenuidade — é uma força real, e rara.
-
-### Corpo — como você age
-O corpo é onde a tensão mais aparece. Ele ferve rápido: o gatilho é curto, a resposta vem antes de você decidir dar ela. Quando alguma coisa incomoda, o corpo reage primeiro e pergunta depois.
-
-**Em resumo:** seu coração está aberto e disponível, mas sua mente não para de girar e seu corpo dispara rápido. É uma combinação que pede muita energia para se manter em pé todos os dias.
-
-**A tensão que mais pesa em você hoje é o corpo — o jeito de agir, que ferve rápido — e logo atrás vem a mente, que gira sem parar.** São essas duas partes que mais puxam você para lados diferentes: uma quer agir na hora, a outra fica repassando a cena depois que ela já passou.
-
-**Como isso aparece em você:**
-- Como pensa: revisita conversas, antecipa problemas antes deles existirem.
-- Como sente: se conecta fácil, se abre com quem confia.
-- Como age: reage rápido quando algo incomoda — o corpo sai na frente.
-- Como planeja: sente que sempre tem que dar conta de mais, como se parar não fosse opção.
-- Nas relações: você se conecta de verdade — mas guarda o que incomoda em vez de dizer na hora, e isso cobra depois.
-
-**A mesma raiz, dois lados:** a mesma energia que faz seu corpo agir rápido e decidir na hora é a que, quando não encontra saída, vira o gatilho curto que fere quem está por perto — inclusive você. E o mesmo coração que se abre fácil e ama de verdade é o que sofre quando a raiva guardada some da conversa e vira silêncio.
-
-**O mal-entendido sobre você:** de fora, você parece tranquilo — afinal seu coração é aberto, você se conecta bem, conversa fácil. Mas por dentro tem uma cabeça que não para e um corpo pronto pra disparar. As pessoas costumam achar que está tudo bem porque você não mostra o que está segurando.
-
-**Quando aperta, você vira:** o corpo dispara primeiro, a mente entra em looping tentando entender o que aconteceu, e o coração — que quer se conectar — fica em segundo plano, esperando a poeira baixar.
-
-**O que te acende:**
-- Sentir que está sendo cobrado sem parar
-- Guardar uma mágoa sem poder dizer o que doeu
-- Perceber que a raiva de antes ainda não foi resolvida
-
-**O que te apaga:**
-- Um espaço para respirar sem cobrança
-- Poder dizer o que incomoda no momento em que acontece
-- Sentir que pode confiar e descansar
-
-No fim das contas, seu corpo dispara, sua mente segura repassando, e seu coração — que quer se abrir — vai ficando de fora dessa engrenagem. Não é falta de força. É força que está sendo segurada por dentro há tempo demais.
-
----
+@ANTES: Helton, você não respondeu nenhuma pergunta pra chegar até aqui. Nada disto veio do que você disse sobre si — veio do que os seus olhos carregam. É um retrato de dentro pra fora.
+@INTRO: Todo mundo vive de três lugares ao mesmo tempo: a cabeça que pensa, o coração que sente, o corpo que age. Em você, os três não puxam parelho.
+@MENTE: Sua mente é a parte mais em tensão de você: ela não desliga fácil. Você antecipa cenário, revisa conversa, remoenda decisão já tomada — como se parar de pensar fosse perder o controle da situação.
+@CORACAO: Já o seu coração é o lugar mais livre e mais forte que você tem: quando alguém te alcança de verdade, você se abre com facilidade, sente inteiro, se conecta sem meio-termo. Aqui não tem freio — tem entrega.
+@CORPO: O corpo é onde a coisa mais aperta em você. É rápido pra ferver: o gatilho é curto, a raiva chega antes do aviso. Não é um corpo tenso e contido — é um corpo que dispara.
+@RESUMO: Em resumo: seu coração se abre fácil, sua cabeça não para, e seu corpo é quem grita primeiro.
+@TENSAO: A dupla que mais puxa em você é Corpo e Mente — o corpo dispara rápido e a cabeça fica girando depois, tentando entender, prever, remendar o que já aconteceu. Enquanto isso, o coração — que é sua parte mais sólida — segue meio à parte desse cabo de guerra.
+@FACETAS:
+- Como pensa | Antecipa e revisa; a cabeça segue trabalhando mesmo depois que a situação já passou.
+- Como sente | Se abre fácil, sente fundo — quando alguém chega perto, você não segura a porta fechada.
+- Como age | Reage rápido quando é contrariado; o corpo chega na frente da razão.
+- Como planeja | Tende a se antecipar demais, tentando prever o problema antes que ele exista.
+- Nas relações | Dá afeto de verdade, mas guarda o incômodo — só que ele sai pelo corpo, não pela palavra.
+@RAIZ: A mesma raiz que faz seu coração se abrir com facilidade é a que faz o corpo disparar rápido: você sente tudo em cheio, sem meio-termo — só que o que é ternura de um lado vira ignição do outro.
+@MALENTENDIDO: As pessoas costumam achar que você é tranquilo, que "leva na boa". Só que por dentro tem uma conta rodando o tempo todo — o que parece calma é raiva sendo administrada.
+@APERTA: Quando aperta, você vira ação antes de virar palavra: o corpo responde primeiro, e só depois a cabeça entra pra tentar entender (ou justificar) o que aconteceu.
+@ACENDE: ser contrariado sem chance de resposta | sentir que engoliu algo injusto | acúmulo de pequenas irritações não ditas
+@APAGA: espaço pra falar o que incomodou na hora | um vínculo em que pode se abrir sem medo | tempo sozinho pra o corpo assentar
+@FECHO: O padrão é este: o corpo dispara, a mente gira tentando entender, e o coração — que é sua força de verdade — fica esperando a vez de aparecer. Não é falta de controle. É força sendo segurada demais, por tempo demais.
 
 # Linha do tempo emocional
+Nesta leitura aparecem quatro marcos: um já em processo de se reorganizar, e três ainda ativos hoje — um deles bem recente. Não são fatos fechados, são estados que ainda pedem espaço.
 
-Você carrega quatro marcos importantes: um já está encaminhado, os outros três ainda estão ativos, pedindo espaço pra se resolver de verdade. Nenhum deles precisa ser lembrado com exatidão — o que importa é reconhecer o que ainda ressoa em você hoje.
-
-@MARCO idade=~4-7 anos | fase=a base | status=proc
-- emoção: uma tensão que se instalou cedo, antes de você conseguir entender de onde vinha
-- comportamento: aprender a se ajustar ao clima ao redor, sem fazer barulho
-- situações: talvez você tenha crescido tendo que se acomodar a um ambiente que já vinha com peso próprio, mesmo sem culpa de ninguém
+@MARCO idade=~4-7 anos | fase=o terreno | status=proc
+- emoção: uma tensão de base instalada cedo, como se o ambiente ao redor já pedisse cautela antes mesmo de você entender por quê.
+- comportamento: aprender a se adaptar rápido, sem fazer muito barulho — virar alguém que se ajusta antes de reclamar.
+- situações: talvez uma casa em que era mais seguro se acomodar do que insistir no que você queria.
 
 @MARCO idade=~13-17 anos | fase=identidade | status=ativo
-- emoção: a sensação de não saber ainda quem estava se tornando, e guardar isso sozinho
-- comportamento: testar quem você era sem falar em voz alta as dúvidas e frustrações que apareciam
-- situações: talvez tenha vivido uma virada — de escola, de grupo, de casa — que mexeu com o que você pensava sobre si mesmo
-- abre: existe uma versão sua, mais nova, que ainda espera para dizer o que sentiu naquela época — o que ela diria, se pudesse falar agora?
-- resolução: o que essa versão mais nova de você precisava ouvir, e nunca ouviu?
+- emoção: uma reorganização de quem você era virando quem você seria — e a sensação de que essa passagem não terminou de assentar.
+- comportamento: talvez você tenha decidido, nessa época, que tipo de pessoa "não seria mais" — e ainda carregue esse contorno hoje.
+- situações: uma virada de fase — de escola, de grupo, de papel em casa — que te deixou tendo que provar quem você era, de novo.
+- abre: Existe alguma versão sua, de adolescente, que você ainda está tentando provar que não é mais?
+- resolução: O que mudaria se você aceitasse que aquela reorganização já cumpriu o que precisava?
 
-@MARCO idade=~28-35 anos | fase=o acúmulo | status=ativo
-- emoção: raiva engolida e cobrança constante, virando peso guardado no corpo
-- comportamento: assumir mais responsabilidade do que cabia, sem reclamar
-- situações: talvez tenha sido a fase de segurar tudo sozinho — trabalho, casa, decisões — engolindo o cansaço para dar conta
-- abre: qual foi a última vez que você segurou a raiva porque parecia mais fácil do que dizer o que estava sentindo?
-- resolução: o que mudaria se, daquela vez, você tivesse dito?
+@MARCO idade=~28-35 anos | fase=o que se acumulou | status=ativo
+- emoção: uma carga que foi se instalando devagar, sem alarde — o tipo de peso que você só percebe quando olha pra trás.
+- comportamento: seguir engolindo, dando conta, sem parar pra descarregar — até isso virar hábito de vida adulta.
+- situações: um período de rotina puxada, cobranças em cima de cobranças, sem muito espaço pra dizer "chega".
+- abre: Tem alguma fase da sua vida adulta em que você lembra de pensar "isso vai me cobrar depois" — e seguiu mesmo assim?
+- resolução: O que você faria diferente hoje, sabendo o preço que aquele acúmulo cobrou?
 
 @MARCO idade=~40-45 anos | fase=o agora | status=ativo
-- emoção: uma irritação que sobe sem aviso, e o cansaço de segurar por tanto tempo
-- comportamento: guardar o que incomoda até que estoure por dentro, mesmo sem querer
-- situações: talvez ultimamente você tenha sentido que uma raiva antiga ainda não encontrou onde descansar
-- abre: onde no corpo você sente essa irritação chegando, antes mesmo de ela virar palavra?
-- resolução: o que essa irritação está tentando dizer, que ainda não foi ouvido?
-
----
+- emoção: uma sobrecarga que ainda está em curso — não é lembrança, é algo que segue pedindo saída agora.
+- comportamento: continuar segurando enquanto o corpo já dá sinal de que está no limite.
+- situações: talvez uma fase recente de pressão sem trégua, em que o corpo começou a "avisar" antes da mente aceitar parar.
+- abre: O que, no seu corpo, tem tentado chamar sua atenção ultimamente — e você tem adiado escutar?
+- resolução: Se você desse ouvidos a esse aviso hoje, o que precisaria mudar primeiro?
 
 # Heranças transgeracionais
-
-@LEAD: nem tudo o que você carrega nasceu com você — muito do que pesa hoje foi aprendido, observado, absorvido antes mesmo de você ter escolha sobre isso.
-@PADROES: Segurar por dentro | Dar conta sozinho | Nunca parar
-@VOCE: hoje isso aparece em você como raiva que fica guardada, responsabilidade que você assume sem pedir ajuda, e uma sensação de que parar não é permitido.
-@DEPOIS: ao aprender a soltar o que incomoda na hora certa, você já entrega pra quem vem depois de você um jeito mais leve de lidar com a própria raiva.
-@PADRAO_DETALHE: esse jeito de engolir e de segurar tudo sozinho provavelmente não nasceu com você — é o tipo de coisa que se aprende observando quem cuidou de você, num ambiente onde parecia mais seguro dar conta calado do que pedir ajuda ou reclamar. Isso tira um pouco do peso: não é uma falha sua, é um aprendizado antigo que você pode revisar agora.
-@DIFICIL: existe um nó silencioso aqui — parece que, se você parar de segurar tudo sozinho, estaria de alguma forma traindo quem sempre fez assim. Mas repetir a mesma dor não é lealdade nenhuma. Lealdade de verdade é viver aquilo que quem veio antes de você não conseguiu viver.
-@VIRADA: a mudança não precisa acontecer em ninguém além de você. Você pode ser a pessoa da sua história que aprende a dizer o que incomoda na hora, em vez de guardar — e isso, sozinho, já muda o que segue depois de você.
-@RESILIENCIA: a mesma linhagem que te ensinou a segurar tudo também te deu a força de aguentar de pé o tempo todo. A ferida e a força vieram juntas — e a força ficou, mesmo depois que a ferida parar de doer.
+@LEAD: Helton, nem tudo o que você carrega nasceu com você. Alguns jeitos de segurar a raiva, de dar conta sozinho, de viver em alerta — vêm de longe, aprendidos antes mesmo de você poder escolher.
+@PADROES: Segurar sozinho | Estar sempre em alerta
+@VOCE: hoje isso aparece em você como raiva que se guarda até explodir por dentro, e como uma urgência constante de dar conta de tudo — como se parar fosse perigoso.
+@DEPOIS: ao aprender a soltar o que pesa e a confiar que pode descansar, você já entrega pra frente uma versão mais leve desse jeito de viver.
+@PADRAO_DETALHE: Esse jeito de engolir a raiva e de viver cobrando de si mesmo "tenho que dar conta" muito provavelmente não começou em você. É o tipo de padrão que se aprende vendo — alguém que também segurava tudo, também vivia em alerta, também não tinha a quem dividir o peso. Você aprendeu o jeito, não escolheu o peso.
+@DIFICIL: Tem uma armadilha aí: parece que se você afrouxar, descansar, parar de "dar conta de tudo", você estaria traindo quem te ensinou esse jeito — como se relaxar fosse desonrar o esforço de quem veio antes. Mas repetir a exaustão não é lealdade. Lealdade de verdade é viver o descanso que talvez eles nunca tiveram chance de viver.
+@VIRADA: A virada não precisa ser grande, nem em ninguém além de você: é só parar de segurar sozinho o que pode ser dito, dividido, soltado. Isso muda em você — e é exatamente assim que você protege quem vem depois: não controlando o que sentem, mas mostrando, na prática, que dá pra soltar sem desmoronar.
+@RESILIENCIA: A mesma linhagem que te ensinou a segurar tudo também te deu a força de aguentar até aqui, dando conta, sem desistir. A ferida e a força vieram juntas — e a força é sua, pra usar de um jeito novo.
 @IDENTIFICACAO:
-- Segurar por dentro | quem na sua família também engolia a raiva em vez de dizer o que doía?
-- Dar conta sozinho | quem, antes de você, aprendeu que pedir ajuda não era opção?
-- Nunca parar | quem na sua história também sentia que parar seria falhar?
+- Segurar sozinho | Quem na sua família também dava conta de tudo, calado, sem dividir o peso com ninguém?
+- Estar sempre em alerta | Quem antes de você vivia como se nunca pudesse baixar a guarda de verdade?
 @FRASES:
-- "Eu reconheço a força de quem segurou tudo antes de mim, e agradeço por ela ter chegado até aqui."
-- "Devolvo o peso que não é meu de carregar sozinho, com respeito por quem me ensinou a segurar."
-- "Isto para em mim; o que segue, segue mais leve."
-@RITUAL: quando quiser fazer esse reconhecimento valer de verdade, respire fundo três vezes. Leve a atenção para o centro do peito. Coloque a mão que você usa mais no peito. Diga devagar a frase que mais ressoar em você. Depois, fique em silêncio por um tempo, sem pressa de sair do momento.
-
----
+- Eu reconheço o que aprendi com vocês — inclusive a força de aguentar.
+- O que não é meu, devolvo com respeito.
+- Isso para em mim; o que segue, segue mais leve.
+@RITUAL: Quando quiser fazer isso valer, pare um instante. Respire fundo três vezes. Leve a atenção pro centro do peito. Coloque a mão que você mais usa sobre o peito. Diga devagar a frase que mais ressoar em você. Depois, fique em silêncio um tempo — sem pressa de sentir nada em especial.
 
 # Mapa emocional
-
-**O que pesa hoje:**
-
-- Raiva contida — nível alto
-- Irritação que sobe do corpo para a cabeça — nível alto
-- Dificuldade de soltar o que já passou — nível médio
-- Mente que não desliga, gira sem parar — nível médio
-- Frustração — nível médio
-- Irritabilidade de fundo — nível médio
-- Medo estrutural de base — nível leve
-- Apego ao passado — nível leve
-
-**O que está leve — sua força:**
-
-- Flexibilidade para mudar de direção quando precisa — força vital
-- Alegria e júbilo — livre
-- Leveza depois de elaborar uma perda — livre
-- Empatia que nutre em vez de esgotar — livre
-- Firmeza e centramento — força que sustenta sem endurecer — livre
-
-A sua maior carga hoje é a raiva contida — e a sua maior força é exatamente a firmeza que você carrega por dentro, o centramento que não te deixa desmoronar. É esse chão firme que sustenta a raiva sem deixar ela tomar conta de tudo. Quanto mais você se apoiar nessa firmeza, menos precisa segurar sozinho o peso da raiva guardada — ela pode ir se soltando aos poucos, sem susto.
-
----
+@LEAD: Cada emoção tem dois lados: o lado que pesa e o lado que já é alívio — e em você os dois convivem, mesmo que um fale mais alto agora.
+@REMEDIO: A raiva contida é o que mais pesa em você hoje — mas o antídoto já está aí dentro: a firmeza que sustenta sem endurecer, a mesma base que te dá flexibilidade pra mudar de direção quando precisa. Você não precisa criar essa força do zero. Ela já existe em você; só precisa ser usada pra soltar, e não só pra segurar.
 
 # Perguntas para a sua sessão
-### Método somático · Sopro da Origem
-
-@INTRO: Se algo vier forte ao corpo enquanto você lê, não precisa ter resposta pronta — basta notar onde chegou.
+@INTRO: Se algo vier forte ao corpo enquanto você lê, não precisa ter resposta — basta notar onde chegou.
 
 @CAMINHO nome=Raiva contida → Serenidade
-- chegar: quando quiser, e só se fizer sentido, deixe a atenção descer devagar até onde a raiva costuma morar em você.
-- tocar: perceba se há uma sensação nessa região — pode ser aperto, calor, peso. Um cantinho já basta; se nada vier agora, também está tudo bem.
-- deixar: se essa sensação pudesse falar, o que ela diria? Fique só notando — sem precisar já ter a resposta certa.
-- outro: agora, sem sair desse lugar, lembre de um momento em que você se sentiu firme, seguro por dentro, como se tivesse chão. Se conseguir sentir os dois — a raiva e a firmeza — ao mesmo tempo, já é um passo real.
-- passo: leve essa descoberta para a sua sessão: o ponto exato do corpo onde a raiva mora, e o que ela pede pra ser ouvida.
+- chegar: Quando quiser, e só se fizer sentido, deixe a atenção descer devagar até onde a raiva costuma morar em você.
+- tocar: Perceba se há alguma tensão aí — um cantinho já basta. Se nada vier, tudo bem, siga mesmo assim.
+- deixar: Se essa tensão pudesse falar, o que ela diria primeiro? Tem mais alguma coisa por trás dela?
+- outro: Agora, sem forçar, veja se existe em você também um lugar mais calmo, mais leve — ele já esteve aí antes. Se você tocou os dois, mesmo que por um segundo, isso já é força.
+- passo: Escolha uma coisa pequena que você poderia dizer, ainda essa semana, em vez de engolir — e leve isso pra sua sessão.
 
 @CAMINHO nome=Irritação que sobe → Clareza
-- chegar: quando estiver à vontade, repare no momento em que a irritação começa — normalmente antes mesmo do pensamento se formar.
-- tocar: veja se dá pra sentir onde no corpo essa irritação nasce antes de subir até a cabeça. Só notar já conta.
-- deixar: dê espaço para o que estiver ali — pode ser calor, agitação, um aperto. Tem mais alguma coisa junto?
-- outro: procure lembrar de um momento em que sua mente ficou clara, mesmo que por pouco tempo — o que havia mudado ali?
-- passo: traga essa observação pra sessão: onde a irritação começa, e o que ajudou, mesmo que uma vez, a mente clarear.
+- chegar: Quando puder, note se existe hoje uma irritação de fundo, sem motivo claro, rodando por dentro.
+- tocar: Veja onde no corpo ela mora — pode ser leve, pode ser só um sinal fraco. Está tudo certo do jeito que vier.
+- deixar: O que essa irritação está tentando dizer, se você parar pra escutar? Tem mais camada embaixo dela?
+- outro: Busque, mesmo que rápido, um momento recente em que sua cabeça esteve clara — sem essa neblina. Tocar os dois já é sinal de que a clareza existe em você.
+- passo: Repare, nos próximos dias, o que costuma vir antes dessa irritação subir — e traga essa observação pra sessão.
 
 @CAMINHO nome=Dificuldade de soltar → Leveza
-- chegar: se fizer sentido agora, pense em algo que você sabe que já não serve mais, mas ainda segura.
-- tocar: perceba se existe um peso físico ligado a isso — talvez no peito, nos ombros, na garganta. Vá com calma, um pouco já é suficiente.
-- deixar: deixe essa sensação apenas estar ali, sem precisar resolvê-la agora. O que ela guarda?
-- outro: lembre de uma vez em que você conseguiu deixar alguma coisa ir — mesmo que pequena — e sentiu um alívio real depois.
-- passo: leve para a sessão o que você identificou que ainda segura, e o que sentiu na vez em que conseguiu soltar.
+- chegar: Se fizer sentido, pense em algo que você sabe que já deveria ter soltado, mas ainda segura.
+- tocar: Onde isso pesa em você agora? Um toque leve nessa sensação já é suficiente.
+- deixar: O que essa dificuldade de soltar está protegendo, no fundo? Deixe a resposta vir sem forçar.
+- outro: Agora procure, mesmo que pequeno, um momento em que você conseguiu soltar algo e sentiu alívio. Os dois lados já convivem em você.
+- passo: Escolha uma coisa concreta, pequena, que você pode começar a soltar esta semana — e leve isso como ponto de partida pra sessão.
 
-@CAMINHO nome=Mente que não desliga → Calma
-- chegar: quando puder, perceba o momento em que a cabeça começa a girar sem parar, revisitando algo que já passou.
-- tocar: veja se esse girar tem um lugar no corpo — muitas vezes fica na testa, no peito ou na garganta.
-- deixar: dê espaço pra esse movimento sem tentar pará-lo agora. O que ele está tentando resolver?
-- outro: busque um momento em que sua mente ficou quieta, mesmo que por instantes — o que estava diferente ali?
-- passo: traga pra sessão onde esse girar mora no corpo, e o que trouxe quietude naquele momento em que ela apareceu.
+@CAMINHO nome=Mente que não desliga → Calma que assenta
+- chegar: Quando quiser, repare no barulho da sua própria cabeça agora, sem tentar mudar nada ainda.
+- tocar: Sinta se esse barulho tem um lugar no corpo — nuca, peito, mandíbula. Um sinal fraco já conta.
+- deixar: O que sua mente está tentando resolver, girando desse jeito? Ela está tentando te proteger de quê?
+- outro: Busque um momento, mesmo curto, em que sua cabeça ficou quieta de verdade. Já ter sentido isso uma vez é prova de que seu corpo sabe voltar à calma.
+- passo: Escolha um horário fixo do dia pra experimentar esse silêncio de propósito, e traga o resultado pra sessão.
 
-@CAMINHO nome=Medo estrutural de base → Segurança
-- chegar: se fizer sentido, note se existe, por baixo de tudo, uma sensação antiga de que o chão pode faltar.
-- tocar: perceba onde essa sensação mora — muitas vezes é na base do corpo, nas pernas, no estômago. Só um pouco já conta.
-- deixar: dê espaço para essa sensação, sem julgar. O que ela está protegendo?
-- outro: agora lembre de um momento — qualquer um — em que você sentiu que tinha apoio real, gente ou recurso em quem confiar.
-- passo: leve para a sessão onde mora esse medo de base, e onde no corpo você sente o apoio quando ele aparece.
+@CAMINHO nome=Medo estrutural de base → Firmeza que sustenta
+- chegar: Se fizer sentido, deixe a atenção ir pra uma sensação de "chão que pode faltar" — se ela existir em você.
+- tocar: Onde no corpo mora essa sensação de base frágil? Mesmo um traço leve já é o suficiente pra notar.
+- deixar: O que essa parte de você teme que aconteça se relaxar de verdade?
+- outro: Agora busque, com calma, a sensação de firmeza que também existe em você — aquela que sustenta sem precisar endurecer. Ela é real, mesmo que fale mais baixo.
+- passo: Identifique uma pessoa ou situação em que você já sentiu essa base seguray, e leve esse exemplo concreto pra sua sessão.
 
-@FECHO: o que, dentro de você, ainda está esperando que você pergunte como está? Se isso tivesse um corpo, onde estaria — e o que estaria pedindo?
+@FECHO: E, pra fechar: o que, dentro de você, ainda está esperando que você pergunte como está? Se isso tivesse um corpo, onde estaria — e o que estaria pedindo?

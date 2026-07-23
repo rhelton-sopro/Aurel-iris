@@ -59,15 +59,23 @@ function prose(md) {
   flush(); return out.join('\n')
 }
 
-// ---------- BLOCO 1 — microfilme + maiêutica ----------
+// extrai campos @RÓTULO: valor (multi-linha até o próximo @ ou #)
+function fields(body) {
+  const map = {}; const re = /^@([A-Z]+):[ \t]*(.*(?:\n(?!@|#).*)*)/gm; let m
+  while ((m = re.exec(body))) map[m[1]] = m[2].trim()
+  return map
+}
+// ---------- BLOCO 1 — microfilme + maiêutica (formato @) ----------
 function block1(body) {
-  const paras = body.split('\n').map((l) => l.trim()).filter(Boolean)
-  const q = paras[paras.length - 1]
-  const micro = paras.slice(0, -1).map((p, i) => {
-    if (i === 0) p = p.replace(/^([^,]+,)/, '<span class="voc">$1</span>') // vocativo
-    return `<p>${inl(p).replace(/<span class="voc">(.+?)<\/span>/, (m) => m)}</p>`
+  const f = fields(body)
+  const voc = (f.VOCATIVO || '').trim()
+  const paras = (f.MICRO || body).split(/\n{2,}|\n/).map((s) => s.trim()).filter((s) => s && !/^@|^#/.test(s))
+  const micro = paras.map((p, i) => {
+    let h = inl(p) // escapa PRIMEIRO
+    if (i === 0 && voc) h = h.replace(new RegExp(`^(${voc.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')},?)`), '<span class="voc">$1</span>') // envolve o vocativo depois
+    return `<p>${h}</p>`
   }).join('')
-  return `<div class="microfilme">${micro}</div><p class="maieutica">${inl(q)}</p>`
+  return `<div class="microfilme">${micro}</div>${f.PERGUNTA ? `<p class="maieutica">${inl(f.PERGUNTA)}</p>` : ''}`
 }
 
 // ---------- BLOCO 2 — pcard(agulhas) + facetas/raízes/drains ----------
@@ -89,44 +97,23 @@ function pcard(paras) {
   return `<div class="pcard">${ctr('mente')}${ctr('coracao')}${ctr('corpo')}</div>`
 }
 function block2(body) {
-  const paras = centerParas(body)
-  const hi = body.search(/\*\*Mente/i)
-  const head = hi >= 0 ? body.slice(0, hi) : body
-  const restStart = body.search(/\*\*(Em resumo|A tensão|Como isso aparece)/i)
-  const rest = restStart >= 0 ? body.slice(restStart) : ''
-  const out = []; const lines = rest.split('\n'); let i = 0
-  const grabPara = () => { const p = []; while (i < lines.length) { const t = lines[i].trim(); if (!t) { i++; break } if (/^\*\*|^[-|]/.test(t)) break; p.push(t); i++ } return p.join(' ') }
-  const grabList = () => { const it = []; while (i < lines.length && lines[i].trim().startsWith('- ')) { it.push(lines[i].trim().slice(2)); i++ } return it }
-  const grabTable = () => { const rows = []; while (i < lines.length && lines[i].trim().startsWith('|')) { const c = lines[i].trim().split('|').map((s) => s.trim()).filter((s) => s.length); i++; if (c.every((x) => /^-+$/.test(x))) continue; rows.push(c) } return rows }
-  while (i < lines.length) {
-    const t = lines[i].trim()
-    if (!t || /^[-*_]{3,}$/.test(t)) { i++; continue }
-    const hm = t.match(/^\*\*(.+?):?\*\*\s*(.*)$/)
-    if (!hm) { i++; out.push(`<p class="tension">${inl(t)}</p>`); continue } // parágrafo solto (fecho) = tension
-    i++
-    const lab = hm[1].trim(); const inline = (hm[2] || '').trim()
-    if (/facetas/i.test(lab)) {
-      const items = grabList()
-      out.push(`<p class="rootlab">Veja como cada centro aparece no seu dia a dia</p><div class="facets">${items.map((it) => { const mm = it.match(/^\*?(.+?):\*?\s*(.*)$/); return `<div class="facet"><span class="fk n">${esc(mm ? mm[1].replace(/\*/g, '') : '')}</span><span class="fv">${inl(mm ? mm[2] : it)}</span></div>` }).join('')}</div>`)
-    } else if (/acende/i.test(lab)) {
-      let acende = [], apaga = []
-      const rows = grabTable()
-      if (rows.length) { for (const rw of rows.slice(1)) { if (rw[0]) acende.push(rw[0]); if (rw[1]) apaga.push(rw[1]) } }
-      else if (inline) { acende = inline.split('·').map((s) => s.trim()).filter(Boolean); const n = lines[i]?.trim().match(/apaga.*?\*\*\s*(.*)/i); if (n) { apaga = n[1].split('·').map((s) => s.trim()).filter(Boolean); i++ } }
-      out.push(`<p class="rootlab">O que te acende &nbsp;·&nbsp; o que te apaga</p><div class="drains"><div class="drain up"><h4>Te acende</h4><ul>${acende.map((x) => `<li>${inl(x)}</li>`).join('')}</ul></div><div class="drain down"><h4>Te apaga</h4><ul>${apaga.map((x) => `<li>${inl(x)}</li>`).join('')}</ul></div></div>`)
-    } else if (/mesma raiz/i.test(lab)) {
-      out.push(`<p class="rootlab">A mesma raiz, dois lados</p><div class="roots"><div class="root">${inl(inline || grabPara())}</div></div>`)
-    } else if (/em resumo/i.test(lab)) {
-      out.push(`<div class="resumo"><p class="resumo-lab">Em resumo</p><p>${inl(inline || grabPara())}</p></div>`)
-    } else if (/quando aperta/i.test(lab)) {
-      out.push(`<p class="rootlab">${esc(lab)}</p><div class="stresswrap"><p class="block-serif">${inl(inline || grabPara())}</p></div>`)
-    } else if (/tensão/i.test(lab)) {
-      out.push(`<p class="tension">${inl(inline || grabPara())}</p>`)
-    } else {
-      out.push(`<p class="rootlab">${esc(lab)}</p><p class="block-serif">${inl(inline || grabPara())}</p>`)
-    }
-  }
-  return `<div class="objbox"><p class="obj-lab">Antes de ler</p><p class="obj-txt">Você já deve ter feito um teste de personalidade — respondeu, marcou opções, ganhou um rótulo. Aqui é diferente: <b>você não respondeu nada</b>. Isto foi lido no que os seus olhos carregam.</p></div>${prose(head)}${pcard(paras)}${out.join('\n')}`
+  const f = fields(body)
+  const facetas = (f.FACETAS || '').split('\n').map((l) => l.replace(/^-\s*/, '').trim()).filter((l) => l.includes('|')).map((l) => { const [k, v] = l.split('|'); return { k: k.trim(), v: v.trim() } })
+  const acende = (f.ACENDE || '').split('|').map((s) => s.trim()).filter(Boolean)
+  const apaga = (f.APAGA || '').split('|').map((s) => s.trim()).filter(Boolean)
+  return [
+    f.ANTES ? `<div class="objbox"><p class="obj-lab">Antes de ler</p><p class="obj-txt">${inl(f.ANTES)}</p></div>` : '',
+    f.INTRO ? `<p class="pintro">${inl(f.INTRO)}</p>` : '',
+    pcard({ mente: f.MENTE, coracao: f.CORACAO, corpo: f.CORPO }),
+    f.RESUMO ? `<div class="resumo"><p class="resumo-lab">Em resumo</p><p>${inl(f.RESUMO)}</p></div>` : '',
+    f.TENSAO ? `<p class="tension">${inl(f.TENSAO)}</p>` : '',
+    facetas.length ? `<p class="rootlab">Veja como cada centro aparece no seu dia a dia</p><div class="facets">${facetas.map((x) => `<div class="facet"><span class="fk n">${esc(x.k)}</span><span class="fv">${inl(x.v)}</span></div>`).join('')}</div>` : '',
+    f.RAIZ ? `<p class="rootlab">A mesma raiz, dois lados</p><div class="roots"><div class="root">${inl(f.RAIZ)}</div></div>` : '',
+    f.MALENTENDIDO ? `<p class="rootlab">O mal-entendido sobre você</p><p class="block-serif">${inl(f.MALENTENDIDO)}</p>` : '',
+    f.APERTA ? `<p class="rootlab">Quando aperta, você vira…</p><div class="stresswrap"><p class="block-serif">${inl(f.APERTA)}</p></div>` : '',
+    (acende.length || apaga.length) ? `<p class="rootlab">O que te acende &nbsp;·&nbsp; o que te apaga</p><div class="drains"><div class="drain up"><h4>Te acende</h4><ul>${acende.map((x) => `<li>${inl(x)}</li>`).join('')}</ul></div><div class="drain down"><h4>Te apaga</h4><ul>${apaga.map((x) => `<li>${inl(x)}</li>`).join('')}</ul></div></div>` : '',
+    f.FECHO ? `<p class="tension">${inl(f.FECHO)}</p>` : '',
+  ].filter(Boolean).join('\n')
 }
 
 // ---------- BLOCO 3 — trilho + momentos (formato @MARCO) ----------
@@ -174,16 +161,14 @@ function block4(body) {
 
 // ---------- BLOCO 5 — pêndulos + legenda + remédio ----------
 function block5(body) {
+  const f = fields(body)
   const carga = r.mapaCarga.slice(0, 6).map(([e, s]) => `<div class="pend"><div class="pend-labels"><span class="pl-carga">${esc(short(e))} <span class="lv">${nivel(s)}</span></span><span class="pl-anti">${ANTIDOTO[e] || '—'}</span></div><div class="pend-track"><i class="needle" style="left:${leftCarga(s)}%"></i></div></div>`).join('')
   const rec = r.mapaRecurso.slice(0, 5).map(([e, s], i) => `<div class="pend"><div class="pend-labels"><span class="pl-shadow">${esc(shadowOf(e))}</span><span class="pl-resource">${esc(short(e))} <span class="lv">${s >= 2 ? 'vital' : 'livre'}</span></span></div><div class="pend-track"><i class="needle free" style="left:${90 - i * 3}%"></i></div></div>`).join('')
-  const med = body.match(/pulo do gato[:\s]*([\s\S]*)/i) || body.match(/rem[ée]dio[\s\S]{0,4}([\s\S]*)/i)
-  const medTxt = med ? med[1].replace(/^\**.*?\**:/, '').trim() : ''
-  const lead = body.split(/\n/).find((l) => l.trim() && !/^#|^\*\*|^\||^-/.test(l.trim())) || ''
-  return `<p class="lead">${inl(lead)}</p>
+  return `${f.LEAD ? `<p class="lead">${inl(f.LEAD)}</p>` : ''}
     <div class="legend"><span>● <b>Bolinha</b> = onde você está</span><span><b style="color:var(--amber)">Esquerda</b> = carregado</span><span><b style="color:var(--good)">Direita</b> = a saída</span></div>
     <p class="grouplab carga"><span class="gd"></span>O que pesa hoje</p>${carga}
     <p class="grouplab livre"><span class="gd"></span>O que está leve — a sua força</p>${rec}
-    ${medTxt ? `<div class="medicine"><p class="med-lab">O que já está livre é o seu remédio</p><p>${inl(medTxt)}</p></div>` : ''}`
+    ${f.REMEDIO ? `<div class="medicine"><p class="med-lab">O que já está livre é o seu remédio</p><p>${inl(f.REMEDIO)}</p></div>` : ''}`
 }
 
 // ---------- BLOCO 6 — perguntas em cards de processo (formato @CAMINHO) ----------
@@ -211,7 +196,7 @@ const blocks = MD.split(/^# /m).filter((b) => b.trim())
 const sections = blocks.map((b, i) => {
   const nl = b.indexOf('\n'); const title = b.slice(0, nl).trim(); const body = b.slice(nl + 1)
   const eyebrow = `<p class="eyebrow"><span class="secnum">${NUMS[i] || ''}</span> &nbsp;${esc(title)}</p>`
-  const h2 = i === 5 ? '' : `<h2 class="display">${esc(H2[i] || title)}</h2>`
+  const h2 = (i === 0 || i === 5) ? '' : `<h2 class="display">${esc(H2[i] || title)}</h2>`
   let inner
   try {
     inner = i === 0 ? block1(body) : i === 1 ? block2(body) : i === 2 ? block3(body) : i === 3 ? block4(body) : i === 4 ? block5(body) : block6(body)
