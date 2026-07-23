@@ -37,18 +37,22 @@ function serialize(name) {
   L.push(`> Pessoa: **${NOME}** · achados=${r.nAch} · preservados=${r.nPres}`)
   L.push('')
 
-  L.push('## Como funciona por dentro (3 centros · agulha tensão 0 ⟷ 100 livre)')
+  L.push('## Como funciona por dentro (3 centros · escala −50 tensão ⟷ 0 equilíbrio ⟷ +50 livre)')
   const centros = ['mente', 'coracao', 'corpo']
   const nomeC = { mente: 'Mente (como pensa)', coracao: 'Coração (como sente)', corpo: 'Corpo (como age)' }
-  const ag = {}
-  for (const c of centros) {
-    const { t, l } = r.centro[c]
-    const a = agulhaDe(t, l); ag[c] = a
-    L.push(`- **${nomeC[c]}**: agulha ${a}/100 (${pende(a)}) → "${centroLabel(c, a, sabor)}"`)
-  }
-  // tensão dominante × secundário (os dois centros mais tensos — peça central do bloco 2)
-  const porTensao = centros.slice().sort((x, y) => ag[x] - ag[y])
-  L.push(`- **Tensão dominante × secundário:** ${nomeC[porTensao[0]].split(' ')[0]} (mais tenso) × ${nomeC[porTensao[1]].split(' ')[0]}`)
+  const ag = {}, bip = {}
+  for (const c of centros) { ag[c] = agulhaDe(r.centro[c].t, r.centro[c].l); bip[c] = ag[c] - 50 } // bipolar centrado no 0
+  const sig = (v) => (v > 0 ? `+${v}` : `${v}`)
+  // RANKING de tensão (mais negativo = mais tenso). SÓ o 1º é "o mais tenso".
+  const porTensao = centros.slice().sort((x, y) => bip[x] - bip[y])
+  const rankTxt = {}
+  porTensao.forEach((c, i) => {
+    rankTxt[c] = bip[c] >= 5 ? 'LIVRE (força — NÃO é tenso)' : i === 0 ? '★ O MAIS tenso (só ESTE é "o mais")' : `também tenso, mas MENOS (${i + 1}º)`
+  })
+  for (const c of centros) L.push(`- **${nomeC[c]}**: ${sig(bip[c])} — ${rankTxt[c]} → "${centroLabel(c, ag[c], sabor)}"`)
+  const nm = (c) => nomeC[c].split(' ')[0]
+  L.push(`- **RANKING de tensão (use exatamente esta ordem):** 1º ${nm(porTensao[0])} (${sig(bip[porTensao[0]])}) · 2º ${nm(porTensao[1])} (${sig(bip[porTensao[1]])}) · 3º ${nm(porTensao[2])} (${sig(bip[porTensao[2]])}). ⚠️ só o 1º é "o mais tenso"; NÃO chame dois centros de "o mais".`)
+  L.push(`- **Tensão dominante × secundário:** ${nm(porTensao[0])} (mais tenso) × ${nm(porTensao[1])}`)
   if (sabor) L.push(`- Sabor do Corpo: **${sabor === 'medo' ? 'medo/fuga (alerta)' : 'raiva/luta (ferve rápido)'}**`)
   L.push('')
 

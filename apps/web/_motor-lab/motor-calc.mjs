@@ -222,13 +222,14 @@ function fmt(r) {
   }
   L.push('   leque de RECURSO (força — dos preservados):')
   for (const [emo, s] of r.mapaRecurso) L.push(`    · ${s.toFixed(1).padStart(4)}  ${emo}`)
-  L.push('\n3 CENTROS (agulha 0=tensão ⟷ 100=livre):')
+  L.push('\n3 CENTROS (escala −50 tensão ⟷ 0 equilíbrio ⟷ +50 livre):')
   for (const c of ['mente', 'coracao', 'corpo']) {
     const { t, l } = r.centro[c]
     const agulha = Math.round(((l + BASELINE_LIVRE) / (t + l + 2 * BASELINE_LIVRE)) * 100) // suavizado (prior Laplace α)
+    const bipolar = agulha - 50 // centrado no 0 (decisão founder — backstage)
     const pos = Math.round(agulha / 5)
     const track = ('·'.repeat(pos) + '◉' + '·'.repeat(20 - pos)).slice(0, 21)
-    L.push(`  ${c.padEnd(8)} tensão${track}livre   agulha=${agulha}  (t ${t.toFixed(1)} / l ${l.toFixed(1)})`)
+    L.push(`  ${c.padEnd(8)} −50${track}+50   score=${bipolar > 0 ? '+' : ''}${bipolar}  (t ${t.toFixed(1)} / l ${l.toFixed(1)})`)
   }
   return L.join('\n')
 }
