@@ -83,20 +83,30 @@ function parseLastro() {
     const clean = (p) => p.replace(/\([^)]*\)/g, '').replace(/[*_`]/g, '').trim()
     const cargaByElem = { fogo: [], agua: [], terra: [], ar: [] }
     const recursoByElem = { fogo: [], agua: [], terra: [], ar: [] }
+    const cargaCrencaByElem = { fogo: [], agua: [], terra: [], ar: [] } // crenças (forma cognitiva) — pro bloco C
+    const recursoCrencaByElem = { fogo: [], agua: [], terra: [], ar: [] }
     let curE = null
     for (const line of b.split('\n')) {
       const em = line.match(/^- \*\*(🔥|💧|🌍|💨)/)
       if (em) curE = ELEM_KEY[em[1]]
       const cm = line.match(/🔴 emoções:\*\*\s*(.*)/)
       const rm = line.match(/🟢 emoções:\*\*\s*(.*)/)
+      const ccm = line.match(/🔴 crenças:\*\*\s*(.*)/)
+      const rcm = line.match(/🟢 crenças:\*\*\s*(.*)/)
       if (cm && curE) cargaByElem[curE].push(...cm[1].split('·').map(clean).filter((p) => p.length > 2).slice(0, NUCLEO_CAP))
       if (rm && curE) recursoByElem[curE].push(...rm[1].split('·').map(clean).filter((p) => p.length > 2).slice(0, NUCLEO_CAP))
+      if (ccm && curE) cargaCrencaByElem[curE].push(...ccm[1].split('·').map(clean).filter((p) => p.length > 2).slice(0, NUCLEO_CAP))
+      if (rcm && curE) recursoCrencaByElem[curE].push(...rcm[1].split('·').map(clean).filter((p) => p.length > 2).slice(0, NUCLEO_CAP))
     }
     // ordena o leque pela PREDOMINÂNCIA do elemento no campo → a emoção-núcleo
     // do elemento dominante fica no rank 0 (recebe o peso cheio no decaimento).
     const order = ['fogo', 'agua', 'terra', 'ar'].sort((a, b) => (elem[b] || 0) - (elem[a] || 0))
     const flat = (o) => order.flatMap((e) => o[e] || [])
-    map[name] = { elem, centros: centros.length ? centros : ['corpo'], carga: flat(cargaByElem), recurso: flat(recursoByElem), cargaByElem, recursoByElem }
+    map[name] = {
+      elem, centros: centros.length ? centros : ['corpo'],
+      carga: flat(cargaByElem), recurso: flat(recursoByElem), cargaByElem, recursoByElem,
+      cargaCrenca: flat(cargaCrencaByElem), recursoCrenca: flat(recursoCrencaByElem),
+    }
   }
   return map
 }
@@ -223,8 +233,16 @@ function fmt(r) {
   return L.join('\n')
 }
 
-const lastro = parseLastro()
-const which = process.argv[2] ? [process.argv[2]] : ['self', 'daniel', 'miguel']
-console.log(`MOTOR protótipo · γ=${GAMMA} k=${K} · pesos pres vital=${W_PRES.vital_ativo}/neutro=${W_PRES.neutro}`)
-console.log(`campos no lastro: ${Object.keys(lastro).length}`)
-for (const n of which) console.log(fmt(calc(n, lastro)))
+// ---------- exports (usados pelo serialize.mjs) ----------
+export { parseLastro, calc, classify, TOPO_CENTRO, GAMMA, K, BASELINE_LIVRE, DECAY, EXAM }
+
+// ---------- CLI (só quando rodado direto: node motor-calc.mjs) ----------
+import { pathToFileURL } from 'node:url'
+const isMain = import.meta.url === pathToFileURL(process.argv[1] || '').href
+if (isMain) {
+  const lastro = parseLastro()
+  const which = process.argv[2] ? [process.argv[2]] : ['self', 'daniel', 'miguel']
+  console.log(`MOTOR protótipo · γ=${GAMMA} k=${K} · pesos pres vital=${W_PRES.vital_ativo}/neutro=${W_PRES.neutro} · α=${BASELINE_LIVRE} decay=${DECAY}`)
+  console.log(`campos no lastro: ${Object.keys(lastro).length}`)
+  for (const n of which) console.log(fmt(calc(n, lastro)))
+}

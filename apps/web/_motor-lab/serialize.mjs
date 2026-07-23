@@ -1,0 +1,121 @@
+#!/usr/bin/env node
+// SERIALIZADOR — transforma o output do motor + o leque da canônica nos BLOCOS
+// B e C que entram no prompt Stage 2 novo (ver prompts/stage2-relatorio-novo-DRAFT.md).
+//   B = DADOS DA LEITURA (números já calculados — o LLM usa, não recalcula)
+//   C = LEQUE (emoções + crenças por área — o LLM seleciona, nunca inventa fora)
+// uso: node _motor-lab/serialize.mjs [self|daniel|miguel]
+import fs from 'node:fs'
+import { parseLastro, calc, classify, BASELINE_LIVRE, EXAM } from './motor-calc.mjs'
+
+const α = BASELINE_LIVRE
+const agulhaDe = (t, l) => Math.round(((l + α) / (t + l + 2 * α)) * 100)
+const nivel = (s) => (s >= 6 ? 'muito alta' : s >= 4 ? 'alta' : s >= 2.5 ? 'média' : 'baixa')
+const pende = (a) => (a < 40 ? 'mais tensão' : a <= 60 ? 'meio a meio' : 'mais livre')
+
+// rótulo de cada lado do centro (o que o gráfico DIZ) — SPEC bloco 2
+function centroLabel(c, agulha, sabor) {
+  const livre = agulha >= 50
+  if (c === 'mente') return livre ? 'pensa claro, sem ruminar' : 'cabeça que não desliga — rumina, antecipa'
+  if (c === 'coracao') return livre ? 'afeto inteiro, se liga com facilidade' : 'afeto ferido ou meio bloqueado'
+  if (livre) return 'corpo tranquilo, responde sem disparar'
+  return sabor === 'medo' ? 'reage se protegendo, em alerta' : 'ferve rápido, gatilho curto'
+}
+
+function serialize(name) {
+  const lastro = parseLastro()
+  const r = calc(name, lastro)
+  const d = JSON.parse(fs.readFileSync(EXAM(name), 'utf8'))
+  const NOME = { self: 'Helton', daniel: 'Daniel', miguel: 'Miguel' }[name] || name
+
+  // sabor do Corpo (2 motores): raiva/luta vs medo/fuga — pelo elemento de carga dominante
+  const sabor = r.elem.carga.fogo >= r.elem.carga.agua ? 'raiva' : 'medo'
+
+  const L = []
+  // ======================= BLOCO B =======================
+  L.push('# BLOCO B — DADOS DA LEITURA (pré-calculados)')
+  L.push('> ⚠️ INTERNO. São os números do motor — **use, não recalcule**. NUNCA copie termo técnico/nome de área daqui pro texto do cliente.')
+  L.push(`> Pessoa: **${NOME}** · achados=${r.nAch} · preservados=${r.nPres}`)
+  L.push('')
+
+  L.push('## Como funciona por dentro (3 centros · agulha tensão 0 ⟷ 100 livre)')
+  const centros = ['mente', 'coracao', 'corpo']
+  const nomeC = { mente: 'Mente (como pensa)', coracao: 'Coração (como sente)', corpo: 'Corpo (como age)' }
+  const ag = {}
+  for (const c of centros) {
+    const { t, l } = r.centro[c]
+    const a = agulhaDe(t, l); ag[c] = a
+    L.push(`- **${nomeC[c]}**: agulha ${a}/100 (${pende(a)}) → "${centroLabel(c, a, sabor)}"`)
+  }
+  // tensão dominante × secundário (os dois centros mais tensos — peça central do bloco 2)
+  const porTensao = centros.slice().sort((x, y) => ag[x] - ag[y])
+  L.push(`- **Tensão dominante × secundário:** ${nomeC[porTensao[0]].split(' ')[0]} (mais tenso) × ${nomeC[porTensao[1]].split(' ')[0]}`)
+  if (sabor) L.push(`- Sabor do Corpo: **${sabor === 'medo' ? 'medo/fuga (alerta)' : 'raiva/luta (ferve rápido)'}**`)
+  L.push('')
+
+  L.push('## Achados evidenciados (todos — ordenados por peso; nada colapsa)')
+  r.achadoList.forEach((a, i) => {
+    const tag = i === 0 ? ' [PRINCIPAL]' : i === 1 ? ' [2º]' : i === 2 ? ' [3º]' : ''
+    const emos = a.breakdown.map((x) => `${x.emo} (${x.pct}%)`).join(' + ')
+    L.push(`${i + 1}. ‹${a.campo}› ${nivel(Math.pow(a.int, 1.1))} — ${emos}${tag}`)
+  })
+  L.push('')
+
+  L.push('## Mapa emocional (o que o prompt seleciona — top cargas + recursos)')
+  L.push('**O que pesa hoje (cargas):**')
+  for (const [emo, s] of r.mapaCarga) L.push(`- ${emo} — ${nivel(s)}`)
+  L.push('**O que está leve — força (recursos, das DUAS fontes):**')
+  for (const [emo, s] of r.mapaRecurso) L.push(`- ${emo} — ${s >= 2 ? 'vital' : 'livre'}`)
+  L.push('')
+
+  L.push('## Força / recursos preservados')
+  for (const p of r.pres) L.push(`- ‹${p.campo}›${p.pol === 'vital_ativo' ? ' (vital)' : ' (livre)'}`)
+  const cb = d.constituicao_base || {}
+  const consti = []
+  if (cb.pupila === 'centrada_regular') consti.push('centramento (um chão por dentro)')
+  if (cb.trama_fibras === 'compacta_densa') consti.push('vitalidade de base')
+  if (cb.bordas_pupilares === 'regulares') consti.push('estabilidade')
+  if (consti.length) L.push(`- constituição: ${consti.join(' · ')}`)
+  if (r.adjuvantes.length) L.push(`- (adjuvantes, sem peso próprio — reforçam a área-alvo: ${r.adjuvantes.join(', ')})`)
+  if (r.skipped.length) L.push(`- (ignorados — marcador/modulador: ${r.skipped.join(', ')})`)
+  L.push('')
+
+  // linha do tempo (bloco 3) — passa cru, o LLM traduz pra emoção/comportamento
+  if ((d.linha_temporal || []).length) {
+    L.push('## Linha do tempo (marcos — traduza p/ emoção + comportamento; idade em formato LIVRE, simbólica)')
+    for (const m of d.linha_temporal) L.push(`- [${m.status}] ${m.idade_aproximada || '?'} — ${m.tipo_provavel}`)
+    L.push('')
+  }
+  if ((d.correlacoes_observadas || []).length) {
+    L.push('## Correlações (teça 2 emoções na narrativa; nudge pequeno)')
+    for (const c of d.correlacoes_observadas) L.push(`- ${(c.campos || []).join(' + ')}: ${c.natureza || ''}`)
+    L.push('')
+  }
+
+  // ======================= BLOCO C =======================
+  L.push('# BLOCO C — LEQUE (emoções + crenças por área)')
+  L.push('> ⚠️ Selecione o que ENCAIXA nesta pessoa — **não use tudo**; **nunca invente** emoção/crença fora daqui. As crenças são a forma cognitiva da emoção (o que a pessoa "acredita" por dentro). Cada área = pêndulo: 🔴 carga ⟷ 🟢 antídoto.')
+  L.push('')
+
+  // campos em jogo = achados (carga ativa) + preservados (recurso ativo), sem duplicar
+  const seen = new Set()
+  const rows = []
+  for (const a of (d.achados_de_atencao || [])) rows.push({ campo: a.campo, role: 'carga ativa (achado)' })
+  for (const p of (d.sistemas_preservados || [])) rows.push({ campo: p.campo, role: 'recurso ativo (preservado)' })
+  for (const row of rows) {
+    const { key, klass } = classify(row.campo)
+    if (klass !== 'emocional') continue // pula marcador/modulador/visto
+    const t = lastro[key]
+    if (!t || seen.has(key)) continue
+    seen.add(key)
+    L.push(`### ‹${key}› — ${row.role}`)
+    if (t.carga.length) L.push(`- 🔴 emoções: ${t.carga.join(' · ')}`)
+    if (t.cargaCrenca.length) L.push(`- 🔴 crenças: ${t.cargaCrenca.join(' · ')}`)
+    if (t.recurso.length) L.push(`- 🟢 emoções: ${t.recurso.join(' · ')}`)
+    if (t.recursoCrenca.length) L.push(`- 🟢 crenças: ${t.recursoCrenca.join(' · ')}`)
+    L.push('')
+  }
+  return L.join('\n')
+}
+
+const name = process.argv[2] || 'self'
+console.log(serialize(name))

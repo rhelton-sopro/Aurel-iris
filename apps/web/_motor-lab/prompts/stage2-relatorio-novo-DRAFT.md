@@ -163,8 +163,7 @@ Subtítulo: **"Método somático · Sopro da Origem"** (marca própria — permi
 
 ---
 
-## ⚙️ NOTA DE ENGENHARIA (o que o CÓDIGO ainda precisa entregar — lado do híbrido)
-Para este prompt rodar, o harness precisa injetar as seções **B** e **C**:
-1. **B (motor):** `motor-calc.mjs` já calcula centros/achados/mapa. Falta **serializar** num bloco limpo pro prompt (hoje ele só imprime no console) + **calibrar** (γ/k/baseline — as agulhas saem em extremos 0/100 vs mockup 26/83/21; wire da família curada de emoções pra o mapa não empatar tudo em 4.6).
-2. **C (leque do lastro):** fatiador que lê `tabela-lastro-CANONICA.md`, filtra os campos desta leitura e entrega emoções **+ crenças** dos 2 polos. (O motor hoje extrai só emoções; as crenças estão na tabela mas não são serializadas ainda.)
-3. Ordem de trabalho sugerida: calibrar motor → escrever serializador B+C → **então** ASK founder pra rodar no Sonnet.
+## ⚙️ NOTA DE ENGENHARIA (lado do CÓDIGO do híbrido)
+- ✅ **B (motor) — CALIBRADO** (commit `a356580`): agulhas suavizadas (α=1.2 + constituição no livre) + mapa com decaimento por rank. `node _motor-lab/motor-calc.mjs [self|daniel|miguel]`.
+- ✅ **B+C — SERIALIZADOS** (`serialize.mjs`): `node _motor-lab/serialize.mjs [self|daniel|miguel]` emite os blocos B (dados calculados: 3 centros+rótulo, achados, mapa, força+constituição, linha do tempo, correlações) e C (leque por área: emoções **+ crenças** dos 2 polos, direto da CANÔNICA). Prontos pra colar nas seções 1.B e 1.C deste prompt.
+- ⏳ **FALTA (antes de rodar):** (a) ASK founder pra rodar no Sonnet; (b) ao produtizar, definir o bloco de dados estruturado que o `render.mjs` consome pros gráficos (agulhas/pêndulos/corrente).
