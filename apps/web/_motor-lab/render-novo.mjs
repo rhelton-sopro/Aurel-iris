@@ -26,22 +26,47 @@ const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v))
 const bipCarga = (s) => clamp(Math.round(-7.5 * s), -48, -6)
 const bipRecurso = (s) => clamp(Math.round(9 * s + 12), 24, 48)
 const leftCarga = (s) => 50 + bipCarga(s)
-const ANTIDOTO = {
-  'raiva contida': 'Serenidade', 'irritação que "sobe" do visceral ao mental': 'Calma',
-  'dificuldade de soltar': 'Leveza', '"tagarelice mental rotativa" — mente que não desliga': 'Calma mental',
-  frustração: 'Fluidez', 'irritabilidade de fundo': 'Serenidade', 'medo estrutural de base': 'Segurança',
-  'apego ao passado': 'Presença', 'baixa autoestima': 'Autovalor', ressentimento: 'Perdão',
-  'desilusão/trauma localizado': 'Sentido', 'rigidez/intolerância': 'Flexibilidade',
-  'urgência constante': 'Ritmo próprio', 'dispersão mental': 'Foco', ressentimento: 'Perdão',
-  'medo de soltar': 'Confiança', 'tensão nervosa sustentada': 'Descanso',
+// PÊNDULO por emoção de carga: [rótulo limpo, o-que-é (carga), antídoto, o-que-é (antídoto)]
+const PEND = {
+  'raiva contida': ['Raiva contida', 'a raiva que você segura pra dentro, pra não virar briga', 'Serenidade', 'sentir e deixar passar, sem explodir'],
+  'irritação que "sobe" do visceral ao mental': ['Irritação que sobe', 'a irritação que sobe do corpo pra cabeça e embaça o que você pensa', 'Calma', 'a irritação baixa e a cabeça clareia'],
+  'dificuldade de soltar': ['Dificuldade de soltar', 'o apego ao que já passou — mágoa, controle, o que você não larga', 'Leveza', 'soltar o que já cumpriu seu papel'],
+  '"tagarelice mental rotativa" — mente que não desliga': ['Mente que não desliga', 'a cabeça que fica girando, sem conseguir parar', 'Calma mental', 'a mente descansa quando há segurança'],
+  ressentimento: ['Ressentimento', 'a mágoa antiga guardada, esperando ser reconhecida', 'Perdão', 'deixar a mágoa ir — por você, não pelo outro'],
+  'dispersão mental': ['Dispersão', 'a atenção que se espalha quando a tensão sobe', 'Foco', 'a energia junta vira atenção'],
+  'medo estrutural de base': ['Medo de base', 'um medo de fundo, de que o chão pode faltar', 'Segurança', 'confiar que você tem base pra se sustentar'],
+  'urgência constante': ['Urgência constante', 'a sensação de precisar sempre fazer mais, sem poder parar', 'Ritmo próprio', 'escolher o que importa e sustentar o passo'],
+  frustração: ['Frustração', 'a energia que trava quando algo não anda', 'Fluidez', 'a energia volta a correr'],
+  'irritabilidade de fundo': ['Irritabilidade de fundo', 'aquela irritação baixa e constante, sem alvo claro', 'Serenidade', 'o fundo aquieta'],
+  'apego ao passado': ['Apego ao passado', 'ficar preso ao que já foi', 'Presença', 'viver o que é agora'],
+  'baixa autoestima': ['Baixa autoestima', 'a sensação de não valer o bastante', 'Autovalor', 'saber que você já basta'],
+  'medo de soltar': ['Medo de soltar', 'o medo de perder se largar o controle', 'Confiança', 'confiar que o essencial fica'],
+}
+// RECURSO (força): [rótulo limpo, o-que-é, sombra (o polo carregado do outro lado)]
+const REC = {
+  'flexibilidade ativa para mudar de direção quando preciso': ['Flexibilidade', 'mudar de direção quando precisa, sem travar', 'Rigidez'],
+  'alegria/júbilo': ['Alegria', 'sentir prazer e leveza no que a vida traz', 'Desânimo'],
+  'leveza depois de elaborar a perda, "respirar aliviado"': ['Leveza', 'respirar aliviado depois de elaborar o que doeu', 'Peso'],
+  'empatia que nutre em vez de esgotar': ['Empatia que nutre', 'se importar com o outro sem se esgotar', 'Sobrecarga do outro'],
+  'firmeza / base vital — força que sustenta sem endurecer': ['Firmeza', 'uma base que te sustenta sem precisar endurecer', 'Fragilidade'],
 }
 const SHADOW = [['firmeza', 'Fragilidade'], ['flexibilidade', 'Rigidez'], ['centr', 'Dispersão'], ['alegria', 'Desamor'], ['fôlego', 'Sufoco'], ['leveza', 'Peso'], ['empatia', 'Sobrecarga do outro'], ['limite', 'Sobrecarga do outro'], ['segur', 'Medo']]
 const shadowOf = (e) => (SHADOW.find(([k]) => e.toLowerCase().includes(k)) || [null, '—'])[1]
+const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1)
+// limpa o rótulo (fallback quando não está no dicionário) — SEM cortar com "…"
 function short(e) {
   let s = e.replace(/["']/g, '').replace(/\s*\(.*?\)/g, '').trim()
   s = s.split(/\s*[—–]\s|,\s/)[0].trim()
-  if (s.length > 32) s = s.slice(0, 30).replace(/\s\S*$/, '') + '…'
-  return s
+  return cap(s)
+}
+// dados do pêndulo de CARGA: usa o dicionário; fallback = rótulo limpo, sem descrição
+function pendData(e) {
+  if (PEND[e]) return { lab: PEND[e][0], desc: PEND[e][1], anti: PEND[e][2], antiDesc: PEND[e][3] }
+  return { lab: short(e), desc: '', anti: '—', antiDesc: '' }
+}
+function recData(e) {
+  if (REC[e]) return { lab: REC[e][0], desc: REC[e][1], shadow: REC[e][2] }
+  return { lab: short(e), desc: '', shadow: shadowOf(e) }
 }
 
 // ---------- markdown inline ----------
@@ -185,8 +210,17 @@ function block4(body) {
 // ---------- BLOCO 5 — pêndulos + legenda + remédio ----------
 function block5(body) {
   const f = fields(body)
-  const carga = r.mapaCarga.slice(0, 9).map(([e, s]) => `<div class="pend"><div class="pend-labels"><span class="pl-carga">${esc(short(e))} <span class="lv">${nivel(s)}</span></span><span class="pl-anti">${ANTIDOTO[e] || '—'}</span></div><div class="pend-track"><i class="needle" style="left:${leftCarga(s)}%"></i></div></div>`).join('')
-  const rec = r.mapaRecurso.slice(0, 5).map(([e, s], i) => `<div class="pend"><div class="pend-labels"><span class="pl-shadow">${esc(shadowOf(e))}</span><span class="pl-resource">${esc(short(e))} <span class="lv">${s >= 2 ? 'vital' : 'livre'}</span></span></div><div class="pend-track"><i class="needle free" style="left:${50 + bipRecurso(s) - i * 2}%"></i></div></div>`).join('')
+  const carga = r.mapaCarga.slice(0, 9).map(([e, s]) => {
+    const p = pendData(e)
+    const antiPart = p.antiDesc ? ` &nbsp;·&nbsp; <b class="anti">${esc(p.anti)}</b>: ${esc(p.antiDesc)}` : ''
+    const desc = p.desc ? `<p class="pend-desc"><b>${esc(p.lab)}</b>: ${esc(p.desc)}${antiPart}</p>` : ''
+    return `<div class="pend"><div class="pend-labels"><span class="pl-carga">${esc(p.lab)} <span class="lv">${nivel(s)}</span></span><span class="pl-anti">${esc(p.anti)}</span></div><div class="pend-track"><i class="needle" style="left:${leftCarga(s)}%"></i></div>${desc}</div>`
+  }).join('')
+  const rec = r.mapaRecurso.slice(0, 5).map(([e, s], i) => {
+    const p = recData(e)
+    const desc = p.desc ? `<p class="pend-desc"><b class="anti">${esc(p.lab)}</b>: ${esc(p.desc)}</p>` : ''
+    return `<div class="pend"><div class="pend-labels"><span class="pl-shadow">${esc(p.shadow)}</span><span class="pl-resource">${esc(p.lab)} <span class="lv">${s >= 2 ? 'vital' : 'livre'}</span></span></div><div class="pend-track"><i class="needle free" style="left:${50 + bipRecurso(s) - i * 2}%"></i></div>${desc}</div>`
+  }).join('')
   return `${f.LEAD ? `<p class="lead">${inl(f.LEAD)}</p>` : ''}
     <div class="legend"><span>● <b>Bolinha</b> = onde você está</span><span><b style="color:var(--amber)">Esquerda</b> = carregado</span><span><b style="color:var(--good)">Direita</b> = a saída</span></div>
     <p class="grouplab carga"><span class="gd"></span>O que pesa hoje</p>${carga}
@@ -235,11 +269,12 @@ const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><met
 .sheet .pcard{margin-bottom:18px} .sheet .resumo{margin-bottom:2px} .microfilme p b{color:var(--teal-deep);font-weight:600}
 .facet .fk.tenso{color:#b5701a} .facet .fk.livre{color:#2f7a54} .facet .fk.meio{color:#8a7d63}
 .respira{text-align:center;font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint,#a99);margin:2px 0 6px}
+.pend-desc{font-size:13px;line-height:1.5;color:var(--ink-soft,#6b6357);margin:5px 0 2px} .pend-desc b{color:#a35a1c;font-weight:600} .pend-desc b.anti{color:#2f7a54} .pend{margin-bottom:14px}
 .maieutica + .maieutica{margin-top:2px}
 </style></head><body>
 <div class="sheet"><div class="pad">
   <div class="brand">IRIS CODEX</div>
-  <div class="brand-sub">Leitura emocional · ${NOME}</div>
+  <div class="brand-sub">Mapa do Ser · ${NOME}</div>
   ${sections}
 </div></div>
 </body></html>`
