@@ -127,7 +127,7 @@ function calc(name, lastro) {
 
   const elem = { carga: { fogo: 0, agua: 0, terra: 0, ar: 0 }, recurso: { fogo: 0, agua: 0, terra: 0, ar: 0 } }
   const centro = { mente: { t: 0, l: 0 }, coracao: { t: 0, l: 0 }, corpo: { t: 0, l: 0 } }
-  const emoCarga = {}, emoRecurso = {} // (B) mapa emocional — acumula score por emoção
+  const emoCarga = {}, emoRecurso = {}, emoElem = {} // (B) mapa emocional — acumula score por emoção (+ elemento de cada)
   const achadoList = [] // TODOS os achados evidenciados (decisão founder: nada de colapsar em 1)
   const skipped = [], adjuvantes = []
 
@@ -144,6 +144,7 @@ function calc(name, lastro) {
     const cw = w / cs.length
     for (const c of cs) centro[c].t += cw
     t.carga.forEach((e, i) => { emoCarga[e] = (emoCarga[e] || 0) + w * Math.pow(DECAY, i) }) // (B) leque de carga com decaimento por rank
+    for (const el of ['fogo', 'agua', 'terra', 'ar']) for (const e of (t.cargaByElem[el] || [])) if (!(e in emoElem)) emoElem[e] = el // guarda o elemento de cada emoção
     // cada achado com sua COMPOSIÇÃO (2 elementos: predominante + secundário),
     // cada elemento com sua emoção-núcleo — o órgão não colapsa em 1 (founder).
     const els = ['fogo', 'agua', 'terra', 'ar'].filter((e) => (t.elem[e] || 0) > 0).sort((x, y) => t.elem[y] - t.elem[x])
@@ -171,6 +172,17 @@ function calc(name, lastro) {
   if (CB.bordas_pupilares === 'regulares') for (const c of ['mente', 'coracao', 'corpo']) centro[c].l += 0.3 // estabilidade
   // ZONA QUIETA: centro sem tensão nenhuma = preservado (livre)
   for (const c of ['mente', 'coracao', 'corpo']) if (centro[c].t === 0) centro[c].l += 1.0
+
+  // REFORÇO DO ELEMENTO DOMINANTE (decisão founder): a emoção mais forte que REPETE
+  // entre achados deve ir pro extremo. O elem.carga já soma os achados do mesmo elemento
+  // (fogo = fígado+radii). Aplico só no DOMINANTE (evita inflar os outros: a Água, por ex.,
+  // se divide entre medo e ressentimento — não é UM tema que repete como a raiva).
+  const domEl = ['fogo', 'agua', 'terra', 'ar'].sort((a, b) => elem.carga[b] - elem.carga[a])[0]
+  const emosDom = Object.keys(emoCarga).filter((e) => emoElem[e] === domEl)
+  if (emosDom.length && elem.carga[domEl] > 0) {
+    const nucleoDom = emosDom.sort((a, b) => emoCarga[b] - emoCarga[a])[0]
+    emoCarga[nucleoDom] = Math.max(emoCarga[nucleoDom], elem.carga[domEl]) // reflete a carga total do elemento dominante
+  }
 
   const pres = preservados.map((p) => ({ campo: p.campo, pol: p.polaridade_funcional }))
   // (E) seleção: todo achado GARANTE seu núcleo (todo achado ruim aparece — decisão
