@@ -178,14 +178,14 @@ Regras: `idade=` e `fase=` vêm da **cronologia da íris** (o `linha_temporal` d
 **Visual:** corrente de 3 elos — *quem veio antes* (esmaecido, com os padrões específicos populados) → **Você** (laranja, onde a corrente muda) → *o que você passa* (teal).
 **A frase para dizer em voz alta** (título; não imprimir "frase de solução"): reconhecer + diferenciar, ancorada no específico da pessoa.
 **Ritual de entrega — FICA NO DOC DO CLIENTE** (ela repete em casa; o terapeuta conduz na sessão): instrução direta — *3 respirações fundas → atenção no centro do peito → mão dominante no peito → dizer devagar a que ressoar → ficar em silêncio um tempo.*
-**Escolha 1-2 padrões** (não a lista inteira = Forer). Padrões possíveis: Silêncio/não-dito · Força/autossuficiência · Papel (criança-adulta, forte-da-família, missão, lealdade invisível) · Vínculo (afeto-não-dito, distância-protege) · Merecimento/escassez · Controle/medo · ★Resiliência (sempre fechar).
+**Escolha 3-5 padrões** que a leitura sustente (não force um número fixo: quantos os achados/emoções realmente indicarem — se são 4 ou 5 padrões transgeracionais reais, traga todos; se só 3, 3). NÃO a lista genérica inteira (aí vira Forer) — cada padrão ancorado no perfil emocional desta pessoa. Padrões possíveis: Silêncio/não-dito · Força/autossuficiência · Papel (criança-adulta, forte-da-família, missão, lealdade invisível) · Vínculo (afeto-não-dito, distância-protege) · Merecimento/escassez · Controle/medo · Raiva engolida/contida · ★Resiliência (sempre fechar).
 **Proibido:** culpar mãe/pai, determinismo ("está no sangue"), afirmar fatos/doenças da família, árvore genealógica literal, linguagem de constelação/carma, prometer cura, nome de autor.
 
 **SAÍDA — formato EXATO (o renderizador lê estes campos; NÃO mude os rótulos):**
 ```
 # Heranças transgeracionais
 @LEAD: [abertura — "nem tudo o que você carrega nasceu com você…", 1–2 frases]
-@PADROES: Padrão curto um | Padrão curto dois | Padrão curto três
+@PADROES: Padrão curto um | Padrão curto dois | Padrão curto três | (mais se a leitura sustentar — 3 a 5)
 @VOCE: [como esses padrões vivem HOJE em você — 1 frase, começa minúscula]
 @DEPOIS: [o que você tira de quem vem depois ao mudar em si — 1 frase, começa minúscula]
 @PADRAO_DETALHE: [o parágrafo que mostra que o padrão não começou numa pessoa só + dissolve a culpa]
@@ -202,7 +202,7 @@ Regras: `idade=` e `fase=` vêm da **cronologia da íris** (o `linha_temporal` d
 - [frase 3 — "isto para em mim; o que segue, segue mais leve"]
 @RITUAL: [instrução do ritual: 3 respirações → atenção no peito → mão dominante no peito → dizer devagar a que ressoar → silêncio]
 ```
-Regras: `@PADROES` = os MESMOS rótulos curtos usados em `@IDENTIFICACAO` (2–3, escolhidos da leitura, NÃO a lista inteira). Campos começam com o `@RÓTULO:` na própria linha. Prosa dentro dos valores (voz do cliente, 8ª série).
+Regras: `@PADROES` = os MESMOS rótulos curtos usados em `@IDENTIFICACAO` (**3 a 5**, escolhidos da leitura, NÃO a lista inteira). `@IDENTIFICACAO` tem uma linha por padrão. Campos começam com o `@RÓTULO:` na própria linha. Prosa dentro dos valores (voz do cliente, 8ª série).
 
 ---
 

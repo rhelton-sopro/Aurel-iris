@@ -19,7 +19,8 @@ const r = calc(name, lastro)
 const agu = (c) => Math.round(((r.centro[c].l + α) / (r.centro[c].t + r.centro[c].l + 2 * α)) * 100)
 const AG = { mente: agu('mente'), coracao: agu('coracao'), corpo: agu('corpo') }
 const nivel = (s) => (s >= 6 ? 'muito alta' : s >= 4 ? 'alta' : s >= 2.5 ? 'média' : 'baixa')
-const leftCarga = (s) => Math.max(12, Math.min(44, Math.round(46 - s * 3.4)))
+// posição da agulha por NÍVEL (como o mockup): alta parece alta (não no meio)
+const leftCarga = (s) => (s >= 6 ? 13 : s >= 4 ? 19 : s >= 2.5 ? 31 : 42)
 const ANTIDOTO = {
   'raiva contida': 'Serenidade', 'irritação que "sobe" do visceral ao mental': 'Calma',
   'dificuldade de soltar': 'Leveza', '"tagarelice mental rotativa" — mente que não desliga': 'Calma mental',
@@ -62,7 +63,7 @@ function prose(md) {
 // extrai campos @RÓTULO: valor (multi-linha até o próximo @ ou #)
 function fields(body) {
   const map = {}; const re = /^@([A-Z]+):[ \t]*(.*(?:\n(?!@|#).*)*)/gm; let m
-  while ((m = re.exec(body))) map[m[1]] = m[2].trim()
+  while ((m = re.exec(body))) map[m[1]] = m[2].replace(/\n+[-*_]{3,}\s*$/, '').trim() // corta o separador --- que o Sonnet põe entre blocos
   return map
 }
 // ---------- BLOCO 1 — microfilme + maiêutica (formato @) ----------
