@@ -65,9 +65,10 @@ function serialize(name) {
   L.push('→ **BLOCO 1 "Em poucas palavras": teça os 3 MAIORES (PRINCIPAL + 2º + 3º) como emoção — SEMPRE os 3, o maior abre. É o punch.**')
   L.push('')
 
-  // régua bipolar −50 (carregado) ⟷ 0 ⟷ +50 (livre), mesmo modelo dos centros
-  const bipC = (s) => (s >= 6 ? -42 : s >= 4 ? -32 : s >= 2.5 ? -20 : -10)
-  const bipR = (s) => (s >= 2 ? 38 : 28)
+  // régua bipolar −50 (carregado) ⟷ 0 ⟷ +50 (livre) CONTÍNUA — cada emoção seu número
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v))
+  const bipC = (s) => clamp(Math.round(-7.5 * s), -48, -6)
+  const bipR = (s) => clamp(Math.round(9 * s + 12), 24, 48)
   L.push('## Mapa emocional (escala −50 carregado ⟷ 0 ⟷ +50 livre — todo achado ruim representado)')
   L.push('**O que pesa hoje (cargas):**')
   for (const [emo, s] of r.mapaCarga) L.push(`- ${emo} — ${nivel(s)} (${bipC(s)})`)

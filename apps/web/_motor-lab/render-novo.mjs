@@ -21,8 +21,10 @@ const AG = { mente: agu('mente'), coracao: agu('coracao'), corpo: agu('corpo') }
 const nivel = (s) => (s >= 6 ? 'muito alta' : s >= 4 ? 'alta' : s >= 2.5 ? 'média' : 'baixa')
 // régua BIPOLAR −50 (totalmente carregado) ⟷ 0 (neutro) ⟷ +50 (antídoto/livre),
 // mesmo modelo dos 3 centros. carga = negativo · recurso = positivo. track% = 50 + bip.
-const bipCarga = (s) => (s >= 6 ? -42 : s >= 4 ? -32 : s >= 2.5 ? -20 : -10)
-const bipRecurso = (s) => (s >= 2 ? 38 : 28)
+// CONTÍNUA (não bucketizada): cada emoção tem seu número; só empata quem é igual de verdade.
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v))
+const bipCarga = (s) => clamp(Math.round(-7.5 * s), -48, -6)
+const bipRecurso = (s) => clamp(Math.round(9 * s + 12), 24, 48)
 const leftCarga = (s) => 50 + bipCarga(s)
 const ANTIDOTO = {
   'raiva contida': 'Serenidade', 'irritação que "sobe" do visceral ao mental': 'Calma',
