@@ -102,6 +102,24 @@ Ordem final (travada): **1** Em poucas palavras · **2** Como você funciona por
 **As Chaves (perguntas do subconsciente), pareadas por marco ativo:** "Abre o estado" + "Resolução". Regras: (1) abrem por **reconhecimento**, nunca recordação de fato ("não lembro" = pergunta morta); (2) ancoram no fio ESPECÍFICO ("última vez que você engoliu o que queria dizer" — não pergunta genérica de fase); (3) podem convidar o silêncio (pergunta + espera).
 ⚠️ Idade = como o Stage 1 emitiu (formato livre). Nunca trave "aos 2 anos exatos". A linha do tempo é dispositivo SIMBÓLICO — caveat forte, nunca "a idade exata do evento".
 
+**SAÍDA — formato EXATO (o renderizador lê estes campos; NÃO mude os rótulos):**
+```
+# Linha do tempo emocional
+[1–2 frases de intro sobre os estados: o que fechou / em processo / ativo hoje. Diga quantos ativos e em processo.]
+
+@MARCO idade=~13–17 anos | fase=identidade | status=ativo
+- emoção: [a emoção que a época deixou — 1 frase]
+- comportamento: [o comportamento que ela pode ter criado — 1 frase]
+- situações: [as situações que talvez tenha vivido — 1 frase]
+- abre: [pergunta "Abre o estado" — reconhecimento, ancorada no fio específico]
+- resolução: [pergunta "Resolução"]
+@MARCO idade=... | fase=... | status=proc
+- emoção: ...
+- comportamento: ...
+- situações: ...
+```
+Regras do formato: `fase=` = 1–3 palavras (ex.: "o terreno", "identidade", "o que ficou", "o agora"). `status=` = `ativo` (a_resolver) · `proc` (em_processo) · `fechado` (resolvido). Marcos `proc`/`fechado` NÃO levam `abre:`/`resolução:` (só ativos têm Chaves). Um `@MARCO` por item do `linha_temporal`, em ordem cronológica.
+
 ---
 
 ### BLOCO 4 — "Heranças transgeracionais"
@@ -113,6 +131,29 @@ Ordem final (travada): **1** Em poucas palavras · **2** Como você funciona por
 **Ritual de entrega — FICA NO DOC DO CLIENTE** (ela repete em casa; o terapeuta conduz na sessão): instrução direta — *3 respirações fundas → atenção no centro do peito → mão dominante no peito → dizer devagar a que ressoar → ficar em silêncio um tempo.*
 **Escolha 1-2 padrões** (não a lista inteira = Forer). Padrões possíveis: Silêncio/não-dito · Força/autossuficiência · Papel (criança-adulta, forte-da-família, missão, lealdade invisível) · Vínculo (afeto-não-dito, distância-protege) · Merecimento/escassez · Controle/medo · ★Resiliência (sempre fechar).
 **Proibido:** culpar mãe/pai, determinismo ("está no sangue"), afirmar fatos/doenças da família, árvore genealógica literal, linguagem de constelação/carma, prometer cura, nome de autor.
+
+**SAÍDA — formato EXATO (o renderizador lê estes campos; NÃO mude os rótulos):**
+```
+# Heranças transgeracionais
+@LEAD: [abertura — "nem tudo o que você carrega nasceu com você…", 1–2 frases]
+@PADROES: Padrão curto um | Padrão curto dois | Padrão curto três
+@VOCE: [como esses padrões vivem HOJE em você — 1 frase, começa minúscula]
+@DEPOIS: [o que você tira de quem vem depois ao mudar em si — 1 frase, começa minúscula]
+@PADRAO_DETALHE: [o parágrafo que mostra que o padrão não começou numa pessoa só + dissolve a culpa]
+@DIFICIL: [o nó da lealdade — por que ficar bem pode dar culpa; repetir a dor não é lealdade]
+@VIRADA: [a virada — muda só em VOCÊ; personagem de transição; é assim que protege quem vem]
+@RESILIENCIA: [a resiliência herdada — a ferida E a força vieram da mesma linhagem]
+@IDENTIFICACAO:
+- Padrão curto um | [pergunta "quem na sua família também…"]
+- Padrão curto dois | [pergunta]
+- Padrão curto três | [pergunta]
+@FRASES:
+- [frase 1 pra dizer em voz alta — reconhecer + agradecer a força]
+- [frase 2 — devolver o que não é seu, com respeito]
+- [frase 3 — "isto para em mim; o que segue, segue mais leve"]
+@RITUAL: [instrução do ritual: 3 respirações → atenção no peito → mão dominante no peito → dizer devagar a que ressoar → silêncio]
+```
+Regras: `@PADROES` = os MESMOS rótulos curtos usados em `@IDENTIFICACAO` (2–3, escolhidos da leitura, NÃO a lista inteira). Campos começam com o `@RÓTULO:` na própria linha. Prosa dentro dos valores (voz do cliente, 8ª série).
 
 ---
 
@@ -143,6 +184,23 @@ Subtítulo: **"Método somático · Sopro da Origem"** (marca própria — permi
 **Linha de permissão** (após o intro): "Se algo vier forte ao corpo enquanto você lê, não precisa ter resposta — basta notar onde chegou."
 **Pergunta-fecho personificada** (anti-Forer): "o que, dentro de você, ainda está esperando que você pergunte como está? Se isso tivesse um corpo, onde estaria — e o que estaria pedindo?"
 **Regras:** as frases-modelo do lastro são gabarito de ESTRUTURA/TOM — **reescreva no vocabulário DESTA leitura** (frase literal do gabarito = vaza = Forer). PNL/Erickson só auto-guiado e transparente, nunca sugestão oculta. Mandar pra sessão (não resolver no PDF) em: trauma precoce, luto, carga crônica alta.
+
+**SAÍDA — formato EXATO (o renderizador lê estes campos; um item por linha, NÃO junte os 5 tempos num parágrafo só):**
+```
+# Perguntas para a sua sessão
+@INTRO: [linha de permissão]
+@CAMINHO nome=Raiva contida → Serenidade
+- chegar: [tempo 1 — chegar, voz permissiva]
+- tocar: [tempo 2 — tocar a carga no corpo, com titração]
+- deixar: [tempo 3 — deixar falar, em aberto]
+- outro: [tempo 4 — trazer o outro lado, ancorado no recurso real]
+- passo: [tempo 5 — micro-passo pra levar à sessão]
+@CAMINHO nome=...
+- chegar: ...
+[etc — 4 a 5 Caminhos; 1 ancorado numa FORÇA/recurso]
+@FECHO: [pergunta-fecho personificada]
+```
+Regras do formato: cada tempo em SUA linha (`- chegar:` … `- passo:`), NUNCA os cinco juntos num parágrafo. `nome=` = "[carga] → [alívio]".
 
 ---
 
