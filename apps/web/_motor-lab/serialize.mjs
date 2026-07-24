@@ -59,7 +59,7 @@ function serialize(name) {
   L.push('## Achados evidenciados (todos — ordenados por peso; nada colapsa)')
   r.achadoList.forEach((a, i) => {
     const tag = i === 0 ? ' [PRINCIPAL]' : i === 1 ? ' [2º]' : i === 2 ? ' [3º]' : ''
-    const emos = a.breakdown.map((x) => `${x.emo} (${x.pct}%)`).join(' + ')
+    const emos = a.breakdown.map((x) => x.emo).join(' + ') // emoção, SEM %elemento (decisão founder: mapa/achados sem elemento)
     L.push(`${i + 1}. ‹${a.campo}› ${nivel(Math.pow(a.int, 1.1))} — ${emos}${tag}`)
   })
   L.push('→ **BLOCO 1 "Em poucas palavras": teça os 3 MAIORES (PRINCIPAL + 2º + 3º) como emoção — SEMPRE os 3, o maior abre. É o punch.**')

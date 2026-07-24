@@ -7,6 +7,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 const LASTRO = path.resolve('apps/web/_motor-lab/lastro/tabela-lastro-CANONICA.md')
+const FAMILIA_MD = path.resolve('apps/web/_motor-lab/lastro/emocao-familia.md')
 const EXAM = (n) => path.resolve(`apps/web/_exame-${n}.json`)
 
 // ---------- parâmetros (calibráveis — calibração 2026-07-22) ----------
@@ -111,6 +112,26 @@ function parseLastro() {
   return map
 }
 
+// ---------- emoção → FAMÍLIA (metodologia C: reforço por família, SEM elemento) ----------
+// A tabela emocao-familia.md foi construída a partir das MESMAS emoções do parseLastro
+// (232 carga + 146 recurso), então os rótulos casam (cobertura medida: 230/232 carga).
+function loadFamilias() {
+  const md = fs.readFileSync(FAMILIA_MD, 'utf8').split(/\r?\n/)
+  const clean = (p) => p.replace(/\*\(alt:[^)]*\)\*/g, '').replace(/[*_`]/g, '').split('→')[0].replace(/\([^)]*\)/g, '').trim().toLowerCase()
+  const fam = {}
+  let cur = ''
+  for (const ln of md) {
+    const h = ln.match(/^### \d+\.\s*(.+)$/); if (h) { cur = h[1].trim(); continue }
+    const m = ln.match(/^\*\*(?:🔴 Carga|🟢 Recurso) \(\d+\):\*\*\s*(.*)$/)
+    if (!m || !cur) continue
+    if (/^—/.test(m[1].trim())) continue
+    for (const item of m[1].split(' · ')) { const k = clean(item); if (k.length > 2 && !(k in fam)) fam[k] = cur }
+  }
+  return fam
+}
+const EMO_FAMILIA = loadFamilias()
+const familiaDe = (emo) => EMO_FAMILIA[(emo || '').toLowerCase()] || null
+
 // ---------- resolve um campo do exame → chave da tabela + classe ----------
 function classify(campo) {
   if (ALIAS[campo]) return { key: ALIAS[campo], klass: 'emocional' }
@@ -127,7 +148,7 @@ function calc(name, lastro) {
 
   const elem = { carga: { fogo: 0, agua: 0, terra: 0, ar: 0 }, recurso: { fogo: 0, agua: 0, terra: 0, ar: 0 } }
   const centro = { mente: { t: 0, l: 0 }, coracao: { t: 0, l: 0 }, corpo: { t: 0, l: 0 } }
-  const emoCarga = {}, emoRecurso = {}, emoElem = {} // (B) mapa emocional — acumula score por emoção (+ elemento de cada)
+  const emoCarga = {}, emoRecurso = {} // (B) mapa emocional — acumula score por emoção
   const achadoList = [] // TODOS os achados evidenciados (decisão founder: nada de colapsar em 1)
   const skipped = [], adjuvantes = []
 
@@ -144,7 +165,6 @@ function calc(name, lastro) {
     const cw = w / cs.length
     for (const c of cs) centro[c].t += cw
     t.carga.forEach((e, i) => { emoCarga[e] = (emoCarga[e] || 0) + w * Math.pow(DECAY, i) }) // (B) leque de carga com decaimento por rank
-    for (const el of ['fogo', 'agua', 'terra', 'ar']) for (const e of (t.cargaByElem[el] || [])) if (!(e in emoElem)) emoElem[e] = el // guarda o elemento de cada emoção
     // cada achado com sua COMPOSIÇÃO (2 elementos: predominante + secundário),
     // cada elemento com sua emoção-núcleo — o órgão não colapsa em 1 (founder).
     const els = ['fogo', 'agua', 'terra', 'ar'].filter((e) => (t.elem[e] || 0) > 0).sort((x, y) => t.elem[y] - t.elem[x])
@@ -173,15 +193,23 @@ function calc(name, lastro) {
   // ZONA QUIETA: centro sem tensão nenhuma = preservado (livre)
   for (const c of ['mente', 'coracao', 'corpo']) if (centro[c].t === 0) centro[c].l += 1.0
 
-  // REFORÇO DO ELEMENTO DOMINANTE (decisão founder): a emoção mais forte que REPETE
-  // entre achados deve ir pro extremo. O elem.carga já soma os achados do mesmo elemento
-  // (fogo = fígado+radii). Aplico só no DOMINANTE (evita inflar os outros: a Água, por ex.,
-  // se divide entre medo e ressentimento — não é UM tema que repete como a raiva).
-  const domEl = ['fogo', 'agua', 'terra', 'ar'].sort((a, b) => elem.carga[b] - elem.carga[a])[0]
-  const emosDom = Object.keys(emoCarga).filter((e) => emoElem[e] === domEl)
-  if (emosDom.length && elem.carga[domEl] > 0) {
-    const nucleoDom = emosDom.sort((a, b) => emoCarga[b] - emoCarga[a])[0]
-    emoCarga[nucleoDom] = Math.max(emoCarga[nucleoDom], elem.carga[domEl]) // reflete a carga total do elemento dominante
+  // REFORÇO POR FAMÍLIA (metodologia C — decisão founder, SEM elemento): cada achado
+  // joga só o seu NÚCLEO na família (cap anti-Forer); a família que REPETE entre achados
+  // acumula a soma dos pesos; o LÍDER dessa família (emoção mais forte do leque) vai ao
+  // extremo. Ex.: raiva contida sobe ao topo porque a família Raiva repete (fígado+radii),
+  // e você continua vendo irritação/ressentimento separadas no leque (granularidade da A).
+  const famScore = {} // família → Σ peso dos achados cujo NÚCLEO é dela (só o núcleo = cap)
+  for (const a of achadoList) {
+    const f = familiaDe(a.breakdown[0]?.emo)
+    if (f) famScore[f] = (famScore[f] || 0) + a.w
+  }
+  const domFam = Object.keys(famScore).sort((a, b) => famScore[b] - famScore[a])[0] || null
+  if (domFam) {
+    const naFamilia = Object.keys(emoCarga).filter((e) => familiaDe(e) === domFam)
+    if (naFamilia.length) {
+      const lider = naFamilia.sort((a, b) => emoCarga[b] - emoCarga[a])[0]
+      emoCarga[lider] = Math.max(emoCarga[lider], famScore[domFam]) // líder da família dominante vai ao extremo
+    }
   }
 
   const pres = preservados.map((p) => ({ campo: p.campo, pol: p.polaridade_funcional }))
@@ -204,7 +232,7 @@ function calc(name, lastro) {
   mapaCarga.sort((a, b) => b[1] - a[1])
   const mapaRecurso = top(emoRecurso, 5)
   achadoList.sort((a, b) => b.w - a.w)
-  return { name, elem, centro, pres, mapaCarga, mapaRecurso, achadoList, skipped, adjuvantes, nAch: achados.length, nPres: preservados.length }
+  return { name, elem, centro, pres, mapaCarga, mapaRecurso, achadoList, famScore, domFam, skipped, adjuvantes, nAch: achados.length, nPres: preservados.length }
 }
 
 function fmt(r) {
@@ -241,6 +269,12 @@ function fmt(r) {
   // I3≈3.3→média · abaixo→baixa. (reforço entre campos da mesma emoção sobe o nível.)
   const nivel = (s) => (s >= 6 ? 'muito alta' : s >= 4 ? 'alta' : s >= 2.5 ? 'média' : 'baixa')
   const maxE = (r.mapaCarga[0] || [0, 1])[1] || 1
+  // metodologia C — família que REPETE entre achados carrega a soma (reforço SEM elemento)
+  const famRank = Object.entries(r.famScore || {}).sort((a, b) => b[1] - a[1])
+  if (famRank.length) {
+    L.push('\n(C) REFORÇO POR FAMÍLIA (a que repete entre achados leva o líder ao extremo):')
+    L.push('  ' + famRank.map(([f, s], i) => `${i === 0 ? '★' : '·'}${f} ${s.toFixed(1)}`).join('  ·  ') + `   → dominante: ${r.domFam}`)
+  }
   L.push('\n(B) MAPA EMOCIONAL — leque de CARGA (score=Σ intensidade^γ · o prompt seleciona):')
   for (const [emo, s] of r.mapaCarga) {
     const bar = '▓'.repeat(Math.round((s / maxE) * 16)).padEnd(16)
