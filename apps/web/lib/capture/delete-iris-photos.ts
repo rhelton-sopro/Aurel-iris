@@ -10,9 +10,22 @@ export interface PurgeResult {
   ok: boolean
   removed: number
   error?: string
+  /** Isento do expurgo (não apagou de propósito) — não deve contar como purga. */
+  skipped?: boolean
 }
 
 const BUCKET = 'iris-captures'
+
+/**
+ * Usuários cujas fotos ficam ISENTAS de todo o expurgo automático (geração
+ * síncrona + cron TTL 24h + catch-up). Escopo TRAVADO por user_id — não afeta
+ * a deleção de NENHUM cliente. Uso: dado biométrico PRÓPRIO do founder, mantido
+ * com consentimento dele para trabalho de análise/calibração (Stage 1 4.6×5.0).
+ * A deleção MANUAL (o próprio dono excluir a leitura) NÃO é afetada.
+ */
+export const PHOTO_PURGE_EXEMPT_USER_IDS = new Set<string>([
+  '1e02831f-0631-4059-b7bc-c8a6a62f9548', // rhelton@gmail.com (founder)
+])
 
 /**
  * Lista RECURSIVAMENTE todos os arquivos sob um prefixo do storage.
@@ -85,6 +98,11 @@ export async function purgeIrisPhotos(
     ?.therapist_id
   if (!therapistId) {
     return { ok: false, removed: 0, error: 'reading sem therapist_id' }
+  }
+
+  // Founder isento: mantém as fotos (dado próprio + consentido, p/ análise).
+  if (PHOTO_PURGE_EXEMPT_USER_IDS.has(therapistId)) {
+    return { ok: true, removed: 0, skipped: true }
   }
 
   const prefix = `${therapistId}/${readingId}`

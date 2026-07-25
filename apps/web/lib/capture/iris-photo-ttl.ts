@@ -53,6 +53,7 @@ export async function purgeExpiredIrisPhotos(): Promise<TtlSweepResult> {
     const rows = (oldRaw ?? []) as unknown as Array<{ id: string }>
     for (const row of rows) {
       const r = await purgeIrisPhotos(service, row.id, 'ttl_24h')
+      if (r.skipped) continue // founder isento — não conta como purga
       if (r.ok) result.ttl_purged += 1
       else result.errors += 1
     }
@@ -78,6 +79,7 @@ export async function purgeExpiredIrisPhotos(): Promise<TtlSweepResult> {
       const complete = row.audit_metadata?.section_completeness?.complete
       if (complete === true) {
         const r = await purgeIrisPhotos(service, row.id, 'audit_complete')
+        if (r.skipped) continue // founder isento — não conta como purga
         if (r.ok) result.catchup_purged += 1
         else result.errors += 1
       }
