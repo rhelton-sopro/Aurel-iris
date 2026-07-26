@@ -651,8 +651,24 @@ Use o seu melhor conhecimento de iridologia clássica — múltiplas escolas
 e tradições (incluindo a topografia radial latino-americana de 5 ciclos) —
 pra identificar marcadores biográficos nesta íris.
 
-**REQUISITO DURO: identifique no MÍNIMO 3 marcadores temporais por
-leitura.** Sempre. Não devolva array vazio. Não devolva 1 ou 2.
+**META DE ESFORÇO: 3 marcadores temporais.** Não é cota de saída — é
+obrigação de PROCURAR. Antes de concluir, varra ATIVAMENTE as três
+bandas biográficas (infância · adolescência · vida adulta) em vez de
+parar no primeiro sinal óbvio. Uma linha do tempo pobre por preguiça de
+varredura é falha.
+
+**TESTE DE VERDADE — aplique a CADA marcador antes de emitir:**
+
+> *"Eu consigo apontar essa marca numa foto específica, dizer QUE tipo
+> de sinal é, e em que zona ela está?"*
+
+Se a resposta for não, **o marcador não existe** — não o emita. A marca
+é o que NÃO pode ser inventado.
+
+Se depois de varredura ativa você encontrar só 2 marcas reais, **emita
+2**. Emitir um 3º sem marca real não é cumprir a meta, é **falha grave**
+— e falha pior do que entregar 2, porque contamina a leitura inteira com
+um evento que nunca aconteceu. O terapeuta vai levar isso para a sessão.
 
 Para cada marcador:
 
@@ -660,12 +676,22 @@ Para cada marcador:
   (mancha, pigmento, compressão fibrilar, lacuna, opacidade, abertura,
   sombreamento, reorganização etc.) com **topografia exata** (zona
   horária + qual olho).
-- **`idade_aproximada`**: traga sua melhor estimativa em formato LIVRE,
-  apoiando-se na topografia cronológica radial das escolas que você
-  conhece — ex.: `"infância precoce (~3-6)"`, `"adolescência tardia
-  (~16-19)"`, `"adulto jovem (~25-30)"`, `"~8 anos"`, `"por volta dos
-  12-14"`. Sintetize internamente quando escolas divergirem; entregue
-  uma estimativa só.
+- **`idade_aproximada`**: traga sua melhor estimativa, em formato LIVRE.
+  **Seja concreto — faixa etária numérica é bem-vinda e preferível**,
+  porque é o que permite à pessoa reconhecer o próprio período de vida:
+  `"por volta dos 12 aos 14"`, `"~8 anos"`, `"dos 25 aos 30"`,
+  `"adolescência tardia (~16-19)"`, `"primeira infância (~3-6)"`.
+
+  Prefira uma FAIXA a um ano cravado (`"dos 12 aos 14"` em vez de
+  `"aos 13"`) — a faixa é honesta sobre a precisão real do método sem
+  perder o poder de reconhecimento.
+
+  O que sustenta a datação é a **maturidade da marca**: marca integrada
+  ao estroma, com bordas fechadas e contraste baixo = mais antiga; marca
+  definida, contrastante, de bordas ativas = mais recente. Use também a
+  ordem RELATIVA entre as marcas — a sequência entre elas é mais firme
+  que a data absoluta de cada uma. Sintetize internamente quando as
+  escolas divergirem e entregue UMA estimativa só.
 - **`tipo_provavel`**: que tipo de evento essa marca sugere — adaptação
   precoce, trauma somático, carga metabólica acumulada, transição de
   ciclo, reorganização constitucional etc.
@@ -678,19 +704,22 @@ Para cada marcador:
 **Íris severamente ilegível** (midríase >70%, pigmentação extrema cobrindo
 estrutura, reflexos cobrindo zonas críticas, opacidade global):
 
-- Mesmo assim, identifique **no mínimo 3 marcadores** trabalhando com o
-  que É acessível.
+- Trabalhe com o que É acessível e **continue procurando os 3** — sinal
+  sutil ainda é sinal, e sutileza declarada é informação honesta.
 - No campo `marca_visivel`, **declare a limitação explicitamente** no
   início da descrição, ex.: `"Leitura limitada por midríase bilateral
   acentuada; sinal observável: sombreamento difuso na zona inferior
   (~6h) bilateral, sem definição fibrilar"`.
-- A confiança pode ser modesta — isso fica claro pela própria descrição
-  qualificada. O importante é entregar 3 ancoragens topográficas pro
-  terapeuta cruzar com anamnese.
+- **Mas o teste de verdade continua valendo.** Íris ilegível não é
+  licença para preencher: se a limitação técnica impede apontar a marca,
+  o marcador não existe. Entregue menos e diga por quê — é isso que
+  permite ao terapeuta pedir foto nova em vez de trabalhar em cima de
+  um evento inventado.
 
-**NÃO** invente faixas defaults sem qualquer ancoragem visual. **MAS**
-sempre identifique 3 marcadores trabalhando com o que está visível,
-mesmo quando o sinal é sutil — declare a sutileza, não omita o marcador.
+**Resumindo o contrato do tempo:** esforço máximo em ENCONTRAR a marca,
+honestidade máxima em DATAR a marca. Marca sutil, declarada como sutil →
+emita. Marca que você não consegue apontar → não emita. Idade sempre em
+janela larga. Sutileza se declara; ausência não se preenche.
 
 ## 5 blindagens auto-aplicáveis (releia antes de submeter)
 

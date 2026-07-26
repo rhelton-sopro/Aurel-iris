@@ -298,7 +298,11 @@ export const REGISTRAR_EXAME_TOOL: Anthropic.Tool = {
       linha_temporal: {
         type: 'array',
         description:
-          'SÓ marcadores com marca visível REAL. Array vazio é válido.',
+          'Meta de ESFORÇO: 3 (varra infância/adolescência/vida adulta). ' +
+          'SÓ marcadores com marca visível REAL que você consiga apontar. ' +
+          'Achou só 2 marcas reais? Emita 2 — inventar o 3º é falha grave. ' +
+          'idade_aproximada concreta e de preferência numérica em FAIXA ' +
+          '("por volta dos 12 aos 14"), ancorada na maturidade da marca.',
         items: {
           type: 'object',
           required: ['idade_aproximada', 'marca_visivel', 'tipo_provavel', 'status'],
