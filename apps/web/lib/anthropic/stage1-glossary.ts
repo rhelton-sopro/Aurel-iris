@@ -85,10 +85,36 @@ export const GLOSSARY: readonly GlossaryEntry[] = [
     // lacunas" era amplo demais — pigmento âmbar DIFUSO em íris castanha é
     // constitutional, não achado clínico. Novo piso exige sinal CONCENTRADO
     // em zona 5-7h específica (não difuso periférico) + densidade evidente.
+    // 2026-07-26 — CORRIGIDO contra o gráfico oficial (Jensen/Ellen Jensen 2004,
+    // livros/551115800-iridology-chart.pdf) + texto do livro grande.
+    // ERRO ANTERIOR: 'Temporal inferior OE+OD (5-7h)'. A 5-7h o gráfico mostra
+    // quadril/coxa/joelho/pé, virilha, peritônio, parede abdominal, pelve,
+    // testículo/ovário, adrenal e apêndice — NENHUM fígado.
+    // O complexo hepatobiliar está a ~7:30-8:15h e SÓ na íris DIREITA: o gráfico
+    // espelha LIVER+GALLBL+PAN HEAD (OD ~8h) com SPLEEN+PAN TAIL (OE ~4h), cada
+    // órgão na íris do seu lado. Livro: "just preceding 8 o'clock in the right iris".
+    // Detalhes em docs/TOPOGRAFIA-JENSEN-2004.md.
     group: 'sistema_orgao', campo: 'figado_vesicula',
-    zona: 'Temporal inferior OE+OD (5-7h)',
-    sinal_carga: 'Pigmento âmbar DENSO e CONCENTRADO na zona 5-7h (não difuso periférico), lacuna hepatobiliar com contorno definido, OU mancha escura bem delimitada. Pigmento âmbar difuso disperso na íris inteira NÃO qualifica (é constitutional em íris castanha).',
-    sinal_preservacao: 'Zona 5-7h limpa, sem pigmento concentrado, sem lacuna definida; pigmento difuso global é base constitucional, não carga hepática.',
+    zona: 'Anel MUSCULATURA (4º de 7), ~7:30-8:15h, íris DIREITA (OD) apenas — órgão lateralizado. Vesícula (GALLBL) e cabeça do pâncreas adjacentes na borda do colarete. Rótulo externo do setor: U. ABDOMEN.',
+    sinal_carga: 'Pigmento âmbar DENSO e CONCENTRADO na faixa ~7:30-8:15h da íris DIREITA, no anel de musculatura (NÃO pericentral, NÃO difuso periférico), lacuna hepatobiliar com contorno definido, OU mancha escura bem delimitada. Pigmento âmbar PERICENTRAL (em volta do colarete) NÃO é hepático — ali é estômago/intestino. Pigmento difuso na íris inteira NÃO qualifica (é constitucional).',
+    sinal_preservacao: 'Faixa ~7:30-8:15h da íris direita limpa, sem pigmento concentrado e sem lacuna definida no anel de musculatura.',
+  },
+  {
+    // 2026-07-26 — CAMPO NOVO. Ausente do glossário apesar de ter banda própria
+    // no gráfico oficial e de constar na lista de zonas do Jensen ("6. Spleen,
+    // thyroid, liver"). É o espelho anatômico do fígado.
+    group: 'sistema_orgao', campo: 'baco',
+    zona: 'Anel MUSCULATURA (4º de 7), ~3:45-4:15h, íris ESQUERDA (OE) apenas — órgão lateralizado, espelho do fígado. Cauda do pâncreas (PAN TAIL) adjacente na borda do colarete.',
+    sinal_carga: 'Pigmento concentrado, opacidade ou lacuna definida na faixa ~3:45-4:15h da íris ESQUERDA, anel de musculatura.',
+    sinal_preservacao: 'Faixa ~3:45-4:15h da íris esquerda íntegra, fibras regulares, sem pigmento concentrado.',
+  },
+  {
+    // 2026-07-26 — CAMPO NOVO. Oval SOL PLX no gráfico oficial + lista de zonas
+    // do Jensen ("3. Adrenal glands, heart and aorta, solar plexus...").
+    group: 'sistema_orgao', campo: 'plexo_solar',
+    zona: 'Oval junto à borda do colarete, ~3h na íris ESQUERDA (OE). Marcado como SOL PLX no gráfico.',
+    sinal_carga: 'Marca, opacidade ou irregularidade concentrada no oval peri-colarete de ~3h em OE.',
+    sinal_preservacao: 'Região peri-colarete de ~3h em OE sem marca, contorno regular.',
   },
   {
     group: 'sistema_orgao', campo: 'rim',
@@ -130,22 +156,31 @@ export const GLOSSARY: readonly GlossaryEntry[] = [
     sinal_preservacao: 'Zona clara, fibras regulares',
   },
   {
+    // 2026-07-26 — enriquecido (estava correto, faltava a coordenada radial).
     group: 'sistema_orgao', campo: 'estomago',
-    zona: 'Pericentral, anel interno',
+    zona: 'Anel STOMACH (1º de 7, nutritive zone), imediatamente ao redor da pupila e DENTRO do colarete. Circunferencial — não tem hora própria. Jensen: "the central area surrounding the pupil corresponds to the stomach".',
     sinal_carga: 'Irregularidade/ondulação no anel interno',
     sinal_preservacao: 'Anel interno regular, bem definido',
   },
   {
+    // 2026-07-26 — CORRIGIDO: 'Estroma intermediário' era vago demais e permitia
+    // confusão com a zona de órgãos. Livro grande: "The small intestine takes up
+    // the area in Zone 2 from seven o'clock to eleven o'clock in the left iris".
     group: 'sistema_orgao', campo: 'intestino_delgado',
-    zona: 'Estroma intermediário',
+    zona: 'Anel INTESTINES (2º de 7), logo FORA do colarete — mesmo anel do cólon, mais próximo do colarete. Placas de Peyer (PEY PT, área pontilhada) no mesmo anel a ~2-3h OD / ~9-10h OE.',
     sinal_carga: 'Lacunas, manchas, irregularidades',
     sinal_preservacao: 'Zona intermediária íntegra',
   },
   {
+    // 2026-07-26 — CORRIGIDO: estava 'Periferia/borda externa'. O cólon é o
+    // 2º anel (INTESTINES — nutritive zone), logo FORA do colarete, não a
+    // periferia. Jensen Simplified p.10: "On the inside of the wreath is found
+    // the stomach, small and large intestines". Só reto e ânus avançam para a
+    // borda. Confirmado em 4 fontes.
     group: 'sistema_orgao', campo: 'intestino_grosso',
-    zona: 'Periferia/borda externa',
-    sinal_carga: 'Lacunas radiais, manchas escuras periféricas',
-    sinal_preservacao: 'Periferia clara',
+    zona: 'Anel INTESTINES (2º de 7), imediatamente FORA do colarete — NÃO a periferia. Percorre a circunferência: cólon ascendente, transverso (~11h-1h), descendente e sigmoide. Apenas RETO e ÂNUS avançam radialmente para a borda externa.',
+    sinal_carga: 'Lacunas radiais, manchas escuras ou irregularidade no 2º anel, logo fora do colarete',
+    sinal_preservacao: 'Anel intestinal de contorno regular e tom uniforme ao redor do colarete',
   },
   {
     group: 'sistema_orgao', campo: 'sistema_linfatico',
@@ -167,14 +202,20 @@ export const GLOSSARY: readonly GlossaryEntry[] = [
     sinal_preservacao: 'Ausência de anel nervoso',
   },
   {
+    // 2026-07-26 — CORRIGIDO: lateralidade estava INVERTIDA. Gráfico oficial
+    // (banda THYROID ampliada nas duas íris) + livro grande: "between 2 and 3
+    // o'clock in the RIGHT iris and 9 and 10 in the LEFT iris".
     group: 'sistema_orgao', campo: 'tireoide',
-    zona: 'Cervical (~2-3h OE, ~9-10h OD)',
-    sinal_carga: 'Pigmentação acinzentada-escura, opacidade densa',
-    sinal_preservacao: 'Zona cervical limpa',
+    zona: 'Anel MUSCULATURA (4º de 7), ~2:40-3:20h na íris DIREITA (OD) e ~9-9:40h na íris ESQUERDA (OE). Paratireoide (PT) e timo (THY) como ovais menores junto ao colarete, no mesmo setor. Rótulo externo: THROAT.',
+    sinal_carga: 'Pigmentação acinzentada-escura ou opacidade densa na banda de ~3h (OD) / ~9h (OE), anel de musculatura',
+    sinal_preservacao: 'Banda cervical-tireoidiana limpa em ambas as íris',
   },
   {
+    // 2026-07-26 — CORRIGIDO: 'Lateralidade OE preferencial (~7-8h OE)' não
+    // corresponde a nenhuma das três posições do gráfico oficial, que divide o
+    // órgão em cabeça / corpo / cauda, cada uma no seu lado anatômico.
     group: 'sistema_orgao', campo: 'pancreas',
-    zona: 'Lateralidade OE preferencial (~7-8h OE, mais sutil em OD)',
+    zona: 'Órgão TRIPARTIDO no gráfico oficial, ovais junto à borda do colarete: PAN HEAD ~8h na íris DIREITA (junto ao fígado e ao duodeno) · PAN TAIL ~4h na íris ESQUERDA (junto ao baço) · PAN BODY no setor dorsal de ambas. Nomear a parte observada.',
     // v2.5.3 (2026-05-24): "Pigmento âmbar" adicionado literal — Cristiane
     // regen=4 mostrou Sonnet classificando pigmento âmbar nasal-inferior
     // OE como pigmento_amber órfão em vez de pancreas. Causa: o sinal_carga

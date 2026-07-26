@@ -127,17 +127,10 @@ O que se espelha é o eixo nasal/temporal:
   - **9h = lado TEMPORAL** (externo, próximo à têmpora)
   - 12h = superior · 6h = inferior
 
-**A hora é a mesma convenção nos DOIS olhos** (12h no topo, sentido
-horário) — verificado nos marcadores do gráfico oficial. O que muda
-entre os olhos é o CONTEÚDO de cada hora, porque cada íris mapeia o
-lado correspondente do corpo. Órgão lateralizado aparece só na íris
-do seu lado: fígado à direita, baço à esquerda.
-
-**Toda zona tem DUAS coordenadas: a HORA e o ANEL radial.** Os 7 anéis,
-da pupila para a borda, nomeados por tecido: **1 estômago · 2 intestinos ·
-3 sangue e linfa · 4 musculatura · 5 óssea · 6 linfa superficial ·
-7 pele**. O colarete fica a ~1/3 do raio e separa os anéis 1-2 (estômago
-e intestinos) do resto. Hora certa com anel errado é achado errado.
+Em coordenadas do GLOSSÁRIO, a expressão "temporal inferior (5-7h)"
+significa **lado externo + parte de baixo**, e cai em horas 5-7 em
+AMBOS os olhos (porque 6h é inferior em ambos; "temporal" é convenção
+de hemisfério externo, e a hora 5-7 é absoluta no relógio).
 
 **ANTES de classificar um sinal como `figado_vesicula`, `coracao`,
 `pulmoes`, `rim`, ou qualquer campo com zona horária definida no
@@ -154,25 +147,16 @@ Se a hora observada NÃO bate com a zona canônica:
   `observacao_qualifying` que a observação foge da convenção clássica
   e o pareamento campo↔zona é tentativo
 
-**Bug recorrente conhecido — âmbar NÃO é sinônimo de fígado.** Medido em
-2026-07-26: o modelo via corretamente o pigmento dourado no setor superior
-e, mesmo assim, escrevia "zona 5-7h" para justificar o rótulo
-`figado_vesicula`. Não repita isso: **descreva onde o sinal ESTÁ, depois
-escolha o campo cuja zona bate — nunca o contrário.**
-
-O complexo hepatobiliar fica em **~7:30-8:15h, anel de MUSCULATURA (4º),
-íris DIREITA apenas**, com vesícula e cabeça do pâncreas ao lado. Pigmento
-âmbar fora dali NÃO é fígado. Em particular:
-- **Âmbar PERICENTRAL** (coroa em volta do colarete, anéis 1-2) = estômago
-  e intestinos. É a confusão mais comum e mais cara.
-- ~3:45-4:15h **OE**, anel musculatura = **baço** (com cauda do pâncreas)
-- ~3h OD / ~9h OE, anel musculatura = **tireoide**
-- ~9-10h OD / ~2-3h OE = pulmão
-- ~2:15-3h OE, sobre o colarete = coração
-- ~5:30-6h ambas = rim
-
-Se o âmbar está em volta do colarete, o campo é do anel 1 ou 2 — não force
-o nome "fígado".
+**Bug recorrente conhecido:** pigmento âmbar visível em ~10-11h ou
+~1-2h é frequentemente classificado como `figado_vesicula` por mera
+associação cromática. **Mas a zona canônica do fígado é 5-7h, NÃO
+10-11h NEM 1-2h.** Pigmento âmbar em 10-11h provavelmente é:
+- 11h OD = zona do baço/abdômen alto
+- 11h OE = zona do pulmão direito/torácica
+- 1-2h = zona do estômago/diafragma
+- 10h = zona da tireoide/cervical
+Se você ver pigmento em 10-11h, escolha o campo do glossário cuja zona
+canônica BATE com 10-11h — não force o nome "fígado".
 
 ## Princípio governing — tradição clássica como base
 
@@ -223,7 +207,7 @@ Pergunta 1: "Há CARGA visível? (pigmento, opacidade, lacuna, abertura
 ```
 
 **Saída esperada:** 3-15 achados de atenção típicos (varia por íris),
-**4-12 sistemas preservados**, 0-4 correlações observadas, 0-6 marcadores
+**4-8 sistemas preservados**, 0-4 correlações observadas, 0-6 marcadores
 temporais. Arrays vazios de achados/correlações/marcadores são VÁLIDOS e
 preferíveis a inflação especulativa.
 
@@ -237,14 +221,6 @@ NUNCA fabrique preservado pra bater a meta. Ausência de carga ≠ evidência
 de saúde. A meta de 4 é um convite a olhar melhor o positivo, não licença
 pra inflar.
 
-**NÃO existe teto.** O 12 da faixa acima é orientação de ordem de
-grandeza, não limite. Se a íris mostra 10 zonas com sinal positivo REAL e
-nomeável, emita as 10 — não corte por cota. Uma zona que você examinou e
-onde viu integridade concreta (fibra regular e contínua, tom uniforme,
-ausência CONFIRMADA por varredura direta de lacuna/marca/anel) pertence a
-sistemas_preservados, mesmo que a lista já esteja longa. O que nunca entra
-é a zona onde você simplesmente não viu nada: essa continua omitida.
-
 <!-- GLOSSARY-START
      Bloco GERADO a partir de GLOSSARY[] em
      apps/web/lib/anthropic/stage1-schema.ts via
@@ -255,36 +231,34 @@ sistemas_preservados, mesmo que a lista já esteja longa. O que nunca entra
      `pnpm generate:schema-artifacts`.
 -->
 
-## Glossário canônico — 44 termos
+## Glossário canônico — 42 termos
 
 Vocabulário REFERENCIAL para uso em `campo`. Você pode usar termo
 composto fora do glossário se a íris realmente pede.
 
-### Sistemas e órgãos (21)
+### Sistemas e órgãos (19)
 
 | campo | zona iridológica | sinal de CARGA | sinal de PRESERVAÇÃO |
 |---|---|---|---|
-| `figado_vesicula` | Anel MUSCULATURA (4º de 7), ~7:30-8:15h, íris DIREITA (OD) apenas — órgão lateralizado. Vesícula (GALLBL) e cabeça do pâncreas adjacentes na borda do colarete. Rótulo externo do setor: U. ABDOMEN. | Pigmento âmbar DENSO e CONCENTRADO na faixa ~7:30-8:15h da íris DIREITA, no anel de musculatura (NÃO pericentral, NÃO difuso periférico), lacuna hepatobiliar com contorno definido, OU mancha escura bem delimitada. Pigmento âmbar PERICENTRAL (em volta do colarete) NÃO é hepático — ali é estômago/intestino. Pigmento difuso na íris inteira NÃO qualifica (é constitucional). | Faixa ~7:30-8:15h da íris direita limpa, sem pigmento concentrado e sem lacuna definida no anel de musculatura. |
-| `baco` | Anel MUSCULATURA (4º de 7), ~3:45-4:15h, íris ESQUERDA (OE) apenas — órgão lateralizado, espelho do fígado. Cauda do pâncreas (PAN TAIL) adjacente na borda do colarete. | Pigmento concentrado, opacidade ou lacuna definida na faixa ~3:45-4:15h da íris ESQUERDA, anel de musculatura. | Faixa ~3:45-4:15h da íris esquerda íntegra, fibras regulares, sem pigmento concentrado. |
-| `plexo_solar` | Oval junto à borda do colarete, ~3h na íris ESQUERDA (OE). Marcado como SOL PLX no gráfico. | Marca, opacidade ou irregularidade concentrada no oval peri-colarete de ~3h em OE. | Região peri-colarete de ~3h em OE sem marca, contorno regular. |
+| `figado_vesicula` | Temporal inferior OE+OD (5-7h) | Pigmento âmbar DENSO e CONCENTRADO na zona 5-7h (não difuso periférico), lacuna hepatobiliar com contorno definido, OU mancha escura bem delimitada. Pigmento âmbar difuso disperso na íris inteira NÃO qualifica (é constitutional em íris castanha). | Zona 5-7h limpa, sem pigmento concentrado, sem lacuna definida; pigmento difuso global é base constitucional, não carga hepática. |
 | `rim` | Inferior (6h) ambos | Lacunas profundas, manchas escuras, opacidade | Zona íntegra, fibras compactas |
 | `adrenal` | Sobre o rim (5:30-6h) — mapeamento anatômico | Opacidade difusa, sombreamento no setor adrenal | Zona clara, sem sombreamento |
 | `eixo_pituitario_adrenal` | Collarete a 12:30h, ambos os iris | Achado MÚLTIPLO/DOMINANTE na zona 12:30h: ≥2 estruturas pareadas (lacuna DEFINIDA + cripta, OU lacuna + surcos radiais em ≥2 direções, OU descontinuidade marcada de collarete + pigmento concentrado). Micro-irregularidade isolada de collarete (presente em qualquer adulto > 30) NÃO qualifica. | Collarete em 12:30h regular, sem lacuna definida pareada com outra estrutura — micro-textura própria de collarete adulto é normal, não preservação especial. |
 | `coracao` | Superior esquerda OE (~2-3h) | Lacunas, manchas, anel circular | Zona limpa, pupila centrada |
 | `pulmoes` | Temporal superior (~3h OE, ~9h OD) | Lacunas, manchas pulmonares, opacidade | Zona clara, fibras regulares |
-| `estomago` | Anel STOMACH (1º de 7, nutritive zone), imediatamente ao redor da pupila e DENTRO do colarete. Circunferencial — não tem hora própria. Jensen: "the central area surrounding the pupil corresponds to the stomach". | Irregularidade/ondulação no anel interno | Anel interno regular, bem definido |
-| `intestino_delgado` | Anel INTESTINES (2º de 7), logo FORA do colarete — mesmo anel do cólon, mais próximo do colarete. Placas de Peyer (PEY PT, área pontilhada) no mesmo anel a ~2-3h OD / ~9-10h OE. | Lacunas, manchas, irregularidades | Zona intermediária íntegra |
-| `intestino_grosso` | Anel INTESTINES (2º de 7), imediatamente FORA do colarete — NÃO a periferia. Percorre a circunferência: cólon ascendente, transverso (~11h-1h), descendente e sigmoide. Apenas RETO e ÂNUS avançam radialmente para a borda externa. | Lacunas radiais, manchas escuras ou irregularidade no 2º anel, logo fora do colarete | Anel intestinal de contorno regular e tom uniforme ao redor do colarete |
-| `sistema_linfatico` | Coroa periférica (zona 6 Jensen) | Rosário linfático visível, opacidade periférica difusa | Periferia clara, sem rosário, drenagem aparente |
+| `estomago` | Pericentral, anel interno | Irregularidade/ondulação no anel interno | Anel interno regular, bem definido |
+| `intestino_delgado` | Estroma intermediário | Lacunas, manchas, irregularidades | Zona intermediária íntegra |
+| `intestino_grosso` | Periferia/borda externa | Lacunas radiais, manchas escuras periféricas | Periferia clara |
+| `sistema_linfatico` | Coroa periférica (zona 6) | Rosário linfático visível, opacidade periférica difusa | Periferia clara, sem rosário, drenagem aparente |
 | `sistema_imune` | Sistêmico (espalhado) | Manchas psóricas dispersas, pigmentação difusa, perda de brilho global | Ausência de manchas dispersas, brilho saudável |
 | `sistema_nervoso_autonomico` | Anel nervoso (concêntrico no estroma médio) | Anel nervoso visível, espessamento | Ausência de anel nervoso |
-| `tireoide` | Anel MUSCULATURA (4º de 7), ~2:40-3:20h na íris DIREITA (OD) e ~9-9:40h na íris ESQUERDA (OE). Paratireoide (PT) e timo (THY) como ovais menores junto ao colarete, no mesmo setor. Rótulo externo: THROAT. | Pigmentação acinzentada-escura ou opacidade densa na banda de ~3h (OD) / ~9h (OE), anel de musculatura | Banda cervical-tireoidiana limpa em ambas as íris |
-| `pancreas` | Órgão TRIPARTIDO no gráfico oficial, ovais junto à borda do colarete: PAN HEAD ~8h na íris DIREITA (junto ao fígado e ao duodeno) · PAN TAIL ~4h na íris ESQUERDA (junto ao baço) · PAN BODY no setor dorsal de ambas. Nomear a parte observada. | Pigmento âmbar, lacunas, pigmentação na zona pancreática | Zona íntegra |
+| `tireoide` | Cervical (~2-3h OE, ~9-10h OD) | Pigmentação acinzentada-escura, opacidade densa | Zona cervical limpa |
+| `pancreas` | Lateralidade OE preferencial (~7-8h OE, mais sutil em OD) | Pigmento âmbar, lacunas, pigmentação na zona pancreática | Zona íntegra |
 | `sistema_reprodutor` | Inferior medial (~6h) | Lacunas/manchas, irregularidades | Zona limpa |
 | `sistema_urinario` | Inferior (rim → ureter → bexiga) | Lacunas conectadas em sequência | Setor urinário limpo |
 | `sistema_circulatorio` | Coroa periférica + anel periférico | Anel sódico, arco senil | Coroa simpática regular, ausência de anel sódico |
 | `sistema_musculoesqueletico` | Estroma intermediário-periférico | Trama afrouxada, fibras irregulares | Fibras compactas, densas, estroma firme |
-| `pele_tegumentar` | Anel periférico extremo (zona 7 Jensen) | Escurecimento ou irregularidade no anel periférico (NÃO confundir com rosário linfático da zona 6) | Borda íntegra, sem marcas |
+| `pele_tegumentar` | Anel periférico extremo (zona 7) | Escurecimento ou irregularidade no anel periférico (NÃO confundir com rosário linfático da zona 6) | Borda íntegra, sem marcas |
 
 ### Sub-zonas cerebrais (3)
 
@@ -554,27 +528,21 @@ Procedimento:
 ### Critério de desempate em zonas competidoras
 
 Em zonas do relógio onde múltiplos campos canônicos do glossário se
-sobrepõem (ex.: ~8h OD pode ser `figado_vesicula` ou a cabeça do
-`pancreas`, que é adjacente), aplique esta ordem de prioridade:
+sobrepõem (ex: 5-7h OE pode ser `figado_vesicula` por zona "Temporal
+inferior OE+OD (5-7h)" OU `pancreas` por "Lateralidade OE preferencial
+(~7-8h OE)"), aplique esta ordem de prioridade:
 
-0. **O ANEL desempata antes da hora.** Se os dois campos candidatos estão
-   em anéis diferentes, o anel observado decide sozinho — não siga para as
-   regras abaixo. Exemplo: âmbar na coroa em volta do colarete está nos
-   anéis 1-2 (estômago/intestinos); nenhum campo do anel 4 (musculatura,
-   onde ficam fígado, baço e tireoide) é candidato, por mais parecida que
-   seja a cor.
-
-1. **Lateralidade obrigatória vence tudo.** Campo cuja entrada do glossário
-   diz "íris DIREITA apenas" ou "íris ESQUERDA apenas" NÃO pode ser emitido
-   no outro olho. Exemplo:
-   - Sinal em ~4h OE → `baco` (OE apenas). `figado_vesicula` está fora de
-     questão nesse olho.
+1. **Lateralidade preferencial vence simetria bilateral.** Campo cuja
+   entrada do glossário menciona lateralidade preferencial DO OLHO em
+   questão vence campo com zona simétrica bilateral. Exemplo:
+   - Sinal em 7h OE → `pancreas` (lateralidade OE preferencial) vence
+     `figado_vesicula` (5-7h bilateral simétrico) e `sacro_coccyx`
+     (5-6h homolateral genérico)
 
 2. **Zona horária mais específica vence zona mais ampla.** Quando
-   ambos campos têm o mesmo anel e o mesmo olho, a faixa mais estreita
-   vence a mais larga. Exemplo:
-   - Sinal em ~8h OD → `figado_vesicula` (~7:30-8:15h) vence um campo
-     cuja zona fosse "setor inferior" genérico
+   ambos campos têm lateralidade do mesmo olho ou ambos são bilaterais,
+   a zona horária mais estreita vence a mais larga. Exemplo:
+   - Sinal em 7-8h → "7-8h" vence "5-7h" pela especificidade
 
 3. **`sinal_carga` cromático literal vence.** Empate restante após (1)
    e (2): se o sinal observado é cromático (pigmento âmbar, mancha,

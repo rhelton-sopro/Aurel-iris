@@ -91,7 +91,32 @@ import { createHash } from 'node:crypto'
 
 import type { DirectImage } from './analyze-direct'
 
+/**
+ * Prompt VIVO do Stage 1. Editável — é aqui que a correção da topografia entra.
+ *
+ * ARQUIVO CONGELADO: `prompts/stage1-scan-v0.1.2.md` é a cópia byte-exata do
+ * prompt como estava em 2026-07-26, ANTES da correção do glossário topográfico
+ * (auditoria em `docs/AUDITORIA-GLOSSARIO-TOPOGRAFIA.md`: hora do fígado, anel
+ * do intestino grosso e lateralidade da tireoide errados contra o gráfico
+ * oficial Jensen/Ellen Jensen 2004).
+ *
+ * ROLLBACK: `STAGE1_PROMPT_VERSION=v0.1.2` + redeploy volta ao prompt antigo.
+ * Mesmo padrão do Stage 2 (`REPORT_PROMPT_VERSION`, ver lib/anthropic/prompts.ts).
+ *
+ * ⚠️ LIMITE DO ROLLBACK: o arquivo congelado traz a TABELA do glossário embutida
+ * (ela é gerada dentro do .md), mas o ENUM da tool vem de `GLOSSARY[]` em runtime.
+ * Logo o rollback recupera o TEXTO, não o enum. Enquanto o congelado for um
+ * caminho de volta real, a regra é: **só CORRIGIR e ADICIONAR campos, nunca
+ * REMOVER** — remover quebraria a validação de exames gerados pelo prompt antigo.
+ */
 const STAGE1_PROMPT_FILENAME = 'stage1-scan.md'
+const STAGE1_PROMPT_ARCHIVED = 'stage1-scan-v0.1.2.md'
+
+/** Default = prompt vivo. `STAGE1_PROMPT_VERSION=v0.1.2` força o congelado. */
+function stage1PromptFilename(): string {
+  const v = process.env.STAGE1_PROMPT_VERSION?.trim().toLowerCase()
+  return v === 'v0.1.2' ? STAGE1_PROMPT_ARCHIVED : STAGE1_PROMPT_FILENAME
+}
 // v2.3.0 (2026-05-23): 0.1.0 init.
 // v2.3.1 (2026-05-23): 0.1.0 → 0.1.2 — calibração linha_temporal em
 // stage1-scan.md (mínimo 3 marcadores não-negociável, conhecimento
@@ -203,14 +228,14 @@ const STAGE1_PROMPT_FILENAME = 'stage1-scan.md'
 // Stage 2 (system.md): escleral retirado do gatilho 🔬 e do exemplo de
 // tradução léxica; theme-maps §8/§10 (analyze-direct) trimados. Icterícia
 // escleral (cor) PRESERVADA. Não-retroativo.
-const STAGE1_METHOD_VERSION = 'sonnet_2x_0.6.0' as const
+const STAGE1_METHOD_VERSION = 'sonnet_2x_0.7.0' as const
 
 let _stage1PromptCache: string | null = null
 let _stage1ShaCache: string | null = null
 
 function loadStage1Prompt(): string {
   if (_stage1PromptCache !== null) return _stage1PromptCache
-  const filepath = path.join(process.cwd(), 'prompts', STAGE1_PROMPT_FILENAME)
+  const filepath = path.join(process.cwd(), 'prompts', stage1PromptFilename())
   _stage1PromptCache = readFileSync(filepath, 'utf8')
   return _stage1PromptCache
 }
