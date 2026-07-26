@@ -412,6 +412,49 @@ export interface IrisBbox {
 }
 
 /**
+ * Centro da PUPILA (lib/canonicalize/pupil-center.ts) — base do recorte ±500.
+ * Medido 2026-07-26: erro mediano de centro 68px (Sonnet 5) vs 245px (Sonnet 4.6).
+ * O `radius_pct` aqui é o raio da PUPILA e é informacional: o recorte NÃO usa
+ * raio nenhum (nenhuma fonte mede o raio da íris com erro aceitável — ver o
+ * cabeçalho de pupil-center.ts).
+ */
+export interface PupilCenter {
+  /** 0.0-1.0 fração da largura (frame pós-EXIF) */
+  center_x_pct: number
+  /** 0.0-1.0 fração da altura (frame pós-EXIF) */
+  center_y_pct: number
+  /** raio da PUPILA como fração de min(W,H). Informacional. */
+  radius_pct: number
+  /** 0.0-1.0 auto-reportada pelo modelo (informacional) */
+  confidence: number
+  /** true quando o modelo viu reflexo de flash sobre a pupila (ele foi instruído a ignorá-lo) */
+  reflex_over_pupil: boolean
+  /** false = não localizou pupila analisável nesta imagem */
+  valid: boolean
+}
+
+/**
+ * Diagnóstica per-imagem do recorte por pupila. Vai pra
+ * `readings.canonical_metadata.pupil_diagnostics` — é o que permite auditar
+ * depois, sem re-rodar nada, se o recorte pegou a íris inteira.
+ */
+export interface PupilCropDiagnostic {
+  eye: string
+  angle: string
+  pupil: PupilCenter
+  /** Meia-janela usada (500 normal, 700 na 2a tentativa, menor se encolheu na borda). */
+  half_window: number
+  /** Lado do quadrado entregue ao Stage 1. */
+  side: number
+  /** true quando a janela encolheu por proximidade da borda do frame. */
+  shrunk: boolean
+  /** Verificação de íris inteira: esclera encontrada dos dois lados? */
+  iris_complete: boolean
+  /** true quando precisou alargar de 500 pra 700 antes de aceitar. */
+  widened: boolean
+}
+
+/**
  * Per-photo iris color extracted by Sonnet 4.6 in the same canonical bbox call
  * (zero extra Anthropic cost — same image upload, ~50 additional output tokens).
  * Phase 07.1.6 UAT item 2 — Sonnet is already looking at the iris for bbox,
@@ -518,6 +561,15 @@ export interface CanonicalMetadata {
     left: IrisColorAggregate | null
     right: IrisColorAggregate | null
   }
+  /**
+   * Método de recorte usado nesta leitura. 'pupil' = ±500 centrado na pupila
+   * (default desde 2026-07-26); 'bbox' = caminho antigo (centro+raio da íris,
+   * janela 0.4×menor_lado → 800px). Rollback via env CROP_METHOD=bbox.
+   * Ausente em leituras anteriores ao patch (assuma 'bbox').
+   */
+  crop_method?: 'pupil' | 'bbox'
+  /** Per-imagem: onde a pupila foi achada, janela usada, íris ficou inteira? */
+  pupil_diagnostics?: PupilCropDiagnostic[]
 }
 
 /** Re-export keeps Database type alive — cross-reference for `readings` Row shape. */

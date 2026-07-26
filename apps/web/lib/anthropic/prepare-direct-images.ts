@@ -25,7 +25,21 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { DirectImage } from '@/lib/anthropic/analyze-direct'
 
 const SIGNED_URL_TTL_SECONDS = 600
-const IMAGE_PX = 800
+/**
+ * Teto de resolução enviado ao Stage 1.
+ *
+ * 800 → 1000 em 2026-07-26, junto com o recorte por pupila (±500 → 1000×1000).
+ * Sem isso o `.resize()` abaixo reduziria a canônica de 1000 pra 800 e devolveria
+ * o ganho de resolução (medido: íris de ⌀632px cairia pra ⌀506px).
+ *
+ * 1000×1000 = 1,0 MP cabe no orçamento de imagem do Sonnet 4.6 (~1,15 MP) SEM
+ * redução server-side, e folgado no Sonnet 5 / Opus 4.8+ (3,75 MP). Custo de
+ * imagem por leitura: ~5.120 → ~8.000 tokens (≈ +2 centavos de dólar).
+ *
+ * `withoutEnlargement: true` garante que imagem menor que isto NÃO é ampliada
+ * (ampliar não adiciona informação e só custa token).
+ */
+const IMAGE_PX = 1000
 
 export type ImageTier = 'canonical' | 'fallback'
 

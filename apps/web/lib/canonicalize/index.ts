@@ -38,7 +38,14 @@ import 'server-only'
 import sharp from 'sharp'
 import { createServiceClient } from '@/lib/supabase/service'
 import { fetchIrisBbox } from './sonnet-bbox'
-import { cropToCanonical } from './crop'
+import { fetchPupilCenter } from './pupil-center'
+import {
+  cropToCanonical,
+  cropAroundPupil,
+  verifyIrisComplete,
+  PUPIL_HALF_WINDOW,
+  PUPIL_HALF_WINDOW_WIDE,
+} from './crop'
 import { diagnoseCanonical, GATE_THRESHOLDS, type GateDiagnostic } from './sanity'
 import { buildCanonicalStoragePath } from './storage-path'
 import type {
@@ -48,12 +55,24 @@ import type {
   CanonicalGateDiagnostic,
   IrisColorPerPhoto,
   IrisColorAggregate,
+  PupilCenter,
+  PupilCropDiagnostic,
 } from '@/lib/anthropic/types'
 import type { Eye } from '@/lib/capture/iris-geometry'
 import type { Angle } from '@/lib/capture/sequence'
 import type { Json } from '@/types/database'
 
 const BUCKET = 'iris-captures'
+
+/**
+ * Método de recorte (2026-07-26). 'pupil' = ±500px centrado na pupila, default.
+ * Rollback: `vercel env add CROP_METHOD bbox` + redeploy volta ao caminho antigo
+ * (centro+raio da íris, janela 0.4×menor_lado, saída 800px) sem mexer em código.
+ * Mesmo padrão do kill-switch D-04 (CANONICAL_CAPTURE_ENABLED).
+ */
+function cropMethod(): 'pupil' | 'bbox' {
+  return process.env.CROP_METHOD === 'bbox' ? 'bbox' : 'pupil'
+}
 
 export interface CanonicalizeResult {
   eye: Eye
@@ -92,6 +111,11 @@ interface PerImageBboxResult {
   input_tokens: number
   output_tokens: number
   cost_usd: number
+  /**
+   * Centro da pupila (chamada separada, Sonnet 5) — base do recorte ±500.
+   * null quando CROP_METHOD=bbox ou quando a chamada falhou (aí cai no bbox).
+   */
+  pupil: PupilCenter | null
   error?: string
 }
 
@@ -166,6 +190,7 @@ export async function canonicalizeReading(
         input_tokens: 0,
         output_tokens: 0,
         cost_usd: 0,
+        pupil: null,
       }
       try {
         const { data: blob, error: dlError } = await service.storage
@@ -188,12 +213,28 @@ export async function canonicalizeReading(
           throw new Error('sharp metadata missing width/height after EXIF bake')
         }
 
-        const { bbox, iris_color, usage, cost_usd } = await fetchIrisBbox(baked)
-        base.bbox = bbox
-        base.iris_color = iris_color
-        base.input_tokens = usage.input_tokens
-        base.output_tokens = usage.output_tokens
-        base.cost_usd = cost_usd
+        // fetchIrisBbox segue sendo chamado SEMPRE: além da geometria antiga
+        // (usada como diagnóstica D-02 e como fallback), é ele que extrai o
+        // `iris_color` que alimenta vision_features. A chamada da pupila roda em
+        // paralelo — não somam latência, só custo (~+$0.05/leitura).
+        const [bboxRes, pupilRes] = await Promise.all([
+          fetchIrisBbox(baked),
+          cropMethod() === 'pupil'
+            ? fetchPupilCenter(baked).catch((err: unknown) => {
+                const msg = err instanceof Error ? err.message : 'unknown'
+                console.error(
+                  `[canonicalize] pupil fetch failed eye=${img.eye} angle=${img.angle}: ${msg} — caindo pro bbox`,
+                )
+                return null
+              })
+            : Promise.resolve(null),
+        ])
+        base.bbox = bboxRes.bbox
+        base.iris_color = bboxRes.iris_color
+        base.input_tokens = bboxRes.usage.input_tokens + (pupilRes?.usage.input_tokens ?? 0)
+        base.output_tokens = bboxRes.usage.output_tokens + (pupilRes?.usage.output_tokens ?? 0)
+        base.cost_usd = bboxRes.cost_usd + (pupilRes?.cost_usd ?? 0)
+        base.pupil = pupilRes?.pupil ?? null
         return base
       } catch (err) {
         const msg = err instanceof Error ? err.message : 'unknown error'
@@ -221,6 +262,7 @@ export async function canonicalizeReading(
   // Step 3: per-image trust gate + (se 'ok') crop + upload + update em paralelo
   // ---------------------------------------------------------------------
   const gate_diagnostics: CanonicalGateDiagnostic[] = []
+  const pupil_diagnostics: PupilCropDiagnostic[] = []
   const results: CanonicalizeResult[] = await Promise.all(
     bboxResults.map(async (r): Promise<CanonicalizeResult> => {
       // Pre-gate failures (download/bbox-fetch erro): marca fallback sem retry
@@ -254,7 +296,12 @@ export async function canonicalizeReading(
         thresholds: GATE_THRESHOLDS,
       })
 
-      if (diag.status !== 'ok') {
+      // O caminho da PUPILA não passa pelo gate do bbox: ele tem verificação
+      // própria (esclera dos dois lados) e não usa a geometria da íris pra nada.
+      // Bloqueá-lo por um bbox ruim herdaria exatamente a falha que ele corrige.
+      const usePupil = cropMethod() === 'pupil' && r.pupil !== null && r.pupil.valid
+
+      if (!usePupil && diag.status !== 'ok') {
         return {
           eye: r.eye,
           angle: r.angle,
@@ -265,14 +312,62 @@ export async function canonicalizeReading(
         }
       }
 
-      // 'ok' path: crop + upload + update
+      // crop + upload + update
       try {
-        const canonicalBuf = await cropToCanonical(
-          r.bufferBaked,
-          r.origW,
-          r.origH,
-          r.bbox,
-        )
+        let canonicalBuf: Buffer
+        if (usePupil && r.pupil) {
+          // ±500 da pupila; se a verificação não confirmar a íris inteira,
+          // ALARGA pra ±700 e re-verifica. Nunca corta pra "caber".
+          let crop = await cropAroundPupil(
+            r.bufferBaked,
+            r.origW,
+            r.origH,
+            r.pupil.center_x_pct,
+            r.pupil.center_y_pct,
+            PUPIL_HALF_WINDOW,
+          )
+          let check = await verifyIrisComplete(crop.buffer)
+          let widened = false
+          if (!check.complete && !crop.shrunk) {
+            const wider = await cropAroundPupil(
+              r.bufferBaked,
+              r.origW,
+              r.origH,
+              r.pupil.center_x_pct,
+              r.pupil.center_y_pct,
+              PUPIL_HALF_WINDOW_WIDE,
+            )
+            const wideCheck = await verifyIrisComplete(wider.buffer)
+            // Só adota a janela larga se ela de fato resolveu — senão fica com a
+            // apertada (mais resolução de íris) e registra o não-confirmado.
+            if (wideCheck.complete) {
+              crop = wider
+              check = wideCheck
+              widened = true
+            }
+          }
+          pupil_diagnostics.push({
+            eye: r.eye,
+            angle: r.angle,
+            pupil: r.pupil,
+            half_window: crop.half,
+            side: crop.side,
+            shrunk: crop.shrunk,
+            iris_complete: check.complete,
+            widened,
+          })
+          if (!check.complete) {
+            // Sinaliza, não reprova: em contraluz mole a transição íris→esclera
+            // perde contraste e a faixa não é achada mesmo com a íris inteira.
+            // Fica auditável em canonical_metadata.pupil_diagnostics.
+            console.warn(
+              `[canonicalize] iris_complete=false eye=${r.eye} angle=${r.angle} half=${crop.half} — recorte aceito, ver pupil_diagnostics`,
+            )
+          }
+          canonicalBuf = crop.buffer
+        } else {
+          canonicalBuf = await cropToCanonical(r.bufferBaked, r.origW, r.origH, r.bbox)
+        }
         const path = buildCanonicalStoragePath(therapistId, readingId, r.eye, r.angle)
 
         // Upload canonical blob (upsert:true torna re-canonicalize idempotente — D-05)
@@ -356,6 +451,8 @@ export async function canonicalizeReading(
     bbox_latency_ms: Date.now() - startedAt,
     gate_diagnostics,
     iris_color_by_eye,
+    crop_method: cropMethod(),
+    pupil_diagnostics,
   }
 
   // `canonical_metadata` é jsonb (migration 0012). Supabase typegen exporta
