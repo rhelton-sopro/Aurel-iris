@@ -1,0 +1,314 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bloco 6 — Exercício de condução</title>
+<style>
+  :root{
+    --paper:#ffffff; --panel:#f7f3ea; --ink:#1f3a3c; --ink-soft:#5a6f6e; --ink-faint:#8a9695;
+    --line:#e6ded0; --line-strong:#d6cbb6; --teal:#0a7d84; --teal-deep:#0d5c63;
+    --amber:#b5701a; --amber-soft:#d69a4e; --good:#2f7a54; --gold:#9a6a12;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#efe9dd;color:var(--ink);font-family:"Inter",-apple-system,Segoe UI,Roboto,sans-serif;}
+  .sheet{max-width:840px;margin:26px auto;background:var(--paper);border:1px solid var(--line);border-radius:6px;box-shadow:0 4px 24px rgba(40,35,25,.10);overflow:hidden;}
+  .pad{padding:clamp(28px,5vw,56px);}
+  .brand{font-size:12px;letter-spacing:.4em;font-weight:700;color:var(--teal-deep);text-align:center;}
+  .brand-sub{text-align:center;font-family:"Palatino Linotype",Palatino,Georgia,serif;font-style:italic;color:var(--ink-faint);font-size:14px;margin-top:8px;padding-bottom:22px;border-bottom:1px solid var(--line);}
+  .eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);font-weight:700;margin:26px 0 6px;}
+  .secnum{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:13px;color:var(--ink-faint);font-weight:600;}
+  .method-sub{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--amber);font-weight:700;margin:-2px 0 12px;}
+  .guide-tag{display:inline-block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--amber);background:color-mix(in srgb,var(--amber) 9%,var(--paper));border:1px solid color-mix(in srgb,var(--amber) 32%,var(--line));border-radius:100px;padding:4px 12px;margin:0 0 12px;}
+  .intro{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:16.5px;line-height:1.62;color:var(--ink-soft);max-width:66ch;margin:0 0 12px;}
+  .intro b{color:var(--ink);font-weight:600;}
+  .safety-line{font-size:13.5px;line-height:1.55;color:var(--ink-soft);background:color-mix(in srgb,var(--amber) 6%,var(--paper));border:1px solid color-mix(in srgb,var(--amber) 24%,var(--line));border-radius:9px;padding:9px 14px;margin:0 0 4px;}
+  .safety-line b{color:var(--amber);} .safety-line i{color:#3a3227;font-family:"Palatino Linotype",Palatino,Georgia,serif;}
+
+  .qsec{padding-top:24px;margin-top:24px;border-top:2px solid var(--line);}
+  .qhead{margin-bottom:14px;}
+  .q-eyebrow{font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:700;margin:0 0 6px;}
+  .q-eyebrow .carga{color:var(--amber);} .q-eyebrow .arw{color:var(--ink-faint);opacity:.7;} .q-eyebrow .anti{color:var(--good);} .q-eyebrow .pn{color:var(--ink-faint);} .q-eyebrow .forca{color:var(--good);}
+  .qtitle{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:clamp(21px,2.7vw,26px);font-weight:600;line-height:1.18;margin:0;color:var(--ink);}
+
+  .step{position:relative;padding:0 0 16px 44px;}
+  .step:last-of-type{padding-bottom:2px;}
+  .step::before{content:"";position:absolute;left:14px;top:27px;bottom:-2px;width:2px;background:var(--line);}
+  .step:last-of-type::before{display:none;}
+  .step .n{position:absolute;left:0;top:0;width:29px;height:29px;border-radius:50%;background:var(--paper);border:2px solid var(--line-strong);display:flex;align-items:center;justify-content:center;font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:13px;font-weight:700;color:var(--ink-faint);z-index:1;}
+  .step.carga .n{border-color:var(--amber);color:var(--amber);} .step.recurso .n{border-color:var(--good);color:var(--good);}
+  .step.sentido .n{border-color:var(--gold);color:var(--gold);} .step.fechar .n{border-color:var(--teal);color:var(--teal-deep);}
+  .st-name{font-size:17px;font-weight:700;color:var(--ink);margin:4px 0 3px;}
+  .exp{font-size:14px;line-height:1.5;color:var(--ink-soft);margin:0 0 8px;}
+  .exp b{color:var(--ink);font-weight:600;}
+  .say{border-left:3px solid var(--amber-soft);background:#fdfbf4;padding:9px 15px;border-radius:0 8px 8px 0;margin:0;}
+  .step.recurso .say{border-left-color:var(--good);} .step.sentido .say{border-left-color:var(--gold);} .step.fechar .say{border-left-color:var(--teal);}
+  .say + .say{margin-top:7px;}
+  .say-lab{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);font-weight:700;display:block;margin-bottom:5px;}
+  .step.recurso .say-lab{color:var(--good);} .step.sentido .say-lab{color:var(--gold);} .step.fechar .say-lab{color:var(--teal-deep);}
+  .say p{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:17px;line-height:1.56;font-style:italic;color:#352d22;margin:0;}
+  .say p + p{margin-top:7px;}
+  .say p.pause{font-family:"Inter",sans-serif;font-style:normal;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);text-align:center;margin:7px 0;font-weight:600;}
+  .cue{font-size:13.5px;line-height:1.48;color:var(--ink-soft);margin:7px 0 0;padding-left:16px;position:relative;}
+  .cue::before{content:"›";position:absolute;left:2px;color:var(--ink-faint);font-weight:700;}
+  .cue b{color:var(--ink);font-weight:600;}
+  .b7pend{display:flex;align-items:center;gap:10px;margin:9px 0 2px;}
+  .b7pend .bar{flex:1;height:7px;border-radius:100px;background:linear-gradient(90deg,var(--amber) 0%,#c98a3d 38%,var(--good) 100%);}
+  .b7pend .pl{font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;font-weight:700;white-space:nowrap;}
+  .b7pend .pl.a{color:var(--amber);} .b7pend .pl.b{color:var(--good);}
+  .conduct{background:color-mix(in srgb,var(--amber) 8%,var(--paper));border:1px solid color-mix(in srgb,var(--amber) 30%,var(--line));border-radius:10px;padding:10px 15px;margin:12px 0 2px;}
+  .conduct-lab{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);font-weight:700;display:block;margin-bottom:4px;}
+  .conduct p{font-size:13.5px;line-height:1.5;color:var(--ink-soft);margin:0;} .conduct b{color:var(--ink);font-weight:600;}
+  .closing{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:17px;line-height:1.6;color:var(--teal-deep);font-style:italic;text-align:center;max-width:56ch;margin:32px auto 4px;}
+</style></head><body>
+<div class="sheet"><div class="pad">
+  <div class="brand">IRIS CODEX</div>
+  <div class="brand-sub">Mapa do Ser · Guia de condução</div>
+
+  <p class="eyebrow"><span class="secnum">6</span> &nbsp;Perguntas para a sua sessão</p>
+  <p class="method-sub">Método somático · Sopro da Origem</p>
+  <span class="guide-tag">◆ Para o terapeuta conduzir — não vai no documento do cliente</span>
+  <p class="intro">Cada <b>Caminho</b> é um exercício guiado com quem te procura — uma emoção da leitura dela, com a sua saída. Conduza um por vez, sem pressa. Cada etapa traz <b>o que ela é</b> e a <b>fala</b> pra você ler quase como está.</p>
+  <p class="safety-line"><b>Regra de ouro:</b> vá sempre aos poucos. <b>Pare e volte ao recurso</b> se a pessoa perder a presença, "virar" a emoção ou se assustar. Resgate: <i>"abre os olhos, sente os pés no chão, me diz três coisas que você vê — isso já passou, você está aqui agora."</i></p>
+
+  <!-- ═══ CAMINHO 1 ═══ -->
+  <div class="qsec">
+    <div class="qhead"><p class="q-eyebrow"><span class="pn">Caminho 1 · </span><span class="carga">Raiva contida</span> <span class="arw">→</span> <span class="anti">Serenidade</span></p><p class="qtitle">Da raiva guardada a uma serenidade que também é dela</p></div>
+
+    <div class="step"><span class="n">1</span><p class="st-name">Chegar e montar a casa</p>
+      <p class="exp">Antes de tocar o que pesa: criar segurança, chão no corpo, e um <b>lugar seguro pra onde voltar</b> (o recurso) — <b>ancorado com um gesto</b> (a mão no peito) pra reativá-lo depois. É a rede de proteção de tudo o que vem depois.</p>
+      <div class="say"><p>"Antes de começar, quero te dizer uma coisa: aqui você não precisa acertar nada, nem chegar a lugar nenhum. É só um tempo seu, com você. Sente os pés no chão, as costas apoiadas, e olha devagar pro lugar onde você está — você está aqui, agora, e aqui é seguro."</p><p class="pause">— respira —</p><p>"Antes da gente olhar o que pesa, acha um lugar dentro de você que está mais tranquilo — uma parte do corpo em paz, uma lembrança boa, ou a sua própria firmeza. Deixa ele por perto: é pra cá que a gente volta."</p><p class="pause">— pausa —</p><p>"Agora coloca a mão no centro do peito e respira ali um instante, deixando essa sensação boa crescer um pouco. Essa é a sua âncora: toda vez que a sua mão voltar pro peito, esse lugar seguro volta junto."</p></div>
+      <p class="cue">Não avance enquanto essa casa não estiver sentida no corpo.</p></div>
+
+    <div class="step carga"><span class="n">2</span><p class="st-name">Tocar a raiva no corpo</p>
+      <p class="exp">Levar a raiva do pensamento pro corpo, <b>aos poucos</b>, em 3 tempos: lembrar a cena → notar no corpo → dar forma. Com a pessoa <b>olhando</b> a emoção, não virando ela.</p>
+      <div class="say"><p>"Lembra de uma vez recente em que você sentiu raiva — ou quis dizer alguma coisa e engoliu. Quando foi? O que aconteceu? Me conta um pouco."</p><p class="pause">— deixe ela contar a cena —</p><p>"Enquanto lembra dessa cena, tem alguma parte do corpo que te chama a atenção? Um aperto, um arrepio, alguma sensação?"</p><p class="pause">— dê tempo —</p><p>"E essa sensação, se tivesse um jeito — peso, temperatura, tamanho — qual seria?"</p></div>
+      <p class="cue">"Você está olhando pra ela; você não é ela." Um pouquinho já basta.</p></div>
+
+    <div class="step"><span class="n">3</span><p class="st-name">Deixar falar</p>
+      <p class="exp">Dar voz à sensação <b>sem interpretar nem confirmar</b> — o que a pessoa nomeia vale mais que a sua leitura.</p>
+      <div class="say"><p>"Fica um instante só com isso. Se essa raiva guardada pudesse falar, o que ela queria ter dito e não disse?"</p><p class="pause">— espere —</p><p>"Tem mais alguma coisa junto?"</p></div></div>
+
+    <div class="step carga"><span class="n">4</span><p class="st-name">Deixar mover — dar caminho pra completar</p>
+      <p class="exp">Dar à raiva um caminho pra <b>se mover e terminar</b> o movimento que ficou preso. <b>É aqui que a energia represada volta como força</b> — não é forçar explosão. Ofereça uma das duas portas.</p>
+      <div class="say"><span class="say-lab">Porta A — a respiração que move</span><p>"Leva a respiração até onde a raiva mora. A cada vez que solta o ar, abre um espaço ali, e deixa ela se mover do jeito que precisar — subir, escorrer, sair. Se vier um tremor, um suspiro, um calor, deixa passar."</p></div>
+      <div class="say"><span class="say-lab">Porta B — a forma que se desfaz</span><p>"Fica olhando a forma dela — o peso, a cor, a temperatura. Sem forçar, vê ela ir mudando, afrouxando, até começar a se desfazer."</p></div>
+      <p class="cue"><b>Deu certo quando o corpo assenta</b> (afrouxou, suspirou, esvaziou) — não pelo tamanho do choro.</p></div>
+
+    <div class="step recurso"><span class="n">5</span><p class="st-name">Voltar pro outro lado</p>
+      <p class="exp">Voltar pra casa e fazer o <b>vaivém</b> — a pessoa aprende que pode tocar a raiva <b>e voltar</b>. Aqui dá <b>forma</b> ao recurso e junta ele ao lugar seguro (a âncora).</p>
+      <div class="say"><p>"Lembra de uma vez em que você conseguiu dizer o que precisava — com firmeza, sem explodir — e foi ouvido. Onde no corpo aparece esse 'aqui eu me sustento'?"</p><p class="pause">— espere —</p><p>"Que jeito tem essa firmeza — é quente, tem um peso bom, uma cor? Que tamanho?"</p><p class="pause">— dê forma —</p><p>"Repara se ela fica perto daquele lugar seguro do começo. Coloca a mão no peito e deixa os dois se juntarem."</p></div>
+      <div class="b7pend"><span class="pl a">raiva guardada</span><span class="bar"></span><span class="pl b">firmeza serena</span></div>
+      <p class="cue">Vaivém devagar, da raiva pra firmeza e de volta. "Você tocou <b>e voltou</b> — isso já é força."</p></div>
+
+    <div class="step sentido"><span class="n">6</span><p class="st-name">Colher o sentido</p>
+      <p class="exp">Amarrar o que o corpo viveu a um <b>novo significado</b> — é o que faz o efeito durar.</p>
+      <div class="say"><p>"Agora que a raiva se moveu um pouco — o que ela estava tentando proteger em você? E o que isso te mostra sobre o quanto você aguenta?"</p></div>
+      <p class="cue">Deixe ela formular. Não entregue a conclusão pronta.</p></div>
+
+    <div class="step fechar"><span class="n">7</span><p class="st-name">Fechar e passar o bastão</p>
+      <p class="exp">Trazer a pessoa <b>de volta por inteiro</b> (nunca encerre dentro do material) e amarrar num passo pra sessão.</p>
+      <div class="say"><span class="say-lab">Fechar</span><p>"Vamos voltar por inteiro. Sente os pés, o corpo apoiado, o ar entrando. Olha o lugar de novo. Repara em como você está agora, comparado a quando começamos."</p></div>
+      <div class="say"><span class="say-lab">Micro-passo</span><p>"Tem uma coisa pequena, hoje, que você anda engolindo e que já poderia dizer — com calma, no tamanho certo? Leva isso pra nossa sessão."</p></div></div>
+
+    <div class="conduct"><span class="conduct-lab">⚠ Carga alta</span><p>É a carga mais forte desta leitura. Vá bem aos poucos e complete o movimento (etapa 4) sem forçar catarse. Se aparecer ferida antiga da infância, acolha e marque pra sessão.</p></div>
+  </div>
+
+  <!-- ═══ CAMINHO 2 ═══ -->
+  <div class="qsec">
+    <div class="qhead"><p class="q-eyebrow"><span class="pn">Caminho 2 · </span><span class="carga">Irritação que sobe</span> <span class="arw">→</span> <span class="anti">Calma</span></p><p class="qtitle">Da irritação que sobe rápido a uma calma que ela alcança</p></div>
+
+    <div class="step"><span class="n">1</span><p class="st-name">Chegar e montar a casa</p>
+      <p class="exp">Segurança, chão no corpo e o <b>recurso pra onde voltar</b>, antes de tocar o que dispara.</p>
+      <div class="say"><p>"Antes de começar, quero te dizer uma coisa: aqui você não precisa acertar nada, nem chegar a lugar nenhum. É só um tempo seu, com você. Sente os pés no chão, as costas apoiadas, e olha devagar pro lugar onde você está — você está aqui, agora, e aqui é seguro."</p><p class="pause">— respira —</p><p>"Antes de olhar o que pesa, acha um lugar dentro de você que está mais calmo — uma parte do corpo tranquila, uma lembrança boa. É pra cá que a gente volta."</p><p class="pause">— pausa —</p><p>"Agora coloca a mão no centro do peito e respira ali um instante, deixando essa sensação boa crescer um pouco. Essa é a sua âncora: toda vez que a sua mão voltar pro peito, esse lugar seguro volta junto."</p></div></div>
+
+    <div class="step carga"><span class="n">2</span><p class="st-name">Tocar o sinal no corpo</p>
+      <p class="exp">Achar o <b>primeiro aviso</b> corporal da irritação, aos poucos, em 3 tempos — sem brigar com ela.</p>
+      <div class="say"><p>"Lembra de uma vez recente em que a irritação subiu rápido em você. Quando foi? O que aconteceu? Me conta um pouco."</p><p class="pause">— deixe ela contar a cena —</p><p>"Voltando a essa cena, tem um lugar no corpo que reage? A barriga aperta, a mandíbula trava, o peito esquenta, as mãos?"</p><p class="pause">— dê tempo —</p><p>"Esse sinal, se tivesse uma forma ou uma temperatura, qual seria?"</p></div>
+      <p class="cue">"Você está olhando o sinal; você não é ele." Nomear, não julgar.</p></div>
+
+    <div class="step"><span class="n">3</span><p class="st-name">Deixar falar</p>
+      <p class="exp">Descobrir o que a irritação <b>cobre</b> — raramente é o que aparece na superfície.</p>
+      <div class="say"><p>"Fica um instante com esse sinal. Na maioria das vezes, o que está por baixo dessa irritação? Cansaço, pressa, algo que não foi respeitado?"</p></div>
+      <p class="cue">Deixe a resposta vir — não sugira a causa.</p></div>
+
+    <div class="step carga"><span class="n">4</span><p class="st-name">Deixar mover — dar caminho pra completar</p>
+      <p class="exp">Dar caminho pra o calor da irritação <b>se mover e baixar</b>. Aqui a completação costuma ser sutil (o corpo desce uma marcha).</p>
+      <div class="say"><span class="say-lab">Porta A — a respiração que move</span><p>"Leva a respiração até esse sinal. A cada expiração, abre um espaço, e deixa a energia se mover — subir, escorrer, sair. Se o corpo quiser soltar num suspiro, deixa."</p></div>
+      <div class="say"><span class="say-lab">Porta B — a forma que se desfaz</span><p>"Olha a forma desse calor que sobe. Sem forçar, vê ele ir perdendo força, esfriando, até baixar."</p></div>
+      <p class="cue"><b>Deu certo quando o corpo desce uma marcha.</b></p></div>
+
+    <div class="step recurso"><span class="n">5</span><p class="st-name">Voltar pro outro lado</p>
+      <p class="exp">Voltar pra uma <b>calma real</b> da memória, dar <b>forma</b> a ela e juntar ao lugar seguro, e fazer o vaivém.</p>
+      <div class="say"><p>"Traz uma imagem de quando você esteve realmente em paz — um lugar, um momento de fôlego."</p><p class="pause">— espere —</p><p>"Onde no corpo aparece essa calma? Que jeito ela tem — leve, morna, espaçosa?"</p><p class="pause">— dê forma —</p><p>"Repara se ela fica perto daquele lugar seguro do começo. Coloca a mão no peito e respira dentro dela."</p></div>
+      <div class="b7pend"><span class="pl a">irritação que sobe</span><span class="bar"></span><span class="pl b">fôlego calmo</span></div>
+      <p class="cue">Vaivém devagar, do ponto que sobe pra esse fôlego e de volta.</p></div>
+
+    <div class="step sentido"><span class="n">6</span><p class="st-name">Colher o sentido</p>
+      <p class="exp">Amarrar num novo significado — é o que faz durar.</p>
+      <div class="say"><p>"O que muda em como você se vê, sabendo que dá pra perceber a irritação chegando — antes dela te dominar?"</p></div></div>
+
+    <div class="step fechar"><span class="n">7</span><p class="st-name">Fechar e passar o bastão</p>
+      <p class="exp">Trazer de volta por inteiro + um passo pra sessão.</p>
+      <div class="say"><span class="say-lab">Fechar</span><p>"Vamos voltar por inteiro. Sente os pés, o ar entrando, olha o lugar de novo. Repara em como você está agora."</p></div>
+      <div class="say"><span class="say-lab">Micro-passo</span><p>"Qual é o primeiro sinal, no seu corpo, de que a irritação vai subir — aquele que, se você notasse a tempo, te daria um segundo pra respirar? Leva essa observação pra nossa sessão."</p></div></div>
+
+    <div class="conduct"><span class="conduct-lab">⚠ Conduzindo</span><p>O ganho é o <b>primeiro sinal</b> — o segundo entre gatilho e reação. Se ela não achar de primeira, tudo bem: a busca já treina. Fique no corpo, não na história.</p></div>
+  </div>
+
+  <!-- ═══ CAMINHO 3 ═══ -->
+  <div class="qsec">
+    <div class="qhead"><p class="q-eyebrow"><span class="pn">Caminho 3 · </span><span class="carga">Dificuldade de soltar</span> <span class="arw">→</span> <span class="anti">Leveza</span></p><p class="qtitle">Do que ela segura ao que dá pra soltar</p></div>
+
+    <div class="step"><span class="n">1</span><p class="st-name">Chegar e montar a casa</p>
+      <p class="exp">Tirar a exigência de soltar (é só olhar) + o <b>recurso pra onde voltar</b>.</p>
+      <div class="say"><p>"Antes de começar, quero te dizer uma coisa: aqui você não precisa acertar nada, nem soltar nada, nem chegar a lugar nenhum. É só um tempo seu, com você. Sente os pés no chão, as costas apoiadas, e olha devagar pro lugar onde você está — você está aqui, agora, e aqui é seguro."</p><p class="pause">— respira —</p><p>"Antes, acha um lugar dentro de você que já está tranquilo, ou a sua firmeza. Deixa ela por perto — é pra cá que a gente volta."</p><p class="pause">— pausa —</p><p>"Agora coloca a mão no centro do peito e respira ali um instante, deixando essa sensação boa crescer um pouco. Essa é a sua âncora: toda vez que a sua mão voltar pro peito, esse lugar seguro volta junto."</p></div></div>
+
+    <div class="step carga"><span class="n">2</span><p class="st-name">Tocar o peso no corpo</p>
+      <p class="exp">Localizar no corpo o que ela carrega de antigo, aos poucos, em 3 tempos.</p>
+      <div class="say"><p>"Pensa em algo antigo que você ainda carrega — uma mágoa, um assunto que nunca encerrou. O que é? Me conta um pouco."</p><p class="pause">— deixe ela trazer a cena —</p><p>"Enquanto pensa nisso, tem um peso em algum lugar do corpo? Onde ele fica?"</p><p class="pause">— sem pressa —</p><p>"Esse peso, que tamanho tem? É mais pesado, mais preso, mais apertado?"</p></div>
+      <p class="cue">"Você está olhando o peso; você não é ele." Se nada vier, tudo bem.</p></div>
+
+    <div class="step"><span class="n">3</span><p class="st-name">Deixar falar — o ganho oculto</p>
+      <p class="exp">Honrar o que o apego <b>protege</b>. Nunca tratá-lo como erro.</p>
+      <div class="say"><p>"O que esse peso te dá, que faz valer a pena continuar carregando? Quase sempre tem algo — proteção, memória, uma justiça."</p></div></div>
+
+    <div class="step carga"><span class="n">4</span><p class="st-name">Deixar mover — dar caminho pra completar</p>
+      <p class="exp">Deixar o peso <b>afrouxar e ficar mais leve</b> — sem largar de vez, só soltar um fio.</p>
+      <div class="say"><span class="say-lab">Porta A — a respiração que move</span><p>"Leva a respiração até esse peso. A cada expiração, afrouxa um pouquinho o aperto em volta dele — sem largar de vez, só afrouxar. Deixa o corpo mostrar como é soltar um fio."</p></div>
+      <div class="say"><span class="say-lab">Porta B — a forma que se desfaz</span><p>"Olha a forma desse peso. Sem forçar, vê ele ir ficando mais leve, menos denso, até começar a se dissolver."</p></div>
+      <p class="cue"><b>Deu certo quando aparece uma leveza</b>, mesmo pequena.</p></div>
+
+    <div class="step recurso"><span class="n">5</span><p class="st-name">Voltar pro outro lado</p>
+      <p class="exp">Lembrar o corpo de que ele <b>já sabe soltar</b>, dar <b>forma</b> à leveza e juntar ao lugar seguro, e fazer o vaivém.</p>
+      <div class="say"><p>"Lembra de uma vez em que você conseguiu soltar algo — e no fim veio um alívio, uma leveza."</p><p class="pause">— espere —</p><p>"Traz essa sensação. Onde no corpo ela mora? Que jeito ela tem?"</p><p class="pause">— dê forma —</p><p>"Repara se ela fica perto daquele lugar seguro do começo. Coloca a mão no peito e deixa os dois se juntarem."</p></div>
+      <div class="b7pend"><span class="pl a">segurar</span><span class="bar"></span><span class="pl b">leveza de soltar</span></div>
+      <p class="cue">Vaivém entre o peso e a leveza. "Você já soltou antes — o corpo sabe o caminho."</p></div>
+
+    <div class="step sentido"><span class="n">6</span><p class="st-name">Colher o sentido</p>
+      <p class="exp">Amarrar num novo significado — é o que faz durar.</p>
+      <div class="say"><p>"O que você descobre sobre você, ao ver que consegue soltar uma coisa sem perder quem você é?"</p></div></div>
+
+    <div class="step fechar"><span class="n">7</span><p class="st-name">Fechar e passar o bastão</p>
+      <p class="exp">Trazer de volta por inteiro + um passo pra sessão.</p>
+      <div class="say"><span class="say-lab">Fechar</span><p>"Vamos voltar por inteiro. Sente os pés, o corpo apoiado, o ar. Repara em como você está agora."</p></div>
+      <div class="say"><span class="say-lab">Micro-passo</span><p>"Tem uma coisa pequena que você carrega e que, se soltasse, ninguém perderia nada — só você ganharia leveza? Leva ela pra nossa sessão."</p></div></div>
+
+    <div class="conduct"><span class="conduct-lab">⚠ Conduzindo</span><p>Se o que ela segura for <b>luto ou trauma</b>, não conduza pro soltar — nomear o ganho oculto já basta; o processamento é sessão continuada.</p></div>
+  </div>
+
+  <!-- ═══ CAMINHO 4 ═══ -->
+  <div class="qsec">
+    <div class="qhead"><p class="q-eyebrow"><span class="pn">Caminho 4 · </span><span class="carga">Mente que não desliga</span> <span class="arw">→</span> <span class="anti">Calma que assenta</span></p><p class="qtitle">Da cabeça que gira à calma que assenta o corpo</p></div>
+
+    <div class="step"><span class="n">1</span><p class="st-name">Chegar e montar a casa</p>
+      <p class="exp">Sair do "resolver" pro "observar" + o <b>recurso pra onde voltar</b>.</p>
+      <div class="say"><p>"Antes de começar, quero te dizer uma coisa: aqui você não precisa acertar nada, nem chegar a lugar nenhum. É só um tempo seu, com você. Sente os pés no chão, as costas apoiadas, e olha devagar pro lugar onde você está — você está aqui, agora, e aqui é seguro."</p><p class="pause">— respira —</p><p>"Antes, acha um lugar no corpo que já está mais quieto, ou a sua firmeza. Deixa por perto — é pra cá que a gente volta."</p><p class="pause">— pausa —</p><p>"Agora coloca a mão no centro do peito e respira ali um instante, deixando essa sensação boa crescer um pouco. Essa é a sua âncora: toda vez que a sua mão voltar pro peito, esse lugar seguro volta junto."</p></div></div>
+
+    <div class="step carga"><span class="n">2</span><p class="st-name">Tocar o girar no corpo</p>
+      <p class="exp">Ficar na <b>forma</b> (o girar), não no assunto do pensamento — aos poucos, em 3 tempos.</p>
+      <div class="say"><p>"Repara na sua cabeça agora. Tem algum pensamento em roda, voltando e voltando?"</p><p class="pause">— dê tempo pra ela notar —</p><p>"Enquanto esse pensamento gira, o corpo acompanha em algum lugar? Uma tensão, uma pressa por dentro?"</p><p class="pause">— sem pressa —</p><p>"Se esse girar tivesse um ritmo ou uma textura, como seria?"</p></div></div>
+
+    <div class="step"><span class="n">3</span><p class="st-name">Deixar falar</p>
+      <p class="exp">Revelar que o girar costuma <b>proteger de um sentir</b>.</p>
+      <div class="say"><p>"Se esse pensamento repetitivo tivesse um motivo pra continuar girando, qual seria?"</p></div></div>
+
+    <div class="step carga"><span class="n">4</span><p class="st-name">Deixar mover — dar caminho pra completar</p>
+      <p class="exp">Deixar a agitação <b>descer da cabeça pro corpo</b> e assentar. A saída é pelo corpo, não pela lógica.</p>
+      <div class="say"><span class="say-lab">Porta A — a respiração que move</span><p>"Leva a respiração pra baixo, do pensamento pro corpo. A cada expiração, deixa a atenção descer da cabeça pro peito, pra barriga — deixa a agitação escorrer pra baixo e assentar."</p></div>
+      <div class="say"><span class="say-lab">Porta B — a forma que se desfaz</span><p>"Imagina o girar como um redemoinho. Sem forçar, vê ele ir perdendo velocidade, afrouxando, até quase parar."</p></div>
+      <p class="cue"><b>Deu certo quando o corpo assenta.</b></p></div>
+
+    <div class="step recurso"><span class="n">5</span><p class="st-name">Voltar pro outro lado</p>
+      <p class="exp">Voltar pra um momento em que o corpo <b>assentou</b>, dar <b>forma</b> a essa calma e juntar ao lugar seguro, e fazer o vaivém.</p>
+      <div class="say"><p>"Lembra de um momento em que seu corpo conseguiu assentar, mesmo que por pouco tempo."</p><p class="pause">— espere —</p><p>"Onde aparece essa calma? Que jeito ela tem?"</p><p class="pause">— dê forma —</p><p>"Repara se ela fica perto daquele lugar seguro do começo. Coloca a mão no peito e respira dentro dela."</p></div>
+      <div class="b7pend"><span class="pl a">mente girando</span><span class="bar"></span><span class="pl b">corpo que assenta</span></div>
+      <p class="cue">Vaivém do girar pro assentar e de volta.</p></div>
+
+    <div class="step sentido"><span class="n">6</span><p class="st-name">Colher o sentido</p>
+      <p class="exp">Amarrar num novo significado — é o que faz durar.</p>
+      <div class="say"><p>"Do que a sua cabeça estava te protegendo de sentir? E o que muda em saber disso?"</p></div></div>
+
+    <div class="step fechar"><span class="n">7</span><p class="st-name">Fechar e passar o bastão</p>
+      <p class="exp">Trazer de volta por inteiro + um passo pra sessão.</p>
+      <div class="say"><span class="say-lab">Fechar</span><p>"Vamos voltar por inteiro. Sente os pés, o ar entrando, olha o lugar. Repara em como está sua cabeça agora."</p></div>
+      <div class="say"><span class="say-lab">Micro-passo</span><p>"Escolhe um momento do seu dia pra praticar essa descida — da cabeça pro corpo por um instante. Traz pra nossa sessão como foi."</p></div></div>
+
+    <div class="conduct"><span class="conduct-lab">⚠ Conduzindo</span><p>A cabeça girando é uma <b>defesa</b> — não combata pela razão (alimenta o girar). Se surgir ansiedade forte, encurte e feche pela casa.</p></div>
+  </div>
+
+  <!-- ═══ CAMINHO 5 ═══ -->
+  <div class="qsec">
+    <div class="qhead"><p class="q-eyebrow"><span class="pn">Caminho 5 · </span><span class="carga">Ressentimento</span> <span class="arw">→</span> <span class="anti">Perdão</span></p><p class="qtitle">Da mágoa guardada a um perdão que é por ela, não pelo outro</p></div>
+
+    <div class="step"><span class="n">1</span><p class="st-name">Chegar e montar a casa — cuidado extra</p>
+      <p class="exp">Ressentimento toca relações: abra com mais segurança e permissão pra parar + o <b>recurso pra onde voltar</b>.</p>
+      <div class="say"><p>"Antes de começar, quero te dizer uma coisa: aqui você não precisa acertar nada, nem chegar a lugar nenhum. É só um tempo seu, com você — e você vai só até onde for confortável; se pesar demais, é só parar. Sente os pés no chão, as costas apoiadas, e olha devagar pro lugar onde você está — você está aqui, agora, e aqui é seguro."</p><p class="pause">— respira —</p><p>"Antes, acha um lugar dentro de você que está em paz, ou a sua firmeza. Deixa por perto — é pra cá que a gente volta."</p><p class="pause">— pausa —</p><p>"Agora coloca a mão no centro do peito e respira ali um instante, deixando essa sensação boa crescer um pouco. Essa é a sua âncora: toda vez que a sua mão voltar pro peito, esse lugar seguro volta junto."</p></div></div>
+
+    <div class="step carga"><span class="n">2</span><p class="st-name">Tocar a mágoa no corpo</p>
+      <p class="exp">Ir ao <b>corpo</b>, não à história do agravo (ela realimenta a mágoa) — aos poucos, em 3 tempos.</p>
+      <div class="say"><p>"Sem entrar na história toda — pensa numa mágoa antiga que ainda mora em você."</p><p class="pause">— espere, com cuidado —</p><p>"Enquanto ela vem, tem um lugar no corpo que responde? O peito, a garganta, o estômago?"</p><p class="pause">— dê tempo —</p><p>"Essa sensação, se tivesse uma forma, qual seria?"</p></div></div>
+
+    <div class="step"><span class="n">3</span><p class="st-name">Deixar falar — só reconhecer</p>
+      <p class="exp">Reconhecer a mágoa. <b>Reconhecer não é perdoar ainda</b> — não empurre pro perdão.</p>
+      <div class="say"><p>"Se essa mágoa pudesse ser reconhecida — só reconhecida, sem consertar nada — o que ela precisaria ouvir?"</p></div></div>
+
+    <div class="step carga"><span class="n">4</span><p class="st-name">Deixar mover — dar caminho pra completar</p>
+      <p class="exp">Deixar a mágoa <b>amolecer</b> — abrir espaço em volta dela, sem apertar.</p>
+      <div class="say"><span class="say-lab">Porta A — a respiração que move</span><p>"Leva a respiração até onde a mágoa mora. A cada expiração, abre um pouquinho de espaço em volta dela — deixa ela existir sem apertar. Se o corpo quiser soltar, deixa."</p></div>
+      <div class="say"><span class="say-lab">Porta B — a forma que se desfaz</span><p>"Olha a forma dessa mágoa. Sem forçar, vê ela ir ficando menos dura, menos presa, começando a amolecer."</p></div>
+      <p class="cue"><b>Doses pequenas.</b> Deu certo com um amolecimento, não a mágoa inteira.</p></div>
+
+    <div class="step recurso"><span class="n">5</span><p class="st-name">Voltar pro outro lado</p>
+      <p class="exp">Mostrar o perdão como <b>alívio próprio</b>, não concessão ao outro, dar <b>forma</b> a ele e juntar ao lugar seguro, e fazer o vaivém.</p>
+      <div class="say"><p>"Lembra de uma vez em que você deixou uma mágoa ir — e sentiu que foi por você, não pelo outro."</p><p class="pause">— espere —</p><p>"Onde no corpo veio esse alívio? Que jeito ele tem?"</p><p class="pause">— dê forma —</p><p>"Repara se ele fica perto daquele lugar seguro do começo. Coloca a mão no peito e respira dentro dele."</p></div>
+      <div class="b7pend"><span class="pl a">mágoa guardada</span><span class="bar"></span><span class="pl b">soltar por mim</span></div>
+      <p class="cue">Vaivém, doses pequenas, da mágoa pro alívio e de volta.</p></div>
+
+    <div class="step sentido"><span class="n">6</span><p class="st-name">Colher o sentido</p>
+      <p class="exp">Amarrar num novo significado — é o que faz durar.</p>
+      <div class="say"><p>"Se essa mágoa não define mais você, quem você é sem o peso dela?"</p></div></div>
+
+    <div class="step fechar"><span class="n">7</span><p class="st-name">Fechar e passar o bastão</p>
+      <p class="exp">Trazer de volta por inteiro + um passo pra sessão.</p>
+      <div class="say"><span class="say-lab">Fechar</span><p>"Vamos voltar por inteiro. Sente os pés, o corpo apoiado, o ar. Olha o lugar de novo. Repara em como você está agora."</p></div>
+      <div class="say"><span class="say-lab">Micro-passo</span><p>"Tem uma mágoa pequena que você já poderia deixar ir — não pelo outro, por você? Leva ela pra nossa sessão."</p></div></div>
+
+    <div class="conduct"><span class="conduct-lab">⚠ Cuidado extra</span><p>Perdão <b>não é a meta a forçar</b> — é subproduto de reconhecer e soltar. Havendo trauma relacional (abuso, traição grave), é sessão continuada, nunca um exercício isolado.</p></div>
+  </div>
+
+  <!-- ═══ CAMINHO 6 · FORÇA ═══ -->
+  <div class="qsec">
+    <div class="qhead"><p class="q-eyebrow"><span class="pn">Caminho 6 · </span><span class="forca">Firmeza serena</span> <span class="arw">→</span> <span class="anti">a base que sustenta a mudança</span></p><p class="qtitle">A força que já é dela — como acessar e ampliar</p></div>
+
+    <div class="step"><span class="n">1</span><p class="st-name">Chegar — visitar uma força, não uma dor</p>
+      <p class="exp">Aqui não se mexe numa carga: visita-se um <b>recurso</b>. Isso dá chão pra todos os outros caminhos.</p>
+      <div class="say"><p>"Antes de começar, quero te dizer uma coisa: aqui você não precisa acertar nada, nem chegar a lugar nenhum. É só um tempo seu, com você. E desta vez a gente não vai mexer numa dor — vamos visitar uma força sua. Sente os pés no chão e senta como quem tem onde se apoiar."</p><p class="pause">— pausa —</p><p>"Coloca a mão no centro do peito. Essa vai ser a sua âncora pra essa força: sempre que a mão voltar pro peito, ela volta junto."</p></div>
+      <p class="cue">Se ela desqualificar a própria força ("não é nada demais"), acolha — é comum.</p></div>
+
+    <div class="step recurso"><span class="n">2</span><p class="st-name">Tocar a firmeza no corpo</p>
+      <p class="exp">Fazer o recurso ser <b>sentido</b> no corpo, não só falado — aos poucos, em 3 tempos.</p>
+      <div class="say"><p>"A sua leitura mostra uma firmeza real — uma base que te sustenta sem endurecer. Lembra de uma vez em que você se sustentou numa situação difícil sem se perder. Quando foi? O que aconteceu?"</p><p class="pause">— deixe ela contar a cena —</p><p>"Onde no corpo mora esse 'aqui eu me sustento'? O que você sente aí?"</p><p class="pause">— deixe encorpar —</p><p>"Se essa firmeza tivesse uma forma, uma temperatura, como seria?"</p></div>
+      <p class="cue">Deixe-a demorar — que ela SINTA, não só fale.</p></div>
+
+    <div class="step"><span class="n">3</span><p class="st-name">Deixar falar — o que a firmeza sabe</p>
+      <p class="exp">Dar voz ao recurso como uma <b>sabedoria dela</b>.</p>
+      <div class="say"><p>"O que essa firmeza sabe, que a parte agitada de você às vezes esquece?"</p></div></div>
+
+    <div class="step carga"><span class="n">4</span><p class="st-name">Olhar a carga a partir da firmeza</p>
+      <p class="exp">Usar o recurso como <b>lugar de onde olhar</b> a carga do dia — ela encolhe. (Pêndulo invertido: o recurso é a casa.)</p>
+      <div class="say"><p>"Agora, com essa firmeza presente, olha de leve pra raiva guardada, ou pra pressa. Ela muda de tamanho quando você a olha a partir da firmeza?"</p></div>
+      <div class="b7pend"><span class="pl b">firmeza serena</span><span class="bar" style="background:linear-gradient(90deg,var(--good),var(--amber))"></span><span class="pl a">a carga do dia</span></div>
+      <p class="cue">Toca a carga de leve e volta pra firmeza.</p></div>
+
+    <div class="step sentido"><span class="n">6</span><p class="st-name">Colher o sentido</p>
+      <p class="exp">Amarrar num novo significado — é o que faz durar.</p>
+      <div class="say"><p>"O que você sabe agora sobre a sua própria força, que a rotina te faz esquecer?"</p></div></div>
+
+    <div class="step fechar"><span class="n">7</span><p class="st-name">Fechar e passar o bastão</p>
+      <p class="exp">Trazer de volta por inteiro + um passo pra sessão.</p>
+      <div class="say"><span class="say-lab">Fechar</span><p>"Vamos voltar por inteiro. Sente os pés, o corpo apoiado, o ar. Leva essa firmeza com você."</p></div>
+      <div class="say"><span class="say-lab">Micro-passo</span><p>"Qual situação desta semana pede exatamente essa firmeza — e como seria entrar nela apoiada nela? Traz pra nossa sessão."</p></div></div>
+
+    <div class="conduct"><span class="conduct-lab">◆ O remédio da leitura</span><p>Firmeza + flexibilidade são o <b>maior recurso disponível</b> desta pessoa. Use este caminho pra <b>abrir ou fechar</b> a sessão, e como porto seguro se qualquer outra carga pesar demais.</p></div>
+  </div>
+
+  <p class="closing">Nenhuma dessas perguntas é um veredito. Cada uma é uma porta — você abre, com quem te procura, no tempo que a pessoa aguentar.</p>
+</div></div>
+</body></html>

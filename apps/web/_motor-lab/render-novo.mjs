@@ -4,13 +4,21 @@
 // blocos 3 e 4 leem o formato ESTRUTURADO (@MARCO / @CAMPOS) do prompt.
 // uso: node apps/web/_motor-lab/render-novo.mjs [self|daniel|miguel]
 import { readFileSync, writeFileSync } from 'node:fs'
-import { parseLastro, calc, BASELINE_LIVRE } from './motor-calc.mjs'
+import { parseLastro, calc, eixoDe, displayDe, EIXOS, BASELINE_LIVRE } from './motor-calc.mjs'
 
 const name = process.argv[2] || 'self'
 const MD = readFileSync(`apps/web/_motor-lab/out/novo-${name}--sonnet-5.md`, 'utf8')
 const MOCK = readFileSync('apps/web/_motor-lab/relatorio-novo/relatorio-completo.html', 'utf8')
 const STYLE = MOCK.slice(MOCK.indexOf('<style>') + 7, MOCK.indexOf('</style>'))
-const NOME = { self: 'Rhelton', daniel: 'Daniel', miguel: 'Miguel' }[name] || name
+const NOME = { self: 'Rhelton', s5novo: 'Rhelton', victor: 'Victor', daniel: 'Daniel', miguel: 'Miguel' }[name] || name
+
+// ---------- BLOCO 6 determinístico: reusa o guia de condução aprovado (proto) ----------
+// O bloco 6 é um MÉTODO fixo (7 movimentos), então não passa pelo Sonnet — o render
+// injeta o proto aprovado + o CSS dele. (self = proto atual; daniel/miguel = parametrizar depois.)
+const PROTO6 = readFileSync('apps/web/_motor-lab/relatorio-novo/b6-terapeuta-proto.html', 'utf8')
+const PROTO6_STYLE = PROTO6.slice(PROTO6.indexOf('<style>') + 7, PROTO6.indexOf('</style>'))
+const B6CSS = ':root{--gold:#9a6a12;--amber-soft:#d69a4e;}\n' + PROTO6_STYLE.slice(PROTO6_STYLE.indexOf('.method-sub{'))
+const B6HTML = PROTO6.slice(PROTO6.indexOf('<p class="method-sub">'), PROTO6.indexOf('</p>', PROTO6.indexOf('<p class="closing">')) + 4)
 
 // ---------- números do motor ----------
 const α = BASELINE_LIVRE
@@ -59,12 +67,30 @@ function short(e) {
   s = s.split(/\s*[—–]\s|,\s/)[0].trim()
   return cap(s)
 }
-// dados do pêndulo de CARGA: usa o dicionário; fallback = rótulo limpo, sem descrição
+// dados do pêndulo de CARGA: dicionário curado primeiro; fallback = rótulo limpo +
+// ANTÍDOTO VINDO DO MOTOR (o 🟢 do mesmo campo na canônica). Antes o fallback cravava
+// "—" e o pêndulo saía manco sempre que a emoção não estava no dicionário acima.
+// FONTE ÚNICA do lado 🟢 = o EIXO (emocao-familia.md). O dicionário curado abaixo só
+// serve pro lado 🔴 (rótulo + o-que-é da carga); os campos de antídoto dele ficaram
+// obsoletos — duas palavras pra mesma saída ("Calma mental" vs "Paz mental") é
+// exatamente a divergência que o eixo veio matar.
 function pendData(e) {
-  if (PEND[e]) return { lab: PEND[e][0], desc: PEND[e][1], anti: PEND[e][2], antiDesc: PEND[e][3] }
-  return { lab: short(e), desc: '', anti: '—', antiDesc: '' }
+  const a = r.antidoto?.[e]
+  const anti = a ? { anti: a.principal, antiDesc: a.oque || '' } : { anti: '—', antiDesc: '' }
+  // rótulo do cliente: override do eixo (`chave :: rótulo`) > dicionário curado > limpeza
+  const dsp = displayDe(e)
+  if (PEND[e]) return { lab: dsp ? cap(dsp) : PEND[e][0], desc: PEND[e][1], ...anti }
+  return { lab: dsp ? cap(dsp) : short(e), desc: '', ...anti }
 }
+// FORÇA: mesma fonte única. O rótulo é o nome do EIXO (8ª série) e a sombra é a ponta
+// 🔴 do MESMO eixo — não mais o chute da lista SHADOW. Foi o que matou
+// "abertura que se mantém firme sem endurecer" (agora: Flexibilidade ⟷ Rigidez).
 function recData(e) {
+  const x = eixoDe(e)
+  if (x) {
+    const carga = (EIXOS.find((y) => y.nome === x.eixo)?.carga) || []
+    return { lab: x.rotulo, desc: x.oque || '', shadow: carga.length ? short(carga[0]) : '—' }
+  }
   if (REC[e]) return { lab: REC[e][0], desc: REC[e][1], shadow: REC[e][2] }
   return { lab: short(e), desc: '', shadow: shadowOf(e) }
 }
@@ -181,7 +207,7 @@ function block3(body) {
     const cls = m.status === 'ativo' ? 'on' : m.status === 'proc' ? 'proc' : ''
     return `<div class="moment ${cls}"><div class="moment-h"><span class="mage display">${esc(m.idade)}</span><span class="${m.status === 'ativo' ? 'mflag' : 'mproc'}">${flag(m.status)}</span></div>${rows}${keys}</div>`
   }).join('')
-  return `<p class="snote">${inl(intro)}</p><div class="rail-wrap"><div class="rail"><div class="rail-line"></div>${rail}</div></div>${moments}`
+  return `<p class="snote">${inl(intro)}</p><div class="rail-wrap"><div class="rail" style="grid-template-columns:repeat(${Math.max(marcos.length, 1)},1fr)"><div class="rail-line"></div>${rail}</div></div>${moments}`
 }
 
 // ---------- BLOCO 4 — corrente + padrões + identificação + frases ----------
@@ -208,18 +234,64 @@ function block4(body) {
 }
 
 // ---------- BLOCO 5 — pêndulos + legenda + remédio ----------
+// CONTRATO @PENDULO (decisão founder 2026-07-26): o Sonnet ESCOLHE a formulação de cada
+// antídoto (encaixe fino na pessoa e na intensidade) e o render VALIDA contra o eixo.
+// Escolha dentro do eixo → vale. Inventou → cai no rótulo canônico e sai no log.
+// Assim inventar deixa de ser POSSÍVEL, em vez de ser só proibido no papel.
+const nrm = (s = '') => s.replace(/[*_`"]/g, '').replace(/\([^)]*\)/g, '').replace(/\s+/g, ' ').trim().toLowerCase()
+function escolhasPendulo(body) {
+  const ok = {}, fora = []
+  for (const m of body.matchAll(/^@PENDULO:?\s*(.+?)\s*::\s*(.+?)\s*$/gm)) {
+    const [, alvoRaw, escolha] = m
+    const hit = r.mapaCarga.find(([e]) => nrm(e) === nrm(alvoRaw) || nrm(e).includes(nrm(alvoRaw)) || nrm(alvoRaw).includes(nrm(e)))
+    if (!hit) { fora.push(`${alvoRaw} → emoção não está no mapa desta pessoa`); continue }
+    const a = r.antidoto?.[hit[0]]
+    // aceita a forma do cliente, o texto cru da canônica E a própria explicação do eixo
+    const leque = a ? [a.principal, a.oque, ...(a.pool || []), ...(a.poolChaves || [])].filter(Boolean) : []
+    // o Sonnet costuma prefixar o nome do eixo ("Sossego — a cabeça organiza"). É acerto
+    // de conteúdo com desvio de formato: tira o prefixo antes de validar, não rejeita.
+    const i = escolha.indexOf(' — ')
+    const limpo = i > 0 ? escolha.slice(i + 3) : escolha
+    const casa = leque.find((p) => nrm(p) === nrm(escolha) || nrm(p) === nrm(limpo))
+    if (casa) ok[hit[0]] = casa
+    else fora.push(`${alvoRaw} :: "${escolha}" → fora do eixo ${a?.eixo || '?'}`)
+  }
+  if (fora.length) console.log(`   ⚠️ @PENDULO rejeitado (caiu no rótulo do eixo):\n${fora.map((x) => '      · ' + x).join('\n')}`)
+  return ok
+}
+
 function block5(body) {
   const f = fields(body)
+  const escolha = escolhasPendulo(body)
   const carga = r.mapaCarga.slice(0, 9).map(([e, s]) => {
     const p = pendData(e)
-    const antiPart = p.antiDesc ? ` &nbsp;·&nbsp; <b class="anti">${esc(p.anti)}</b>: ${esc(p.antiDesc)}` : ''
-    const desc = p.desc ? `<p class="pend-desc"><b>${esc(p.lab)}</b>: ${esc(p.desc)}${antiPart}</p>` : ''
+    const a0 = r.antidoto?.[e]
+    // A ESCOLHA DO SONNET VAI PRA BARRA (decisão founder: três cargas no mesmo eixo têm
+    // que mostrar as três saídas, não a mesma palavra 3x). Isso só é possível porque as
+    // formulações passaram pela auditoria e hoje estão no registro do cliente — antes
+    // eram texto cru da canônica e quebravam a barra. O EIXO a que ela pertence continua
+    // visível, na descrição.
+    if (escolha[e]) { p.anti = cap(escolha[e].replace(/"/g, '')); p.antiEixo = a0?.principal; p.antiDesc = a0?.oque || '' }
+    const bits = []
+    if (p.desc) bits.push(`<b>${esc(p.lab)}</b>: ${esc(p.desc)}`)
+    // sem descrição curada, o antídoto entra sozinho como "A saída" (não fica linha vazia)
+    if (p.antiDesc) bits.push(p.antiEixo ? `<b class="anti">A saída</b>: ${esc(p.antiDesc)}` : `<b class="anti">${esc(p.anti)}</b>: ${esc(p.antiDesc)}`)
+    const desc = bits.length ? `<p class="pend-desc">${bits.join(' &nbsp;·&nbsp; ')}</p>` : ''
     return `<div class="pend"><div class="pend-labels"><span class="pl-carga">${esc(p.lab)} <span class="lv">${nivel(s)}</span></span><span class="pl-anti">${esc(p.anti)}</span></div><div class="pend-track"><i class="needle" style="left:${leftCarga(s)}%"></i></div>${desc}</div>`
   }).join('')
-  const rec = r.mapaRecurso.slice(0, 5).map(([e, s], i) => {
+  // DEDUPE por EIXO: duas entradas distintas da canônica podem cair no mesmo eixo e,
+  // desde que o rótulo passou a vir do eixo, imprimiam a MESMA linha duas vezes
+  // (bug real: "Inflexibilidade / rigidez → Flexibilidade" 2x). Fica a de maior score.
+  const vistoEixo = new Set()
+  const recUnico = r.mapaRecurso.filter(([e]) => {
+    const k = eixoDe(e)?.eixo || e
+    if (vistoEixo.has(k)) return false
+    vistoEixo.add(k); return true
+  })
+  const rec = recUnico.slice(0, 5).map(([e, s], i) => {
     const p = recData(e)
     const desc = p.desc ? `<p class="pend-desc"><b class="anti">${esc(p.lab)}</b>: ${esc(p.desc)}</p>` : ''
-    return `<div class="pend"><div class="pend-labels"><span class="pl-shadow">${esc(p.shadow)}</span><span class="pl-resource">${esc(p.lab)} <span class="lv">${s >= 2 ? 'vital' : 'livre'}</span></span></div><div class="pend-track"><i class="needle free" style="left:${50 + bipRecurso(s) - i * 2}%"></i></div>${desc}</div>`
+    return `<div class="pend"><div class="pend-labels"><span class="pl-shadow">${esc(p.shadow)}</span><span class="pl-resource">${esc(p.lab)} <span class="lv">${s >= 2 ? 'vital' : 'livre'}</span></span></div><div class="pend-track"><i class="needle free" style="left:${50 + bipRecurso(s)}%"></i></div>${desc}</div>`
   }).join('')
   return `${f.LEAD ? `<p class="lead">${inl(f.LEAD)}</p>` : ''}
     <div class="legend"><span>● <b>Bolinha</b> = onde você está</span><span><b style="color:var(--amber)">Esquerda</b> = carregado</span><span><b style="color:var(--good)">Direita</b> = a saída</span></div>
@@ -228,23 +300,8 @@ function block5(body) {
     ${f.REMEDIO ? `<div class="medicine"><p class="med-lab">O que já está livre é o seu remédio</p><p>${inl(f.REMEDIO)}</p></div>` : ''}`
 }
 
-// ---------- BLOCO 6 — perguntas em cards de processo (formato @CAMINHO) ----------
-function block6(body) {
-  const out = ['<p class="method-sub">Método somático · Sopro da Origem</p>']
-  const g1 = (k) => { const m = body.match(new RegExp(`^@${k}:[ \\t]*(.*)`, 'm')); return m ? m[1].trim() : '' }
-  const intro = g1('INTRO'); if (intro) out.push(`<p class="intro">${inl(intro)}</p>`)
-  const TEMPOS = [['chegar', 'Chegar', ''], ['tocar', 'Tocar — onde isso mora no corpo', 'carga'], ['deixar', 'Deixar falar', ''], ['outro', 'Trazer o outro lado', 'recurso'], ['passo', 'O que isso pede — pra sua sessão', 'passo']]
-  for (const c of body.split(/^@CAMINHO /m).slice(1)) {
-    const nome = (c.split('\n')[0].match(/nome=(.*)/) || [])[1]?.trim() || ''
-    const steps = TEMPOS.map(([k, lab, cls], idx) => {
-      const v = (c.match(new RegExp(`^- ${k}:\\s*(.*)`, 'm')) || [])[1]?.trim()
-      return v ? `<div class="step ${cls}"><span class="dot">${idx + 1}</span><p class="st-lab">${esc(lab)}</p><div class="card"><p class="st-txt">${inl(v)}</p></div></div>` : ''
-    }).join('')
-    out.push(`<div class="qsec"><div class="qhead">${esc(nome)}</div>${steps}</div>`)
-  }
-  const fecho = g1('FECHO'); if (fecho) out.push(`<p class="qfecho">${inl(fecho)}</p>`)
-  return out.join('\n')
-}
+// ---------- BLOCO 6 — guia de condução (determinístico, do proto aprovado) ----------
+function block6() { return B6HTML }
 
 // ---------- monta ----------
 const NUMS = ['1', '2', '3', '4', '5', '6']
@@ -258,8 +315,24 @@ const sections = blocks.map((b, i) => {
   try {
     inner = i === 0 ? block1(body) : i === 1 ? block2(body) : i === 2 ? block3(body) : i === 3 ? block4(body) : i === 4 ? block5(body) : block6(body)
   } catch (e) { inner = prose(body) + `<!-- render fallback: ${e.message} -->` }
-  return `<section class="block">${eyebrow}${h2}${inner}</section>`
-}).join('\n<hr class="div">\n')
+  return `<section class="block" id="b${i + 1}">${eyebrow}${h2}${inner}</section>`
+})
+// ÍNDICE — gerado aqui, não pelo prompt: o render já sabe os 6 títulos, então não gasta
+// token e não corre risco de o Sonnet inventar seção. Entra logo depois do bloco 1.
+const toc = `<nav class="toc"><p class="toc-lab">O que vem a seguir</p>${
+  H2.map((t, i) => `<a class="toc-row" href="#b${i + 1}"><span class="toc-n">${NUMS[i]}</span><span class="toc-t">${esc(t)}</span></a>`).join('')
+}</nav>`
+const sectionsHtml = [sections[0] + toc, ...sections.slice(1)].join('\n<hr class="div">\n')
+
+// FECHO — nome, data e natureza do documento. Um doc "pra guardar" não pode terminar
+// numa instrução de manejo; precisa fechar como peça.
+const DATA = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
+const fecho = `<div class="colofao">
+  <p class="cf-nome">${esc(NOME)}</p>
+  <p class="cf-meta">Leitura de ${DATA}</p>
+  <p class="cf-marca">IRIS CODEX · Mapa do Ser</p>
+  <p class="cf-nota">Este documento é uma leitura de emoções e comportamentos. Não é diagnóstico, não substitui acompanhamento de saúde e não prescreve tratamento.</p>
+</div>`
 
 const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Relatório · ${NOME}</title><style>${STYLE}
@@ -271,11 +344,52 @@ const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><met
 .respira{text-align:center;font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint,#a99);margin:2px 0 6px}
 .pend-desc{font-size:13px;line-height:1.5;color:var(--ink-soft,#6b6357);margin:5px 0 2px} .pend-desc b{color:#a35a1c;font-weight:600} .pend-desc b.anti{color:#2f7a54} .pend{margin-bottom:14px}
 .maieutica + .maieutica{margin-top:2px}
+/* --- ajustes do founder (2026-07-27) --- */
+/* o âmbar da tarja de seção estava pequeno demais pro peso que a marca tem */
+/* título de seção em PRETO (decisão founder 2026-07-27): tira o âmbar do rótulo, que
+   passava a significar duas coisas — carga emocional E "isto é uma etiqueta". */
+.eyebrow{font-size:14px;letter-spacing:.16em;margin:0 0 12px;color:var(--ink)}
+.eyebrow .secnum{color:var(--ink)}
+.eyebrow .secnum{font-family:Palatino,Georgia,serif;font-size:21px;font-weight:400;letter-spacing:0;vertical-align:-2px;margin-right:2px}
+/* MAIS AR entre as seções — estava tudo colado */
+section.block{margin:0} hr.div{margin:64px 0 60px;border:0;border-top:1px solid var(--line)}
+section.block > h2.display{margin-top:6px;margin-bottom:22px}
+/* índice */
+.toc{margin:52px 0 4px;padding:22px 26px;background:#f7f3ea;border:1px solid var(--line);border-radius:10px}
+.toc-lab{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint,#a99a87);font-weight:700;margin:0 0 12px}
+.toc-row{display:flex;align-items:baseline;gap:14px;padding:7px 0;text-decoration:none;color:inherit;border-bottom:1px solid rgba(0,0,0,.05)}
+.toc-row:last-child{border-bottom:0}
+.toc-n{font-family:Palatino,Georgia,serif;font-size:17px;color:var(--amber);min-width:16px}
+.toc-t{font-family:Palatino,Georgia,serif;font-size:16.5px;line-height:1.35}
+.toc-row:hover .toc-t{color:var(--teal-deep)}
+${B6CSS}
+/* --- fecho --- */
+.colofao{margin-top:64px;padding-top:26px;border-top:1px solid var(--line);text-align:center}
+.cf-nome{font-family:Palatino,Georgia,serif;font-size:19px;margin:0 0 2px}
+.cf-meta{font-size:13px;color:var(--ink-soft,#6b6357);margin:0 0 16px}
+.cf-marca{font-size:11px;letter-spacing:.2em;color:var(--teal-deep);font-weight:700;margin:0 0 14px}
+.cf-nota{font-size:11.5px;line-height:1.6;color:var(--ink-faint,#a99a87);max-width:52ch;margin:0 auto}
+/* --- IMPRESSÃO: o documento é pra imprimir e guardar. Sem isto, os cards partem
+   no meio entre páginas — invisível na tela, fatal no papel. --- */
+@media print{
+  @page{margin:16mm 14mm}
+  body{background:#fff;padding:0}
+  .sheet{max-width:none;margin:0;border:0;border-radius:0;box-shadow:none}
+  .pcard,.moment,.saybox,.step,.root,.gen,.toc,.pend,.objbox,.stresswrap,.resil,.medicine,
+  .maieutica,.chave,.qsec,.idrow,.facet,.colofao{break-inside:avoid;page-break-inside:avoid}
+  section.block{break-inside:auto}
+  h2.display,.eyebrow{break-after:avoid;page-break-after:avoid}
+  hr.div{margin:34px 0 30px}
+  .toc-row{border-bottom-color:#ddd}
+  a{color:inherit;text-decoration:none}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 </style></head><body>
 <div class="sheet"><div class="pad">
   <div class="brand">IRIS CODEX</div>
   <div class="brand-sub">Mapa do Ser · ${NOME}</div>
-  ${sections}
+  ${sectionsHtml}
+  ${fecho}
 </div></div>
 </body></html>`
 writeFileSync(`apps/web/_motor-lab/out/novo-${name}.html`, html)
