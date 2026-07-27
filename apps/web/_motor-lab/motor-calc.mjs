@@ -23,6 +23,13 @@ const BASELINE_LIVRE = 1.2 // α
 // órgão domina, a paleta genérica cai (quebra o empate 4.6 sem mapa de família
 // frágil, que reintroduziria o Forer da emoção ubíqua). rank0=1 · r1=.6 · r2=.36…
 const DECAY = 0.6
+// ATENUADOR do reforço de família (decisão founder 2026-07-25): os achados SOMAM na
+// família, mas cada membro SECUNDÁRIO entra atenuado por (intensidade/5)^2 — achado
+// fraco (I2 → fator 0.16) quase não soma; achado forte (I4 → 0.64, I5 → 1.0) soma quase
+// inteiro. O líder (mais forte) conta cheio. Efeito: fígado I3 + radii I2 fica em MÉDIA
+// (~3.7, não "alta" como se fosse I4/I5), mas fígado I4 + radii I4 continua MUITO ALTA
+// (~7.5). Um achado I3 nunca alcança o patamar de um I5.
+const FAM_DAMP_EXP = 2
 
 // ---------- classificação dos campos (de classificacao-campos.md) ----------
 const ALIAS = {
@@ -103,9 +110,15 @@ function parseLastro() {
     // do elemento dominante fica no rank 0 (recebe o peso cheio no decaimento).
     const order = ['fogo', 'agua', 'terra', 'ar'].sort((a, b) => (elem[b] || 0) - (elem[a] || 0))
     const flat = (o) => order.flatMap((e) => o[e] || [])
+    // PROCEDÊNCIA de cada emoção de carga no arquivo: em que bloco ela estava e em que
+    // posição. Serve SÓ pra casar 🔴[k] com o 🟢[k] que a canônica escreveu ao lado dele
+    // (o antídoto do pêndulo). NÃO é modelo de elemento — nada disso aparece em mapa,
+    // prompt ou doc; é só o endereço do dado no arquivo (decisão founder 2026-07-26).
+    const flatSrc = (o) => order.flatMap((e) => (o[e] || []).map((_, k) => ({ e, k })))
     map[name] = {
       elem, centros: centros.length ? centros : ['corpo'],
       carga: flat(cargaByElem), recurso: flat(recursoByElem), cargaByElem, recursoByElem,
+      cargaSrc: flatSrc(cargaByElem),
       cargaCrenca: flat(cargaCrencaByElem), recursoCrenca: flat(recursoCrencaByElem),
     }
   }
@@ -132,6 +145,63 @@ function loadFamilias() {
 const EMO_FAMILIA = loadFamilias()
 const familiaDe = (emo) => EMO_FAMILIA[(emo || '').toLowerCase()] || null
 
+// ---------- EIXOS DO PÊNDULO (decisão founder 2026-07-26) ----------
+// O par carga⟷antídoto é propriedade da EMOÇÃO, escrito à mão por eixo — NÃO se deriva
+// do 🟢 do órgão (aquele responde "como é este órgão quando está bem", que é outra
+// pergunta; daí saía `preocupação ⟷ curiosidade e apetite pelo novo`).
+// O rótulo do eixo obedece a LEI DA 8ª SÉRIE — é o termo que chega ao cliente.
+export function loadEixos() {
+  const md = fs.readFileSync(FAMILIA_MD, 'utf8')
+  const sec = md.slice(md.indexOf('## Eixos do pêndulo'))
+  const eixos = []
+  for (const b of sec.split(/^### Eixo · /m).slice(1)) {
+    const nome = b.split('\n')[0].trim()
+    if (/^Fora do pêndulo/.test(nome)) continue
+    const anti = (b.match(/\*\*🟢 Antídoto:\*\*\s*(.*)/) || [])[1] || ''
+    const [rotulo, oque] = anti.split(' — ').map((s) => (s || '').replace(/\*/g, '').trim())
+    // `chave :: rótulo` — a ESQUERDA é o texto da canônica (a chave de busca, imexível);
+    // a DIREITA é o que o cliente lê. Serve quando o termo da fonte não passa na lei da
+    // 8ª série ou lê como virtude (`obstinação` → "obstinação compulsiva").
+    const lista = (re) => {
+      const raw = (b.match(re) || [])[1] || ''
+      if (raw.trim() === '—') return []
+      return raw.split(' · ').map((s) => s.trim()).filter(Boolean).map((s) => {
+        const [k, d] = s.split(' :: ')
+        return { k: k.trim(), d: (d || '').trim() }
+      })
+    }
+    const c = lista(/\*\*🔴 Cargas:\*\*\s*(.*)/), rr = lista(/\*\*🟢 Recursos:\*\*\s*(.*)/)
+    const display = Object.fromEntries([...c, ...rr].filter((x) => x.d).map((x) => [x.k, x.d]))
+    // VARIAÇÕES: formulações SÓ do cliente — não são entradas da canônica, então ficam
+    // FORA da conferência de cobertura (que segue 1:1 com a fonte). Existem porque eixo
+    // com uma formulação só faz o Sonnet PARAFRASEAR por falta de opção — medido em
+    // Sossego e Tranquilidade. Dar escolha é mais seguro que afrouxar a validação.
+    const variacoes = lista(/\*\*🟢 Variações:\*\*\s*(.*)/).map((x) => x.k)
+    eixos.push({ nome, rotulo: rotulo || nome, oque: oque || '', carga: c.map((x) => x.k), recurso: rr.map((x) => x.k), variacoes, display })
+  }
+  return eixos
+}
+// índice emoção→eixo. A entrada do eixo pode trazer o sufixo "→ emoção-base" do princípio
+// psicossomático; a canônica não traz. Indexo pelas DUAS formas pra casar dos dois lados.
+const EIXOS = loadEixos()
+const normE = (s) => (s || '').replace(/[*_`]/g, '').replace(/\([^)]*\)/g, '').replace(/\s+/g, ' ').trim().toLowerCase()
+const EIXO_DE = {}
+for (const x of EIXOS) {
+  for (const [lado, itens] of [['carga', x.carga], ['recurso', x.recurso]]) {
+    for (const e of itens) {
+      const k = normE(e)
+      EIXO_DE[k] = { eixo: x.nome, rotulo: x.rotulo, oque: x.oque, lado }
+      const semSeta = k.split(' → ')[0].trim()
+      if (semSeta !== k && !(semSeta in EIXO_DE)) EIXO_DE[semSeta] = EIXO_DE[k]
+    }
+  }
+}
+const eixoDe = (emo) => EIXO_DE[normE(emo)] || null
+// rótulo do CLIENTE pra uma emoção de carga, quando o texto da canônica não serve
+const DISPLAY_DE = {}
+for (const x of EIXOS) for (const [k, d] of Object.entries(x.display || {})) DISPLAY_DE[normE(k)] = d
+const displayDe = (emo) => DISPLAY_DE[normE(emo)] || null
+
 // ---------- resolve um campo do exame → chave da tabela + classe ----------
 function classify(campo) {
   if (ALIAS[campo]) return { key: ALIAS[campo], klass: 'emocional' }
@@ -149,6 +219,7 @@ function calc(name, lastro) {
   const elem = { carga: { fogo: 0, agua: 0, terra: 0, ar: 0 }, recurso: { fogo: 0, agua: 0, terra: 0, ar: 0 } }
   const centro = { mente: { t: 0, l: 0 }, coracao: { t: 0, l: 0 }, corpo: { t: 0, l: 0 } }
   const emoCarga = {}, emoRecurso = {} // (B) mapa emocional — acumula score por emoção
+  const antiSrc = {} // emoção de carga → de onde puxar o 🟢 (campo de MAIOR peso que a emitiu)
   const achadoList = [] // TODOS os achados evidenciados (decisão founder: nada de colapsar em 1)
   const skipped = [], adjuvantes = []
 
@@ -164,7 +235,14 @@ function calc(name, lastro) {
     const cs = TOPO_CENTRO[key] || t.centros // centro por ZONA topográfica (decisão founder)
     const cw = w / cs.length
     for (const c of cs) centro[c].t += cw
-    t.carga.forEach((e, i) => { emoCarga[e] = (emoCarga[e] || 0) + w * Math.pow(DECAY, i) }) // (B) leque de carga com decaimento por rank
+    t.carga.forEach((e, i) => {
+      emoCarga[e] = (emoCarga[e] || 0) + w * Math.pow(DECAY, i) // (B) leque de carga com decaimento por rank
+      // ANTÍDOTO (decisão founder 2026-07-26): toda emoção de carga puxa o 🟢 DO MESMO
+      // CAMPO. Antes o polo 🟢 só existia se o campo estivesse em sistemas_preservados —
+      // por isso preocupação/rigidez/inquietação saíam MANCAS (o campo é só carga).
+      // Se duas áreas emitem a mesma emoção, vale a de maior peso.
+      if (!antiSrc[e] || antiSrc[e].w < w) antiSrc[e] = { key, i, w }
+    })
     // cada achado com sua COMPOSIÇÃO (2 elementos: predominante + secundário),
     // cada elemento com sua emoção-núcleo — o órgão não colapsa em 1 (founder).
     const els = ['fogo', 'agua', 'terra', 'ar'].filter((e) => (t.elem[e] || 0) > 0).sort((x, y) => t.elem[y] - t.elem[x])
@@ -198,10 +276,20 @@ function calc(name, lastro) {
   // acumula a soma dos pesos; o LÍDER dessa família (emoção mais forte do leque) vai ao
   // extremo. Ex.: raiva contida sobe ao topo porque a família Raiva repete (fígado+radii),
   // e você continua vendo irritação/ressentimento separadas no leque (granularidade da A).
-  const famScore = {} // família → Σ peso dos achados cujo NÚCLEO é dela (só o núcleo = cap)
+  // coleta os membros de cada família (peso + intensidade de cada achado)
+  const famMembers = {}
   for (const a of achadoList) {
     const f = familiaDe(a.breakdown[0]?.emo)
-    if (f) famScore[f] = (famScore[f] || 0) + a.w
+    if (f) (famMembers[f] ||= []).push({ w: a.w, int: a.int })
+  }
+  // famScore = líder cheio + demais ATENUADOS por (int/5)^FAM_DAMP_EXP (achado fraco
+  // quase não soma; achado forte soma quase inteiro). Teto natural: I3 não vira I5.
+  const famScore = {}
+  for (const f in famMembers) {
+    const ms = famMembers[f].sort((a, b) => b.w - a.w)
+    let s = ms[0].w
+    for (let i = 1; i < ms.length; i++) s += ms[i].w * Math.pow(ms[i].int / 5, FAM_DAMP_EXP)
+    famScore[f] = s
   }
   const domFam = Object.keys(famScore).sort((a, b) => famScore[b] - famScore[a])[0] || null
   if (domFam) {
@@ -225,6 +313,41 @@ function calc(name, lastro) {
       emoCarga[a.breakdown[1].emo] = Math.max(emoCarga[a.breakdown[1].emo] || 0, a.w * 0.6) // lê ~1 nível abaixo do núcleo, não "baixa"
     }
   }
+  // ---- PÊNDULO COMPLETO: cada carga com o seu lado-antídoto (🟢 do MESMO campo) ----
+  // `principal` = o 🟢 que a canônica escreveu na MESMA posição do 🔴 (é o par que a
+  // fonte já pareou: preocupação ⟷ "digerir a vida com gosto"). `pool` = TODAS as 🟢
+  // do campo, sem distinção — o prompt escolhe qual encaixa nesta pessoa.
+  // ⚠️ o antídoto é DIREÇÃO, não força presente: NÃO entra em emoRecurso (o trilho dos
+  // preservados é o único que afirma "isto já está livre em você").
+  const antidoto = {}
+  for (const e in antiSrc) {
+    const x = eixoDe(e)
+    if (!x) continue // sem eixo = furo na tabela; check-eixos.mjs acusa
+    const { key } = antiSrc[e]
+    // pool = as 🟢 do MESMO EIXO (o Sonnet escolhe a formulação que encaixa nesta
+    // pessoa e nesta intensidade — força casa com força, decisão founder).
+    // pool oferecido ao Sonnet = a forma que o CLIENTE lê (lei da 8ª série). O texto cru
+    // da canônica fica só como chave — aceito na validação, mas nunca sugerido.
+    const ex = EIXOS.find((y) => y.nome === x.eixo)
+    const chaves = ex?.recurso || []
+    const pool = [...chaves.map((k) => ex.display?.[k] || k), ...(ex?.variacoes || [])]
+    antidoto[e] = { principal: x.rotulo, oque: x.oque, eixo: x.eixo, pool, poolChaves: chaves, campo: key }
+  }
+
+  // ---- COLISÃO DE EIXO: carga e recurso PRESERVADO nas duas pontas do mesmo pêndulo ----
+  // Caso real do founder: `rigidez/intolerância` (achado, intestino delgado) vs
+  // `flexibilidade ativa…` (preservado, musculoesquelético) — mesmo eixo, lados opostos
+  // da página. Só DETECTA e reporta; o que fazer é decisão do founder na frente do caso.
+  const colisoes = []
+  for (const [emoC] of Object.entries(emoCarga)) {
+    const xc = eixoDe(emoC)
+    if (!xc) continue
+    for (const [emoR] of Object.entries(emoRecurso)) {
+      const xr = eixoDe(emoR)
+      if (xr && xr.eixo === xc.eixo) colisoes.push({ eixo: xc.eixo, carga: emoC, recurso: emoR, sc: emoCarga[emoC], sr: emoRecurso[emoR] })
+    }
+  }
+
   const rankedCarga = Object.entries(emoCarga).sort((a, b) => b[1] - a[1])
   const mapaCarga = rankedCarga.filter(([e]) => garantidas.has(e)) // 1º: as garantidas
   const N = Math.max(8, mapaCarga.length)
@@ -232,7 +355,7 @@ function calc(name, lastro) {
   mapaCarga.sort((a, b) => b[1] - a[1])
   const mapaRecurso = top(emoRecurso, 5)
   achadoList.sort((a, b) => b.w - a.w)
-  return { name, elem, centro, pres, mapaCarga, mapaRecurso, achadoList, famScore, domFam, skipped, adjuvantes, nAch: achados.length, nPres: preservados.length }
+  return { name, elem, centro, pres, mapaCarga, mapaRecurso, antidoto, colisoes, achadoList, famScore, domFam, skipped, adjuvantes, nAch: achados.length, nPres: preservados.length }
 }
 
 function fmt(r) {
@@ -278,7 +401,9 @@ function fmt(r) {
   L.push('\n(B) MAPA EMOCIONAL — leque de CARGA (score=Σ intensidade^γ · o prompt seleciona):')
   for (const [emo, s] of r.mapaCarga) {
     const bar = '▓'.repeat(Math.round((s / maxE) * 16)).padEnd(16)
+    const a = r.antidoto?.[emo]
     L.push(`    ${bar} ${s.toFixed(1).padStart(4)} ${nivel(s).padEnd(9)} ${emo}`)
+    L.push(`    ${' '.repeat(16)}      ⟷ 🟢 ${a ? a.principal : '(SEM ANTÍDOTO — furo na canônica)'}`)
   }
   L.push('   leque de RECURSO (força — dos preservados):')
   for (const [emo, s] of r.mapaRecurso) L.push(`    · ${s.toFixed(1).padStart(4)}  ${emo}`)
@@ -295,7 +420,7 @@ function fmt(r) {
 }
 
 // ---------- exports (usados pelo serialize.mjs) ----------
-export { parseLastro, calc, classify, TOPO_CENTRO, GAMMA, K, BASELINE_LIVRE, DECAY, EXAM }
+export { parseLastro, calc, classify, eixoDe, displayDe, EIXOS, TOPO_CENTRO, GAMMA, K, BASELINE_LIVRE, DECAY, EXAM }
 
 // ---------- CLI (só quando rodado direto: node motor-calc.mjs) ----------
 import { pathToFileURL } from 'node:url'

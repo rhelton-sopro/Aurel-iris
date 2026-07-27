@@ -25,7 +25,7 @@ function serialize(name) {
   const lastro = parseLastro()
   const r = calc(name, lastro)
   const d = JSON.parse(fs.readFileSync(EXAM(name), 'utf8'))
-  const NOME = { self: 'Rhelton', daniel: 'Daniel', miguel: 'Miguel' }[name] || name
+  const NOME = { self: 'Rhelton', s5novo: 'Rhelton', victor: 'Victor', daniel: 'Daniel', miguel: 'Miguel' }[name] || name
 
   // sabor do Corpo (2 motores): raiva/luta vs medo/fuga — pelo elemento de carga dominante
   const sabor = r.elem.carga.fogo >= r.elem.carga.agua ? 'raiva' : 'medo'
@@ -70,8 +70,26 @@ function serialize(name) {
   const bipC = (s) => clamp(Math.round(-7.5 * s), -48, -6)
   const bipR = (s) => clamp(Math.round(9 * s + 12), 24, 48)
   L.push('## Mapa emocional (escala −50 carregado ⟷ 0 ⟷ +50 livre — todo achado ruim representado)')
-  L.push('**O que pesa hoje (cargas):**')
-  for (const [emo, s] of r.mapaCarga) L.push(`- ${emo} — ${nivel(s)} (${bipC(s)})`)
+  L.push('**O que pesa hoje (cargas) — cada uma com o SEU lado-antídoto (o outro polo do mesmo pêndulo):**')
+  for (const [emo, s] of r.mapaCarga) {
+    const a = r.antidoto?.[emo]
+    let anti = ''
+    if (a) {
+      const formul = a.pool.slice(0, 3)
+      anti = ` ⟷ 🟢 **${a.principal}**${a.oque ? ` (${a.oque})` : ''}${formul.length ? ` _[formulações do eixo: ${formul.join(' · ')}]_` : ''}`
+    }
+    L.push(`- ${emo} — ${nivel(s)} (${bipC(s)})${anti}`)
+  }
+  L.push('> ⚠️ O 🟢 acima é o **antídoto** = a DIREÇÃO de saída daquela carga, não uma força que a pessoa já tem. Use-o pra mostrar a saída ("o outro lado disso é…"), **nunca** pra afirmar que ela já está assim. O que ela JÁ tem livre é só a lista abaixo.')
+  L.push('> **O nome em negrito é o termo do EIXO — já está em 8ª série, use-o.** As "formulações do eixo" são variações da MESMA saída: escolha a que encaixa nesta pessoa, e quanto mais forte a carga, mais forte a formulação. NÃO invente antídoto fora do eixo.')
+  // colisão de eixo: as duas pontas do mesmo pêndulo, uma como carga e outra como força
+  const vc = new Set(r.mapaCarga.map(([e]) => e)), vr = new Set(r.mapaRecurso.map(([e]) => e))
+  const col = (r.colisoes || []).filter((c) => vc.has(c.carga) && vr.has(c.recurso))
+  if (col.length) {
+    L.push('> ⚠️⚠️ **COLISÃO DE EIXO — leia antes de escrever:** a mesma régua aparece dos dois lados abaixo:')
+    for (const c of col) L.push(`> - eixo **${c.eixo}**: pesa como \`${c.carga}\` e ao mesmo tempo está livre como \`${c.recurso}\`.`)
+    L.push('> Isso **não** é contradição a esconder — é uma distinção real: a pessoa é assim numa área da vida e o oposto em outra. **Diga em que cada lado se aplica** (ex.: dura no critério, solta no corpo). ⛔ NUNCA escreva as duas pontas soltas, sem dizer onde cada uma vale — o cliente lê como erro.')
+  }
   L.push('**O que está leve — força (recursos, das DUAS fontes):**')
   for (const [emo, s] of r.mapaRecurso) L.push(`- ${emo} — ${s >= 2 ? 'vital' : 'livre'} (+${bipR(s)})`)
   L.push('')

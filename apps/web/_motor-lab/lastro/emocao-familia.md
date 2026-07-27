@@ -129,6 +129,300 @@ Nota: a ligação `sintoma → emoção-base` é justamente o gancho terapêutic
 
 ---
 
+## Eixos do pêndulo (🔴 carga ⟷ 🟢 antídoto)
+
+**O que é (decisão founder 2026-07-26):** o pêndulo é propriedade da **EMOÇÃO**, não do órgão.
+O 🟢 da `tabela-lastro-CANONICA.md` responde *"como é este órgão quando está bem"* — que **não é**
+a mesma pergunta que *"qual é o oposto desta emoção"*. Quando coincidia era sorte; quando não,
+saía `preocupação ⟷ curiosidade e apetite pelo novo`. Aqui o par é escrito à mão, por eixo.
+
+**A unidade é o EIXO, não o par.** Cinco jeitos de dizer "não tenho chão" têm **um** oposto só
+(*segurança*). Por isso 232 cargas cabem em ~44 eixos — e o antídoto fica curto o bastante pra
+caber num rótulo de gráfico.
+
+**LEI DO ANTÍDOTO — 8ª SÉRIE** ([[feedback_lei_oitava_serie]]): o nome do eixo é o termo que
+**chega ao cliente**. Tem que ser entendido por alguém da 8ª série sem perguntar o que significa.
+**Simples ganha de preciso-e-difícil, sempre.** `Flexibilidade` > *"capacidade de assimilar e
+aproveitar o que serve"*. `Paz mental` > *"calma receptiva diante do incerto"*.
+⚠️ **Teste de qualidade:** entrada que não consegue nomear **UM** oposto está errada — ou é duas
+coisas grudadas, ou é mush. Foi o que queimou *"abertura que se mantém firme sem endurecer"*
+(tentava ser o antídoto de endurecer **e** de ser mole ao mesmo tempo). O eixo é a auditoria do
+vocabulário: o que não couber num eixo é entrada pra consertar na canônica.
+
+**Força casa com força (founder):** achado muito forte pede oposto muito forte. O nome do eixo é
+o piso; o Sonnet escolhe **dentro do eixo** a formulação que encaixa naquela pessoa e naquela
+intensidade — e **nunca** inventa antídoto fora do eixo.
+
+**⚠️ COLISÃO DE EIXO:** quando uma **carga** e um **recurso preservado** caem no MESMO eixo, o
+motor está mostrando as duas pontas do mesmo pêndulo em lados opostos da página (caso real:
+`rigidez/intolerância` do intestino delgado vs `flexibilidade ativa…` do musculoesquelético —
+o 🔴 do próprio musculoesquelético é *"rigidez / resistência"*, é literalmente o mesmo eixo).
+O motor agora **detecta**; o que fazer com a colisão (netar em uma agulha só, ou nomear os dois
+eixos com mais precisão e manter) é **decisão do founder na frente do caso renderizado**.
+
+---
+
+### Eixo · Paz
+**🟢 Antídoto:** Paz — *raiva que passa sem explodir*
+**🔴 Cargas:** raiva contida · ira · raiva não-dissolvida · hostilidade/rivalidade
+**🟢 Recursos:** assertividade/combatividade bem regulada :: firmeza sem briga
+**🟢 Variações:** dizer sem explodir · a raiva que passa · calor que não vira briga
+
+### Eixo · Serenidade
+**🟢 Antídoto:** Serenidade — *irritação que baixa e passa*
+**🔴 Cargas:** irritação/irritabilidade :: irritação constante · irritação que "sobe" do visceral ao mental · irritabilidade de fundo · irritação cristalizada nas articulações · "estar irritado/pissed off" retido
+**🟢 Recursos:** —
+**🟢 Variações:** a irritação baixa · não se acender por pouco · humor estável
+
+### Eixo · Paciência
+**🟢 Antídoto:** Paciência — *esperar sem aperto*
+**🔴 Cargas:** impaciência/pressa :: pressa constante · impaciência :: impaciência constante
+**🟢 Recursos:** paciência
+**🟢 Variações:** esperar sem pressa · o tempo certo de cada coisa
+
+### Eixo · Autocontrole
+**🟢 Antídoto:** Autocontrole — *responder em vez de disparar*
+**🔴 Cargas:** impulso / ímpeto de ação descontrolado · prontidão para luta / reatividade · "reajo antes de pensar"
+**🟢 Recursos:** impulso a serviço da ação escolhida :: impulso a serviço da escolha · energia que, canalizada, vira foco e ação :: energia convertida em foco · prontidão que responde e depois relaxa — mobilização bem regulada :: reagir e soltar — mobilização regulada
+
+### Eixo · Destravar
+**🟢 Antídoto:** Destravar — *a energia volta a correr*
+**🔴 Cargas:** acúmulo emocional não drenado · constipação emocional
+**🟢 Recursos:** capacidade de deixar fluir o que já não serve :: deixar ir o que não serve · descarga saudável, abrir espaço
+
+### Eixo · Satisfação
+**🟢 Antídoto:** Satisfação — *o que você faz dá em algo*
+**🔴 Cargas:** frustração :: frustração guardada
+**🟢 Recursos:** —
+**🟢 Variações:** ver resultado no que faz · esforço que rende · chegar onde se propôs
+
+### Eixo · Segurança
+**🟢 Antídoto:** Segurança — *ter chão sob os pés*
+**🔴 Cargas:** medo estrutural de base · insegurança da infância · pavor · terror/horror · falta de reserva/apoio · base frágil sentida como medo · insegurança · síndrome do pânico · medo/fobia inscrita na coluna · medo de falta de apoio · medo/ansiedade somatizada na lombar → medo que desce pro corpo · insegurança material/financeira · insegurança estrutural / de fundamento · base frágil / não ter chão · insegurança de base / sobrevivência · fobias somatizadas → medo que vira sintoma no corpo · fobia/pânico · desproteção · eco da vida intra-uterina
+**🟢 Recursos:** coragem tranquila / segurança de base :: coragem calma · confiar e descansar na própria base :: descansar na própria base · senso de reserva e apoio real :: ter com quem contar · constância, ter recursos guardados :: ter reserva guardada · segurança interna · confiança de que há apoio e recursos :: ter apoio e recurso · sentir-se sustentado · senso de sustentação e base material segura :: base material segura · construir base passo a passo · segurança de base sentida · firmeza / base vital — força que sustenta sem endurecer :: firmeza que sustenta sem endurecer · constância/resistência :: constância no tempo
+
+### Eixo · Baixar a guarda
+**🟢 Antídoto:** Baixar a guarda — *relaxar sem alerta*
+**🔴 Cargas:** retração defensiva · alerta sustentado → medo (resposta de ameaça) · hipervigilância → medo (varredura de ameaça) · prontidão reativa crônica → medo em prontidão · sobressalto → medo (susto reflexo) · ansiedade corporal / sobressalto · hipervigilância / incapacidade de relaxar → medo que não baixa a guarda · alerta crônico → medo de fundo · hipervigilância sensorial → medo (sentidos em alerta) · reatividade sensorial → medo (sobressalto sensorial) · hipervigilância defensiva → medo (defesa em alerta) · prontidão defensiva crônica → medo sempre pronto a se proteger
+**🟢 Recursos:** sensação de segurança que permite baixar o alerta :: segurança que desliga o alerta · sensação de que pode baixar a guarda :: poder baixar a guarda · capacidade de voltar à calma quando há segurança :: voltar à calma passado o perigo · capacidade de baixar a guarda em segurança — não precisar reagir sempre :: não reagir a tudo · calma que não precisa travar de medo :: calma sem travar de medo · prontidão sensorial que serve à ação, sem sobressalto :: atenção sem sobressalto
+
+### Eixo · Corpo solto
+**🟢 Antídoto:** Corpo solto — *corpo sem tensão*
+**🔴 Cargas:** tensão muscular de fundo → medo de sobreviver · congelamento → medo que paralisa (freeze) · desconexão do corpo → medo (dissociação de ameaça) · tensão intestino-cérebro → medo/estresse retido na víscera · tensão visceral acumulada → medo/estresse retido no corpo · tensão nervosa sustentada → ansiedade tensionada no corpo · constrição/contração interna
+**🟢 Recursos:** capacidade de assentar o corpo, tônus de base calmo :: corpo assentado, tônus calmo · base instintiva assentada, corpo como chão seguro :: o corpo como chão seguro · aterrar a tensão no corpo antes que suba :: descarregar a tensão no corpo · clareza mental quando a tensão visceral se alivia :: clareza mental após o alívio da tensão · sensibilidade que se ancora no corpo, receptividade calma :: sensibilidade ancorada no corpo
+
+### Eixo · Coragem
+**🟢 Antídoto:** Coragem — *agir sem garantia*
+**🔴 Cargas:** medo de seguir em frente / de decisões grandes · sexualidade e medos inatos — o instinto travado · medo do fracasso que trava a ação · medo de errar/de falhar · culpa/vergonha que trava o impulso · procrastinação / "não começo minha missão" · medo do fracasso
+**🟢 Recursos:** assertividade saudável, coragem de "cortar o que não serve" :: cortar o que não serve · decisão e iniciativa · ímpeto/motivação de ação :: vontade de fazer acontecer · força de vontade, calor no agir :: calor para agir · iniciativa quando há de fato o que enfrentar :: enfrentar quando é preciso · coragem de se arriscar na própria missão :: arriscar-se no que é seu · capacidade de dar o primeiro passo concreto, aterrar a missão :: dar o primeiro passo concreto
+
+### Eixo · Meu espaço
+**🟢 Antídoto:** Meu espaço — *limite entre você e o outro*
+**🔴 Cargas:** fronteira/limite frágil com o mundo · sensibilidade/ameaça ao externo · sentir-se exposto/sem casca · tensão de fronteira eu↔mundo quando espessada/irregular → medo do limite invadido · ausência de limite entre si e o mundo · fusão com o outro · tensão na regulação de limites eu↔mundo · fronteira eu↔mundo mal definida · ondulação = dificuldade de dizer onde eu acabo e o outro começa
+**🟢 Recursos:** fronteira sentida sem se sentir invadido :: limite sentido, sem invasão · sensibilidade que protege e conecta na medida :: sentir o outro sem se perder · limites saudáveis — cuidar sem se dissolver :: cuidar sem se dissolver · firmeza que sustenta o próprio contorno :: manter o próprio contorno · sentir o outro sem se afogar · fronteira eu↔mundo bem regulada — aproximar-se e proteger-se na medida :: aproximação e proteção na medida
+
+### Eixo · Identidade
+**🟢 Antídoto:** Identidade — *um eu firme, que não oscila*
+**🔴 Cargas:** falta de identidade/insegurança criativa · temperamento manifesto reativo — o "eu" que oscila tímido↔dominante, submisso↔sedutor → insegurança de identidade
+**🟢 Recursos:** presença firme e serena
+**🟢 Variações:** saber quem se é · um eu que se sustenta · não mudar conforme quem está perto
+
+### Eixo · Tranquilidade
+**🟢 Antídoto:** Tranquilidade — *corpo que para de viver ligado*
+**🔴 Cargas:** nervosismo :: nervosismo constante · ansiedade de fundo · ansiedade mental de fundo · neuroticismo → instabilidade emocional de base · nervosismo somatizado na pele → nervosismo que aflora na pele · inquietação :: inquietação constante · medo/ansiedade
+**🟢 Recursos:** calma receptiva :: receber o que vem com calma
+**🟢 Variações:** o corpo desacelera · sair do alerta · descansar por dentro
+
+### Eixo · Confiança no futuro
+**🟢 Antídoto:** Confiança no futuro — *confiar no processo da vida*
+**🔴 Cargas:** ansiedade :: ansiedade constante · preocupação :: preocupação constante · ansiedade de performance · preocupação crônica somatizada → preocupação que vira sintoma no corpo · natureza conceitual/futuro-orientada, indecisão → ansiedade da mente que antecipa · medo do futuro econômico · medo do futuro · pessimismo · indecisão :: indecisão constante
+**🟢 Recursos:** confiança de que dá conta :: saber que dá conta · calma receptiva diante do incerto :: ficar em paz diante do incerto
+
+### Eixo · Sossego
+**🟢 Antídoto:** Sossego — *a cabeça para de girar*
+**🔴 Cargas:** ruminação · ruminação mental · ruminação/mente-que-julga · "mente que não desliga" na hora de dormir · "tagarelice mental rotativa" — mente que não desliga · sobrecarga mental · sobrecarga difusa
+**🟢 Recursos:** mente clara que organiza e descansa :: mente clara, que descansa
+**🟢 Variações:** a mente aquieta · parar de remoer · silêncio por dentro
+
+### Eixo · Foco
+**🟢 Antídoto:** Foco — *atenção reunida*
+**🔴 Cargas:** dispersão/ausência → ansiedade que não deixa a mente assentar · confusão / "cabeça no mundo da lua" → ansiedade que embaralha a mente · credulidade / dificuldade de discernir → ansiedade que não deixa a mente filtrar · intuição não-ancorada → mente dispersa pela ansiedade · sobrecarga sensorial → ansiedade de sistema saturado · dispersão mental → ansiedade que não deixa a mente assentar · dificuldade de concentração → ansiedade que não deixa a mente assentar · dispersão entre ideias → ansiedade que não deixa a mente assentar
+**🟢 Recursos:** clareza mental · agilidade mental e curiosidade · intuição e imaginação quando ancoradas — o dom do sonhador :: imaginação ancorada
+
+### Eixo · Sono
+**🟢 Antídoto:** Sono — *dormir e acordar inteiro*
+**🔴 Cargas:** desregulação sono-vigília → ansiedade que não deixa a mente assentar à noite
+**🟢 Recursos:** ritmo sono-vigília regulado, corpo que descansa no horário :: ritmo de sono regulado
+**🟢 Variações:** noite inteira de sono · acordar descansado
+
+### Eixo · Seguir em frente
+**🟢 Antídoto:** Seguir em frente — *elaborar a perda e voltar a andar*
+**🔴 Cargas:** luto/pesar :: luto que não passa · tristeza/luto "pelo que poderia ter sido" · desilusão/trauma localizado · desespero · perda :: perda não elaborada · decepção :: decepção que ficou · choro :: choro que não alivia
+**🟢 Recursos:** leveza depois de elaborar a perda, "respirar aliviado" :: respirar aliviado depois da dor · sentir fundo e soltar a dor :: sentir fundo e soltar
+
+### Eixo · Alegria
+**🟢 Antídoto:** Alegria — *recuperar o gosto pela vida*
+**🔴 Cargas:** melancolia · tristeza :: tristeza que não levanta · desânimo :: desânimo que não passa · falta de alegria/prazer, rejeição da vida (anedonia) · derrotismo / "deixar de cuidar de si" · resignação · desistência · fadiga crônica/astenia matutina → desânimo/desistência · falta de vitalidade → desânimo · inércia do esgotamento → desistência/desânimo · desesperança · depressão/desesperança · amargura pela falta de doçura
+**🟢 Recursos:** alegria/júbilo :: alegria · sentir o gostinho bom das coisas :: sentir o prazer nas coisas · otimismo · otimismo e leveza depois do luto :: otimismo depois do luto · desejo vivo · doçura da vida recuperada, amor-próprio · ímpeto de ir atrás do próprio prazer/doçura :: encontrar o próprio prazer · alegria & amor · recentrar no essencial: amor e alegria :: o essencial: amor e alegria
+
+### Eixo · Perdão
+**🟢 Antídoto:** Perdão — *soltar a mágoa — por você, não pelo outro*
+**🔴 Cargas:** ressentimento · amargura · mágoa velha presa · mágoa acumulada nas costas · ressentimento endurecido · amargura / vitimização · ressentimento de nunca ter vez · rancor/desejo de vingança
+**🟢 Recursos:** sentir fundo e soltar / perdoar :: sentir, soltar e perdoar · compaixão que substitui o rancor · soltar a mágoa velha com leveza :: soltar a mágoa antiga
+
+### Eixo · Contentamento
+**🟢 Antídoto:** Contentamento — *não medir a vida pela do outro*
+**🔴 Cargas:** inveja
+**🟢 Recursos:** —
+**🟢 Variações:** bastar-se com o que se tem · olhar a própria vida · parar de comparar
+
+### Eixo · Olhar sem julgar
+**🟢 Antídoto:** Olhar sem julgar — *ver o outro sem crítica*
+**🔴 Cargas:** crítica cristalizada · julgamento do outro e de si · "recusa em ver os dois lados" · crítica crônica/faultfinding
+**🟢 Recursos:** flexibilidade — capacidade de considerar outros pontos de vista :: ver pelo lado do outro
+**🟢 Variações:** olhar sem sentença · entender antes de julgar
+
+### Eixo · Confiança nas pessoas
+**🟢 Antídoto:** Confiança nas pessoas — *voltar a confiar depois de uma traição*
+**🔴 Cargas:** traição :: desconfiança
+**🟢 Recursos:** segurança amorosa
+**🟢 Variações:** abrir-se de novo com alguém · confiança reconstruída
+
+### Eixo · Autoestima
+**🟢 Antídoto:** Autoestima — *saber que você já basta*
+**🔴 Cargas:** vergonha · auto-rejeição · falta de amor-próprio/auto-rejeição · desvalorização · senso de inferioridade · baixa autoestima · "baixa estima → baixa imunidade" → baixa autoestima (a imunidade é só o veículo) · sentir-se não-amado · ciúme/desvalorização no vínculo · baixa autoestima por auto-comparação
+**🟢 Recursos:** valor sentido por dentro · autoestima que sustenta a defesa sem exaustão :: se valorizar sem se esgotar · senso de valor que não depende da entrega :: valer sem precisar entregar · senso de pertencer e de valor igual ao dos outros :: valer tanto quanto os outros · senso de ser visto e valorizado :: ser visto e valorizado · senso de merecimento :: sentir que merece
+
+### Eixo · Gentileza consigo
+**🟢 Antídoto:** Gentileza consigo — *parar de se tratar como inimigo*
+**🔴 Cargas:** auto-humilhação · irritação voltada contra si na auto-humilhação · autocensura moral/social — super-ego mental · culpa por "não dar conta" · "fora de equilíbrio consigo mesmo" → desconforto de não estar em paz consigo · autoexigência / autocrítica
+**🟢 Recursos:** compaixão consigo · gentileza consigo quando não dá conta :: gentileza consigo na falha
+
+### Eixo · Reparação
+**🟢 Antídoto:** Reparação — *reparar o que dá, se perdoar pelo resto*
+**🔴 Cargas:** culpa · culpa antiga enterrada
+**🟢 Recursos:** —
+**🟢 Variações:** consertar o que der · acertar o que ficou · se perdoar pelo que não tem conserto
+
+### Eixo · Direito de existir
+**🟢 Antídoto:** Direito de existir — *ocupar o próprio espaço sem desculpa*
+**🔴 Cargas:** fôlego curto / sufocamento — "não digno de respirar a vida plena" → sensação de indignidade · humilhação engolida · humilhação/vergonha do campo sexual · culpa ou pressão em torno do sexual · submissão/desonra · culpa/vergonha ligada ao sexual
+**🟢 Recursos:** —
+**🟢 Variações:** ocupar o próprio lugar · existir sem se justificar · respirar por inteiro
+
+### Eixo · Flexibilidade
+**🟢 Antídoto:** Flexibilidade — *dobrar sem quebrar*
+**🔴 Cargas:** inflexibilidade / rigidez · rigidez / resistência · rigidez moral · rigidez teimosa com calor · teimosia · resistência a "mudar de direção" · resistência à mudança · endurecimento de atitudes · apego a ideias velhas / medo de soltar · orgulho/dureza
+**🟢 Recursos:** flexibilidade ativa para mudar de direção quando preciso :: mudar de direção · maleabilidade, soltar aos poucos · abertura que se mantém firme sem endurecer :: ceder sem endurecer
+
+### Eixo · Soltar
+**🟢 Antídoto:** Soltar — *largar o que já cumpriu seu papel*
+**🔴 Cargas:** possessividade · marca de primeira infância/retenção · dificuldade de soltar · apego ao passado · retenção · medo de soltar · fixação no passado — "como as coisas eram antes" · nostalgia dura / apego ao que passou · retenção — "segurar o que deveria fluir" · obstinação :: obstinação compulsiva · indecisão de soltar · desapego difícil · congestionamento/acúmulo do velho · marca de primeira infância
+**🟢 Recursos:** capacidade de soltar/deixar fluir — eliminar o que não serve :: largar o que não serve · desapego leve, confiança de que o novo chega :: desapego leve, confiança no novo · constância sem apego :: seguir firme sem se agarrar
+
+### Eixo · Confiar e dividir
+**🟢 Antídoto:** Confiar e dividir — *delegar sem vigiar*
+**🔴 Cargas:** necessidade de controle · hipercontrole / necessidade de controle · dificuldade de delegar/confiar no outro
+**🟢 Recursos:** autoconfiança que permite delegar e confiar — força de vontade que não precisa controlar tudo :: confiar sem controlar
+**🟢 Variações:** deixar nas mãos do outro · dividir a responsabilidade
+
+### Eixo · Bom o bastante
+**🟢 Antídoto:** Bom o bastante — *aceitar pronto em vez de perfeito*
+**🔴 Cargas:** dever rígido, "tenho de" internalizado · autoexigência de performance · dever/idealismo excessivo · perfeccionismo · proibições/imposições internalizadas · peso de regras antigas · vergonha de não corresponder ao próprio padrão
+**🟢 Recursos:** rigor que vira método sustentável, constância sem rigidez :: rigor que vira método · discernimento e capacidade de organizar/decidir bem — a face útil do rigor :: organizar e decidir bem · praticidade, resolver no próprio tempo
+
+### Eixo · Se deixar sentir
+**🟢 Antídoto:** Se deixar sentir — *descer da cabeça para o peito*
+**🔴 Cargas:** frieza/racionalização como defesa · rigidez afetiva / "endurecer para aguentar" · afeto que "desliga para se proteger" · amor retido / medo de dar afeto · coração endurecido / medo de sentir
+**🟢 Recursos:** calor afetivo que se permite sentir :: deixar o carinho aparecer · abertura afetiva sem medo de se machucar :: abrir-se sem medo · afeto que se deixa demonstrar
+
+### Eixo · Se sentir amado
+**🟢 Antídoto:** Se sentir amado — *ter lugar no afeto de alguém*
+**🔴 Cargas:** medo de não ser amado / amor não recebido · abandono · solidão de fundo — "sozinha apesar de rodeada", medo da solidão · desamparo · esforço não reconhecido · angústia · vulnerabilidade :: sentir-se desprotegido · rejeição
+**🟢 Recursos:** sentir-se amado e conectado · sentir-se amado e sustentado por dentro :: se sentir amado por dentro · sentir fundo e se deixar amar · calor no vínculo / afeto que aquece :: afeto que aquece
+
+### Eixo · Criar laço
+**🟢 Antídoto:** Criar laço — *criar laço e sustentar*
+**🔴 Cargas:** dificuldade de vínculo / de ligar-se · dificuldade de ligar-se · idealismo afetivo — "coração aventureiro que não sustenta o vínculo" · medo de pertencer / de vincular-se · medo de finalizações / de pertencer · medo de finalizações / gravidez não-planejada
+**🟢 Recursos:** vincular-se com prazer e segurança · vínculo prazeroso e nutridor, intimidade viva :: vínculo que nutre · entusiasmo afetivo, coração aberto/aventureiro :: coração aberto · desejo saudável de aproximar-se, ardor afetivo vivo :: desejo de se aproximar
+
+### Eixo · Amor leve
+**🟢 Antídoto:** Amor leve — *gostar sem sufocar*
+**🔴 Cargas:** paixão possessiva / drama afetivo · intensidade que consome, "queimar-se" no outro · ciúme ardente no vínculo · passividade sexual ↔ dominação no vínculo · ciúme
+**🟢 Recursos:** leveza no vínculo, circular afeto sem carga :: amar sem peso · intimidade viva e leve, vínculo que circula :: intimidade leve e viva
+
+### Eixo · Receber também
+**🟢 Antídoto:** Receber também — *deixar cuidarem de você*
+**🔴 Cargas:** cuidar demais dos outros / doar sem receber · carregar os outros / falta de apoio emocional · sobrecarga empática / assumir os fardos dos outros · sobrecarga silenciosa de quem sustenta a todos · exaustão de cuidador · ressentimento de quem sempre sustenta
+**🟢 Recursos:** capacidade de receber tanto quanto dá :: receber tanto quanto dá · capacidade de pedir e receber apoio :: pedir e receber ajuda · empatia que nutre em vez de esgotar :: se importar sem se esgotar · acolhimento/nutrição de si e dos outros :: cuidar de si e do outro · nutrição de si, presença cuidadora equilibrada :: cuidar sem se abandonar
+
+### Eixo · Voz própria
+**🟢 Antídoto:** Voz própria — *falar com as próprias palavras*
+**🔴 Cargas:** voz sufocada / "nunca é minha vez" · voz sufocada · contenção da voz / engolir o que quer dizer · expressão engolida · expressão reprimida · expressão contida/retida · engolir emoções · "não consigo dizer o que sinto" · raiva engolida · raiva engolida / não falar por si · medo de se expor ao falar
+**🟢 Recursos:** voz que sente e se deixa ouvir sem medo :: falar sem medo · dizer o que sente, voz própria :: dizer o que sente · dizer o que sente com jeito, deixar a voz passar :: dizer o que sente, com cuidado · deixar a emoção passar em palavra :: pôr em palavra o que sente · confiança de que a própria voz importa :: a própria voz importa · sustentar a própria fala com calma :: sustentar a própria fala · comunicação leve e viva · calma receptiva depois de dizer o que doeu :: a calma depois de falar
+
+### Eixo · Saber dizer não
+**🟢 Antídoto:** Saber dizer não — *pôr limite sem culpa*
+**🔴 Cargas:** servilismo / incapacidade de dizer não · dificuldade de dizer não ao cuidado do outro
+**🟢 Recursos:** capacidade de pôr limites e sustentar a própria posição :: pôr limite e sustentar · firmeza para sustentar a própria posição :: sustentar a própria posição · firmeza que tem posição sem endurecer — ter jeito próprio sem fechar a porta :: saber se posicionar sem endurecer · assertividade — reivindicar a própria vez com calor :: reivindicar a própria vez · assertividade — falar por si com firmeza :: falar por si, com firmeza
+
+### Eixo · Criar
+**🟢 Antídoto:** Criar — *deixar sair o que quer nascer*
+**🔴 Cargas:** criatividade bloqueada
+**🟢 Recursos:** criatividade e expressão liberadas · criatividade / "fogo criador" — o instinto criativo, não só o reprodutivo :: vontade de criar · ímpeto de agir e criar :: impulso de criar · espírito livre / não-conformismo criativo — energia inquieta que inova :: espírito livre, que inventa
+
+### Eixo · Poder parar
+**🟢 Antídoto:** Poder parar — *descansar sem culpa*
+**🔴 Cargas:** "não posso parar" · incapacidade de parar · "tenho de fazer mais / não posso parar" · hiper-realização · urgência constante · sobrecarga de dever
+**🟢 Recursos:** capacidade de desacelerar e sustentar o ritmo :: desacelerar e sustentar o ritmo · calma receptiva, confiar que pode descansar :: confiar que pode descansar · capacidade de escolher a prioridade real e agir com foco :: escolher o que importa e focar · constância que sustenta sem se esgotar :: manter o passo sem se esgotar
+
+### Eixo · Fôlego
+**🟢 Antídoto:** Fôlego — *energia que dura o dia*
+**🔴 Cargas:** exaustão/esgotamento adrenal · "estrutura mais esgotada" → exaustão · autoproteção exaurida · defesa esgotada / depleção de base → exaustão · carga inflamatória crônica de fundo → estresse/exaustão crônica
+**🟢 Recursos:** fôlego/vitalidade :: fôlego · capacidade de recuperar vitalidade após o descanso — voltar à base :: recuperar depois do descanso · vigor direcionado · energia mobilizada a serviço da ação escolhida — vigor que responde e depois recua :: vigor na hora certa · vitalidade / "fogo criador" — a base instintiva viva :: energia viva por dentro · vitalidade e ímpeto generativo :: energia para criar · vitalidade e presença na conexão :: presença e energia no encontro · capacidade de se recuperar e se fortalecer, base que se refaz :: recuperar-se e fortalecer · iniciativa expansiva e presença, "energia que puxa o grupo" :: energia que puxa o grupo
+
+### Eixo · Leveza
+**🟢 Antídoto:** Leveza — *não carregar tudo sozinho*
+**🔴 Cargas:** peso afetivo / "carregar nas costas" · peso estrutural / "vida adulta pesada" · "segurar tudo sozinho" · sobrecarga de responsabilidade que "trava o pescoço"
+**🟢 Recursos:** capacidade de dividir o peso, apoiar-se sem carregar tudo :: dividir o peso com alguém
+**🟢 Variações:** peso repartido · não ser o único a segurar
+
+### Eixo · Rumo
+**🟢 Antídoto:** Rumo — *saber para onde vai*
+**🔴 Cargas:** desconexão de propósito · perda de sentido/missão · confusão sobre o rumo · busca ansiosa de propósito/missão
+**🟢 Recursos:** reconexão com propósito/sentido, entusiasmo pela missão :: reencontrar o sentido · entusiasmo pela missão / sentido de propósito vivo :: entusiasmo pela missão · reconexão com o sentido sentido, calma interior :: reencontro do sentido, com calma · orientação ao futuro com esperança, visão conceitual que inspira :: olhar para frente, clareza de destino · pneuma / conexão espiritual — o sopro que liga a algo maior :: pertencer a algo maior
+
+### Eixo · Gosto pelo encontro
+**🟢 Antídoto:** Gosto pelo encontro — *prazer no encontro*
+**🔴 Cargas:** —
+**🟢 Recursos:** sociabilidade, prazer no encontro · sociabilidade, carisma, calor no contato · leveza no vínculo social
+
+### Eixo · Ver beleza
+**🟢 Antídoto:** Ver beleza — *reparar na beleza do comum*
+**🔴 Cargas:** —
+**🟢 Recursos:** sensibilidade que percebe beleza e detalhe :: atenção à beleza e ao detalhe
+**🟢 Variações:** notar o bonito do dia · olhar demorado nas coisas
+
+### Eixo · Digerir o novo
+**🟢 Antídoto:** Digerir o novo — *provar o diferente sem enjoo*
+**🔴 Cargas:** nojo/desgosto · "não digerir/não assimilar o novo" · pavor do novo / medo de ideias novas · não-assimilar · fechamento ao novo depois da perda
+**🟢 Recursos:** curiosidade e apetite pelo novo, "digerir a vida com gosto" :: provar a vida com gosto · capacidade de assimilar/aproveitar o que serve — separar o puro do impuro :: ficar com o que serve · confiança de que o novo pode ser bom :: confiança no novo · capacidade de inspirar/receber a vida, abertura ao novo :: abertura ao novo
+
+### Eixo · Tolerância
+**🟢 Antídoto:** Tolerância — *conviver com o diferente*
+**🔴 Cargas:** intolerância · intolerância que endurece · rigidez/intolerância :: não tolerar o diferente
+**🟢 Recursos:** abrir-se devagar ao diferente
+**🟢 Variações:** espaço para quem pensa diferente · suportar a diferença sem endurecer
+
+---
+
+### Fora do pêndulo — não são emoções
+Semântica de **marcador** (`cripta`, `lacuna_estrutural`, `pigmento_amber`, `anel_interno`): dizem *"herda a emoção da área onde cai"*, não nomeiam sentimento. Ficam sem eixo, por definição.
+**🔴:** mesma família emocional da lacuna na mesma área, porém mais antiga/consolidada · carga estrutural profunda · tema de origem precoce / "vem de longe" · padrão cristalizado, difícil de mover
+**🟢:** a função da área integrada — a marca vira aprendizado/dom · a função da área preenchida/nutrida · raiz antiga que, olhada, pode se transformar
+
+---
+
 ## Contagem por família (carga + recurso)
 
 | # | Família | 🔴 Carga | 🟢 Recurso | Total |
