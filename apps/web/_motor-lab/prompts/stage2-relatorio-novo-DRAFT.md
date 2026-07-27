@@ -69,7 +69,7 @@ Se houver contexto do cliente (nome, idade, o que trouxe), use o **nome** no voc
 
 ## 3. OS 6 BLOCOS
 
-Ordem final (travada): **1** Em poucas palavras · **2** Como você funciona por dentro · **3** Linha do tempo emocional · **4** Heranças transgeracionais · **5** Mapa emocional · **6** Perguntas para a sua sessão.
+Ordem final (travada): **1** Em poucas palavras · **2** Como você funciona por dentro · **3** Linha do tempo emocional · **4** Heranças transgeracionais · **5** Mapa emocional · **6** Crenças a serem trabalhadas · **7** Perguntas para a sua sessão.
 
 ---
 
@@ -177,7 +177,7 @@ Dentro dos textos, marque 1-2 **palavras-chave** por parágrafo com `**negrito**
 - comportamento: ...
 - situações: ...
 ```
-Regras: `idade=` e `fase=` vêm da **cronologia da íris** (o `linha_temporal` do Stage 1, que lê idade+evento pela topografia radial — NÃO invente idade). `status=` = `ativo` (a_resolver) · `proc` (em_processo) · `fechado` (resolvido). Marcos `proc`/`fechado` NÃO levam `abre:`/`resolução:`. Um `@MARCO` por item do `linha_temporal`, em ordem cronológica. **⭐ REGRA DO MARCO (decisão founder):** cada marco LIDERA com a PRÓPRIA natureza (o `tipo_provavel` do Stage 1) alinhada ao ACHADO daquela zona/idade — **NÃO pinte todos os marcos com a emoção dominante da leitura** (isso achata a linha do tempo). As Chaves são GENERATIVAS (abrem auto-descoberta), não somáticas (o somático é do bloco 6). `situações` = 2-3 cenários concretos que a pessoa reconhece ("foi isso!"). Anti-Forer sempre.
+Regras: `idade=` e `fase=` vêm da **cronologia da íris** (o `linha_temporal` do Stage 1, que lê idade+evento pela topografia radial — NÃO invente idade). `status=` = `ativo` (a_resolver) · `proc` (em_processo) · `fechado` (resolvido). **Marcos `proc` LEVAM `abre:` e `resolução:`** (decisão founder 2026-07-27) — o que está em reorganização é justamente onde a pergunta ainda tem o que abrir. Só `fechado` fica sem: ali não há mais o que destravar. Na `resolução:` do `proc`, aponte o que **já está se integrando**, não o que falta. Um `@MARCO` por item do `linha_temporal`, em ordem cronológica. **⭐ REGRA DO MARCO (decisão founder):** cada marco LIDERA com a PRÓPRIA natureza (o `tipo_provavel` do Stage 1) alinhada ao ACHADO daquela zona/idade — **NÃO pinte todos os marcos com a emoção dominante da leitura** (isso achata a linha do tempo). As Chaves são GENERATIVAS (abrem auto-descoberta), não somáticas (o somático é do bloco 6). `situações` = 2-3 cenários concretos que a pessoa reconhece ("foi isso!"). Anti-Forer sempre.
 
 ---
 
@@ -247,7 +247,32 @@ Voz do cliente, zero iridologia.
 
 ---
 
-### BLOCO 6 — "Perguntas para a sua sessão"
+### BLOCO 6 — "Crenças a serem trabalhadas"
+
+**Consome (do motor):** a lista de CRENÇAS já calculada no bloco B — **uma por achado**, cada uma com seu nível (muito forte · forte · média · fraca) e a marca `⊕` quando é **corroborada** (a mesma crença veio de 2+ achados).
+
+**⛔ A LISTA É DETERMINÍSTICA — você NÃO a escreve.** O render desenha as crenças e a régua a partir do motor. Você escreve **só os dois textos** abaixo. Nunca invente crença, nunca reordene, nunca mude o nível.
+
+**O que é uma crença aqui** (para o `@LEAD`): é a **forma em que a emoção virou regra** — a frase que a pessoa repete por dentro sem perceber e que decide como ela age. Não é opinião nem pensamento passageiro: é o combinado silencioso que organiza o comportamento. Explique isso em linguagem de cliente, sem termo técnico e sem citar escola.
+
+**A régua é ABSOLUTA, não é pêndulo** (decisão founder): crença não tem polo oposto — não se balança pro contrário, **se desmonta**. Então não escreva "o outro lado disso é…" aqui; isso é do bloco 5.
+
+**Nível ≠ verdade.** O nível diz o quanto a crença está **entranhada** (herda a intensidade do achado; sobe uma banda quando corroborada), não o quanto ela é verdadeira. Toda crença desta lista é hipótese a verificar com a pessoa.
+
+**SAÍDA — formato EXATO:**
+```
+# Crenças a serem trabalhadas
+@LEAD: [2-3 frases: o que é uma crença, na voz do cliente. Sem jargão. Sem "crença limitante".]
+@FECHO: [1-2 frases: ligue a crença MAIS FORTE ao que ela custa no dia a dia desta pessoa — concreto, ancorado nos achados, nunca conselho genérico. Se houver crença corroborada (⊕), é dela que você fala.]
+```
+
+---
+
+### BLOCO 7 — "Perguntas para a sua sessão" ⛔ NÃO ESCREVA ESTE BLOCO
+
+**O bloco 7 é 100% determinístico e o sistema o anexa sozinho** — é um método fixo de condução, igual em toda leitura. **Você escreve os blocos 1 a 6 e para.** Não emita `# Perguntas para a sua sessão` nem nada abaixo dele; o que você escrever aqui é descartado.
+
+*(Especificação abaixo mantida só como referência do que o sistema injeta.)*
 Subtítulo: **"Método somático · Sopro da Origem"** (marca própria — permitida). Fecho ATIVO: manda a pessoa adiante com as perguntas.
 > ⚠️ ABERTO (founder decide antes de produtizar): (a) este bloco pode ir SÓ pro terapeuta (tentativo); (b) nº de perguntas — recomendação: **poucas e fundas (4-5)**, não 10.
 **Consome:** as top ~4-5 CARGAS do mapa (bloco 5) + **1 pergunta ancorada numa FORÇA/recurso** (equilibra) + 1 fecho personificado.

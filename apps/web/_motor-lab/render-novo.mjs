@@ -203,7 +203,10 @@ function block3(body) {
   const rail = marcos.map((m) => `<div class="node ${m.status === 'ativo' ? 'active' : m.status === 'proc' ? 'proc' : ''}"><div class="dot"></div><div class="age">${esc(m.idade)}</div><div class="ph">${esc(m.fase || '')}</div><span class="flag ${m.status === 'proc' ? 'proc' : ''}">${flag(m.status)}</span></div>`).join('')
   const moments = marcos.map((m) => {
     const rows = [['Emoção', m.emocao], ['Comportamento', m.comportamento], ['Situações', m.situacoes]].filter(([, v]) => v).map(([k, v]) => `<div class="mrow"><span class="k">${k}</span><span class="v">${inl(v)}</span></div>`).join('')
-    const keys = m.status === 'ativo' && m.abre ? `<div class="keys"><p class="keys-lab">Chaves do tempo</p><div class="key"><span class="kind abre">Abre o estado</span><span class="q">${inl(m.abre)}</span></div>${m.resolucao ? `<div class="key"><span class="kind res">Resolução</span><span class="q">${inl(m.resolucao)}</span></div>` : ''}</div>` : (m.status === 'proc' ? `<p class="mnote">Ainda em reorganização — não é ferida aberta, mas também não fechou de todo. Está se integrando.</p>` : '')
+    // Chaves também no 'proc' (decisão founder): o que está em reorganização é onde a
+    // pergunta ainda tem o que abrir. A nota de reorganização continua, antes das chaves.
+    const procNota = m.status === 'proc' ? `<p class="mnote">Ainda em reorganização — não é ferida aberta, mas também não fechou de todo. Está se integrando.</p>` : ''
+    const keys = procNota + ((m.status === 'ativo' || m.status === 'proc') && m.abre ? `<div class="keys"><p class="keys-lab">Chaves do tempo</p><div class="key"><span class="kind abre">Abre o estado</span><span class="q">${inl(m.abre)}</span></div>${m.resolucao ? `<div class="key"><span class="kind res">Resolução</span><span class="q">${inl(m.resolucao)}</span></div>` : ''}</div>` : '')
     const cls = m.status === 'ativo' ? 'on' : m.status === 'proc' ? 'proc' : ''
     return `<div class="moment ${cls}"><div class="moment-h"><span class="mage display">${esc(m.idade)}</span><span class="${m.status === 'ativo' ? 'mflag' : 'mproc'}">${flag(m.status)}</span></div>${rows}${keys}</div>`
   }).join('')
@@ -301,16 +304,28 @@ function block5(body) {
 }
 
 // ---------- BLOCO 6 — guia de condução (determinístico, do proto aprovado) ----------
-function block6() { return B6HTML }
+// BLOCO 6 — crenças. A LISTA vem do motor (determinística); o Sonnet só escreve
+// @LEAD e @FECHO. Régua ABSOLUTA em 4 degraus — crença não tem polo oposto.
+function block6(body) {
+  const f = fields(body)
+  const linhas = (r.crencaList || []).map((c) => {
+    const pct = c.forca * 25 // 4 degraus: fraca 25 · média 50 · forte 75 · muito forte 100
+    return `<div class="cren"><div class="cren-h"><span class="cren-txt">${esc(c.texto)}</span><span class="cren-lv f${c.forca}">${esc(c.nivel)}${c.corroborada ? '<i class="cren-corr" title="aparece em mais de um achado">⊕</i>' : ''}</span></div><div class="cren-track"><i class="cren-fill f${c.forca}" style="width:${pct}%"></i></div></div>`
+  }).join('')
+  return `${f.LEAD ? `<p class="lead">${inl(f.LEAD)}</p>` : ''}
+    <div class="crenlist">${linhas}</div>
+    ${f.FECHO ? `<p class="deep">${inl(f.FECHO)}</p>` : ''}`
+}
+function block7() { return B6HTML }
 
 // ---------- monta ----------
-const NUMS = ['1', '2', '3', '4', '5', '6']
-const H2 = ['Em poucas palavras', 'Mente, coração e corpo — a sua mistura', 'O que cada tempo deixou em você', 'O que talvez não tenha começado em você', 'Onde você está — e pra onde dá pra ir', 'Perguntas para a sua sessão']
+const NUMS = ['1', '2', '3', '4', '5', '6', '7']
+const H2 = ['Em poucas palavras', 'Mente, coração e corpo — a sua mistura', 'O que cada tempo deixou em você', 'O que talvez não tenha começado em você', 'Onde você está — e pra onde dá pra ir', 'Crenças a serem trabalhadas', 'Perguntas para a sua sessão']
 const blocks = MD.split(/^# /m).filter((b) => b.trim())
 const sections = blocks.map((b, i) => {
   const nl = b.indexOf('\n'); const title = b.slice(0, nl).trim(); const body = b.slice(nl + 1)
   const eyebrow = `<p class="eyebrow"><span class="secnum">${NUMS[i] || ''}</span> &nbsp;${esc(title)}</p>`
-  const h2 = (i === 0 || i === 5) ? '' : `<h2 class="display">${esc(H2[i] || title)}</h2>`
+  const h2 = (i === 0 || i === 6) ? '' : `<h2 class="display">${esc(H2[i] || title)}</h2>`
   let inner
   try {
     inner = i === 0 ? block1(body) : i === 1 ? block2(body) : i === 2 ? block3(body) : i === 3 ? block4(body) : i === 4 ? block5(body) : block6(body)
@@ -322,7 +337,11 @@ const sections = blocks.map((b, i) => {
 const toc = `<nav class="toc"><p class="toc-lab">O que vem a seguir</p>${
   H2.map((t, i) => `<a class="toc-row" href="#b${i + 1}"><span class="toc-n">${NUMS[i]}</span><span class="toc-t">${esc(t)}</span></a>`).join('')
 }</nav>`
-const sectionsHtml = [sections[0] + toc, ...sections.slice(1)].join('\n<hr class="div">\n')
+// bloco 7 (guia de condução) é método fixo — o render ANEXA, o Sonnet não escreve.
+// Assim não depende de quantos blocos vieram do markdown e o modelo para de gastar
+// token num bloco que era descartado de qualquer jeito.
+const b7 = `<section class="block" id="b7"><p class="eyebrow"><span class="secnum">7</span> &nbsp;${esc(H2[6])}</p>${block7()}</section>`
+const sectionsHtml = [sections[0] + toc, ...sections.slice(1), b7].join('\n<hr class="div">\n')
 
 // FECHO — nome, data e natureza do documento. Um doc "pra guardar" não pode terminar
 // numa instrução de manejo; precisa fechar como peça.
@@ -344,6 +363,17 @@ const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><met
 .respira{text-align:center;font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint,#a99);margin:2px 0 6px}
 .pend-desc{font-size:13px;line-height:1.5;color:var(--ink-soft,#6b6357);margin:5px 0 2px} .pend-desc b{color:#a35a1c;font-weight:600} .pend-desc b.anti{color:#2f7a54} .pend{margin-bottom:14px}
 .maieutica + .maieutica{margin-top:2px}
+/* --- bloco 6 · crenças (régua ABSOLUTA, discreta) --- */
+.crenlist{margin:20px 0 22px}
+.cren{margin:0 0 17px}
+.cren-h{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin:0 0 5px}
+.cren-txt{font-family:Palatino,Georgia,serif;font-size:16.5px;line-height:1.45;font-style:italic;color:var(--ink)}
+.cren-lv{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint,#8a9695);white-space:nowrap;flex-shrink:0}
+.cren-corr{font-style:normal;margin-left:5px;color:var(--amber);cursor:help}
+.cren-track{position:relative;height:3px;border-radius:2px;background:rgba(0,0,0,.07);overflow:hidden}
+.cren-fill{position:absolute;left:0;top:0;height:100%;border-radius:2px;background:var(--amber);opacity:.45}
+.cren-fill.f3{opacity:.65} .cren-fill.f4{opacity:.85}
+.cren-lv.f4{color:var(--amber)}
 /* --- ajustes do founder (2026-07-27) --- */
 /* o âmbar da tarja de seção estava pequeno demais pro peso que a marca tem */
 /* título de seção em PRETO (decisão founder 2026-07-27): tira o âmbar do rótulo, que

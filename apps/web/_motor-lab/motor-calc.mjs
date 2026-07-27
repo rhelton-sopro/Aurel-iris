@@ -219,6 +219,7 @@ function calc(name, lastro) {
   const elem = { carga: { fogo: 0, agua: 0, terra: 0, ar: 0 }, recurso: { fogo: 0, agua: 0, terra: 0, ar: 0 } }
   const centro = { mente: { t: 0, l: 0 }, coracao: { t: 0, l: 0 }, corpo: { t: 0, l: 0 } }
   const emoCarga = {}, emoRecurso = {} // (B) mapa emocional — acumula score por emoção
+  const crencaSrc = {} // crença → achados que a emitiram (CORROBORAÇÃO)
   const antiSrc = {} // emoção de carga → de onde puxar o 🟢 (campo de MAIOR peso que a emitiu)
   const achadoList = [] // TODOS os achados evidenciados (decisão founder: nada de colapsar em 1)
   const skipped = [], adjuvantes = []
@@ -243,6 +244,9 @@ function calc(name, lastro) {
       // Se duas áreas emitem a mesma emoção, vale a de maior peso.
       if (!antiSrc[e] || antiSrc[e].w < w) antiSrc[e] = { key, i, w }
     })
+    // CRENÇA do achado (bloco 6): UMA por achado, a do elemento dominante do campo.
+    const cr = (t.cargaCrenca || [])[0]
+    if (cr) (crencaSrc[cr] ||= []).push({ campo: key, int: a.intensidade || 0 })
     // cada achado com sua COMPOSIÇÃO (2 elementos: predominante + secundário),
     // cada elemento com sua emoção-núcleo — o órgão não colapsa em 1 (founder).
     const els = ['fogo', 'agua', 'terra', 'ar'].filter((e) => (t.elem[e] || 0) > 0).sort((x, y) => t.elem[y] - t.elem[x])
@@ -348,6 +352,27 @@ function calc(name, lastro) {
     }
   }
 
+  // ---- CRENÇAS (bloco 6) — o cálculo é DIFERENTE do das emoções, de propósito ----
+  // (a) sem leque/decaimento: o campo emite UMA crença, não uma paleta — não há
+  //     paleta genérica pra fazer decair;
+  // (b) sem reforço por família: crença não tem família, tem CORROBORAÇÃO — a mesma
+  //     regra vinda de 2 achados independentes está mais entranhada. É mais literal
+  //     e mais válido que o reforço de família, porque crença é uma REGRA que a
+  //     pessoa carrega, não um estado passageiro;
+  // (c) ABSOLUTA (decisão founder): crença não tem polo oposto — não se balança pro
+  //     contrário, se desmonta. Por isso não entra no modelo bipolar do pêndulo;
+  // (d) ⛔ SEM MEDIDA PRÓPRIA: a crença É a forma cognitiva do achado, então HERDA a
+  //     intensidade dele. Inventar uma métrica separada seria falsa precisão — o
+  //     mesmo Forer-pela-matemática que fez a gente recusar abater carga com preservado.
+  const BANDA = ['fraca', 'fraca', 'média', 'forte', 'muito forte'] // índice = intensidade−1
+  const crencaList = Object.entries(crencaSrc).map(([texto, srcs]) => {
+    const int = Math.max(...srcs.map((x) => x.int))
+    let i = Math.min(Math.max(int, 1), 5) - 1
+    const corroborada = srcs.length > 1
+    if (corroborada) i = Math.min(i + 1, BANDA.length - 1) // +1 banda quando 2+ achados apontam a mesma regra
+    return { texto, nivel: BANDA[i], forca: i + 1, int, corroborada, campos: srcs.map((x) => x.campo) }
+  }).sort((a, b) => b.forca - a.forca || b.int - a.int)
+
   const rankedCarga = Object.entries(emoCarga).sort((a, b) => b[1] - a[1])
   const mapaCarga = rankedCarga.filter(([e]) => garantidas.has(e)) // 1º: as garantidas
   const N = Math.max(8, mapaCarga.length)
@@ -355,7 +380,7 @@ function calc(name, lastro) {
   mapaCarga.sort((a, b) => b[1] - a[1])
   const mapaRecurso = top(emoRecurso, 5)
   achadoList.sort((a, b) => b.w - a.w)
-  return { name, elem, centro, pres, mapaCarga, mapaRecurso, antidoto, colisoes, achadoList, famScore, domFam, skipped, adjuvantes, nAch: achados.length, nPres: preservados.length }
+  return { name, elem, centro, pres, mapaCarga, mapaRecurso, antidoto, colisoes, crencaList, achadoList, famScore, domFam, skipped, adjuvantes, nAch: achados.length, nPres: preservados.length }
 }
 
 function fmt(r) {
