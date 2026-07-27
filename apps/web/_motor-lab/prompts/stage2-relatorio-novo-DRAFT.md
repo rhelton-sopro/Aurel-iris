@@ -75,7 +75,7 @@ Ordem final (travada): **1** Em poucas palavras · **2** Como você funciona por
 
 ### BLOCO 1 — "Em poucas palavras"
 **⭐⭐ OBJETIVO EMOCIONAL (é o coração do relatório — o cliente LÊ isto):** este bloco existe pra **levantar a lágrima**. A meta é a pessoa parar, sentir um aperto no peito e pensar *"poxa, está falando comigo — ninguém nunca me leu assim"*. Consegue isso por **reconhecimento tão preciso que dói bonito** (não por elogio) + **linguagem que a pessoa SENTE NO CORPO** (o aperto, o nó, o cansaço) — é aqui que a leitura já vira terapia. Não é resumo bonito: é um espelho que a pessoa não esperava que existisse. Se ao reler você não sente o baque, está morno demais — reescreve mais específico e mais corporal.
-**Consome:** os **3 MAIORES achados por PESO** (do bloco B — os marcados PRINCIPAL + 2º + 3º), cada um traduzido numa EMOÇÃO do leque (bloco C; pode escolher mais de uma emoção por achado se encaixar). **SEMPRE os 3 maiores** — é o que dá o "punch". A cadeia de consequência do microfilme sai desses 3 (o peso dita a ordem: o maior abre). Se um 4º achado ajudar a fechar, pode entrar; mas os 3 maiores são obrigatórios.
+**Consome:** os **3 MAIORES achados por PESO** (do bloco B — os marcados PRINCIPAL + 2º + 3º), cada um traduzido em EMOÇÃO do leque (bloco C). **⭐ REGRA DAS 2 EMOÇÕES (obrigatória em achado significativo):** todo achado significativo carrega **2 emoções LIGADAS EM CADEIA** — a emoção-núcleo → a que ela VIRA (ex.: *raiva contida → ressentimento*; *medo de base → controle/apego*), nunca uma etiqueta seca. O **protagonista** pode ter até **3** (a cadeia completa: *raiva contida → ressentimento → rancor que não perdoa*). ⚠️ **Guardrail:** tem que ser **cadeia coerente que conta uma micro-história**, NUNCA lista solta ("raiva, ciúme, orgulho, vingança" = Forer); só nos achados significativos, jamais inflando achado fraco. **SEMPRE os 3 maiores** — é o que dá o "punch". A cadeia de consequência do microfilme sai desses 3 (o peso dita a ordem: o maior abre). Se um 4º achado ajudar a fechar, pode entrar; mas os 3 maiores são obrigatórios.
 **Estrutura:**
 - Abre com vocativo ("**Nome**, você...").
 - 3-5 frases curtas de prosa integrada (não lista). Traz o achado principal e o secundário **como emoção/comportamento** — zero iridologia.
@@ -83,7 +83,8 @@ Ordem final (travada): **1** Em poucas palavras · **2** Como você funciona por
 - **Ritmo triplo** (device de prosa, quando couber): uma tríade curta que nomeia 3 faces do mesmo padrão ("A raiva que não vira briga. A mágoa que você não conta. O cansaço atrás do 'tá tudo bem'."). "Desde cedo…" abre a origem em 2 palavras.
 - Padrão: modo dominante → cadeia de consequência concreta → custo/vergonha nomeado → **reframe final** ("Você não é X — você é alguém que…") que dignifica. Máx 2 movimentos de dignificação (o 3º vira discurso de coach).
 - Termina com a **pergunta maiêutica em DOIS TEMPOS** (método = `lastro/maieutica-evoluida.md`; autores ESCONDIDOS). Nasce da **EMOÇÃO do MAIOR achado** + o **COMPORTAMENTO da pessoa com ela**. Estrutura obrigatória: **TEMPO 1 (punch)** → linha `(respira)` → **TEMPO 2 (corpo no AGORA)**.
-  - **⛔ REGRA DE OURO:** o tempo 2 é SEMPRE no **PRESENTE** ("agora, falando disso", "enquanto você lê isto"). NUNCA passado ("da última vez…", "onde isso ficou" — "ficou" congela o sentimento; proibido).
+  - **⛔ REGRA DE OURO:** o tempo 2 é SEMPRE no **PRESENTE** ("agora, falando disso", "enquanto você toma essa consciência", "agora, pensando nisso"). NUNCA passado ("da última vez…", "onde isso ficou" — "ficou" congela o sentimento; proibido).
+  - **⛔⛔ NUNCA "enquanto você LÊ" (nem "lendo isto", "ao ler", "neste momento em que você lê").** O documento tem **contexto DUPLO**: às vezes quem lê em voz alta é o **terapeuta**, com o cliente só escutando — aí "enquanto você lê" fala com a pessoa errada e quebra a cena. Ancore no **ato interno**, que vale nos dois casos: *"enquanto você toma essa consciência"* · *"agora, pensando nisso"* · *"agora, falando disso"*. Vale pro relatório INTEIRO, não só aqui.
   - **TEMPO 1 — ROTACIONE uma família** (varie a cada leitura): **Escolha honesta** ("quando [emoção] aperta, você segura ou deixa sair?") · **Ganho oculto** ("o que você ganhou, todos esses anos, [mantendo o padrão]?") · **Virada da crença** ("você tem certeza de que [crença da tabela]? ou o perigoso é [o oposto]?") · **Tipo-e-mais** ("que tipo de [emoção] é essa que você [comportamento]?") · **Suposição libertadora** ("se você soubesse que [oposto libertador], o que faria — e pra quem?").
   - **TEMPO 2 — SEMPRE corpo no agora, com UMA textura** (rotacione): "onde você sente que seu corpo se fecha?" · "…está quente ou frio?" · "…parado ou se mexendo?" · "o que muda só de imaginar [a virada]?".
   ⚠️ exemplos = MOLDE de estrutura/tom — reescreva no vocabulário DESTA leitura (as palavras do achado/tabela). Copiar literal vaza = Forer. Por baixo (escondido): precisão ("de quê, exatamente?"), não-culpa (comportamento = reação, nunca caráter), reverter nominalização (nome parado → processo vivo). Critérios: emerge DESTA pessoa · ≥1 elemento específico · nunca coach-instagram.
@@ -138,6 +139,8 @@ Dentro dos textos, marque 1-2 **palavras-chave** por parágrafo com `**negrito**
 - Nas relações | [idem]
 @RAIZ:
 - [par força↔sombra da MESMA raiz. Marque a FORÇA com {{...}} e a SOMBRA com [[...]]. Ex.: {{A sua entrega intensa}} faz as pessoas confiarem em você — e é a mesma coisa que [[te esgota quando ninguém retribui]].]
+- **⛔ UMA COISA POR MARCADOR — nunca duas coladas com "e".** A força dentro de `{{…}}` é **um traço só**, dito em português que se entende sem decifrar. ❌ *"seu jeito de se ligar rápido e sentir fundo"* (o founder derrubou: teve que perguntar o que significava, e eram duas capacidades de áreas diferentes grudadas). ✅ *"a sua facilidade de criar laço com quem chega"*. Se você tem dois traços bons, **escolha o mais forte** ou faça deles dois pares — nunca funda os dois numa etiqueta.
+- **Teste antes de emitir cada par:** *"alguém lê isso uma vez e entende, sem reler?"* Se precisar reler, quebrou. Vale para `{{…}}` E para `[[…]]`.
 - [2º par]
 - [3º par]
 - [4º par — 4 pares no total, cada um um dom que é também um custo]
@@ -215,6 +218,12 @@ Regras: `@PADROES` = os MESMOS rótulos curtos usados em `@IDENTIFICACAO` (**3 a
 
 ### BLOCO 5 — "Mapa emocional" (os pêndulos)
 **Consome (do motor):** o leque de CARGA (top ~6 cargas) + o leque de RECURSO (~4-5, das DUAS fontes: preservados + constituição).
+**⚠️ CADA CARGA JÁ VEM COM O SEU LADO-ANTÍDOTO** (`⟷ 🟢`): é o outro polo daquele mesmo **EIXO**. **Use-o** — nenhuma carga pode ser descrita só pelo lado que dói.
+- O **nome em negrito é o termo do eixo** e já passou pela lei da 8ª série: *use essa palavra*, não invente sinônimo difícil.
+- As **"formulações do eixo"** são variações da MESMA saída. Escolha a que encaixa nesta pessoa — e **força casa com força**: carga muito alta pede a formulação mais forte; carga baixa, a mais discreta.
+- ⛔ **Nunca** invente antídoto fora do eixo que veio.
+**⚠️⚠️ Se o bloco B trouxer COLISÃO DE EIXO**, a mesma régua está pesando de um lado e livre do outro. **Não esconda e não escolha um lado:** diga **onde cada ponta se aplica** (ex.: *dura no critério, solta no corpo*). Deixar as duas soltas, sem dizer onde cada uma vale, faz o cliente ler como erro do relatório.
+**⛔ ANTÍDOTO ≠ FORÇA PRESENTE:** o 🟢 do pêndulo é a **direção de saída** ("o outro lado disso é…", "pra onde isso afrouxa"). **NUNCA** afirme que a pessoa já tem isso. O que ela já tem livre é **só** o leque de RECURSO — esse sim é força presente.
 **Visual = pêndulos** (agulha carga⟷antídoto). Cada emoção = eixo com 2 polos:
 - **Cargas** = agulha à ESQUERDA/âmbar (raiva→serenidade, apego→soltar, medo→segurança, alerta→calma...).
 - **Recursos/força** = agulha à DIREITA/verde (fragilidade→firmeza, desamor→alegria...).
@@ -227,8 +236,14 @@ Voz do cliente, zero iridologia.
 ```
 # Mapa emocional
 @LEAD: [1-2 frases: cada emoção tem dois lados — o carregado e o alívio/saída]
+@PENDULO: [emoção de carga, copiada EXATA do bloco B] :: [a formulação do eixo que melhor encaixa NESTA pessoa]
+@PENDULO: [... uma linha por carga do mapa ...]
 @REMEDIO: [o "pulo do gato" — o que já está livre é o remédio da carga, ligando a maior força à maior carga]
 ```
+**Sobre os `@PENDULO`** — é você compondo cada pêndulo, um por um:
+- **Escolha entre o rótulo do eixo e as "formulações do eixo"** que vieram no bloco B daquela carga. **Força casa com força:** carga muito alta pede a formulação mais forte e mais encarnada; carga baixa, a mais discreta.
+- ⛔ **Você NÃO pode inventar.** O que estiver fora do eixo é descartado automaticamente e o gráfico volta pro rótulo padrão — então inventar só faz você perder o encaixe que teria ganhado.
+- Não sabe qual escolher numa carga? **Omita o `@PENDULO` dela** — o rótulo do eixo já está certo. Melhor omitir que forçar.
 
 ---
 
@@ -243,7 +258,7 @@ Subtítulo: **"Método somático · Sopro da Origem"** (marca própria — permi
 3. **Deixar falar** — sensação em ABERTO, nunca afirmar o que ela sente (anti-Forer); "tem mais alguma coisa?".
 4. **Trazer o outro lado** (rótulo exibido = "Trazer o outro lado", nunca "pendular") — ancora no recurso REAL da íris; "tocou E voltou = já é força".
 5. **Micro-passo** — precisão + passa o bastão (o PDF ABRE, a sessão PROCESSA).
-**Linha de permissão** (após o intro): "Se algo vier forte ao corpo enquanto você lê, não precisa ter resposta — basta notar onde chegou."
+**Linha de permissão** (após o intro): "Se algo vier forte ao corpo enquanto você toma essa consciência, não precisa ter resposta — basta notar onde chegou."
 **Pergunta-fecho personificada** (anti-Forer): "o que, dentro de você, ainda está esperando que você pergunte como está? Se isso tivesse um corpo, onde estaria — e o que estaria pedindo?"
 **Regras:** as frases-modelo do lastro são gabarito de ESTRUTURA/TOM — **reescreva no vocabulário DESTA leitura** (frase literal do gabarito = vaza = Forer). PNL/Erickson só auto-guiado e transparente, nunca sugestão oculta. Mandar pra sessão (não resolver no PDF) em: trauma precoce, luto, carga crônica alta.
 
