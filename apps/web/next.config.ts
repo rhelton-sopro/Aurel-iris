@@ -26,6 +26,27 @@ const nextConfig: NextConfig = {
     // ao primeiro request porque prompts/system.md e feature-injection.md
     // não estão no .vercel/output/functions/<route>.func/.
     'app/api/readings/[id]/analyze/route': ['./prompts/**/*'],
+    // Relatório emocional: o motor lê a tabela-lastro, o mapa de eixos, o prompt e os
+    // dois HTML de design em runtime. Mesmo pitfall do system.md — sem isto, ENOENT no
+    // primeiro request em produção.
+    // O relatório emocional lê a tabela-lastro, o mapa de eixos, o prompt e os dois HTML
+    // de design em runtime. Mesmo pitfall do system.md — sem isto, ENOENT no 1º request.
+    // A rota de geração precisa do prompt; as que RENDERIZAM precisam dos HTML de design.
+    'app/api/readings/[id]/emocional/route': [
+      './_motor-lab/lastro/**/*.md',
+      './_motor-lab/prompts/**/*.md',
+      './_motor-lab/*.mjs',
+    ],
+    'app/api/readings/[id]/emocional/pdf/route': [
+      './_motor-lab/lastro/**/*.md',
+      './_motor-lab/relatorio-novo/*.html',
+      './_motor-lab/*.mjs',
+    ],
+    'app/(dashboard)/leituras/[id]/emocional/page': [
+      './_motor-lab/lastro/**/*.md',
+      './_motor-lab/relatorio-novo/*.html',
+      './_motor-lab/*.mjs',
+    ],
   },
 }
 

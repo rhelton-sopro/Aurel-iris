@@ -5,9 +5,15 @@
 // uso: node apps/web/_motor-lab/check-eixos.mjs
 import fs from 'node:fs'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+// BASE relativa ao PRÓPRIO módulo — o lab roda com cwd=raiz do repo e o app
+// Next roda com cwd=apps/web. Resolver por import.meta.url faz o MESMO motor
+// servir os dois, sem cópia paralela que deriva depois.
+const LAB_DIR = path.dirname(fileURLToPath(import.meta.url))
+const REPO = path.resolve(LAB_DIR, '../../..')
 import { parseLastro } from './motor-calc.mjs'
 
-const MD = path.resolve('apps/web/_motor-lab/lastro/emocao-familia.md')
+const MD = path.join(LAB_DIR, 'lastro/emocao-familia.md')
 
 export function parseEixos() {
   const md = fs.readFileSync(MD, 'utf8')
@@ -30,7 +36,7 @@ export function parseEixos() {
 if (import.meta.url === (await import('node:url')).pathToFileURL(process.argv[1] || '').href) {
   // Compara contra a canônica CRUA (sem o NUCLEO_CAP=4 do parseLastro) — o cap é knob do
   // motor, não do vocabulário: a 5ª emoção de um bloco existe na fonte e um dia pode subir.
-  const rawMd = fs.readFileSync(path.resolve('apps/web/_motor-lab/lastro/tabela-lastro-CANONICA.md'), 'utf8')
+  const rawMd = fs.readFileSync(path.join(LAB_DIR, 'lastro/tabela-lastro-CANONICA.md'), 'utf8')
   const clean = (p) => p.replace(/\([^)]*\)/g, '').replace(/[*_`]/g, '').trim()
   const canonC = new Set(), canonR = new Set()
   for (const ln of rawMd.split('\n')) {

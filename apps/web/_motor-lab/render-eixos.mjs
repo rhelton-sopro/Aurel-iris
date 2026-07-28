@@ -5,9 +5,15 @@
 // uso: node apps/web/_motor-lab/render-eixos.mjs  → out/eixos.html (localhost:8899/eixos.html)
 import fs from 'node:fs'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+// BASE relativa ao PRÓPRIO módulo — o lab roda com cwd=raiz do repo e o app
+// Next roda com cwd=apps/web. Resolver por import.meta.url faz o MESMO motor
+// servir os dois, sem cópia paralela que deriva depois.
+const LAB_DIR = path.dirname(fileURLToPath(import.meta.url))
+const REPO = path.resolve(LAB_DIR, '../../..')
 import { parseLastro, calc, eixoDe, EIXOS } from './motor-calc.mjs'
 
-const OUT = path.resolve('apps/web/_motor-lab/out/eixos.html')
+const OUT = path.join(LAB_DIR, 'out/eixos.html')
 const EXAMES = ['self', 'daniel', 'miguel', 's5novo', 'opus']
 const esc = (s = '') => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 

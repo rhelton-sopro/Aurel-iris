@@ -5,6 +5,13 @@
 //   C = LEQUE (emoções + crenças por área — o LLM seleciona, nunca inventa fora)
 // uso: node _motor-lab/serialize.mjs [self|daniel|miguel]
 import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+// BASE relativa ao PRÓPRIO módulo — o lab roda com cwd=raiz do repo e o app
+// Next roda com cwd=apps/web. Resolver por import.meta.url faz o MESMO motor
+// servir os dois, sem cópia paralela que deriva depois.
+const LAB_DIR = path.dirname(fileURLToPath(import.meta.url))
+const REPO = path.resolve(LAB_DIR, '../../..')
 import { parseLastro, calc, classify, familiaDe as famDe, BASELINE_LIVRE, EXAM } from './motor-calc.mjs'
 
 const α = BASELINE_LIVRE
@@ -21,11 +28,14 @@ function centroLabel(c, agulha, sabor) {
   return sabor === 'medo' ? 'reage se protegendo, em alerta' : 'ferve rápido, gatilho curto'
 }
 
-function serialize(name) {
+// `exameOuNome` = objeto (produção) ou nome (lab). `nomePessoa` sobrepõe o mapa do lab.
+function serialize(exameOuNome, nomePessoa) {
   const lastro = parseLastro()
-  const r = calc(name, lastro)
-  const d = JSON.parse(fs.readFileSync(EXAM(name), 'utf8'))
-  const NOME = { self: 'Rhelton', s5novo: 'Rhelton', victor: 'Victor', daniel: 'Daniel', miguel: 'Miguel' }[name] || name
+  const r = calc(exameOuNome, lastro)
+  const ehNome = typeof exameOuNome === 'string'
+  const d = ehNome ? JSON.parse(fs.readFileSync(EXAM(exameOuNome), 'utf8')) : exameOuNome
+  const NOME = nomePessoa
+    || (ehNome ? ({ self: 'Rhelton', s5novo: 'Rhelton', victor: 'Victor', daniel: 'Daniel', miguel: 'Miguel' }[exameOuNome] || exameOuNome) : 'você')
 
   // sabor do Corpo (2 motores): raiva/luta vs medo/fuga — pelo elemento de carga dominante
   const sabor = r.elem.carga.fogo >= r.elem.carga.agua ? 'raiva' : 'medo'

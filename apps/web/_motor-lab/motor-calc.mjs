@@ -5,10 +5,16 @@
 //      node _motor-lab/motor-calc.mjs self       (um só)
 import fs from 'node:fs'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+// BASE relativa ao PRÓPRIO módulo — o lab roda com cwd=raiz do repo e o app
+// Next roda com cwd=apps/web. Resolver por import.meta.url faz o MESMO motor
+// servir os dois, sem cópia paralela que deriva depois.
+const LAB_DIR = path.dirname(fileURLToPath(import.meta.url))
+const REPO = path.resolve(LAB_DIR, '../../..')
 
-const LASTRO = path.resolve('apps/web/_motor-lab/lastro/tabela-lastro-CANONICA.md')
-const FAMILIA_MD = path.resolve('apps/web/_motor-lab/lastro/emocao-familia.md')
-const EXAM = (n) => path.resolve(`apps/web/_exame-${n}.json`)
+const LASTRO = path.join(LAB_DIR, 'lastro/tabela-lastro-CANONICA.md')
+const FAMILIA_MD = path.join(LAB_DIR, 'lastro/emocao-familia.md')
+const EXAM = (n) => path.join(REPO, `apps/web/_exame-${n}.json`)
 
 // ---------- parâmetros (calibráveis — calibração 2026-07-22) ----------
 const GAMMA = 1.1
@@ -227,8 +233,13 @@ function classify(campo) {
   return { key: campo, klass: 'emocional' }
 }
 
-function calc(name, lastro) {
-  const d = JSON.parse(fs.readFileSync(EXAM(name), 'utf8'))
+// Aceita o EXAME como objeto (produção: vem de report_findings.exame_json) ou como
+// nome (lab: lê _exame-<nome>.json). Mesmo motor nos dois caminhos.
+function calc(exameOuNome, lastro) {
+  const name = typeof exameOuNome === 'string' ? exameOuNome : (exameOuNome?.__nome || 'exame')
+  const d = typeof exameOuNome === 'string'
+    ? JSON.parse(fs.readFileSync(EXAM(exameOuNome), 'utf8'))
+    : exameOuNome
   const achados = d.achados_de_atencao || []
   const preservados = d.sistemas_preservados || []
 

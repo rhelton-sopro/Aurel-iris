@@ -4,23 +4,38 @@
 // blocos 3 e 4 leem o formato ESTRUTURADO (@MARCO / @CAMPOS) do prompt.
 // uso: node apps/web/_motor-lab/render-novo.mjs [self|daniel|miguel]
 import { readFileSync, writeFileSync } from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+// BASE relativa ao PRÓPRIO módulo — o lab roda com cwd=raiz do repo e o app Next
+// roda com cwd=apps/web. Resolver por import.meta.url faz o MESMO motor servir os
+// dois, sem cópia paralela que deriva depois.
+const LAB_DIR = path.dirname(fileURLToPath(import.meta.url))
 import { parseLastro, calc, eixoDe, displayDe, EIXOS, BASELINE_LIVRE } from './motor-calc.mjs'
 import { METODO7, CONDUCT } from './metodo7.mjs'
 import { familiaDe as famDe, oqueCargaDe } from './motor-calc.mjs'
 
-const name = process.argv[2] || 'self'
-const MD = readFileSync(`apps/web/_motor-lab/out/novo-${name}--sonnet-5.md`, 'utf8')
-const MOCK = readFileSync('apps/web/_motor-lab/relatorio-novo/relatorio-completo.html', 'utf8')
+const MOCK = readFileSync(path.join(LAB_DIR, 'relatorio-novo/relatorio-completo.html'), 'utf8')
 const STYLE = MOCK.slice(MOCK.indexOf('<style>') + 7, MOCK.indexOf('</style>'))
-const NOME = { self: 'Rhelton', s5novo: 'Rhelton', victor: 'Victor', daniel: 'Daniel', miguel: 'Miguel' }[name] || name
+const PROTO6 = readFileSync(path.join(LAB_DIR, 'relatorio-novo/b6-terapeuta-proto.html'), 'utf8')
+const PROTO6_STYLE = PROTO6.slice(PROTO6.indexOf('<style>') + 7, PROTO6.indexOf('</style>'))
+const B6CSS = ':root{--gold:#9a6a12;--amber-soft:#d69a4e;}\n' + PROTO6_STYLE.slice(PROTO6_STYLE.indexOf('.method-sub{'))
+const B6HTML = PROTO6.slice(PROTO6.indexOf('<p class="method-sub">'), PROTO6.indexOf('</p>', PROTO6.indexOf('<p class="closing">')) + 4)
+
+// ---------- RENDER como FUNÇÃO (produção) ----------
+// Era um script (process.argv + writeFileSync). Virou função pra a rota do app poder
+// renderizar o mesmo HTML sem passar por arquivo. O CLI do lab continua funcionando —
+// ele só chama a função e grava. UM render, dois consumidores.
+//   md    = markdown estruturado do Stage 2 emocional
+//   exame = objeto do Stage 1 (produção) ou nome do exame (lab)
+//   nome  = nome da pessoa, para o vocativo
+export function renderHTML(md, exame, nome) {
+  const MD = md
+  const name = typeof exame === 'string' ? exame : 'exame'
+  const NOME = nome || 'você'
 
 // ---------- BLOCO 6 determinístico: reusa o guia de condução aprovado (proto) ----------
 // O bloco 6 é um MÉTODO fixo (7 movimentos), então não passa pelo Sonnet — o render
 // injeta o proto aprovado + o CSS dele. (self = proto atual; daniel/miguel = parametrizar depois.)
-const PROTO6 = readFileSync('apps/web/_motor-lab/relatorio-novo/b6-terapeuta-proto.html', 'utf8')
-const PROTO6_STYLE = PROTO6.slice(PROTO6.indexOf('<style>') + 7, PROTO6.indexOf('</style>'))
-const B6CSS = ':root{--gold:#9a6a12;--amber-soft:#d69a4e;}\n' + PROTO6_STYLE.slice(PROTO6_STYLE.indexOf('.method-sub{'))
-const B6HTML = PROTO6.slice(PROTO6.indexOf('<p class="method-sub">'), PROTO6.indexOf('</p>', PROTO6.indexOf('<p class="closing">')) + 4)
 
 // ---------- números do motor ----------
 const α = BASELINE_LIVRE
@@ -567,5 +582,17 @@ ${B6CSS}
   ${fecho}
 </div></div>
 </body></html>`
-writeFileSync(`apps/web/_motor-lab/out/novo-${name}.html`, html)
-console.log(`→ out/novo-${name}.html (${html.length} chars · agulhas M${AG.mente}/C${AG.coracao}/Corpo${AG.corpo})`)
+  return { html, AG }
+}
+
+
+// ---------- CLI do lab ----------
+import { pathToFileURL } from 'node:url'
+if (import.meta.url === pathToFileURL(process.argv[1] || '').href) {
+  const nm = process.argv[2] || 'self'
+  const NOMES = { self: 'Rhelton', s5novo: 'Rhelton', victor: 'Victor', daniel: 'Daniel', miguel: 'Miguel' }
+  const mdCli = readFileSync(path.join(LAB_DIR, `out/novo-${nm}--sonnet-5.md`), 'utf8')
+  const { html, AG } = renderHTML(mdCli, nm, NOMES[nm] || nm)
+  writeFileSync(path.join(LAB_DIR, `out/novo-${nm}.html`), html)
+  console.log(`→ out/novo-${nm}.html (${html.length} chars · agulhas M${AG.mente}/C${AG.coracao}/Corpo${AG.corpo})`)
+}

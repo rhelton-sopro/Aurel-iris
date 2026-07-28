@@ -27,6 +27,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { createClient } from '@/lib/supabase/server'
+import { isFounderEmail } from '@/lib/auth/founder'
 import { createServiceClient } from '@/lib/supabase/service'
 import { convertReservationToConsume } from '@/lib/billing/credits'
 import { LocalDateTime } from '@/components/ui/local-date-time'
@@ -64,15 +65,22 @@ export default async function LeituraDetailPage({
   // 'as never' isola o type-check; RLS authed garante isolation.
   const { data: progress } = await supabase
     .from('readings')
-    .select('analysis_started_at, analysis_completed_at, images_purged_at' as never)
+    .select('analysis_started_at, analysis_completed_at, images_purged_at, report_emocional_generated_at' as never)
     .eq('id', readingId)
     .maybeSingle<{
       analysis_started_at: string | null
       analysis_completed_at: string | null
       images_purged_at: string | null
+      report_emocional_generated_at: string | null
     }>()
 
   if (error || !reading) notFound()
+
+  // Relatório emocional (Mapa do Ser) — founder-only por enquanto (2026-07-28).
+  // O botão só existe em reading mode, então o Stage 1 daquela leitura já existe.
+  const { data: authUser } = await supabase.auth.getUser()
+  const ehFounder = isFounderEmail(authUser?.user?.email)
+  const temEmocional = Boolean(progress?.report_emocional_generated_at)
 
   // Marca como "vista pelo terapeuta" — derruba o badge de notificação
   // no /dashboard (0026 readings.seen_by_therapist_at). Idempotente:
@@ -274,6 +282,8 @@ export default async function LeituraDetailPage({
               clientName={clientName}
               clientPhone={clientPhone}
               isAnalysisInProgress={isAnalysisInProgress}
+              isFounder={ehFounder}
+              temEmocional={temEmocional}
             />
           }
         />

@@ -36,6 +36,7 @@ import {
 } from '@/components/ui/tooltip'
 import { LocalDateTime } from '@/components/ui/local-date-time'
 import { cn } from '@/lib/utils'
+import { GerarEmocionalButton } from './GerarEmocionalButton'
 import { DeliverDialog } from './DeliverDialog'
 import { ExportPdfButton } from './ExportPdfButton'
 import { markReadingDelivered } from '@/app/actions/analise'
@@ -72,6 +73,8 @@ export interface ReadingModeActionsProps {
    * /analyze reforça no servidor.
    */
   isFounder?: boolean
+  /** já existe report_emocional gravado nesta leitura (migration 0051) */
+  temEmocional?: boolean
 }
 
 export function ReadingModeActions({
@@ -84,6 +87,7 @@ export function ReadingModeActions({
   clientPhone,
   isAnalysisInProgress = false,
   isFounder = false,
+  temEmocional = false,
 }: ReadingModeActionsProps) {
   const router = useRouter()
   const [deliverOpen, setDeliverOpen] = useState(false)
@@ -366,6 +370,17 @@ export function ReadingModeActions({
           <Send className="h-4 w-4" aria-hidden />
           Concluir leitura
         </Button>
+      )}
+
+      {/* Relatório emocional (Mapa do Ser) — founder-only por enquanto. Aparece aqui
+          porque este bloco só existe em reading mode, ou seja: o relatório de produção
+          já foi feito e portanto o Stage 1 daquela leitura existe. */}
+      {isFounder && (
+        <GerarEmocionalButton
+          readingId={readingId}
+          jaGerado={temEmocional}
+          disabled={regenServerOrLocal}
+        />
       )}
 
       {/* Regen só pro founder (2026-06-03): o terapeuta não regenera mais. */}
