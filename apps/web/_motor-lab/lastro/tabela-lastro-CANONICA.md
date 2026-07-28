@@ -69,7 +69,7 @@ Esta é a tabela-mestra. O 🔴 de um campo é a carga daquele elemento; o 🟢 
   - **🟢 emoções:** coragem tranquila / segurança de base (MTC — rim em harmonia = força de vontade e vontade de viver) · confiar e descansar na própria base (MTC) · calma receptiva (assinatura Água+)
   - **🟢 crenças:** "eu tenho base pra me sustentar" · "posso descansar sem que tudo desabe" · "confio que vou dar conta do que vier"
   - **🔴 emoções:** medo estrutural de base (Br/MTC/Dias) · insegurança da infância (Dias) · pavor (Br/MTC) · terror/horror (Br) · fobia/pânico (MTC/Dias) · culpa (Br/MTC — "rins = culpa e medo") · decepção (Hay) · vergonha (Hay) · desesperança (Dias — usar com MUITA parcimônia)
-  - **🔴 crenças:** "o chão pode faltar a qualquer momento" · "preciso me preparar para o pior" · "no fundo, estou sozinho pra me sustentar" · "se eu relaxar, alguma coisa ruim acontece"
+  - **🔴 crenças:** "o chão pode faltar a qualquer momento" · "preciso me preparar para o pior" · "só posso contar comigo" · "se eu relaxar, alguma coisa ruim acontece"
 - **🌍 Terra**
   - **🟢 emoções:** senso de reserva e apoio real (assinatura Terra+ — chão/segurança) · constância, ter recursos guardados
   - **🟢 crenças:** "tenho gente e recursos em quem me apoiar" · "tenho uma reserva pra aguentar um baque"
@@ -88,7 +88,7 @@ Esta é a tabela-mestra. O 🔴 de um campo é a carga daquele elemento; o 🟢 
   - **🟢 emoções:** capacidade de inspirar/receber a vida, abertura ao novo (MTC — pulmão em harmonia) · fôlego/vitalidade (PROPOSTA recurso — 💨1.0) · **pneuma / conexão espiritual — o sopro que liga a algo maior** (respiração=pneuma; a "dimensão espiritual" que o próprio glossário de produção põe na pineal) · otimismo e leveza depois do luto (assinatura Ar+)
   - **🟢 crenças:** "tem coisa boa pra receber da vida" · "consigo me abrir pro novo" · "cada respiração é um recomeço" · "quando respiro fundo, me reconecto com algo maior que eu"
   - **🔴 emoções:** fôlego curto / sufocamento — "não digno de respirar a vida plena" (Hay) · fechamento ao novo depois da perda
-  - **🔴 crenças:** "não me sinto digno de ocupar meu espaço" (Hay tema) · "prefiro não me abrir pra não perder de novo"
+  - **🔴 crenças:** "não tenho direito de ocupar meu espaço" (Hay tema) · "prefiro não me abrir pra não perder de novo"
 - **Nota:** a CARGA do pulmão é 💧Água (luto/valor); o 💨Ar é a face-recurso (respirar, receber a vida). O Ar aqui aparece no polo saudável, não como carga — sem forçar.
 
 ### `estomago` — anel interno pericentral
@@ -112,7 +112,7 @@ Esta é a tabela-mestra. O 🔴 de um campo é a carga daquele elemento; o 🟢 
   - **🟢 emoções:** capacidade de assimilar/aproveitar o que serve — separar o puro do impuro (MTC) · maleabilidade, soltar aos poucos (assinatura Terra+) · paciência
   - **🟢 crenças:** "posso absorver o que me serve e deixar o resto" · "consigo me soltar aos poucos, no meu ritmo"
   - **🔴 emoções:** rigidez/intolerância (Dias/Hay) · não-assimilar (MTC) · marca de primeira infância/retenção (Dias) · constrição/contração interna (Dias) · *(Bradley põe "abandono" aqui; o produto usa "primeira infância/retenção", NÃO abandono)*
-  - **🔴 crenças:** "tem um jeito certo, e é o meu" (rigidez) · "seguro tudo por dentro, não solto fácil" · "aprendi cedo que era mais seguro me fechar" (primeira infância — Dias)
+  - **🔴 crenças:** "tem um jeito certo, e é o meu" (rigidez) · "guardar é mais seguro que soltar" · "aprendi cedo que era mais seguro me fechar" (primeira infância — Dias)
 - **🔥 Fogo**
   - **🟢 emoções:** firmeza que tem posição sem endurecer — ter jeito próprio sem fechar a porta (assinatura Fogo+ moderado)
   - **🟢 crenças:** "posso ter meu jeito sem fechar a porta pro diferente"
@@ -145,7 +145,7 @@ Esta é a tabela-mestra. O 🔴 de um campo é a carga daquele elemento; o 🟢 
   - **🟢 emoções:** doçura da vida recuperada, amor-próprio (MTC — Terra/baço em harmonia; a doçura sentida) · sentir o gostinho bom das coisas · compaixão consigo (assinatura Água+)
   - **🟢 crenças:** "consigo sentir o gostinho bom das coisas de novo" · "posso cuidar de mim como cuido dos outros"
   - **🔴 emoções:** falta de amor-próprio/auto-rejeição (Dias) · auto-humilhação (Dias) · culpa (Dias) · tristeza/luto "pelo que poderia ter sido" (Hay) · amargura pela falta de doçura (Hay)
-  - **🔴 crenças:** "a vida perdeu a doçura pra mim" · "não me dou o direito de receber carinho" · "me rebaixo pra ser aceito" (auto-humilhação — Dias) · "a culpa costuma sobrar pra mim"
+  - **🔴 crenças:** "nada mais tem graça" · "não me dou o direito de receber carinho" · "me rebaixo pra ser aceito" (auto-humilhação — Dias) · "a culpa costuma sobrar pra mim"
 - **🌍 Terra**
   - **🟢 emoções:** capacidade de receber tanto quanto dá (MTC — nutrir a si) · nutrição de si, presença cuidadora equilibrada (assinatura Terra+)
   - **🟢 crenças:** "mereço receber carinho, não só dar" · "posso me nutrir sem culpa"
@@ -164,7 +164,7 @@ Esta é a tabela-mestra. O 🔴 de um campo é a carga daquele elemento; o 🟢 
   - **🟢 emoções:** segurança amorosa (Br) · sentir fundo e se deixar amar (assinatura Água+) · sentir-se amado e conectado (Br/Dias)
   - **🟢 crenças:** "posso me abrir e me deixar amar" · "mereço vínculos que me façam bem" · "meu coração aguenta amar de novo"
   - **🔴 emoções:** medo de não ser amado / amor não recebido (Br/Dias) · abandono (Br) · perda (Br) · traição (Br) · desamparo (Br) · vulnerabilidade (Br) · esforço não reconhecido (Br) · angústia (Br) · coração endurecido / medo de sentir (Hay)
-  - **🔴 crenças:** "se eu me abrir, vão me abandonar" · "amar é arriscado demais" · "no fundo, não sou digno de ser amado de verdade" · "melhor não me apegar pra não sofrer" (coração endurecido — Hay)
+  - **🔴 crenças:** "se eu me abrir, vão me abandonar" · "amar é arriscado demais" · "se me conhecessem de verdade, não me quereriam" · "melhor não me apegar pra não sofrer" (coração endurecido — Hay)
 - **💨 Ar**
   - **🟢 emoções:** alegria/júbilo (MTC — Fogo em harmonia = alegria; aqui a alegria conectada) · entusiasmo afetivo, coração aberto/aventureiro (Dias) · sociabilidade, prazer no encontro (assinatura Ar+) · alegria & amor (PROPOSTA recurso — 💨0.6/💧0.4)
   - **🟢 crenças:** "dá pra sentir alegria e prazer sem culpa" · "gosto de me conectar e me abrir pras pessoas" · "meu coração aberto atrai bons encontros"
@@ -187,7 +187,7 @@ Esta é a tabela-mestra. O 🔴 de um campo é a carga daquele elemento; o 🟢 
   - **🟢 emoções:** sensação de segurança que permite baixar o alerta (somático — parassimpático ativo) · calma receptiva, confiar que pode descansar (assinatura Água+)
   - **🟢 crenças:** "posso baixar a guarda quando estou seguro" · "nem toda situação é uma emergência"
   - **🔴 emoções:** exaustão/esgotamento adrenal (Dias/Hay) · solidão de fundo — "sozinha apesar de rodeada", medo da solidão (Dias) · síndrome do pânico (Dias) · ansiedade (Hay)
-  - **🔴 crenças:** "estou acabado, mas sigo no automático" · "mesmo cercado de gente, me sinto sozinho" (solidão de fundo — Dias)
+  - **🔴 crenças:** "estou acabado, mas sigo no automático" · "ninguém me alcança de verdade" (solidão de fundo — Dias)
 - **🔥 Fogo**
   - **🟢 emoções:** energia mobilizada a serviço da ação escolhida — vigor que responde e depois recua (assinatura Fogo+) · iniciativa quando há de fato o que enfrentar
   - **🟢 crenças:** "minha energia responde quando preciso, e depois descansa" · "posso agir sem viver em emergência"
@@ -247,7 +247,7 @@ Esta é a tabela-mestra. O 🔴 de um campo é a carga daquele elemento; o 🟢 
   - **🟢 emoções:** mente clara que organiza e descansa (assinatura Ar+ — raciocínio claro/objetividade) · reconexão com propósito/sentido, entusiasmo pela missão (Dias — anel de propósito, lado recurso)
   - **🟢 crenças:** "minha mente pode descansar à noite" · "dá pra reconectar com o que faz sentido pra mim" · "consigo organizar o que penso"
   - **🔴 emoções:** sobrecarga mental (N) · "mente que não desliga" na hora de dormir (N — *modo Mente*) · ruminação mental (assinatura Ar−)
-  - **🔴 crenças:** "minha cabeça não desliga na hora de dormir" · "estou sobrecarregado por dentro, sem pausa"
+  - **🔴 crenças:** "minha cabeça não desliga na hora de dormir" · "não posso parar"
 - **💧 Água**
   - **🟢 emoções:** reconexão com o sentido sentido, calma interior (assinatura Água+)
   - **🟢 crenças:** "posso reencontrar meu rumo aos poucos"
@@ -341,7 +341,7 @@ Esta é a tabela-mestra. O 🔴 de um campo é a carga daquele elemento; o 🟢 
   - **🟢 emoções:** energia que, canalizada, vira foco e ação (assinatura Fogo+)
   - **🟢 crenças:** "quando canalizo, minha energia vira foco" · "posso agir sem que a irritação mande"
   - **🔴 emoções:** irritação que "sobe" do visceral ao mental (N) · irritabilidade de fundo (N/MTC)
-  - **🔴 crenças:** "qualquer coisa me irrita por dentro" · "tem uma irritação de fundo que não sei de onde vem"
+  - **🔴 crenças:** "qualquer coisa me irrita" · "tem uma irritação de fundo que não sei de onde vem"
 - **💨 Ar**
   - **🟢 emoções:** clareza mental quando a tensão visceral se alivia (assinatura Ar+)
   - **🟢 crenças:** "quando me acalmo, minha cabeça clareia"
@@ -403,7 +403,7 @@ Esta é a tabela-mestra. O 🔴 de um campo é a carga daquele elemento; o 🟢 
   - **🟢 emoções:** senso de sustentação e base material segura (assinatura Terra+ — chão) · construir base passo a passo
   - **🟢 crenças:** "tenho como me sustentar" · "posso construir uma base firme, passo a passo"
   - **🔴 emoções:** insegurança material/financeira (Hay — "medo por dinheiro") · insegurança estrutural / de fundamento (N) · base frágil / não ter chão (N)
-  - **🔴 crenças:** "não tenho base firme debaixo dos pés" · "tudo depende de mim pra família não cair"
+  - **🔴 crenças:** "não tenho base firme debaixo dos pés" · "se eu não segurar, tudo desaba"
 
 ### `sacro_coccyx` — 5-6h
 - **Elemento(s):** 💧Água 66% · 🌍Terra 17% · 🔥Fogo 17%. **Derivação:** medo de seguir em frente(💧0.8/🌍0.2) + insegurança de base(💧0.7/🌍0.3) + sexualidade e medos inatos(💧0.5/🔥0.5) → 💧=2.0 · 🌍=0.5 · 🔥=0.5 sobre 3.0 → **💧66 · 🌍17 · 🔥17**. O 🔥Fogo é a semente do "fogo criador"/vitalidade.
@@ -412,7 +412,7 @@ Esta é a tabela-mestra. O 🔴 de um campo é a carga daquele elemento; o 🟢 
   - **🟢 emoções:** senso de pertencer e de valor igual ao dos outros (assinatura Água+) · segurança de base sentida
   - **🟢 crenças:** "tenho meu valor, igual a qualquer um" · "posso dar passos grandes no meu tempo"
   - **🔴 emoções:** medo de seguir em frente / de decisões grandes (Hay) · insegurança de base / sobrevivência (Dias/Hay) · senso de inferioridade (Dias) · medo de finalizações / de pertencer (Dias — área 8) · culpa/vergonha ligada ao sexual (Dias)
-  - **🔴 crenças:** "tenho medo de dar passos grandes" · "no fundo, me sinto menos que os outros" (inferioridade — Dias) · "não sei se pertenço de verdade" (medo de pertencer — Dias)
+  - **🔴 crenças:** "tenho medo de dar passos grandes" · "os outros são melhores que eu" (inferioridade — Dias) · "não sei se pertenço de verdade" (medo de pertencer — Dias)
 - **🌍 Terra**
   - **🟢 emoções:** base instintiva assentada, corpo como chão seguro (assinatura Terra+)
   - **🟢 crenças:** "meu corpo é uma base em que posso confiar"
@@ -441,7 +441,7 @@ Esta é a tabela-mestra. O 🔴 de um campo é a carga daquele elemento; o 🟢 
   - **🟢 emoções:** sentir-se amado e sustentado por dentro (assinatura Água+)
   - **🟢 crenças:** "posso me sentir amado e sustentado"
   - **🔴 emoções:** amargura / vitimização (Hay — reumatismo) · sentir-se não-amado (Hay — articulações) · preocupação crônica somatizada (Dias)
-  - **🔴 crenças:** "a vida foi injusta comigo" (vitimização — Hay reumatismo) · "no fundo, me sinto não-amado" (Hay articulações)
+  - **🔴 crenças:** "a vida foi injusta comigo" (vitimização — Hay reumatismo) · "não sou amável do jeito que sou" (Hay articulações)
 
 ### `boca_garganta` — orofaríngea (1-2h OE / 10-11h OD)
 - **Elemento(s):** 💧Água 45% · 💨Ar 30% · 🔥Fogo 15% · 🌍Terra 10%. **Derivação:** expressão reprimida/engolir = 💧Água; **voz/comunicação/criatividade = 💨Ar** (função do órgão — correção Ar-funcional, glossário: "eixo verbal"); raiva engolida = 🔥Fogo; contenção = 🌍Terra.
@@ -497,7 +497,7 @@ Esta é a tabela-mestra. O 🔴 de um campo é a carga daquele elemento; o 🟢 
   - **🟢 emoções:** autoestima que sustenta a defesa sem exaustão (Dias — o positivo do anel de expressão) · valor sentido por dentro (assinatura Água+)
   - **🟢 crenças:** "meu valor não depende de me defender" · "posso me sentir bem comigo sem provar nada"
   - **🔴 emoções:** baixa autoestima (Dias — "anel de expressão") · desilusão/trauma localizado (Dias) · "baixa estima → baixa imunidade" (Dias)
-  - **🔴 crenças:** "no fundo, me sinto pouco" (baixa autoestima — Dias) · "guardo uma desilusão que ainda dói"
+  - **🔴 crenças:** "nunca sou bom o bastante" (baixa autoestima — Dias) · "guardo uma desilusão que ainda dói"
 - **🌍 Terra**
   - **🟢 emoções:** capacidade de se recuperar e se fortalecer, base que se refaz (assinatura Terra+ — resistência)
   - **🟢 crenças:** "consigo me recuperar e me fortalecer"
@@ -536,7 +536,7 @@ Esta é a tabela-mestra. O 🔴 de um campo é a carga daquele elemento; o 🟢 
   - **🟢 emoções:** sensibilidade que protege e conecta na medida (assinatura Água+) · fronteira sentida sem se sentir invadido
   - **🟢 crenças:** "tenho uma pele que me protege e me conecta"
   - **🔴 emoções:** fronteira/limite frágil com o mundo (N/Hay) · sensibilidade/ameaça ao externo (Hay — "ameaça à individualidade") · nervosismo somatizado na pele (Dias) · sentir-se exposto/sem casca (Hay)
-  - **🔴 crenças:** "me sinto exposto, sem casca, diante do mundo" (Hay) · "qualquer coisa de fora me ameaça"
+  - **🔴 crenças:** "não tenho como me proteger" (Hay) · "qualquer coisa de fora me ameaça"
 - **💨 Ar**
   - **🟢 emoções:** entusiasmo pela missão / sentido de propósito vivo (Dias — anel de propósito, recurso) · orientação ao futuro com esperança, visão conceitual que inspira (Dias) · otimismo (assinatura Ar+)
   - **🟢 crenças:** "sinto entusiasmo pelo que quero construir" · "posso começar minha missão, um passo de cada vez"
@@ -615,7 +615,7 @@ Estes campos são **especiais** — localizadores e marcadores. NÃO forçam doi
 - **Elemento(s):** **localizador — elemento HERDADO da área onde o pigmento cai** (cruzar com o campo topográfico). Isolado, a família (desilusão/mágoa/desconsideração) puxa ≈ 💧Água 75% · 🔥Fogo 15% · 🌍Terra 10%, mas o correto é herdar da área. *Constitucionalmente o pigmento/gema também sinaliza o tipo Jóia (mental) — leitura de estrutura, separada da de trauma.*
 - **Centro:** localizador de TEMA/trauma (a emoção depende da ÁREA). Nativo forte (Dias).
 - **🔴 emoções (por área):** desconsideração — "não ser considerado pelos pais/sociedade" (área do EGO, Dias) · amor condicionado ao sacrifício (área da VONTADE, Dias) · desilusão/trauma localizado (Dias) · exigência/encorajamento parental em excesso (Dias — área 1) · sensação de dívida afetiva (Dias) · mágoa cristalizada naquela função (Dias)
-- **🔴 crenças:** "não fui considerado/visto pelos que importavam" (área EGO — Dias) · "só sou amado se eu me sacrificar" (área VONTADE — Dias) · "carrego uma decepção antiga cristalizada aqui" · "sinto que devo algo afetivamente" (dívida afetiva — Dias)
+- **🔴 crenças:** "não fui considerado/visto pelos que importavam" (área EGO — Dias) · "só sou amado se eu me sacrificar" (área VONTADE — Dias) · "carrego uma decepção antiga cristalizada aqui" · "estou sempre devendo pra quem gosta de mim" (dívida afetiva — Dias)
 - **🟢 emoções:** a função da área integrada — a marca vira aprendizado/dom (framing nativo Dias) · senso de ser visto e valorizado
 - **🟢 crenças:** "posso ser visto e valorizado como sou" · "mereço amor sem ter que me sacrificar" · "consigo elaborar a mágoa antiga"
 - **Nota:** NÃO é emoção fixa — o pigmento marca ONDE olhar; a emoção sai da função da área.
@@ -624,7 +624,7 @@ Estes campos são **especiais** — localizadores e marcadores. NÃO forçam doi
 - **Elemento(s):** **localizador — elemento HERDADO da área**. Isolada, a família (carência/vazio/"não merecer"/ressentimento) puxa ≈ 💧Água 65% · 🌍Terra 20% · 🔥Fogo 15%. Marcador de carga mais RECENTE/aberta (vs. cripta).
 - **Centro:** localizador de CARÊNCIA/vazio (a emoção depende da ÁREA). Nativo forte (Dias).
 - **🔴 emoções (por área):** carência/vazio na função da área (Dias) · "não merecer" / pouca força interior (área do EGO, Dias) · ressentimento (área do PERDÃO, Dias) · medo de não receber amor (área da VONTADE, Dias) · abandono — "não ser aceito, como se a mãe não nos tivesse aceitado" (INSTINTO/colarete, Dias) · sensação de falta/insuficiência (Dias)
-- **🔴 crenças:** "tem um vazio nessa parte de mim" · "no fundo, sinto que não mereço" (área EGO — Dias) · "guardo ressentimento nessa área" (área PERDÃO — Dias) · "tenho medo de não receber o amor que preciso" (área VONTADE — Dias) · "é como se eu não tivesse sido aceito desde o começo" (abandono/colarete — Dias)
+- **🔴 crenças:** "tem um vazio nessa parte de mim" · "não mereço o que tenho de bom" (área EGO — Dias) · "guardo ressentimento nessa área" (área PERDÃO — Dias) · "tenho medo de não receber o amor que preciso" (área VONTADE — Dias) · "é como se eu não tivesse sido aceito desde o começo" (abandono/colarete — Dias)
 - **🟢 emoções:** a função da área preenchida/nutrida · senso de merecimento
 - **🟢 crenças:** "posso preencher esse vazio com o que me nutre" · "mereço, mesmo com minhas faltas" · "consigo receber amor e apoio"
 - **Nota:** como o pigmento, puxa a emoção da função da área.

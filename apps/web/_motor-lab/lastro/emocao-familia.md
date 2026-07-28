@@ -257,7 +257,7 @@ eixos com mais precisão e manter) é **decisão do founder na frente do caso re
 
 ### Eixo · Seguir em frente
 **🟢 Antídoto:** Seguir em frente — *elaborar a perda e voltar a andar*
-**🔴 Cargas:** luto/pesar :: luto que não passa · tristeza/luto "pelo que poderia ter sido" · desilusão/trauma localizado · desespero · perda :: perda não elaborada · decepção :: decepção que ficou · choro :: choro que não alivia
+**🔴 Cargas:** luto/pesar :: luto que não passa · tristeza/luto "pelo que poderia ter sido" · desilusão/trauma localizado :: desilusão que ficou · desespero · perda :: perda não elaborada · decepção :: decepção que ficou · choro :: choro que não alivia
 **🟢 Recursos:** leveza depois de elaborar a perda, "respirar aliviado" :: respirar aliviado depois da dor · sentir fundo e soltar a dor :: sentir fundo e soltar
 
 ### Eixo · Alegria
@@ -353,7 +353,7 @@ eixos com mais precisão e manter) é **decisão do founder na frente do caso re
 
 ### Eixo · Receber também
 **🟢 Antídoto:** Receber também — *deixar cuidarem de você*
-**🔴 Cargas:** cuidar demais dos outros / doar sem receber · carregar os outros / falta de apoio emocional · sobrecarga empática / assumir os fardos dos outros · sobrecarga silenciosa de quem sustenta a todos · exaustão de cuidador · ressentimento de quem sempre sustenta
+**🔴 Cargas:** cuidar demais dos outros / doar sem receber :: doa muito e tem dificuldade de receber · carregar os outros / falta de apoio emocional · sobrecarga empática / assumir os fardos dos outros · sobrecarga silenciosa de quem sustenta a todos · exaustão de cuidador · ressentimento de quem sempre sustenta
 **🟢 Recursos:** capacidade de receber tanto quanto dá :: receber tanto quanto dá · capacidade de pedir e receber apoio :: pedir e receber ajuda · empatia que nutre em vez de esgotar :: se importar sem se esgotar · acolhimento/nutrição de si e dos outros :: cuidar de si e do outro · nutrição de si, presença cuidadora equilibrada :: cuidar sem se abandonar
 
 ### Eixo · Voz própria
@@ -378,7 +378,7 @@ eixos com mais precisão e manter) é **decisão do founder na frente do caso re
 
 ### Eixo · Fôlego
 **🟢 Antídoto:** Fôlego — *energia que dura o dia*
-**🔴 Cargas:** exaustão/esgotamento adrenal · "estrutura mais esgotada" → exaustão · autoproteção exaurida · defesa esgotada / depleção de base → exaustão · carga inflamatória crônica de fundo → estresse/exaustão crônica
+**🔴 Cargas:** exaustão/esgotamento adrenal · "estrutura mais esgotada" → exaustão · autoproteção exaurida :: esgotado de se proteger · defesa esgotada / depleção de base → exaustão · carga inflamatória crônica de fundo → estresse/exaustão crônica
 **🟢 Recursos:** fôlego/vitalidade :: fôlego · capacidade de recuperar vitalidade após o descanso — voltar à base :: recuperar depois do descanso · vigor direcionado · energia mobilizada a serviço da ação escolhida — vigor que responde e depois recua :: vigor na hora certa · vitalidade / "fogo criador" — a base instintiva viva :: energia viva por dentro · vitalidade e ímpeto generativo :: energia para criar · vitalidade e presença na conexão :: presença e energia no encontro · capacidade de se recuperar e se fortalecer, base que se refaz :: recuperar-se e fortalecer · iniciativa expansiva e presença, "energia que puxa o grupo" :: energia que puxa o grupo
 
 ### Eixo · Leveza
