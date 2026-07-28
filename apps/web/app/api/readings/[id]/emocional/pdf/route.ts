@@ -48,16 +48,17 @@ import { DISCLAIMER_COMPACT } from '@/components/legal/DisclaimerCopy'
 const RE_AT_PAGE = /@page\s*\{[^}]*\}/g
 
 /**
- * Injetado no fim do <head>.
- * - `.pad{padding:0}`: tinha até 56px; somado aos 0.7in laterais, duplicaria o recuo.
- * - `.brand/.brand-sub`: a identidade agora vive na capa e no cabeçalho de cada página;
- *   sem isto, a página 2 abriria com a terceira marca Iris Codex empilhada.
+ * ⛔ NÃO MEXER NA GEOMETRIA DO DOCUMENTO. Lição de 2026-07-28.
+ *
+ * A primeira versão zerava `.pad` e escondia `.brand/.brand-sub` para o documento "caber"
+ * no pipeline. Isso é o avesso do certo: o desenho foi aprovado pelo founder em 2026-07-27
+ * ("FICA O MOCKUP") e o `@media print` dele foi escrito junto, calibrado para essa
+ * geometria. Mudar recuo e blocos quebrou o layout (Heranças) em produção.
+ *
+ * Regra: o pipeline se molda ao documento, não o contrário. A ÚNICA coisa que precisa sair
+ * é o `@page` — porque as bandas de cabeçalho/rodapé só existem nas margens do Gotenberg,
+ * e um `@page` no CSS vence essas margens. Tudo o mais do desenho fica como aprovado.
  */
-const PRINT_OVERRIDES =
-  '<style>@media print{' +
-  '.pad{padding:0}' +
-  '.brand,.brand-sub{display:none}' +
-  '}</style>'
 
 export const runtime = 'nodejs'
 export const maxDuration = 120
@@ -97,13 +98,9 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
   let html: string
   try {
     html = renderEmocional(reading.report_emocional, findings?.exame_json ?? {}, primeiro).html
-    // 1) Tira o @page do documento — daí quem manda nas margens é o Gotenberg (ver acima).
+    // Única alteração no documento: tirar o @page, senão as bandas não têm onde caber.
+    // Nada de mexer em .pad, .brand ou qualquer coisa do desenho aprovado (ver acima).
     html = html.replace(RE_AT_PAGE, '')
-    // 2) Overrides no fim do <head> para vencerem o @media print por ordem de cascata.
-    //    Sem </head> seguimos sem eles: o PDF sai com o recuo antigo, mas sai.
-    html = html.includes('</head>')
-      ? html.replace('</head>', `${PRINT_OVERRIDES}</head>`)
-      : html
   } catch (e) {
     console.error('[emocional/pdf] falha ao renderizar', { readingId: id, e })
     return NextResponse.json({ error: 'falha ao montar o documento' }, { status: 500 })
@@ -140,7 +137,17 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
   coverForm.append('scale', '1.0')
 
   // CORPO — as margens saem do documento e passam para cá, que é onde as bandas cabem.
-  // Os mesmos valores do dossiê, para os dois PDFs terem a mesma caixa de texto.
+  //
+  // LATERAIS = 0.551in = 14mm, que é EXATAMENTE o que o `@page` aprovado declarava. Somado
+  // ao recuo do `.pad` (preservado), a caixa de texto fica idêntica à do desenho aprovado.
+  // ⚠️ NÃO usar os 0.7in do dossiê aqui: são 0.15in a mais de cada lado, e foi isso (junto
+  // com o `.pad` zerado) que estreitou a coluna e desmontou o bloco das Heranças.
+  //
+  // VERTICAIS = 1.2 / 1.0, como no dossiê. Aqui o custo é inevitável: a banda do cabeçalho
+  // e a do rodapé SÓ existem dentro dessas margens, então a altura útil cai de 10.43in para
+  // 9.49in e a paginação muda. É o preço de ter cabeçalho e rodapé em toda página — não dá
+  // para ter os dois e a paginação original. Os blocos frágeis já têm `break-inside:avoid`
+  // no @media print aprovado (.gen das Heranças inclusive), que é o que segura isso.
   const bodyForm = new FormData()
   bodyForm.append('files', blob(html), 'index.html')
   bodyForm.append('files', blob(renderHeaderHtml(nomeCompleto)), 'header.html')
@@ -149,8 +156,8 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
   bodyForm.append('paperHeight', '11.69')
   bodyForm.append('marginTop', '1.2')
   bodyForm.append('marginBottom', '1.0')
-  bodyForm.append('marginLeft', '0.7')
-  bodyForm.append('marginRight', '0.7')
+  bodyForm.append('marginLeft', '0.551')
+  bodyForm.append('marginRight', '0.551')
   bodyForm.append('printBackground', 'true') // sem isto o papel marfim e as barras somem
   bodyForm.append('scale', '1.0')
   bodyForm.append('generateDocumentOutline', 'true') // marcadores clicáveis a partir dos h2
