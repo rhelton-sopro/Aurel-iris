@@ -33,15 +33,28 @@ import {
 import { DISCLAIMER_COMPACT } from '@/components/legal/DisclaimerCopy'
 
 /**
- * Injetado no <head> do documento antes de virar PDF.
- * - `@page{margin:0}`: o Gotenberg assume as margens (é o espaço das bandas).
- * - `.pad{padding:0}`: senão soma com os 0.7in laterais e duplica o recuo.
+ * ⚠️ O `@page` do DOCUMENTO tem que SUMIR, não ser sobrescrito.
+ *
+ * No Chromium, um `@page{margin:...}` no CSS VENCE as margens que o Gotenberg pede. O
+ * documento emocional traz `@page{margin:16mm 14mm}` próprio. A 1ª tentativa sobrescreveu
+ * com `@page{margin:0}` — o pior dos mundos: zerou a margem do CORPO enquanto as bandas de
+ * cabeçalho/rodapé seguiam desenhadas onde o Gotenberg mandou. Resultado em prod: texto
+ * até a borda do papel e passando por baixo do cabeçalho.
+ *
+ * O CSS de impressão do dossiê NÃO declara `@page` nenhum de propósito (só um comentário
+ * dizendo que as margens são da rota). Aqui é a mesma coisa: removemos a regra do HTML e
+ * o Gotenberg passa a ser o único dono das margens — que é onde as bandas cabem.
+ */
+const RE_AT_PAGE = /@page\s*\{[^}]*\}/g
+
+/**
+ * Injetado no fim do <head>.
+ * - `.pad{padding:0}`: tinha até 56px; somado aos 0.7in laterais, duplicaria o recuo.
  * - `.brand/.brand-sub`: a identidade agora vive na capa e no cabeçalho de cada página;
  *   sem isto, a página 2 abriria com a terceira marca Iris Codex empilhada.
  */
 const PRINT_OVERRIDES =
   '<style>@media print{' +
-  '@page{margin:0}' +
   '.pad{padding:0}' +
   '.brand,.brand-sub{display:none}' +
   '}</style>'
@@ -84,9 +97,10 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
   let html: string
   try {
     html = renderEmocional(reading.report_emocional, findings?.exame_json ?? {}, primeiro).html
-    // Os overrides entram no fim do <head> para vencerem o @media print do documento por
-    // ordem de cascata (mesma especificidade). Se o </head> não existir por algum motivo,
-    // seguimos sem eles — o PDF sai com o recuo antigo, mas sai.
+    // 1) Tira o @page do documento — daí quem manda nas margens é o Gotenberg (ver acima).
+    html = html.replace(RE_AT_PAGE, '')
+    // 2) Overrides no fim do <head> para vencerem o @media print por ordem de cascata.
+    //    Sem </head> seguimos sem eles: o PDF sai com o recuo antigo, mas sai.
     html = html.includes('</head>')
       ? html.replace('</head>', `${PRINT_OVERRIDES}</head>`)
       : html
