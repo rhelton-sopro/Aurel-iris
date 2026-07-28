@@ -77,4 +77,39 @@ describe('lib/auth/founder', () => {
     const { isFounderEmail } = await freshImport()
     expect(isFounderEmail('rhelton@gmail.com')).toBe(true)
   })
+
+  // Lista separada por vírgula (2+ founders). Fail-closed preservado.
+  it('accepts every email in a comma-separated FOUNDER_EMAIL', async () => {
+    process.env.FOUNDER_EMAIL = 'rhelton@gmail.com,esposa@example.com'
+    const { isFounderEmail } = await freshImport()
+    expect(isFounderEmail('rhelton@gmail.com')).toBe(true)
+    expect(isFounderEmail('esposa@example.com')).toBe(true)
+    expect(isFounderEmail('ESPOSA@EXAMPLE.COM')).toBe(true)
+  })
+
+  it('rejects non-members when FOUNDER_EMAIL is a list', async () => {
+    process.env.FOUNDER_EMAIL = 'rhelton@gmail.com,esposa@example.com'
+    const { isFounderEmail } = await freshImport()
+    expect(isFounderEmail('attacker@example.com')).toBe(false)
+    // não pode casar com a string inteira nem com fragmento
+    expect(isFounderEmail('rhelton@gmail.com,esposa@example.com')).toBe(false)
+    expect(isFounderEmail('esposa@example')).toBe(false)
+  })
+
+  it('tolerates spaces and trailing commas in the list', async () => {
+    process.env.FOUNDER_EMAIL = ' rhelton@gmail.com , esposa@example.com , '
+    const { isFounderEmail } = await freshImport()
+    expect(isFounderEmail('rhelton@gmail.com')).toBe(true)
+    expect(isFounderEmail('esposa@example.com')).toBe(true)
+    // entradas vazias da lista não podem virar um curinga
+    expect(isFounderEmail('')).toBe(false)
+    expect(isFounderEmail('   ')).toBe(false)
+  })
+
+  it('returns false when FOUNDER_EMAIL is only commas/spaces (fail-closed)', async () => {
+    process.env.FOUNDER_EMAIL = ' , , '
+    const { isFounderEmail } = await freshImport()
+    expect(isFounderEmail('rhelton@gmail.com')).toBe(false)
+    expect(isFounderEmail('')).toBe(false)
+  })
 })
