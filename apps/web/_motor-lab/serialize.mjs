@@ -16,7 +16,7 @@ const pende = (a) => (a < 40 ? 'mais tensão' : a <= 60 ? 'meio a meio' : 'mais 
 function centroLabel(c, agulha, sabor) {
   const livre = agulha >= 50
   if (c === 'mente') return livre ? 'pensa claro, sem ruminar' : 'cabeça que não desliga — rumina, antecipa'
-  if (c === 'coracao') return livre ? 'afeto inteiro, se liga com facilidade' : 'afeto ferido ou meio bloqueado'
+  if (c === 'coracao') return livre ? 'sente com profundidade e demonstra — o afeto chega ao outro' : 'sente com profundidade, mas o afeto não sai: fica guardado'
   if (livre) return 'corpo tranquilo, responde sem disparar'
   return sabor === 'medo' ? 'reage se protegendo, em alerta' : 'ferve rápido, gatilho curto'
 }

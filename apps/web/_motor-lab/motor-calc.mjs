@@ -92,6 +92,10 @@ function parseLastro() {
     const cargaByElem = { fogo: [], agua: [], terra: [], ar: [] }
     const recursoByElem = { fogo: [], agua: [], terra: [], ar: [] }
     const cargaCrencaByElem = { fogo: [], agua: [], terra: [], ar: [] } // crenças (forma cognitiva) — pro bloco C
+    // A canônica anota, entre parênteses, A QUAL EMOÇÃO a crença pertence
+    // ("coisa nova me embrulha o estômago" (pavor do novo — Hay)). 28% delas têm isso,
+    // e o `clean` descartava — o que fazia a crença ser escolhida por POSIÇÃO.
+    const cargaCrencaTagByElem = { fogo: [], agua: [], terra: [], ar: [] }
     const recursoCrencaByElem = { fogo: [], agua: [], terra: [], ar: [] }
     let curE = null
     for (const line of b.split('\n')) {
@@ -103,7 +107,11 @@ function parseLastro() {
       const rcm = line.match(/🟢 crenças:\*\*\s*(.*)/)
       if (cm && curE) cargaByElem[curE].push(...cm[1].split('·').map(clean).filter((p) => p.length > 2).slice(0, NUCLEO_CAP))
       if (rm && curE) recursoByElem[curE].push(...rm[1].split('·').map(clean).filter((p) => p.length > 2).slice(0, NUCLEO_CAP))
-      if (ccm && curE) cargaCrencaByElem[curE].push(...ccm[1].split('·').map(clean).filter((p) => p.length > 2).slice(0, NUCLEO_CAP))
+      if (ccm && curE) {
+        const its = ccm[1].split('·').map((x) => x.trim()).filter((x) => clean(x).length > 2).slice(0, NUCLEO_CAP)
+        cargaCrencaByElem[curE].push(...its.map(clean))
+        cargaCrencaTagByElem[curE].push(...its.map((x) => ((x.match(/\(([^)]*)\)/) || [])[1] || '').split('—')[0].trim().toLowerCase()))
+      }
       if (rcm && curE) recursoCrencaByElem[curE].push(...rcm[1].split('·').map(clean).filter((p) => p.length > 2).slice(0, NUCLEO_CAP))
     }
     // ordena o leque pela PREDOMINÂNCIA do elemento no campo → a emoção-núcleo
@@ -119,7 +127,7 @@ function parseLastro() {
       elem, centros: centros.length ? centros : ['corpo'],
       carga: flat(cargaByElem), recurso: flat(recursoByElem), cargaByElem, recursoByElem,
       cargaSrc: flatSrc(cargaByElem),
-      cargaCrenca: flat(cargaCrencaByElem), recursoCrenca: flat(recursoCrencaByElem),
+      cargaCrenca: flat(cargaCrencaByElem), cargaCrencaTag: flat(cargaCrencaTagByElem), recursoCrenca: flat(recursoCrencaByElem),
     }
   }
   return map
@@ -224,8 +232,27 @@ function calc(name, lastro) {
   const achadoList = [] // TODOS os achados evidenciados (decisão founder: nada de colapsar em 1)
   const skipped = [], adjuvantes = []
 
-  // ACHADOS → carga (elemento) + tensão (centro)
+  // DEDUPE POR CAMPO DO LASTRO — o Stage 1 emite o SINAL e o SISTEMA como achados
+  // separados (`manchas_psoricas` + `sistema_imune`; `anel_nervoso` + `sistema_nervoso`;
+  // `anel_sodico` + `sistema_circulatorio`), mas o ALIAS resolve os dois no MESMO campo.
+  // Somar os dois era contar a mesma observação duas vezes: inflava a emoção (Miguel:
+  // 5.87+2.14=8.01 em "baixa autoestima") e produzia CORROBORAÇÃO FALSA na crença.
+  // Vale a maior intensidade — sinal e sistema são a mesma coisa vista de dois jeitos.
+  const porChave = {}
   for (const a of achados) {
+    const { key, klass } = classify(a.campo)
+    if (klass !== 'emocional') continue
+    const cur = porChave[key]
+    if (!cur || (a.intensidade || 0) > (cur.intensidade || 0)) porChave[key] = a
+  }
+  const fundidos = Object.values(porChave)
+  const achadosUnicos = achados.filter((a) => {
+    const { klass } = classify(a.campo)
+    return klass !== 'emocional' || fundidos.includes(a)
+  })
+
+  // ACHADOS → carga (elemento) + tensão (centro)
+  for (const a of achadosUnicos) {
     const { key, klass, alvo } = classify(a.campo)
     if (klass === 'marcador' || klass === 'modulador') { skipped.push(`${a.campo}(${klass})`); continue }
     if (klass === 'visto') { adjuvantes.push(`${a.campo}→${alvo}`); continue } // sem peso
@@ -244,13 +271,19 @@ function calc(name, lastro) {
       // Se duas áreas emitem a mesma emoção, vale a de maior peso.
       if (!antiSrc[e] || antiSrc[e].w < w) antiSrc[e] = { key, i, w }
     })
-    // CRENÇA do achado (bloco 6): UMA por achado, a do elemento dominante do campo.
-    const cr = (t.cargaCrenca || [])[0]
-    if (cr) (crencaSrc[cr] ||= []).push({ campo: key, int: a.intensidade || 0 })
+
     // cada achado com sua COMPOSIÇÃO (2 elementos: predominante + secundário),
     // cada elemento com sua emoção-núcleo — o órgão não colapsa em 1 (founder).
     const els = ['fogo', 'agua', 'terra', 'ar'].filter((e) => (t.elem[e] || 0) > 0).sort((x, y) => t.elem[y] - t.elem[x])
     const breakdown = els.slice(0, 2).map((e) => ({ e, pct: Math.round((t.elem[e] || 0) * 100), emo: (t.cargaByElem[e] || [])[0] || (t.carga[0] || '?') }))
+    // CRENÇA do achado (bloco 6): UMA por achado. Escolhida pela ANOTAÇÃO da canônica
+    // que casa com a emoção-núcleo — não pela posição. Sem anotação, cai na 1ª do campo.
+    const nucleo = (breakdown[0]?.emo || t.carga[0] || '').toLowerCase()
+    const tags = t.cargaCrencaTag || []
+    let idx = tags.findIndex((tg) => tg && tg.length > 2 && (nucleo.includes(tg) || tg.includes(nucleo.split(/[\/,(—]/)[0].trim())))
+    if (idx < 0) idx = 0
+    const cr = (t.cargaCrenca || [])[idx]
+    if (cr) (crencaSrc[cr] ||= []).push({ campo: key, int: a.intensidade || 0 })
     achadoList.push({ campo: a.campo, int: a.intensidade, breakdown, w })
   }
   // PRESERVADOS → recurso (elemento) + livre (centro)
