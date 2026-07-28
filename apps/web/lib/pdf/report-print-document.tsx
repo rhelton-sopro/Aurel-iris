@@ -414,7 +414,17 @@ function htmlDoc(title: string, bodyInner: string): string {
  * COVER — its own standalone PDF (the route renders it with zero margins and
  * NO header/footer so it bleeds and carries no running header).
  */
-export function renderCoverHtml(props: ReportPrintDocumentProps): string {
+export function renderCoverHtml(
+  props: ReportPrintDocumentProps,
+  /**
+   * Rótulo do tipo de documento. Default = o do dossiê, então a chamada de
+   * produção segue byte a byte igual. O relatório emocional passa "Mapa do Ser":
+   * a capa é a MESMA (mesma logo, mesmo nome completo, mesma data, mesma
+   * tipografia) — só o rótulo diz qual dos dois documentos é, porque chamar o
+   * emocional de "Clínico-Funcional" contradiria o enfoque não-médico dele.
+   */
+  label = 'Leitura Iridológica Clínico-Funcional',
+): string {
   const { clientName, readingDate } = props
   const date = readingDate ? formatDate(readingDate) : ''
   const cover =
@@ -422,7 +432,7 @@ export function renderCoverHtml(props: ReportPrintDocumentProps): string {
     `<img class="cover-logo" src="${IRIS_CODEX_LOGO_LIGHT_DATA_URI}" alt="Iris Codex">` +
     `<div class="cover-tagline">A íris como mapa do ser.</div>` +
     `<div class="cover-divider"></div>` +
-    `<div class="cover-label">Leitura Iridológica Clínico-Funcional</div>` +
+    `<div class="cover-label">${htmlEscape(label)}</div>` +
     `<div class="cover-name">${htmlEscape(clientName)}</div>` +
     (date ? `<div class="cover-date">${htmlEscape(date)}</div>` : '') +
     `<div class="cover-wordmark">Iris Codex</div>` +
