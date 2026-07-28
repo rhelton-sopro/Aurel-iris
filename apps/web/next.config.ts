@@ -32,17 +32,24 @@ const nextConfig: NextConfig = {
     // O relatório emocional lê a tabela-lastro, o mapa de eixos, o prompt e os dois HTML
     // de design em runtime. Mesmo pitfall do system.md — sem isto, ENOENT no 1º request.
     // A rota de geração precisa do prompt; as que RENDERIZAM precisam dos HTML de design.
-    'app/api/readings/[id]/emocional/route': [
+    // ⚠️ A CHAVE É A ROTA (URL), não o caminho do arquivo — picomatch contra o route
+    // path, tipo `/api/hello`. As chaves originais (`app/api/.../route`) nunca casaram
+    // com nada: as três entradas do emocional eram INERTES. A rota de geração só
+    // funcionava porque o tracer analisa `fs` sozinho e puxou o lab por conta própria;
+    // a página e o PDF não tiveram a mesma sorte e davam 500 no carregamento do módulo.
+    // Dois detalhes que mordem: route group `(dashboard)` NÃO aparece na URL, e `[id]`
+    // é classe de caractere no picomatch — por isso `*` no segmento dinâmico.
+    '/api/readings/*/emocional': [
       './_motor-lab/lastro/**/*.md',
       './_motor-lab/prompts/**/*.md',
       './_motor-lab/*.mjs',
     ],
-    'app/api/readings/[id]/emocional/pdf/route': [
+    '/api/readings/*/emocional/pdf': [
       './_motor-lab/lastro/**/*.md',
       './_motor-lab/relatorio-novo/*.html',
       './_motor-lab/*.mjs',
     ],
-    'app/(dashboard)/leituras/[id]/emocional/page': [
+    '/leituras/*/emocional': [
       './_motor-lab/lastro/**/*.md',
       './_motor-lab/relatorio-novo/*.html',
       './_motor-lab/*.mjs',
