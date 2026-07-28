@@ -30,7 +30,6 @@ const B6HTML = PROTO6.slice(PROTO6.indexOf('<p class="method-sub">'), PROTO6.ind
 //   nome  = nome da pessoa, para o vocativo
 export function renderHTML(md, exame, nome) {
   const MD = md
-  const name = typeof exame === 'string' ? exame : 'exame'
   const NOME = nome || 'você'
 
 // ---------- BLOCO 6 determinístico: reusa o guia de condução aprovado (proto) ----------
@@ -40,7 +39,12 @@ export function renderHTML(md, exame, nome) {
 // ---------- números do motor ----------
 const α = BASELINE_LIVRE
 const lastro = parseLastro()
-const r = calc(name, lastro)
+// `exame` vai DIRETO pro motor: o calc já aceita objeto (produção, vindo de
+// report_findings.exame_json) ou nome (lab, que lê _exame-<nome>.json). Antes daqui saía
+// um `name` derivado que virava a string literal 'exame' quando o argumento era objeto —
+// o motor então procurava _exame-exame.json e estourava ENOENT. Só quebrava em produção:
+// o lab passa string e sempre funcionou, então o refactor byte-a-byte não pegou.
+const r = calc(exame, lastro)
 const agu = (c) => Math.round(((r.centro[c].l + α) / (r.centro[c].t + r.centro[c].l + 2 * α)) * 100)
 const AG = { mente: agu('mente'), coracao: agu('coracao'), corpo: agu('corpo') }
 // "muito alta" passa a significar FORTE **E** CORROBORADA. Sem 2 achados na família, o
