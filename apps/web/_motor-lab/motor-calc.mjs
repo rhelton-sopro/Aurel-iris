@@ -209,6 +209,14 @@ const eixoDe = (emo) => EIXO_DE[normE(emo)] || null
 const DISPLAY_DE = {}
 for (const x of EIXOS) for (const [k, d] of Object.entries(x.display || {})) DISPLAY_DE[normE(k)] = d
 const displayDe = (emo) => DISPLAY_DE[normE(emo)] || null
+// "o que é" de cada carga — a linha que explica o pêndulo ao cliente
+const OQUE_CARGA = {}
+{
+  const md = fs.readFileSync(FAMILIA_MD, 'utf8')
+  const sec = md.slice(md.indexOf('O que cada carga é'))
+  for (const m of sec.matchAll(/^`([^`]+)`\s*=\s*(.+)$/gm)) OQUE_CARGA[normE(m[1])] = m[2].trim()
+}
+const oqueCargaDe = (emo) => OQUE_CARGA[normE(emo)] || null
 
 // ---------- resolve um campo do exame → chave da tabela + classe ----------
 function classify(campo) {
@@ -488,7 +496,7 @@ function fmt(r) {
 }
 
 // ---------- exports (usados pelo serialize.mjs) ----------
-export { parseLastro, calc, classify, eixoDe, familiaDe, displayDe, EIXOS, TOPO_CENTRO, GAMMA, K, BASELINE_LIVRE, DECAY, EXAM }
+export { parseLastro, calc, classify, eixoDe, familiaDe, displayDe, oqueCargaDe, EIXOS, TOPO_CENTRO, GAMMA, K, BASELINE_LIVRE, DECAY, EXAM }
 
 // ---------- CLI (só quando rodado direto: node motor-calc.mjs) ----------
 import { pathToFileURL } from 'node:url'

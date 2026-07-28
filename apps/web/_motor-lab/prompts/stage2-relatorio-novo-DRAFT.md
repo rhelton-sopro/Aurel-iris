@@ -258,6 +258,7 @@ Voz do cliente, zero iridologia.
 ```
 **Sobre os `@PENDULO`** — é você compondo cada pêndulo, um por um:
 - **Escolha entre o rótulo do eixo e as "formulações do eixo"** que vieram no bloco B daquela carga. **Força casa com força:** carga muito alta pede a formulação mais forte e mais encarnada; carga baixa, a mais discreta.
+- ⛔⛔ **COPIE A FORMULAÇÃO LETRA POR LETRA.** Não acrescente palavra, não emende explicação, não escreva frase. O campo depois de `::` é uma ESCOLHA, não uma redação — cole exatamente uma das opções que vieram no bloco B. Acrescentar "aos poucos", "sem explodir" ou qualquer complemento faz a escolha ser descartada.
 - ⛔ **Você NÃO pode inventar.** O que estiver fora do eixo é descartado automaticamente e o gráfico volta pro rótulo padrão — então inventar só faz você perder o encaixe que teria ganhado.
 - Não sabe qual escolher numa carga? **Omita o `@PENDULO` dela** — o rótulo do eixo já está certo. Melhor omitir que forçar.
 

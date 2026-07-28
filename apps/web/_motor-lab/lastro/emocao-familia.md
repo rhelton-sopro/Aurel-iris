@@ -416,6 +416,45 @@ eixos com mais precisão e manter) é **decisão do founder na frente do caso re
 
 ---
 
+### O que cada carga é (a linha do pêndulo)
+
+O rótulo diz **qual** é a carga; esta linha diz **o que ela é**, na voz do cliente. Sem ela
+o mapa mostra a saída sem nomear o que está pesando. Chave = o texto da canônica.
+⚠️ Vale a lei da concisão: sintagma curto, palavra adulta, zero gíria, zero jargão.
+
+`raiva contida` = a raiva que você segura pra dentro, pra não virar briga
+`ira` = a raiva que estoura antes de você escolher
+`irritação/irritabilidade` = aquela irritação baixa e constante, sem alvo claro
+`irritabilidade de fundo` = o fundo já vem irritado, mesmo sem nada acontecer
+`irritação que "sobe" do visceral ao mental` = a irritação sobe do corpo pra cabeça e embaça o que você pensa
+`ressentimento` = a mágoa antiga guardada, esperando ser reconhecida
+`crítica cristalizada` = a crítica virou hábito — sai antes de você pensar
+`baixa autoestima` = a sensação de não valer o bastante, por mais que entregue
+`falta de amor-próprio/auto-rejeição` = cuidar de todo mundo e sobrar pouco pra você
+`autoproteção exaurida` = o cansaço de quem vive sempre em guarda
+`desilusão/trauma localizado` = uma decepção antiga que ainda pesa quando a lembrança volta
+`dificuldade de soltar` = o apego ao que já passou — mágoa, controle, o que você não larga
+`medo de soltar` = o medo de perder o que é seu se largar o controle
+`fixação no passado — "como as coisas eram antes"` = o passado parece melhor, e o presente custa a caber
+`rigidez/intolerância` = o que é diferente do seu jeito incomoda antes de ser entendido
+`não-assimilar` = o novo demora a entrar — você resiste antes de provar
+`preocupação` = a cabeça se adianta e já vive o problema antes dele existir
+`ansiedade` = o corpo fica ligado esperando alguma coisa acontecer
+`inquietação` = ficar parado incomoda — sempre falta fazer algo
+`medo do futuro` = a sensação de que o que vem por aí pode não dar certo
+`medo estrutural de base` = um medo de fundo, de que o chão pode faltar
+`"tagarelice mental rotativa" — mente que não desliga` = a cabeça fica girando, sem conseguir parar
+`ruminação` = o mesmo pensamento voltando, sem sair do lugar
+`sobrecarga difusa` = muita coisa ao mesmo tempo, sem saber por onde começar
+`dispersão mental` = a atenção se espalha quando a tensão sobe
+`dificuldade de concentração` = a cabeça não fica no que você escolheu
+`urgência constante` = a sensação de precisar sempre fazer mais, sem poder parar
+`frustração` = a energia trava quando alguma coisa não anda
+`tensão intestino-cérebro` = o que a cabeça carrega aperta a barriga
+`tensão visceral acumulada` = a tensão foi ficando guardada no corpo, sem sair
+
+---
+
 ### Fora do pêndulo — não são emoções
 Semântica de **marcador** (`cripta`, `lacuna_estrutural`, `pigmento_amber`, `anel_interno`): dizem *"herda a emoção da área onde cai"*, não nomeiam sentimento. Ficam sem eixo, por definição.
 **🔴:** mesma família emocional da lacuna na mesma área, porém mais antiga/consolidada · carga estrutural profunda · tema de origem precoce / "vem de longe" · padrão cristalizado, difícil de mover

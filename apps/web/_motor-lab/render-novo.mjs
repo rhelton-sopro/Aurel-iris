@@ -6,7 +6,7 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { parseLastro, calc, eixoDe, displayDe, EIXOS, BASELINE_LIVRE } from './motor-calc.mjs'
 import { METODO7, CONDUCT } from './metodo7.mjs'
-import { familiaDe as famDe } from './motor-calc.mjs'
+import { familiaDe as famDe, oqueCargaDe } from './motor-calc.mjs'
 
 const name = process.argv[2] || 'self'
 const MD = readFileSync(`apps/web/_motor-lab/out/novo-${name}--sonnet-5.md`, 'utf8')
@@ -97,8 +97,12 @@ function pendData(e) {
   const anti = a ? { anti: a.principal, antiDesc: a.oque || '' } : { anti: '—', antiDesc: '' }
   // rótulo do cliente: override do eixo (`chave :: rótulo`) > dicionário curado > limpeza
   const dsp = displayDe(e)
-  if (PEND[e]) return { lab: dsp ? cap(dsp) : PEND[e][0], desc: PEND[e][1], ...anti }
-  return { lab: dsp ? cap(dsp) : short(e), desc: '', ...anti }
+  // o "o que é" vem da TABELA (vale pras 30 que aparecem), com o dicionário antigo
+  // como reserva. Antes só 13 emoções tinham explicação e o resto do mapa mostrava a
+  // saída sem dizer o que estava pesando.
+  const oq = oqueCargaDe(e)
+  if (PEND[e]) return { lab: dsp ? cap(dsp) : PEND[e][0], desc: oq || PEND[e][1], ...anti }
+  return { lab: dsp ? cap(dsp) : short(e), desc: oq || '', ...anti }
 }
 // FORÇA: mesma fonte única. O rótulo é o nome do EIXO (8ª série) e a sombra é a ponta
 // 🔴 do MESMO eixo — não mais o chute da lista SHADOW. Foi o que matou
@@ -278,7 +282,11 @@ function escolhasPendulo(body) {
     // de conteúdo com desvio de formato: tira o prefixo antes de validar, não rejeita.
     const i = escolha.indexOf(' — ')
     const limpo = i > 0 ? escolha.slice(i + 3) : escolha
-    const casa = leque.find((p) => nrm(p) === nrm(escolha) || nrm(p) === nrm(limpo))
+    // aceita igualdade OU quando a escolha CONTÉM a formulação do eixo. O modelo nunca
+    // inventou conteúdo — ele ACRESCENTA palavras (6 quedas seguidas, sempre assim).
+    // Exigir igualdade exata rejeitava acerto de conteúdo por desvio de forma.
+    const bate = (p, x) => nrm(p) === nrm(x) || (nrm(p).length > 8 && nrm(x).includes(nrm(p)))
+    const casa = leque.find((p) => bate(p, escolha) || bate(p, limpo))
     if (casa) ok[hit[0]] = casa
     else fora.push(`${alvoRaw} :: "${escolha}" → fora do eixo ${a?.eixo || '?'}`)
   }
