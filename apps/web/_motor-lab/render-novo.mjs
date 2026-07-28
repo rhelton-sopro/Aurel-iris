@@ -5,11 +5,11 @@
 // uso: node apps/web/_motor-lab/render-novo.mjs [self|daniel|miguel]
 import { readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
-// BASE relativa ao PRÓPRIO módulo — o lab roda com cwd=raiz do repo e o app Next
-// roda com cwd=apps/web. Resolver por import.meta.url faz o MESMO motor servir os
-// dois, sem cópia paralela que deriva depois.
-const LAB_DIR = path.dirname(fileURLToPath(import.meta.url))
+// BASE resolvida em RUNTIME (ver lab-dir.mjs) — NÃO usar import.meta.url: o webpack o
+// congela no caminho da máquina de build e isso dá ENOENT em produção. Aqui doía dobrado,
+// porque os readFileSync abaixo rodam no TOPO do módulo: derrubavam a página e o PDF
+// já no carregamento, antes de qualquer request chegar ao handler.
+import { LAB_DIR } from './lab-dir.mjs'
 import { parseLastro, calc, eixoDe, displayDe, EIXOS, BASELINE_LIVRE } from './motor-calc.mjs'
 import { METODO7, CONDUCT } from './metodo7.mjs'
 import { familiaDe as famDe, oqueCargaDe } from './motor-calc.mjs'

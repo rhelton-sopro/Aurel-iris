@@ -6,12 +6,9 @@
 // uso: node _motor-lab/serialize.mjs [self|daniel|miguel]
 import fs from 'node:fs'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
-// BASE relativa ao PRÓPRIO módulo — o lab roda com cwd=raiz do repo e o app
-// Next roda com cwd=apps/web. Resolver por import.meta.url faz o MESMO motor
-// servir os dois, sem cópia paralela que deriva depois.
-const LAB_DIR = path.dirname(fileURLToPath(import.meta.url))
-const REPO = path.resolve(LAB_DIR, '../../..')
+// BASE resolvida em RUNTIME (ver lab-dir.mjs) — NÃO usar import.meta.url: o webpack o
+// congela no caminho da máquina de build e isso dá ENOENT em produção.
+import { LAB_DIR, REPO } from './lab-dir.mjs'
 import { parseLastro, calc, classify, familiaDe as famDe, BASELINE_LIVRE, EXAM } from './motor-calc.mjs'
 
 const α = BASELINE_LIVRE

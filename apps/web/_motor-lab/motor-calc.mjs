@@ -5,12 +5,10 @@
 //      node _motor-lab/motor-calc.mjs self       (um só)
 import fs from 'node:fs'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
-// BASE relativa ao PRÓPRIO módulo — o lab roda com cwd=raiz do repo e o app
-// Next roda com cwd=apps/web. Resolver por import.meta.url faz o MESMO motor
-// servir os dois, sem cópia paralela que deriva depois.
-const LAB_DIR = path.dirname(fileURLToPath(import.meta.url))
-const REPO = path.resolve(LAB_DIR, '../../..')
+// BASE resolvida em RUNTIME (ver lab-dir.mjs): o MESMO motor serve o lab e o app Next,
+// sem cópia paralela que deriva depois. NÃO voltar a usar import.meta.url aqui — o
+// webpack o congela no caminho da máquina de build e isso dá ENOENT em produção.
+import { LAB_DIR, REPO } from './lab-dir.mjs'
 
 const LASTRO = path.join(LAB_DIR, 'lastro/tabela-lastro-CANONICA.md')
 const FAMILIA_MD = path.join(LAB_DIR, 'lastro/emocao-familia.md')
