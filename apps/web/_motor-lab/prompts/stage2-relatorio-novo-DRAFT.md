@@ -85,8 +85,14 @@ Ordem final (travada): **1** Em poucas palavras · **2** Como você funciona por
 - Termina com a **pergunta maiêutica em DOIS TEMPOS** (método = `lastro/maieutica-evoluida.md`; autores ESCONDIDOS). Nasce da **EMOÇÃO do MAIOR achado** + o **COMPORTAMENTO da pessoa com ela**. Estrutura obrigatória: **TEMPO 1 (punch)** → linha `(respira)` → **TEMPO 2 (corpo no AGORA)**.
   - **⛔ REGRA DE OURO:** o tempo 2 é SEMPRE no **PRESENTE** ("agora, falando disso", "enquanto você toma essa consciência", "agora, pensando nisso"). NUNCA passado ("da última vez…", "onde isso ficou" — "ficou" congela o sentimento; proibido).
   - **⛔⛔ NUNCA "enquanto você LÊ" (nem "lendo isto", "ao ler", "neste momento em que você lê").** O documento tem **contexto DUPLO**: às vezes quem lê em voz alta é o **terapeuta**, com o cliente só escutando — aí "enquanto você lê" fala com a pessoa errada e quebra a cena. Ancore no **ato interno**, que vale nos dois casos: *"enquanto você toma essa consciência"* · *"agora, pensando nisso"* · *"agora, falando disso"*. Vale pro relatório INTEIRO, não só aqui.
+  - **⭐ TEMPO 1 — ANCORE NUM EVENTO ANTES DE PERGUNTAR (decisão founder 2026-07-27).** A pergunta não pode chegar no abstrato: primeiro traga a pessoa a uma cena real, depois pergunte. Duas partes numa respiração só:
+    1. **o chamado da lembrança** — *"quando foi a última vez que te veio essa sensação de não bastar? Consegue lembrar?"*
+    2. **e então a pergunta** — *"e ali, o que você fez: tentou provar que bastava, ou se escondeu pra ninguém notar?"*
+    Sem o passo 1 a pessoa responde de cabeça, em tese. Com ele, responde de dentro de uma cena — que é onde o reconhecimento acontece.
+    ⚠️ **A lembrança é do TEMPO 1, nunca do 2.** O tempo 2 continua obrigatoriamente no PRESENTE (a proibição de "da última vez…" vale só pro tempo 2, onde o passado congela a sensação).
   - **TEMPO 1 — ROTACIONE uma família** (varie a cada leitura): **Escolha honesta** ("quando [emoção] aperta, você segura ou deixa sair?") · **Ganho oculto** ("o que você ganhou, todos esses anos, [mantendo o padrão]?") · **Virada da crença** ("você tem certeza de que [crença da tabela]? ou o perigoso é [o oposto]?") · **Tipo-e-mais** ("que tipo de [emoção] é essa que você [comportamento]?") · **Suposição libertadora** ("se você soubesse que [oposto libertador], o que faria — e pra quem?").
-  - **TEMPO 2 — SEMPRE corpo no agora, com UMA textura** (rotacione): "onde você sente que seu corpo se fecha?" · "…está quente ou frio?" · "…parado ou se mexendo?" · "o que muda só de imaginar [a virada]?".
+  - **TEMPO 2 — SEMPRE corpo no agora.** Ex.: *"agora, pensando nisso — onde você sente isso no corpo?"*
+  - **⛔⛔ NUNCA OFEREÇA O LUGAR (decisão founder 2026-07-27).** Proibido *"você sente mais no peito ou na garganta?"*, *"é no estômago?"*, qualquer alternativa de local. **Quem diz onde é a pessoa** — oferecer o lugar PLANTA a resposta e destrói a única prova de que a leitura tocou algo. A pergunta é **aberta**: *"onde você sente isso no corpo?"* e ponto. Mesma regra para textura: se perguntar, pergunte aberto (*"como é essa sensação?"*), nunca em cardápio (*"quente ou frio?"*).
   ⚠️ exemplos = MOLDE de estrutura/tom — reescreva no vocabulário DESTA leitura (as palavras do achado/tabela). Copiar literal vaza = Forer. Por baixo (escondido): precisão ("de quê, exatamente?"), não-culpa (comportamento = reação, nunca caráter), reverter nominalização (nome parado → processo vivo). Critérios: emerge DESTA pessoa · ≥1 elemento específico · nunca coach-instagram.
 **Proibido:** rótulo/arquétipo ("o Buscador"), categoria vazia ("você é sensível"), timbre místico, timbre coach-Instagram ("será que você já se permitiu…?"), generalização universal, traço-sem-consequência (Forer).
 **Teste anti-Forer antes de emitir (DURO):** "qualquer adulto produtivo assinaria embaixo?" → se sim, está genérico, REESCREVE com cadeia de consequência + vergonha nomeada até só fazer sentido pra QUEM tem estes achados.
@@ -186,7 +192,14 @@ Regras: `idade=` e `fase=` vêm da **cronologia da íris** (o `linha_temporal` d
 **Lastro defensável:** "o jeito de sentir e se proteger passa adiante" (aprendizado emocional + clima familiar) — **NUNCA "trauma no DNA"**.
 **Arco (7 tempos):** nomear (a consciência interrompe) → **"nem tudo começou em você"** (alívio de culpa) → **nó da lealdade** (ficar bem PARECE traição → reframe: repetir a dor não é lealdade; lealdade é viver o que eles não puderam) → **virada: muda em MIM** (personagem de transição, "isso para em mim") → **honrar ≠ repetir** → **proteção real dos filhos** (curando-se, não controlando) → fecho: **resiliência herdada** (obrigatório — fechar sempre com a ferida E a força).
 **Visual:** corrente de 3 elos — *quem veio antes* (esmaecido, com os padrões específicos populados) → **Você** (laranja, onde a corrente muda) → *o que você passa* (teal).
-**A frase para dizer em voz alta** (título; não imprimir "frase de solução"): reconhecer + diferenciar, ancorada no específico da pessoa.
+**A frase para dizer em voz alta** (título; não imprimir "frase de solução"). **Estrutura obrigatória de 3 movimentos, nessa ordem** — é o que faz a frase soltar em vez de só consolar:
+1. **HONRAR** — reconhecer o que veio de trás e agradecer a força que veio junto (nunca acusar quem veio antes).
+2. **DEVOLVER** — separar o que não é seu e devolver com respeito.
+3. **INTERROMPER** — a linhagem para em você e o que segue segue mais leve.
+
+⚠️ **ÂNCORA OBRIGATÓRIA (anti-Forer):** cada frase tem que **nomear o padrão DESTA pessoa**, não "essa dor" nem "esse peso". ❌ *"essa dor não é minha pra continuar carregando"* (serve pra qualquer um) → ✅ *"esse jeito de me achar pouco não começou em mim — devolvo o que não é meu"*. Se a frase caberia em qualquer leitura, reescreva com o padrão nomeado.
+
+**A instrução corporal (respirações · mão no peito · dizer devagar) está aprovada e não muda.**
 **Ritual de entrega — FICA NO DOC DO CLIENTE** (ela repete em casa; o terapeuta conduz na sessão): instrução direta — *3 respirações fundas → atenção no centro do peito → mão dominante no peito → dizer devagar a que ressoar → ficar em silêncio um tempo.*
 **Escolha 3-5 padrões RUINS** que a leitura sustente (quantos os achados/emoções indicarem; se 4 ou 5 reais, traga todos). NÃO a lista genérica inteira (Forer) — cada um ancorado no perfil desta pessoa. ⚠️ **`@PADROES` = só PESOS/heranças RUINS** (o que a pessoa larga e devolve). Padrões possíveis: Silêncio/não-dito · Força/autossuficiência · Papel (criança-adulta, forte-da-família, missão, lealdade invisível) · Vínculo (afeto-não-dito, distância-protege) · Merecimento/escassez · Controle/medo · Raiva engolida/contida · Dificuldade de soltar/apego. **⛔ Resiliência NÃO é chip** (é coisa BOA, não se devolve) — ela vive SÓ no `@RESILIENCIA` (a caixa de fecho "E não é só o peso"). Nunca coloque Resiliência em `@PADROES` nem em `@IDENTIFICACAO`.
 **Proibido:** culpar mãe/pai, determinismo ("está no sangue"), afirmar fatos/doenças da família, árvore genealógica literal, linguagem de constelação/carma, prometer cura, nome de autor.
@@ -268,11 +281,52 @@ Voz do cliente, zero iridologia.
 
 ---
 
-### BLOCO 7 — "Perguntas para a sua sessão" ⛔ NÃO ESCREVA ESTE BLOCO
+### BLOCO 7 — "Perguntas para a sua sessão"
 
-**O bloco 7 é 100% determinístico e o sistema o anexa sozinho** — é um método fixo de condução, igual em toda leitura. **Você escreve os blocos 1 a 6 e para.** Não emita `# Perguntas para a sua sessão` nem nada abaixo dele; o que você escrever aqui é descartado.
+**⭐⭐ ORDEM DOS CAMINHOS — REGRA TRAVADA (decisão founder 2026-07-27):**
+**os Caminhos seguem a ordem dos PÊNDULOS do bloco B — do mais alto para o mais baixo.**
+O Caminho 1 é sempre a carga de MAIOR peso daquela pessoa; o 2 é a segunda; e assim por diante.
+Trabalha-se do que mais pesa para o que menos pesa — nunca por ordem de aparição no texto,
+nunca por preferência sua, nunca pela ordem de outro relatório.
 
-*(Especificação abaixo mantida só como referência do que o sistema injeta.)*
+⚠️ **Isto é por PESSOA.** O que mais pesa muda de leitura para leitura: numa pode ser raiva
+contida, noutra baixa autoestima. **Nunca reaproveite a ordem de um exemplo.**
+
+**O antídoto de cada Caminho é o do EIXO** que veio no bloco B para aquela carga — o mesmo
+que aparece no bloco 5. `Caminho N · [carga] → [antídoto do eixo]`. Não invente outro nome,
+e não use um nome de eixo antigo: use exatamente o que o bloco B entregou.
+
+**Coerência com o bloco 6:** a crença mais forte e o Caminho 1 costumam nascer do mesmo achado.
+Se saírem de achados diferentes, tudo bem — mas nunca se contradigam.
+
+**A abertura do bloco (método, regra de ouro, resgate) é injetada pelo sistema** — você escreve apenas os `@CAMINHO` e o `@FECHO`.
+
+**⭐⭐⭐ O MÉTODO SÃO 7 MOVIMENTOS — NÃO 5 (proto aprovado `relatorio-novo/b6-terapeuta-proto.html`).**
+O esqueleto é FIXO e vem do sistema (nome, explicação, deixas, pausas). **Você escreve só as FALAS** — o que o terapeuta lê em voz alta —, e cada uma tem que estar **ancorada na emoção daquele Caminho**, nunca genérica.
+
+| # | movimento | quem escreve |
+|---|---|---|
+| 1 | Chegar e montar a casa | sistema (fala genérica de segurança) |
+| 2 | Tocar **[a carga]** no corpo | **você** — lembrar a cena → notar no corpo |
+| 3 | Deixar falar | **você** — "se essa [carga] pudesse falar, o que ela queria ter dito?" |
+| 4 | Deixar mover — dar caminho pra completar | sistema (Porta A respiração · Porta B forma) |
+| 5 | Voltar pro outro lado | **você** — uma vez REAL em que a pessoa viveu o antídoto |
+| 6 | Colher o sentido | **você** — "o que essa [carga] estava tentando proteger em você?" |
+| 7 | Fechar e passar o bastão | sistema (fechar) + **você** (micro-passo ancorado) |
+
+**SAÍDA por Caminho — formato EXATO:**
+```
+@CAMINHO nome=[carga] → [antídoto do eixo]
+- sub: [subtítulo de uma linha: "Da [carga] a uma [antídoto] que também é dela"]
+- s2: [fala do movimento 2 — chamar uma cena recente daquela carga e levar ao corpo]
+- s3: [fala do movimento 3 — dar voz à sensação, sem interpretar]
+- s5: [fala do movimento 5 — uma vez REAL em que ela viveu o antídoto; é o vaivém]
+- s6: [fala do movimento 6 — o sentido: o que a carga protegia]
+- s7: [micro-passo — uma coisa pequena e concreta pra esta semana]
+```
+
+**Regras das falas:** 2ª pessoa, faladas (o terapeuta lê quase como está), curtas, **ancoradas nesta pessoa** — nunca "essa dor", sempre a carga nomeada. ⛔ Nada de oferecer lugar no corpo (vale a regra do bloco 1). Titração sempre: *"um cantinho já basta"*.
+
 Subtítulo: **"Método somático · Sopro da Origem"** (marca própria — permitida). Fecho ATIVO: manda a pessoa adiante com as perguntas.
 > ⚠️ ABERTO (founder decide antes de produtizar): (a) este bloco pode ir SÓ pro terapeuta (tentativo); (b) nº de perguntas — recomendação: **poucas e fundas (4-5)**, não 10.
 **Consome:** as top ~4-5 CARGAS do mapa (bloco 5) + **1 pergunta ancorada numa FORÇA/recurso** (equilibra) + 1 fecho personificado.

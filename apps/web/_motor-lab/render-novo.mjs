@@ -5,6 +5,7 @@
 // uso: node apps/web/_motor-lab/render-novo.mjs [self|daniel|miguel]
 import { readFileSync, writeFileSync } from 'node:fs'
 import { parseLastro, calc, eixoDe, displayDe, EIXOS, BASELINE_LIVRE } from './motor-calc.mjs'
+import { METODO7, CONDUCT } from './metodo7.mjs'
 
 const name = process.argv[2] || 'self'
 const MD = readFileSync(`apps/web/_motor-lab/out/novo-${name}--sonnet-5.md`, 'utf8')
@@ -222,10 +223,15 @@ function block4(body) {
   const frBlock = (body.match(/@FRASES:([\s\S]*?)(?=\n@|\n#|$)/) || [])[1] || ''
   const frases = frBlock.split('\n').map((l) => l.replace(/^-\s*/, '').replace(/^["“]+|["”]+$/g, '').trim()).filter(Boolean)
   const chips = padroes.map((p) => `<span class="chip">${esc(p)}</span>`).join('')
-  const gen = `<div class="gen"><div class="gen-line"></div>
-    <div class="gcol pastcol"><div class="gring past">antes</div><div class="glabel">O que veio de trás</div><div class="gcontent">${chips}</div></div>
-    <div class="gcol"><div class="gring you">você</div><div class="glabel you">Em você — e só aqui muda</div><div class="gcontent"><p class="gtext">${inl(g('VOCE'))}</p></div></div>
-    <div class="gcol"><div class="gring next">depois</div><div class="glabel">Quem você liberta</div><div class="gcontent"><p class="gtext">${inl(g('DEPOIS'))}</p></div></div></div>`
+  const gen = `<div class="genfig"><div class="gen"><div class="gen-line"></div>
+    <div class="gcol pastcol"><div class="figs"><svg class="tree" viewBox="0 0 232 137" role="img"
+    aria-label="Árvore de gerações: pais, avós, bisavós e trisavós">
+    <g class="link"><path d="M11.0,14.0V24.0H25.0V14.0"/><path d="M18.0,24.0V34.0"/><path d="M39.0,14.0V24.0H53.0V14.0"/><path d="M46.0,24.0V34.0"/><path d="M67.0,14.0V24.0H81.0V14.0"/><path d="M74.0,24.0V34.0"/><path d="M95.0,14.0V24.0H109.0V14.0"/><path d="M102.0,24.0V34.0"/><path d="M123.0,14.0V24.0H137.0V14.0"/><path d="M130.0,24.0V34.0"/><path d="M151.0,14.0V24.0H165.0V14.0"/><path d="M158.0,24.0V34.0"/><path d="M179.0,14.0V24.0H193.0V14.0"/><path d="M186.0,24.0V34.0"/><path d="M207.0,14.0V24.0H221.0V14.0"/><path d="M214.0,24.0V34.0"/><path d="M18.0,49.6V59.6H46.0V49.6"/><path d="M32.0,59.6V69.6"/><path d="M74.0,49.6V59.6H102.0V49.6"/><path d="M88.0,59.6V69.6"/><path d="M130.0,49.6V59.6H158.0V49.6"/><path d="M144.0,59.6V69.6"/><path d="M186.0,49.6V59.6H214.0V49.6"/><path d="M200.0,59.6V69.6"/><path d="M32.0,89.4V99.4H88.0V89.4"/><path d="M60.0,99.4V109.4"/><path d="M144.0,89.4V99.4H200.0V89.4"/><path d="M172.0,99.4V109.4"/></g><g class="t-tri"><use href="#g-adulto" x="6.0" y="2.0" width="10" height="12.0"/><use href="#g-adulto" x="20.0" y="2.0" width="10" height="12.0"/><use href="#g-adulto" x="34.0" y="2.0" width="10" height="12.0"/><use href="#g-adulto" x="48.0" y="2.0" width="10" height="12.0"/><use href="#g-adulto" x="62.0" y="2.0" width="10" height="12.0"/><use href="#g-adulto" x="76.0" y="2.0" width="10" height="12.0"/><use href="#g-adulto" x="90.0" y="2.0" width="10" height="12.0"/><use href="#g-adulto" x="104.0" y="2.0" width="10" height="12.0"/><use href="#g-adulto" x="118.0" y="2.0" width="10" height="12.0"/><use href="#g-adulto" x="132.0" y="2.0" width="10" height="12.0"/><use href="#g-adulto" x="146.0" y="2.0" width="10" height="12.0"/><use href="#g-adulto" x="160.0" y="2.0" width="10" height="12.0"/><use href="#g-adulto" x="174.0" y="2.0" width="10" height="12.0"/><use href="#g-adulto" x="188.0" y="2.0" width="10" height="12.0"/><use href="#g-adulto" x="202.0" y="2.0" width="10" height="12.0"/><use href="#g-adulto" x="216.0" y="2.0" width="10" height="12.0"/></g><g class="t-bis"><use href="#g-adulto" x="11.5" y="34.0" width="13" height="15.6"/><use href="#g-adulto" x="39.5" y="34.0" width="13" height="15.6"/><use href="#g-adulto" x="67.5" y="34.0" width="13" height="15.6"/><use href="#g-adulto" x="95.5" y="34.0" width="13" height="15.6"/><use href="#g-adulto" x="123.5" y="34.0" width="13" height="15.6"/><use href="#g-adulto" x="151.5" y="34.0" width="13" height="15.6"/><use href="#g-adulto" x="179.5" y="34.0" width="13" height="15.6"/><use href="#g-adulto" x="207.5" y="34.0" width="13" height="15.6"/></g><g class="t-avo"><use href="#g-adulto" x="23.8" y="69.6" width="16.5" height="19.8"/><use href="#g-adulto" x="79.8" y="69.6" width="16.5" height="19.8"/><use href="#g-adulto" x="135.8" y="69.6" width="16.5" height="19.8"/><use href="#g-adulto" x="191.8" y="69.6" width="16.5" height="19.8"/></g><g class="t-pai"><use href="#g-adulto" x="49.5" y="109.4" width="21" height="25.2"/><use href="#g-adulto" x="161.5" y="109.4" width="21" height="25.2"/></g></svg></div><div class="glabel">O que veio de trás</div><div class="gcontent">${chips}</div></div>
+    <div class="gcol"><div class="figs"><div class="tier t-you"><div class="you-wrap"><svg class="fg " width="30" height="36.0" viewBox="0 0 20 24"><use href="#g-adulto"/></svg></div></div></div><div class="glabel you">Em você — e só aqui muda</div><div class="gcontent"><p class="gtext">${inl(g('VOCE'))}</p></div></div>
+    <div class="gcol"><div class="figs"><svg class="tree tree-dep" viewBox="0 0 232 42" role="img"
+    aria-label="Quem vem depois: duas crianças descendo de você">
+    <g class="link"><path d="M88,14V6H144V14"/><path d="M116,6V1"/></g>
+    <g class="t-dep"><use href="#g-crianca" x="77.0" y="14" width="22" height="26.4" class=""/><use href="#g-crianca" x="133.0" y="14" width="22" height="26.4" class="far"/></g></svg></div><div class="glabel">Quem você liberta</div><div class="gcontent"><p class="gtext">${inl(g('DEPOIS'))}</p></div></div></div></div>`
   const idlist = idrows.length ? `<p class="subhead">De quem isso pode ter vindo?</p><p class="idintro">Antes de soltar, olhe pra trás. Para cada padrão, veja se reconhece alguém:</p><div class="idlist">${idrows.map((x) => `<div class="idrow"><span class="idpat">${esc(x.pat)}</span><p class="idq">${inl(x.q)}</p></div>`).join('')}</div>` : ''
   const saybox = frases.length ? `<p class="subhead" style="color:var(--teal-deep)">Uma frase para dizer em voz alta</p><div class="saybox"><p class="sayintro">Uma frase muda mais quando o corpo entra antes da fala. Antes de dizer, se dê um instante:</p><ol class="rsteps"><li>Faça <b>três respirações fundas</b>, bem devagar.</li><li>Leve a <b>atenção ao centro do peito</b>.</li><li>Apoie a <b>mão dominante</b> ali, sobre o peito.</li></ol><p class="rsay">Então, lentamente, diga — a que ressoar com você:</p>${frases.map((f) => `<p class="sayline">&ldquo;${esc(f)}&rdquo;</p>`).join('')}<p class="rnote">Na sessão, o seu terapeuta conduz esse momento. Em casa, você pode repetir do seu jeito — sempre sem pressa.</p></div>` : ''
   return `<p class="lead">${inl(g('LEAD'))}</p>${gen}
@@ -309,14 +315,61 @@ function block5(body) {
 function block6(body) {
   const f = fields(body)
   const linhas = (r.crencaList || []).map((c) => {
-    const pct = c.forca * 25 // 4 degraus: fraca 25 · média 50 · forte 75 · muito forte 100
-    return `<div class="cren"><div class="cren-h"><span class="cren-txt">${esc(c.texto)}</span><span class="cren-lv f${c.forca}">${esc(c.nivel)}${c.corroborada ? '<i class="cren-corr" title="aparece em mais de um achado">⊕</i>' : ''}</span></div><div class="cren-track"><i class="cren-fill f${c.forca}" style="width:${pct}%"></i></div></div>`
+    // 4 degraus REAIS. A força vai de 1 a 5 (fraca ocupa 1 e 2), então multiplicar por
+    // 25 dava 125% na banda mais alta — estourava e ficava igual a "forte" na tela.
+    const pct = { 1: 22, 2: 22, 3: 48, 4: 74, 5: 100 }[c.forca] || 22
+    return `<div class="cren"><div class="cren-h"><span class="cren-txt">${esc(c.texto)}</span><span class="cren-lv f${c.forca}">${esc(c.nivel)}${c.corroborada ? '<i class="cren-corr" title="aparece em mais de um achado">⊕</i>' : ''}</span></div><div class="cren-track"><i class="cren-fill f${c.forca}" style="width:${pct}%"></i><i class="cren-dot f${c.forca}" style="left:${pct}%"></i></div></div>`
   }).join('')
   return `${f.LEAD ? `<p class="lead">${inl(f.LEAD)}</p>` : ''}
     <div class="crenlist">${linhas}</div>
     ${f.FECHO ? `<p class="deep">${inl(f.FECHO)}</p>` : ''}`
 }
-function block7() { return B6HTML }
+// BLOCO 7 — os 7 MOVIMENTOS do método (proto aprovado). O ESQUELETO é fixo e vem de
+// metodo7.mjs; as FALAS ancoradas (movimentos 2, 3, 5, 6 e o micro-passo do 7) vêm do
+// Sonnet. O método é igual pra todo mundo; a fala é da pessoa. Isso existia aprovado
+// desde 21/07 num HTML e nunca tinha sido ligado — o bloco saía com 5 tempos rasos.
+function block7(body) {
+  const out = [B6HTML.slice(0, B6HTML.indexOf('<div class="qsec"'))]
+  const g1 = (k) => { const m = body.match(new RegExp(`^@${k}:[ \\t]*(.*)`, 'm')); return m ? m[1].trim() : '' }
+  const blocos = body.split(/^@CAMINHO /m).slice(1)
+  blocos.forEach((c, ci) => {
+    const cab = c.split('\n')[0]
+    const nome = (cab.match(/nome=(.*)/) || [])[1]?.trim() || ''
+    const [cargaTxt, antiTxt] = nome.split('→').map((x) => (x || '').trim())
+    const campo = (k) => (c.match(new RegExp(`^- ${k}:\\s*([\\s\\S]*?)(?=\\n- |\\n@|$)`, 'm')) || [])[1]?.trim() || ''
+    const T = (t) => (t || '').replaceAll('{CARGA}', (cargaTxt || '').toLowerCase()).replaceAll('{ANTI}', (antiTxt || '').toLowerCase())
+    const sub = campo('sub')
+    const steps = METODO7.map((m) => {
+      const falas = []
+      if (m.fixo && m.fixo.length) {
+        m.fixo.forEach((f, k) => {
+          const lab = m.labs[k] ? `<p class="say-lab">${esc(m.labs[k])}</p>` : ''
+          falas.push(`<div class="say">${lab}${T(f)}</div>`)
+        })
+      }
+      const slot = m.slot || m.slot7
+      if (slot) {
+        const v = campo(slot)
+        if (v) {
+          const lab = m.n === 7 ? '<p class="say-lab">Micro-passo</p>' : ''
+          falas.push(`<div class="say">${lab}<p>${inl(v)}</p></div>`)
+        }
+      }
+      if (!falas.length) return ''
+      return `<div class="step ${m.cls}"><span class="n">${m.n}</span><p class="st-name">${esc(T(m.nome))}</p>`
+        + `<p class="exp">${T(m.exp)}</p>${falas.join('')}`
+        + (m.cue ? `<p class="cue">${T(m.cue)}</p>` : '') + '</div>'
+    }).join('')
+    // mini-pêndulo do cabeçalho + nota de manejo só no Caminho de MAIOR carga
+    const head = `<div class="qhead"><p class="q-eyebrow"><span class="pn">Caminho ${ci + 1} · </span>`
+      + `<span class="carga">${esc(cargaTxt)}</span> <span class="arw">→</span> <span class="anti">${esc(antiTxt)}</span></p>`
+      + (sub ? `<p class="qtitle">${inl(sub)}</p>` : '') + '</div>'
+    const nota = ci === 0 && CONDUCT ? `<div class="conduct"><span class="conduct-lab">⚠ Carga alta</span>${CONDUCT.replace(/^⚠ Carga alta/, '')}</div>` : ''
+    out.push(`<div class="qsec">${head}${steps}${nota}</div>`)
+  })
+  const fecho = g1('FECHO'); if (fecho) out.push(`<p class="qfecho">${inl(fecho)}</p>`)
+  return out.join('\n')
+}
 
 // ---------- monta ----------
 const NUMS = ['1', '2', '3', '4', '5', '6', '7']
@@ -328,7 +381,7 @@ const sections = blocks.map((b, i) => {
   const h2 = (i === 0 || i === 6) ? '' : `<h2 class="display">${esc(H2[i] || title)}</h2>`
   let inner
   try {
-    inner = i === 0 ? block1(body) : i === 1 ? block2(body) : i === 2 ? block3(body) : i === 3 ? block4(body) : i === 4 ? block5(body) : block6(body)
+    inner = i === 0 ? block1(body) : i === 1 ? block2(body) : i === 2 ? block3(body) : i === 3 ? block4(body) : i === 4 ? block5(body) : i === 5 ? block6(body) : block7(body)
   } catch (e) { inner = prose(body) + `<!-- render fallback: ${e.message} -->` }
   return `<section class="block" id="b${i + 1}">${eyebrow}${h2}${inner}</section>`
 })
@@ -340,8 +393,7 @@ const toc = `<nav class="toc"><p class="toc-lab">O que vem a seguir</p>${
 // bloco 7 (guia de condução) é método fixo — o render ANEXA, o Sonnet não escreve.
 // Assim não depende de quantos blocos vieram do markdown e o modelo para de gastar
 // token num bloco que era descartado de qualquer jeito.
-const b7 = `<section class="block" id="b7"><p class="eyebrow"><span class="secnum">7</span> &nbsp;${esc(H2[6])}</p>${block7()}</section>`
-const sectionsHtml = [sections[0] + toc, ...sections.slice(1), b7].join('\n<hr class="div">\n')
+const sectionsHtml = [sections[0] + toc, ...sections.slice(1)].join('\n<hr class="div">\n')
 
 // FECHO — nome, data e natureza do documento. Um doc "pra guardar" não pode terminar
 // numa instrução de manejo; precisa fechar como peça.
@@ -363,6 +415,60 @@ const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><met
 .respira{text-align:center;font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint,#a99);margin:2px 0 6px}
 .pend-desc{font-size:13px;line-height:1.5;color:var(--ink-soft,#6b6357);margin:5px 0 2px} .pend-desc b{color:#a35a1c;font-weight:600} .pend-desc b.anti{color:#2f7a54} .pend{margin-bottom:14px}
 .maieutica + .maieutica{margin-top:2px}
+/* ===== faixa .gen com pictogramas — escopo .genfig ===== */
+.genfig{--h:158px;margin:38px 0 26px;}
+/* start = as três áreas de figura têm a MESMA altura, então os pés alinham sozinhos */
+.genfig .gen{margin:0;align-items:start;}
+/* a linha vira CHÃO: todo mundo pisa no mesmo tempo */
+.genfig .gen-line{top:var(--h);bottom:auto;}
+.genfig .gcol{padding:0 8px;}
+/* padding-bottom = ar entre os pés e a linha · margin-bottom = ar entre a linha e o rótulo */
+.genfig .figs{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  gap:6px;height:var(--h);padding-bottom:15px;margin-bottom:27px;}
+.genfig .tier{display:flex;align-items:flex-end;justify-content:center;}
+.genfig .fg{display:block;fill:currentColor;}
+
+/* a árvore é UM svg: só assim o ponto médio é exato e as ligações saem retas */
+.genfig .tree{display:block;width:100%;max-width:232px;height:auto;margin:0 auto;}
+.genfig .tree g[class^="t-"]{fill:currentColor;}
+.genfig .link{fill:none;stroke:var(--line-strong);stroke-width:.8;opacity:.5;}
+.genfig .tree-dep{max-width:232px;}
+.genfig .t-dep .far{opacity:.42;}
+
+/* profundidade geracional: quanto mais longe, menor e mais claro (4 degraus) */
+.genfig .t-tri{color:var(--ink-faint);opacity:.40;gap:3px;}
+.genfig .t-bis{color:var(--ink-faint);opacity:.58;gap:5px;}
+.genfig .t-avo{color:var(--ink-faint);opacity:.80;gap:7px;}
+/* com todas as fileiras na mesma largura, a profundidade passa a depender SÓ de
+   tamanho+tinta — por isso os pais escurecem até --ink (o degrau mais próximo). */
+.genfig .t-pai{color:var(--ink);gap:10px;}
+
+/* VOCÊ — uma só, mas a de maior contraste: peso por CONTRASTE, não por contagem */
+.genfig .you-wrap{display:grid;place-items:center;width:62px;height:62px;border-radius:50%;
+  background:color-mix(in srgb,var(--amber) 13%,var(--paper));
+  box-shadow:0 0 0 5px color-mix(in srgb,var(--amber) 11%,transparent);}
+.genfig .t-you{color:var(--amber);}
+
+/* DEPOIS — criança, e uma segunda menor atrás: "gerações", não uma pessoa */
+.genfig .t-dep{color:var(--teal);gap:8px;align-items:flex-end;}
+.genfig .t-dep .far{color:var(--teal);opacity:.42;}
+
+.genfig .glabel{margin-top:0;}
+.genfig .tier-lab{font-size:9px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;
+  color:var(--ink-faint);opacity:.75;margin-bottom:3px;text-align:center;}
+
+
+
+/* 700px (e não 560): abaixo disso a coluna fica menor que a fileira de 16 e ela estouraria.
+   A .gen do documento só quebra em 560, então aqui a faixa entra em modo empilhado antes. */
+@media(max-width:700px){
+  .genfig .gen{grid-template-columns:1fr;gap:26px;}
+  .genfig .figs{height:auto;padding-bottom:0;margin-bottom:12px;align-items:flex-start;}
+  .genfig .gen-line{display:none;}
+  .genfig .gcol{text-align:left;padding:0;}
+  .genfig .tier{justify-content:flex-start;flex-wrap:wrap;}
+}
+  color:var(--teal-deep);margin:0 0 4px;}
 /* --- bloco 6 · crenças (régua ABSOLUTA, discreta) --- */
 .crenlist{margin:20px 0 22px}
 .cren{margin:0 0 17px}
@@ -372,8 +478,11 @@ const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><met
 .cren-corr{font-style:normal;margin-left:5px;color:var(--amber);cursor:help}
 .cren-track{position:relative;height:3px;border-radius:2px;background:rgba(0,0,0,.07);overflow:hidden}
 .cren-fill{position:absolute;left:0;top:0;height:100%;border-radius:2px;background:var(--amber);opacity:.45}
-.cren-fill.f3{opacity:.65} .cren-fill.f4{opacity:.85}
-.cren-lv.f4{color:var(--amber)}
+.cren-fill.f3{opacity:.6} .cren-fill.f4{opacity:.75} .cren-fill.f5{opacity:.9}
+.cren-dot{position:absolute;top:50%;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;background:var(--amber);opacity:.5;box-shadow:0 0 0 2px var(--paper)}
+.cren-dot.f3{opacity:.7} .cren-dot.f4{opacity:.85} .cren-dot.f5{opacity:1}
+.cren-track{overflow:visible}
+.cren-lv.f5{color:var(--amber)}
 /* --- ajustes do founder (2026-07-27) --- */
 /* o âmbar da tarja de seção estava pequeno demais pro peso que a marca tem */
 /* título de seção em PRETO (decisão founder 2026-07-27): tira o âmbar do rótulo, que
@@ -415,6 +524,12 @@ ${B6CSS}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 </style></head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="g-adulto" viewBox="0 0 20 24"><circle cx="10" cy="5.6" r="4.6"/>
+    <path d="M1.6 24v-5.4C1.6 13.9 5.4 11 10 11s8.4 2.9 8.4 7.6V24Z"/></symbol>
+  <symbol id="g-crianca" viewBox="0 0 20 24"><circle cx="10" cy="7.4" r="5.4"/>
+    <path d="M3.6 24v-3.6c0-3.5 2.7-5.6 6.4-5.6s6.4 2.1 6.4 5.6V24Z"/></symbol>
+</defs></svg>
 <div class="sheet"><div class="pad">
   <div class="brand">IRIS CODEX</div>
   <div class="brand-sub">Mapa do Ser · ${NOME}</div>
