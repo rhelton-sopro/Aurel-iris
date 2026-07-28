@@ -5,11 +5,11 @@
 //   C = LEQUE (emoções + crenças por área — o LLM seleciona, nunca inventa fora)
 // uso: node _motor-lab/serialize.mjs [self|daniel|miguel]
 import fs from 'node:fs'
-import { parseLastro, calc, classify, BASELINE_LIVRE, EXAM } from './motor-calc.mjs'
+import { parseLastro, calc, classify, familiaDe as famDe, BASELINE_LIVRE, EXAM } from './motor-calc.mjs'
 
 const α = BASELINE_LIVRE
 const agulhaDe = (t, l) => Math.round(((l + α) / (t + l + 2 * α)) * 100)
-const nivel = (s) => (s >= 6 ? 'muito alta' : s >= 4 ? 'alta' : s >= 2.5 ? 'média' : 'baixa')
+const nivel = (s, conv = true) => (s >= 6 && conv ? 'muito alta' : s >= 4 ? 'alta' : s >= 2.5 ? 'média' : 'baixa')
 const pende = (a) => (a < 40 ? 'mais tensão' : a <= 60 ? 'meio a meio' : 'mais livre')
 
 // rótulo de cada lado do centro (o que o gráfico DIZ) — SPEC bloco 2
@@ -67,7 +67,18 @@ function serialize(name) {
 
   // régua bipolar −50 (carregado) ⟷ 0 ⟷ +50 (livre) CONTÍNUA — cada emoção seu número
   const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v))
-  const bipC = (s) => clamp(Math.round(-7.5 * s), -48, -6)
+  // ESCALA SATURANTE (calibração 2026-07-27, medida em 49 scores de 6 exames).
+// A linear com trava tinha dois defeitos: CRAVAVA em cima (o Daniel, 8.81, ficava
+// idêntico a um hipotético 15) e ACHATAVA embaixo (tudo abaixo de 1.1 virava -6, então
+// 0.10 e 0.46 desenhavam igual). A curva nunca crava e nunca achata: sempre sobra
+// régua pra quem vier mais forte, e o fundo continua distinguindo.
+//   posição = -(6 + 42 · (1 - e^(-s/5.5)))     8.81 → -39.5 · 2.76 → -22.6 · 0.10 → -6.8
+const bipCarga = (s) => -(6 + 42 * (1 - Math.exp(-s / 5.5)))
+// O EXTREMO exige CONVERGÊNCIA (2+ achados na mesma família — metodologia C do founder):
+// sem ela o fator satura em 0.70, ou seja, a agulha não passa de ~70% da régua. Um elo
+// de fonte única não pode desenhar como conclusão fechada.
+const bipC2 = (s, conv) => (conv ? bipCarga(s) : -(6 + 42 * Math.min(1 - Math.exp(-s / 5.5), 0.70)))
+const bipC = bipCarga
   const bipR = (s) => clamp(Math.round(9 * s + 12), 24, 48)
   L.push('## Mapa emocional (escala −50 carregado ⟷ 0 ⟷ +50 livre — todo achado ruim representado)')
   L.push('**O que pesa hoje (cargas) — cada uma com o SEU lado-antídoto (o outro polo do mesmo pêndulo):**')
@@ -78,7 +89,8 @@ function serialize(name) {
       const formul = a.pool.slice(0, 3)
       anti = ` ⟷ 🟢 **${a.principal}**${a.oque ? ` (${a.oque})` : ''}${formul.length ? ` _[formulações do eixo: ${formul.join(' · ')}]_` : ''}`
     }
-    L.push(`- ${emo} — ${nivel(s)} (${bipC(s)})${anti}`)
+    const conv = (r.famN?.[famDe(emo)] || 1) >= 2
+    L.push(`- ${emo} — ${nivel(s, conv)} (${Math.round(bipC2(s, conv))})${conv ? ' ⊕ corroborada' : ''}${anti}`)
   }
   L.push('> ⚠️ O 🟢 acima é o **antídoto** = a DIREÇÃO de saída daquela carga, não uma força que a pessoa já tem. Use-o pra mostrar a saída ("o outro lado disso é…"), **nunca** pra afirmar que ela já está assim. O que ela JÁ tem livre é só a lista abaixo.')
   L.push('> **O nome em negrito é o termo do EIXO — já está em 8ª série, use-o.** As "formulações do eixo" são variações da MESMA saída: escolha a que encaixa nesta pessoa, e quanto mais forte a carga, mais forte a formulação. NÃO invente antídoto fora do eixo.')

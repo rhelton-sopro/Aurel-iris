@@ -6,6 +6,7 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { parseLastro, calc, eixoDe, displayDe, EIXOS, BASELINE_LIVRE } from './motor-calc.mjs'
 import { METODO7, CONDUCT } from './metodo7.mjs'
+import { familiaDe as famDe } from './motor-calc.mjs'
 
 const name = process.argv[2] || 'self'
 const MD = readFileSync(`apps/web/_motor-lab/out/novo-${name}--sonnet-5.md`, 'utf8')
@@ -27,14 +28,30 @@ const lastro = parseLastro()
 const r = calc(name, lastro)
 const agu = (c) => Math.round(((r.centro[c].l + α) / (r.centro[c].t + r.centro[c].l + 2 * α)) * 100)
 const AG = { mente: agu('mente'), coracao: agu('coracao'), corpo: agu('corpo') }
-const nivel = (s) => (s >= 6 ? 'muito alta' : s >= 4 ? 'alta' : s >= 2.5 ? 'média' : 'baixa')
+// "muito alta" passa a significar FORTE **E** CORROBORADA. Sem 2 achados na família, o
+// teto é "alta" — porque um elo de autor único não pode desenhar como conclusão fechada.
+const convDe = (e) => (r.famN?.[famDe(e)] || 1) >= 2
+const nivel = (s, e) => {
+  const top = e === undefined || convDe(e)
+  return s >= 6 && top ? 'muito alta' : s >= 4 ? 'alta' : s >= 2.5 ? 'média' : 'baixa'
+}
 // régua BIPOLAR −50 (totalmente carregado) ⟷ 0 (neutro) ⟷ +50 (antídoto/livre),
 // mesmo modelo dos 3 centros. carga = negativo · recurso = positivo. track% = 50 + bip.
 // CONTÍNUA (não bucketizada): cada emoção tem seu número; só empata quem é igual de verdade.
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v))
-const bipCarga = (s) => clamp(Math.round(-7.5 * s), -48, -6)
+// ESCALA SATURANTE (calibração 2026-07-27, medida em 49 scores de 6 exames).
+// A linear com trava tinha dois defeitos: CRAVAVA em cima (o Daniel, 8.81, ficava
+// idêntico a um hipotético 15) e ACHATAVA embaixo (tudo abaixo de 1.1 virava -6, então
+// 0.10 e 0.46 desenhavam igual). A curva nunca crava e nunca achata: sempre sobra
+// régua pra quem vier mais forte, e o fundo continua distinguindo.
+//   posição = -(6 + 42 · (1 - e^(-s/5.5)))     8.81 → -39.5 · 2.76 → -22.6 · 0.10 → -6.8
+const bipCarga = (s) => -(6 + 42 * (1 - Math.exp(-s / 5.5)))
+// O EXTREMO exige CONVERGÊNCIA (2+ achados na mesma família — metodologia C do founder):
+// sem ela o fator satura em 0.70, ou seja, a agulha não passa de ~70% da régua. Um elo
+// de fonte única não pode desenhar como conclusão fechada.
+const bipC2 = (s, conv) => (conv ? bipCarga(s) : -(6 + 42 * Math.min(1 - Math.exp(-s / 5.5), 0.70)))
 const bipRecurso = (s) => clamp(Math.round(9 * s + 12), 24, 48)
-const leftCarga = (s) => 50 + bipCarga(s)
+const leftCarga = (s, e) => 50 + bipC2(s, e === undefined || convDe(e))
 // PÊNDULO por emoção de carga: [rótulo limpo, o-que-é (carga), antídoto, o-que-é (antídoto)]
 const PEND = {
   'raiva contida': ['Raiva contida', 'a raiva que você segura pra dentro, pra não virar briga', 'Serenidade', 'sentir e deixar passar, sem explodir'],
@@ -286,7 +303,7 @@ function block5(body) {
     // sem descrição curada, o antídoto entra sozinho como "A saída" (não fica linha vazia)
     if (p.antiDesc) bits.push(p.antiEixo ? `<b class="anti">A saída</b>: ${esc(p.antiDesc)}` : `<b class="anti">${esc(p.anti)}</b>: ${esc(p.antiDesc)}`)
     const desc = bits.length ? `<p class="pend-desc">${bits.join(' &nbsp;·&nbsp; ')}</p>` : ''
-    return `<div class="pend"><div class="pend-labels"><span class="pl-carga">${esc(p.lab)} <span class="lv">${nivel(s)}</span></span><span class="pl-anti">${esc(p.anti)}</span></div><div class="pend-track"><i class="needle" style="left:${leftCarga(s)}%"></i></div>${desc}</div>`
+    return `<div class="pend"><div class="pend-labels"><span class="pl-carga">${esc(p.lab)} <span class="lv">${nivel(s, e)}</span></span><span class="pl-anti">${esc(p.anti)}</span></div><div class="pend-track"><i class="needle" style="left:${leftCarga(s, e)}%"></i></div>${desc}</div>`
   }).join('')
   // DEDUPE por EIXO: duas entradas distintas da canônica podem cair no mesmo eixo e,
   // desde que o rótulo passou a vir do eixo, imprimiam a MESMA linha duas vezes
@@ -352,9 +369,12 @@ function block7(body) {
         const v = campo(slot)
         if (v) {
           const lab = m.n === 7 ? '<p class="say-lab">Micro-passo</p>' : ''
-          // a deixa do proto entra DEPOIS da fala — é onde o terapeuta espera
-          const pau = m.pausa && m.n !== 7 ? `<p class="pause">${esc(m.pausa)}</p>` : ''
-          falas.push(`<div class="say">${lab}<p>${inl(v)}</p>${pau}</div>`)
+          // depois da fala ancorada vem a CONTINUAÇÃO FIXA do método (varredura no
+          // corpo, dar forma/submodalidades, "tem mais alguma coisa junto?") com as
+          // deixas entre elas — sem isso o movimento saía pela metade.
+          const cont = (m.depois || []).map((d) => d.pausa
+            ? `<p class="pause">${esc(d.t)}</p>` : `<p>${T(d.t)}</p>`).join('')
+          falas.push(`<div class="say">${lab}<p>${inl(v)}</p>${cont}</div>`)
         }
       }
       if (!falas.length) return ''

@@ -227,6 +227,7 @@ function calc(name, lastro) {
   const elem = { carga: { fogo: 0, agua: 0, terra: 0, ar: 0 }, recurso: { fogo: 0, agua: 0, terra: 0, ar: 0 } }
   const centro = { mente: { t: 0, l: 0 }, coracao: { t: 0, l: 0 }, corpo: { t: 0, l: 0 } }
   const emoCarga = {}, emoRecurso = {} // (B) mapa emocional — acumula score por emoção
+  const emoCampos = {} // emoção → campos DISTINTOS que a emitiram (convergência)
   const crencaSrc = {} // crença → achados que a emitiram (CORROBORAÇÃO)
   const antiSrc = {} // emoção de carga → de onde puxar o 🟢 (campo de MAIOR peso que a emitiu)
   const achadoList = [] // TODOS os achados evidenciados (decisão founder: nada de colapsar em 1)
@@ -265,6 +266,7 @@ function calc(name, lastro) {
     for (const c of cs) centro[c].t += cw
     t.carga.forEach((e, i) => {
       emoCarga[e] = (emoCarga[e] || 0) + w * Math.pow(DECAY, i) // (B) leque de carga com decaimento por rank
+      ;(emoCampos[e] ||= new Set()).add(key) // quantos campos INDEPENDENTES apontam pra cá
       // ANTÍDOTO (decisão founder 2026-07-26): toda emoção de carga puxa o 🟢 DO MESMO
       // CAMPO. Antes o polo 🟢 só existia se o campo estivesse em sistemas_preservados —
       // por isso preocupação/rigidez/inquietação saíam MANCAS (o campo é só carga).
@@ -413,7 +415,15 @@ function calc(name, lastro) {
   mapaCarga.sort((a, b) => b[1] - a[1])
   const mapaRecurso = top(emoRecurso, 5)
   achadoList.sort((a, b) => b.w - a.w)
-  return { name, elem, centro, pres, mapaCarga, mapaRecurso, antidoto, colisoes, crencaList, achadoList, famScore, domFam, skipped, adjuvantes, nAch: achados.length, nPres: preservados.length }
+  return { name, elem, centro, pres, mapaCarga, mapaRecurso, antidoto, colisoes, crencaList,
+    // nº de campos distintos por emoção — o EXTREMO da régua se ganha por CONVERGÊNCIA
+    // (metodologia C do founder), não por um único achado forte. Sem isto, um I5 de
+    // fonte única desenha igual a um I4 confirmado por três órgãos.
+    nCampos: Object.fromEntries(Object.entries(emoCampos).map(([e, s2]) => [e, s2.size])),
+    // achados distintos por FAMÍLIA. É o critério de convergência que vale: a mesma
+    // emoção vinda de 2 órgãos quase nunca acontece, mas a mesma FAMÍLIA vinda de 2
+    // acontece e é o que a metodologia C chama de "a família que repete".
+    famN: Object.fromEntries(Object.entries(famMembers).map(([f, ms]) => [f, ms.length])), achadoList, famScore, domFam, skipped, adjuvantes, nAch: achados.length, nPres: preservados.length }
 }
 
 function fmt(r) {
@@ -478,7 +488,7 @@ function fmt(r) {
 }
 
 // ---------- exports (usados pelo serialize.mjs) ----------
-export { parseLastro, calc, classify, eixoDe, displayDe, EIXOS, TOPO_CENTRO, GAMMA, K, BASELINE_LIVRE, DECAY, EXAM }
+export { parseLastro, calc, classify, eixoDe, familiaDe, displayDe, EIXOS, TOPO_CENTRO, GAMMA, K, BASELINE_LIVRE, DECAY, EXAM }
 
 // ---------- CLI (só quando rodado direto: node motor-calc.mjs) ----------
 import { pathToFileURL } from 'node:url'
