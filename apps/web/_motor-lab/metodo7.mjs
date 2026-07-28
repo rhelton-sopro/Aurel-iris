@@ -12,6 +12,7 @@ export const METODO7 = [
   "labs": [],
   "pausa": "— respira —",
   "slot": null,
+  "depois": [],
   "fixo": [
    "<p>\"Antes de começar, quero te dizer uma coisa: aqui você não precisa acertar nada, nem chegar a lugar nenhum. É só um tempo seu, com você. Sente os pés no chão, as costas apoiadas, e olha devagar pro lugar onde você está — você está aqui, agora, e aqui é seguro.\"</p><p class=\"pause\">— respira —</p><p>\"Antes da gente olhar o que pesa, acha um lugar dentro de você que está mais tranquilo — uma parte do corpo em paz, uma lembrança boa, ou a sua própria firmeza. Deixa ele por perto: é pra cá que a gente volta.\"</p><p class=\"pause\">— pausa —</p><p>\"Agora coloca a mão no centro do peito e respira ali um instante, deixando essa sensação boa crescer um pouco. Essa é a sua âncora: toda vez que a sua mão voltar pro peito, esse lugar seguro volta junto.\"</p>"
   ],
@@ -26,6 +27,24 @@ export const METODO7 = [
   "labs": [],
   "pausa": "— deixe ela contar a cena —",
   "slot": "s2",
+  "depois": [
+   {
+    "pausa": true,
+    "t": "— deixe ela contar a cena —"
+   },
+   {
+    "pausa": false,
+    "t": "\"Enquanto lembra dessa cena, tem alguma parte do corpo que te chama a atenção? Um aperto, um arrepio, alguma sensação?\""
+   },
+   {
+    "pausa": true,
+    "t": "— dê tempo —"
+   },
+   {
+    "pausa": false,
+    "t": "\"E essa sensação, se tivesse um jeito — peso, temperatura, tamanho — qual seria?\""
+   }
+  ],
   "fixo": null,
   "slot7": null
  },
@@ -38,6 +57,16 @@ export const METODO7 = [
   "labs": [],
   "pausa": "— espere —",
   "slot": "s3",
+  "depois": [
+   {
+    "pausa": true,
+    "t": "— espere —"
+   },
+   {
+    "pausa": false,
+    "t": "\"Tem mais alguma coisa junto?\""
+   }
+  ],
   "fixo": null,
   "slot7": null
  },
@@ -53,6 +82,7 @@ export const METODO7 = [
   ],
   "pausa": "",
   "slot": null,
+  "depois": [],
   "fixo": [
    "<span class=\"say-lab\">Porta A — a respiração que move</span><p>\"Leva a respiração até onde a {CARGA} mora. A cada vez que solta o ar, abre um espaço ali, e deixa ela se mover do jeito que precisar — subir, escorrer, sair. Se vier um tremor, um suspiro, um calor, deixa passar.\"</p>",
    "<span class=\"say-lab\">Porta B — a forma que se desfaz</span><p>\"Fica olhando a forma dela — o peso, a cor, a temperatura. Sem forçar, vê ela ir mudando, afrouxando, até começar a se desfazer.\"</p>"
@@ -68,6 +98,24 @@ export const METODO7 = [
   "labs": [],
   "pausa": "— espere —",
   "slot": "s5",
+  "depois": [
+   {
+    "pausa": true,
+    "t": "— espere —"
+   },
+   {
+    "pausa": false,
+    "t": "\"Que jeito tem essa firmeza — é quente, tem um peso bom, uma cor? Que tamanho?\""
+   },
+   {
+    "pausa": true,
+    "t": "— dê forma —"
+   },
+   {
+    "pausa": false,
+    "t": "\"Repara se ela fica perto daquele lugar seguro do começo. Coloca a mão no peito e deixa os dois se juntarem.\""
+   }
+  ],
   "fixo": null,
   "slot7": null
  },
@@ -80,6 +128,7 @@ export const METODO7 = [
   "labs": [],
   "pausa": "",
   "slot": "s6",
+  "depois": [],
   "fixo": null,
   "slot7": null
  },
@@ -95,6 +144,7 @@ export const METODO7 = [
   ],
   "pausa": "",
   "slot": null,
+  "depois": [],
   "fixo": [
    "<span class=\"say-lab\">Fechar</span><p>\"Vamos voltar por inteiro. Sente os pés, o corpo apoiado, o ar entrando. Olha o lugar de novo. Repara em como você está agora, comparado a quando começamos.\"</p>",
    "<span class=\"say-lab\">Micro-passo</span><p>\"Tem uma coisa pequena, hoje, que você anda engolindo e que já poderia dizer — com calma, no tamanho certo? Leva isso pra nossa sessão.\"</p>"
