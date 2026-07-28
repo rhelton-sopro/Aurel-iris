@@ -10,6 +10,7 @@ export const METODO7 = [
   "exp": "Antes de tocar o que pesa: criar segurança, chão no corpo, e um <b>lugar seguro pra onde voltar</b> (o recurso) — <b>ancorado com um gesto</b> (a mão no peito) pra reativá-lo depois. É a rede de proteção de tudo o que vem depois.",
   "cue": "Não avance enquanto essa casa não estiver sentida no corpo.",
   "labs": [],
+  "pausa": "— respira —",
   "slot": null,
   "fixo": [
    "<p>\"Antes de começar, quero te dizer uma coisa: aqui você não precisa acertar nada, nem chegar a lugar nenhum. É só um tempo seu, com você. Sente os pés no chão, as costas apoiadas, e olha devagar pro lugar onde você está — você está aqui, agora, e aqui é seguro.\"</p><p class=\"pause\">— respira —</p><p>\"Antes da gente olhar o que pesa, acha um lugar dentro de você que está mais tranquilo — uma parte do corpo em paz, uma lembrança boa, ou a sua própria firmeza. Deixa ele por perto: é pra cá que a gente volta.\"</p><p class=\"pause\">— pausa —</p><p>\"Agora coloca a mão no centro do peito e respira ali um instante, deixando essa sensação boa crescer um pouco. Essa é a sua âncora: toda vez que a sua mão voltar pro peito, esse lugar seguro volta junto.\"</p>"
@@ -23,6 +24,7 @@ export const METODO7 = [
   "exp": "Levar a {CARGA} do pensamento pro corpo, <b>aos poucos</b>, em 3 tempos: lembrar a cena → notar no corpo → dar forma. Com a pessoa <b>olhando</b> a emoção, não virando ela.",
   "cue": "\"Você está olhando pra ela; você não é ela.\" Um pouquinho já basta.",
   "labs": [],
+  "pausa": "— deixe ela contar a cena —",
   "slot": "s2",
   "fixo": null,
   "slot7": null
@@ -34,6 +36,7 @@ export const METODO7 = [
   "exp": "Dar voz à sensação <b>sem interpretar nem confirmar</b> — o que a pessoa nomeia vale mais que a sua leitura.",
   "cue": "",
   "labs": [],
+  "pausa": "— espere —",
   "slot": "s3",
   "fixo": null,
   "slot7": null
@@ -48,6 +51,7 @@ export const METODO7 = [
    "Porta A — a respiração que move",
    "Porta B — a forma que se desfaz"
   ],
+  "pausa": "",
   "slot": null,
   "fixo": [
    "<span class=\"say-lab\">Porta A — a respiração que move</span><p>\"Leva a respiração até onde a {CARGA} mora. A cada vez que solta o ar, abre um espaço ali, e deixa ela se mover do jeito que precisar — subir, escorrer, sair. Se vier um tremor, um suspiro, um calor, deixa passar.\"</p>",
@@ -62,6 +66,7 @@ export const METODO7 = [
   "exp": "Voltar pra casa e fazer o <b>vaivém</b> — a pessoa aprende que pode tocar a {CARGA} <b>e voltar</b>. Aqui dá <b>forma</b> ao recurso e junta ele ao lugar seguro (a âncora).",
   "cue": "Vaivém devagar, da {CARGA} pra firmeza e de volta. \"Você tocou <b>e voltou</b> — isso já é força.\"",
   "labs": [],
+  "pausa": "— espere —",
   "slot": "s5",
   "fixo": null,
   "slot7": null
@@ -73,6 +78,7 @@ export const METODO7 = [
   "exp": "Amarrar o que o corpo viveu a um <b>novo significado</b> — é o que faz o efeito durar.",
   "cue": "Deixe ela formular. Não entregue a conclusão pronta.",
   "labs": [],
+  "pausa": "",
   "slot": "s6",
   "fixo": null,
   "slot7": null
@@ -87,6 +93,7 @@ export const METODO7 = [
    "Fechar",
    "Micro-passo"
   ],
+  "pausa": "",
   "slot": null,
   "fixo": [
    "<span class=\"say-lab\">Fechar</span><p>\"Vamos voltar por inteiro. Sente os pés, o corpo apoiado, o ar entrando. Olha o lugar de novo. Repara em como você está agora, comparado a quando começamos.\"</p>",

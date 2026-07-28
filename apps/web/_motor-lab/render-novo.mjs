@@ -352,7 +352,9 @@ function block7(body) {
         const v = campo(slot)
         if (v) {
           const lab = m.n === 7 ? '<p class="say-lab">Micro-passo</p>' : ''
-          falas.push(`<div class="say">${lab}<p>${inl(v)}</p></div>`)
+          // a deixa do proto entra DEPOIS da fala — é onde o terapeuta espera
+          const pau = m.pausa && m.n !== 7 ? `<p class="pause">${esc(m.pausa)}</p>` : ''
+          falas.push(`<div class="say">${lab}<p>${inl(v)}</p>${pau}</div>`)
         }
       }
       if (!falas.length) return ''
