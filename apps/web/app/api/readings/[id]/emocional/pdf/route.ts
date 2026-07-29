@@ -159,7 +159,20 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
   bodyForm.append('marginLeft', '0.551')
   bodyForm.append('marginRight', '0.551')
   bodyForm.append('printBackground', 'true') // sem isto o papel marfim e as barras somem
-  bodyForm.append('scale', '1.0')
+  // ⭐ SCALE 0.85 — é o que faz o PDF mostrar o desenho APROVADO.
+  //
+  // O documento foi aprovado num card de 820px (`.sheet{max-width:820px}`). A 100%, a caixa
+  // de impressão do A4 dá 688px — abaixo do breakpoint de 700px, então a regra de CELULAR
+  // disparava dentro do PDF: o diagrama de gerações (.genfig .gen) empilhava em 1 coluna e
+  // a linha que liga os círculos (.gen-line) recebia display:none. Era isso o "perdeu toda a
+  // diagramação do transgeracional" — e acontecia em TODAS as versões do PDF, não só depois
+  // das minhas margens. Só desligar o breakpoint na impressão não serve: o comentário dele
+  // avisa que abaixo de 700px a fileira de 16 figuras estouraria.
+  //
+  // A 0.85 o viewport de impressão vira 810px ≈ os 820px aprovados: TODOS os breakpoints
+  // (700/640/600/560/540) ficam desligados e o layout renderiza como o aprovado. De bônus, a
+  // altura útil sai de 911px para 1072px (+18%), o que já alivia a paginação.
+  bodyForm.append('scale', '0.85')
   bodyForm.append('generateDocumentOutline', 'true') // marcadores clicáveis a partir dos h2
 
   const controller = new AbortController()

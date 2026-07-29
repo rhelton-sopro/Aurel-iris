@@ -564,8 +564,14 @@ ${B6CSS}
   body{background:#fff;padding:0}
   .sheet{max-width:none;margin:0;border:0;border-radius:0;box-shadow:none}
   .pcard,.moment,.saybox,.step,.root,.gen,.toc,.pend,.objbox,.stresswrap,.resil,.medicine,
-  .maieutica,.chave,.qsec,.idrow,.facet,.colofao{break-inside:avoid;page-break-inside:avoid}
+  .maieutica,.chave,.idrow,.facet,.colofao{break-inside:avoid;page-break-inside:avoid}
   section.block{break-inside:auto}
+  /* ⚠️ .qsec NÃO pode pedir avoid: cada Caminho mede ~2600-2800px (medido no Miguel) contra
+     ~1072px de altura útil — quase 3 páginas. Pedir avoid no que é impossível de honrar faz
+     o Chromium empurrar o bloco pra página nova, não caber, e partir torto: sobra meia
+     página em branco e o corte cai em lugar ruim. Proteger a FOLHA, não o galho — os .step
+     lá dentro (<=490px) seguem com avoid e são a unidade que de fato não pode partir. */
+  .qsec{break-inside:auto;page-break-inside:auto}
   h2.display,.eyebrow{break-after:avoid;page-break-after:avoid}
   hr.div{margin:34px 0 30px}
   .toc-row{border-bottom-color:#ddd}
