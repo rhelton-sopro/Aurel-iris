@@ -634,6 +634,33 @@ ${B6CSS}
   /* a pílula de status não pode partir no meio ("EM / PROCESSO") */
   .sheet .rail .node .flag{white-space:nowrap}
 }
+/* --- CELULAR: o TRANSGERACIONAL também perdia o traço --- (2026-07-31)
+   Mesmo defeito da linha do tempo: abaixo de 700px o .genfig empilha as gerações em coluna
+   e o mockup faz .gen-line{display:none}. Sobravam três blocos soltos — sem o traço, some a
+   ideia de LINHAGEM, que é o assunto do bloco (bisavós → avós → pais → você).
+   O traço vira vertical, com um nó por geração, e mantém o degradê original: começa apagado
+   (o que veio de longe) e chega no âmbar (você). */
+@media(max-width:700px){
+  .genfig .gen{position:relative;padding-left:26px}
+  .genfig .gen::before{content:"";position:absolute;left:5px;top:12px;bottom:12px;width:2px;
+    border-radius:2px;
+    background:linear-gradient(180deg,color-mix(in srgb,var(--line-strong) 70%,transparent),var(--amber) 62%,var(--teal))}
+  .genfig .gcol{position:relative}
+  /* nó de cada geração, alinhado ao rótulo — senta EM CIMA do traço */
+  .genfig .gcol::before{content:"";position:absolute;left:-26px;top:4px;width:12px;height:12px;
+    border-radius:50%;background:var(--paper);border:2.5px solid var(--line-strong);z-index:1}
+  /* a geração ATUAL (você) é a única em âmbar, como no traço horizontal.
+     Por posição (fallback) e por conteúdo — o `:has` acerta mesmo se a ordem mudar;
+     em regra separada porque seletor não suportado invalidaria o bloco inteiro. */
+  .genfig .gcol:nth-last-child(2)::before{border-color:var(--amber);background:var(--amber);
+    box-shadow:0 0 0 4px color-mix(in srgb,var(--amber) 18%,transparent)}
+}
+@media(max-width:700px){
+  .genfig .gcol:has(.you-wrap)::before{border-color:var(--amber);background:var(--amber);
+    box-shadow:0 0 0 4px color-mix(in srgb,var(--amber) 18%,transparent)}
+  .genfig .gcol:not(:has(.you-wrap)):nth-last-child(2)::before{border-color:var(--line-strong);
+    background:var(--paper);box-shadow:none}
+}
 /* --- IMPRESSÃO: o documento é pra imprimir e guardar. Sem isto, os cards partem
    no meio entre páginas — invisível na tela, fatal no papel. --- */
 @media print{
