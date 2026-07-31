@@ -607,6 +607,33 @@ ${B6CSS}
 .cf-meta{font-size:13px;color:var(--ink-soft,#6b6357);margin:0 0 16px}
 .cf-marca{font-size:11px;letter-spacing:.2em;color:var(--teal-deep);font-weight:700;margin:0 0 14px}
 .cf-nota{font-size:11.5px;line-height:1.6;color:var(--ink-faint,#a99a87);max-width:52ch;margin:0 auto}
+/* --- CELULAR: a linha do tempo não estava empilhando --- (2026-07-31, visto em prod)
+   O mockup JÁ tem @media(max-width:600px){.rail{grid-template-columns:1fr}}, e o gap dessa
+   regra é aplicado — mas as colunas continuavam três, de ~95px, com os selos quebrando no
+   meio da pílula ("EM / PROCESSO"). Como a mesma media query também faz .rail-line{display:none},
+   o resultado era o pior dos dois mundos: espremido E sem a linha. Foi o que o founder viu
+   no celular ("não tem a linha... está horrível").
+
+   Aqui não se disputa a cascata do grid: em telas estreitas o trilho vira BLOCO. Empilhado,
+   cada marco ganha a largura toda e a linha continua oculta — que é o certo, porque uma
+   linha do tempo horizontal não sobrevive a 376px.
+
+   ⚠️ Só abaixo de 600px: o PDF sai a ~816px e segue idêntico ao aprovado. */
+@media(max-width:600px){
+  .sheet .rail{display:block;position:relative;padding-left:30px}
+  /* A LINHA continua existindo — vira VERTICAL. O mockup a esconde no mobile
+     (.rail-line{display:none}), mas ela é o que faz a figura ser uma linha do tempo:
+     sem ela sobram três blocos soltos. Mesmo degradê do trilho horizontal, do teal
+     (o mais antigo) ao âmbar (o que ainda está ativo). */
+  .sheet .rail::before{content:"";position:absolute;left:7px;top:9px;bottom:14px;width:2px;
+    border-radius:2px;background:linear-gradient(180deg,var(--teal-deep),#c9b48f 55%,var(--amber))}
+  .sheet .rail .node{position:relative;text-align:left;padding:0;margin:0 0 18px}
+  .sheet .rail .node:last-child{margin-bottom:0}
+  /* o marcador senta EM CIMA da linha, como no trilho horizontal */
+  .sheet .rail .node .dot{position:absolute;left:-30px;top:1px;margin:0;z-index:1}
+  /* a pílula de status não pode partir no meio ("EM / PROCESSO") */
+  .sheet .rail .node .flag{white-space:nowrap}
+}
 /* --- IMPRESSÃO: o documento é pra imprimir e guardar. Sem isto, os cards partem
    no meio entre páginas — invisível na tela, fatal no papel. --- */
 @media print{
