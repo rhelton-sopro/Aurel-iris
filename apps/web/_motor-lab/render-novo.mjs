@@ -669,6 +669,13 @@ ${B6CSS}
   .sheet{max-width:none;margin:0;border:0;border-radius:0;box-shadow:none}
   .pcard,.moment,.saybox,.step,.root,.gen,.toc,.pend,.objbox,.stresswrap,.resil,.medicine,
   .maieutica,.chave,.idrow,.facet,.colofao{break-inside:avoid;page-break-inside:avoid}
+  /* 2026-07-31 — blocos coesos que estavam DESPROTEGIDOS e podiam partir entre páginas.
+     Medidos na simulação de impressão (724×959px): o maior é 345px, bem abaixo de uma
+     página, então protegê-los não corre o risco descrito na nota do .qsec (pedir avoid no
+     que não cabe faz o Chromium empurrar e partir torto).
+     O mais grave era o .say: são 15 no documento e é a FALA que o terapeuta lê em voz alta
+     na sessão — partida no meio, ele perde a frase virando a página. */
+  .say,.genfig,.ctr,.drain,.pattern,.tension,.key,.qhead{break-inside:avoid;page-break-inside:avoid}
   section.block{break-inside:auto}
   /* ⚠️ .qsec NÃO pode pedir avoid: cada Caminho mede ~2600-2800px (medido no Miguel) contra
      ~1072px de altura útil — quase 3 páginas. Pedir avoid no que é impossível de honrar faz
