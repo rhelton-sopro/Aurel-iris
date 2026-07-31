@@ -27,7 +27,7 @@ import {
   SECTION_TITLE_BY_NUMBER,
 } from '@/lib/anthropic/types'
 
-const TOTAL_SECTIONS = NUMBERED_SECTION_HEADINGS.length // 15 (Plan 27 — 1..15 sequential)
+// 15 (Plan 27 — 1..15 sequential). Continua sendo o padrão quando `steps` não vem.
 
 // Derived from the single source of truth (Plan 27 — kills the prior
 // inline-array drift; was a Plan 18 follow-up debt item).
@@ -38,11 +38,27 @@ const SECTION_TITLES: readonly string[] = NUMBERED_SECTION_HEADINGS.map(
 export interface AnalysisStreamProps {
   sectionsReceived: number
   error?: string | null
+  /**
+   * Etapas exibidas no checklist. Omitido = as 15 seções do Dossiê (o padrão
+   * histórico). Desde 2026-07-30 a geração normal é o **Mapa do Ser**, e a página
+   * passa os 7 blocos dele — que vêm do motor, não de uma cópia. Sem isto, o
+   * terapeuta via "0/15 seções" e uma lista de títulos que não seriam escritos.
+   */
+  steps?: readonly string[]
+  /** Substantivo do que está sendo contado ("seções" | "blocos"). */
+  unidade?: string
 }
 
-export function AnalysisStream({ sectionsReceived, error }: AnalysisStreamProps) {
-  const safe = Math.min(TOTAL_SECTIONS, Math.max(0, sectionsReceived))
-  const pct = Math.round((safe / TOTAL_SECTIONS) * 100)
+export function AnalysisStream({
+  sectionsReceived,
+  error,
+  steps,
+  unidade = 'seções',
+}: AnalysisStreamProps) {
+  const titles = steps?.length ? steps : SECTION_TITLES
+  const total = titles.length
+  const safe = Math.min(total, Math.max(0, sectionsReceived))
+  const pct = Math.round((safe / total) * 100)
 
   return (
     <Card className="max-w-3xl">
@@ -50,7 +66,7 @@ export function AnalysisStream({ sectionsReceived, error }: AnalysisStreamProps)
         <CardTitle className="flex items-center gap-2 text-xl">
           <Loader2 className="h-4 w-4 animate-spin text-teal" aria-hidden />
           <span>
-            Gerando relatório… {safe}/{TOTAL_SECTIONS} seções
+            Gerando relatório… {safe}/{total} {unidade}
           </span>
         </CardTitle>
         <p className="text-sm text-muted-foreground">
@@ -60,9 +76,11 @@ export function AnalysisStream({ sectionsReceived, error }: AnalysisStreamProps)
       <CardContent className="space-y-4">
         <Progress value={pct} aria-label="Progresso da geração" />
         <div role="region" aria-live="polite" aria-atomic="false" className="space-y-2">
-          {SECTION_TITLES.map((title, i) => {
+          {titles.map((title, i) => {
             const received = i < safe
-            const headingNumber = NUMBERED_SECTION_HEADINGS[i]
+            // Com steps customizados (Mapa do Ser) a numeração é posicional; no
+            // Dossiê continua sendo o número da seção (§1..§15).
+            const headingNumber = steps?.length ? i + 1 : NUMBERED_SECTION_HEADINGS[i]
             return (
               <div key={i} className="flex items-center gap-3">
                 {received ? (

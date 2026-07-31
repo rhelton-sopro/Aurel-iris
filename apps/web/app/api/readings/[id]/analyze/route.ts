@@ -32,6 +32,7 @@ import {
   convertReservationToConsume,
   reserveCreditForReading,
   readingHasReservation,
+  readingHasActiveReservation,
 } from '@/lib/billing/credits'
 import { logAuditEvent } from '@/lib/audit/log'
 import { logReportGeneration } from '@/lib/calibration/log-generation'
@@ -43,6 +44,8 @@ import {
   STAGE2_VERSION,
 } from '@/lib/anthropic/analyze-direct'
 import { runStage1Scan } from '@/lib/anthropic/stage1-scan'
+import { gerarRelatorioEmocional } from '@/lib/emocional/gerar'
+import { getPricingFor, computeCostUsd } from '@/lib/anthropic/pricing'
 import { buildRecentPhrasesContext } from '@/lib/anthropic/recent-phrases-context'
 import { extractPhrases } from '@/lib/anthropic/extract-phrases'
 import { prepareDirectImages } from '@/lib/anthropic/prepare-direct-images'
@@ -96,7 +99,7 @@ export async function POST(
   const { data: reading, error: readingError } = await supabase
     .from('readings')
     .select(
-      'id, therapist_id, status, report_delivered, regeneration_count, regeneration_log, client_id, canonical_metadata, notification_sent_at, client:clients(full_name, birth_date)',
+      'id, therapist_id, status, report_generated, report_delivered, regeneration_count, regeneration_log, client_id, canonical_metadata, notification_sent_at, client:clients(full_name, birth_date)',
     )
     .eq('id', readingId)
     .maybeSingle()
@@ -106,11 +109,12 @@ export async function POST(
   // regenerar. Idempotency gate (f) usa o par {started, completed}.
   const { data: progress } = await supabase
     .from('readings')
-    .select('analysis_started_at, analysis_completed_at' as never)
+    .select('analysis_started_at, analysis_completed_at, report_emocional' as never)
     .eq('id', readingId)
     .maybeSingle<{
       analysis_started_at: string | null
       analysis_completed_at: string | null
+      report_emocional: string | null
     }>()
 
   if (readingError) {
@@ -145,7 +149,22 @@ export async function POST(
   // da leitura + /admin/regenerar). Antes era `>= 2` (1 regen grátis).
   const currentCount = reading.regeneration_count ?? 0
   const isFounder = isFounderEmail(user.email)
-  if (currentCount >= 1 && !isFounder) {
+
+  // Qual documento está sendo pedido (2026-07-30). Ver a BIFURCAÇÃO mais abaixo.
+  const doc = request.nextUrl.searchParams.get('doc') === 'dossie' ? 'dossie' : 'mapa'
+
+  // ⚠️ O cap passou a valer POR DOCUMENTO, não por leitura. Antes era
+  // `currentCount >= 1`, e `regeneration_count` sobe nas DUAS gerações — então,
+  // com dois documentos por leitura, o terapeuta gerava o Mapa do Ser e o botão
+  // "Antigo relatório" já nascia bloqueado como se fosse regeneração. A intenção
+  // da regra continua a mesma: uma geração de cada documento, sem regen (founder
+  // bypassa). Gerar o Dossiê pela 1ª vez não é regenerar coisa nenhuma.
+  const temDossie =
+    reading.report_generated != null &&
+    Object.keys(reading.report_generated as Record<string, unknown>).length > 0
+  const temMapa = Boolean(progress?.report_emocional)
+  const docJaExiste = doc === 'dossie' ? temDossie : temMapa
+  if (docJaExiste && !isFounder) {
     return NextResponse.json(
       {
         error:
@@ -192,7 +211,22 @@ export async function POST(
   //     readingHasReservation). 1 leitura = 1 crédito.
   // O débito firme (convert) segue no pós-stream. Founder bypassa via
   // internal_use dentro do fifo_reserve_credit.
-  if (!(await readingHasReservation(readingId))) {
+  //
+  // ===== 2026-07-30: o DOSSIÊ cobra 1 crédito PRÓPRIO (decisão do founder) =====
+  // Ele deixou de ser "o relatório da leitura" e virou um segundo documento, opcional,
+  // pedido depois que o Mapa do Ser já foi entregue. Por isso o guard muda de documento:
+  //   - Mapa do Ser → `readingHasReservation` (active OU converted): 1 leitura = 1
+  //     crédito, regen não recobra. Regra intacta.
+  //   - Dossiê      → só reserva ATIVA. A do Mapa do Ser já está 'converted', então não
+  //     conta e o Dossiê reserva o crédito dele. Reusar a ATIVA (quando existe, de uma
+  //     tentativa que morreu no meio) é o que garante NUNCA haver duas ativas na mesma
+  //     leitura — que é a única condição em que `convert_reservation_to_consume`
+  //     (converte por reading_id) marcaria duas e debitaria uma. Ver a nota em credits.ts.
+  const jaReservado =
+    doc === 'dossie'
+      ? await readingHasActiveReservation(readingId)
+      : await readingHasReservation(readingId)
+  if (!jaReservado) {
     const reserve = await reserveCreditForReading(user.id, readingId)
     if (!reserve.ok) {
       if (reserve.reason === 'no_balance') {
@@ -200,15 +234,15 @@ export async function POST(
           {
             error: 'no_balance',
             message:
-              'Sem créditos para gerar este relatório. As fotos estão salvas — compre créditos para gerar.',
+              doc === 'dossie'
+                ? 'Sem créditos para gerar o antigo relatório. Ele consome 1 crédito, separado do relatório principal.'
+                : 'Sem créditos para gerar este relatório. As fotos estão salvas — compre créditos para gerar.',
             redirect_to: '/assinatura/comprar',
           },
           { status: 402 },
         )
       }
-      console.error(
-        `[analyze] reserve falhou reading=${readingId}: ${reserve.reason}`,
-      )
+      console.error(`[analyze] reserve falhou reading=${readingId}: ${reserve.reason}`)
       return NextResponse.json(
         { error: 'Erro ao verificar créditos. Tente novamente.' },
         { status: 500 },
@@ -224,7 +258,10 @@ export async function POST(
         actor_email: user.email,
         target_type: 'reading',
         target_id: readingId,
-        metadata: { entry_point: 'generate', client_id: reading.client_id ?? null },
+        metadata: {
+          entry_point: 'generate',
+          client_id: reading.client_id ?? null,
+        },
       })
     }
   }
@@ -242,6 +279,31 @@ export async function POST(
   // ownership already enforced above with the user client.
   const service = createServiceClient()
 
+  // ===== Stage 1 REAPROVEITADO (2026-07-30) =====
+  // 🚨 Sem isto o botão "Gerar antigo relatório" NUNCA funcionaria: as fotos são
+  // apagadas assim que o Mapa do Ser fica pronto (LGPD), e todo o caminho abaixo
+  // começa lendo as 6 imagens — o Dossiê sob demanda morreria em 404 `no_images`
+  // em 100% das leituras novas, que é exatamente quando ele é pedido.
+  //
+  // O Stage 1 é o exame estruturado da íris; ele já foi feito e está no banco.
+  // Reusá-lo é o certo em qualquer caso: não custa API, não depende de foto e
+  // garante que os dois documentos falam do MESMO exame (se rodasse de novo, o
+  // Stage 1 é não-determinístico e o Dossiê descreveria outra íris).
+  const { data: findingsExistentes } = await service
+    .from('report_findings')
+    .select('exame_json')
+    .eq('reading_id', readingId)
+    .is('superseded_at', null)
+    .maybeSingle<{ exame_json: Record<string, unknown> | null }>()
+  const exameReaproveitado =
+    findingsExistentes?.exame_json &&
+    Object.keys(findingsExistentes.exame_json).length > 0
+      ? findingsExistentes.exame_json
+      : null
+
+  // `true` = pula fotos e Stage 1, vai direto compor o Dossiê com o exame que existe.
+  const reusaStage1 = doc === 'dossie' && exameReaproveitado != null
+
   // Lazy canonicalization (fix 07.4 — raiz da convergência cross-leitura):
   // leituras capturadas via CONVITE não passam pelo finalizeReadingAction (que
   // é quem dispara o canonicalize no fluxo do terapeuta), então chegam aqui com
@@ -255,7 +317,7 @@ export async function POST(
   // abandonadas nunca pagam o custo (~$0.07). Best-effort (D-01): se falhar,
   // prepareDirectImages cai no raw (comportamento atual) — NUNCA bloqueia a
   // geração. Idempotente (D-05): re-rodar sobrescreve os crops.
-  if (!reading.canonical_metadata) {
+  if (!reading.canonical_metadata && !reusaStage1) {
     try {
       await canonicalizeReading(readingId, user.id)
       console.info(`[analyze] lazy-canonicalize OK reading=${readingId}`)
@@ -267,11 +329,30 @@ export async function POST(
     }
   }
 
-  const prep = await prepareDirectImages(service, readingId)
+  // Só lê as fotos quando vai mesmo rodar o Stage 1. No caminho reaproveitado elas
+  // provavelmente nem existem mais (purgadas na geração do Mapa do Ser).
+  const prep = reusaStage1
+    ? { ok: true as const, images: [], fallbackCount: 0 }
+    : await prepareDirectImages(service, readingId)
   if (!prep.ok) {
     const status = prep.reason === 'no_images' ? 404 : 502
+    // Cada documento é auto-suficiente: sem Stage 1 gravado, QUALQUER um dos dois o
+    // gera a partir das fotos. Só que sem Stage 1 E sem fotos não há o que fazer — e
+    // quem pede o Dossiê nesse estado é um terapeuta clicando num botão, não um script.
+    // "Image preparation failed: no_images" não diz a ele o que aconteceu nem o que fazer.
+    if (doc === 'dossie' && prep.reason === 'no_images') {
+      return NextResponse.json(
+        {
+          error:
+            'Esta leitura não tem mais as fotos da íris (apagadas por privacidade) e não tem observação estruturada guardada, então o antigo relatório não pode ser gerado. Para um novo relatório, faça uma nova leitura.',
+        },
+        { status: 409 },
+      )
+    }
     return NextResponse.json(
-      { error: `Image preparation failed: ${prep.reason} ${prep.message ?? ''}`.trim() },
+      {
+        error: `Image preparation failed: ${prep.reason} ${prep.message ?? ''}`.trim(),
+      },
       { status },
     )
   }
@@ -292,76 +373,110 @@ export async function POST(
   // runStage1Scan faz tool_use com REGISTRAR_EXAME_TOOL, valida (5
   // blindagens), retry 1x em invalid, retorna JSON estruturado.
   // Fallback Sonnet 4.6 → 4.5 inline em 429/503/5xx.
-  const stage1 = await runStage1Scan({
-    readingId,
-    therapistId: user.id,
-    images: prep.images,
-    clientName,
-    clientAge,
-  })
+  const stage1 = reusaStage1
+    ? null
+    : await runStage1Scan({
+        readingId,
+        therapistId: user.id,
+        images: prep.images,
+        clientName,
+        clientAge,
+      })
 
-  // Persistência via RPC (transação atômica superseded_at).
-  // Migration 0030 cria o RPC; se pendente, log warn e segue (analytics
-  // perde linha mas relatório não trava).
-  const validationStatusForDb =
-    stage1.validation_status === 'valid' ||
-    stage1.validation_status === 'valid_with_warnings'
-      ? 'valid'
-      : stage1.validation_status === 'invalid_retried'
-        ? 'invalid_retried'
-        : 'invalid_final'
-  const { error: findingsErr } = await service.rpc(
-    'persist_report_findings_versioned' as never,
-    {
-      p_reading_id: readingId,
-      p_therapist_id: user.id,
-      p_prompt_version: stage1.prompt_version,
-      p_prompt_sha: stage1.prompt_sha,
-      p_method_version: stage1.method_version,
-      p_model: stage1.model,
-      p_exame_json: stage1.exame ?? {},
-      p_raw_xml: stage1.raw_output,
-      p_validation_status: validationStatusForDb,
-      p_tokens_in: stage1.tokens_in,
-      p_tokens_out: stage1.tokens_out,
-      p_cost_usd: Number(stage1.cost_usd.toFixed(6)),
-      p_latency_ms: stage1.latency_ms,
-      // Migration 0031: cache buckets (RPC tem defaults NULL — se migration
-      // ainda não foi aplicada, postgres aceita os params extras só se a RPC
-      // já tem a nova assinatura; senão erro fica preso no findingsErr below).
-      p_cache_creation_input_tokens: stage1.cache_creation_input_tokens,
-      p_cache_read_input_tokens: stage1.cache_read_input_tokens,
-    } as never,
-  )
-  if (findingsErr) {
-    console.warn(
-      '[analyze] persist_report_findings_versioned RPC failed (migration 0030 pending?):',
-      findingsErr.message,
+  // O exame que alimenta o Stage 2 — recém-observado ou o que já estava no banco.
+  // O cast é seguro: `report_findings.exame_json` foi gravado por este mesmo Stage 1,
+  // com esta mesma forma; só perdeu o tipo ao passar pelo jsonb.
+  type ExameStage1 = NonNullable<Awaited<ReturnType<typeof runStage1Scan>>['exame']>
+  let exameParaStage2 = exameReaproveitado as unknown as ExameStage1
+
+  if (stage1) {
+    // Persistência via RPC (transação atômica superseded_at).
+    // Migration 0030 cria o RPC; se pendente, log warn e segue (analytics
+    // perde linha mas relatório não trava).
+    const validationStatusForDb =
+      stage1.validation_status === 'valid' ||
+      stage1.validation_status === 'valid_with_warnings'
+        ? 'valid'
+        : stage1.validation_status === 'invalid_retried'
+          ? 'invalid_retried'
+          : 'invalid_final'
+    const { error: findingsErr } = await service.rpc(
+      'persist_report_findings_versioned' as never,
+      {
+        p_reading_id: readingId,
+        p_therapist_id: user.id,
+        p_prompt_version: stage1.prompt_version,
+        p_prompt_sha: stage1.prompt_sha,
+        p_method_version: stage1.method_version,
+        p_model: stage1.model,
+        p_exame_json: stage1.exame ?? {},
+        p_raw_xml: stage1.raw_output,
+        p_validation_status: validationStatusForDb,
+        p_tokens_in: stage1.tokens_in,
+        p_tokens_out: stage1.tokens_out,
+        p_cost_usd: Number(stage1.cost_usd.toFixed(6)),
+        p_latency_ms: stage1.latency_ms,
+        // Migration 0031: cache buckets (RPC tem defaults NULL — se migration
+        // ainda não foi aplicada, postgres aceita os params extras só se a RPC
+        // já tem a nova assinatura; senão erro fica preso no findingsErr below).
+        p_cache_creation_input_tokens: stage1.cache_creation_input_tokens,
+        p_cache_read_input_tokens: stage1.cache_read_input_tokens,
+      } as never,
     )
+    if (findingsErr) {
+      console.warn(
+        '[analyze] persist_report_findings_versioned RPC failed (migration 0030 pending?):',
+        findingsErr.message,
+      )
+    }
+
+    // Aborta Etapa 2 se Stage 1 falhou 2x. Preserva custo Sonnet (~$0.15)
+    // e qualidade do produto (não gera relatório fraco sem ancoragem).
+    // Terapeuta clica Reprocessar; pipeline tenta de novo.
+    if (stage1.validation_status === 'invalid_final' || !stage1.exame) {
+      console.error('[analyze] Stage 1 invalid_final — aborting Stage 2', {
+        readingId,
+        tokens_in: stage1.tokens_in,
+        tokens_out: stage1.tokens_out,
+        cost_usd: stage1.cost_usd,
+      })
+      await service
+        .from('readings')
+        .update({ analysis_completed_at: new Date().toISOString() } as never)
+        .eq('id', readingId)
+      return NextResponse.json(
+        {
+          error:
+            'Falha na observação estruturada da íris. Clique em Reprocessar pra tentar novamente.',
+          stage: 1,
+          validation_status: stage1.validation_status,
+        },
+        { status: 502 },
+      )
+    }
+    exameParaStage2 = stage1.exame
   }
 
-  // Aborta Etapa 2 se Stage 1 falhou 2x. Preserva custo Sonnet (~$0.15)
-  // e qualidade do produto (não gera relatório fraco sem ancoragem).
-  // Terapeuta clica Reprocessar; pipeline tenta de novo.
-  if (stage1.validation_status === 'invalid_final' || !stage1.exame) {
-    console.error('[analyze] Stage 1 invalid_final — aborting Stage 2', {
+  // ===== BIFURCAÇÃO DO STAGE 2 (2026-07-30) =====
+  // O Stage 1 acima é COMUM aos dois documentos — é o exame estruturado da íris,
+  // e é ele que custa as 6 fotos. Daqui pra baixo o caminho se divide:
+  //
+  //   padrão      → **Mapa do Ser** (o relatório principal desde 2026-07-30)
+  //   ?doc=dossie → **Dossiê**, o Stage 2 antigo (15 seções, jargão técnico)
+  //
+  // Leituras ANTERIORES a esta mudança não são tocadas: elas já têm
+  // `report_generated` e continuam abrindo o Dossiê normalmente. O botão
+  // "Antigo relatório" é quem passa `?doc=dossie` — e como reaproveita este
+  // mesmo Stage 1, gerar o Dossiê depois NÃO repaga a leitura das fotos.
+  if (doc !== 'dossie') {
+    return await gerarMapaDoSer({
       readingId,
-      tokens_in: stage1.tokens_in,
-      tokens_out: stage1.tokens_out,
-      cost_usd: stage1.cost_usd,
+      service,
+      clientName,
+      clientId: (reading as { client_id?: string | null }).client_id ?? null,
+      exame: exameParaStage2,
+      currentCount,
     })
-    await service
-      .from('readings')
-      .update({ analysis_completed_at: new Date().toISOString() } as never)
-      .eq('id', readingId)
-    return NextResponse.json(
-      {
-        error: 'Falha na observação estruturada da íris. Clique em Reprocessar pra tentar novamente.',
-        stage: 1,
-        validation_status: stage1.validation_status,
-      },
-      { status: 502 },
-    )
   }
 
   // ===== Builder do contexto recente (10 últimas frases do terapeuta) =====
@@ -383,7 +498,7 @@ export async function POST(
   const analysis = await analyzeReadingComposeStage2({
     readingId,
     therapistId: user.id,
-    exameIridologico: stage1.exame, // garantido não-null pelo check acima
+    exameIridologico: exameParaStage2, // recém-observado, ou o Stage 1 reaproveitado
     recentPhrasesBlock,
     clientName,
     clientAge,
@@ -623,24 +738,20 @@ export async function POST(
           cost_usd: Number(finalization.cost_estimate_usd.toFixed(5)),
           tokens_in: finalization.usage.input_tokens,
           tokens_out: finalization.usage.output_tokens,
-          cache_creation_input_tokens:
-            finalization.usage.cache_creation_input_tokens,
+          cache_creation_input_tokens: finalization.usage.cache_creation_input_tokens,
           cache_read_input_tokens: finalization.usage.cache_read_input_tokens,
           model_version: MODEL,
           prompt_version: getSystemPromptVersion(),
           canonical_fallback_count: prep.fallbackCount,
           audit_summary: audit,
           regeneration_count: currentCount + 1,
-          client_id:
-            (reading as { client_id?: string | null }).client_id ?? null,
+          client_id: (reading as { client_id?: string | null }).client_id ?? null,
           bbox_cost_usd:
             typeof canon?.cost_usd === 'number'
               ? Number(canon.cost_usd.toFixed(5))
               : null,
           bbox_latency_ms:
-            typeof canon?.bbox_latency_ms === 'number'
-              ? canon.bbox_latency_ms
-              : null,
+            typeof canon?.bbox_latency_ms === 'number' ? canon.bbox_latency_ms : null,
         })
 
         revalidatePath(`/leituras/${readingId}`)
@@ -711,6 +822,210 @@ export async function POST(
 
     async cancel() {
       console.info('[analyze] stream cancelled by caller reading=' + readingId)
+    },
+  })
+
+  return new Response(responseStream, {
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Cache-Control': 'no-cache, no-transform',
+      'X-Content-Type-Options': 'nosniff',
+    },
+  })
+}
+
+/**
+ * STAGE 2 — Mapa do Ser (o relatório principal desde 2026-07-30).
+ *
+ * Roda no lugar do Stage 2 antigo, a partir do MESMO `exame` do Stage 1. Mantém, uma a
+ * uma, as garantias que o caminho do Dossiê já tinha e que não são sobre o texto:
+ * crédito convertido, foto purgada (LGPD), `analysis_completed_at` sempre gravado,
+ * e persistência que NUNCA depende do cliente continuar na página.
+ *
+ * ⚠️ O texto é repassado em streaming só para a barra de progresso ter o que mostrar
+ * (~3 min de geração). A VERDADE é o que se grava no banco no fim — se o terapeuta
+ * fechar a aba no meio, o relatório continua e aparece completo no próximo load.
+ */
+async function gerarMapaDoSer({
+  readingId,
+  service,
+  clientName,
+  clientId,
+  exame,
+  currentCount,
+}: {
+  readingId: string
+  /** service-role: escreve sem passar por RLS, igual ao caminho do Dossiê */
+  service: ReturnType<typeof createServiceClient>
+  clientName: string
+  clientId: string | null
+  exame: Record<string, unknown>
+  currentCount: number
+}): Promise<Response> {
+  const encoder = new TextEncoder()
+  const primeiroNome = (clientName || '').trim().split(/\s+/)[0] || 'você'
+
+  const responseStream = new ReadableStream({
+    async start(controller) {
+      const enqueueSilent = (chunk: Uint8Array): void => {
+        try {
+          controller.enqueue(chunk)
+        } catch {
+          // cliente desconectou — segue gerando e persistindo
+        }
+      }
+
+      try {
+        const { markdown, metadata } = await gerarRelatorioEmocional(
+          exame,
+          primeiroNome,
+          (delta) => enqueueSilent(encoder.encode(delta)),
+        )
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- colunas da 0051, tipos não regerados
+        const db = service as unknown as { from: (t: string) => any }
+        const { error: upErr } = await db
+          .from('readings')
+          .update({
+            report_emocional: markdown,
+            report_emocional_generated_at: new Date().toISOString(),
+            report_emocional_metadata: metadata,
+            regeneration_count: currentCount + 1,
+          })
+          .eq('id', readingId)
+        if (upErr) {
+          // Não engolir: sem persistência o terapeuta viu o texto passar e não tem nada.
+          throw new Error(`falha ao gravar o Mapa do Ser: ${upErr.message}`)
+        }
+
+        // Crédito — mesma regra do Dossiê: debita no sucesso, nunca bloqueia a entrega.
+        try {
+          const consume = await convertReservationToConsume(readingId)
+          if (!consume.ok && consume.reason !== 'not_found') {
+            console.warn(
+              `[analyze/mapa] convert reservation failed reading=${readingId}: ${consume.reason}`,
+            )
+          }
+        } catch (consumeErr) {
+          console.warn(
+            `[analyze/mapa] convert reservation threw reading=${readingId}:`,
+            consumeErr instanceof Error ? consumeErr.message : consumeErr,
+          )
+        }
+
+        // LGPD: relatório completo → a íris é apagada AGORA (promessa da LP/FAQ).
+        // Incompleto RETÉM a foto pro resgate em /admin/regenerar, como no Dossiê —
+        // e o cron de 24h cobre de qualquer jeito.
+        //
+        // São **7 blocos** — "Crenças a serem trabalhadas" é canônico desde `90f35f2`
+        // (27/07). Documento com 6 significa que o bloco de crenças não veio: é
+        // geração INCOMPLETA, retém a foto e cai no resgate do /admin/regenerar.
+        const blocos = (markdown.match(/^# /gm) ?? []).length
+        try {
+          if (blocos >= 7) {
+            const purge = await purgeIrisPhotos(service, readingId, 'audit_complete')
+            if (!purge.ok) {
+              console.warn(
+                `[analyze/mapa] purge fotos falhou reading=${readingId}: ${purge.error} — cron horário cobre`,
+              )
+            }
+          } else {
+            console.warn(
+              `[analyze/mapa] Mapa do Ser INCOMPLETO reading=${readingId} blocos=${blocos}/7 — foto RETIDA`,
+            )
+          }
+        } catch (purgeErr) {
+          console.warn(
+            `[analyze/mapa] purge fotos threw reading=${readingId}:`,
+            purgeErr instanceof Error ? purgeErr.message : purgeErr,
+          )
+        }
+
+        // Analytics de custo (best-effort). Sem esta linha o /admin mostraria só o
+        // Stage 1 e o custo por leitura sairia subestimado justamente agora, quando
+        // o Stage 2 do Mapa do Ser é o que domina a conta.
+        try {
+          const pricing = await getPricingFor(metadata.model)
+          await logReportGeneration(service, {
+            reading_id: readingId,
+            // ⚠️ `method` tem CHECK no banco ('vigente','sam','sonnet_direct',
+            // 'sonnet_2x' — migration 0031). Um valor novo exigiria migration só
+            // para rotular, e o pipeline É sonnet_2x: quem distingue o documento é o
+            // `method_version` ('emocional_0.x'), que já viaja junto.
+            method: 'sonnet_2x',
+            method_version: metadata.prompt_version,
+            latency_ms: metadata.latency_ms,
+            cost_usd: Number(
+              (
+                computeCostUsd(metadata.tokens_in, metadata.tokens_out, pricing) ?? 0
+              ).toFixed(5),
+            ),
+            tokens_in: metadata.tokens_in,
+            tokens_out: metadata.tokens_out,
+            model_version: metadata.model,
+            prompt_version: metadata.prompt_version,
+            regeneration_count: currentCount + 1,
+            client_id: clientId,
+          })
+        } catch (logErr) {
+          console.warn(
+            `[analyze/mapa] logReportGeneration falhou reading=${readingId}:`,
+            logErr instanceof Error ? logErr.message : logErr,
+          )
+        }
+
+        revalidatePath(`/leituras/${readingId}`)
+        revalidatePath('/leituras')
+
+        console.log(
+          '[analyze/mapa] ok',
+          JSON.stringify({
+            readingId,
+            blocos,
+            words: metadata.words,
+            latency_ms: metadata.latency_ms,
+            tokens_out: metadata.tokens_out,
+          }),
+        )
+
+        try {
+          controller.close()
+        } catch {
+          // já fechado pelo cliente — no-op
+        }
+      } catch (err) {
+        console.error(
+          '[analyze/mapa] erro reading=' + readingId + ' err=',
+          err instanceof Error ? err.message : 'unknown',
+        )
+        enqueueSilent(
+          encoder.encode(
+            '\n\n[erro]: ' + (err instanceof Error ? err.message : 'desconhecido'),
+          ),
+        )
+        try {
+          controller.close()
+        } catch {
+          // já fechado — no-op
+        }
+      } finally {
+        // Sempre: libera o gate de "já rodando" (mesmo em erro), senão o
+        // terapeuta ficaria 5 min sem poder tentar de novo.
+        const { error: completedErr } = await service
+          .from('readings')
+          .update({ analysis_completed_at: new Date().toISOString() } as never)
+          .eq('id', readingId)
+        if (completedErr) {
+          console.warn(
+            '[analyze/mapa] analysis_completed_at update failed:',
+            completedErr.message,
+          )
+        }
+      }
+    },
+
+    async cancel() {
+      console.info('[analyze/mapa] stream cancelled by caller reading=' + readingId)
     },
   })
 

@@ -61,7 +61,19 @@ export default async function ClienteDetailPage({
     .eq('client_id', client.id)
     .order('created_at', { ascending: false })
 
-  const list = readings ?? []
+  // Quais leituras deste cliente têm MAPA DO SER (2026-07-30) — mesma razão da
+  // lista global: sem isto, leitura nova aparece como "sem relatório". Coluna da
+  // migration 0051, ainda fora dos tipos gerados.
+  const { data: mapas } = await supabase
+    .from('readings')
+    .select('id, report_emocional_generated_at' as never)
+    .eq('client_id', client.id)
+    .not('report_emocional_generated_at' as never, 'is', null)
+  const comMapa = new Set(
+    ((mapas ?? []) as unknown as Array<{ id: string }>).map((m) => m.id),
+  )
+
+  const list = (readings ?? []).map((r) => ({ ...r, temMapa: comMapa.has(r.id) }))
 
   return (
     <div className="space-y-6 max-w-2xl">

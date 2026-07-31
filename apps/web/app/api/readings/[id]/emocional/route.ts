@@ -42,7 +42,7 @@ export async function POST(_req: Request, ctx: { params: Promise<{ id: string }>
     .single()
   if (eRead || !reading) return NextResponse.json({ error: 'leitura não encontrada' }, { status: 404 })
 
-  // o Stage 1 que já foi gerado para o relatório de produção
+  // o Stage 1 que já foi gerado para o Dossiê (o relatório que já estava no ar)
   const { data: findings } = await db
     .from('report_findings')
     .select('exame_json')
@@ -52,7 +52,10 @@ export async function POST(_req: Request, ctx: { params: Promise<{ id: string }>
   const exame = findings?.exame_json as Record<string, unknown> | null
   if (!exame || Object.keys(exame).length === 0) {
     return NextResponse.json(
-      { error: 'esta leitura ainda não tem Stage 1 — gere o relatório principal primeiro' },
+      // ⚠️ NÃO dizer "relatório principal" aqui: desde 2026-07-30 o principal é o Mapa
+      // do Ser (este), e o que falta gerar é o Dossiê. Dizer "principal" mandaria o
+      // founder gerar exatamente o que ele já está tentando gerar.
+      { error: 'esta leitura ainda não tem Stage 1 — gere o Dossiê primeiro' },
       { status: 409 },
     )
   }

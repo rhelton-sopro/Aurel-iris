@@ -159,7 +159,10 @@ export async function GET(
   }
 
   const props = { sections: reportToShow, clientName, readingDate }
-  const coverHtml = renderCoverHtml(props)
+  // Rótulo da capa por variante (naming do founder, 2026-07-30): o documento
+  // completo é o **Dossiê** (do terapeuta); a versão do cliente é um recorte
+  // dele e por isso NÃO se chama dossiê — fica no rótulo neutro.
+  const coverHtml = renderCoverHtml(props, isClient ? 'Leitura Iridológica' : 'Dossiê')
   const bodyHtml = await renderBodyHtml(props)
   const headerHtml = renderHeaderHtml(clientName)
   const footerHtml = renderFooterHtml(clientName, disclaimerFooterLine(reportToShow))

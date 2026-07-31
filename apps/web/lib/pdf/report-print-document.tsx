@@ -417,13 +417,17 @@ function htmlDoc(title: string, bodyInner: string): string {
 export function renderCoverHtml(
   props: ReportPrintDocumentProps,
   /**
-   * Rótulo do tipo de documento. Default = o do dossiê, então a chamada de
-   * produção segue byte a byte igual. O relatório emocional passa "Mapa do Ser":
-   * a capa é a MESMA (mesma logo, mesmo nome completo, mesma data, mesma
-   * tipografia) — só o rótulo diz qual dos dois documentos é, porque chamar o
-   * emocional de "Clínico-Funcional" contradiria o enfoque não-médico dele.
+   * Rótulo do tipo de documento. A capa é a MESMA nos três casos (mesma logo,
+   * mesmo nome completo, mesma data, mesma tipografia) — só o rótulo diz qual
+   * documento é: **Dossiê** (terapeuta), **Mapa do Ser** (cliente) ou o neutro
+   * do default (versão do cliente do dossiê).
+   *
+   * ⚠️ 2026-07-30: o default era "Leitura Iridológica Clínico-Funcional".
+   * "Clínico" contradiz o enfoque explicitamente não-médico do produto, e o
+   * mesmo default servia dossiê E versão do cliente. Agora a rota passa o
+   * rótulo por variante e o default ficou neutro — nada herda "Clínico".
    */
-  label = 'Leitura Iridológica Clínico-Funcional',
+  label = 'Leitura Iridológica',
 ): string {
   const { clientName, readingDate } = props
   const date = readingDate ? formatDate(readingDate) : ''

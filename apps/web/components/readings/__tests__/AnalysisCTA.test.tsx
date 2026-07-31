@@ -3,7 +3,9 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { AnalysisCTA } from '../AnalysisCTA'
 
 describe('components/readings/AnalysisCTA — Surface 1 button group', () => {
-  it('renderiza apenas "Gerar análise" quando hasReport=false', () => {
+  // 2026-07-30: o CTA passou a nomear o documento que vai gerar (Mapa do Ser),
+  // porque a leitura passou a poder ter dois relatórios.
+  it('renderiza apenas o CTA de gerar quando hasReport=false', () => {
     render(
       <AnalysisCTA
         readingId="r1"
@@ -13,7 +15,9 @@ describe('components/readings/AnalysisCTA — Surface 1 button group', () => {
         onTrigger={vi.fn()}
       />,
     )
-    expect(screen.getByText('Gerar análise')).toBeDefined()
+    expect(screen.getByTestId('analysis-cta-generate').textContent).toContain(
+      'Mapa do Ser',
+    )
     expect(screen.queryByText('Editar análise')).toBeNull()
   })
 
@@ -81,7 +85,7 @@ describe('components/readings/AnalysisCTA — Surface 1 button group', () => {
     expect(btn.hasAttribute('disabled')).toBe(true)
   })
 
-  it('onTrigger é chamado ao clicar "Gerar análise"', () => {
+  it('onTrigger é chamado ao clicar no CTA de gerar', () => {
     const onTrigger = vi.fn()
     render(
       <AnalysisCTA
@@ -92,7 +96,7 @@ describe('components/readings/AnalysisCTA — Surface 1 button group', () => {
         onTrigger={onTrigger}
       />,
     )
-    fireEvent.click(screen.getByText('Gerar análise'))
+    fireEvent.click(screen.getByTestId('analysis-cta-generate'))
     expect(onTrigger).toHaveBeenCalledTimes(1)
   })
 

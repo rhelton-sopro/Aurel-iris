@@ -1,5 +1,9 @@
 /**
- * Página do RELATÓRIO EMOCIONAL ("Mapa do Ser") — a visualização do 2º relatório.
+ * Página do MAPA DO SER — o relatório PRINCIPAL, o que o cliente lê.
+ *
+ * ⚠️ A rota continua `/emocional` de propósito (nome interno; renomear quebraria links
+ * já enviados). O rótulo visível é "Mapa do Ser" — decisão de naming do founder,
+ * 2026-07-30. O outro relatório, o do terapeuta, chama-se **Dossiê**.
  *
  * ⛔ FOUNDER-ONLY (decisão founder 2026-07-28). Defesa em profundidade: a rota de geração
  * já bloqueia, e aqui bloqueamos de novo no server component — mesmo padrão do /admin.
@@ -10,7 +14,6 @@
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { isFounderEmail } from '@/lib/auth/founder'
 import { renderEmocional } from '@/lib/emocional/render'
 
 export const runtime = 'nodejs'
@@ -26,7 +29,8 @@ export default async function RelatorioEmocionalPage({
 
   const { data: auth } = await supabase.auth.getUser()
   if (!auth?.user) redirect('/login')
-  if (!isFounderEmail(auth.user.email)) notFound()
+  // 2026-07-30: gate founder-only removido — o Mapa do Ser é o relatório principal e
+  // o terapeuta precisa poder abri-lo. O isolamento continua no RLS da query abaixo.
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- colunas da migration 0051, tipos ainda não regerados
   const db = supabase as unknown as { from: (t: string) => any }
@@ -52,7 +56,7 @@ export default async function RelatorioEmocionalPage({
     // prompt, falha aqui — melhor dizer isso que servir página quebrada.
     return (
       <main style={{ padding: 40, fontFamily: 'system-ui', maxWidth: 640, margin: '0 auto' }}>
-        <h1 style={{ fontSize: 20 }}>Não consegui montar este relatório</h1>
+        <h1 style={{ fontSize: 20 }}>Não consegui montar o Mapa do Ser</h1>
         <p style={{ color: '#6b6357', lineHeight: 1.6 }}>
           O texto guardado não bate com o formato que o desenho espera — provavelmente foi
           gerado por uma versão anterior do prompt. Gerar de novo resolve.

@@ -133,6 +133,39 @@ export async function readingHasReservation(readingId: string): Promise<boolean>
   return Boolean(data)
 }
 
+/**
+ * Existe reserva **ATIVA** (ainda não convertida) pra esta leitura?
+ *
+ * Criada em 2026-07-30, quando o DOSSIÊ passou a ser um segundo documento cobrável
+ * da mesma leitura (1 crédito próprio). O guard acima (`readingHasReservation`) não
+ * serve aí: ele conta a reserva já CONVERTIDA do Mapa do Ser e concluiria "já tem",
+ * entregando o Dossiê de graça.
+ *
+ * ⚠️ O que este guard protege: `convert_reservation_to_consume` (migration 0042)
+ * converte **por reading_id** — se houvesse DUAS reservas ativas na mesma leitura, o
+ * UPDATE marcaria as duas como 'converted' e debitaria UM crédito só, deixando
+ * `leituras_reserved` com drift permanente. Reusando a ativa órfã (em vez de criar
+ * outra), nunca existe mais de uma ativa por leitura e o débito fecha 1-para-1.
+ *
+ * Fail-safe idêntico ao do irmão: erro de query → TRUE (não re-reserva, não arrisca
+ * cobrar em dobro).
+ */
+export async function readingHasActiveReservation(readingId: string): Promise<boolean> {
+  const service = createServiceClient()
+  const { data, error } = await service
+    .from('credit_reservations')
+    .select('id')
+    .eq('reading_id', readingId)
+    .eq('status', 'active')
+    .limit(1)
+    .maybeSingle()
+  if (error) {
+    console.error('[billing] readingHasActiveReservation query failed:', error.message)
+    return true // fail-safe: nunca arrisca double-charge
+  }
+  return Boolean(data)
+}
+
 export type ConsumeResult =
   | { ok: true; already: boolean }
   | { ok: false; reason: 'not_found' | 'db_error'; error?: string }

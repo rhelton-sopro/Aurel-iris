@@ -138,6 +138,51 @@ export async function markReadingDelivered(readingId: string): Promise<DeliverRe
   if (readingError || !reading) return { error: 'Leitura não encontrada' }
   if (reading.is_delivered) return { error: 'Leitura já concluída' }
 
+  // report_emocional vem da migration 0051 e ainda não está em types/database.ts —
+  // query separada com cast, o mesmo padrão já usado para as colunas novas no repo.
+  const { data: mapaRow } = await supabase
+    .from('readings')
+    .select('report_emocional' as never)
+    .eq('id', readingId)
+    .maybeSingle<{ report_emocional: string | null }>()
+
+  // ===== Leitura cujo relatório é o MAPA DO SER (2026-07-30) =====
+  // Tudo o que vem depois (snapshot em report_delivered, auditoria de ancoragem,
+  // varredura por seção) foi escrito para o DOSSIÊ: um jsonb de 15 seções que o
+  // terapeuta pode editar. O Mapa do Ser não tem nada disso — é markdown único,
+  // não-editável, e a `audit_metadata` da ancoragem simplesmente não existe para
+  // ele. Sem este desvio, concluir uma leitura nova morria em "Relatório ainda não
+  // foi gerado", que seria uma mentira: ele foi gerado, só não é o outro.
+  //
+  // O que NÃO se afrouxa: a varredura de termos afirmativos roda igual, no
+  // markdown inteiro — é ela que segura o compromisso não-médico.
+  const mapaMd = mapaRow?.report_emocional ?? null
+  const temDossieParaEntregar =
+    reading.report_generated != null &&
+    Object.keys(reading.report_generated as Record<string, unknown>).length > 0
+  if (mapaMd && !temDossieParaEntregar) {
+    const hits = extractForbiddenHits(mapaMd, 'mapa_do_ser')
+    if (hits.length > 0) {
+      const terms = Array.from(new Set(hits.map((h) => h.term))).join(', ')
+      return {
+        error: `Não foi possível concluir: o relatório contém termos afirmativos (${terms}). Gere novamente antes de concluir.`,
+      }
+    }
+
+    const { error: mapaErr } = await supabase
+      .from('readings')
+      .update({
+        is_delivered: true,
+        delivered_at: new Date().toISOString(),
+      } as never)
+      .eq('id', readingId)
+    if (mapaErr) return { error: `Falha ao concluir: ${mapaErr.message}` }
+
+    revalidatePath(`/leituras/${readingId}`)
+    revalidatePath('/leituras')
+    return { success: true }
+  }
+
   // 2026-05-21 (founder UAT): se terapeuta não editou (report_delivered vazio),
   // entregar usa o report_generated como conteúdo final — não bloqueia mais.
   // Cópia explícita pra report_delivered congela o snapshot da entrega.

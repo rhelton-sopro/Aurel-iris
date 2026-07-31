@@ -36,9 +36,10 @@ import {
 } from '@/components/ui/tooltip'
 import { LocalDateTime } from '@/components/ui/local-date-time'
 import { cn } from '@/lib/utils'
-import { GerarEmocionalButton } from './GerarEmocionalButton'
 import { DeliverDialog } from './DeliverDialog'
 import { ExportPdfButton } from './ExportPdfButton'
+import { VersaoClienteButton } from './VersaoClienteButton'
+import { AntigoRelatorioButton } from './AntigoRelatorioButton'
 import { markReadingDelivered } from '@/app/actions/analise'
 
 // Mirrors AnaliseClient / parser.ts BOUNDARY_RE — best-effort UI counter
@@ -73,8 +74,16 @@ export interface ReadingModeActionsProps {
    * /analyze reforça no servidor.
    */
   isFounder?: boolean
-  /** já existe report_emocional gravado nesta leitura (migration 0051) */
-  temEmocional?: boolean
+  /**
+   * Esta leitura tem MAPA DO SER (o relatório principal desde 2026-07-30).
+   * Quando true, a página exibe o Mapa do Ser e o Dossiê vira "antigo relatório".
+   */
+  temMapa?: boolean
+  /**
+   * Esta leitura tem DOSSIÊ (`report_generated`). Leituras anteriores a
+   * 2026-07-30 têm só ele — e continuam exatamente como estavam.
+   */
+  temDossie?: boolean
 }
 
 export function ReadingModeActions({
@@ -87,7 +96,8 @@ export function ReadingModeActions({
   clientPhone,
   isAnalysisInProgress = false,
   isFounder = false,
-  temEmocional = false,
+  temMapa = false,
+  temDossie = true,
 }: ReadingModeActionsProps) {
   const router = useRouter()
   const [deliverOpen, setDeliverOpen] = useState(false)
@@ -106,8 +116,26 @@ export function ReadingModeActions({
     // Editar/Regenerar/Entregar are hidden because they DO modify state.
     return (
       <>
-        <ExportPdfButton readingId={readingId} />
-        <ExportPdfButton readingId={readingId} variant="client" />
+        {temMapa ? (
+          <>
+            <ExportPdfButton
+              readingId={readingId}
+              variant="emocional"
+              label="Mapa do Ser (PDF)"
+            />
+            <VersaoClienteButton readingId={readingId} />
+            {temDossie && <AntigoRelatorioButton readingId={readingId} jaExiste />}
+          </>
+        ) : (
+          <>
+            <ExportPdfButton readingId={readingId} label="Dossiê (PDF)" />
+            <ExportPdfButton
+              readingId={readingId}
+              variant="client"
+              label="Versão do cliente (PDF)"
+            />
+          </>
+        )}
         <p
           className="text-sm text-muted-foreground"
           data-testid="reading-mode-delivered-status"
@@ -154,7 +182,13 @@ export function ReadingModeActions({
       // 2. Gera + baixa o PDF (Gotenberg/Chromium → /api/readings/[id]/pdf).
       toast.success('Leitura concluída. Gerando PDF…')
       try {
-        const res = await fetch(`/api/readings/${readingId}/pdf`, { method: 'GET' })
+        // O PDF que vai pro cliente é o do relatório DELE. Numa leitura nova isso é
+        // o Mapa do Ser (versão do cliente, blocos 1-6); pedir `/pdf` aqui buscaria
+        // o Dossiê e devolveria 409 "Report not ready" em toda leitura nova.
+        const pdfUrl = temMapa
+          ? `/api/readings/${readingId}/emocional/pdf?variant=client`
+          : `/api/readings/${readingId}/pdf`
+        const res = await fetch(pdfUrl, { method: 'GET' })
         if (!res.ok) throw new Error(`HTTP ${res.status}`)
         const blob = await res.blob()
         const cd = res.headers.get('Content-Disposition')
@@ -203,7 +237,13 @@ export function ReadingModeActions({
     // botão disabled+spinner + banner sticky no topo (renderizado abaixo).
     toast.info('Regeneração iniciada — costuma levar 2-3 minutos.')
     try {
-      const res = await fetch(`/api/readings/${readingId}/analyze`, { method: 'POST' })
+      // Regenera o documento QUE ESTA LEITURA TEM. Sem o `?doc=dossie`, regenerar
+      // uma leitura antiga trocaria o Dossiê dela por um Mapa do Ser — e o founder
+      // foi explícito: leitura anterior a 2026-07-30 permanece dossiê.
+      const rota = temMapa
+        ? `/api/readings/${readingId}/analyze`
+        : `/api/readings/${readingId}/analyze?doc=dossie`
+      const res = await fetch(rota, { method: 'POST' })
       if (!res.ok) {
         // 402 = sem créditos. Estado de saldo, não erro de sistema.
         if (res.status === 402) {
@@ -342,22 +382,50 @@ export function ReadingModeActions({
     <>
       {regenBanner}
 
-      <ExportPdfButton readingId={readingId} />
-      <ExportPdfButton readingId={readingId} variant="client" />
+      {/* ===== Leitura NOVA: o principal é o Mapa do Ser ===== */}
+      {temMapa ? (
+        <>
+          <ExportPdfButton
+            readingId={readingId}
+            variant="emocional"
+            label="Mapa do Ser (PDF)"
+          />
+          <VersaoClienteButton readingId={readingId} />
+          <AntigoRelatorioButton
+            readingId={readingId}
+            jaExiste={temDossie}
+            disabled={regenServerOrLocal}
+          />
+        </>
+      ) : (
+        <>
+          {/* ===== Leitura ANTERIOR a 2026-07-30: segue com o Dossiê, sem mudança ===== */}
+          <ExportPdfButton readingId={readingId} label="Dossiê (PDF)" />
+          <ExportPdfButton
+            readingId={readingId}
+            variant="client"
+            label="Versão do cliente (PDF)"
+          />
+        </>
+      )}
 
-      <Link
-        href={`/leituras/${readingId}/editar`}
-        className={cn(buttonVariants({ variant: 'outline' }), 'gap-2')}
-        data-testid="reading-mode-edit"
-        aria-disabled={regenServerOrLocal}
-        tabIndex={regenServerOrLocal ? -1 : undefined}
-        onClick={(e) => {
-          if (regenServerOrLocal) e.preventDefault()
-        }}
-      >
-        <Pencil className="h-4 w-4" aria-hidden />
-        Editar análise
-      </Link>
+      {/* O editor é seção-a-seção do DOSSIÊ — não existe editor para o Mapa do Ser,
+          então o botão só aparece quando há dossiê para editar. */}
+      {temDossie && (
+        <Link
+          href={`/leituras/${readingId}/editar`}
+          className={cn(buttonVariants({ variant: 'outline' }), 'gap-2')}
+          data-testid="reading-mode-edit"
+          aria-disabled={regenServerOrLocal}
+          tabIndex={regenServerOrLocal ? -1 : undefined}
+          onClick={(e) => {
+            if (regenServerOrLocal) e.preventDefault()
+          }}
+        >
+          <Pencil className="h-4 w-4" aria-hidden />
+          Editar análise
+        </Link>
+      )}
 
       {!isSelfReading && (
         <Button
@@ -372,16 +440,12 @@ export function ReadingModeActions({
         </Button>
       )}
 
-      {/* Relatório emocional (Mapa do Ser) — founder-only por enquanto. Aparece aqui
-          porque este bloco só existe em reading mode, ou seja: o relatório de produção
-          já foi feito e portanto o Stage 1 daquela leitura existe. */}
-      {isFounder && (
-        <GerarEmocionalButton
-          readingId={readingId}
-          jaGerado={temEmocional}
-          disabled={regenServerOrLocal}
-        />
-      )}
+      {/* ⛔ NÃO existe botão de "gerar Mapa do Ser" em leitura antiga (founder,
+          2026-07-30: "não deixa disponível não"). Leitura anterior permanece no
+          Dossiê; quem quiser o Mapa do Ser tira fotos novas — o que é coerente com
+          o produto, já que o Mapa do Ser nasce do Stage 1 daquelas fotos e a leitura
+          nova é o que o cliente paga. A rota POST /emocional continua existindo e
+          founder-only, como ferramenta manual — só não tem porta na UI. */}
 
       {/* Regen só pro founder (2026-06-03): o terapeuta não regenera mais. */}
       {isFounder &&

@@ -23,8 +23,7 @@
  */
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { isFounderEmail } from '@/lib/auth/founder'
-import { renderEmocional } from '@/lib/emocional/render'
+import { renderEmocional, OMITIR_NA_VERSAO_CLIENTE } from '@/lib/emocional/render'
 import {
   renderCoverHtml,
   renderHeaderHtml,
@@ -65,15 +64,22 @@ export const maxDuration = 120
 
 const RENDER_TIMEOUT_MS = 90_000
 
-export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> }) {
+export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params
   const supabase = await createClient()
 
   const { data: auth } = await supabase.auth.getUser()
   if (!auth?.user) return NextResponse.json({ error: 'não autenticado' }, { status: 401 })
-  if (!isFounderEmail(auth.user.email)) {
-    return NextResponse.json({ error: 'indisponível' }, { status: 403 })
-  }
+  // 2026-07-30: o gate founder-only CAIU aqui — o Mapa do Ser é o relatório principal,
+  // e o terapeuta precisa baixar o PDF do próprio trabalho. O isolamento continua sendo
+  // o de sempre: RLS na leitura abaixo (a query não retorna leitura de outro terapeuta).
+
+  // Versão do cliente (2026-07-30): blocos 1-6; o 7 ("Perguntas para a sua sessão") é o
+  // guia de condução do terapeuta e só entra se ele marcar a caixinha (`&guia=1`).
+  const sp = new URL(req.url).searchParams
+  const isClient = sp.get('variant') === 'client'
+  const comGuia = sp.get('guia') === '1'
+  const omitirTitulos = isClient && !comGuia ? OMITIR_NA_VERSAO_CLIENTE : undefined
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- colunas da 0051, tipos não regerados
   const db = supabase as unknown as { from: (t: string) => any }
@@ -84,7 +90,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
     .eq('id', id)
     .single()
   if (!reading?.report_emocional) {
-    return NextResponse.json({ error: 'relatório emocional ainda não gerado' }, { status: 404 })
+    return NextResponse.json({ error: 'Mapa do Ser ainda não gerado' }, { status: 404 })
   }
 
   const [{ data: findings }, { data: client }] = await Promise.all([
@@ -97,7 +103,9 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
 
   let html: string
   try {
-    html = renderEmocional(reading.report_emocional, findings?.exame_json ?? {}, primeiro).html
+    html = renderEmocional(reading.report_emocional, findings?.exame_json ?? {}, primeiro, {
+      omitirTitulos,
+    }).html
     // Única alteração no documento: tirar o @page, senão as bandas não têm onde caber.
     // Nada de mexer em .pad, .brand ou qualquer coisa do desenho aprovado (ver acima).
     html = html.replace(RE_AT_PAGE, '')
@@ -214,7 +222,9 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
     return new NextResponse(pdf, {
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `inline; filename="Mapa-do-Ser-${slug || 'cliente'}.pdf"`,
+        'Content-Disposition': `inline; filename="Mapa-do-Ser-${slug || 'cliente'}${
+          isClient ? '-cliente' : ''
+        }.pdf"`,
         'Cache-Control': 'private, no-store',
       },
     })

@@ -26,6 +26,23 @@ const nextConfig: NextConfig = {
     // ao primeiro request porque prompts/system.md e feature-injection.md
     // não estão no .vercel/output/functions/<route>.func/.
     'app/api/readings/[id]/analyze/route': ['./prompts/**/*'],
+    // ⚠️ A chave acima é INERTE (ver a explicação da CHAVE=ROTA logo abaixo) — o
+    // system.md só chegava ao bundle porque o tracer analisa `fs` por conta própria.
+    // Desde 2026-07-30 esta rota também gera o MAPA DO SER, então passou a depender
+    // do prompt e da tabela-lastro do motor. Aqui a chave está no formato certo:
+    '/api/readings/*/analyze': [
+      './prompts/**/*',
+      './_motor-lab/lastro/**/*.md',
+      './_motor-lab/prompts/**/*.md',
+      './_motor-lab/*.mjs',
+    ],
+    // A PÁGINA DA LEITURA passou a renderizar o Mapa do Ser inline (antes só
+    // exibia o dossiê, que não usa o motor).
+    '/leituras/*': [
+      './_motor-lab/lastro/**/*.md',
+      './_motor-lab/relatorio-novo/*.html',
+      './_motor-lab/*.mjs',
+    ],
     // Relatório emocional: o motor lê a tabela-lastro, o mapa de eixos, o prompt e os
     // dois HTML de design em runtime. Mesmo pitfall do system.md — sem isto, ENOENT no
     // primeiro request em produção.

@@ -31,11 +31,13 @@ export interface ExportPdfButtonProps {
   readingId: string
   /**
    * Variante do PDF:
-   *  - 'sam'    → harness SAM (relatório paralelo, Phase 7.4)
-   *  - 'client' → versão condensada do cliente (subconjunto de seções global)
-   *  - ausente  → relatório completo de produção
+   *  - 'sam'       → harness SAM (relatório paralelo, Phase 7.4)
+   *  - 'client'    → versão condensada do cliente (subconjunto de seções global)
+   *  - 'emocional' → MAPA DO SER, o relatório principal desde 2026-07-30. Rota
+   *                  própria (`/emocional/pdf`), não é um ?variant do dossiê.
+   *  - ausente     → Dossiê completo
    */
-  variant?: 'sam' | 'client'
+  variant?: 'sam' | 'client' | 'emocional'
   /** Optional override for the button label (defaults to "Exportar PDF"). */
   label?: string
 }
@@ -65,10 +67,14 @@ export function ExportPdfButton({ readingId, variant, label }: ExportPdfButtonPr
   const isPending = pending || localPending
   const isSam = variant === 'sam'
   const isClient = variant === 'client'
-  const pdfUrl = variant
-    ? `/api/readings/${readingId}/pdf?variant=${variant}`
-    : `/api/readings/${readingId}/pdf`
-  const idleLabel = label ?? (isClient ? 'Versão do cliente' : 'Exportar PDF')
+  const isEmocional = variant === 'emocional'
+  const pdfUrl = isEmocional
+    ? `/api/readings/${readingId}/emocional/pdf`
+    : variant
+      ? `/api/readings/${readingId}/pdf?variant=${variant}`
+      : `/api/readings/${readingId}/pdf`
+  const idleLabel =
+    label ?? (isClient ? 'Versão do cliente' : isEmocional ? 'Mapa do Ser (PDF)' : 'Exportar PDF')
 
   function onClick() {
     setLocalPending(true)
@@ -84,7 +90,9 @@ export function ExportPdfButton({ readingId, variant, label }: ExportPdfButtonPr
         const blob = await res.blob()
         const filename =
           parseFilenameFromHeader(res.headers.get('Content-Disposition')) ??
-          `leitura-${readingId}${isSam ? '-SAM' : isClient ? '-cliente' : ''}.pdf`
+          `leitura-${readingId}${
+            isSam ? '-SAM' : isClient ? '-cliente' : isEmocional ? '-mapa-do-ser' : ''
+          }.pdf`
         triggerDownload(blob, filename)
         toast.success('PDF baixado.')
       } catch (err) {
@@ -108,7 +116,9 @@ export function ExportPdfButton({ readingId, variant, label }: ExportPdfButtonPr
           ? 'reading-mode-export-pdf-sam'
           : isClient
             ? 'reading-mode-export-pdf-client'
-            : 'reading-mode-export-pdf'
+            : isEmocional
+              ? 'reading-mode-export-pdf-mapa'
+              : 'reading-mode-export-pdf'
       }
     >
       {isPending ? (

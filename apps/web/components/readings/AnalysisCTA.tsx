@@ -62,7 +62,10 @@ export function AnalysisCTA({
     return (
       <Button onClick={onTrigger} size="lg" className="gap-2" data-testid="analysis-cta-generate">
         <Sparkles className="h-4 w-4" aria-hidden />
-        Gerar análise
+        {/* 2026-07-30: este botão passou a gerar o MAPA DO SER (o relatório
+            principal). Nomear o documento evita a dúvida de "qual dos dois vem?",
+            agora que a leitura pode ter dois. */}
+        Gerar relatório · Mapa do Ser
       </Button>
     )
   }

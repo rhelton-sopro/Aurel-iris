@@ -38,6 +38,11 @@ import { AnalysisStream } from '@/components/readings/AnalysisStream'
 // is 1..15 sequential). Best-effort UI counter; server parser is authoritative.
 const BOUNDARY_RE = /^[ \t]*#{2,3}[ \t]+§?[ \t]*\d{1,2}(?:\.\d)?[ \t]*[\p{Pd}.][ \t]*/gmu
 
+// 2026-07-30: o "Gerar relatório" passou a produzir o MAPA DO SER, cujos blocos são
+// H1 (`# Título`) — o BOUNDARY_RE acima é do Dossiê (H2/H3 numerados) e contaria zero
+// aqui, deixando a barra parada em 0 durante os ~3 minutos inteiros.
+const BLOCO_RE = /^# /gm
+
 export interface AnaliseClientProps {
   readingId: string
   hasInitialReport: boolean
@@ -53,6 +58,12 @@ export interface AnaliseClientProps {
   isAnalysisInProgress?: boolean
   /** Regen só pro founder (2026-06-03) — repassa ao AnalysisCTA. */
   isFounder?: boolean
+  /**
+   * Títulos dos 7 blocos do Mapa do Ser, vindos do motor via server component
+   * (`lib/emocional/render` é server-only). Presentes = a geração é do Mapa do Ser,
+   * que é o padrão desde 2026-07-30; ausentes = checklist do Dossiê.
+   */
+  blocosTitulos?: readonly string[]
 }
 
 export function AnaliseClient({
@@ -62,6 +73,7 @@ export function AnaliseClient({
   isDelivered,
   isAnalysisInProgress = false,
   isFounder = false,
+  blocosTitulos,
 }: AnaliseClientProps) {
   const router = useRouter()
   const [streaming, setStreaming] = useState(false)
@@ -137,7 +149,8 @@ export function AnaliseClient({
         // Legacy: count `^### N. ` markdown boundaries. Best-effort count
         // without monotonic guard (UI hint only); server parser does the
         // strict thing for persistence.
-        const boundaryMatches = accumulated.match(BOUNDARY_RE) ?? []
+        const re = blocosTitulos?.length ? BLOCO_RE : BOUNDARY_RE
+        const boundaryMatches = accumulated.match(re) ?? []
         setSectionsReceived(boundaryMatches.length)
       }
       toast.success('Análise gerada. Revise as seções antes de concluir.')
@@ -195,7 +208,12 @@ export function AnaliseClient({
   return (
     <>
       {streaming ? (
-        <AnalysisStream sectionsReceived={sectionsReceived} error={error} />
+        <AnalysisStream
+          sectionsReceived={sectionsReceived}
+          error={error}
+          steps={blocosTitulos}
+          unidade={blocosTitulos?.length ? 'blocos' : 'seções'}
+        />
       ) : (
         <>
           <AnalysisCTA

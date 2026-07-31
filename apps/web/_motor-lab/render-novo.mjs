@@ -28,7 +28,27 @@ const B6HTML = PROTO6.slice(PROTO6.indexOf('<p class="method-sub">'), PROTO6.ind
 //   md    = markdown estruturado do Stage 2 emocional
 //   exame = objeto do Stage 1 (produção) ou nome do exame (lab)
 //   nome  = nome da pessoa, para o vocativo
-export function renderHTML(md, exame, nome) {
+//   opts  = { blocos } — OPCIONAL. Lista 1-based dos blocos que entram no documento
+//           (ex.: [1,2,3,4,5,6] = versão do cliente sem o guia de sessão). Omitido =
+//           todos, então lab e Mapa do Ser completo seguem byte a byte idênticos.
+//           A numeração e as âncoras NÃO são recalculadas: o bloco 5 continua sendo
+//           b5 mesmo se o 3 sair — link velho não passa a apontar pro bloco errado.
+// Títulos dos 7 blocos. Moraram dentro de renderHTML até 2026-07-30; subiram para o
+// escopo do módulo quando a barra de progresso da geração passou a precisar deles —
+// a alternativa era uma segunda lista em lib/, e lista duplicada vira deriva (foi
+// assim que o método de 7 movimentos ficou 7 dias aprovado sem chegar ao prompt).
+export const NUMS_BLOCOS = ['1', '2', '3', '4', '5', '6', '7']
+export const TITULOS_BLOCOS = [
+  'Em poucas palavras',
+  'Mente, coração e corpo — a sua mistura',
+  'O que cada tempo deixou em você',
+  'O que talvez não tenha começado em você',
+  'Onde você está — e pra onde dá pra ir',
+  'Crenças a serem trabalhadas',
+  'Perguntas para a sua sessão',
+]
+
+export function renderHTML(md, exame, nome, opts = {}) {
   const MD = md
   const NOME = nome || 'você'
 
@@ -395,7 +415,10 @@ function block7(body) {
       if (slot) {
         const v = campo(slot)
         if (v) {
-          const lab = m.n === 7 ? '<p class="say-lab">Micro-passo</p>' : ''
+          // Era "Micro-passo" — mudou junto com o s7 (2026-07-29). O movimento 7 deixou de
+          // prescrever tarefa e passou a PERGUNTAR ("tem algo hoje que você já pode…?"), então
+          // um rótulo que anuncia "passo" contradiz o que vem escrito embaixo dele.
+          const lab = m.n === 7 ? '<p class="say-lab">O que já dá pra agora</p>' : ''
           // depois da fala ancorada vem a CONTINUAÇÃO FIXA do método (varredura no
           // corpo, dar forma/submodalidades, "tem mais alguma coisa junto?") com as
           // deixas entre elas — sem isso o movimento saía pela metade.
@@ -421,10 +444,23 @@ function block7(body) {
 }
 
 // ---------- monta ----------
-const NUMS = ['1', '2', '3', '4', '5', '6', '7']
-const H2 = ['Em poucas palavras', 'Mente, coração e corpo — a sua mistura', 'O que cada tempo deixou em você', 'O que talvez não tenha começado em você', 'Onde você está — e pra onde dá pra ir', 'Crenças a serem trabalhadas', 'Perguntas para a sua sessão']
+const NUMS = NUMS_BLOCOS
+const H2 = TITULOS_BLOCOS
 const blocks = MD.split(/^# /m).filter((b) => b.trim())
+
+// Filtro da VERSÃO DO CLIENTE (2026-07-30) — por TÍTULO, nunca por posição.
+//
+// O documento canônico tem 7 blocos ("Crenças a serem trabalhadas" entrou em `90f35f2`,
+// 27/07). Mesmo assim o filtro casa pelo TÍTULO, não pelo número: se algum dia faltar um
+// bloco, um filtro posicional ("1 a 6") entregaria o guia de sessão ao cliente justamente
+// no documento defeituoso — o oposto do que ele existe para impedir. Casar por título
+// custa o mesmo e não tem esse modo de falha.
+const omitirRx = Array.isArray(opts.omitirTitulos) ? opts.omitirTitulos : null
+const tituloDe = (b) => b.slice(0, b.indexOf('\n')).trim()
+const omitido = (b) => !!omitirRx && omitirRx.some((rx) => new RegExp(rx, 'i').test(tituloDe(b)))
+
 const sections = blocks.map((b, i) => {
+  if (omitido(b)) return null
   const nl = b.indexOf('\n'); const title = b.slice(0, nl).trim(); const body = b.slice(nl + 1)
   const eyebrow = `<p class="eyebrow"><span class="secnum">${NUMS[i] || ''}</span> &nbsp;${esc(title)}</p>`
   const h2 = (i === 0 || i === 6) ? '' : `<h2 class="display">${esc(H2[i] || title)}</h2>`
@@ -436,13 +472,27 @@ const sections = blocks.map((b, i) => {
 })
 // ÍNDICE — gerado aqui, não pelo prompt: o render já sabe os 6 títulos, então não gasta
 // token e não corre risco de o Sonnet inventar seção. Entra logo depois do bloco 1.
+// O índice lista os blocos que EXISTEM neste documento. No caminho normal são os 7
+// canônicos; a diferença aparece na versão do cliente (que omite o guia de sessão) e
+// em documento defeituoso — antes, o índice fixo anunciava uma seção ausente e
+// apontava para uma âncora inexistente.
 const toc = `<nav class="toc"><p class="toc-lab">O que vem a seguir</p>${
-  H2.map((t, i) => `<a class="toc-row" href="#b${i + 1}"><span class="toc-n">${NUMS[i]}</span><span class="toc-t">${esc(t)}</span></a>`).join('')
+  blocks.map((b, i) => omitido(b)
+    ? ''
+    : `<a class="toc-row" href="#b${i + 1}"><span class="toc-n">${NUMS[i] || i + 1}</span><span class="toc-t">${esc(H2[i] || tituloDe(b))}</span></a>`,
+  ).join('')
 }</nav>`
 // bloco 7 (guia de condução) é método fixo — o render ANEXA, o Sonnet não escreve.
 // Assim não depende de quantos blocos vieram do markdown e o modelo para de gastar
 // token num bloco que era descartado de qualquer jeito.
-const sectionsHtml = [sections[0] + toc, ...sections.slice(1)].join('\n<hr class="div">\n')
+//
+// O índice entra depois do PRIMEIRO bloco presente — não em `sections[0]` fixo: com
+// filtro de blocos aquele índice pode ter saído, e concatenar em null imprimia
+// literalmente "null<nav…" no documento do cliente.
+const presentes = sections.filter(Boolean)
+const sectionsHtml = presentes.length
+  ? [presentes[0] + toc, ...presentes.slice(1)].join('\n<hr class="div">\n')
+  : ''
 
 // FECHO — nome, data e natureza do documento. Um doc "pra guardar" não pode terminar
 // numa instrução de manejo; precisa fechar como peça.

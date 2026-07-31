@@ -51,7 +51,10 @@ describe('renderCoverHtml', () => {
     expect(html).toContain('src="data:image/png;base64,')
     expect(html).toContain('A íris como mapa do ser.')
     expect(html).toContain('class="cover-divider"')
-    expect(html).toContain('Leitura Iridológica Clínico-Funcional')
+    // 2026-07-30: default neutro. "Clínico-Funcional" saiu (enfoque não-médico) e o
+    // rótulo real passou a vir da rota, por variante: "Dossiê" / "Leitura Iridológica".
+    expect(html).toContain('Leitura Iridológica')
+    expect(html).not.toContain('Clínico')
     expect(html).toContain('class="cover-name">Nailli Test')
     expect(html).toContain('class="cover-wordmark">Iris Codex')
     // White cover (CHANGE 2): --white token is #FFFFFF and the cover uses it.

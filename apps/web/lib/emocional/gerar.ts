@@ -51,10 +51,15 @@ export type ResultadoEmocional = {
 /**
  * @param exame  o `exame_json` do Stage 1 (objeto, direto do banco)
  * @param nome   nome do cliente, para o vocativo
+ * @param onText callback OPCIONAL por delta de texto. Existe porque o Mapa do Ser
+ *   virou o relatório principal (2026-07-30) e a geração leva ~3 min: sem repassar
+ *   o texto, o terapeuta encara uma tela parada. Quem não passa o callback (a rota
+ *   /emocional das leituras antigas) segue exatamente como antes.
  */
 export async function gerarRelatorioEmocional(
   exame: Record<string, unknown>,
   nome: string,
+  onText?: (delta: string) => void,
 ): Promise<ResultadoEmocional> {
   const apiKey = process.env.ANTHROPIC_API_KEY
   if (!apiKey) throw new Error('ANTHROPIC_API_KEY ausente')
@@ -67,7 +72,7 @@ export async function gerarRelatorioEmocional(
 
   // streaming é obrigatório: a saída passa de 20k tokens e a chamada pode ultrapassar
   // o limite de resposta não-streamed da SDK.
-  const msg = await client.messages
+  const stream = client.messages
     .stream({
       model: MODEL,
       max_tokens: MAX_TOKENS,
@@ -90,7 +95,21 @@ export async function gerarRelatorioEmocional(
         },
       ],
     })
-    .finalMessage()
+
+  // O repasse é best-effort e NÃO pode derrubar a geração: se o consumidor
+  // (a conexão do terapeuta) já fechou, `onText` throw — e perder o relatório
+  // inteiro porque o navegador saiu seria o mesmo bug do UAT 2026-05-20.
+  if (onText) {
+    stream.on('text', (delta) => {
+      try {
+        onText(delta)
+      } catch {
+        /* consumidor foi embora — a geração continua e persiste no banco */
+      }
+    })
+  }
+
+  const msg = await stream.finalMessage()
 
   const markdown = msg.content
     .filter((b): b is Anthropic.TextBlock => b.type === 'text')

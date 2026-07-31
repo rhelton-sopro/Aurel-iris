@@ -69,7 +69,9 @@ describe('components/readings/ReadingModeActions (Plan 7.4-18 — UAT-3 reading-
     // → blob download. No href anymore.
     expect(pdf.tagName.toLowerCase()).toBe('button')
     expect(pdf.getAttribute('href')).toBeNull()
-    expect(pdf.textContent).toContain('Exportar PDF')
+    // 2026-07-30: o botão passou a nomear o DOCUMENTO ("Dossiê"), não a ação, agora
+    // que a leitura tem dois relatórios — o Dossiê e o Mapa do Ser.
+    expect(pdf.textContent).toContain('Dossiê')
   })
 
   it('Editar análise links to /leituras/[id]/editar', () => {
@@ -114,7 +116,7 @@ describe('components/readings/ReadingModeActions (Plan 7.4-18 — UAT-3 reading-
     expect(regen.getAttribute('aria-label')).toContain('1/1')
   })
 
-  it('isDelivered=true hides edit/deliver/regenerate but KEEPS Exportar PDF visible (Plan 19)', () => {
+  it('isDelivered=true hides edit/deliver/regenerate but KEEPS o PDF do Dossiê visível (Plan 19)', () => {
     render(
       <ReadingModeActions
         readingId="reading-123"

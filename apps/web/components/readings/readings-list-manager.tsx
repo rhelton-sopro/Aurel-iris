@@ -30,6 +30,12 @@ export interface ReadingRow {
   created_at: string | null
   vision_features: unknown
   report_generated: unknown
+  /**
+   * Tem MAPA DO SER (2026-07-30). Leitura nova não tem `report_generated` — se a
+   * lista olhasse só pra ele, uma leitura recém-gerada apareceria como "sem
+   * relatório" e, pior, como "Fotos apagadas" (a purga roda logo após a geração).
+   */
+  temMapa?: boolean
   is_delivered: boolean | null
   images_purged_at?: string | null
   reading_images: { count: number }[] | null
@@ -133,8 +139,9 @@ export function ReadingsListManager({
             (r.vision_features as { processing_metadata?: { error_summary?: string } } | null)
               ?.processing_metadata?.error_summary ?? null
           const hasReport =
-            r.report_generated != null &&
-            Object.keys(r.report_generated as Record<string, unknown>).length > 0
+            r.temMapa === true ||
+            (r.report_generated != null &&
+              Object.keys(r.report_generated as Record<string, unknown>).length > 0)
           const isDelivered = r.is_delivered ?? false
           const isSelected = selected.has(r.id)
           // "Fotos apagadas" (furo 2026-06-29): imagens purgadas (TTL 24h) +

@@ -41,7 +41,23 @@ export default async function LeiturasPage() {
       .order('full_name', { ascending: true }),
   ])
 
-  const list = readings ?? []
+  // Quais destas leituras têm MAPA DO SER (2026-07-30). Query separada porque a
+  // coluna é da migration 0051 e ainda não está em types/database.ts.
+  //
+  // ⚠️ Sem isto a lista fica gravemente errada: ela deriva "tem relatório" só de
+  // `report_generated`, e a foto é purgada logo após a geração — então uma leitura
+  // nova, recém-gerada com sucesso, apareceria como "Fotos apagadas" (leitura morta,
+  // sem caminho a não ser refazer a captura). Exatamente o oposto do que aconteceu.
+  const { data: mapas } = await supabase
+    .from('readings')
+    .select('id, report_emocional_generated_at' as never)
+    .not('report_emocional_generated_at' as never, 'is', null)
+    .limit(200)
+  const comMapa = new Set(
+    ((mapas ?? []) as unknown as Array<{ id: string }>).map((m) => m.id),
+  )
+
+  const list = (readings ?? []).map((r) => ({ ...r, temMapa: comMapa.has(r.id) }))
   const availableClients = (clients ?? []).map((c) => ({
     id: c.id,
     full_name: c.full_name,

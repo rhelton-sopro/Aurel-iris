@@ -37,6 +37,8 @@ import { ReportReadView } from '@/components/readings/ReportReadView'
 import { ReadingModeActions } from '@/components/readings/ReadingModeActions'
 import { AutoRefreshWhileProcessing } from '@/components/readings/AutoRefreshWhileProcessing'
 import { ExpiredReadingActions } from '@/components/readings/ExpiredReadingActions'
+import { MapaDoSerEmbed } from '@/components/readings/MapaDoSerEmbed'
+import { renderEmocional, TITULOS_BLOCOS } from '@/lib/emocional/render'
 import { AnaliseClient } from './analise-client'
 
 export const dynamic = 'force-dynamic'
@@ -65,22 +67,25 @@ export default async function LeituraDetailPage({
   // 'as never' isola o type-check; RLS authed garante isolation.
   const { data: progress } = await supabase
     .from('readings')
-    .select('analysis_started_at, analysis_completed_at, images_purged_at, report_emocional_generated_at' as never)
+    .select(
+      'analysis_started_at, analysis_completed_at, images_purged_at, report_emocional, report_emocional_generated_at' as never,
+    )
     .eq('id', readingId)
     .maybeSingle<{
       analysis_started_at: string | null
       analysis_completed_at: string | null
       images_purged_at: string | null
+      report_emocional: string | null
       report_emocional_generated_at: string | null
     }>()
 
   if (error || !reading) notFound()
 
-  // Relatório emocional (Mapa do Ser) — founder-only por enquanto (2026-07-28).
-  // O botão só existe em reading mode, então o Stage 1 daquela leitura já existe.
+  // `ehFounder` continua governando o botão de REGENERAR (2026-06-03: regen saiu
+  // do terapeuta). O Mapa do Ser em si não é mais founder-only desde 2026-07-30 —
+  // virou o relatório padrão de toda leitura nova.
   const { data: authUser } = await supabase.auth.getUser()
   const ehFounder = isFounderEmail(authUser?.user?.email)
-  const temEmocional = Boolean(progress?.report_emocional_generated_at)
 
   // Marca como "vista pelo terapeuta" — derruba o badge de notificação
   // no /dashboard (0026 readings.seen_by_therapist_at). Idempotente:
@@ -107,7 +112,13 @@ export default async function LeituraDetailPage({
   const regenerationCount = reading.regeneration_count ?? 0
   const isDelivered = reading.is_delivered ?? false
   const status = reading.status ?? 'pending'
-  const isReadingMode = (status === 'ready' || status === 'edited') && hasReport
+  // 2026-07-30: o Mapa do Ser virou o relatório principal, então ele TAMBÉM abre o
+  // modo leitura. Sem isto, uma leitura nova (que só tem Mapa do Ser, nunca gerou
+  // Dossiê) ficaria presa na tela de "Gerar análise" — sem relatório e sem botão,
+  // porque todas as ações moram dentro deste modo.
+  const temMapa = Boolean(progress?.report_emocional)
+  const isReadingMode =
+    (status === 'ready' || status === 'edited') && (hasReport || temMapa)
   const reportToShow = (reportDelivered ?? reportGenerated) as Record<string, string>
   const reportGeneratedAt =
     (reading as { report_generated_at?: string }).report_generated_at ?? null
@@ -126,7 +137,15 @@ export default async function LeituraDetailPage({
   // sucesso, analyze/route.ts:490). O catch de erro grava report_generated
   // PARCIAL sem _at — o inline decidiu NÃO cobrar nesse caso, então o backstop
   // também não pode. Mesma regra do cron (reconcileOrphanedConsumes).
-  if (hasReport && reportGeneratedAt != null) {
+  // 2026-07-30: vale também para o MAPA DO SER — mesma regra, mesma prova de
+  // sucesso. `report_emocional_generated_at` só é gravado no caminho bom (o catch
+  // do gerador não escreve nada), então serve de "_at" exatamente como o do Dossiê.
+  // Sem isto, uma geração de Mapa do Ser cuja função morresse logo após persistir
+  // ficaria com a reserva ativa para sempre = leitura entregue e nunca cobrada.
+  const geracaoBemSucedida =
+    (hasReport && reportGeneratedAt != null) ||
+    Boolean(progress?.report_emocional_generated_at)
+  if (geracaoBemSucedida) {
     const service = createServiceClient()
     const { data: orphan } = await service
       .from('credit_reservations')
@@ -249,6 +268,81 @@ export default async function LeituraDetailPage({
   // ---- READING MODE (Plan 18 default) ----
   // Continuous flowing serif document with top action buttons.
   if (isReadingMode) {
+    const acoes = (
+      <ReadingModeActions
+        readingId={readingId}
+        regenerationCount={regenerationCount}
+        isDelivered={isDelivered}
+        deliveredAt={reading.delivered_at}
+        isSelfReading={isSelfReading}
+        clientName={clientName}
+        clientPhone={clientPhone}
+        isAnalysisInProgress={isAnalysisInProgress}
+        isFounder={ehFounder}
+        temMapa={temMapa}
+        temDossie={hasReport}
+      />
+    )
+
+    // ---- MAPA DO SER inline (relatório principal desde 2026-07-30) ----
+    // Só entra aqui quem TEM o documento. Leitura anterior à mudança cai no
+    // ReportReadView de sempre, com o Dossiê — nada de espaço vazio ou aviso de
+    // relatório que ela nunca teve.
+    if (temMapa) {
+      const { data: findings } = await supabase
+        .from('report_findings')
+        .select('exame_json')
+        .eq('reading_id', readingId)
+        .maybeSingle<{ exame_json: unknown }>()
+
+      const primeiroNome = clientName.trim().split(/\s+/)[0] || 'você'
+      let mapaHtml: string | null = null
+      try {
+        mapaHtml = renderEmocional(
+          progress!.report_emocional!,
+          findings?.exame_json ?? {},
+          primeiroNome,
+        ).html
+      } catch (e) {
+        // O render depende do formato @BLOCOS. Se falhar, mostramos as ações e o
+        // aviso — melhor que derrubar a página inteira da leitura.
+        console.error('[leitura] render do Mapa do Ser falhou', { readingId, e })
+      }
+
+      return (
+        <div className="space-y-6 -mx-7 px-4 py-8 sm:mx-0 sm:px-6">
+          <AutoRefreshWhileProcessing active={isAnalysisInProgress} />
+          <div className="flex items-center justify-between">
+            <Link
+              href="/leituras"
+              className="text-sm text-muted-foreground hover:underline"
+            >
+              ← Voltar para leituras
+            </Link>
+            <StatusBadge status={status as never} />
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">{acoes}</div>
+
+          {mapaHtml ? (
+            <div className="overflow-hidden rounded-lg border bg-white">
+              <MapaDoSerEmbed html={mapaHtml} title={`Mapa do Ser — ${clientName}`} />
+            </div>
+          ) : (
+            <div className="rounded-lg border-2 border-amber-500 bg-amber-50 px-5 py-5">
+              <h1 className="text-lg font-semibold text-amber-950">
+                Não consegui montar o Mapa do Ser
+              </h1>
+              <p className="mt-2 text-sm text-amber-900/90">
+                O texto guardado não bate com o formato que o desenho espera. O
+                conteúdo está salvo — gerar de novo resolve.
+              </p>
+            </div>
+          )}
+        </div>
+      )
+    }
+
     return (
       <div className="space-y-6 -mx-7 px-4 py-8 sm:mx-0 sm:px-6">
         {/* v2.9.0 (2026-05-27): auto-refresh + banner em reading mode
@@ -272,20 +366,7 @@ export default async function LeituraDetailPage({
           readingDate={reportGeneratedAt ?? reading.created_at}
           analysisVersion={analysisVersion}
           technicalNotice={technicalNotice}
-          topActionsSlot={
-            <ReadingModeActions
-              readingId={readingId}
-              regenerationCount={regenerationCount}
-              isDelivered={isDelivered}
-              deliveredAt={reading.delivered_at}
-              isSelfReading={isSelfReading}
-              clientName={clientName}
-              clientPhone={clientPhone}
-              isAnalysisInProgress={isAnalysisInProgress}
-              isFounder={ehFounder}
-              temEmocional={temEmocional}
-            />
-          }
+          topActionsSlot={acoes}
         />
       </div>
     )
@@ -403,6 +484,10 @@ export default async function LeituraDetailPage({
           regenerationCount={regenerationCount}
           isDelivered={isDelivered}
           isAnalysisInProgress={isAnalysisInProgress}
+          // Gerar aqui = gerar o MAPA DO SER (padrão desde 2026-07-30). Os títulos
+          // vêm do motor porque `lib/emocional/render` é server-only e o checklist
+          // é client — passar por prop é o que mantém UMA lista só.
+          blocosTitulos={TITULOS_BLOCOS}
         />
       </AnalysisHero>
     </div>
