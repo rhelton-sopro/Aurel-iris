@@ -30,6 +30,7 @@ que o founder não lê, não revisa e não pode corrigir.
 | **Relatório principal** | Mapa do Ser | APLICADA | `48b4c00` (2026-07-30) |
 | **Dossiê** | opcional, sob demanda, **1 crédito** | APLICADA | `48b4c00` |
 | **Leituras anteriores a 30/07** | permanecem no Dossiê, sem oferta de migração | APLICADA | `48b4c00` |
+| **Topografia** (hora/anel/olho por campo) | auditoria Jensen — 40 de 44 campos com zona | APLICADA | `4d6a82a` · conferida por `verificar-decisoes.mjs` |
 | **Versão do cliente** (Mapa do Ser) | tudo menos "Perguntas para a sua sessão"; caixinha inclui | APLICADA | `48b4c00` |
 
 ---

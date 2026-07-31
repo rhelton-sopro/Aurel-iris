@@ -79,6 +79,35 @@ for (const c of CHECAGENS) {
   }
 }
 
+// ===== A TOPOGRAFIA (Jensen) continua no ar? =====
+// O founder gastou dias em cima dos livros mapeando hora/anel/olho de cada campo, e o
+// Stage 1 já teve o fígado na zona errada (5-7h, que é quadril/coxa/joelho). Se esse
+// trabalho sumir do glossário ou parar de chegar ao prompt, o Stage 1 volta a errar em
+// silêncio — o modelo continua respondendo, só que sem topografia. Isso se confere, não
+// se lembra.
+{
+  const gloss = ler('lib/anthropic/stage1-glossary.ts') ?? ''
+  const prompt = ler('prompts/stage1-scan.md') ?? ''
+  const comZona = new Set([...gloss.matchAll(/campo:\s*'([a-z_]+)'[\s\S]{0,600}?zona:\s*'([^']{10,})'/g)].map((m) => m[1]))
+  const campos = new Set([...gloss.matchAll(/campo:\s*'([a-z_]+)'/g)].map((m) => m[1]))
+  const figado = /figado_vesicula'[\s\S]{0,600}?zona:\s*'([^']+)'/.exec(gloss)?.[1] ?? ''
+
+  console.log('\nTopografia (auditoria Jensen, 4d6a82a):')
+  const okCobertura = comZona.size >= 38
+  console.log(`${okCobertura ? '✓' : '✗'} ${comZona.size} de ${campos.size} campos com zona definida no glossário`)
+  if (!okCobertura) falhas++
+
+  // O fígado é o canário: é lateralizado (só OD) e foi o erro histórico.
+  const okFigado = /7:30/.test(figado) && /\bOD\b|DIREITA/.test(figado)
+  console.log(`${okFigado ? '✓' : '✗'} fígado em ~7:30-8:15h na íris DIREITA${okFigado ? '' : ` — está como: "${figado.slice(0, 80)}"`}`)
+  if (!okFigado) falhas++
+
+  // Tabela no glossário não basta: o modelo só obedece ao que chega no PROMPT.
+  const okPrompt = /7:30/.test(prompt) && /anel/i.test(prompt)
+  console.log(`${okPrompt ? '✓' : '✗'} a topografia chega ao prompt que o modelo lê`)
+  if (!okPrompt) falhas++
+}
+
 // O furo que contaminou o estudo de 26/07: harness com enum próprio, defasado do de produção.
 const harnesses = ['_audit-3x-anthropic.mjs', '_audit-stage1-4way.mjs', '_audit-stage1-500s5.mjs']
   .filter((f) => existsSync(path.resolve(RAIZ, f)))
