@@ -688,13 +688,66 @@ ${B6CSS}
      sobre onde ele COMEÇA. O :not(:first-of-type) evita uma página em branco antes do 1º. */
   .qsec:not(:first-of-type){break-before:page;page-break-before:always}
 
+  /* ===== REVISÃO DO PDF (founder, 2026-07-31, olhando o PDF impresso) ===== */
+
+  /* 1. CADA SEÇÃO COMEÇA NUMA PÁGINA. Motivo: "a linha do tempo começou numa página e
+     terminou na outra, ficou ruim". Proteger só a seção não resolve — ela mede mais que
+     uma página. Começar cada capítulo no topo resolve o caso dele e todos os iguais, e de
+     quebra dá o respiro que ele pediu entre o fim de uma seção e o começo da outra.
+     O bloco 7 também entra aqui, então o Caminho 1 já nasce em página nova. */
+  section.block:not(:first-of-type){break-before:page;page-break-before:always}
+
+  /* 2. CABEÇALHOS MAIORES. O rótulo da seção estava em 11px e o título de capítulo caía em
+     ~21px (o clamp resolve pela largura de 724px do PDF, não pelos 820px do mockup). */
+  .eyebrow{font-size:16px;letter-spacing:.13em;margin-bottom:11px}
+  .secnum{font-size:17px}
+  h2.display{font-size:27px;line-height:1.14;margin:4px 0 18px}
+
+  /* 2b. TEXTO DE CORPO — "heranças transgeracionais, esse texto está muito pequeno...
+     e assim para os demais". Sobe ~10% em tudo que é leitura corrida. Os valores base
+     foram pensados num card de 820px na TELA; no papel a 724px eles ficam apertados. */
+  .lead{font-size:20px}
+  .snote{font-size:16px}
+  .deep,.block-serif,.idq{font-size:18px}
+  .gtext{font-size:14px}
+  .chip{font-size:13.5px}
+  .pintro,.lead10{font-size:16.5px}
+  .turn{font-size:20.5px}
+  .microfilme p,.prose p{font-size:17.5px}
+
+  /* 3. (o ar entre seções está na regra hr.div lá embaixo — aqui seria sobrescrito) */
+
+  /* 4. BLOCO 5 — separar "o que pesa" de "o que está leve", e subir as duas fontes.
+     O founder: "terminou o mapa emocional negativo, dá mais espaço pra começar o que está
+     leve" — os dois grupos estavam colados e liam como uma lista só. */
+  .grouplab{font-size:14px}
+  .grouplab.livre{margin-top:54px}
+  .pl-carga,.pl-resource{font-size:17.5px}
+  .pl-anti{font-size:16px}
+  .pl-shadow{font-size:15.5px}
+  .pend-desc{font-size:14px}
+
+  /* 5. BLOCO 7 — o subtítulo do método e o corpo dos caminhos estavam pequenos.
+     .qtitle usa clamp com vw: a 724px ele encosta no piso de 19px. Fixo no print. */
+  .method-sub{font-size:13px}
+  .qtitle{font-size:25px}
+  .intro{font-size:17px}
+  /* ⚠️ as classes reais do bloco 7 são .say / .say-lab / .st-name — st-txt e st-lab são do
+     protótipo antigo e NÃO existem no HTML gerado (regra inerte). Conferido contando
+     ocorrências no documento: say 51x · say-lab 45x · st-name 35x. */
+  .say{font-size:17px;line-height:1.6}
+  .say-lab{font-size:10.5px}
+  .st-name{font-size:18.5px}
+
   /* AGULHAS: fora a sombra. No Chromium de impressão, box-shadow com BLUR num elemento com
      transform é rasterizada sem respeitar o border-radius — vira um quadrado cinza
      translúcido em volta da bolinha (founder viu no PDF, nas agulhas dos centros e nos
      pêndulos). Na tela a sombra fica; no papel ela não agrega e é o defeito. */
   .needle,.dv-needle,.e10-needle{box-shadow:none}
   h2.display,.eyebrow{break-after:avoid;page-break-after:avoid}
-  hr.div{margin:34px 0 30px}
+  /* "salta mais umas duas linhas" entre o fim de uma seção e o começo da outra
+     (founder, 2026-07-31). Era 34/30. */
+  hr.div{margin:56px 0 50px}
   .toc-row{border-bottom-color:#ddd}
   a{color:inherit;text-decoration:none}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
