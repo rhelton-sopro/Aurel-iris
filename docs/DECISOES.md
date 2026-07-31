@@ -22,7 +22,7 @@ que o founder não lê, não revisa e não pode corrigir.
 
 | Item | Decisão | Status | Evidência |
 |---|---|---|---|
-| Modelo do **Stage 1** (ler a íris) | `claude-sonnet-4-6` | APLICADA | `lib/anthropic/client.ts` · decisão 2026-07-26 |
+| Modelo do **Stage 1** (ler a íris) | `claude-sonnet-4-6` | APLICADA | `lib/anthropic/client.ts` · decisão 2026-07-26, **reconfirmada 2026-07-31** com estudo novo |
 | Modelo da **localização da pupila** (crop) | `claude-sonnet-5` | APLICADA | `6d3a806` · `lib/canonicalize/pupil-center.ts` |
 | Modelo do **Stage 2 — Mapa do Ser** | `claude-sonnet-5` | APLICADA | `lib/emocional/gerar.ts` |
 | Modelo do **Stage 2 — Dossiê** | `claude-sonnet-4-6` | APLICADA | decisão 2026-07-20 |
@@ -38,7 +38,7 @@ que o founder não lê, não revisa e não pode corrigir.
 ## Histórico
 
 ### 2026-07-31 — RESULTADO do estudo refeito (4.6 × Sonnet 5, pós-fix)
-Harness `_audit-posfix.mts` · 3 amostras × 2 modelos · mesma íris e mesmas 6 canônicas do
+Harness `apps/web/scripts/estudo-modelo-stage1.mts` · 3 amostras × 2 modelos · mesma íris e mesmas 6 canônicas do
 estudo de 26/07 · enum vindo de `KNOWN_CAMPOS_LIST` (40 campos, igual produção) · custo $0,996.
 
 | | Jaccard | Jaccard I≥4 | Gabarito | Agulhas (amplitude entre as 3) |
@@ -82,7 +82,35 @@ dividido com thinking, constante de modelo por estágio) por um ganho líquido n
 **Gatilho para reconsiderar:** quando o flip preservado↔carga tiver solução (critério mais
 duro de preservado no prompt, ou voto 2-de-3), refazer este mesmo estudo — o S5 já vence em
 acurácia (3/3) e é 40% mais rápido.
-⏳ **Aguardando decisão do founder.**
+
+### ✅ 2026-07-31 — DECISÃO DO FOUNDER: fica no Sonnet 4.6
+**Decisão:** o Stage 1 **permanece no `claude-sonnet-4-6`**. Founder, verbatim:
+*"fica no 4.6 mesmo, registra a decisão."*
+**Status:** APLICADA — nenhuma mudança de código necessária; é o que já está no ar.
+Conferido por `node apps/web/scripts/verificar-decisoes.mjs`.
+
+**O que sustenta (medido em 2026-07-31, não herdado):**
+- As agulhas do 4.6 não variam entre execuções (mente ±0, coração ±0) — o S5 balança a
+  mente em 36 pontos, o que faz o gráfico principal mudar de veredito na mesma íris.
+- O erro histórico do fígado **foi corrigido**: hoje o 4.6 acha estômago em **3/3** (I4/I5/I4),
+  intestino delgado em 2/3, e o fígado que resta é **I2 nas três**, na zona anatomicamente
+  CERTA (~7:30-8:15h OD, conforme a tabela auditada), com ressalva explícita do próprio
+  modelo ("sinal sutil", "difícil de distinguir com certeza"). Não é mais o falso positivo
+  topográfico de antes.
+- Combinar os dois modelos foi testado e **descartado**: união compra 1 ponto de Jaccard
+  (62%→63%) por 2× o custo e reintroduz o fígado; interseção derruba o Jaccard dos achados
+  para 33%. Ver a tabela de combinação abaixo.
+
+**Quando reabrir:** só com o flip preservado↔carga resolvido. O estudo se refaz com
+`npx tsx apps/web/scripts/estudo-modelo-stage1.mts 3` (~$1) — harness preservado no repo
+de propósito, para a comparação futura usar a MESMA régua desta.
+
+| combinar 2 modelos | Jaccard achados | preservados | Stage 1 inteiro | gabarito | custo |
+|---|---|---|---|---|---|
+| 4.6 sozinho | 54% | 71% | **62%** | 2/2/1 | $0,15 |
+| S5 sozinho | 52% | 68% | 61% | 3/3/3 | $0,18 |
+| interseção | **33%** | 78% | 59% | 3/3/2 | $0,33 |
+| união | 60% | 66% | 63% | 2/2/2 | $0,33 |
 
 ### 2026-07-26 — Stage 1 fica no Sonnet 4.6
 **Decisão:** Stage 1 inteiro no `claude-sonnet-4-6`; Sonnet 5 **apenas** para localizar a pupila.
