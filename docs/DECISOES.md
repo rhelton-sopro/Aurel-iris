@@ -31,6 +31,9 @@ que o founder não lê, não revisa e não pode corrigir.
 | **Dossiê** | opcional, sob demanda, **1 crédito** | APLICADA | `48b4c00` |
 | **Leituras anteriores a 30/07** | permanecem no Dossiê, sem oferta de migração | APLICADA | `48b4c00` |
 | **Topografia** (hora/anel/olho por campo) | auditoria Jensen — 40 de 44 campos com zona | APLICADA | `4d6a82a` · conferida por `verificar-decisoes.mjs` |
+| **PDF — scale do Gotenberg** | `0.95` (⚠️ teto **0.97**) | APLICADA | `b9cb2cd` · acima de 0.97 a largura CSS cai abaixo de 700px e o PDF entra no MODO CELULAR |
+| **PDF — paginação** | cada seção e cada Caminho começam em página nova | APLICADA | `bfa6e96` · conferido página a página no PDF real |
+| **Verificação do PDF** | local, via Chrome + CDP (sem Docker) | APLICADA | `c37c62a` + `dc5794f` · `scripts/pdf-local.mjs` e `scripts/pdf-paginas.mjs` |
 | **Versão do cliente** (Mapa do Ser) | tudo menos "Perguntas para a sua sessão"; caixinha inclui | APLICADA | `48b4c00` |
 
 ---
@@ -131,6 +134,26 @@ decisão pesou estabilidade acima de acurácia; não foi resultado unânime.
 intencional, não resíduo.
 
 ---
+
+### ✅ 2026-07-31 — Cobrança do Dossiê: RESOLVIDA sem migration
+**Decisão:** o Dossiê sob demanda consome **1 crédito próprio**. Founder: *"Se a pessoa
+dessas novas fotos quiser o dossiê, ela pode fazer, cobra um crédito."*
+**Status:** APLICADA (`48b4c00`).
+**⚠️ Correção de uma análise minha anterior:** eu havia dito que exigiria migration no
+billing. Não exigiu. O bug do `convert_reservation_to_consume` (converte por `reading_id`)
+só aparece com **duas reservas ATIVAS** na mesma leitura — e no fluxo real a do Mapa do Ser
+já está `converted` quando o Dossiê é pedido. Bastou `readingHasActiveReservation()` (só
+status `active`): o Dossiê reusa a ativa órfã em vez de criar outra, então nunca há duas
+ativas e o débito fecha 1:1. UI avisa antes de gastar (rótulo "(1 crédito)" + confirmação).
+
+### 2026-07-31 — Revisão do PDF com verificação visual local
+**Decisão:** montar geração + rasterização local do PDF, para o assistente conferir antes de
+entregar. Founder: *"dá um jeito de visualizar. Você gerou o PDF e encontra caminho."*
+**Status:** APLICADA — `scripts/pdf-local.mjs` (CDP `Page.printToPDF`, mesmos parâmetros da
+rota) e `scripts/pdf-paginas.mjs` (PDFium + screenshot → PNG por página).
+**Achados que só apareceram por olhar:** cabeçalho do Caminho ficava órfão com meia página
+em branco (`.qhead` sem `break-after:avoid`); e as regras que eu tinha escrito para
+`.st-txt`/`.st-lab` eram **inertes** — essas classes não existem no HTML gerado.
 
 ## Como usar
 
