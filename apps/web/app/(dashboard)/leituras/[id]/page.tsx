@@ -289,10 +289,17 @@ export default async function LeituraDetailPage({
     // ReportReadView de sempre, com o Dossiê — nada de espaço vazio ou aviso de
     // relatório que ela nunca teve.
     if (temMapa) {
+      // ⚠️ `superseded_at IS NULL` é OBRIGATÓRIO: uma leitura que falhou e foi gerada
+      // de novo tem VÁRIAS linhas em report_findings (as antigas ficam marcadas como
+      // superseded). Sem o filtro, `maybeSingle()` acha 2+ linhas, devolve erro com
+      // data null, e o render recebe `exame = {}` — o documento sai com as agulhas
+      // neutras, o mapa emocional VAZIO e a linha do tempo sem figura. Silencioso:
+      // o texto aparece normal e só os gráficos somem (founder pegou em prod, 31/07).
       const { data: findings } = await supabase
         .from('report_findings')
         .select('exame_json')
         .eq('reading_id', readingId)
+        .is('superseded_at', null)
         .maybeSingle<{ exame_json: unknown }>()
 
       const primeiroNome = clientName.trim().split(/\s+/)[0] || 'você'

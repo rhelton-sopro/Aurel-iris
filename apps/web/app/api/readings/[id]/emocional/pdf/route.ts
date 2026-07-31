@@ -94,7 +94,14 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
   }
 
   const [{ data: findings }, { data: client }] = await Promise.all([
-    db.from('report_findings').select('exame_json').eq('reading_id', id).maybeSingle(),
+    // superseded_at IS NULL — sem isto, leitura regerada tem 2+ linhas, o maybeSingle
+    // erra e o PDF sai com os gráficos vazios (mesmo bug da tela).
+    db
+      .from('report_findings')
+      .select('exame_json')
+      .eq('reading_id', id)
+      .is('superseded_at', null)
+      .maybeSingle(),
     db.from('clients').select('full_name').eq('id', reading.client_id).maybeSingle(),
   ])
   const nomeCompleto = (client?.full_name || 'cliente').trim()

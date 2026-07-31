@@ -110,16 +110,33 @@ export function AnaliseClient({
         // "Falha ao iniciar análise: internal server error" (falso).
         let appMsg: string | null = null
         let inflight = false
+        let falhouNoStage1 = false
         try {
           const j = (await res.clone().json()) as {
             error?: string
             message?: string
             retry_after_seconds?: number
+            stage?: number
           }
           appMsg = j.message ?? j.error ?? null
           if (j.retry_after_seconds != null) inflight = true // gate "already running"
+          // 502 com `stage: 1` = a observação da íris foi reprovada nas DUAS
+          // tentativas e o pipeline abortou de propósito (sem ancoragem não se
+          // gera relatório). É erro DEFINITIVO com 502 — sem esta distinção caía
+          // no ramo de baixo e o terapeuta lia "está rodando no servidor",
+          // ficando à espera de um relatório que nunca viria (founder, 2026-07-31).
+          if (j.stage === 1) falhouNoStage1 = true
         } catch {
           // corpo não-JSON (página 500 da plataforma) — trata como 5xx abaixo.
+        }
+        if (falhouNoStage1) {
+          const msg =
+            appMsg ??
+            'Não consegui ler as fotos desta íris com segurança. Tente gerar novamente.'
+          setError(msg)
+          toast.error(msg)
+          setStreaming(false)
+          return
         }
         if (res.status >= 500 || inflight) {
           toast.info('A análise está rodando no servidor — esta página atualiza sozinha quando terminar.')

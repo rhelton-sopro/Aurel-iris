@@ -43,7 +43,15 @@ export default async function RelatorioEmocionalPage({
   if (!reading?.report_emocional) notFound()
 
   const [{ data: findings }, { data: client }] = await Promise.all([
-    db.from('report_findings').select('exame_json').eq('reading_id', id).maybeSingle(),
+    // superseded_at IS NULL: leitura regerada tem VÁRIAS linhas aqui e o maybeSingle
+    // devolveria erro + null → render sem exame → gráficos vazios. Ver nota em
+    // /leituras/[id]/page.tsx.
+    db
+      .from('report_findings')
+      .select('exame_json')
+      .eq('reading_id', id)
+      .is('superseded_at', null)
+      .maybeSingle(),
     db.from('clients').select('full_name').eq('id', reading.client_id).maybeSingle(),
   ])
 
