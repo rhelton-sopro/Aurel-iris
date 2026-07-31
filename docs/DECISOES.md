@@ -233,6 +233,33 @@ antes divergiam. **Status:** APLICADA — verificado renderizando a leitura real
 **Alternativa descartada:** endurecer o prompt do bloco 7 (seria calibração de Sonnet, e mais
 frágil que a regra determinística).
 
+### 2026-07-31 — Bloco 7: 20 rótulos duplicados (achado meu, olhando o PDF)
+**Como apareceu:** não foi reportado — apareceu ao rasterizar o PDF pra conferir a fonte do
+cabeçalho. É o retorno concreto do fluxo "gero → olho → corrijo".
+
+**O defeito:** cada texto de `m.fixo` (em `metodo7.mjs`) **já abre com o seu**
+`<span class="say-lab">`, e o render somava outro rótulo a partir de `m.labs[k]`. Saíam duas
+vezes: "Porta A", "Porta B", "Fechar" e o do movimento 7 — **4 por Caminho, 20 no documento**.
+É a MESMA causa do "⚠ Carga alta" duplicado: rótulo emitido pelos dois lados.
+
+**Por que ficava feio além de repetido:** o rótulo do render saía como `<p>`, e dentro de
+`.say` o seletor **`.say p`** (Palatino 17px itálica) tem especificidade MAIOR que `.say-lab`
+e vencia. A cópia de cima saía grande e serifada; a de baixo, correta. Corrigido também o
+rótulo do slot do movimento 7, que era `<p>` pelo mesmo motivo → virou `<span>`.
+
+**"Micro-passo" ainda imprimia.** A decisão de 2026-07-29 (o movimento 7 deixou de prescrever
+tarefa e passou a perguntar) trocou o rótulo do **slot**, mas o **texto fixo** ficou com o nome
+velho. Renomeado para **"Levar pra sessão"** — o que o próprio texto diz ("Leva isso pra nossa
+sessão"). ⚠️ **Não** foi renomeado para "O que já dá pra agora" porque colidiria com o rótulo
+do slot, que fica logo abaixo: seriam dois blocos com o mesmo nome. Founder pode trocar a
+palavra; é uma linha em `metodo7.mjs`.
+**Contraponto:** o founder autorizou "trocar pelo nome novo" sem saber da colisão — o nome
+escolhido é meu, não dele.
+
+**Efeito colateral medido:** o PDF caiu de **37 para 34 páginas**.
+**Status:** APLICADA — conferido no PDF real, páginas 19 e 20.
+**⚠️ `m.labs` ficou sem uso** em `metodo7.mjs`; mantido como dado, mas o render não lê mais.
+
 ## Como usar
 
 - **Ao tomar uma decisão:** registrar aqui na mesma sessão, com razão e status.

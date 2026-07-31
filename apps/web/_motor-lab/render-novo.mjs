@@ -428,11 +428,15 @@ function block7(body) {
     const sub = campo('sub')
     const steps = METODO7.map((m) => {
       const falas = []
+      // ⛔ NÃO emitir `m.labs[k]` aqui: cada texto de `m.fixo` JÁ ABRE com o seu
+      // <span class="say-lab">. Somar o rótulo do render imprimia tudo DUAS vezes —
+      // "Porta A", "Porta B", "Fechar" e o do movimento 7, ou seja 4 por Caminho, 20 no
+      // documento (visto no PDF em 2026-07-31). Pior: o rótulo do render saía como <p>,
+      // e dentro de `.say` o seletor `.say p` (serifada 17px itálica) tem especificidade
+      // MAIOR que `.say-lab` e vencia — por isso a cópia de cima saía grande e serifada.
+      // `m.labs` ficou sem uso; é a mesma informação que já vive dentro do texto fixo.
       if (m.fixo && m.fixo.length) {
-        m.fixo.forEach((f, k) => {
-          const lab = m.labs[k] ? `<p class="say-lab">${esc(m.labs[k])}</p>` : ''
-          falas.push(`<div class="say">${lab}${T(f)}</div>`)
-        })
+        m.fixo.forEach((f) => { falas.push(`<div class="say">${T(f)}</div>`) })
       }
       const slot = m.slot || m.slot7
       if (slot) {
@@ -441,7 +445,9 @@ function block7(body) {
           // Era "Micro-passo" — mudou junto com o s7 (2026-07-29). O movimento 7 deixou de
           // prescrever tarefa e passou a PERGUNTAR ("tem algo hoje que você já pode…?"), então
           // um rótulo que anuncia "passo" contradiz o que vem escrito embaixo dele.
-          const lab = m.n === 7 ? '<p class="say-lab">O que já dá pra agora</p>' : ''
+          // <span>, NÃO <p>: dentro de `.say` o seletor `.say p` vence `.say-lab` por
+          // especificidade e o rótulo sairia serifado 17px, como os duplicados acima.
+          const lab = m.n === 7 ? '<span class="say-lab">O que já dá pra agora</span>' : ''
           // depois da fala ancorada vem a CONTINUAÇÃO FIXA do método (varredura no
           // corpo, dar forma/submodalidades, "tem mais alguma coisa junto?") com as
           // deixas entre elas — sem isso o movimento saía pela metade.

@@ -147,7 +147,7 @@ export const METODO7 = [
   "depois": [],
   "fixo": [
    "<span class=\"say-lab\">Fechar</span><p>\"Vamos voltar por inteiro. Sente os pés, o corpo apoiado, o ar entrando. Olha o lugar de novo. Repara em como você está agora, comparado a quando começamos.\"</p>",
-   "<span class=\"say-lab\">Micro-passo</span><p>\"Tem uma coisa pequena, hoje, que você anda engolindo e que já poderia dizer — com calma, no tamanho certo? Leva isso pra nossa sessão.\"</p>"
+   "<span class=\"say-lab\">Levar pra sessão</span><p>\"Tem uma coisa pequena, hoje, que você anda engolindo e que já poderia dizer — com calma, no tamanho certo? Leva isso pra nossa sessão.\"</p>"
   ],
   "slot7": "s7"
  }
