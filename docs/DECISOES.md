@@ -36,6 +36,30 @@ que o founder não lê, não revisa e não pode corrigir.
 
 ## Histórico
 
+### 2026-07-31 — RESULTADO do estudo refeito (4.6 × Sonnet 5, pós-fix)
+Harness `_audit-posfix.mts` · 3 amostras × 2 modelos · mesma íris e mesmas 6 canônicas do
+estudo de 26/07 · enum vindo de `KNOWN_CAMPOS_LIST` (40 campos, igual produção) · custo $0,996.
+
+| | Jaccard | Jaccard I≥4 | Gabarito | Agulhas (amplitude entre as 3) |
+|---|---|---|---|---|
+| Sonnet 4.6 `temp=0` | 54% (era 78%) | 42% | 2 de 3 | mente **±0** · coração **±0** · corpo ±5 |
+| Sonnet 5 (sem temp) | 52% (era 36%) | **100%** | **3 de 3** | mente **±36** · coração ±8 · corpo ±18 |
+
+**O argumento de 26/07 caiu:** medido com a régua de produção, os dois EMPATAM em Jaccard
+(~53%). O 4.6 piorou (78→54) porque o número antigo foi medido com 45 campos, incluindo 5
+constitucionais que ele gastava como achado.
+
+⭐ **Mas o Jaccard não é a métrica que decide** — o que decide é quanto o RELATÓRIO balança:
+- S5 é 100% determinístico em I≥4 (núcleo pétreo), mas a agulha da MENTE varia **36 pontos**
+  (45↔81 = "tensa" ↔ "livre") — o gráfico principal muda de veredito na mesma íris.
+- 4.6 é instável em I≥5 (o protagonista troca), mas as agulhas saem IDÊNTICAS nas 3.
+
+⭐⭐ **CAUSA RAIZ do balanço do S5 — não é a cauda fraca nem o γ:** é **FLIP carga↔livre**.
+`sistema_nervoso_autonomico` sai PRESERVADO na amostra 1, CARGA(I2) na 2, PRESERVADO na 3.
+Idem `sistema_musculoesqueletico`. O S5 emite 8-9 preservados contra 6 do 4.6 — mais campos
+na zona ambígua. Testado e REFUTADO: subir o γ (1.1→3) **piora** (±36 → ±58), porque ponderar
+intensidade não ajuda quando o campo muda de LADO, não de peso.
+
 ### 2026-07-31 — Refazer o estudo de modelo do Stage 1
 **Decisão:** refazer a comparação 4.6 × Sonnet 5 antes de qualquer troca.
 **Razão:** o estudo de 26/07 mediu o 4.6 **antes** do conserto de topografia
@@ -45,8 +69,19 @@ eram constitucionais (`trama_fibras`, `vascularizacao_escleral`, `pupila`,
 `bordas_pupilares`, `cor_predominante`), e o 4.6 gastava vagas de achado com eles
 (`vascularizacao_escleral` 3/3, `trama_fibras` 2/3). O Jaccard que decidiu a escolha foi
 medido com uma régua diferente da de produção.
-**Status:** EM CURSO — harness `_audit-posfix.mts` (importa `KNOWN_CAMPOS_LIST`, sem enum
-hardcoded). Founder decide depois do resultado.
+**Status:** CONCLUÍDO — ver o resultado acima.
+
+**RECOMENDAÇÃO (assistente, 2026-07-31):** **manter o Sonnet 4.6 no Stage 1** e atacar o
+fígado por REGRA, não por troca de modelo. Razão: o erro do 4.6 é uma afirmação errada
+CONSTANTE (corrigível, e o fix de topografia já provou que responde a regra); o do S5 é o
+relatório se **contradizer entre execuções** — a agulha da mente indo de "tensa" a "livre" na
+mesma íris é pior que um achado errado estável, porque destrói a confiança do terapeuta no
+instrumento. Somado a isso, o swap custaria 3 mudanças técnicas (`temperature`, `max_tokens`
+dividido com thinking, constante de modelo por estágio) por um ganho líquido não comprovado.
+**Gatilho para reconsiderar:** quando o flip preservado↔carga tiver solução (critério mais
+duro de preservado no prompt, ou voto 2-de-3), refazer este mesmo estudo — o S5 já vence em
+acurácia (3/3) e é 40% mais rápido.
+⏳ **Aguardando decisão do founder.**
 
 ### 2026-07-26 — Stage 1 fica no Sonnet 4.6
 **Decisão:** Stage 1 inteiro no `claude-sonnet-4-6`; Sonnet 5 **apenas** para localizar a pupila.
