@@ -676,6 +676,12 @@ ${B6CSS}
      O mais grave era o .say: são 15 no documento e é a FALA que o terapeuta lê em voz alta
      na sessão — partida no meio, ele perde a frase virando a página. */
   .say,.genfig,.ctr,.drain,.pattern,.tension,.key,.qhead{break-inside:avoid;page-break-inside:avoid}
+  /* 2026-07-31 (2ª rodada, founder olhando o PDF impresso):
+     .rail-wrap  — o TRILHO da linha do tempo. Partia com as idades numa folha e os selos
+                   ("em processo / ainda ativo") na outra. É uma figura só; não pode partir.
+     .cren       — cada crença com sua régua. Na virada de página "engolia o gráfico":
+                   o texto ia numa folha e a barra ficava na outra, ou sumia no corte. */
+  .rail-wrap,.rail,.cren{break-inside:avoid;page-break-inside:avoid}
   section.block{break-inside:auto}
   /* ⚠️ .qsec NÃO pode pedir avoid: cada Caminho mede ~2600-2800px (medido no Miguel) contra
      ~1072px de altura útil — quase 3 páginas. Pedir avoid no que é impossível de honrar faz
@@ -699,8 +705,8 @@ ${B6CSS}
 
   /* 2. CABEÇALHOS MAIORES. O rótulo da seção estava em 11px e o título de capítulo caía em
      ~21px (o clamp resolve pela largura de 724px do PDF, não pelos 820px do mockup). */
-  .eyebrow{font-size:16px;letter-spacing:.13em;margin-bottom:11px}
-  .secnum{font-size:17px}
+  .eyebrow{font-size:18px;letter-spacing:.13em;margin-bottom:13px}
+  .secnum{font-size:19px}
   h2.display{font-size:27px;line-height:1.14;margin:4px 0 18px}
 
   /* 2b. TEXTO DE CORPO — "heranças transgeracionais, esse texto está muito pequeno...
@@ -720,17 +726,21 @@ ${B6CSS}
   /* 4. BLOCO 5 — separar "o que pesa" de "o que está leve", e subir as duas fontes.
      O founder: "terminou o mapa emocional negativo, dá mais espaço pra começar o que está
      leve" — os dois grupos estavam colados e liam como uma lista só. */
-  .grouplab{font-size:14px}
-  .grouplab.livre{margin-top:54px}
-  .pl-carga,.pl-resource{font-size:17.5px}
-  .pl-anti{font-size:16px}
-  .pl-shadow{font-size:15.5px}
-  .pend-desc{font-size:14px}
+  .grouplab{font-size:17px;letter-spacing:.11em}
+  .grouplab.livre{margin-top:86px}   /* "dá bastante espaço" entre o que pesa e o que é leve */
+  .pl-carga,.pl-resource{font-size:19px}
+  .pl-anti{font-size:17px}
+  .pl-shadow{font-size:16.5px}
+  .pend-desc{font-size:15px}
 
   /* 5. BLOCO 7 — o subtítulo do método e o corpo dos caminhos estavam pequenos.
      .qtitle usa clamp com vw: a 724px ele encosta no piso de 19px. Fixo no print. */
-  .method-sub{font-size:13px}
-  .qtitle{font-size:25px}
+  .method-sub{font-size:14px}
+  /* "Caminho 1 — da preocupação a uma confiança" — founder: "aumenta bastante" */
+  .qtitle{font-size:31px;line-height:1.16}
+  .q-eyebrow{font-size:14px;letter-spacing:.11em;margin-bottom:9px}
+  /* 3-4 enters entre o cabeçalho do bloco 7 e o Caminho 1 */
+  .qsec:first-of-type{margin-top:74px;padding-top:0}
   .intro{font-size:17px}
   /* ⚠️ as classes reais do bloco 7 são .say / .say-lab / .st-name — st-txt e st-lab são do
      protótipo antigo e NÃO existem no HTML gerado (regra inerte). Conferido contando

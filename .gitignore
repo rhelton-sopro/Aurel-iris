@@ -2,6 +2,9 @@
 node_modules/
 .pnpm-store/
 
+# material-fonte com dado pessoal sensível (LGPD) — nunca versionar
+depoimentos/
+
 # next.js
 .next/
 out/
@@ -44,3 +47,6 @@ supabase/.branches
 supabase/.temp
 
 .vercel
+
+# PDF gerado localmente para conferir paginação (scripts/pdf-local.mjs) — não versionar
+apps/web/_pdf-local/
