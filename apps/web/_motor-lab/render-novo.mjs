@@ -131,17 +131,30 @@ function short(e) {
 // serve pro lado 🔴 (rótulo + o-que-é da carga); os campos de antídoto dele ficaram
 // obsoletos — duas palavras pra mesma saída ("Calma mental" vs "Paz mental") é
 // exatamente a divergência que o eixo veio matar.
+// RÓTULO DO CLIENTE de uma emoção de carga — régua ÚNICA, usada pelo bloco 5 (pêndulos)
+// e pelo bloco 7 (cabeçalho dos Caminhos). Ordem: override do eixo (`chave :: rótulo`) >
+// dicionário curado (PEND) > limpeza (short).
+// ⚠️ Existe como função porque o bloco 7 monta o cabeçalho a partir do `nome=` ESCRITO
+// PELO SONNET, e ele às vezes copia a CHAVE CRUA da canônica em vez do rótulo — caso real
+// 2026-07-31, leitura c3841fbf: saiu `irritação que "sobe" do visceral ao mental` no lugar
+// de `Irritação que sobe`. Passando pela mesma régua do bloco 5, a chave crua vira o
+// rótulo limpo por REGRA (decisão founder), sem depender de o modelo obedecer o prompt.
+function rotuloCarga(e) {
+  if (!e) return e
+  const dsp = displayDe(e)
+  if (dsp) return cap(dsp)
+  if (PEND[e]) return PEND[e][0]
+  return short(e)
+}
 function pendData(e) {
   const a = r.antidoto?.[e]
   const anti = a ? { anti: a.principal, antiDesc: a.oque || '' } : { anti: '—', antiDesc: '' }
-  // rótulo do cliente: override do eixo (`chave :: rótulo`) > dicionário curado > limpeza
-  const dsp = displayDe(e)
   // o "o que é" vem da TABELA (vale pras 30 que aparecem), com o dicionário antigo
   // como reserva. Antes só 13 emoções tinham explicação e o resto do mapa mostrava a
   // saída sem dizer o que estava pesando.
   const oq = oqueCargaDe(e)
-  if (PEND[e]) return { lab: dsp ? cap(dsp) : PEND[e][0], desc: oq || PEND[e][1], ...anti }
-  return { lab: dsp ? cap(dsp) : short(e), desc: oq || '', ...anti }
+  if (PEND[e]) return { lab: rotuloCarga(e), desc: oq || PEND[e][1], ...anti }
+  return { lab: rotuloCarga(e), desc: oq || '', ...anti }
 }
 // FORÇA: mesma fonte única. O rótulo é o nome do EIXO (8ª série) e a sombra é a ponta
 // 🔴 do MESMO eixo — não mais o chute da lista SHADOW. Foi o que matou
@@ -367,7 +380,13 @@ function block5(body) {
     return `<div class="pend"><div class="pend-labels"><span class="pl-shadow">${esc(p.shadow)}</span><span class="pl-resource">${esc(p.lab)} <span class="lv">${s >= 2 ? 'vital' : 'livre'}</span></span></div><div class="pend-track"><i class="needle free" style="left:${50 + bipRecurso(s)}%"></i></div>${desc}</div>`
   }).join('')
   return `${f.LEAD ? `<p class="lead">${inl(f.LEAD)}</p>` : ''}
-    <div class="legend"><span>● <b>Bolinha</b> = onde você está</span><span><b style="color:var(--amber)">Esquerda</b> = carregado</span><span><b style="color:var(--good)">Direita</b> = a saída</span></div>
+    <!-- LEGENDA (decisão founder 2026-07-31): "onde você está" SAIU. "Onde" remete a
+         ESTADO/lugar, e emoção não é lugar onde a pessoa mora — o cliente lia a bolinha
+         como veredito de identidade. Agora a bolinha mede o PESO DE HOJE (passageiro) e o
+         lado direito é "pra onde afrouxa" — direção, não destino, o que também casa com a
+         regra de que o antídoto NÃO é força presente. ⛔ Só a terminologia mudou: o
+         modelo bipolar, os pares carga⟷antídoto e o desenho continuam iguais. -->
+    <div class="legend"><span>● <b>Bolinha</b> = quanto isso pesa hoje</span><span><b style="color:var(--amber)">Esquerda</b> = mais peso</span><span><b style="color:var(--good)">Direita</b> = pra onde afrouxa</span></div>
     <p class="grouplab carga"><span class="gd"></span>O que pesa hoje</p>${carga}
     <p class="grouplab livre"><span class="gd"></span>O que está leve — a sua força</p>${rec}
     ${f.REMEDIO ? `<div class="medicine"><p class="med-lab">O que já está livre é o seu remédio</p><p>${inl(f.REMEDIO)}</p></div>` : ''}`
@@ -399,7 +418,11 @@ function block7(body) {
   blocos.forEach((c, ci) => {
     const cab = c.split('\n')[0]
     const nome = (cab.match(/nome=(.*)/) || [])[1]?.trim() || ''
-    const [cargaTxt, antiTxt] = nome.split('→').map((x) => (x || '').trim())
+    // o lado da CARGA passa pela régua de rótulo do cliente (ver `rotuloCarga`): se o
+    // Sonnet copiou a chave crua da canônica, ela vira o rótulo limpo aqui. O lado do
+    // ANTÍDOTO não passa — ele já vem do EIXO, que é fonte curada.
+    const [cargaRaw, antiTxt] = nome.split('→').map((x) => (x || '').trim())
+    const cargaTxt = rotuloCarga(cargaRaw)
     const campo = (k) => (c.match(new RegExp(`^- ${k}:\\s*([\\s\\S]*?)(?=\\n- |\\n@|$)`, 'm')) || [])[1]?.trim() || ''
     const T = (t) => (t || '').replaceAll('{CARGA}', (cargaTxt || '').toLowerCase()).replaceAll('{ANTI}', (antiTxt || '').toLowerCase())
     const sub = campo('sub')
@@ -436,7 +459,11 @@ function block7(body) {
     const head = `<div class="qhead"><p class="q-eyebrow"><span class="pn">Caminho ${ci + 1} · </span>`
       + `<span class="carga">${esc(cargaTxt)}</span> <span class="arw">→</span> <span class="anti">${esc(antiTxt)}</span></p>`
       + (sub ? `<p class="qtitle">${inl(sub)}</p>` : '') + '</div>'
-    const nota = ci === 0 && CONDUCT ? `<div class="conduct"><span class="conduct-lab">⚠ Carga alta</span>${CONDUCT.replace(/^⚠ Carga alta/, '')}</div>` : ''
+    // ⚠️ CONDUCT JÁ TRAZ o <span class="conduct-lab">⚠ Carga alta</span> dentro dele
+    // (metodo7.mjs). A versão anterior somava um span próprio e tentava tirar o do
+    // CONDUCT com `.replace(/^⚠ Carga alta/,'')` — que nunca casava, porque a string
+    // começa com a TAG, não com o texto. Resultado: o rótulo saía DUAS vezes na tela.
+    const nota = ci === 0 && CONDUCT ? `<div class="conduct">${CONDUCT}</div>` : ''
     out.push(`<div class="qsec">${head}${steps}${nota}</div>`)
   })
   const fecho = g1('FECHO'); if (fecho) out.push(`<p class="qfecho">${inl(fecho)}</p>`)
@@ -738,7 +765,10 @@ ${B6CSS}
   .method-sub{font-size:14px}
   /* "Caminho 1 — da preocupação a uma confiança" — founder: "aumenta bastante" */
   .qtitle{font-size:31px;line-height:1.16}
-  .q-eyebrow{font-size:14px;letter-spacing:.11em;margin-bottom:9px}
+  /* 2026-07-31: a tela subiu de 11px/caixa-alta para 16px/caixa-normal (ver o comentário
+     no b6-terapeuta-proto.html). Este override PRECISAVA subir junto — em 14px ele
+     ENCOLHERIA a linha no PDF, invertendo a relação de sempre (print ≥ tela). */
+  .q-eyebrow{font-size:17px;letter-spacing:0;margin-bottom:9px}
   /* 3-4 enters entre o cabeçalho do bloco 7 e o Caminho 1 */
   .qsec:first-of-type{margin-top:74px;padding-top:0}
   .intro{font-size:17px}

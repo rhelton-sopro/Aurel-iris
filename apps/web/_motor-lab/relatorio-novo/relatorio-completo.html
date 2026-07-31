@@ -238,7 +238,11 @@
   .qsec{padding-top:26px;margin-top:26px;border-top:1px solid var(--line);}
   .qsec:first-of-type{border-top:0;padding-top:4px;margin-top:4px;}
   .qhead{margin-bottom:18px;}
-  .q-eyebrow{font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:700;margin:0 0 6px;}
+  /* ⚠️ ESTE <style> É O CSS DE PRODUÇÃO: render-novo.mjs o lê inteiro como STYLE.
+     A regra abaixo tinha uma segunda cópia (11px, caixa alta) em b6-terapeuta-proto.html,
+     que entra DEPOIS como B6CSS e vencia esta. Mantidas iguais de propósito — se
+     divergirem de novo, vale a do proto. Ver a decisão de 2026-07-31 em docs/DECISOES.md. */
+  .q-eyebrow{font-size:16px;letter-spacing:0;font-weight:600;margin:0 0 8px;}
   .q-eyebrow .carga{color:var(--amber);} .q-eyebrow .arw{color:var(--ink-faint);opacity:.7;} .q-eyebrow .anti{color:var(--good);} .q-eyebrow .pn{color:var(--ink-faint);}
   .qtitle{font-family:"Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;font-size:clamp(19px,2.5vw,23px);font-weight:600;line-height:1.18;margin:0;color:var(--ink);}
   .step{position:relative;padding:0 0 22px 44px;}

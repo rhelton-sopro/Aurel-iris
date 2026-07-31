@@ -155,6 +155,84 @@ rota) e `scripts/pdf-paginas.mjs` (PDFium + screenshot → PNG por página).
 em branco (`.qhead` sem `break-after:avoid`); e as regras que eu tinha escrito para
 `.st-txt`/`.st-lab` eram **inertes** — essas classes não existem no HTML gerado.
 
+### 2026-07-31 — Bloco 5: "onde você está" SAI da legenda (emoção não é lugar)
+**Decisão:** a legenda do Mapa emocional passa a ser
+`● Bolinha = quanto isso pesa hoje · Esquerda = mais peso · Direita = pra onde afrouxa`.
+Founder: *"'onde' remete a estado, essa expressão não é indicada para falar da emoção."*
+E sobre o novo lado direito: *"'afrouxa' já caminha alguma coisa para recurso."*
+**Razão:** "onde você está" fixa a emoção como um **lugar onde a pessoa mora** — o cliente
+lê a bolinha como veredito de identidade. "Quanto pesa hoje" é passageiro, e "pra onde
+afrouxa" é **direção**, não destino — o que também alinha a figura com a regra já escrita
+no prompt e no motor de que **o antídoto NÃO é força presente**, e sim a saída.
+**⛔ Escopo — só terminologia.** O modelo bipolar, os pares carga⟷antídoto, o desenho, os
+níveis e o bloco 7 ficam **exatamente como estavam**. O founder avaliou e aprovou o modelo:
+*"ali os locais, os nomes, está tudo certo"*.
+**Alternativas descartadas na conversa:** renomear o bloco para "O pêndulo das emoções" com
+explicação da metáfora (founder preferiu manter **Mapa emocional**); e uma proposta minha,
+mais ampla, de trocar o modelo bipolar — **rejeitada por ter errado o alvo**, a crítica era
+de terminologia, não de concepção.
+**Status:** APLICADA — `_motor-lab/render-novo.mjs` (fonte única; a prod importa esse mesmo
+módulo via `lib/emocional/render.ts`). Smoke `scripts/smoke-render.mjs` verde.
+**Nota:** as ocorrências restantes de "onde você está" no HTML são do roteiro de aterramento
+(`metodo7.mjs`, *"olha devagar pro lugar onde você está"*) — ali é lugar **físico**, o corpo
+na sala. Uso correto, mantido de propósito.
+
+### 2026-07-31 — Público: dizemos **"terapeuta"**, sem qualificador. Nunca "psicólogo" nem "psicanalista"
+**Decisão do founder:** *"minha decisão é: não vamos falar psicólogo nem psicanalista. Vamos falar
+simplesmente terapeuta. E aí no marketing, no tráfego, a gente direciona para essa galera também."*
+**Razão:** "terapeuta" é guarda-chuva — não invoca conselho, não obriga ninguém a se declarar, e
+deixa o enquadramento com quem já é dono dele por lei (o profissional). É a execução, no nível da
+palavra, do princípio de **nunca vestir a roupa da Psicologia** — que é exatamente o que a Nota
+Técnica CFP de 03/03/2023 ataca no caso da Constelação Familiar (incompatível *"enquanto método ou
+técnica da Psicologia"* — vedação de **rótulo**, não de pessoa).
+**Contraponto do founder, aceito e incorporado ao estudo:** quando o CFP veio tirar a Constelação da
+psicologia, ela **já tinha pegado** — a nota chegou tarde e não matou o mercado. Ler a régua do
+conselho como muro é ler errado o que aconteceu; é um jogo em que se entra para ganhar, conhecendo
+as regras. Minha ressalva remanescente, registrada: a Constelação tinha **massa crítica antes** da
+nota e nós ainda não temos — por isso a disciplina de rótulo é o que sustenta a jogada.
+**Escopo operacional:**
+- ✅ Segmentar tráfego por interesse (psicologia, psicanálise, terapias integrativas) é permitido.
+- ⛔ O **criativo não muda de língua** por audiência: nenhum anúncio, LP ou peça diz "para psicólogos".
+- ⛔ Nunca usar CRP/conselho como prova, selo ou endosso ("indicado para psicólogos" é proibido).
+**Decorrência de posicionamento (mesma conversa):** as dores do terapeuta **D3 (permissão/medo de
+conduzir)** e **D5 (como mostro que meu trabalho é diferente)** passam a ser a frente de comunicação.
+A LP hoje abre pela reação do cliente; a dor que faz o terapeuta comprar é dele. ⚠️ A alavanca do
+duplo público **não morre** — o UAU do cliente vira **prova** de que a dor foi resolvida, e deixa de
+ser a abertura. ⚠️ D3 **não pode ser nomeada de fora** (acusa a autoimagem e a pessoa fecha a página).
+**Fonte:** `Estatégia comercial e mkt/ESTUDO-DORES-DO-TERAPEUTA.md` (31/07/2026).
+**Status:** DECIDIDA — falta aplicar em `LP-COPY.md` v2 e nas peças.
+
+### 2026-07-31 — Bloco 7 na tela: rótulo do Caminho legível + "Carga alta" duplicada
+Três defeitos vistos pelo founder na página (computador), na leitura `c3841fbf`.
+
+**1. BUG — "⚠ Carga alta" saía DUAS vezes.** O render somava um `<span class="conduct-lab">`
+próprio e tentava remover o do `CONDUCT` com `.replace(/^⚠ Carga alta/,'')`. A regex nunca
+casava, porque `CONDUCT` (em `metodo7.mjs`) **começa com a tag**, não com o texto. Agora usa
+`CONDUCT` direto. **Status:** APLICADA — verificado no HTML: 2 → 1 ocorrência.
+
+**2. Fonte do `Caminho N · carga → antídoto` (`.q-eyebrow`).** Estava **11px, caixa alta e
+espaçada** na tela contra 14px no PDF — a tela ficara 27% menor que o print, ao contrário da
+relação de sempre. **Decisão do founder: 16px, SEM caixa alta.** Caixa alta com tracking é o
+que fazia a linha parecer apertada, e piora com nome de carga longo, que quebra em 2 linhas.
+Print acompanhou (14 → 17px), senão o PDF ENCOLHERIA a linha.
+**⚠️ O CSS de produção do bloco 7 mora nos HTML de `relatorio-novo/`** — `relatorio-completo.html`
+vira `STYLE` e `b6-terapeuta-proto.html` vira `B6CSS`. Não são mockups inertes. A regra
+existia **duplicada** nos dois; as duas foram atualizadas (vence a do proto, que vem depois).
+**Status:** APLICADA — conferido por screenshot via Chrome/CDP: `font-size:16px`,
+`text-transform:none`.
+
+**3. Chave crua da canônica vazando no nome do Caminho.** Saiu
+`irritação que "sobe" do visceral ao mental → Serenidade` no lugar de `Irritação que sobe`.
+O `nome=` é escrito pelo Sonnet e ele às vezes copia a chave em vez do rótulo.
+**Decisão do founder: consertar por REGRA no render, não no prompt** — assim não depende de o
+modelo obedecer. Criada `rotuloCarga()`, régua ÚNICA (override do eixo > dicionário `PEND` >
+limpeza), usada pelo bloco 5 **e** pelo bloco 7.
+**Ganho colateral:** os dois blocos passaram a exibir **o mesmo rótulo** para a mesma emoção —
+antes divergiam. **Status:** APLICADA — verificado renderizando a leitura real `c3841fbf`.
+
+**Alternativa descartada:** endurecer o prompt do bloco 7 (seria calibração de Sonnet, e mais
+frágil que a regra determinística).
+
 ## Como usar
 
 - **Ao tomar uma decisão:** registrar aqui na mesma sessão, com razão e status.

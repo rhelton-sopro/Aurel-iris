@@ -23,7 +23,13 @@
 
   .qsec{padding-top:24px;margin-top:24px;border-top:2px solid var(--line);}
   .qhead{margin-bottom:14px;}
-  .q-eyebrow{font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:700;margin:0 0 6px;}
+  /* ⚠️ ESTE <style> NÃO É SÓ MOCKUP: render-novo.mjs fatia daqui (de `.method-sub{` até o
+     fim) e serve como B6CSS do bloco 7 em PRODUÇÃO. Mexer aqui muda o relatório real.
+     2026-07-31 (founder, na tela): 11px em CAIXA ALTA com espaçamento ficava pequeno e
+     apertado demais — pior ainda com nome de carga longo, que quebra em duas linhas.
+     Vai pra 16px em caixa normal, sem tracking (tracking existe pra caixa alta). O par
+     `carga → antídoto` é a linha FUNCIONAL do guia do terapeuta e precisa ser legível. */
+  .q-eyebrow{font-size:16px;letter-spacing:0;font-weight:600;margin:0 0 8px;}
   .q-eyebrow .carga{color:var(--amber);} .q-eyebrow .arw{color:var(--ink-faint);opacity:.7;} .q-eyebrow .anti{color:var(--good);} .q-eyebrow .pn{color:var(--ink-faint);} .q-eyebrow .forca{color:var(--good);}
   .qtitle{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:clamp(21px,2.7vw,26px);font-weight:600;line-height:1.18;margin:0;color:var(--ink);}
 
