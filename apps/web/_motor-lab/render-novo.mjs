@@ -650,7 +650,7 @@ ${B6CSS}
   .genfig .gcol::before{content:"";position:absolute;left:-26px;top:4px;width:12px;height:12px;
     border-radius:50%;background:var(--paper);border:2.5px solid var(--line-strong);z-index:1}
   /* a geração ATUAL (você) é a única em âmbar, como no traço horizontal.
-     Por posição (fallback) e por conteúdo — o `:has` acerta mesmo se a ordem mudar;
+     Por posição (fallback) e por conteúdo — o :has acerta mesmo se a ordem mudar;
      em regra separada porque seletor não suportado invalidaria o bloco inteiro. */
   .genfig .gcol:nth-last-child(2)::before{border-color:var(--amber);background:var(--amber);
     box-shadow:0 0 0 4px color-mix(in srgb,var(--amber) 18%,transparent)}
