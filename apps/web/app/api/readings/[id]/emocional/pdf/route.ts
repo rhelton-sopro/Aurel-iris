@@ -187,7 +187,16 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
   // A 0.85 o viewport de impressão vira 810px ≈ os 820px aprovados: TODOS os breakpoints
   // (700/640/600/560/540) ficam desligados e o layout renderiza como o aprovado. De bônus, a
   // altura útil sai de 911px para 1072px (+18%), o que já alivia a paginação.
-  bodyForm.append('scale', '0.85')
+  //
+  // ⭐ 0.85 → 0.95 (founder, 2026-07-31: "tá pequena a fonte, deixa maior"). O scale é a
+  // ÚNICA alavanca de tamanho aqui — o documento usa px absolutos em dezenas de regras, e
+  // mexer nelas mudaria também a tela e o mockup aprovado.
+  // ⚠️ O TETO é rígido e vem da conta acima: a caixa de impressão tem 688px, então a largura
+  // CSS é 688/scale. Acima de 0.97 ela cai abaixo de 700px e o PDF entra no modo CELULAR —
+  // exatamente o bug que o 0.85 existe para evitar. A 0.95 a largura fica em 724px, com 24px
+  // de folga sobre o breakpoint, e o texto sai ~12% maior. ⛔ NÃO passar de 0.95 sem antes
+  // baixar o breakpoint de 700px do .genfig.
+  bodyForm.append('scale', '0.95')
   bodyForm.append('generateDocumentOutline', 'true') // marcadores clicáveis a partir dos h2
 
   const controller = new AbortController()

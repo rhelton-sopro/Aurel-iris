@@ -676,6 +676,16 @@ ${B6CSS}
      página em branco e o corte cai em lugar ruim. Proteger a FOLHA, não o galho — os .step
      lá dentro (<=490px) seguem com avoid e são a unidade que de fato não pode partir. */
   .qsec{break-inside:auto;page-break-inside:auto}
+  /* CADA CAMINHO COMEÇA NUMA PÁGINA (founder, 2026-07-31). Não conflita com a nota acima:
+     aquilo é sobre não PARTIR o caminho no meio (impossível, ele mede ~3 páginas); isto é
+     sobre onde ele COMEÇA. O :not(:first-of-type) evita uma página em branco antes do 1º. */
+  .qsec:not(:first-of-type){break-before:page;page-break-before:always}
+
+  /* AGULHAS: fora a sombra. No Chromium de impressão, box-shadow com BLUR num elemento com
+     transform é rasterizada sem respeitar o border-radius — vira um quadrado cinza
+     translúcido em volta da bolinha (founder viu no PDF, nas agulhas dos centros e nos
+     pêndulos). Na tela a sombra fica; no papel ela não agrega e é o defeito. */
+  .needle,.dv-needle,.e10-needle{box-shadow:none}
   h2.display,.eyebrow{break-after:avoid;page-break-after:avoid}
   hr.div{margin:34px 0 30px}
   .toc-row{border-bottom-color:#ddd}
