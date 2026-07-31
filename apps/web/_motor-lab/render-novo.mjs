@@ -755,6 +755,11 @@ ${B6CSS}
      pêndulos). Na tela a sombra fica; no papel ela não agrega e é o defeito. */
   .needle,.dv-needle,.e10-needle{box-shadow:none}
   h2.display,.eyebrow{break-after:avoid;page-break-after:avoid}
+  /* O cabeçalho do Caminho não pode ficar SOZINHO no pé da página. Visto no PDF gerado
+     localmente (pág. 17): o título "Da preocupação a uma confiança..." abria a página e o
+     passo 1 pulava pra seguinte, deixando meia folha vazia — porque o .step tem avoid e é
+     empurrado, mas nada prendia o cabeçalho a ele. */
+  .qhead,.q-eyebrow,.qtitle{break-after:avoid;page-break-after:avoid}
   /* "salta mais umas duas linhas" entre o fim de uma seção e o começo da outra
      (founder, 2026-07-31). Era 34/30. */
   hr.div{margin:56px 0 50px}
