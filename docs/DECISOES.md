@@ -260,6 +260,84 @@ escolhido é meu, não dele.
 **Status:** APLICADA — conferido no PDF real, páginas 19 e 20.
 **⚠️ `m.labs` ficou sem uso** em `metodo7.mjs`; mantido como dado, mas o render não lê mais.
 
+### 2026-08-01 — ✅ SUPERA 2026-06-13: "a íris lembra o que a pessoa esqueceu de si" está LIBERADA
+**Decisão do founder, verbatim:** *"esse guardrail aí… não, isso aí não é do guardrail não, isso aí
+você tira. Essa frase é muito legal sim, a íris lembra o que a pessoa esqueceu de si, perfeito."*
+**O que muda:** a proibição registrada em 11 e 13/06/2026 (guardrail anti-oráculo, item 5.3 das
+premissas) **cai para esta frase**. Ela é a headline da LP em produção (`apps/web/app/page.tsx`) e a
+capa do deck — e permanece. A reformulação "a leitura revela o que a pessoa esqueceu de si" passa a
+ser alternativa de estilo, **não** correção obrigatória.
+**O que permanece:** o guardrail anti-oráculo continua valendo contra o abuso real — a íris não
+adivinha futuro, não dá veredito e não sabe nada que a pessoa deva obedecer. Quem conduz é o
+terapeuta; quem se reconhece é o cliente.
+**⛔ Para os agentes de marketing:** ninguém reescreve, evita ou sinaliza essa frase como violação.
+**Status:** APLICADA — `PREMISSAS-DO-PRODUTO.md` §5.3 e registro de correções. Nenhuma mudança de
+código: a LP já estava assim.
+
+### 2026-08-01 — As dores D5 e D3 governam TODO material, com regra de aterrissagem
+**Decisão do founder:** os materiais passam a sair com base nas dores escolhidas no estudo.
+Verbatim: *"a nossa narrativa pode falar de uma coisa nada a ver, mas vai chegar sempre no fim
+nessas dores."*
+**A regra:** o **gancho é livre** (curiosidade, íris, história, ciência — o que fisgar); o **pouso
+não é**. Toda peça termina em **D5** (*como mostro que meu trabalho é diferente* → o objeto de prova)
+ou **D3** (*será que eu posso atender* → a segurança de conduzir).
+**Divisão:** D3 = gancho, topo de funil, orgânico. D5 = caixa, landing, fechamento.
+**Razão da divisão:** quem mais sente D3 é quem **ainda não atende** — e o comportamento provado desse
+público é comprar formação para adiar o primeiro atendimento. LP construída só em D3 enche o trial de
+gente sem cliente em quem usar. D5 é a dor de quem já atende: tem cliente, gasta crédito, renova.
+**Fora:** D1 (captação — o produto não gera tráfego) e D2 (cobrar — ajuda com a prova, não resolve a
+culpa). D4 (desgaste) entra só como reforço dentro de D3, nunca como frente, e **nunca** como
+substituto de supervisão.
+**Travas:** D3 não pode ser nomeada de fora (acusa a autoimagem → ela fecha a página; entregar o
+remédio, nunca o diagnóstico) · vocabulário de renda proibido (zero ocorrências em 372 comentários
+reais) · léxico nativo é **medo**, **transbordar**, **"é exatamente isso"** · o UAU do cliente não
+morre, vira **prova** e deixa de ser abertura.
+**Status:** APLICADA em `PREMISSAS-DO-PRODUTO.md` §3.3 (fonte que todo agente lê antes de produzir).
+PENDENTE na LP — ver proposta em `Estatégia comercial e mkt/LP-V2-CIRURGIAS.md`.
+
+### 2026-08-01 — PDF: folha em branco, hierarquia do Caminho invertida, corpo -7%
+Revisão do founder no PDF. **37 → 32 páginas** no total (34 após os rótulos duplicados).
+
+**1. FOLHA TOTALMENTE EM BRANCO (pág. 9), entre a linha do tempo e as Heranças.**
+Founder: *"uma folha ficou totalmente em branco. Essas coisas não podem acontecer."*
+**Causa:** o `<hr class="div">` mora **entre** as `<section>`, fora das duas. Como
+`section.block:not(:first-of-type){break-before:page}` faz toda seção começar em página nova,
+o separador não separa nada no PDF — e com margem de 56+50px, quando a seção anterior
+terminava perto do rodapé ele transbordava e **ganhava uma folha inteira só pra ele**.
+**Decisão:** `hr.div{display:none}` **no print** (na tela continua).
+⚠️ **SUPERA** o ajuste de margem 34/30 → 56/50 de 2026-07-31: o "ar entre seções" que o
+founder pediu passou a ser a própria virada de página.
+**⭐ Mecanismo novo:** `apps/web/scripts/pdf-paginas-vazias.mjs` mede a TINTA de cada página
+e acusa as vazias. Conferir 32 páginas no olho não escala — e falhou: eu tinha olhado o PDF
+e não vi. **Rodar sempre antes de entregar PDF.**
+
+**2. HIERARQUIA DO CAMINHO INVERTIDA.** Founder: *"o caminho, preocupação constante →
+confiança no futuro, essa parte tem que crescer mais"* e *"aquela parte da preocupação, a
+confiança que também é dela, diminua esse cabeçalho para todos"*.
+O par `carga → antídoto` (`.q-eyebrow`) virou o **título** do Caminho — 19px tela / 21px print
+— e a frase em prosa (`.qtitle`) virou **apoio** em itálico — 17,5px tela / 19px print.
+⚠️ **SUPERA** o "aumenta bastante" de 31px de 2026-07-31, que valia enquanto a prosa ERA o
+título. É também a opção que o founder tinha **recusado** na conversa da véspera.
+
+**3. TEXTO DE CORPO −7%.** Founder: *"a fonte padrão de texto poderia diminuir um pouquinho"*
++ *"37 páginas tá muita coisa"*. ⚠️ **Mudança de rumo consciente:** em 2026-07-31 ele havia
+pedido o oposto (*"esse texto está muito pequeno... e assim para os demais"*, +10%). O novo
+valor fica **entre** o original e o de ontem — títulos e rótulos ficam nos tamanhos novos, só
+a leitura corrida cede. Valores anteriores estão nos comentários do CSS.
+
+**4. RÓTULOS ÓRFÃOS (achado meu, no PDF).** Só cabeçalho de seção e do Caminho tinham
+`break-after:avoid`; qualquer outro rótulo podia fechar a página com o conteúdo na seguinte —
+*"Uma frase para dizer em voz alta"* (`.subhead`) fazia isso. Regra estendida a 18 classes,
+levantadas do HTML gerado, não de memória.
+
+**⚠️ Efeito colateral a decidir:** com o corpo menor, o **Caminho 1 deixou de cair em página
+própria** e agora divide a folha com a abertura do bloco 7. A regra sempre foi
+`.qsec:not(:first-of-type)`, então o Caminho 1 nunca teve quebra forçada — antes ele caía
+sozinho por acidente de altura. Visualmente ficou bom, mas a linha da tabela acima diz "cada
+Caminho começa em página nova". **Founder decide se força a quebra também no primeiro.**
+
+**Status:** APLICADA — PDF regerado e conferido; `pdf-paginas-vazias` acusa 0 páginas vazias.
+
 ## Como usar
 
 - **Ao tomar uma decisão:** registrar aqui na mesma sessão, com razão e status.

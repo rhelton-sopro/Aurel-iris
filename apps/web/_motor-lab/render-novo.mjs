@@ -742,17 +742,22 @@ ${B6CSS}
   .secnum{font-size:19px}
   h2.display{font-size:27px;line-height:1.14;margin:4px 0 18px}
 
-  /* 2b. TEXTO DE CORPO — "heranças transgeracionais, esse texto está muito pequeno...
-     e assim para os demais". Sobe ~10% em tudo que é leitura corrida. Os valores base
-     foram pensados num card de 820px na TELA; no papel a 724px eles ficam apertados. */
-  .lead{font-size:20px}
-  .snote{font-size:16px}
-  .deep,.block-serif,.idq{font-size:18px}
-  .gtext{font-size:14px}
-  .chip{font-size:13.5px}
-  .pintro,.lead10{font-size:16.5px}
-  .turn{font-size:20.5px}
-  .microfilme p,.prose p{font-size:17.5px}
+  /* 2b. TEXTO DE CORPO. Histórico em DOIS passos, de propósito:
+     · 2026-07-31 o founder disse "esse texto está muito pequeno... e assim para os demais"
+       e tudo subiu ~10%;
+     · 2026-08-01 ele reviu: "a fonte padrão ali de texto mesmo poderia diminuir um
+       pouquinho" — junto com "37 páginas tá muita coisa".
+     Desce ~7%, ficando ENTRE o valor original e o de ontem. Não é desfazer o pedido de
+     ontem: os títulos e os rótulos continuam nos tamanhos novos; só a leitura corrida cede.
+     (Comentários guardam o valor anterior pra próxima calibração não chutar do zero.) */
+  .lead{font-size:18.5px}          /* era 20   */
+  .snote{font-size:15px}           /* era 16   */
+  .deep,.block-serif,.idq{font-size:17px} /* era 18 */
+  .gtext{font-size:13.5px}         /* era 14   */
+  .chip{font-size:13px}            /* era 13.5 */
+  .pintro,.lead10{font-size:15.5px}/* era 16.5 */
+  .turn{font-size:19px}            /* era 20.5 */
+  .microfilme p,.prose p{font-size:16.5px} /* era 17.5 */
 
   /* 3. (o ar entre seções está na regra hr.div lá embaixo — aqui seria sobrescrito) */
 
@@ -769,12 +774,12 @@ ${B6CSS}
   /* 5. BLOCO 7 — o subtítulo do método e o corpo dos caminhos estavam pequenos.
      .qtitle usa clamp com vw: a 724px ele encosta no piso de 19px. Fixo no print. */
   .method-sub{font-size:14px}
-  /* "Caminho 1 — da preocupação a uma confiança" — founder: "aumenta bastante" */
-  .qtitle{font-size:31px;line-height:1.16}
-  /* 2026-07-31: a tela subiu de 11px/caixa-alta para 16px/caixa-normal (ver o comentário
-     no b6-terapeuta-proto.html). Este override PRECISAVA subir junto — em 14px ele
-     ENCOLHERIA a linha no PDF, invertendo a relação de sempre (print ≥ tela). */
-  .q-eyebrow{font-size:17px;letter-spacing:0;margin-bottom:9px}
+  /* 2026-08-01 — HIERARQUIA INVERTIDA (founder): o par "Caminho N · carga → antídoto"
+     virou o TÍTULO do Caminho ("essa parte tem que crescer mais") e a frase em prosa
+     virou o apoio ("diminua esse cabeçalho para todos"). Supera o "aumenta bastante" de
+     31px do dia anterior, que valia enquanto a prosa ERA o título. */
+  .qtitle{font-size:19px;line-height:1.3}   /* era 31 */
+  .q-eyebrow{font-size:21px;letter-spacing:0;margin-bottom:7px}  /* era 17 */
   /* 3-4 enters entre o cabeçalho do bloco 7 e o Caminho 1 */
   .qsec:first-of-type{margin-top:74px;padding-top:0}
   .intro{font-size:17px}
@@ -796,9 +801,24 @@ ${B6CSS}
      passo 1 pulava pra seguinte, deixando meia folha vazia — porque o .step tem avoid e é
      empurrado, mas nada prendia o cabeçalho a ele. */
   .qhead,.q-eyebrow,.qtitle{break-after:avoid;page-break-after:avoid}
-  /* "salta mais umas duas linhas" entre o fim de uma seção e o começo da outra
-     (founder, 2026-07-31). Era 34/30. */
-  hr.div{margin:56px 0 50px}
+  /* 2026-08-01 — NENHUM RÓTULO ÓRFÃO NO PÉ DA PÁGINA. Antes só os cabeçalhos de seção e do
+     Caminho estavam protegidos, então qualquer outro rótulo podia ficar sozinho no rodapé
+     com o conteúdo dele na página seguinte — visto no PDF: "Uma frase para dizer em voz
+     alta" (.subhead) fechava a página 10 e a caixa começava na 11. Lista levantada das
+     classes que REALMENTE aparecem no HTML gerado, não de memória. */
+  .subhead,.rootlab,.grouplab,.keys-lab,.method-sub,.st-name,.toc-lab,.dv-lab,.glabel,
+  .ctr-name,.ctr-head,.rlab,.resumo-lab,.obj-lab,.minih,.med-lab,.guide-tag,.sayintro
+  {break-after:avoid;page-break-after:avoid}
+  /* ⛔ O SEPARADOR NÃO EXISTE NO PDF. Ele mora ENTRE as <section> (fora das duas), e como
+     "section.block:not(:first-of-type){break-before:page}" faz toda seção começar em
+     página nova, ele não separa coisa nenhuma aqui — só ocupa espaço. Com margem de
+     56+50px, quando a seção anterior terminava perto do rodapé o <hr> transbordava e
+     ganhava UMA FOLHA INTEIRA só pra ele: foi o que aconteceu entre a linha do tempo e as
+     Heranças transgeracionais (página 9 em branco, pega pelo founder em 2026-08-01).
+     ⚠️ Isto SUPERA o ajuste de margem 34/30 → 56/50 do dia anterior: o "ar entre seções"
+     que o founder pediu passou a ser a própria virada de página. Na TELA o filete continua.
+     Detector: node scripts/pdf-paginas-vazias.mjs */
+  hr.div{display:none}
   .toc-row{border-bottom-color:#ddd}
   a{color:inherit;text-decoration:none}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
