@@ -371,6 +371,46 @@ marcava TODAS as páginas como vazias com total confiança.
 versão rasterizava com Chrome + `sharp` (~2 min); agora são milissegundos, sem browser.
 **Status:** APLICADA — build da Vercel verde, `tsc` sem erro fora de teste, 6/6 testes novos.
 
+### 2026-08-02 — DUAS fontes no relatório, via variável (o PDF tinha QUATRO)
+**Founder:** *"a fonte tem parte que está em uma fonte, parece que a outra parte está em
+outra, e isso precisa ser padronizado."* Estava certo, e era pior do que parecia.
+
+**Medido, não achado:** o documento declarava **cinco** pilhas de `font-family` e o PDF saía
+com **quatro famílias embutidas**:
+
+| | fonte | origem |
+|---|---|---|
+| serifada pretendida | Palatino Linotype | 36 declarações |
+| serifada **acidental** | **Georgia** | 5 regras com `Palatino,Georgia,serif` — sem o "Linotype" no início, o Windows não tem fonte chamada só "Palatino" e cai em Georgia (`.cren-txt`, `.secnum`, `.toc-n`, `.toc-t`, `.cf-nome`) |
+| sem serifa pretendida | Segoe UI | pilha `ui-sans-serif,system-ui,…` |
+| sem serifa **acidental** | **Arial** | `"Inter",sans-serif` em `.say p.pause` — **a Inter não está instalada em lugar nenhum** e o documento não tem um único `@font-face` |
+
+**Decisão:** duas variáveis, `--serif` e `--sans`, no `:root`; **as 42 declarações passaram a
+usá-las**. ⛔ Regra nova não declara `font-family` literal.
+**Verificação (é objetiva):** as fontes `/BaseFont` embutidas no PDF gerado têm que ser só
+essas duas famílias. Depois do fix: Palatino Linotype ×4 pesos + Segoe UI ×4 pesos, nada mais.
+
+**⚠️⚠️ LIMITE QUE EU NÃO TINHA DECLARADO:** meu PDF local é gerado pelo Chrome do **Windows**,
+com as fontes do Windows. O Gotenberg roda em **Linux** no Render, e Palatino Linotype e
+Segoe UI são fontes da Microsoft que quase certamente **não existem naquele contêiner** — lá
+tudo cai no fallback genérico. Ou seja: **meu PDF local confere geometria e paginação com
+fidelidade, mas NÃO confere tipografia.** Quando eu disse "conferi o PDF" nos dias anteriores,
+isso nunca incluiu qual fonte de fato aparece em produção.
+**Consequência:** a padronização acima é correta em qualquer plataforma, mas só um
+`@font-face` com a fonte embarcada garante que o PDF de produção use a fonte pretendida.
+**PENDENTE — decisão do founder:** embarcar fonte exige fonte com licença para isso, e
+Palatino Linotype e Segoe UI são proprietárias da Microsoft. Trocar por uma serifada aberta
+equivalente é decisão de marca (a LP usa Fraunces + Raleway — já divergente do relatório).
+
+### 2026-08-02 — Mapa emocional menor no PDF
+**Founder:** *"o mapa emocional no PDF a fonte está muito grande, pode diminuir uns dois
+pontos"* + *"os gráficos também dá uma diminuidazinha, está destoando do resto"*.
+Rótulos −2px (`.grouplab` 17→15, `.pl-carga/.pl-resource` 19→17, `.pl-anti` 17→15,
+`.pl-shadow` 16,5→14,5, `.pend-desc` 15→13,5). O **gráfico** não tinha override nenhum no
+print — herdava a tela (trilho 13px, bolinha 21px) e no papel pesava mais que qualquer outro
+elemento; agora trilho 10px e bolinha 17px. ⚠️ Tudo **só no print**; a tela mantém o mockup
+aprovado. **Status:** APLICADA — conferido na página 13 do PDF real.
+
 ## Como usar
 
 - **Ao tomar uma decisão:** registrar aqui na mesma sessão, com razão e status.

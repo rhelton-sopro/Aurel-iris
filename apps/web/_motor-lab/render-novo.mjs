@@ -605,7 +605,7 @@ const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><met
 .crenlist{margin:20px 0 22px}
 .cren{margin:0 0 17px}
 .cren-h{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin:0 0 5px}
-.cren-txt{font-family:Palatino,Georgia,serif;font-size:16.5px;line-height:1.45;font-style:italic;color:var(--ink)}
+.cren-txt{font-family:var(--serif);font-size:16.5px;line-height:1.45;font-style:italic;color:var(--ink)}
 .cren-lv{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint,#8a9695);white-space:nowrap;flex-shrink:0}
 .cren-corr{font-style:normal;margin-left:5px;color:var(--amber);cursor:help}
 .cren-track{position:relative;height:3px;border-radius:2px;background:rgba(0,0,0,.07);overflow:hidden}
@@ -621,7 +621,7 @@ const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><met
    passava a significar duas coisas — carga emocional E "isto é uma etiqueta". */
 .eyebrow{font-size:14px;letter-spacing:.16em;margin:0 0 12px;color:var(--ink)}
 .eyebrow .secnum{color:var(--ink)}
-.eyebrow .secnum{font-family:Palatino,Georgia,serif;font-size:21px;font-weight:400;letter-spacing:0;vertical-align:-2px;margin-right:2px}
+.eyebrow .secnum{font-family:var(--serif);font-size:21px;font-weight:400;letter-spacing:0;vertical-align:-2px;margin-right:2px}
 /* MAIS AR entre as seções — estava tudo colado */
 section.block{margin:0} hr.div{margin:64px 0 60px;border:0;border-top:1px solid var(--line)}
 section.block > h2.display{margin-top:6px;margin-bottom:22px}
@@ -630,13 +630,13 @@ section.block > h2.display{margin-top:6px;margin-bottom:22px}
 .toc-lab{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint,#a99a87);font-weight:700;margin:0 0 12px}
 .toc-row{display:flex;align-items:baseline;gap:14px;padding:7px 0;text-decoration:none;color:inherit;border-bottom:1px solid rgba(0,0,0,.05)}
 .toc-row:last-child{border-bottom:0}
-.toc-n{font-family:Palatino,Georgia,serif;font-size:17px;color:var(--amber);min-width:16px}
-.toc-t{font-family:Palatino,Georgia,serif;font-size:16.5px;line-height:1.35}
+.toc-n{font-family:var(--serif);font-size:17px;color:var(--amber);min-width:16px}
+.toc-t{font-family:var(--serif);font-size:16.5px;line-height:1.35}
 .toc-row:hover .toc-t{color:var(--teal-deep)}
 ${B6CSS}
 /* --- fecho --- */
 .colofao{margin-top:64px;padding-top:26px;border-top:1px solid var(--line);text-align:center}
-.cf-nome{font-family:Palatino,Georgia,serif;font-size:19px;margin:0 0 2px}
+.cf-nome{font-family:var(--serif);font-size:19px;margin:0 0 2px}
 .cf-meta{font-size:13px;color:var(--ink-soft,#6b6357);margin:0 0 16px}
 .cf-marca{font-size:11px;letter-spacing:.2em;color:var(--teal-deep);font-weight:700;margin:0 0 14px}
 .cf-nota{font-size:11.5px;line-height:1.6;color:var(--ink-faint,#a99a87);max-width:52ch;margin:0 auto}
@@ -764,12 +764,20 @@ ${B6CSS}
   /* 4. BLOCO 5 — separar "o que pesa" de "o que está leve", e subir as duas fontes.
      O founder: "terminou o mapa emocional negativo, dá mais espaço pra começar o que está
      leve" — os dois grupos estavam colados e liam como uma lista só. */
-  .grouplab{font-size:17px;letter-spacing:.11em}
+  /* 2026-08-02 (founder, olhando o PDF): "o mapa emocional, a fonte está muito grande, pode
+     diminuir uns dois pontos" + "os gráficos também dá uma diminuidazinha, está destoando
+     do resto". Desce ~2px em cada rótulo e encolhe trilho e bolinha.
+     ⚠️ SÓ no print: a tela mantém o mockup aprovado. Valores anteriores nos comentários. */
+  .grouplab{font-size:15px;letter-spacing:.11em}   /* era 17 */
   .grouplab.livre{margin-top:86px}   /* "dá bastante espaço" entre o que pesa e o que é leve */
-  .pl-carga,.pl-resource{font-size:19px}
-  .pl-anti{font-size:17px}
-  .pl-shadow{font-size:16.5px}
-  .pend-desc{font-size:15px}
+  .pl-carga,.pl-resource{font-size:17px}           /* era 19 */
+  .pl-anti{font-size:15px}                         /* era 17 */
+  .pl-shadow{font-size:14.5px}                     /* era 16.5 */
+  /* o GRÁFICO em si — sem override antes, herdava a tela (trilho 13px, bolinha 21px) e no
+     papel ficava mais pesado que qualquer outro elemento da página. */
+  .pend-track{height:10px}
+  .needle{width:17px;height:17px;border-width:3px}
+  .pend-desc{font-size:13.5px}   /* era 15 — mesma redução do bloco 5 (2026-08-02) */
 
   /* 5. BLOCO 7 — o subtítulo do método e o corpo dos caminhos estavam pequenos.
      .qtitle usa clamp com vw: a 724px ele encosta no piso de 19px. Fixo no print. */

@@ -5,21 +5,26 @@
     --paper:#ffffff; --panel:#f7f3ea; --ink:#1f3a3c; --ink-soft:#5a6f6e; --ink-faint:#8a9695;
     --line:#e6ded0; --line-strong:#d6cbb6; --teal:#0a7d84; --teal-deep:#0d5c63;
     --amber:#b5701a; --amber-soft:#d69a4e; --good:#2f7a54; --gold:#9a6a12;
+    /* Em PRODUÇÃO estas duas vêm do :root de relatorio-completo.html (o corte do B6CSS
+       começa em `.method-sub`, então este :root não entra). Ficam aqui para o arquivo
+       continuar abrindo sozinho no navegador — sem elas o mockup perderia as fontes. */
+    --serif:"Palatino Linotype","Book Antiqua",Palatino,Georgia,serif;
+    --sans:ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   }
   *{box-sizing:border-box;}
-  body{margin:0;background:#efe9dd;color:var(--ink);font-family:"Inter",-apple-system,Segoe UI,Roboto,sans-serif;}
+  body{margin:0;background:#efe9dd;color:var(--ink);font-family:var(--sans);}
   .sheet{max-width:840px;margin:26px auto;background:var(--paper);border:1px solid var(--line);border-radius:6px;box-shadow:0 4px 24px rgba(40,35,25,.10);overflow:hidden;}
   .pad{padding:clamp(28px,5vw,56px);}
   .brand{font-size:12px;letter-spacing:.4em;font-weight:700;color:var(--teal-deep);text-align:center;}
-  .brand-sub{text-align:center;font-family:"Palatino Linotype",Palatino,Georgia,serif;font-style:italic;color:var(--ink-faint);font-size:14px;margin-top:8px;padding-bottom:22px;border-bottom:1px solid var(--line);}
+  .brand-sub{text-align:center;font-family:var(--serif);font-style:italic;color:var(--ink-faint);font-size:14px;margin-top:8px;padding-bottom:22px;border-bottom:1px solid var(--line);}
   .eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);font-weight:700;margin:26px 0 6px;}
-  .secnum{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:13px;color:var(--ink-faint);font-weight:600;}
+  .secnum{font-family:var(--serif);font-size:13px;color:var(--ink-faint);font-weight:600;}
   .method-sub{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--amber);font-weight:700;margin:-2px 0 12px;}
   .guide-tag{display:inline-block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--amber);background:color-mix(in srgb,var(--amber) 9%,var(--paper));border:1px solid color-mix(in srgb,var(--amber) 32%,var(--line));border-radius:100px;padding:4px 12px;margin:0 0 12px;}
-  .intro{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:16.5px;line-height:1.62;color:var(--ink-soft);max-width:66ch;margin:0 0 12px;}
+  .intro{font-family:var(--serif);font-size:16.5px;line-height:1.62;color:var(--ink-soft);max-width:66ch;margin:0 0 12px;}
   .intro b{color:var(--ink);font-weight:600;}
   .safety-line{font-size:13.5px;line-height:1.55;color:var(--ink-soft);background:color-mix(in srgb,var(--amber) 6%,var(--paper));border:1px solid color-mix(in srgb,var(--amber) 24%,var(--line));border-radius:9px;padding:9px 14px;margin:0 0 4px;}
-  .safety-line b{color:var(--amber);} .safety-line i{color:#3a3227;font-family:"Palatino Linotype",Palatino,Georgia,serif;}
+  .safety-line b{color:var(--amber);} .safety-line i{color:#3a3227;font-family:var(--serif);}
 
   .qsec{padding-top:24px;margin-top:24px;border-top:2px solid var(--line);}
   .qhead{margin-bottom:14px;}
@@ -37,13 +42,13 @@
   .q-eyebrow{font-size:19px;letter-spacing:0;font-weight:700;margin:0 0 6px;}
   .q-eyebrow .carga{color:var(--amber);} .q-eyebrow .arw{color:var(--ink-faint);opacity:.7;} .q-eyebrow .anti{color:var(--good);} .q-eyebrow .pn{color:var(--ink-faint);} .q-eyebrow .forca{color:var(--good);}
   /* virou APOIO do .q-eyebrow (ver acima) — era clamp(21,2.7vw,26). */
-  .qtitle{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:17.5px;font-weight:600;line-height:1.3;margin:0;color:var(--ink-soft,#5a6f6e);font-style:italic;}
+  .qtitle{font-family:var(--serif);font-size:17.5px;font-weight:600;line-height:1.3;margin:0;color:var(--ink-soft,#5a6f6e);font-style:italic;}
 
   .step{position:relative;padding:0 0 16px 44px;}
   .step:last-of-type{padding-bottom:2px;}
   .step::before{content:"";position:absolute;left:14px;top:27px;bottom:-2px;width:2px;background:var(--line);}
   .step:last-of-type::before{display:none;}
-  .step .n{position:absolute;left:0;top:0;width:29px;height:29px;border-radius:50%;background:var(--paper);border:2px solid var(--line-strong);display:flex;align-items:center;justify-content:center;font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:13px;font-weight:700;color:var(--ink-faint);z-index:1;}
+  .step .n{position:absolute;left:0;top:0;width:29px;height:29px;border-radius:50%;background:var(--paper);border:2px solid var(--line-strong);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:13px;font-weight:700;color:var(--ink-faint);z-index:1;}
   .step.carga .n{border-color:var(--amber);color:var(--amber);} .step.recurso .n{border-color:var(--good);color:var(--good);}
   .step.sentido .n{border-color:var(--gold);color:var(--gold);} .step.fechar .n{border-color:var(--teal);color:var(--teal-deep);}
   .st-name{font-size:17px;font-weight:700;color:var(--ink);margin:4px 0 3px;}
@@ -54,9 +59,9 @@
   .say + .say{margin-top:7px;}
   .say-lab{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);font-weight:700;display:block;margin-bottom:5px;}
   .step.recurso .say-lab{color:var(--good);} .step.sentido .say-lab{color:var(--gold);} .step.fechar .say-lab{color:var(--teal-deep);}
-  .say p{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:17px;line-height:1.56;font-style:italic;color:#352d22;margin:0;}
+  .say p{font-family:var(--serif);font-size:17px;line-height:1.56;font-style:italic;color:#352d22;margin:0;}
   .say p + p{margin-top:7px;}
-  .say p.pause{font-family:"Inter",sans-serif;font-style:normal;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);text-align:center;margin:7px 0;font-weight:600;}
+  .say p.pause{font-family:var(--sans);font-style:normal;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);text-align:center;margin:7px 0;font-weight:600;}
   .cue{font-size:13.5px;line-height:1.48;color:var(--ink-soft);margin:7px 0 0;padding-left:16px;position:relative;}
   .cue::before{content:"›";position:absolute;left:2px;color:var(--ink-faint);font-weight:700;}
   .cue b{color:var(--ink);font-weight:600;}
@@ -67,7 +72,7 @@
   .conduct{background:color-mix(in srgb,var(--amber) 8%,var(--paper));border:1px solid color-mix(in srgb,var(--amber) 30%,var(--line));border-radius:10px;padding:10px 15px;margin:12px 0 2px;}
   .conduct-lab{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);font-weight:700;display:block;margin-bottom:4px;}
   .conduct p{font-size:13.5px;line-height:1.5;color:var(--ink-soft);margin:0;} .conduct b{color:var(--ink);font-weight:600;}
-  .closing{font-family:"Palatino Linotype",Palatino,Georgia,serif;font-size:17px;line-height:1.6;color:var(--teal-deep);font-style:italic;text-align:center;max-width:56ch;margin:32px auto 4px;}
+  .closing{font-family:var(--serif);font-size:17px;line-height:1.6;color:var(--teal-deep);font-style:italic;text-align:center;max-width:56ch;margin:32px auto 4px;}
 </style></head><body>
 <div class="sheet"><div class="pad">
   <div class="brand">IRIS CODEX</div>
