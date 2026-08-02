@@ -30,6 +30,8 @@ import {
   renderFooterHtml,
 } from '@/lib/pdf/report-print-document'
 import { DISCLAIMER_COMPACT } from '@/components/legal/DisclaimerCopy'
+// .mjs sem tipos, compartilhado com scripts/pdf-paginas-vazias.mjs de propósito (evita deriva)
+import { paginasVazias } from '@/lib/pdf/paginas-vazias.mjs'
 
 /**
  * ⚠️ O `@page` do DOCUMENTO tem que SUMIR, não ser sobrescrito.
@@ -163,17 +165,22 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
   // 9.49in e a paginação muda. É o preço de ter cabeçalho e rodapé em toda página — não dá
   // para ter os dois e a paginação original. Os blocos frágeis já têm `break-inside:avoid`
   // no @media print aprovado (.gen das Heranças inclusive), que é o que segura isso.
-  const bodyForm = new FormData()
-  bodyForm.append('files', blob(html), 'index.html')
-  bodyForm.append('files', blob(renderHeaderHtml(nomeCompleto)), 'header.html')
-  bodyForm.append('files', blob(renderFooterHtml(nomeCompleto, DISCLAIMER_COMPACT)), 'footer.html')
-  bodyForm.append('paperWidth', '8.27')
-  bodyForm.append('paperHeight', '11.69')
-  bodyForm.append('marginTop', '1.2')
-  bodyForm.append('marginBottom', '1.0')
-  bodyForm.append('marginLeft', '0.551')
-  bodyForm.append('marginRight', '0.551')
-  bodyForm.append('printBackground', 'true') // sem isto o papel marfim e as barras somem
+  const montaBodyForm = (scale: string) => {
+    const f = new FormData()
+    f.append('files', blob(html), 'index.html')
+    f.append('files', blob(renderHeaderHtml(nomeCompleto)), 'header.html')
+    f.append('files', blob(renderFooterHtml(nomeCompleto, DISCLAIMER_COMPACT)), 'footer.html')
+    f.append('paperWidth', '8.27')
+    f.append('paperHeight', '11.69')
+    f.append('marginTop', '1.2')
+    f.append('marginBottom', '1.0')
+    f.append('marginLeft', '0.551')
+    f.append('marginRight', '0.551')
+    f.append('printBackground', 'true') // sem isto o papel marfim e as barras somem
+    f.append('scale', scale)
+    f.append('generateDocumentOutline', 'true') // marcadores clicáveis a partir dos h2
+    return f
+  }
   // ⭐ SCALE 0.85 — é o que faz o PDF mostrar o desenho APROVADO.
   //
   // O documento foi aprovado num card de 820px (`.sheet{max-width:820px}`). A 100%, a caixa
@@ -196,9 +203,15 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
   // exatamente o bug que o 0.85 existe para evitar. A 0.95 a largura fica em 724px, com 24px
   // de folga sobre o breakpoint, e o texto sai ~12% maior. ⛔ NÃO passar de 0.95 sem antes
   // baixar o breakpoint de 700px do .genfig.
-  bodyForm.append('scale', '0.95')
-  bodyForm.append('generateDocumentOutline', 'true') // marcadores clicáveis a partir dos h2
+  //
+  // ⭐ SCALE_RETRY (2026-08-02): só é usado quando o guard acha PÁGINA EM BRANCO. Descer o
+  // scale faz caber mais por página, o texto reflui e a órfã costuma desmanchar. Descer é
+  // seguro por construção — o perigo mora no TETO (0.97 → modo celular), nunca no piso;
+  // 0.93 foi valor de produção até 31/07.
+  const SCALE = '0.95'
+  const SCALE_RETRY = '0.93'
 
+  const t0 = Date.now()
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), RENDER_TIMEOUT_MS)
   const post = (path: string, body: FormData) =>
@@ -213,13 +226,48 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
     }
     const coverPdf = await coverRes.arrayBuffer()
 
-    const bodyRes = await post('/forms/chromium/convert/html', bodyForm)
-    if (!bodyRes.ok) {
-      const detail = await bodyRes.text().catch(() => '')
-      console.error('[emocional/pdf] gotenberg corpo', { readingId: id, status: bodyRes.status, detail: detail.slice(0, 300) })
-      return NextResponse.json({ error: 'falha na conversão para PDF' }, { status: 502 })
+    const renderCorpo = async (scale: string) => {
+      const res = await post('/forms/chromium/convert/html', montaBodyForm(scale))
+      if (!res.ok) {
+        const detail = await res.text().catch(() => '')
+        console.error('[emocional/pdf] gotenberg corpo', { readingId: id, scale, status: res.status, detail: detail.slice(0, 300) })
+        return null
+      }
+      return res.arrayBuffer()
     }
-    const bodyPdf = await bodyRes.arrayBuffer()
+
+    let bodyPdf = await renderCorpo(SCALE)
+    if (!bodyPdf) return NextResponse.json({ error: 'falha na conversão para PDF' }, { status: 502 })
+
+    // ⭐ GUARD DE PÁGINA EM BRANCO (founder, 2026-08-01: "a gente já tem que ver ANTES de
+    // gerar o PDF para não ter mais páginas em branco"). Ver lib/pdf/paginas-vazias.mjs.
+    //
+    // Ordem importa: confere o CORPO, antes do merge — é o único pedaço que dá para
+    // regerar. Descer o scale faz caber mais por página, o texto reflui e a órfã desmancha.
+    // ⚠️ É HEURÍSTICA, não prova: se ainda sobrar página vazia, ENTREGA MESMO ASSIM e
+    // registra. Um documento com uma folha a mais é melhor que "não consegui baixar o PDF"
+    // com o terapeuta na frente do cliente (decisão do founder).
+    const chk = paginasVazias(bodyPdf)
+    if (chk.ok && chk.vazias.length) {
+      // só tenta de novo se sobrar tempo com folga — o retry não pode causar um 504.
+      const gasto = Date.now() - t0
+      const temFolga = gasto * 2 < RENDER_TIMEOUT_MS * 0.8
+      console.warn('[emocional/pdf] página(s) em branco no corpo', {
+        readingId: id, scale: SCALE, vazias: chk.vazias, total: chk.total, gastoMs: gasto, vaiTentarDeNovo: temFolga,
+      })
+      if (temFolga) {
+        const retry = await renderCorpo(SCALE_RETRY)
+        const chk2 = retry ? paginasVazias(retry) : null
+        if (retry && chk2?.ok && !chk2.vazias.length) {
+          bodyPdf = retry
+          console.warn('[emocional/pdf] corrigido no retry', { readingId: id, scale: SCALE_RETRY, total: chk2.total })
+        } else {
+          console.error('[emocional/pdf] retry NÃO resolveu — entregando assim mesmo', {
+            readingId: id, aindaVazias: chk2?.vazias ?? null,
+          })
+        }
+      }
+    }
 
     // MERGE — ordenado por nome de arquivo, daí os prefixos numéricos. O engine é pdftk
     // (forçado no render.yaml): o `cat` dele preserva os destinos nomeados, então os links

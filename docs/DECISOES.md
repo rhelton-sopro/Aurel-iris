@@ -338,6 +338,39 @@ Caminho começa em página nova". **Founder decide se força a quebra também no
 
 **Status:** APLICADA — PDF regerado e conferido; `pdf-paginas-vazias` acusa 0 páginas vazias.
 
+### 2026-08-02 — GUARD de página em branco DENTRO da rota de PDF
+**Decisão do founder:** *"para gerar o PDF, a gente já tem que ver antes de gerar o PDF para
+não ter mais páginas em branco"*. E, quando detectar: **corrige sozinho e entrega**.
+
+**Por que na rota e não só num script:** o defeito depende de ONDE o texto cai, e isso muda
+com os dados de cada pessoa — um teste com leitura-modelo nunca cobriria. E a versão
+"script que eu rodo" já falhou uma vez: eu tinha o rasterizador e não rodei nas 32 páginas.
+
+**Como:** `lib/pdf/paginas-vazias.mjs` infla o content stream de cada página e conta os
+operadores de texto. Medido no Mapa do Ser real: **páginas normais 32 a 210 operadores, a
+página em branco exatamente 0** — por isso o critério é `=== 0`, sem limiar chutado.
+⛔ **Zero dependência nova** (só o `zlib` do Node). ⚠️ **FAIL-OPEN**: qualquer erro de
+parsing devolve `ok:false` e não acusa nada — detector quebrado não pode atrapalhar entrega.
+
+**Fluxo na rota:** confere o CORPO (antes do merge, que é o único pedaço regerável) → se
+achar vazia, **regera com `scale` 0,95 → 0,93** (cabe mais por página, o texto reflui, a
+órfã desmancha) → se ainda sobrar, **ENTREGA ASSIM MESMO** e loga. Founder descartou
+bloquear o download: *"não consigo baixar o PDF"* com o terapeuta na frente do cliente é
+pior que uma folha a mais. O retry só acontece se houver folga de tempo (não pode virar 504).
+⚠️ **É heurística, não prova** — refluir pode, em tese, criar outra órfã.
+⚠️ Descer o `scale` é seguro por construção: o perigo é o TETO (0,97 → modo celular), nunca
+o piso; 0,93 foi valor de produção até 31/07.
+
+**Validação (não é opinião):** reintroduzi a regressão do `hr.div` de propósito, o detector
+acusou a página 9, e restaurei. Mais 6 testes em `lib/pdf/paginas-vazias.test.ts`.
+**⭐ Um deles guarda o modo de falha que MENTE:** o Chromium escreve texto em HEXADECIMAL
+(`<002C> Tj`); o regex do protótipo exigia `)` antes do `Tj`, não casava nada e o detector
+marcava TODAS as páginas como vazias com total confiança.
+
+**Um detector só:** `scripts/pdf-paginas-vazias.mjs` passou a importar o mesmo módulo. A 1ª
+versão rasterizava com Chrome + `sharp` (~2 min); agora são milissegundos, sem browser.
+**Status:** APLICADA — build da Vercel verde, `tsc` sem erro fora de teste, 6/6 testes novos.
+
 ## Como usar
 
 - **Ao tomar uma decisão:** registrar aqui na mesma sessão, com razão e status.
