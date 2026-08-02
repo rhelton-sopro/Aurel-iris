@@ -43,7 +43,12 @@ export const TITULOS_BLOCOS = [
   'Mente, coração e corpo — a sua mistura',
   'O que cada tempo deixou em você',
   'O que talvez não tenha começado em você',
-  'Onde você está — e pra onde dá pra ir',
+  // 2026-08-02 — era "Onde você está — e pra onde dá pra ir". ESTE título era o alvo real
+  // da crítica do founder em 31/07 ("tá lá, 5, mapa emocional, onde você está? não acho
+  // legal; 'onde' remete a estado") — eu tinha entendido que era a legendinha do gráfico,
+  // troquei só ela, e a frase seguiu no H2, em corpo muito maior. Agora usa o mesmo
+  // vocabulário aprovado da legenda: pesa / afrouxa.
+  'O que pesa — e pra onde afrouxa',
   'Crenças a serem trabalhadas',
   'Perguntas para a sua sessão',
 ]
@@ -768,16 +773,18 @@ ${B6CSS}
      diminuir uns dois pontos" + "os gráficos também dá uma diminuidazinha, está destoando
      do resto". Desce ~2px em cada rótulo e encolhe trilho e bolinha.
      ⚠️ SÓ no print: a tela mantém o mockup aprovado. Valores anteriores nos comentários. */
-  .grouplab{font-size:15px;letter-spacing:.11em}   /* era 17 */
-  .grouplab.livre{margin-top:86px}   /* "dá bastante espaço" entre o que pesa e o que é leve */
-  .pl-carga,.pl-resource{font-size:17px}           /* era 19 */
-  .pl-anti{font-size:15px}                         /* era 17 */
-  .pl-shadow{font-size:14.5px}                     /* era 16.5 */
+  /* 2ª rodada (founder viu o PDF de prod já reduzido: "ainda tá grande"). Histórico do
+     tamanho, pra próxima calibração não chutar: 19 → 17 → 15 no rótulo da carga. */
+  .grouplab{font-size:13.5px;letter-spacing:.11em}  /* 17 → 15 → 13,5 */
+  .grouplab.livre{margin-top:72px}   /* respiro entre "o que pesa" e "o que está leve" (era 86) */
+  .pl-carga,.pl-resource{font-size:15px}            /* 19 → 17 → 15 */
+  .pl-anti{font-size:13.5px}                        /* 17 → 15 → 13,5 */
+  .pl-shadow{font-size:13px}                        /* 16,5 → 14,5 → 13 */
   /* o GRÁFICO em si — sem override antes, herdava a tela (trilho 13px, bolinha 21px) e no
      papel ficava mais pesado que qualquer outro elemento da página. */
-  .pend-track{height:10px}
-  .needle{width:17px;height:17px;border-width:3px}
-  .pend-desc{font-size:13.5px}   /* era 15 — mesma redução do bloco 5 (2026-08-02) */
+  .pend-track{height:8px}                           /* 13 → 10 → 8 */
+  .needle{width:14px;height:14px;border-width:2.5px} /* 21 → 17 → 14 */
+  .pend-desc{font-size:12.5px}   /* 15 → 13,5 → 12,5 (2026-08-02) */
 
   /* 5. BLOCO 7 — o subtítulo do método e o corpo dos caminhos estavam pequenos.
      .qtitle usa clamp com vw: a 724px ele encosta no piso de 19px. Fixo no print. */
