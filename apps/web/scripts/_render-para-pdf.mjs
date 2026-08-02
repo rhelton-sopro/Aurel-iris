@@ -5,6 +5,7 @@
  */
 import { readFileSync } from 'node:fs'
 import { renderHTML } from '../_motor-lab/render-novo.mjs'
+import { FONT_FACE_CSS } from '../lib/pdf/fontes-embutidas.mjs'
 
 const RE_AT_PAGE = /@page\s*\{[^}]*\}/g
 
@@ -25,6 +26,10 @@ export async function renderEmocionalStandalone(readingId) {
   const nome = (reading.client?.full_name || 'cliente').trim().split(/\s+/)[0]
 
   const { html } = renderHTML(reading.report_emocional, findings?.exame_json ?? {}, nome)
+  // ⚠️ as fontes embarcadas TÊM que entrar aqui também, senão o PDF local usaria as fontes
+  // do Windows e eu voltaria a "conferir" uma tipografia que produção não tem — foi
+  // exatamente o furo declarado em docs/DECISOES.md (2026-08-02).
+  const comFontes = html.replace('<head>', `<head><style>${FONT_FACE_CSS}</style>`)
   // a rota tira o @page para as bandas de header/footer do Gotenberg caberem nas margens
-  return html.replace(RE_AT_PAGE, '')
+  return comFontes.replace(RE_AT_PAGE, '')
 }

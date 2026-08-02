@@ -411,6 +411,66 @@ print — herdava a tela (trilho 13px, bolinha 21px) e no papel pesava mais que 
 elemento; agora trilho 10px e bolinha 17px. ⚠️ Tudo **só no print**; a tela mantém o mockup
 aprovado. **Status:** APLICADA — conferido na página 13 do PDF real.
 
+### 2026-08-02 — FONTES EMBARCADAS no PDF (e o que produção usava de verdade)
+**Founder:** *"vamos padronizar na fonte do nosso relatório"* + *"acesse o PDF, baixe o PDF,
+e olha no PDF que fonte que tá"*.
+
+**⭐ MEDIDO EM PRODUÇÃO, não suposto.** Baixei o PDF pela rota real (sessão da conta do
+founder via admin API, mesma técnica do `gen-magiclink.mjs`) e li as fontes embutidas:
+
+| | desenhado | **o que produção usava** |
+|---|---|---|
+| serifada | Palatino Linotype | **Liberation Serif** (clone da Times) |
+| sem serifa | Segoe UI | **Noto Sans** |
+| `→` e `●` | — | Liberation Sans |
+
+**NENHUMA** das fontes do desenho existe no contêiner Linux do Gotenberg. O cliente recebia
+*Times + Noto Sans* — par que briga — e não o *Palatino + Segoe UI* aprovado. O "fontes
+diferentes" que o founder viu era isso, não a seta.
+
+**Decisão:** embarcar as fontes em **base64 dentro do HTML**. ⛔ Não por URL: se o Gotenberg
+falhasse ao buscar, cairia no fallback CALADO — o mesmo modo de falha que estamos matando.
+- **Inter** (SIL OFL) no lugar da Segoe UI — já era a intenção do CSS original.
+- **TeX Gyre Pagella** (GUST Font License), clone livre da Palatino, no lugar da Palatino
+  Linotype. ⛔ Palatino Linotype e Segoe UI são da Microsoft e **não podem** ser embarcadas.
+- Capa, cabeçalho e rodapé recebem o mesmo tratamento — senão ficariam numa fonte e o corpo
+  em outra **dentro do mesmo PDF**. A troca é feita na rota por string, não em
+  `REPORT_FONTS`, porque mudar o token mexeria no Dossiê e na tela do terapeuta.
+- 9 faces · 213 KB de fonte · gerado por `scripts/gerar-fontes-embutidas.mjs`.
+
+**⚠️ Sobra 1 glifo:** a seta `→` (U+2192) não existe nem na Inter nem na Pagella (subconjunto
+latin), então continua caindo numa fonte do sistema. A bolinha `●` foi resolvida **desenhando
+um círculo em CSS** em vez de usar o caractere — assim sai igual em qualquer máquina.
+Resolver a seta exigiria gerar um subconjunto de fonte só pra ela.
+
+**⭐ O PDF local passou a ser fiel também na tipografia:** `scripts/_render-para-pdf.mjs`
+injeta as mesmas fontes. Antes eu conferia com as fontes do Windows e produção usava outras —
+o furo declarado na entrada anterior.
+
+### 2026-08-02 — TRAVA da crase (5ª vez) e da font-family literal
+Errei a **quinta** crase em comentário CSS dentro da template string (`.section-body`).
+Reconhecer o padrão não bastou. `scripts/smoke-render.mjs` agora falha ANTES do import, com
+**linha e trecho**, em vez do enigmático `ReferenceError: body is not defined`. E falha
+também se aparecer `font-family` literal no HTML (tem que ser `var(--serif)`/`var(--sans)`).
+Ambas as travas foram **provadas disparando** antes de eu confiar nelas.
+
+### 2026-08-02 — "Em poucas palavras" com o tamanho e a cor do relatório antigo
+**Founder:** *"em poucas palavras, quero que você deixe exatamente como era o nosso relatório
+antigo, no tamanho e cor também"*. Valores tirados do DOSSIÊ (`.section-body` em
+`report-print-document.tsx`): **13,5pt (18px), line-height 1,9, cor #2A2A2A**. Antes era
+16,5px em #26403f.
+**⚠️ Escopo:** só a prosa. As **perguntas** (`.maieutica`) ficaram no teal atual — o relatório
+antigo não tem pergunta maiêutica no bloco 1, então não existe "como era" para elas. Se o
+founder quiser, é trocar o `color` de uma regra.
+
+### 2026-08-02 — Título do bloco 5: eu tinha errado o alvo
+O founder criticou *"onde você está"* em 31/07 lendo a página em voz alta (*"tá lá, 5, mapa
+emocional, onde você está?"*). Eu troquei a **legenda do gráfico**; o **título H2** continuou
+`Onde você está — e pra onde dá pra ir`, em corpo muito maior. Agora:
+**`O que pesa — e pra onde afrouxa`**, no mesmo vocabulário aprovado.
+**Lição:** quando ele lê a tela em voz alta, o alvo é o que está ESCRITO ali, no maior corpo —
+não o detalhe que eu escolhi olhar.
+
 ## Como usar
 
 - **Ao tomar uma decisão:** registrar aqui na mesma sessão, com razão e status.

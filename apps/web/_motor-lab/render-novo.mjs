@@ -391,7 +391,7 @@ function block5(body) {
          lado direito é "pra onde afrouxa" — direção, não destino, o que também casa com a
          regra de que o antídoto NÃO é força presente. ⛔ Só a terminologia mudou: o
          modelo bipolar, os pares carga⟷antídoto e o desenho continuam iguais. -->
-    <div class="legend"><span>● <b>Bolinha</b> = quanto isso pesa hoje</span><span><b style="color:var(--amber)">Esquerda</b> = mais peso</span><span><b style="color:var(--good)">Direita</b> = pra onde afrouxa</span></div>
+    <div class="legend"><span><i class="gl"></i> <b>Bolinha</b> = quanto isso pesa hoje</span><span><b style="color:var(--amber)">Esquerda</b> = mais peso</span><span><b style="color:var(--good)">Direita</b> = pra onde afrouxa</span></div>
     <p class="grouplab carga"><span class="gd"></span>O que pesa hoje</p>${carga}
     <p class="grouplab livre"><span class="gd"></span>O que está leve — a sua força</p>${rec}
     ${f.REMEDIO ? `<div class="medicine"><p class="med-lab">O que já está livre é o seu remédio</p><p>${inl(f.REMEDIO)}</p></div>` : ''}`
@@ -762,7 +762,16 @@ ${B6CSS}
   .chip{font-size:13px}            /* era 13.5 */
   .pintro,.lead10{font-size:15.5px}/* era 16.5 */
   .turn{font-size:19px}            /* era 20.5 */
-  .microfilme p,.prose p{font-size:16.5px} /* era 17.5 */
+  .prose p{font-size:16.5px} /* era 17.5 */
+  /* ⭐ "EM POUCAS PALAVRAS" IGUAL AO RELATÓRIO ANTIGO (founder, 2026-08-02): "em poucas
+     palavras, eu quero que você deixe exatamente como era o nosso relatório antigo, no
+     tamanho e cor também". Os valores vêm do DOSSIÊ, não de chute — ".section-body" em
+     lib/pdf/report-print-document.tsx: 13.5pt (=18px), line-height 1.9, cor #2A2A2A
+     (REPORT_COLORS.body). Antes era 16,5px em #26403f (verde-escuro).
+     ⚠️ As PERGUNTAS (.maieutica) ficaram no teal atual de propósito: o relatório antigo não
+     tem pergunta maiêutica no bloco 1, então não existe "como era" para elas. Se o founder
+     quiser essas também na cor do antigo, é trocar o color desta regra. */
+  .microfilme p{font-size:18px;line-height:1.9;color:#2A2A2A}
 
   /* 3. (o ar entre seções está na regra hr.div lá embaixo — aqui seria sobrescrito) */
 

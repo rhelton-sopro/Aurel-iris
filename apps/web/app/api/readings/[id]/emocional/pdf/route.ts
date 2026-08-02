@@ -24,6 +24,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { renderEmocional, OMITIR_NA_VERSAO_CLIENTE } from '@/lib/emocional/render'
+import { REPORT_FONTS } from '@/lib/design/report-tokens'
 import {
   renderCoverHtml,
   renderHeaderHtml,
@@ -32,6 +33,8 @@ import {
 import { DISCLAIMER_COMPACT } from '@/components/legal/DisclaimerCopy'
 // .mjs sem tipos, compartilhado com scripts/pdf-paginas-vazias.mjs de propósito (evita deriva)
 import { paginasVazias } from '@/lib/pdf/paginas-vazias.mjs'
+// @font-face com as fontes em base64 — ver scripts/gerar-fontes-embutidas.mjs
+import { FONT_FACE_CSS } from '@/lib/pdf/fontes-embutidas.mjs'
 
 /**
  * ⚠️ O `@page` do DOCUMENTO tem que SUMIR, não ser sobrescrito.
@@ -135,6 +138,29 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
 
   const blob = (s: string) => new Blob([s], { type: 'text/html' })
 
+  /**
+   * ⭐ FONTES EMBARCADAS (founder, 2026-08-02: "vamos padronizar na fonte do nosso relatório").
+   *
+   * Medido baixando o PDF de produção e lendo as fontes embutidas nele: NENHUMA das fontes
+   * do desenho existe no contêiner do Gotenberg (Linux). Palatino Linotype, Book Antiqua,
+   * Georgia e Segoe UI, todas ausentes — o PDF saía em **Liberation Serif** (clone da Times)
+   * + **Noto Sans**, um par que briga e que não é o desenho aprovado.
+   *
+   * Agora as fontes viajam DENTRO do HTML, em base64. ⛔ Não usar URL: se o Gotenberg
+   * falhasse ao buscar a fonte, cairia no fallback CALADO — o mesmo modo de falha que
+   * estamos consertando.
+   *
+   * A CAPA precisa do mesmo tratamento, senão ela fica numa fonte e o corpo em outra
+   * DENTRO DO MESMO PDF. Como `renderCoverHtml` é compartilhada com o Dossiê, a troca é
+   * feita aqui por string — mudar `REPORT_FONTS` mexeria também no Dossiê e na tela do
+   * terapeuta, que não foi o que o founder pediu.
+   */
+  const comFontes = (h: string) => {
+    const style = `<style>${FONT_FACE_CSS}</style>`
+    return h.includes('<head>') ? h.replace('<head>', `<head>${style}`) : style + h
+  }
+  const SERIF_COM_PAGELLA = `'TeX Gyre Pagella', ${REPORT_FONTS.serif}`
+
   // CAPA — a mesma do dossiê, com o NOME COMPLETO. Margem zero para sangrar e, como é um
   // render separado, ela não recebe as bandas de cabeçalho/rodapé (o Chromium não sabe
   // pular header numa página só — foi por isso que o dossiê virou split+merge).
@@ -143,7 +169,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
     'Mapa do Ser',
   )
   const coverForm = new FormData()
-  coverForm.append('files', blob(coverHtml), 'index.html')
+  coverForm.append('files', blob(comFontes(coverHtml).split(REPORT_FONTS.serif).join(SERIF_COM_PAGELLA)), 'index.html')
   coverForm.append('paperWidth', '8.27') // A4 em polegadas
   coverForm.append('paperHeight', '11.69')
   coverForm.append('marginTop', '0')
@@ -167,9 +193,9 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
   // no @media print aprovado (.gen das Heranças inclusive), que é o que segura isso.
   const montaBodyForm = (scale: string) => {
     const f = new FormData()
-    f.append('files', blob(html), 'index.html')
-    f.append('files', blob(renderHeaderHtml(nomeCompleto)), 'header.html')
-    f.append('files', blob(renderFooterHtml(nomeCompleto, DISCLAIMER_COMPACT)), 'footer.html')
+    f.append('files', blob(comFontes(html)), 'index.html')
+    f.append('files', blob(comFontes(renderHeaderHtml(nomeCompleto)).split(REPORT_FONTS.serif).join(SERIF_COM_PAGELLA)), 'header.html')
+    f.append('files', blob(comFontes(renderFooterHtml(nomeCompleto, DISCLAIMER_COMPACT)).split(REPORT_FONTS.serif).join(SERIF_COM_PAGELLA)), 'footer.html')
     f.append('paperWidth', '8.27')
     f.append('paperHeight', '11.69')
     f.append('marginTop', '1.2')

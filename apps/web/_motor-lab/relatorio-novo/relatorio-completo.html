@@ -16,8 +16,8 @@
        ⛔ NÃO declarar font-family literal em regra nova: usar var(--serif)/var(--sans).
        Conferir com: as fontes /BaseFont embutidas no PDF gerado têm que ser só estas duas
        famílias (mais os pesos/itálicos delas). */
-    --serif:"Palatino Linotype","Book Antiqua",Palatino,Georgia,serif;
-    --sans:ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --serif:"TeX Gyre Pagella","Palatino Linotype","Book Antiqua",Palatino,Georgia,serif;
+    --sans:"Inter",ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   }
   *{box-sizing:border-box;}
   body{margin:0;background:#e9e2d3;color:var(--ink);
@@ -253,6 +253,12 @@
      A regra abaixo tinha uma segunda cópia (11px, caixa alta) em b6-terapeuta-proto.html,
      que entra DEPOIS como B6CSS e vencia esta. Mantidas iguais de propósito — se
      divergirem de novo, vale a do proto. Ver a decisão de 2026-07-31 em docs/DECISOES.md. */
+  /* A BOLINHA da legenda e DESENHADA EM CSS, nao e o caractere ● (U+25CF): nem a Inter nem a
+     Pagella embarcadas tem esse glifo, entao ele caia numa 3a fonte do sistema - que em
+     producao (Linux) nem e a mesma do meu Windows. Circulo em CSS sai igual em todo lugar.
+     ⚠️ A SETA (U+2192) nao existe em nenhuma das duas - continua caindo no fallback do
+     sistema. E 1 glifo; resolver exigiria gerar um subconjunto de fonte so pra ele. */
+  .legend .gl{display:inline-block;width:.5em;height:.5em;border-radius:50%;background:currentColor;vertical-align:middle;}
   .q-eyebrow{font-size:19px;letter-spacing:0;font-weight:700;margin:0 0 6px;}
   .q-eyebrow .carga{color:var(--amber);} .q-eyebrow .arw{color:var(--ink-faint);opacity:.7;} .q-eyebrow .anti{color:var(--good);} .q-eyebrow .pn{color:var(--ink-faint);}
   /* ⚠️ duplicada em b6-terapeuta-proto.html, que entra DEPOIS (B6CSS) e vence. Manter iguais. */
