@@ -550,6 +550,32 @@ MESMO módulo na tela e no PDF, então o bloco está nos dois — em `/leituras/
 mostra o relatório inteiro embaixo) e em `/leituras/<id>/emocional`. **Não precisa regerar
 leitura:** o bloco é determinístico e deriva do markdown já guardado.
 
+### 2026-08-03 — Bloco 7 reformulado + BUG do índice recursivo
+**Founder, três coisas:**
+1. *"'O que as tradições leem no mesmo lugar' eu não achei necessária"* → seção **removida**.
+   A atribuição virou **nota de BASE no topo**, uma vez: *"Base: os achados desta leitura de
+   íris, interpretados à luz da nutrição, da Medicina Tradicional Chinesa e do Ayurveda."*
+   ⚠️ Os textos por campo continuam no lastro, prontos, se voltar a fazer falta.
+2. *"não achei interessante deixar como sinal… do que mais é requerido para o menos"* → o chip
+   **"N sinais" SAIU**. A ordem (convergência) continua mandando, e a **barra da esquerda**
+   codifica a força. Grupos renomeados: **"O que a leitura mais sugere"** / **"O que a leitura
+   sugere de forma pontual"**. ⚠️ Os nomes são meus — ele pediu "um termo legal" e não travou
+   qual. Evitei "carência" de propósito: afirmaria falta, e a régua é hipótese.
+3. Moldura: **não é diagnóstico** + **sugere investigação** — aprovadas por ele, mantidas.
+
+### 🐛 2026-08-03 — ÍNDICE RECURSIVO na página da leitura
+**Founder:** *"cliquei no repertório de suporte e o link abriu uma página dentro dessa página,
+parece recursivo"*. Estava certo, e valia para **todos** os links do índice.
+**Causa:** em `/leituras/<id>` o relatório é embutido num `<iframe srcDoc>` — e documento
+carregado por `srcDoc` **não tem URL própria**, herda a do PAI. Então `href="#b7"` resolvia
+para `/leituras/<id>#b7` e o iframe carregava a página da leitura dentro de si.
+**Por que não dá pra consertar com script:** o sandbox é `allow-same-origin` **sem**
+`allow-scripts`, de propósito (o HTML vem de saída de modelo).
+**Fix:** `MapaDoSerEmbed` remove os `href="#…"` só na cópia embutida. O índice continua
+listando, sem ser clicável ali. ✅ Em `/leituras/<id>/emocional` (injeção direta, URL própria)
+e no PDF os links seguem funcionando.
+**Status:** APLICADA.
+
 ## Como usar
 
 - **Ao tomar uma decisão:** registrar aqui na mesma sessão, com razão e status.

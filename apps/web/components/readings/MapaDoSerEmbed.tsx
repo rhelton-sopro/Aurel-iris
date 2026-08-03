@@ -15,6 +15,23 @@
  */
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+/**
+ * ⛔ ÂNCORAS DO ÍNDICE PRECISAM MORRER AQUI DENTRO (bug pego pelo founder, 2026-08-03).
+ *
+ * Um documento carregado por `srcDoc` NÃO tem URL própria: ele herda a URL base do
+ * documento PAI. Então `href="#b7"` não resolve para "âncora deste documento" e sim para
+ * `/leituras/<id>#b7` — e o iframe carrega a PÁGINA DA LEITURA dentro de si mesmo. Foi o
+ * que o founder viu: "abriu uma página dentro dessa página, parece recursivo".
+ *
+ * Não dá para consertar com script: o sandbox é `allow-same-origin` SEM `allow-scripts`,
+ * de propósito (o HTML vem de saída de modelo). Então o link some — o índice continua
+ * listando o que vem a seguir, só não é clicável AQUI.
+ * ✅ Na página dedicada (`/leituras/<id>/emocional`) o documento é injetado com
+ * `dangerouslySetInnerHTML`, tem URL própria, e os links funcionam normalmente. No PDF
+ * também (o Gotenberg gera os marcadores a partir das mesmas âncoras).
+ */
+const semAncoras = (h: string) => h.replace(/\shref="#[^"]*"/g, '')
+
 export function MapaDoSerEmbed({ html, title }: { html: string; title: string }) {
   const ref = useRef<HTMLIFrameElement>(null)
   const [altura, setAltura] = useState(1200)
@@ -41,7 +58,7 @@ export function MapaDoSerEmbed({ html, title }: { html: string; title: string })
     <iframe
       ref={ref}
       title={title}
-      srcDoc={html}
+      srcDoc={semAncoras(html)}
       onLoad={medir}
       className="w-full border-0 bg-white"
       style={{ height: altura }}

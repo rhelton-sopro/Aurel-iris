@@ -439,7 +439,12 @@ function block6(body) {
 //   · bloco SOME por inteiro quando não há suporte sustentado (`if (!lista.length)`).
 //     Sair curto, ou não sair, é resultado honesto.
 const H2_SUPORTE = 'O que vale olhar com quem te acompanha'
-const SUPORTE_LEAD = 'O que segue não é receita nem diagnóstico. São áreas que os sinais desta leitura sugerem observar — para você conversar com quem acompanha a sua saúde, que é quem pode avaliar se faz sentido no seu caso.'
+const SUPORTE_LEAD = '<b>Não é diagnóstico nem receita</b> — é uma sugestão de investigação, para você levar a quem acompanha a sua saúde, que é quem pode avaliar se faz sentido no seu caso.'
+// nota de BASE, separada da moldura (founder, 2026-08-03: "coloque que essas informações são
+// com base nas tradições da Medicina Tradicional Chinesa e da Ayurveda, com base nos achados
+// iridológicos — além do que já está lá em cima"). Fica UMA vez, no topo, em vez de repetida
+// campo a campo, que era o que fazia o bloco virar catálogo.
+const SUPORTE_BASE = 'Base: os achados desta leitura de íris, interpretados à luz da nutrição, da <b>Medicina Tradicional Chinesa</b> e do <b>Ayurveda</b>.'
 const SUPORTE_FECHO = 'Nada aqui substitui avaliação profissional, e nenhuma dessas áreas deve virar suplemento por conta própria. A leitura aponta onde olhar; quem decide o que fazer é você, com apoio de quem te acompanha.'
 function blockSuporte() {
   const lista = (r.suporteList || [])
@@ -461,7 +466,7 @@ function blockSuporte() {
     const o = s.origem || {}
     return `<div class="sup-item sup-${forca}">
       <div class="sup-h"><span class="sup-n">${esc(cap(s.nutriente))}</span>
-        <span class="sup-sinal">${s.n} ${s.n === 1 ? 'sinal' : 'sinais'}</span></div>
+</div>
       ${s.porque ? `<p class="sup-p">${esc(s.porque)}</p>` : ''}
     </div>`
   }
@@ -481,28 +486,14 @@ function blockSuporte() {
     jaVi.add(o.leitura); vistas.push(o)
   }
   vistas.sort((a, b) => (b.int || 0) - (a.int || 0))
-  // ⭐ TRADIÇÕES NOMEADAS — exceção do founder (2026-08-03) à regra "sem escolas", válida SÓ
-  // para MTC e Ayurveda e SÓ neste bloco. Cada linha vem atribuída: o cliente sabe de onde
-  // veio a leitura, em vez de receber a ideia solta.
-  const trad = (o) => [
-    o.mtc ? `<p class="sup-t"><span class="sup-esc">Medicina Tradicional Chinesa</span>${esc(o.mtc)}</p>` : '',
-    o.ay ? `<p class="sup-t"><span class="sup-esc">Ayurveda</span>${esc(o.ay)}</p>` : '',
-  ].join('')
-  const leituras = vistas.length
-    ? `<p class="grouplab livre"><span class="gd"></span>O que as tradições leem no mesmo lugar</p>`
-      // a linha neutra existia SÓ porque não dava pra nomear a escola. Com a exceção aberta
-    // ela virou paráfrase do que a MTC diz logo abaixo — some quando há atribuição.
-    + vistas.map((o) => {
-      const atrib = trad(o)
-      const neutra = atrib ? '' : `<p class="sup-l">${esc(o.leitura)}</p>`
-      return `<div class="sup-vista">${neutra}${atrib}</div>`
-    }).join('')
-    : ''
-
+  // ⚠️ A seção "o que as tradições leem no mesmo lugar" SAIU (founder, 2026-08-03: "essa
+  // parte aqui eu não achei necessária"). A atribuição a MTC/Ayurveda passou para o
+  // informativo de abertura — uma vez, em vez de repetida campo a campo, que fazia o bloco
+  // virar catálogo. Os textos por campo continuam no lastro, prontos, se voltar a fazer falta.
   return `<p class="lead">${SUPORTE_LEAD}</p>
-    ${grupo('O que mais se repete na leitura', conv, 'Aparecem em mais de um sinal independente — por isso pesam mais.')}
-    ${grupo('Sinais isolados', isolados, 'Vieram de um único sinal. Ficam registrados, mas valem menos que os de cima.')}
-    ${leituras}
+    <p class="sup-base">${SUPORTE_BASE}</p>
+    ${grupo('O que a leitura mais sugere', conv, null)}
+    ${grupo('O que a leitura sugere de forma pontual', isolados, null)}
     <div class="medicine"><p class="med-lab">Antes de fazer qualquer coisa com isto</p><p>${SUPORTE_FECHO}</p></div>`
 }
 
