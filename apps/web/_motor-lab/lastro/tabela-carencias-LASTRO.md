@@ -400,3 +400,33 @@ texto do campo fazia dois itens diferentes saírem com **a mesma frase**. Voz do
 | sódio (sal integral) | sustenta o volume dos líquidos e o eixo que responde ao estresse |
 | coenzima Q10 | participa da produção de energia dentro da célula, sobretudo onde ela nunca para |
 | cloreto (sal integral) | é parte do ácido que o estômago usa para abrir a digestão |
+
+## MAPA MÁQUINA — TRADIÇÕES (exceção do founder, 2026-08-03)
+
+⚠️ **Exceção às 9 regras absolutas.** A regra "sem autores/escolas" continua valendo para
+todo o resto do documento; o founder abriu exceção **só para Medicina Tradicional Chinesa e
+Ayurveda**, neste bloco. Elas passam a ser **nomeadas** ao cliente.
+⛔ Continua proibido: erva, fórmula, prática, dose. Elas explicam o PADRÃO — nada mais.
+Texto na voz do cliente; campo sem entrada simplesmente não mostra a linha.
+
+| campo | mtc | ayurveda |
+|---|---|---|
+| estomago | o estômago e o baço formam o centro que transforma — tanto o alimento quanto o que acontece com você | o fogo digestivo aqui é irregular: às vezes você come bem, às vezes o corpo simplesmente fecha |
+| intestino_delgado | é o órgão que separa o puro do impuro — no corpo e no discernimento | é a sede do calor do corpo; quando ele sobe demais, irritação e inflamação vêm juntas |
+| intestino_grosso | forma par com o pulmão: os dois tratam de soltar o que já cumpriu o papel | é o vento descendente que governa a eliminação — quando desregula, nada desce na hora certa |
+| figado_vesicula | quando a energia do fígado estagna, o impulso que não saiu vira calor guardado | é território do calor: excesso aqui aparece como pavio curto |
+| pancreas | pertence ao centro da terra, o eixo da doçura — inclusive da que falta e se busca no açúcar | o peso e a sonolência depois de comer são o sinal clássico deste desequilíbrio |
+| rim | é a raiz da energia herdada e a morada do medo — o cansaço de fundo mora aqui | governa o movimento e a secura; medo e agitação vêm do mesmo lugar |
+| sistema_linfatico | é o padrão de umidade: acúmulo, peso, coisa que não escoa | é o excesso do que estagna — pede movimento, não mais uma coisa pra tomar |
+| pele_tegumentar | a pele é governada pelo pulmão: é a fronteira entre você e o mundo | é onde o calor interno encontra saída quando as outras vias estão ocupadas |
+| pulmoes | o pulmão é o órgão da tristeza e do luto, e é ele que governa a fronteira que te protege | o peito é território do que se acumula e pesa |
+| adrenal | é a reserva profunda do rim: viver em alerta consome a energia herdada | é a reserva vital — o que sustenta imunidade, brilho e disposição — e ela se gasta com vigilância |
+| tireoide | fica na garganta, a passagem entre o que se sente e o que se diz | governa a velocidade com que o corpo transforma tudo |
+| pineal_hipotalamica | o sono depende do espírito do coração se assentar — dormir é o corpo confiar que pode baixar a guarda | é a parte da mente que digere experiência; sobrecarregada, ela não desliga |
+| sistema_nervoso_autonomico | é a desarmonia entre coração e rim: o fogo em cima sem a água embaixo para assentá-lo | é o excesso de movimento — irregularidade, pressa, secura |
+| cerebrum_motor | o cérebro é o mar da medula, e quem o nutre é o rim | clareza depende de o que sustenta a mente estar reposto |
+| radii_solaris | é a umidade turva subindo e obscurecendo os sentidos de cima | o que não é digerido embaixo sobe e embaça a cabeça |
+| sistema_musculoesqueletico | os tendões pertencem ao fígado e os ossos ao rim | secura nas articulações é o sinal do excesso de movimento |
+| coracao | o coração abriga o espírito, e a alegria é sua emoção equilibrada | é o coração que sente e processa, não só o que bombeia |
+| sistema_imune | é a energia defensiva que circula na superfície, governada pelo pulmão | é a reserva vital que sustenta a imunidade — ela cai quando você se gasta |
+| sistema_reprodutor | guarda a essência: a mesma energia da criação, de filho a obra | é o tecido mais refinado do corpo, o último a se formar e o primeiro a sofrer com desgaste |

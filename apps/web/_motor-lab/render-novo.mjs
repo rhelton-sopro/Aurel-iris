@@ -481,9 +481,22 @@ function blockSuporte() {
     jaVi.add(o.leitura); vistas.push(o)
   }
   vistas.sort((a, b) => (b.int || 0) - (a.int || 0))
+  // ⭐ TRADIÇÕES NOMEADAS — exceção do founder (2026-08-03) à regra "sem escolas", válida SÓ
+  // para MTC e Ayurveda e SÓ neste bloco. Cada linha vem atribuída: o cliente sabe de onde
+  // veio a leitura, em vez de receber a ideia solta.
+  const trad = (o) => [
+    o.mtc ? `<p class="sup-t"><span class="sup-esc">Medicina Tradicional Chinesa</span>${esc(o.mtc)}</p>` : '',
+    o.ay ? `<p class="sup-t"><span class="sup-esc">Ayurveda</span>${esc(o.ay)}</p>` : '',
+  ].join('')
   const leituras = vistas.length
-    ? `<p class="grouplab livre"><span class="gd"></span>O que isso conversa com o resto da leitura</p>`
-      + vistas.map((o) => `<p class="sup-l">${esc(o.leitura)}</p>`).join('')
+    ? `<p class="grouplab livre"><span class="gd"></span>O que as tradições leem no mesmo lugar</p>`
+      // a linha neutra existia SÓ porque não dava pra nomear a escola. Com a exceção aberta
+    // ela virou paráfrase do que a MTC diz logo abaixo — some quando há atribuição.
+    + vistas.map((o) => {
+      const atrib = trad(o)
+      const neutra = atrib ? '' : `<p class="sup-l">${esc(o.leitura)}</p>`
+      return `<div class="sup-vista">${neutra}${atrib}</div>`
+    }).join('')
     : ''
 
   return `<p class="lead">${SUPORTE_LEAD}</p>

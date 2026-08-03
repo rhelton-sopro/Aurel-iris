@@ -529,6 +529,27 @@ com 4 sinais cada, zinco/fibras/água com 2.
 **Status:** APLICADA. Build verde, 0 páginas vazias, 31 páginas, linha de base de testes
 inalterada. ⏳ Falta o veredito do founder em prod.
 
+### 2026-08-03 — EXCEÇÃO: MTC e Ayurveda passam a ser NOMEADAS ao cliente
+**Founder:** *"a gente pode abrir uma exceção para a MTC e a Ayurveda"*.
+⚠️ **SUPERA parcialmente as 9 regras absolutas** (`feedback_iris_codex_seven_rules`), que
+proíbem citar autor/escola no documento. A regra continua valendo para **todo o resto**; a
+exceção é **só para Medicina Tradicional Chinesa e Ayurveda**, e **só no bloco 7**.
+⛔ Continua proibido erva, fórmula, prática e dose — elas explicam o PADRÃO, nada mais.
+
+19 campos ganharam texto atribuído, na voz do cliente. Sai assim:
+`MEDICINA TRADICIONAL CHINESA — quando a energia do fígado estagna, o impulso que não saiu
+vira calor guardado` · `AYURVEDA — é território do calor: excesso aqui aparece como pavio curto`.
+
+**Efeito colateral bom:** a linha neutra que eu tinha escrito existia SÓ porque não dava pra
+nomear a escola — era paráfrase da frase da MTC. Com a exceção aberta virou repetição, então
+ela some quando há atribuição. **Terceira duplicação do mesmo tipo pega neste bloco.**
+**Status:** APLICADA.
+
+**Onde o bloco aparece (o founder procurou no lugar errado):** o relatório é renderizado pelo
+MESMO módulo na tela e no PDF, então o bloco está nos dois — em `/leituras/<id>` (a página
+mostra o relatório inteiro embaixo) e em `/leituras/<id>/emocional`. **Não precisa regerar
+leitura:** o bloco é determinístico e deriva do markdown já guardado.
+
 ## Como usar
 
 - **Ao tomar uma decisão:** registrar aqui na mesma sessão, com razão e status.

@@ -262,6 +262,22 @@ export function loadPorqueNutriente() {
 }
 const PORQUE_NUTRIENTE = loadPorqueNutriente()
 
+// TRADIÇÕES NOMEADAS — exceção do founder (2026-08-03) às 9 regras absolutas, válida SÓ
+// para MTC e Ayurveda e SÓ neste bloco. Continua proibido erva, fórmula, prática e dose:
+// elas explicam o padrão, não prescrevem.
+export function loadTradicoes() {
+  const md = fs.readFileSync(CARENCIAS_MD, 'utf8')
+  const sec = md.slice(md.indexOf('## MAPA MÁQUINA — TRADIÇÕES'))
+  const out = {}
+  for (const linha of sec.split(/\r?\n/)) {
+    const m = linha.match(/^\|\s*([a-z_]+)\s*\|([^|]*)\|([^|]*)\|\s*$/)
+    if (!m || m[1] === 'campo') continue
+    out[m[1]] = { mtc: m[2].trim(), ay: m[3].trim() }
+  }
+  return out
+}
+const TRADICOES = loadTradicoes()
+
 // ---------- resolve um campo do exame → chave da tabela + classe ----------
 function classify(campo) {
   if (ALIAS[campo]) return { key: ALIAS[campo], klass: 'emocional' }
@@ -326,7 +342,7 @@ function calc(exameOuNome, lastro) {
     const w = Math.pow(a.intensidade || 0, GAMMA)
     const sup = SUPORTES[key]
     if (sup) {
-      supDetalhe[key] = { porque: sup.porque, leitura: sup.leitura, int: a.intensidade || 0 }
+      supDetalhe[key] = { porque: sup.porque, leitura: sup.leitura, int: a.intensidade || 0, ...(TRADICOES[key] || {}) }
       for (const n of sup.suporte) {
         ;(supCampos[n] ||= new Set()).add(key)
         supPeso[n] = (supPeso[n] || 0) + w
