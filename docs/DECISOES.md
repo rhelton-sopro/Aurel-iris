@@ -611,6 +611,20 @@ dentro do quadro, sem recarregar nada**. Os links do índice foram restaurados.
 no teste de "o bug sumiu" e falha no de "a coisa funciona".
 **Status:** APLICADA.
 
+### 🐛 2026-08-03 — Eu apaguei as figuras do transgeracional com um regex largo
+**Founder:** *"no 4, heranças transgeracionais, a imagem sumiu"*.
+**Causa: minha.** Para matar a recursão de âncora dentro do iframe (`08a6d6f`) eu removia
+`href="#..."` do HTML embutido. Só que o diagrama transgeracional desenha os pictogramas com
+**33 `<use href="#g-adulto">`** — SVG referencia símbolo por âncora. O regex apagou todos e a
+árvore de gerações inteira sumiu da tela.
+**Já estava consertado** por acidente: `045138a` (o conserto do índice) trocou `srcDoc` por
+URL própria e eliminou o `semAncoras`.
+**Trava adicionada** em `scripts/smoke-render.mjs`: falha se houver menos de 20
+`<use href="#...">` no HTML. Provada disparando contra o regex antigo.
+**Lição:** regex largo em cima de HTML acerta o que você não estava mirando. `href="#"` não é
+só link de âncora — em SVG é referência de símbolo.
+**Status:** APLICADA.
+
 ## Como usar
 
 - **Ao tomar uma decisão:** registrar aqui na mesma sessão, com razão e status.

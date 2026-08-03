@@ -45,4 +45,13 @@ if (literais.length) {
   console.error([...new Set(literais)].map((x) => '  ' + x).join('\n'))
   process.exit(1)
 }
-console.log('✓ render OK —', html.length, 'chars · AG', JSON.stringify(AG))
+// ⛔ REGRESSÃO 2026-08-03: o diagrama transgeracional desenha os pictogramas com
+// `<use href="#g-adulto">` — 33 deles. Um regex meu que removia `href="#..."` (escrito pra
+// matar a recursão de âncora dentro do iframe) apagou TODOS, e as figuras sumiram da tela.
+// Quem pegou foi o founder. Regex largo em cima de HTML acerta o que você não estava mirando.
+const usos = (html.match(/<use\b[^>]*href="#/g) || []).length
+if (usos < 20) {
+  console.error(`⛔ só ${usos} <use href="#..."> no SVG do transgeracional (esperado 30+). As figuras somem da tela.`)
+  process.exit(1)
+}
+console.log('✓ render OK —', html.length, 'chars · AG', JSON.stringify(AG), '·', usos, 'pictogramas')
