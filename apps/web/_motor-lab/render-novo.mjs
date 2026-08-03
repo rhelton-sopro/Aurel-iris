@@ -58,7 +58,7 @@ export const TITULOS_BLOCOS = [
   // troquei só ela, e a frase seguiu no H2, em corpo muito maior. Agora usa o mesmo
   // vocabulário aprovado da legenda: pesa / afrouxa.
   'O que pesa — e pra onde afrouxa',
-  'Crenças a serem trabalhadas',
+  'As regras que você repete sem perceber',
   'Repertório de suporte',
   'Sugestões integrativas',
   'Perguntas para a sua sessão',
@@ -456,10 +456,10 @@ function blockIntegrativas(versaoCliente) {
   const corpo = [
     cat('Na alimentação', I.nutricao),
     cat('No corpo', I.corporais),
-    cat('Na prática diária', I.contemplativas, FAMILIA_TXT[I.familia] || ''),
+    cat(`Na prática diária · ${I.familia}`, I.contemplativas, FAMILIA_TXT[I.familia] || ''),
     cat('Florais', I.florais, 'Escolhidos pelo que pesa hoje, não pelo órgão.'),
-    versaoCliente ? '' : cat('Fitoterapia tradicional', I.fito, '◆ Para o terapeuta avaliar — não vai no documento do cliente.'),
-    versaoCliente ? '' : cat('Adaptógenos', I.adapto, '◆ Para o terapeuta avaliar. Considere acompanhamento de profissional habilitado antes de iniciar.'),
+    versaoCliente ? '' : cat('Fitoterapia tradicional', I.fito, 'Para você avaliar.'),
+    versaoCliente ? '' : cat('Adaptógenos', I.adapto, 'Para você avaliar. Considere acompanhamento de profissional habilitado antes de iniciar.'),
   ].filter(Boolean).join('')
   if (!corpo) return null
   return `<p class="lead">${INTEG_LEAD}</p>${corpo}`
@@ -587,7 +587,7 @@ function block7(body) {
     }).join('')
     // mini-pêndulo do cabeçalho + nota de manejo só no Caminho de MAIOR carga
     const head = `<div class="qhead"><p class="q-eyebrow"><span class="pn">Caminho ${ci + 1} · </span>`
-      + `<span class="carga">${esc(cargaTxt)}</span> <span class="arw">→</span> <span class="anti">${esc(antiTxt)}</span></p>`
+      + `<span class="carga">${esc(cargaTxt)}</span> <span class="arw"></span> <span class="anti">${esc(antiTxt)}</span></p>`
       + (sub ? `<p class="qtitle">${inl(sub)}</p>` : '') + '</div>'
     // ⚠️ CONDUCT JÁ TRAZ o <span class="conduct-lab">⚠ Carga alta</span> dentro dele
     // (metodo7.mjs). A versão anterior somava um span próprio e tentava tirar o do
@@ -993,7 +993,16 @@ ${B6CSS}
      ⚠️ Isto SUPERA o ajuste de margem 34/30 → 56/50 do dia anterior: o "ar entre seções"
      que o founder pediu passou a ser a própria virada de página. Na TELA o filete continua.
      Detector: node scripts/pdf-paginas-vazias.mjs */
-  hr.div{display:none}
+  /* Espaçador INVISÍVEL, não display:none. Com display:none a margem some junto e as
+     seções ficam coladas (founder, 2026-08-03). Com border:0 + height:0 ele não desenha
+     nada, só separa — e o break-avoid dos dois lados impede que ele volte a ganhar uma
+     folha inteira só pra si, que foi o bug de 01/08. */
+  hr.div{display:block;border:0;height:0;margin:52px 0;break-before:avoid;break-after:avoid;page-break-before:avoid;page-break-after:avoid}
+  /* 2026-08-03 (founder): "o que vem a seguir e o 2 estao juntos, tem que dar um espaco de
+     saltar duas linhas, e pra todos os outros tambem". Efeito colateral de eu ter tirado a
+     quebra de pagina por secao: elas passaram a fluir COLADAS. O ar volta como MARGEM da
+     secao - e nao pelo <hr>, que podia ficar orfao numa folha inteira (bug de 01/08). */
+
   .toc-row{border-bottom-color:#ddd}
   a{color:inherit;text-decoration:none}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}

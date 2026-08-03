@@ -22,7 +22,7 @@ export const METODO7 = [
   "n": 2,
   "cls": "carga",
   "nome": "Tocar a {CARGA} no corpo",
-  "exp": "Levar a {CARGA} do pensamento pro corpo, <b>aos poucos</b>, em 3 tempos: lembrar a cena → notar no corpo → dar forma. Com a pessoa <b>olhando</b> a emoção, não virando ela.",
+  "exp": "Levar a {CARGA} do pensamento pro corpo, <b>aos poucos</b>, em 3 tempos: lembrar a cena · notar no corpo · dar forma. Com a pessoa <b>olhando</b> a emoção, não virando ela.",
   "cue": "\"Você está olhando pra ela; você não é ela.\" Um pouquinho já basta.",
   "labs": [],
   "pausa": "— deixe ela contar a cena —",
@@ -152,4 +152,4 @@ export const METODO7 = [
   "slot7": "s7"
  }
 ]
-export const CONDUCT = "<span class=\"conduct-lab\">⚠ Carga alta</span><p>É a carga mais forte desta leitura. Vá bem aos poucos e complete o movimento (etapa 4) sem forçar catarse. Se aparecer ferida antiga da infância, acolha e marque pra sessão.</p>"
+export const CONDUCT = "<span class=\"conduct-lab\">Carga alta</span><p>É a carga mais forte desta leitura. Vá bem aos poucos e complete o movimento (etapa 4) sem forçar catarse. Se aparecer ferida antiga da infância, acolha e marque pra sessão.</p>"

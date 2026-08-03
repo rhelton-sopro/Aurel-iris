@@ -191,7 +191,7 @@
   .pl-carga{font-size:16px;font-weight:600;color:var(--amber);}
   .pl-carga .lv{font-size:10.5px;color:var(--ink-faint);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-left:7px;}
   .pl-anti{font-size:14.5px;font-weight:600;color:var(--good);text-align:right;}
-  .pl-anti::before{content:"→ ";color:var(--good);opacity:.6;}
+  .pl-anti::before{content:"";display:inline-block;width:.45em;height:.45em;margin-right:.45em;border-right:2px solid var(--good);border-top:2px solid var(--good);transform:rotate(45deg) translateY(.12em);opacity:.6;}
   .pend-track{position:relative;height:13px;border-radius:100px;background:linear-gradient(90deg,#cf8636,#e7dcc6 44%,#e7dcc6 56%,#5fae86);box-shadow:inset 0 1px 2px rgba(20,40,40,.09);}
   .needle{position:absolute;top:50%;width:21px;height:21px;border-radius:50%;background:#fff;border:3.5px solid var(--amber);transform:translate(-50%,-50%);box-shadow:0 1px 5px rgba(0,0,0,.22);z-index:1;}
   .grouplab{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;margin:28px 0 6px;display:flex;align-items:center;gap:9px;}
@@ -268,6 +268,11 @@
   .int-item{border-left:2px solid var(--line-strong);padding:3px 0 3px 14px;margin:0 0 10px;}
   .int-s{font-family:var(--serif);font-size:17px;color:var(--ink);margin:0;font-weight:600;}
   .int-d{font-size:13.5px;line-height:1.5;color:var(--ink-soft);margin:2px 0 0;}
+  /* SETA DESENHADA EM CSS, nao caractere. U+2192 nao existe na Pagella nem na Inter, entao
+     ele puxava uma TERCEIRA fonte do sistema (Segoe UI no Windows, Liberation Sans no
+     servidor) - era isso que o founder via como "fonte diferente da nossa". Borda girada
+     45 graus resolve e sai igual em qualquer maquina. */
+  .arw{display:inline-block;width:.42em;height:.42em;border-right:2px solid currentColor;border-top:2px solid currentColor;transform:rotate(45deg) translateY(.1em);margin:0 .15em;}
   .sup-item{border-left:3px solid var(--line-strong);background:var(--panel);border-radius:0 9px 9px 0;padding:11px 16px;margin:0 0 8px;}
   .sup-forte{border-left-color:var(--teal);background:color-mix(in srgb,var(--teal) 6%,var(--paper));}
   .sup-moderado{border-left-color:color-mix(in srgb,var(--teal) 55%,var(--line));}

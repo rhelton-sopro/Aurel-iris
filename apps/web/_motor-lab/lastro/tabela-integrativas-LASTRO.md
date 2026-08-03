@@ -192,7 +192,7 @@ emocional que o relatório já calcula, e não com o campo.
 | adrenal_nervoso | melissa | tensão que se instala no digestivo |
 | adrenal_nervoso | mulungu | quando o alerta atrapalha o sono |
 | digestivo_imune | espinheira-santa | mucosa gástrica |
-| digestivo_imune | camomila | espasmo e irritação de mucosa — ⚠️ só quando o eixo sustenta, é o default mais batido da categoria |
+| digestivo_imune | camomila | espasmo e irritação de mucosa |
 | respiratorio | guaco | via respiratória com secreção |
 | respiratorio | tanchagem | irritação de mucosa alta |
 | renal_eliminatorio | cavalinha | diurético suave |
@@ -208,7 +208,7 @@ profissional habilitado antes de iniciar adaptógenos.* Herdado do dossiê.
 
 | padrão | adaptógeno | detalhe |
 |---|---|---|
-| CALMAR (hipervigilância / exaustão adrenal) | ashwagandha | ⚠️ interage com medicação de tireoide — motivo pelo qual esta categoria não vai ao cliente |
+| CALMAR (hipervigilância / exaustão adrenal) | ashwagandha | apoio em fase de exaustão por alerta prolongado |
 | ATIVAR (fadiga sustentada com queda funcional) | rhodiola | fadiga com sobrecarga mental |
 | LIBERAR (tensão imune com retenção emocional) | reishi | tensão imune sustentada |
 
