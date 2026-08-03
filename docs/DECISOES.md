@@ -471,6 +471,27 @@ emocional, onde você está?"*). Eu troquei a **legenda do gráfico**; o **títu
 **Lição:** quando ele lê a tela em voz alta, o alvo é o que está ESCRITO ali, no maior corpo —
 não o detalhe que eu escolhi olhar.
 
+### 2026-08-02 — Densidade: caixas da linha do tempo menores + fim da seção-por-página
+**1. Caixas da linha do tempo.** Founder: *"aqueles quadradões tomam muito espaço, poderiam
+ser menores — pode até diminuir o texto, mas essas caixas azuis diminuírem"*. Não havia
+**nenhum** ajuste de impressão para elas: usavam os recuos generosos da tela (padding 20/22,
+`.mrow` 14,5px, `.key .q` 16,5px). Agora padding 12/16, `.mrow` 13px, `.key .q` 14px.
+⚠️ A regra de 1 coluna do `.mrow` é de CELULAR (≤560px) e nunca valeu no papel.
+**Resultado:** duas caixas inteiras por página; antes uma ocupava quase a folha.
+
+**2. ⚠️ SUPERA a decisão de 2026-07-31 "cada seção começa em página nova" (`bfa6e96`).**
+Founder: *"tem um espação nessa página que poderia colocar o diagrama de mente, coração e
+corpo… a gente está tendo muito espaço em branco, isso tem que ser otimizado, não pode ficar
+desse jeito. Questões que é importante começar numa página, tudo bem, mas aqui não faz
+sentido."*
+**Medido antes de mexer:** a regra custava **2 folhas** e deixava a página do índice com 2/3
+em branco. Com `break-before:auto`, o bloco 2 sobe para a página do índice — que é exatamente
+o que ele pediu. **31 → 30 páginas** (com a compactação da linha do tempo junto).
+**⛔ O que NÃO mudou:** `.qsec:not(:first-of-type){break-before:page}` — cada **Caminho**
+continua começando em página nova. E os `break-inside:avoid` dos blocos coesos continuam,
+então nada se parte no meio; a diferença é só que a seção seguinte aproveita a folha.
+**Como reverter:** uma linha, trocar `break-before:auto` de volta por `page`.
+
 ## Como usar
 
 - **Ao tomar uma decisão:** registrar aqui na mesma sessão, com razão e status.

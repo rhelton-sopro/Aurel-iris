@@ -739,7 +739,7 @@ ${B6CSS}
      uma página. Começar cada capítulo no topo resolve o caso dele e todos os iguais, e de
      quebra dá o respiro que ele pediu entre o fim de uma seção e o começo da outra.
      O bloco 7 também entra aqui, então o Caminho 1 já nasce em página nova. */
-  section.block:not(:first-of-type){break-before:page;page-break-before:always}
+  section.block:not(:first-of-type){break-before:auto}
 
   /* 2. CABEÇALHOS MAIORES. O rótulo da seção estava em 11px e o título de capítulo caía em
      ~21px (o clamp resolve pela largura de 724px do PDF, não pelos 820px do mockup). */
@@ -830,6 +830,21 @@ ${B6CSS}
      com o conteúdo dele na página seguinte — visto no PDF: "Uma frase para dizer em voz
      alta" (.subhead) fechava a página 10 e a caixa começava na 11. Lista levantada das
      classes que REALMENTE aparecem no HTML gerado, não de memória. */
+  /* 2026-08-02 (founder, no PDF): "aqueles quadradões da linha do tempo tomam muito espaço,
+     poderiam ser menores — pode até diminuir o texto, mas essas caixas azuis diminuírem".
+     Não havia NENHUM ajuste de impressão para elas: usavam os mesmos recuos generosos da
+     tela (padding 20/22, .mrow 14,5px, .key .q 16,5px). ⚠️ A regra de 1 coluna do .mrow é
+     de CELULAR (≤560px) e nunca valeu aqui — no papel a caixa sempre foi 2 colunas. */
+  .moment{padding:12px 16px;margin:9px 0;border-radius:10px}
+  .moment-h{margin-bottom:8px;gap:9px}
+  .moment-h .mage{font-size:16px}
+  .mrow{padding:4px 0;font-size:13px;grid-template-columns:100px 1fr;gap:10px}
+  .mrow .k{font-size:9.5px}
+  .keys{margin-top:10px;padding-top:9px}
+  .key{margin:0 0 6px;grid-template-columns:88px 1fr;gap:10px}
+  .key .q{font-size:14px;line-height:1.38}
+  .key .kind{font-size:9px;padding:2px 6px}
+
   .subhead,.rootlab,.grouplab,.keys-lab,.method-sub,.st-name,.toc-lab,.dv-lab,.glabel,
   .ctr-name,.ctr-head,.rlab,.resumo-lab,.obj-lab,.minih,.med-lab,.guide-tag,.sayintro
   {break-after:avoid;page-break-after:avoid}
