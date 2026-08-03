@@ -303,6 +303,10 @@ export default async function LeituraDetailPage({
         .maybeSingle<{ exame_json: unknown }>()
 
       const primeiroNome = clientName.trim().split(/\s+/)[0] || 'você'
+      // ⚠️ Este render NÃO é o que vai à tela — quem serve o documento ao iframe é
+      // `/leituras/<id>/emocional/documento` (o iframe precisa de URL própria para as
+      // âncoras do índice funcionarem). Ele roda aqui só para SABER se o markdown ainda
+      // casa com o desenho: falhando, mostramos o aviso em vez de um quadro vazio.
       let mapaHtml: string | null = null
       try {
         mapaHtml = renderEmocional(
@@ -333,7 +337,7 @@ export default async function LeituraDetailPage({
 
           {mapaHtml ? (
             <div className="overflow-hidden rounded-lg border bg-white">
-              <MapaDoSerEmbed html={mapaHtml} title={`Mapa do Ser — ${clientName}`} />
+              <MapaDoSerEmbed readingId={readingId} title={`Mapa do Ser — ${clientName}`} />
             </div>
           ) : (
             <div className="rounded-lg border-2 border-amber-500 bg-amber-50 px-5 py-5">

@@ -592,6 +592,25 @@ Seria **perder convergência por excesso de precisão**.
 que existe porque este bloco vai ao cliente, continua valendo.
 **Status:** APLICADA.
 
+### 2026-08-03 — Índice do relatório volta a navegar: iframe com URL própria
+**Founder:** *"eu clico e não vai para lugar nenhum, deveria descer na página"*.
+Meu conserto anterior (remover os `href="#…"` da cópia embutida) matou a recursão **e a
+navegação junto** — meia solução.
+
+**Conserto inteiro:** o iframe passou de `srcDoc` para **`src` com URL real**
+(`/leituras/<id>/emocional/documento`, rota nova que devolve o documento como `text/html`).
+Com URL própria o documento tem base própria, e `#b7` volta a ser âncora interna: **rola
+dentro do quadro, sem recarregar nada**. Os links do índice foram restaurados.
+- mesma origem de propósito — a página pai lê `contentDocument` para medir a altura;
+- `sandbox` removido: `allow-same-origin` sozinho já dava acesso ao documento, e o documento
+  não tem script nenhum (é gerado pelo nosso render, com escape em todo texto de modelo);
+- o render na página da leitura **continua rodando**, mas só para SABER se o markdown ainda
+  casa com o desenho — falhando, mostra o aviso em vez de um quadro vazio.
+
+**Lição:** consertei o sintoma (recursão) sem devolver a função (navegar). Meia solução passa
+no teste de "o bug sumiu" e falha no de "a coisa funciona".
+**Status:** APLICADA.
+
 ## Como usar
 
 - **Ao tomar uma decisão:** registrar aqui na mesma sessão, com razão e status.
