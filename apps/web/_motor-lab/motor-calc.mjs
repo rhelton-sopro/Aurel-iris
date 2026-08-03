@@ -294,6 +294,61 @@ export function loadEspecificos() {
 }
 const ESPECIFICOS = loadEspecificos()
 
+// ---------- SUGESTÕES INTEGRATIVAS (bloco 8 — decisão do founder 2026-08-03) ----------
+// Lê `tabela-integrativas-LASTRO.md`. Mesmo desenho do bloco 7: DETERMINÍSTICO, o Sonnet
+// não escreve nada. ⛔ Categoria sem lastro nesta leitura não sai — nem com título.
+const INTEG_MD = path.join(LAB_DIR, 'lastro/tabela-integrativas-LASTRO.md')
+const chr10 = String.fromCharCode(10)
+function secao(md, titulo) {
+  const i = md.indexOf(titulo)
+  if (i < 0) return ''
+  const j = md.indexOf(chr10 + '## ', i + 5)
+  return md.slice(i, j < 0 ? md.length : j)
+}
+function linhas3(sec) {
+  const out = []
+  for (const l of sec.split(/\r?\n/)) {
+    const m = l.match(/^\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*$/)
+    // cabeçalho de tabela markdown: reconhecido pela 3ª coluna, que é sempre um rótulo fixo
+    if (!m || /^-+$/.test(m[1]) || ['detalhe', 'para quem', 'específico'].includes(m[3].toLowerCase())) continue
+    out.push([m[1], m[2], m[3]])
+  }
+  return out
+}
+export function loadIntegrativas() {
+  const md = fs.readFileSync(INTEG_MD, 'utf8')
+  const eixoDeCampo = {}
+  for (const l of secao(md, '## 1. EIXO de cada campo').split(/\r?\n/)) {
+    const m = l.match(/^\|\s*([a-z_]+)\s*\|\s*([a-z_]+)\s*\|\s*$/)
+    if (m && m[1] !== 'campo') eixoDeCampo[m[1]] = m[2]
+  }
+  const porEixo = (titulo) => {
+    const o = {}
+    for (const [k, sug, det] of linhas3(secao(md, titulo))) (o[k] ||= []).push({ sug, det })
+    return o
+  }
+  return {
+    eixoDeCampo,
+    nutricao: porEixo('## 2. NUTRIÇÃO'),
+    corporais: porEixo('## 3. PRÁTICAS CORPORAIS'),
+    contemplativas: porEixo('## 4. PRÁTICAS CONTEMPLATIVAS'),
+    florais: porEixo('## 5. FLORAIS'),
+    fito: porEixo('## 6. FITOTERAPIA'),
+    adapto: porEixo('## 7. ADAPTÓGENOS'),
+  }
+}
+const INTEG = loadIntegrativas()
+
+// FAMÍLIA contemplativa — escolhida pelo PADRÃO (é a categoria que o dossiê considera a mais
+// perigosa para Forer). Pontua as três e fica com a maior; EMPATE → CALMAR, porque baixar
+// ativação não machuca ninguém e ATIVAR em quem está exausto piora.
+const GATILHO = {
+  LIBERAR: { campos: ['tireoide', 'boca_garganta', 'pulmoes'], emo: /raiva contida|voz sufocada|soltar|ressentimento|engol/i },
+  CALMAR: { campos: ['adrenal', 'eixo_pituitario_adrenal', 'sistema_nervoso_autonomico', 'pineal_hipotalamica', 'coroa_simpatica'], emo: /alerta|ansiedade|não desliga|preocupa|urg[êe]ncia|vigil/i },
+  ATIVAR: { campos: [], emo: /dispers|melancol|desânimo|desanimo|fadiga|exaur|apatia/i },
+}
+
+
 // ---------- resolve um campo do exame → chave da tabela + classe ----------
 function classify(campo) {
   if (ALIAS[campo]) return { key: ALIAS[campo], klass: 'emocional' }
@@ -347,6 +402,8 @@ function calc(exameOuNome, lastro) {
   const supCampos = {}   // nutriente → Set(campo)
   const supPeso = {}     // nutriente → soma das intensidades (desempate)
   const supDetalhe = {}  // campo → {porque, leitura} para o render citar a origem
+  const eixoPeso = {}      // eixo → maior intensidade que o sustenta (bloco 8)
+  const camposAtivos = []  // {key,int} — usado na escolha da família contemplativa
 
   // ACHADOS → carga (elemento) + tensão (centro)
   for (const a of achadosUnicos) {
@@ -359,6 +416,12 @@ function calc(exameOuNome, lastro) {
     const sup = SUPORTES[key]
     if (sup) {
       supDetalhe[key] = { porque: sup.porque, leitura: sup.leitura, int: a.intensidade || 0, ...(TRADICOES[key] || {}) }
+    }
+    {
+      // EIXO do achado (bloco 8) — independe de haver suporte nutricional pro campo
+      const eixo = INTEG.eixoDeCampo[key]
+      if (eixo) eixoPeso[eixo] = Math.max(eixo in eixoPeso ? eixoPeso[eixo] : 0, a.intensidade || 0)
+      camposAtivos.push({ key, int: a.intensidade || 0 })
       for (const n of sup.suporte) {
         ;(supCampos[n] ||= new Set()).add(key)
         supPeso[n] = (supPeso[n] || 0) + w
@@ -539,7 +602,55 @@ function calc(exameOuNome, lastro) {
     }
   }).sort((a, b) => b.n - a.n || b.peso - a.peso)
 
-  return { name, elem, centro, pres, mapaCarga, mapaRecurso, antidoto, colisoes, crencaList, suporteList,
+  // ---- BLOCO 8: sugestões integrativas ----
+  // Cada categoria por EIXO sai ordenada pela intensidade do achado que sustenta o eixo, com
+  // teto de 3 (o mesmo que o dossiê já praticava). Eixo sem achado não gera nada.
+  const eixosOrdenados = Object.entries(eixoPeso).sort((a, b) => b[1] - a[1])
+  const porCategoria = (tabela, teto = 3) => {
+    const out = []
+    for (const [eixo] of eixosOrdenados) for (const it of tabela[eixo] || []) out.push({ ...it, eixo })
+    return out.slice(0, teto)
+  }
+
+  // FAMÍLIA contemplativa: pontua as três pelos campos e pelas cargas; empate → CALMAR.
+  const cargasTexto = Object.keys(emoCarga).join(' · ')
+  const placar = {}
+  for (const [fam, g] of Object.entries(GATILHO)) {
+    let n = 0
+    for (const c of camposAtivos) if (g.campos.includes(c.key)) n += 2
+    if (g.emo.test(cargasTexto)) n += 1
+    placar[fam] = n
+  }
+  const familia = Object.entries(placar).sort((a, b) => b[1] - a[1] || (a[0] === 'CALMAR' ? -1 : 1))[0]
+  const familiaEscolhida = (familia && familia[1] > 0) ? familia[0] : 'CALMAR'
+
+  // FLORAIS: cruzam com a EMOÇÃO, não com o campo — o mapa emocional já é individual.
+  const floraisList = []
+  for (const [emo] of Object.entries(emoCarga).sort((a, b) => b[1] - a[1])) {
+    const chave = Object.keys(INTEG.florais).find((k) => normE(emo).includes(normE(k)) || normE(k).includes(normE(emo)))
+    if (!chave) continue
+    const it = INTEG.florais[chave][0]
+    if (it && !floraisList.some((x) => x.sug === it.sug)) floraisList.push({ ...it, emo })
+    if (floraisList.length >= 3) break
+  }
+
+  const integrativas = {
+    familia: familiaEscolhida,
+    placar,
+    eixos: eixosOrdenados.map(([e, i]) => ({ eixo: e, int: i })),
+    nutricao: porCategoria(INTEG.nutricao),
+    corporais: porCategoria(INTEG.corporais),
+    contemplativas: (INTEG.contemplativas[familiaEscolhida] || []).slice(0, 3),
+    florais: floraisList,
+    fito: porCategoria(INTEG.fito),          // ⛔ só no guia do terapeuta
+    // a chave da tabela é "CALMAR (hipervigilância…)", não "CALMAR" — casa por prefixo
+    adapto: (() => {
+      const k = Object.keys(INTEG.adapto).find((x) => x.trim().toUpperCase().startsWith(familiaEscolhida))
+      return k ? [{ ...INTEG.adapto[k][0], eixo: familiaEscolhida }] : []
+    })(),
+  }
+
+  return { name, elem, centro, pres, mapaCarga, mapaRecurso, antidoto, colisoes, crencaList, suporteList, integrativas,
     // nº de campos distintos por emoção — o EXTREMO da régua se ganha por CONVERGÊNCIA
     // (metodologia C do founder), não por um único achado forte. Sem isto, um I5 de
     // fonte única desenha igual a um I4 confirmado por três órgãos.

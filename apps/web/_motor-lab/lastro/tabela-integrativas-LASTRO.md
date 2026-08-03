@@ -136,15 +136,24 @@ práticas contemplativas por **FAMÍLIA DE PADRÃO** — as duas coisas são der
 
 | família | sugestão | detalhe |
 |---|---|---|
-| CALMAR | Respiração 4-7-8 | inspira em 4, segura em 7, solta em 8 — a expiração longa é o que desliga o alerta |
-| CALMAR | Varredura do corpo deitada | religa a percepção fina sem exigir concentração |
-| CALMAR | Yoga restaurativa, posições paradas | a fáscia solta no tempo, não na força |
-| ATIVAR | Caminhada consciente em ritmo crescente | religa o pulso vital começando devagar |
-| ATIVAR | Dança livre, 5 a 10 minutos | movimento sem performance destrava mais que exercício |
-| ATIVAR | Leitura lenta em voz alta | foco suave, pra quem não consegue quietude |
-| LIBERAR | Escrita catártica que não se envia | solta o que ficou preso na garganta sem consequência |
-| LIBERAR | Cantar ou emitir som livre | destrava a expressão pelo corpo, não pela conversa |
-| LIBERAR | Chorar quando vier, sem segurar | represar é o que cansa, não o choro |
+| CALMAR | Suspiro fisiológico | duas inspirações curtas seguidas e uma expiração longa — é o jeito mais rápido que o corpo tem de baixar a ativação, e ele já faz isso sozinho quando você chora |
+| CALMAR | Respiração 4-7-8 | inspira em 4, segura em 7, solta em 8 — a expiração mais longa que a inspiração é o que desliga o alerta |
+| CALMAR | Varredura do corpo deitada | percorrer o corpo com a atenção, dos pés à cabeça, sem tentar mudar nada — religa a percepção fina sem exigir concentração |
+| CALMAR | Posições paradas e apoiadas | almofadas sustentando o corpo por alguns minutos; a fáscia solta no tempo, não na força |
+| ATIVAR | Luz do sol na primeira hora do dia | 10 minutos de luz natural sem óculos escuros — é o sinal que acerta o relógio do corpo e levanta a disposição do dia inteiro |
+| ATIVAR | Caminhada em ritmo crescente | começa devagar e acelera aos poucos, sem meta de distância — religa o pulso vital sem cobrar performance |
+| ATIVAR | Dança livre, 5 a 10 minutos | música que você gosta, movimento sem coreografia — destrava mais que exercício porque não tem jeito certo |
+| ATIVAR | Leitura lenta em voz alta | foco suave para quem não consegue quietude; a voz sustenta a atenção que a mente sozinha não sustenta |
+| LIBERAR | Escrita catártica que não se envia | escrever para a pessoa ou a situação, sem enviar — solta o que ficou preso na garganta sem consequência nenhuma |
+| LIBERAR | Som livre com a boca fechada | zumbir, cantarolar, murmurar — a vibração atinge a garganta e o peito por dentro, e destrava sem precisar de palavra |
+| LIBERAR | Cantar alto sozinho | no carro, no banho; usa a mesma musculatura que se contrai quando você se cala |
+| LIBERAR | Chorar quando vier, sem segurar | represar é o que cansa, não o choro — o corpo já sabe fazer, o trabalho é não interromper |
+
+⚠️ **Fora da lista de propósito:** exercícios de tremor voluntário (TRE) e derivados. Já foram
+sinalizados como **fórmula universal** que aparecia em qualquer leitura
+([[feedback_anti_formula_universal_s11]]) — o mesmo defeito que esta tabela existe pra evitar.
+
+---|---|---|
 
 ---
 

@@ -44,8 +44,9 @@ const B6HTML = PROTO6.slice(PROTO6.indexOf('<p class="method-sub">'), PROTO6.ind
 // jeito que as crenças. Duas consequências boas: leituras JÁ GERADAS ganham o bloco sem
 // regerar, e não há como o modelo inventar carência.
 // ⇒ índice do markdown (0..6) ≠ índice de exibição (0..7). Ver `diDe()` mais abaixo.
-export const NUMS_BLOCOS = ['1', '2', '3', '4', '5', '6', '7', '8']
-export const IDX_SUPORTE = 6 // posição de exibição do bloco novo
+export const NUMS_BLOCOS = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+export const IDX_SUPORTE = 6 // posição de exibição do repertório
+export const IDX_INTEG = 7  // posição de exibição das sugestões integrativas
 export const TITULOS_BLOCOS = [
   'Em poucas palavras',
   'Mente, coração e corpo — a sua mistura',
@@ -59,10 +60,13 @@ export const TITULOS_BLOCOS = [
   'O que pesa — e pra onde afrouxa',
   'Crenças a serem trabalhadas',
   'Repertório de suporte',
+  'Sugestões integrativas',
   'Perguntas para a sua sessão',
 ]
 // markdown (0..6) → exibição (0..7): tudo a partir de "Perguntas" desloca um.
-const diDe = (i) => (i < IDX_SUPORTE ? i : i + 1)
+// markdown (0..6) → exibição (0..8): os DOIS blocos montados pelo render entram antes de
+// "Perguntas", então tudo a partir dele desloca DOIS.
+const diDe = (i) => (i < IDX_SUPORTE ? i : i + 2)
 
 export function renderHTML(md, exame, nome, opts = {}) {
   const MD = md
@@ -427,6 +431,39 @@ function block6(body) {
 // metodo7.mjs; as FALAS ancoradas (movimentos 2, 3, 5, 6 e o micro-passo do 7) vêm do
 // Sonnet. O método é igual pra todo mundo; a fala é da pessoa. Isso existia aprovado
 // desde 21/07 num HTML e nunca tinha sido ligado — o bloco saía com 5 tempos rasos.
+
+// ---------- BLOCO 8 — SUGESTÕES INTEGRATIVAS (100% determinístico) ----------
+// Lastro: `lastro/tabela-integrativas-LASTRO.md`. Motor: `r.integrativas`.
+// ⛔ QUEM LÊ O QUÊ (decisão do founder 2026-08-03): fitoterapia e adaptógenos NÃO vão ao
+// cliente — erva tem interação farmacológica real (ashwagandha × medicação de tireoide).
+// O sinalizador é o mesmo do guia de sessão: se "Perguntas para a sua sessão" foi omitido,
+// é a versão do cliente.
+// ⛔ Categoria sem lastro nesta leitura não sai — nem com título.
+const H2_INTEG = 'Caminhos para experimentar'
+const INTEG_LEAD = 'Caminhos que a leitura sugere experimentar. <b>Nada aqui é receita nem tratamento</b> — são possibilidades para você escolher, no seu ritmo, com quem acompanha a sua saúde.'
+const FAMILIA_TXT = {
+  CALMAR: 'A leitura aponta um corpo em alerta — então as práticas abaixo são de descida, não de estímulo.',
+  ATIVAR: 'A leitura aponta dispersão e queda de energia — então as práticas abaixo religam o pulso, sem cobrança.',
+  LIBERAR: 'A leitura aponta expressão retida — então as práticas abaixo são de soltar, não de acalmar.',
+}
+function blockIntegrativas(versaoCliente) {
+  const I = r.integrativas
+  if (!I) return null
+  const cat = (titulo, itens, nota) => (itens && itens.length)
+    ? `<p class="grouplab carga"><span class="gd"></span>${titulo}</p>${nota ? `<p class="sup-nota">${nota}</p>` : ''}`
+      + itens.map((x) => `<div class="int-item"><p class="int-s">${esc(x.sug)}</p><p class="int-d">${esc(x.det)}</p></div>`).join('')
+    : ''
+  const corpo = [
+    cat('Na alimentação', I.nutricao),
+    cat('No corpo', I.corporais),
+    cat('Na prática diária', I.contemplativas, FAMILIA_TXT[I.familia] || ''),
+    cat('Florais', I.florais, 'Escolhidos pelo que pesa hoje, não pelo órgão.'),
+    versaoCliente ? '' : cat('Fitoterapia tradicional', I.fito, '◆ Para o terapeuta avaliar — não vai no documento do cliente.'),
+    versaoCliente ? '' : cat('Adaptógenos', I.adapto, '◆ Para o terapeuta avaliar. Considere acompanhamento de profissional habilitado antes de iniciar.'),
+  ].filter(Boolean).join('')
+  if (!corpo) return null
+  return `<p class="lead">${INTEG_LEAD}</p>${corpo}`
+}
 // ---------- BLOCO 7 — REPERTÓRIO DE SUPORTE (100% determinístico) ----------
 // Lastro: `lastro/tabela-carencias-LASTRO.md`. Motor: `r.suporteList` (ordenado por
 // CONVERGÊNCIA — nº de achados independentes que sustentam o nutriente).
@@ -598,9 +635,13 @@ const sections = blocks.map((b, i) => {
 // em documento defeituoso — antes, o índice fixo anunciava uma seção ausente e
 // apontava para uma âncora inexistente.
 const supHtml = blockSuporte()
+// versão do cliente = a que omite o guia de sessão. É o mesmo sinalizador do bloco 9.
+const versaoCliente = !!omitirRx
+const intHtml = blockIntegrativas(versaoCliente)
 const tocLinhas = blocks.map((b, i) => omitido(b) ? null : { di: diDe(i), t: H2[diDe(i)] || tituloDe(b) }).filter(Boolean)
 // o repertório só entra no índice se o bloco existir de fato (pode não haver suporte sustentado)
 if (supHtml) tocLinhas.push({ di: IDX_SUPORTE, t: H2[IDX_SUPORTE] })
+if (intHtml) tocLinhas.push({ di: IDX_INTEG, t: H2[IDX_INTEG] })
 tocLinhas.sort((a, b) => a.di - b.di)
 const toc = `<nav class="toc"><p class="toc-lab">O que vem a seguir</p>${
   tocLinhas.map((x) => `<a class="toc-row" href="#b${x.di + 1}"><span class="toc-n">${NUMS[x.di] || x.di + 1}</span><span class="toc-t">${esc(x.t)}</span></a>`).join('')
@@ -617,8 +658,11 @@ const toc = `<nav class="toc"><p class="toc-lab">O que vem a seguir</p>${
 const secSuporte = supHtml
   ? `<section class="block" id="b${IDX_SUPORTE + 1}"><p class="eyebrow"><span class="secnum">${NUMS[IDX_SUPORTE]}</span> &nbsp;${esc(TITULOS_BLOCOS[IDX_SUPORTE])}</p><h2 class="display">${esc(H2_SUPORTE)}</h2>${supHtml}</section>`
   : null
+const secInteg = intHtml
+  ? `<section class="block" id="b${IDX_INTEG + 1}"><p class="eyebrow"><span class="secnum">${NUMS[IDX_INTEG]}</span> &nbsp;${esc(TITULOS_BLOCOS[IDX_INTEG])}</p><h2 class="display">${esc(H2_INTEG)}</h2>${intHtml}</section>`
+  : null
 const comSuporte = [...sections]
-comSuporte.splice(IDX_SUPORTE, 0, secSuporte)
+comSuporte.splice(IDX_SUPORTE, 0, secSuporte, secInteg)
 const presentes = comSuporte.filter(Boolean)
 const sectionsHtml = presentes.length
   ? [presentes[0] + toc, ...presentes.slice(1)].join('\n<hr class="div">\n')
