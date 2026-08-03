@@ -430,3 +430,29 @@ Texto na voz do cliente; campo sem entrada simplesmente não mostra a linha.
 | coracao | o coração abriga o espírito, e a alegria é sua emoção equilibrada | é o coração que sente e processa, não só o que bombeia |
 | sistema_imune | é a energia defensiva que circula na superfície, governada pelo pulmão | é a reserva vital que sustenta a imunidade — ela cai quando você se gasta |
 | sistema_reprodutor | guarda a essência: a mesma energia da criação, de filho a obra | é o tecido mais refinado do corpo, o último a se formar e o primeiro a sofrer com desgaste |
+
+## MAPA MÁQUINA — ESPECIFICAÇÃO POR CAMPO
+
+⚠️ **Por que não quebrar o "complexo B" em vitaminas separadas:** ele AGREGA. Na leitura real
+do founder, complexo B apareceu com **4 achados independentes** — o sinal mais forte do bloco.
+Quebrado em B12/B5/B2 viraria três entradas de 1 achado cada, todas caindo no grupo "de forma
+pontual": **perderíamos o sinal mais forte por excesso de precisão**.
+⇒ A entrada continua agregando; a especificação entra como uma linha a mais, montada a partir
+dos campos que de fato dispararam. Ganha precisão sem perder convergência.
+⛔ Isto especifica QUAL VITAMINA, nunca a FORMA (B12, não "metilcobalamina") — a regra da
+forma continua valendo.
+
+| campo | nutriente | específico |
+|---|---|---|
+| estomago | complexo B | B12 |
+| figado_vesicula | complexo B | B9 · B12 |
+| boca_garganta | complexo B | B2 · B12 |
+| adrenal | complexo B | B5 |
+| eixo_pituitario_adrenal | complexo B | B5 |
+| sistema_nervoso_autonomico | complexo B | B1 · B6 · B12 |
+| cerebrum_motor | complexo B | B9 · B12 |
+| cerebellum_sensory | complexo B | B9 · B12 |
+| coluna_cervical | complexo B | B12 |
+| coluna_toracica | complexo B | B12 |
+| coluna_lombar | complexo B | B12 |
+| sistema_reprodutor | complexo B | B9 |

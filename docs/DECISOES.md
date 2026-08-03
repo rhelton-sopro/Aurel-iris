@@ -576,6 +576,22 @@ listando, sem ser clicável ali. ✅ Em `/leituras/<id>/emocional` (injeção di
 e no PDF os links seguem funcionando.
 **Status:** APLICADA.
 
+### 2026-08-03 — Complexo B: agrega, mas diz QUAIS Bs
+**Founder:** *"ali é o complexo B? ou tem algumas Bs específicas? a gente poderia melhorar"*.
+Sim — e a fisiologia é bem específica por órgão: estômago→**B12** (fator intrínseco),
+adrenal→**B5**, boca/garganta→**B2**, cérebro e fígado→**B9+B12**, nervoso→**B1/B6/B12**.
+
+**⚠️ Mas quebrar em vitaminas separadas CUSTARIA o sinal mais forte do bloco.** Medido na
+leitura real do founder: "complexo B" tem **4 achados independentes** porque AGREGA. Quebrado
+em B12/B5/B2 viram três entradas de 1 achado cada — todas caindo no grupo "de forma pontual".
+Seria **perder convergência por excesso de precisão**.
+
+**Decisão (proposta minha, aprovada por ele):** a entrada continua agregando e ganha uma linha
+`Nesta leitura, sobretudo B9 e B12.`, montada a partir dos campos que de fato dispararam.
+⛔ Especifica qual VITAMINA, nunca a FORMA (B12, não "metilcobalamina") — a regra da forma,
+que existe porque este bloco vai ao cliente, continua valendo.
+**Status:** APLICADA.
+
 ## Como usar
 
 - **Ao tomar uma decisão:** registrar aqui na mesma sessão, com razão e status.

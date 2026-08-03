@@ -468,6 +468,7 @@ function blockSuporte() {
       <div class="sup-h"><span class="sup-n">${esc(cap(s.nutriente))}</span>
 </div>
       ${s.porque ? `<p class="sup-p">${esc(s.porque)}</p>` : ''}
+      ${s.especificos && s.especificos.length ? `<p class="sup-esp">Nesta leitura, sobretudo ${esc(s.especificos.length > 1 ? s.especificos.slice(0, -1).join(', ') + ' e ' + s.especificos.slice(-1) : s.especificos[0])}.</p>` : ''}
     </div>`
   }
   const grupo = (titulo, itens, nota) => itens.length

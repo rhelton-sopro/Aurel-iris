@@ -278,6 +278,22 @@ export function loadTradicoes() {
 }
 const TRADICOES = loadTradicoes()
 
+// ESPECIFICAÇÃO: qual vitamina do grupo aquele campo aponta. O nutriente continua agregando
+// (senão a convergência se dissolve — ver a nota na tabela); isto só diz, dos campos que
+// dispararam, quais membros do grupo estão em jogo. ⛔ vitamina, NUNCA forma.
+export function loadEspecificos() {
+  const md = fs.readFileSync(CARENCIAS_MD, 'utf8')
+  const sec = md.slice(md.indexOf('## MAPA MÁQUINA — ESPECIFICAÇÃO'))
+  const out = {}
+  for (const linha of sec.split(/\r?\n/)) {
+    const m = linha.match(/^\|\s*([a-z_]+)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*$/)
+    if (!m || m[1] === 'campo') continue
+    ;(out[m[2].toLowerCase()] ||= {})[m[1]] = m[3].split('·').map((x) => x.trim()).filter(Boolean)
+  }
+  return out
+}
+const ESPECIFICOS = loadEspecificos()
+
 // ---------- resolve um campo do exame → chave da tabela + classe ----------
 function classify(campo) {
   if (ALIAS[campo]) return { key: ALIAS[campo], klass: 'emocional' }
@@ -516,6 +532,8 @@ function calc(exameOuNome, lastro) {
       peso: supPeso[nutriente] || 0,
       convergente: campos.length >= 2,
       porque: PORQUE_NUTRIENTE[nutriente.toLowerCase()] || '',
+      // membros do grupo que ESTES campos apontam (dedup, ordem de aparição)
+      especificos: [...new Set(campos.flatMap((c) => (ESPECIFICOS[nutriente.toLowerCase()] || {})[c] || []))],
       // a LEITURA (camada simbólica) vem do campo de MAIOR intensidade que o sustenta
       origem: campos.map((c) => ({ campo: c, ...supDetalhe[c] })).sort((a, b) => (b.int || 0) - (a.int || 0))[0] || null,
     }
