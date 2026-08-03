@@ -625,6 +625,29 @@ URL própria e eliminou o `semAncoras`.
 só link de âncora — em SVG é referência de símbolo.
 **Status:** APLICADA.
 
+### 2026-08-03 — "Complete seu cadastro" passa a DIZER o que falta
+**Caso real:** a Juliana não conseguia acessar. Investigado: conta saudável, e-mail
+confirmado, **trial ativo com 1 leitura**. O que travava era o **gate de perfil completo** —
+faltavam `cep`, `address_number`, `city` e `state`. O cadastro inicial coleta telefone,
+especialidades e CPF; **o endereço só é pedido em `/perfil/completar`**, e ela não concluiu.
+**Não era só ela:** 2 de 8 contas recentes estavam paradas com exatamente os mesmos 4 campos.
+
+**O defeito de produto:** o gate SABIA o que faltava (`missing: ['address']`) e a tela não
+mostrava — repetia "faltam alguns dados" e reexibia o formulário inteiro. Quem devia um
+campo era devolvido a cada navegação sem descobrir qual, e concluía que o cadastro não salva.
+**Fix:** `describeGaps()` + banner nomeando o que falta, na voz de quem lê
+("Falta só: o endereço (CEP, número, cidade e estado)").
+
+**Verificado e SEM mudança necessária — CEP que o ViaCEP não acha JÁ é aceito** (founder
+perguntou): no formulário a mensagem é aviso e não bloqueia o envio; no servidor a validação
+é `cepIsValidBR`, que checa **só o formato de 8 dígitos** e nunca consulta o ViaCEP. CEP novo
+ou rural passa, desde que cidade e estado sejam digitados.
+
+**Também descartado como causa (medido, não suposto):** envio de e-mail. Disparei OTP para a
+conta do founder, o Supabase aceitou e o e-mail chegou — para ele e para ela.
+**Status:** APLICADA. ⏳ Pendente decidir se o endereço passa a ser pedido no cadastro inicial,
+que eliminaria a classe do problema em vez de sinalizá-la.
+
 ## Como usar
 
 - **Ao tomar uma decisão:** registrar aqui na mesma sessão, com razão e status.

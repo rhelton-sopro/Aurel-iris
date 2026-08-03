@@ -61,3 +61,27 @@ export function evaluateTherapistProfile(
   if (missing.length > 0) return { status: 'incomplete', missing }
   return { status: 'ok' }
 }
+
+/**
+ * Rótulo de cada lacuna, na voz de quem lê a tela.
+ *
+ * ⭐ Existe porque o gate SABIA o que faltava e a tela não mostrava (2026-08-03): a pessoa
+ * era devolvida para "Complete seu cadastro" a cada navegação, sem descobrir qual campo
+ * estava travando. Caso real: a Juliana só devia o ENDEREÇO, mas via o formulário inteiro
+ * de novo e concluía que o cadastro não salvava. Duas de oito contas recentes estavam
+ * paradas exatamente assim.
+ */
+export const THERAPIST_GAP_LABEL: Record<TherapistGap, string> = {
+  phone: 'WhatsApp',
+  specialties: 'suas especialidades',
+  tos: 'o aceite dos termos',
+  cpf: 'o CPF',
+  address: 'o endereço (CEP, número, cidade e estado)',
+}
+
+/** "o endereço" · "o CPF e o endereço" · "o CPF, o endereço e o WhatsApp" */
+export function describeGaps(missing: TherapistGap[]): string {
+  const t = missing.map((m) => THERAPIST_GAP_LABEL[m])
+  if (t.length <= 1) return t[0] ?? ''
+  return t.slice(0, -1).join(', ') + ' e ' + t[t.length - 1]
+}

@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { evaluateTherapistProfile } from '@/lib/gates/therapist-profile'
+import { evaluateTherapistProfile, describeGaps } from '@/lib/gates/therapist-profile'
 import { CompleteProfileForm } from './complete-profile-form'
 
 // GATE landing. NÃO está em PROTECTED_PATHS → o middleware não a bloqueia
@@ -58,9 +58,22 @@ export default async function CompletarPerfilPage() {
             Complete seu cadastro
           </h1>
           <p className="text-sm text-muted-foreground">
-            Faltam alguns dados para continuar usando o Iris Codex.
+            Falta pouco para você começar a usar o Iris Codex.
           </p>
         </div>
+
+        {/* ⭐ DIZ O QUE FALTA. Antes a tela só repetia "faltam alguns dados" e mostrava o
+            formulário inteiro — quem devia um único campo era devolvido para cá a cada
+            navegação sem descobrir qual. Caso real em 2026-08-03: duas contas paradas há
+            dias, ambas devendo só o endereço. */}
+        {gate.status === 'incomplete' && (
+          <div className="border border-amber-500 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+            <b className="font-semibold">Falta {gate.missing.length === 1 ? 'só' : 'preencher'}: {describeGaps(gate.missing)}.</b>
+            <span className="mt-1 block text-amber-900/90">
+              O resto do seu cadastro já está salvo — é só completar {gate.missing.length === 1 ? 'esse campo' : 'esses campos'} e salvar.
+            </span>
+          </div>
+        )}
         <CompleteProfileForm initial={initial} />
       </div>
     </main>
