@@ -222,6 +222,46 @@ const OQUE_CARGA = {}
 }
 const oqueCargaDe = (emo) => OQUE_CARGA[normE(emo)] || null
 
+
+// ---------- SUPORTE NUTRICIONAL (bloco 7 — decisão do founder 2026-08-02) ----------
+// Lê o MAPA MÁQUINA de `tabela-carencias-LASTRO.md`. A lista é DETERMINÍSTICA: o Sonnet
+// não escreve item nenhum, só a moldura. Foi assim que as crenças pararam de ser inventadas.
+// ⛔ Campo fora do mapa NÃO gera suporte — falta de cobertura é teto da leitura.
+const CARENCIAS_MD = path.join(LAB_DIR, 'lastro/tabela-carencias-LASTRO.md')
+export function loadSuportes() {
+  const md = fs.readFileSync(CARENCIAS_MD, 'utf8')
+  const sec = md.slice(md.indexOf('## MAPA MÁQUINA'))
+  const mapa = {}
+  for (const linha of sec.split(/\r?\n/)) {
+    const m = linha.match(/^\|\s*([a-z_]+)\s*\|(.+)\|(.+)\|(.+)\|\s*$/)
+    if (!m) continue
+    if (m[1] === 'campo') continue
+    mapa[m[1]] = {
+      suporte: m[2].split('·').map((x) => x.trim()).filter(Boolean),
+      porque: m[3].trim(),
+      leitura: m[4].trim(),
+    }
+  }
+  return mapa
+}
+const SUPORTES = loadSuportes()
+
+// porquê POR NUTRIENTE. Existe porque o texto por CAMPO fazia dois nutrientes sustentados
+// pelo mesmo achado saírem com a MESMA frase (fígado explicava complexo B e magnésio
+// igualzinho). O cliente lê a razão do nutriente; o campo continua sendo a evidência.
+export function loadPorqueNutriente() {
+  const md = fs.readFileSync(CARENCIAS_MD, 'utf8')
+  const sec = md.slice(md.indexOf('## MAPA MÁQUINA — POR NUTRIENTE'))
+  const out = {}
+  for (const linha of sec.split(/\r?\n/)) {
+    const m = linha.match(/^\|\s*([^|]+?)\s*\|\s*(.+?)\s*\|\s*$/)
+    if (!m || m[1] === 'nutriente' || /^-+$/.test(m[1])) continue
+    out[m[1].toLowerCase()] = m[2]
+  }
+  return out
+}
+const PORQUE_NUTRIENTE = loadPorqueNutriente()
+
 // ---------- resolve um campo do exame → chave da tabela + classe ----------
 function classify(campo) {
   if (ALIAS[campo]) return { key: ALIAS[campo], klass: 'emocional' }
@@ -269,6 +309,13 @@ function calc(exameOuNome, lastro) {
     return klass !== 'emocional' || fundidos.includes(a)
   })
 
+  // SUPORTE NUTRICIONAL: nutriente → conjunto de campos INDEPENDENTES que o sustentam.
+  // A convergência é o sinal (mesma régua da corroboração das crenças): um nutriente
+  // apontado por 3 achados diferentes vale muito mais que um apontado por 1.
+  const supCampos = {}   // nutriente → Set(campo)
+  const supPeso = {}     // nutriente → soma das intensidades (desempate)
+  const supDetalhe = {}  // campo → {porque, leitura} para o render citar a origem
+
   // ACHADOS → carga (elemento) + tensão (centro)
   for (const a of achadosUnicos) {
     const { key, klass, alvo } = classify(a.campo)
@@ -277,6 +324,14 @@ function calc(exameOuNome, lastro) {
     const t = lastro[key]
     if (!t) { skipped.push(`${a.campo}(SEM-LASTRO)`); continue }
     const w = Math.pow(a.intensidade || 0, GAMMA)
+    const sup = SUPORTES[key]
+    if (sup) {
+      supDetalhe[key] = { porque: sup.porque, leitura: sup.leitura, int: a.intensidade || 0 }
+      for (const n of sup.suporte) {
+        ;(supCampos[n] ||= new Set()).add(key)
+        supPeso[n] = (supPeso[n] || 0) + w
+      }
+    }
     for (const e of ['fogo', 'agua', 'terra', 'ar']) elem.carga[e] += w * (t.elem[e] || 0)
     const cs = TOPO_CENTRO[key] || t.centros // centro por ZONA topográfica (decisão founder)
     const cw = w / cs.length
@@ -432,7 +487,25 @@ function calc(exameOuNome, lastro) {
   mapaCarga.sort((a, b) => b[1] - a[1])
   const mapaRecurso = top(emoRecurso, 5)
   achadoList.sort((a, b) => b.w - a.w)
-  return { name, elem, centro, pres, mapaCarga, mapaRecurso, antidoto, colisoes, crencaList,
+  // ---- lista final de SUPORTES, ordenada por CONVERGÊNCIA ----
+  // Ordena por nº de achados independentes; empate desempata pelo peso somado. Um suporte
+  // apontado por 1 campo só entra como "sinal isolado" — o render mostra a diferença, e o
+  // texto NUNCA afirma falta: é hipótese a investigar.
+  const suporteList = Object.entries(supCampos).map(([nutriente, set]) => {
+    const campos = [...set]
+    return {
+      nutriente,
+      campos,
+      n: campos.length,
+      peso: supPeso[nutriente] || 0,
+      convergente: campos.length >= 2,
+      porque: PORQUE_NUTRIENTE[nutriente.toLowerCase()] || '',
+      // a LEITURA (camada simbólica) vem do campo de MAIOR intensidade que o sustenta
+      origem: campos.map((c) => ({ campo: c, ...supDetalhe[c] })).sort((a, b) => (b.int || 0) - (a.int || 0))[0] || null,
+    }
+  }).sort((a, b) => b.n - a.n || b.peso - a.peso)
+
+  return { name, elem, centro, pres, mapaCarga, mapaRecurso, antidoto, colisoes, crencaList, suporteList,
     // nº de campos distintos por emoção — o EXTREMO da régua se ganha por CONVERGÊNCIA
     // (metodologia C do founder), não por um único achado forte. Sem isto, um I5 de
     // fonte única desenha igual a um I4 confirmado por três órgãos.

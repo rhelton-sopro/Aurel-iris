@@ -318,3 +318,85 @@ corpo de verdade. É a mesma metodologia de corroboração já usada nas crença
 
 **Regra de ordenação sugerida para o bloco:** ordenar por número de achados independentes
 que sustentam o suporte, não pela ordem dos campos.
+
+---
+
+## MAPA MÁQUINA — parseado por `motor-calc.mjs`
+
+⚠️ **Formato fixo.** Uma linha por campo: `campo | suporte | porquê | leitura`.
+- **suporte** — nutrientes separados por ` · `. ⛔ SEM forma (magnésio, não magnésio glicinato).
+- **porquê** — a razão fisiológica **na voz do cliente**, lei da 8ª série. É o que ele lê.
+- **leitura** — a camada MTC/Ayurveda **traduzida**. ⛔ NUNCA nomear a escola: as 9 regras
+  absolutas proíbem citar escola/autor no documento. "Deficiência de Qi do Baço" vira
+  "o corpo trata o que você não digeriu — comida e acontecimento — no mesmo lugar".
+  A tradição informa a frase; o nome dela fica aqui dentro.
+- Campo ausente desta lista **não gera suporte**. É de propósito.
+
+| campo | suporte | porquê | leitura |
+|---|---|---|---|
+| estomago | zinco · complexo B | o estômago é onde o corpo prepara o alimento pra ser aproveitado; quando ele vive tenso, a própria absorção fica prejudicada | o que você não digere — comida ou acontecimento — o corpo trata no mesmo lugar |
+| intestino_delgado | glutamina · zinco · vitamina A · vitamina D | é onde o alimento de fato entra em você; se a parede dele está frágil, todo o resto chega menos | é o lugar que separa o que serve do que não serve — no corpo e na vida |
+| intestino_grosso | magnésio · fibras · água | é o fim da linha: o que o corpo já usou precisa sair na hora certa | segurar o que já cumpriu o papel cansa o corpo do mesmo jeito que cansa você |
+| figado_vesicula | complexo B · magnésio · enxofre alimentar | o fígado é a central de limpeza, e esse trabalho gasta um conjunto específico de nutrientes | é o órgão do impulso que precisa sair; quando não sai, vira calor guardado |
+| pancreas | cromo · magnésio · complexo B | ajuda o corpo a manter o açúcar estável ao longo do dia, sem picos e quedas | a busca por doce costuma aparecer quando falta doçura em outro lugar |
+| rim | água · magnésio · potássio | filtrar o dia inteiro depende de líquido suficiente e do equilíbrio dos sais | é o órgão da reserva: o cansaço que vem de fundo mora aqui |
+| sistema_urinario | água · magnésio · vitamina C | hidratação é o fator que mais muda esse eixo, e é o mais simples de ajustar | o que se segura e o que se deixa ir passam pelo mesmo caminho |
+| sistema_linfatico | água · vitamina C · movimento | a linfa não tem bomba própria: ela só circula quando você se move e respira fundo | acúmulo pede movimento, não mais uma coisa pra tomar |
+| pele_tegumentar | ômega-3 · zinco · vitamina A | são o que sustenta a barreira da pele e ajuda a acalmar irritação | a pele assume quando as outras saídas do corpo estão sobrecarregadas |
+| pulmoes | vitamina C · vitamina D · ômega-3 | sustentam a defesa das vias respiratórias e ajudam a soltar a musculatura do peito | é o lugar do fôlego: onde entra o novo e onde se despede do que passou |
+| boca_garganta | zinco · complexo B · ferro | as mucosas se renovam rápido, então são as primeiras a dar sinal quando algo falta | a garganta é a passagem do que se diz — e do que ficou sem dizer |
+| adrenal | vitamina C · complexo B · magnésio | é a glândula do estresse, e ela gasta vitamina C mais que quase qualquer outro tecido | viver em alerta consome uma reserva que leva tempo pra repor |
+| eixo_pituitario_adrenal | complexo B · magnésio · vitamina D | é o mesmo eixo do estresse, visto de onde ele é comandado | prontidão constante é um comando que fica ligado mesmo sem perigo |
+| tireoide | iodo · selênio · zinco · ferro | esses quatro entram, em sequência, na produção e na ativação do hormônio que regula o seu ritmo | é o centro do ritmo próprio — e fica na altura da garganta, onde mora a voz |
+| pineal_hipotalamica | magnésio · vitamina B6 · triptofano | são a matéria-prima do que acalma e do que dá sono de verdade | dormir não é só parar: é o corpo confiar que pode baixar a guarda |
+| sistema_nervoso_autonomico | magnésio · complexo B · ômega-3 | o magnésio é o que ajuda o sistema nervoso a sair do estado de alerta | alerta sustentado gasta mais que esforço — porque não tem hora de acabar |
+| cerebrum_motor | ômega-3 · complexo B · ferro | são o material da própria estrutura do cérebro e da clareza de raciocínio | falta de ferro aparece como névoa na cabeça antes de aparecer em exame |
+| cerebellum_sensory | ômega-3 · complexo B · ferro | são o material da própria estrutura do cérebro e da clareza de raciocínio | falta de ferro aparece como névoa na cabeça antes de aparecer em exame |
+| radii_solaris | magnésio · complexo B · fibras · água | intestino e cabeça conversam: o que acalma um costuma clarear o outro | pensamento que gira raramente se resolve só no pensamento |
+| sistema_musculoesqueletico | magnésio · cálcio · vitamina D · vitamina K · proteína | sem vitamina D e K o cálcio não chega ao osso — os quatro trabalham juntos ou nenhum funciona | o corpo que sustenta tudo também precisa ser sustentado |
+| coluna_cervical | magnésio · vitamina D · complexo B | soltam a musculatura que fica contraída ao redor da coluna | o pescoço é onde se segura o que não se quer largar |
+| coluna_toracica | magnésio · vitamina D · complexo B | soltam a musculatura que fica contraída ao redor da coluna | o meio das costas guarda o que se carrega sem falar |
+| coluna_lombar | magnésio · vitamina D · complexo B | soltam a musculatura que fica contraída ao redor da coluna | a lombar é a base: ela reclama quando falta apoio |
+| sacro_coccyx | magnésio · vitamina D | sustentam a base da coluna, que é onde o peso do corpo se apoia | é o ponto de assento: a sensação de ter chão |
+| coracao | magnésio · potássio · ômega-3 | governam o ritmo do coração e a energia do músculo que nunca para | é o único músculo que trabalha a vida toda sem descanso |
+| sistema_circulatorio | ômega-3 · magnésio · vitamina E | ajudam o sangue a circular com mais fluidez e cuidam da parede dos vasos | circulação é o quanto de você chega até as pontas |
+| sistema_imune | vitamina D · zinco · vitamina C · selênio | são os quatro com papel mais bem estabelecido na defesa do corpo | defender-se o tempo todo cansa — inclusive por dentro |
+| coroa_simpatica | magnésio · complexo B | mesmo eixo do sistema nervoso, visto na borda | o tônus de alerta aparece na periferia antes de aparecer no centro |
+| sistema_reprodutor | zinco · vitamina D · ômega-3 · ferro | participam da produção hormonal; o ferro pesa mais onde há perda cíclica | é o eixo do que se gera — filho, obra, projeto |
+
+## MAPA MÁQUINA — POR NUTRIENTE
+
+⚠️ O "porquê" mostrado ao cliente é **do nutriente**, não do campo. Motivo: um mesmo campo
+sustenta vários nutrientes (o fígado puxa complexo B *e* magnésio *e* enxofre), então usar o
+texto do campo fazia dois itens diferentes saírem com **a mesma frase**. Voz do cliente.
+
+| nutriente | porquê |
+|---|---|
+| magnésio | é o mineral que ajuda o corpo a sair do estado de alerta: solta a musculatura, acalma o sistema nervoso e regula o ritmo |
+| complexo B | é o grupo que o corpo gasta para produzir energia e para o sistema nervoso funcionar — e é o primeiro a se esgotar em fase de desgaste |
+| zinco | participa da renovação de tecidos e da produção do ácido que abre a digestão |
+| ferro | é o que leva oxigênio a cada célula; quando falta, aparece como cansaço e névoa mental antes de aparecer em qualquer outro lugar |
+| vitamina D | age como um regulador geral — osso, defesa e humor respondem a ela |
+| vitamina C | é o que o corpo consome mais rápido em fase de estresse, e sustenta a defesa e a firmeza dos tecidos |
+| vitamina A | cuida das superfícies que separam você do mundo: pele, mucosas, visão |
+| vitamina E | protege as gorduras do corpo, inclusive as das membranas de cada célula |
+| vitamina K | é quem leva o cálcio para o osso — sem ela o cálcio circula sem chegar aonde precisa |
+| vitamina B6 | participa da fabricação do que acalma e do que dá bom humor |
+| ômega-3 | é gordura estrutural do cérebro e o que ajuda o corpo a encerrar processos de inflamação |
+| cálcio | é a matéria do osso e o que permite ao músculo contrair |
+| potássio | trabalha junto com o magnésio no ritmo do coração e no equilíbrio dos líquidos |
+| iodo | é a matéria-prima do hormônio que define a velocidade do seu metabolismo |
+| selênio | é o que ativa esse hormônio — sem ele, o corpo produz mas não usa |
+| cromo | ajuda a manter o açúcar do sangue estável ao longo do dia |
+| glutamina | é o alimento das células que forram o intestino por dentro |
+| colina | participa do transporte de gordura no fígado e da comunicação entre neurônios |
+| triptofano | é o ponto de partida do que traz calma e do que dá sono de verdade |
+| tirosina | é o ponto de partida dos hormônios que dão disposição e foco |
+| proteína | é a matéria de reposição do corpo inteiro: músculo, pele, defesa, hormônio |
+| fibras | dão volume e ritmo ao intestino, e alimentam as bactérias que trabalham a seu favor |
+| água | é o que permite filtrar, transportar e eliminar — quase todo o resto depende dela |
+| movimento | não é nutriente: a linfa não tem bomba própria e só circula quando você se mexe |
+| enxofre alimentar | entra nas reações que o fígado usa para transformar e eliminar |
+| sódio (sal integral) | sustenta o volume dos líquidos e o eixo que responde ao estresse |
+| coenzima Q10 | participa da produção de energia dentro da célula, sobretudo onde ela nunca para |
+| cloreto (sal integral) | é parte do ácido que o estômago usa para abrir a digestão |

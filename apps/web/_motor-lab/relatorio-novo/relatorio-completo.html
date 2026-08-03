@@ -259,6 +259,22 @@
      ⚠️ A SETA (U+2192) nao existe em nenhuma das duas - continua caindo no fallback do
      sistema. E 1 glifo; resolver exigiria gerar um subconjunto de fonte so pra ele. */
   .legend .gl{display:inline-block;width:.5em;height:.5em;border-radius:50%;background:currentColor;vertical-align:middle;}
+
+  /* ===== BLOCO 7 — Repertorio de suporte (2026-08-03) =====
+     A FORCA e codificada na FORMA, nao so no numero: a barra da esquerda fica mais densa
+     quanto mais achados independentes sustentam o nutriente. Assim da pra ver de relance
+     o que pesa, sem precisar ler a contagem. */
+  .sup-item{border-left:3px solid var(--line-strong);background:var(--panel);border-radius:0 9px 9px 0;padding:11px 16px;margin:0 0 8px;}
+  .sup-forte{border-left-color:var(--teal);background:color-mix(in srgb,var(--teal) 6%,var(--paper));}
+  .sup-moderado{border-left-color:color-mix(in srgb,var(--teal) 55%,var(--line));}
+  .sup-isolado{border-left-color:var(--line-strong);background:var(--paper);}
+  .sup-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:3px;}
+  .sup-n{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--ink);}
+  .sup-sinal{font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--teal-deep);background:color-mix(in srgb,var(--teal) 10%,var(--paper));border-radius:100px;padding:2px 9px;}
+  .sup-isolado .sup-sinal{color:var(--ink-faint);background:var(--panel);}
+  .sup-p{font-size:14px;line-height:1.5;color:var(--ink-soft);margin:0;}
+  .sup-l{font-family:var(--serif);font-style:italic;font-size:14.5px;line-height:1.45;color:var(--teal-deep);margin:5px 0 0;}
+  .sup-nota{font-size:12.5px;color:var(--ink-faint);margin:-4px 0 9px;}
   .q-eyebrow{font-size:19px;letter-spacing:0;font-weight:700;margin:0 0 6px;}
   .q-eyebrow .carga{color:var(--amber);} .q-eyebrow .arw{color:var(--ink-faint);opacity:.7;} .q-eyebrow .anti{color:var(--good);} .q-eyebrow .pn{color:var(--ink-faint);}
   /* ⚠️ duplicada em b6-terapeuta-proto.html, que entra DEPOIS (B6CSS) e vence. Manter iguais. */

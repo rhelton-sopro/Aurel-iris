@@ -492,6 +492,43 @@ continua começando em página nova. E os `break-inside:avoid` dos blocos coesos
 então nada se parte no meio; a diferença é só que a seção seguinte aproveita a folha.
 **Como reverter:** uma linha, trocar `break-before:auto` de volta por `page`.
 
+### 2026-08-03 — BLOCO 7 "Repertório de suporte" no ar
+**Decisão do founder:** copiar o §7 do dossiê para o Mapa do Ser, entre crenças e perguntas;
+**o cliente vê**, com moldura de investigação; MTC/Ayurveda como **camada de leitura**.
+
+**⭐ O bloco é 100% DETERMINÍSTICO — o Sonnet não escreve nada dele.** Lista e textos vêm do
+motor + `lastro/tabela-carencias-LASTRO.md`. Três ganhos: (1) **não há como fabricar
+carência**; (2) **leituras JÁ GERADAS ganham o bloco sem regerar** — o founder baixa o PDF de
+uma leitura antiga e o bloco está lá; (3) **nenhuma calibração de Sonnet** foi necessária.
+⇒ o markdown continua com 7 blocos; a exibição tem 8. `diDe()` faz a ponte.
+
+**Ordenação por CONVERGÊNCIA** (nº de achados independentes que sustentam o nutriente), a
+mesma régua da corroboração das crenças. Na leitura real do founder: complexo B e magnésio
+com 4 sinais cada, zinco/fibras/água com 2.
+
+**Guardrails implementados em CÓDIGO, não só em comentário:**
+- sem dose, frequência, duração ou nome de exame — nada disso existe na tabela;
+- **sem a FORMA do nutriente** ("magnésio", nunca "magnésio glicinato") — é a única
+  divergência deliberada do dossiê, porque este bloco vai ao CLIENTE e forma específica
+  funciona como ordem de compra;
+- **o bloco SOME inteiro** se nenhum achado sustentar suporte. Sair curto é honesto;
+- **TETO de 4 nos suportes de sinal único** — sem ele saíam 8 isolados junto com 4
+  convergentes, e lista longa de "pode ser isso, pode ser aquilo" é o formato que serve pra
+  qualquer pessoa (alarme Forer). Os convergentes não têm teto. ⚠️ O que é cortado vai pro
+  log, não some calado;
+- **MTC/Ayurveda NÃO são nomeadas.** As 9 regras absolutas proíbem citar escola no documento.
+  "Deficiência de Qi do Baço" virou "o que você não digere — comida ou acontecimento — o
+  corpo trata no mesmo lugar". A tradição informa a frase; o nome dela fica no lastro.
+
+**Dois defeitos de duplicação pegos ANTES de subir** (mesma família dos rótulos duplicados):
+1. o "porquê" vinha do CAMPO, então complexo B e magnésio — ambos sustentados pelo fígado —
+   saíam com **a mesma frase**. Criada uma segunda tabela, **porquê por NUTRIENTE**.
+2. a "leitura" simbólica é do campo, e vários nutrientes dividem o campo → repetia dentro dos
+   itens. Saiu dos itens e virou uma lista **deduplicada** no fim do bloco.
+
+**Status:** APLICADA. Build verde, 0 páginas vazias, 31 páginas, linha de base de testes
+inalterada. ⏳ Falta o veredito do founder em prod.
+
 ## Como usar
 
 - **Ao tomar uma decisão:** registrar aqui na mesma sessão, com razão e status.

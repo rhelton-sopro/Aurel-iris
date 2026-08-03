@@ -37,7 +37,15 @@ const B6HTML = PROTO6.slice(PROTO6.indexOf('<p class="method-sub">'), PROTO6.ind
 // escopo do módulo quando a barra de progresso da geração passou a precisar deles —
 // a alternativa era uma segunda lista em lib/, e lista duplicada vira deriva (foi
 // assim que o método de 7 movimentos ficou 7 dias aprovado sem chegar ao prompt).
-export const NUMS_BLOCOS = ['1', '2', '3', '4', '5', '6', '7']
+// ⭐ 8 BLOCOS desde 2026-08-03: "Repertório de suporte" entrou como 7 e empurrou
+// "Perguntas para a sua sessão" para 8 (decisão do founder).
+// ⚠️ O MARKDOWN continua com 7 blocos — o Sonnet NÃO escreve o repertório. Ele é montado
+// inteiro pelo render a partir do motor (lista determinística + moldura fixa), do mesmo
+// jeito que as crenças. Duas consequências boas: leituras JÁ GERADAS ganham o bloco sem
+// regerar, e não há como o modelo inventar carência.
+// ⇒ índice do markdown (0..6) ≠ índice de exibição (0..7). Ver `diDe()` mais abaixo.
+export const NUMS_BLOCOS = ['1', '2', '3', '4', '5', '6', '7', '8']
+export const IDX_SUPORTE = 6 // posição de exibição do bloco novo
 export const TITULOS_BLOCOS = [
   'Em poucas palavras',
   'Mente, coração e corpo — a sua mistura',
@@ -50,8 +58,11 @@ export const TITULOS_BLOCOS = [
   // vocabulário aprovado da legenda: pesa / afrouxa.
   'O que pesa — e pra onde afrouxa',
   'Crenças a serem trabalhadas',
+  'Repertório de suporte',
   'Perguntas para a sua sessão',
 ]
+// markdown (0..6) → exibição (0..7): tudo a partir de "Perguntas" desloca um.
+const diDe = (i) => (i < IDX_SUPORTE ? i : i + 1)
 
 export function renderHTML(md, exame, nome, opts = {}) {
   const MD = md
@@ -416,6 +427,72 @@ function block6(body) {
 // metodo7.mjs; as FALAS ancoradas (movimentos 2, 3, 5, 6 e o micro-passo do 7) vêm do
 // Sonnet. O método é igual pra todo mundo; a fala é da pessoa. Isso existia aprovado
 // desde 21/07 num HTML e nunca tinha sido ligado — o bloco saía com 5 tempos rasos.
+// ---------- BLOCO 7 — REPERTÓRIO DE SUPORTE (100% determinístico) ----------
+// Lastro: `lastro/tabela-carencias-LASTRO.md`. Motor: `r.suporteList` (ordenado por
+// CONVERGÊNCIA — nº de achados independentes que sustentam o nutriente).
+//
+// ⛔ GUARDRAILS que este código IMPLEMENTA (não são só comentário):
+//   · sem dose, frequência, duração ou nome de exame — nada disso existe na tabela;
+//   · sem FORMA do nutriente ("magnésio", nunca "magnésio glicinato") — decisão do
+//     founder porque este bloco vai ao CLIENTE, e forma específica vira ordem de compra;
+//   · nada aparece sem achado que sustente — a lista vem do motor, não de texto;
+//   · bloco SOME por inteiro quando não há suporte sustentado (`if (!lista.length)`).
+//     Sair curto, ou não sair, é resultado honesto.
+const H2_SUPORTE = 'O que vale olhar com quem te acompanha'
+const SUPORTE_LEAD = 'O que segue não é receita nem diagnóstico. São áreas que os sinais desta leitura sugerem observar — para você conversar com quem acompanha a sua saúde, que é quem pode avaliar se faz sentido no seu caso.'
+const SUPORTE_FECHO = 'Nada aqui substitui avaliação profissional, e nenhuma dessas áreas deve virar suplemento por conta própria. A leitura aponta onde olhar; quem decide o que fazer é você, com apoio de quem te acompanha.'
+function blockSuporte() {
+  const lista = (r.suporteList || [])
+  if (!lista.length) return null // sem achado que sustente, o bloco não existe
+  const conv = lista.filter((s) => s.convergente)
+  // ⚠️ TETO nos isolados. Sem ele saíam 8 nutrientes de sinal único junto com 4
+  // convergentes — e uma lista longa de "pode ser isso, pode ser aquilo" é o formato que
+  // serve pra qualquer pessoa (alarme Forer que as personas já dispararam uma vez).
+  // Os convergentes NÃO têm teto: quanto mais achados independentes, mais legítimo.
+  const CAP_ISOLADOS = 4
+  const isoladosTodos = lista.filter((s) => !s.convergente)
+  const isolados = isoladosTodos.slice(0, CAP_ISOLADOS)
+  if (isoladosTodos.length > CAP_ISOLADOS) {
+    console.log(`   · repertório: ${isoladosTodos.length - CAP_ISOLADOS} suporte(s) de sinal único omitido(s) pelo teto (${isoladosTodos.slice(CAP_ISOLADOS).map((x) => x.nutriente).join(', ')})`)
+  }
+
+  const item = (s) => {
+    const forca = s.n >= 3 ? 'forte' : s.n === 2 ? 'moderado' : 'isolado'
+    const o = s.origem || {}
+    return `<div class="sup-item sup-${forca}">
+      <div class="sup-h"><span class="sup-n">${esc(cap(s.nutriente))}</span>
+        <span class="sup-sinal">${s.n} ${s.n === 1 ? 'sinal' : 'sinais'}</span></div>
+      ${s.porque ? `<p class="sup-p">${esc(s.porque)}</p>` : ''}
+    </div>`
+  }
+  const grupo = (titulo, itens, nota) => itens.length
+    ? `<p class="grouplab carga"><span class="gd"></span>${titulo}</p>
+       ${nota ? `<p class="sup-nota">${nota}</p>` : ''}${itens.map(item).join('')}`
+    : ''
+
+  // A leitura simbólica é do CAMPO, não do nutriente — vários nutrientes dividem o mesmo
+  // campo, então dentro do item ela saía repetida (o mesmo "órgão do impulso" embaixo de
+  // complexo B e de magnésio). Sai uma vez só, deduplicada, ordenada por intensidade.
+  const vistas = []
+  const jaVi = new Set()
+  for (const s2 of lista) {
+    const o = s2.origem
+    if (!o || !o.leitura || jaVi.has(o.leitura)) continue
+    jaVi.add(o.leitura); vistas.push(o)
+  }
+  vistas.sort((a, b) => (b.int || 0) - (a.int || 0))
+  const leituras = vistas.length
+    ? `<p class="grouplab livre"><span class="gd"></span>O que isso conversa com o resto da leitura</p>`
+      + vistas.map((o) => `<p class="sup-l">${esc(o.leitura)}</p>`).join('')
+    : ''
+
+  return `<p class="lead">${SUPORTE_LEAD}</p>
+    ${grupo('O que mais se repete na leitura', conv, 'Aparecem em mais de um sinal independente — por isso pesam mais.')}
+    ${grupo('Sinais isolados', isolados, 'Vieram de um único sinal. Ficam registrados, mas valem menos que os de cima.')}
+    ${leituras}
+    <div class="medicine"><p class="med-lab">Antes de fazer qualquer coisa com isto</p><p>${SUPORTE_FECHO}</p></div>`
+}
+
 function block7(body) {
   const out = [B6HTML.slice(0, B6HTML.indexOf('<div class="qsec"'))]
   const g1 = (k) => { const m = body.match(new RegExp(`^@${k}:[ \\t]*(.*)`, 'm')); return m ? m[1].trim() : '' }
@@ -500,13 +577,14 @@ const omitido = (b) => !!omitirRx && omitirRx.some((rx) => new RegExp(rx, 'i').t
 const sections = blocks.map((b, i) => {
   if (omitido(b)) return null
   const nl = b.indexOf('\n'); const title = b.slice(0, nl).trim(); const body = b.slice(nl + 1)
-  const eyebrow = `<p class="eyebrow"><span class="secnum">${NUMS[i] || ''}</span> &nbsp;${esc(title)}</p>`
-  const h2 = (i === 0 || i === 6) ? '' : `<h2 class="display">${esc(H2[i] || title)}</h2>`
+  const di = diDe(i) // índice de EXIBIÇÃO (o markdown tem 7 blocos; o doc mostra 8)
+  const eyebrow = `<p class="eyebrow"><span class="secnum">${NUMS[di] || ''}</span> &nbsp;${esc(title)}</p>`
+  const h2 = (i === 0 || i === 6) ? '' : `<h2 class="display">${esc(H2[di] || title)}</h2>`
   let inner
   try {
     inner = i === 0 ? block1(body) : i === 1 ? block2(body) : i === 2 ? block3(body) : i === 3 ? block4(body) : i === 4 ? block5(body) : i === 5 ? block6(body) : block7(body)
   } catch (e) { inner = prose(body) + `<!-- render fallback: ${e.message} -->` }
-  return `<section class="block" id="b${i + 1}">${eyebrow}${h2}${inner}</section>`
+  return `<section class="block" id="b${di + 1}">${eyebrow}${h2}${inner}</section>`
 })
 // ÍNDICE — gerado aqui, não pelo prompt: o render já sabe os 6 títulos, então não gasta
 // token e não corre risco de o Sonnet inventar seção. Entra logo depois do bloco 1.
@@ -514,11 +592,13 @@ const sections = blocks.map((b, i) => {
 // canônicos; a diferença aparece na versão do cliente (que omite o guia de sessão) e
 // em documento defeituoso — antes, o índice fixo anunciava uma seção ausente e
 // apontava para uma âncora inexistente.
+const supHtml = blockSuporte()
+const tocLinhas = blocks.map((b, i) => omitido(b) ? null : { di: diDe(i), t: H2[diDe(i)] || tituloDe(b) }).filter(Boolean)
+// o repertório só entra no índice se o bloco existir de fato (pode não haver suporte sustentado)
+if (supHtml) tocLinhas.push({ di: IDX_SUPORTE, t: H2[IDX_SUPORTE] })
+tocLinhas.sort((a, b) => a.di - b.di)
 const toc = `<nav class="toc"><p class="toc-lab">O que vem a seguir</p>${
-  blocks.map((b, i) => omitido(b)
-    ? ''
-    : `<a class="toc-row" href="#b${i + 1}"><span class="toc-n">${NUMS[i] || i + 1}</span><span class="toc-t">${esc(H2[i] || tituloDe(b))}</span></a>`,
-  ).join('')
+  tocLinhas.map((x) => `<a class="toc-row" href="#b${x.di + 1}"><span class="toc-n">${NUMS[x.di] || x.di + 1}</span><span class="toc-t">${esc(x.t)}</span></a>`).join('')
 }</nav>`
 // bloco 7 (guia de condução) é método fixo — o render ANEXA, o Sonnet não escreve.
 // Assim não depende de quantos blocos vieram do markdown e o modelo para de gastar
@@ -527,7 +607,14 @@ const toc = `<nav class="toc"><p class="toc-lab">O que vem a seguir</p>${
 // O índice entra depois do PRIMEIRO bloco presente — não em `sections[0]` fixo: com
 // filtro de blocos aquele índice pode ter saído, e concatenar em null imprimia
 // literalmente "null<nav…" no documento do cliente.
-const presentes = sections.filter(Boolean)
+// o repertório é montado pelo RENDER (não vem do markdown), então entra aqui, na posição
+// de exibição 6 — entre "Crenças" e "Perguntas".
+const secSuporte = supHtml
+  ? `<section class="block" id="b${IDX_SUPORTE + 1}"><p class="eyebrow"><span class="secnum">${NUMS[IDX_SUPORTE]}</span> &nbsp;${esc(TITULOS_BLOCOS[IDX_SUPORTE])}</p><h2 class="display">${esc(H2_SUPORTE)}</h2>${supHtml}</section>`
+  : null
+const comSuporte = [...sections]
+comSuporte.splice(IDX_SUPORTE, 0, secSuporte)
+const presentes = comSuporte.filter(Boolean)
 const sectionsHtml = presentes.length
   ? [presentes[0] + toc, ...presentes.slice(1)].join('\n<hr class="div">\n')
   : ''
