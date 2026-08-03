@@ -339,6 +339,37 @@ export function loadIntegrativas() {
 }
 const INTEG = loadIntegrativas()
 
+// ---------- EXERCÍCIOS por FAMÍLIA EMOCIONAL (founder, 2026-08-03) ----------
+// Lê `tabela-exercicios-LASTRO.md`. Substitui a §4 (práticas contemplativas por
+// CALMAR/LIBERAR/ATIVAR), que entregava a MESMA lista para quase todo mundo: medido em
+// 03/08, 5 das 6 leituras do lab recebiam os três mesmos exercícios, 67% de sobreposição
+// média. A causa era a chave — 3 famílias × ~4 itens, com CALMAR de desempate.
+//
+// A chave agora é a FAMÍLIA EMOCIONAL (as 13 de `emocao-familia.md`, que vêm do mapa
+// emocional e por isso são individuais) cruzada com a MODALIDADE. CALMAR/LIBERAR/ATIVAR
+// não morre: vira TRAVA de segurança (ver `travaOk` abaixo).
+const EXERC_MD = path.join(LAB_DIR, 'lastro/tabela-exercicios-LASTRO.md')
+export function loadExercicios() {
+  const md = fs.readFileSync(EXERC_MD, 'utf8')
+  const out = {}
+  for (const l of md.split(/\r?\n/)) {
+    // 6 colunas: familia | modalidade | exercicio | detalhe | trava | fonte.
+    // A tabela de MODALIDADES tem 2 colunas e a de TRAVAS tem 2 — não casam aqui.
+    const m = l.match(/^\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*$/)
+    if (!m) continue
+    const [, fam, mod, sug, det, trava, fonte] = m
+    if (fam === 'família' || /^-+$/.test(fam)) continue // cabeçalho e separador
+    ;(out[fam] ||= []).push({ sug, det, mod, trava: trava.toUpperCase(), fonte })
+  }
+  return out
+}
+const EXERCICIOS = loadExercicios()
+
+// TRAVA — a única regra que pode BARRAR um exercício individualmente.
+// ATIVAR só sai em padrão ATIVAR: ativar quem está exausto piora, e essa é a razão de
+// CALMAR ser o desempate desde a v1 do bloco 8. O resto passa.
+const travaOk = (trava, familiaPadrao) => trava !== 'ATIVAR' || familiaPadrao === 'ATIVAR'
+
 // FAMÍLIA contemplativa — escolhida pelo PADRÃO (é a categoria que o dossiê considera a mais
 // perigosa para Forer). Pontua as três e fica com a maior; EMPATE → CALMAR, porque baixar
 // ativação não machuca ninguém e ATIVAR em quem está exausto piora.
@@ -634,8 +665,60 @@ function calc(exameOuNome, lastro) {
     if (floraisList.length >= 3) break
   }
 
+  // ---- EXERCÍCIOS: família emocional × modalidade (2026-08-03) ----
+  // DOIS eixos, os dois individuais — é o que impede a lista de repetir:
+  //
+  //   1. QUAL família emocional, na ordem do peso da carga (o mesmo rank do mapa emocional).
+  //   2. QUAL modalidade dentro dela, pelo CENTRO mais carregado desta leitura — o mesmo
+  //      mente/coração/corpo das agulhas que o cliente vê no bloco 2.
+  //
+  // Sem o eixo 2, duas pessoas com Raiva no topo recebiam o mesmo exercício de Raiva: medido,
+  // "Empurrar a parede" saía em 6 de 6 leituras. Com ele, quem está carregado no CORPO entra
+  // por movimento/somático e quem está carregado na MENTE entra por atenção/respiração —
+  // pela porta que está aberta nesta pessoa.
+  const MOD_POR_CENTRO = {
+    corpo: ['somático', 'movimento', 'toque', 'respiração', 'atenção'],
+    mente: ['atenção', 'respiração', 'somático', 'movimento', 'toque'],
+    coracao: ['toque', 'movimento', 'atenção', 'respiração', 'somático'],
+  }
+  const centrosPorCarga = ['mente', 'coracao', 'corpo'].sort((a, b) => centro[b].t - centro[a].t)
+  const prefMod = []
+  for (const c of centrosPorCarga) for (const mo of MOD_POR_CENTRO[c]) if (!prefMod.includes(mo)) prefMod.push(mo)
+  const rankMod = (mo) => { const i = prefMod.indexOf(mo); return i < 0 ? 99 : i }
+
+  const exercicios = []
+  const modUsadas = new Set()
+  const famUsadas = new Set()
+  const famsOrdenadas = []
+  for (const [emo] of rankedCarga) {
+    const f = familiaDe(emo)
+    if (f && EXERCICIOS[f] && !famsOrdenadas.includes(f)) famsOrdenadas.push(f)
+  }
+  // 2 passadas: a 1ª pega no máximo um por família (espalha), a 2ª completa o teto.
+  for (const soUmPorFamilia of [true, false]) {
+    for (const f of famsOrdenadas) {
+      if (exercicios.length >= 3) break
+      if (soUmPorFamilia && famUsadas.has(f)) continue
+      const candidatos = EXERCICIOS[f]
+        .filter((ex) => travaOk(ex.trava, familiaEscolhida))
+        .filter((ex) => !modUsadas.has(ex.mod))
+        .filter((ex) => !exercicios.some((x) => x.sug === ex.sug))
+        // ordem da tabela desempata — determinístico, nunca aleatório
+        .sort((a, b) => rankMod(a.mod) - rankMod(b.mod))
+      const escolhidos = soUmPorFamilia ? candidatos.slice(0, 1) : candidatos
+      for (const ex of escolhidos) {
+        if (exercicios.length >= 3) break
+        if (modUsadas.has(ex.mod)) continue
+        exercicios.push({ ...ex, familiaEmocional: f })
+        modUsadas.add(ex.mod)
+        famUsadas.add(f)
+      }
+    }
+  }
+
   const integrativas = {
     familia: familiaEscolhida,
+    exercicios,
     placar,
     eixos: eixosOrdenados.map(([e, i]) => ({ eixo: e, int: i })),
     nutricao: porCategoria(INTEG.nutricao),

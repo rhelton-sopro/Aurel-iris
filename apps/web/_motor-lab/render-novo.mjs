@@ -466,10 +466,14 @@ function block6(body) {
 // ⛔ Categoria sem lastro nesta leitura não sai — nem com título.
 const H2_INTEG = 'Pequenas mudanças que cabem no seu dia'
 const INTEG_LEAD = 'Caminhos que a leitura sugere experimentar. <b>Nada aqui é receita nem tratamento</b> — são possibilidades para você escolher, no seu ritmo, com quem acompanha a sua saúde.'
+// 2026-08-03: a nota mudou junto com o critério. Antes ela dizia que as práticas eram
+// "de descida" — o que deixou de ser verdade quando a escolha passou a ser pela emoção:
+// em padrão CALMAR sai "Empurrar a parede", que é de soltar, e a nota contradizia a lista.
+// O que a trava garante é só isto: nada que ATIVE quem está em alerta.
 const FAMILIA_TXT = {
-  CALMAR: 'A leitura aponta um corpo em alerta — então as práticas abaixo são de descida, não de estímulo.',
-  ATIVAR: 'A leitura aponta dispersão e queda de energia — então as práticas abaixo religam o pulso, sem cobrança.',
-  LIBERAR: 'A leitura aponta expressão retida — então as práticas abaixo são de soltar, não de acalmar.',
+  CALMAR: 'A leitura aponta um corpo em alerta — nada aqui puxa para cima. Escolhidas pela emoção que mais pesa hoje.',
+  ATIVAR: 'A leitura aponta queda de energia — aqui o caminho é religar o pulso, sem cobrança. Escolhidas pela emoção que mais pesa hoje.',
+  LIBERAR: 'A leitura aponta expressão retida — aqui o caminho é soltar. Escolhidas pela emoção que mais pesa hoje.',
 }
 function blockIntegrativas(versaoCliente) {
   const I = r.integrativas
@@ -481,7 +485,10 @@ function blockIntegrativas(versaoCliente) {
   const corpo = [
     cat('Na alimentação', I.nutricao),
     cat('No corpo', I.corporais),
-    cat(`Na prática diária · ${I.familia}`, I.contemplativas, FAMILIA_TXT[I.familia] || ''),
+    // Exercícios por FAMÍLIA EMOCIONAL desde 2026-08-03 (antes: 3 fixos por padrão, que
+    // davam a mesma lista para 5 de 6 leituras). `contemplativas` fica de rede: leitura sem
+    // emoção de carga com exercício no lastro continua recebendo o bloco.
+    cat(`Na prática diária · ${I.familia}`, I.exercicios?.length ? I.exercicios : I.contemplativas, FAMILIA_TXT[I.familia] || ''),
     cat('Florais', I.florais, 'Escolhidos pelo que pesa hoje, não pelo órgão.'),
     versaoCliente ? '' : cat('Fitoterapia tradicional', I.fito, 'Para você avaliar.'),
     // ADAPTOGENOS REMOVIDOS (founder, 2026-08-03). Era a unica categoria com interacao

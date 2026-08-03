@@ -32,6 +32,7 @@ import { readFileSync } from 'node:fs'
 }
 
 const { renderHTML, TITULOS_BLOCOS, OMITIR_RX_POR_BLOCO } = await import('../_motor-lab/render-novo.mjs')
+const { calc, parseLastro } = await import('../_motor-lab/motor-calc.mjs')
 const md = readFileSync('../_motor-lab/out/novo-miguel--sonnet-5.md', 'utf8')
 const { html, AG } = renderHTML(md, 'miguel', 'Teste')
 if (!html || html.length < 50000) throw new Error('HTML suspeito: ' + html.length)
@@ -103,6 +104,50 @@ if (usos < 20) {
     process.exit(1)
   }
   console.log(`✓ seleção de blocos OK — ${todos.length} blocos, cada um provado nos dois sentidos`)
+}
+
+// ⭐ ANTI-FORER DOS EXERCÍCIOS (founder, 2026-08-03) — o guard que mede o que o olho não vê.
+//
+// O bloco "Na prática diária" entregava a MESMA lista para 5 das 6 leituras do lab: 67% de
+// sobreposição média. Não dava para perceber lendo UM relatório — só comparando vários, que
+// é exatamente o que ninguém faz à mão. Depois de indexar por família emocional × canal
+// carregado: 13%.
+//
+// TETO 35%: acima disso o bloco voltou a ser genérico, mesmo que cada linha pareça boa
+// isolada. Fail-open quando faltam exames locais (`_exame-*.json` não são versionados) —
+// avisa e segue, como o detector de páginas vazias.
+{
+  const NOMES = ['daniel', 'miguel', 'opus', 's5novo', 'self', 'victor']
+  const L = parseLastro()
+  const listas = []
+  for (const n of NOMES) {
+    try { listas.push({ n, ex: calc(n, L).integrativas.exercicios.map((x) => x.sug) }) }
+    catch { /* exame ausente nesta máquina — ver fail-open acima */ }
+  }
+  if (listas.length < 3) {
+    console.log(`⚠ anti-Forer dos exercícios PULADO — só ${listas.length} exame(s) local(is) (precisa de 3+).`)
+  } else {
+    let soma = 0, pares = 0, identicos = 0
+    for (let i = 0; i < listas.length; i++) for (let j = i + 1; j < listas.length; j++) {
+      const a = new Set(listas[i].ex), b = listas[j].ex
+      if (!a.size && !b.length) continue
+      soma += b.filter((x) => a.has(x)).length / Math.max(a.size, b.length, 1)
+      pares++
+      if (listas[i].ex.join('|') === listas[j].ex.join('|')) identicos++
+    }
+    const pct = Math.round((100 * soma) / pares)
+    if (identicos) {
+      console.error(`⛔ ${identicos} par(es) de leituras recebem exercícios IDÊNTICOS — o bloco voltou a ser genérico.`)
+      for (const l of listas) console.error(`   ${l.n}: ${l.ex.join(' · ')}`)
+      process.exit(1)
+    }
+    if (pct > 35) {
+      console.error(`⛔ sobreposição dos exercícios em ${pct}% (teto 35%) — o bloco está servindo pra qualquer um.`)
+      for (const l of listas) console.error(`   ${l.n}: ${l.ex.join(' · ')}`)
+      process.exit(1)
+    }
+    console.log(`✓ anti-Forer dos exercícios OK — ${pct}% de sobreposição em ${listas.length} leituras (teto 35%, era 67%)`)
+  }
 }
 
 console.log('✓ render OK —', html.length, 'chars · AG', JSON.stringify(AG), '·', usos, 'pictogramas')
