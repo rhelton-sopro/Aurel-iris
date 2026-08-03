@@ -439,7 +439,7 @@ function block6(body) {
 // O sinalizador é o mesmo do guia de sessão: se "Perguntas para a sua sessão" foi omitido,
 // é a versão do cliente.
 // ⛔ Categoria sem lastro nesta leitura não sai — nem com título.
-const H2_INTEG = 'Caminhos para experimentar'
+const H2_INTEG = 'Pequenas mudanças que cabem no seu dia'
 const INTEG_LEAD = 'Caminhos que a leitura sugere experimentar. <b>Nada aqui é receita nem tratamento</b> — são possibilidades para você escolher, no seu ritmo, com quem acompanha a sua saúde.'
 const FAMILIA_TXT = {
   CALMAR: 'A leitura aponta um corpo em alerta — então as práticas abaixo são de descida, não de estímulo.',
@@ -459,7 +459,9 @@ function blockIntegrativas(versaoCliente) {
     cat(`Na prática diária · ${I.familia}`, I.contemplativas, FAMILIA_TXT[I.familia] || ''),
     cat('Florais', I.florais, 'Escolhidos pelo que pesa hoje, não pelo órgão.'),
     versaoCliente ? '' : cat('Fitoterapia tradicional', I.fito, 'Para você avaliar.'),
-    versaoCliente ? '' : cat('Adaptógenos', I.adapto, 'Para você avaliar. Considere acompanhamento de profissional habilitado antes de iniciar.'),
+    // ADAPTOGENOS REMOVIDOS (founder, 2026-08-03). Era a unica categoria com interacao
+    // farmacologica real, ja restrita ao terapeuta, e entregava UMA linha. O peso
+    // regulatorio nao compensava o que acrescentava. A tabela fica no lastro se voltar.
   ].filter(Boolean).join('')
   if (!corpo) return null
   return `<p class="lead">${INTEG_LEAD}</p>${corpo}`

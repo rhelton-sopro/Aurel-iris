@@ -648,6 +648,40 @@ conta do founder, o Supabase aceitou e o e-mail chegou — para ele e para ela.
 **Status:** APLICADA. ⏳ Pendente decidir se o endereço passa a ser pedido no cadastro inicial,
 que eliminaria a classe do problema em vez de sinalizá-la.
 
+### 2026-08-03 — Bloco 8: adaptógenos SAEM, título travado, e o que a revisão do founder pegou
+**Adaptógenos removidos** (founder: *"pode tirar"*). Era a única categoria com **interação
+farmacológica real**, já restrita ao terapeuta, e entregava **uma linha**. O peso regulatório
+não compensava. ⚠️ A tabela continua no lastro se um dia voltar.
+**Título travado:** `Pequenas mudanças que cabem no seu dia` — escolhido entre 3 opções.
+⚠️ Contraponto registrado: é o mais longo (pode quebrar em 2 linhas no celular) e o único que
+promete resultado, então é também o que mais se aproxima de conselho. Founder escolheu ciente.
+
+**⚠️⚠️ O QUE ESTA REVISÃO ENSINOU — eu declarei a fonte resolvida e não estava.**
+Founder: *"essa fonte tá diferente da nossa. Eu já pedi pra corrigir e não foi corrigido."*
+Ele estava certo. Depois de embarcar Pagella+Inter eu **introduzi três coisas novas** que
+puxavam fonte de fora, e não reconferi:
+- a seta `→` (U+2192) — não existe em nenhuma das duas → puxava Segoe UI/Liberation Sans.
+  Agora é **desenhada em CSS** (borda girada 45°); na prosa do método virou ponto médio.
+- os símbolos **⚠️ e ◆ que eu mesmo escrevi** → puxavam **Cambria Math**.
+**Lição:** "resolvido" numa medição não sobrevive às minhas próprias edições seguintes. A
+verificação (ler os `/BaseFont` do PDF) tem que rodar a CADA entrega, não uma vez.
+
+**Texto interno vazou para o documento do cliente** (bug meu, do bloco 8): a anotação da
+camomila — *"só quando o eixo sustenta, é o default mais batido da categoria"* — era nota de
+lastro **para mim**. Idem o hedge da ashwagandha e um "não vai no documento do cliente".
+**Regra:** o campo `det` do lastro é TEXTO DE PRODUTO. Anotação minha vai em comentário, nunca
+na coluna que o render emite.
+
+**Espaço entre seções** (founder: *"tem que dar um espaço de saltar duas linhas, e pra todos"*)
+— efeito colateral de eu ter tirado a quebra de página por seção: com `hr.div{display:none}` a
+margem sumiu junto e as seções colaram. Agora o `<hr>` é **espaçador invisível**
+(`border:0;height:0;margin:52px`) com `break-avoid` dos dois lados — o ar volta sem ele poder
+ganhar uma folha inteira de novo (bug de 01/08).
+
+**Crenças repetia o título** (rótulo e h2 eram a mesma frase, mesmo defeito já corrigido no
+bloco 7). H2 virou *"As regras que você repete sem perceber"* — frase do próprio prompt do
+bloco. **Status:** APLICADA.
+
 ## Como usar
 
 - **Ao tomar uma decisão:** registrar aqui na mesma sessão, com razão e status.
