@@ -63,6 +63,31 @@ export const TITULOS_BLOCOS = [
   'Sugestões integrativas',
   'Perguntas para a sua sessão',
 ]
+
+// Padrões de TÍTULO para tirar um bloco da versão do cliente, indexados pela posição de
+// EXIBIÇÃO (0..8). Fonte única de quem-é-quem no filtro — a UI manda índices, o servidor
+// converte aqui, e o casamento continua sendo por TÍTULO.
+//
+// ⚠️ Os seis primeiros casam com o título que o Sonnet escreve no MARKDOWN, que NÃO é o
+// H2 de exibição ("Como você funciona por dentro" é exibido como "Mente, coração e corpo
+// — a sua mistura"). Já 6 e 7 são os blocos que o render monta sozinho: não há markdown,
+// então casam com o título de exibição.
+//
+// ⛔ Por que não filtrar por posição: documento com bloco faltando acontece de verdade
+// (`out/novo-s5novo` saiu sem "Crenças"), e aí um filtro posicional entregaria o guia de
+// sessão ao cliente exatamente no documento defeituoso. Prefixo curto porque o custo de
+// errar por acento é maior que o de casar demais — nenhum prefixo colide com outro.
+export const OMITIR_RX_POR_BLOCO = [
+  '^em poucas palavras',
+  '^como voc',
+  '^linha do tempo',
+  '^heran',
+  '^mapa emocional',
+  '^cren',
+  '^repert', // montado pelo render
+  '^sugest', // montado pelo render
+  '^perguntas para a sua sess',
+]
 // markdown (0..6) → exibição (0..7): tudo a partir de "Perguntas" desloca um.
 // markdown (0..6) → exibição (0..8): os DOIS blocos montados pelo render entram antes de
 // "Perguntas", então tudo a partir dele desloca DOIS.
@@ -616,7 +641,11 @@ const blocks = MD.split(/^# /m).filter((b) => b.trim())
 // custa o mesmo e não tem esse modo de falha.
 const omitirRx = Array.isArray(opts.omitirTitulos) ? opts.omitirTitulos : null
 const tituloDe = (b) => b.slice(0, b.indexOf('\n')).trim()
-const omitido = (b) => !!omitirRx && omitirRx.some((rx) => new RegExp(rx, 'i').test(tituloDe(b)))
+// 2026-08-03: o filtro passou a valer TAMBÉM para os dois blocos que o render monta
+// sozinho (repertório e sugestões integrativas). Antes só os blocos vindos do markdown
+// podiam sair — com as caixinhas por entrega, o terapeuta escolhe os nove.
+const omitidoTitulo = (t) => !!omitirRx && omitirRx.some((rx) => new RegExp(rx, 'i').test(t))
+const omitido = (b) => omitidoTitulo(tituloDe(b))
 
 const sections = blocks.map((b, i) => {
   if (omitido(b)) return null
@@ -636,10 +665,13 @@ const sections = blocks.map((b, i) => {
 // canônicos; a diferença aparece na versão do cliente (que omite o guia de sessão) e
 // em documento defeituoso — antes, o índice fixo anunciava uma seção ausente e
 // apontava para uma âncora inexistente.
-const supHtml = blockSuporte()
-// versão do cliente = a que omite o guia de sessão. É o mesmo sinalizador do bloco 9.
+const supHtml = omitidoTitulo(TITULOS_BLOCOS[IDX_SUPORTE]) ? null : blockSuporte()
+// versão do cliente = toda geração que passa um filtro de blocos (mesmo vazio). É o que
+// mantém a fitoterapia fora do documento do cliente, independente do que ele marcou.
 const versaoCliente = !!omitirRx
-const intHtml = blockIntegrativas(versaoCliente)
+const intHtml = omitidoTitulo(TITULOS_BLOCOS[IDX_INTEG])
+  ? null
+  : blockIntegrativas(versaoCliente)
 const tocLinhas = blocks.map((b, i) => omitido(b) ? null : { di: diDe(i), t: H2[diDe(i)] || tituloDe(b) }).filter(Boolean)
 // o repertório só entra no índice se o bloco existir de fato (pode não haver suporte sustentado)
 if (supHtml) tocLinhas.push({ di: IDX_SUPORTE, t: H2[IDX_SUPORTE] })

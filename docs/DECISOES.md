@@ -34,7 +34,11 @@ que o founder não lê, não revisa e não pode corrigir.
 | **PDF — scale do Gotenberg** | `0.95` (⚠️ teto **0.97**) | APLICADA | `b9cb2cd` · acima de 0.97 a largura CSS cai abaixo de 700px e o PDF entra no MODO CELULAR |
 | **PDF — paginação** | cada seção e cada Caminho começam em página nova | APLICADA | `bfa6e96` · conferido página a página no PDF real |
 | **Verificação do PDF** | local, via Chrome + CDP (sem Docker) | APLICADA | `c37c62a` + `dc5794f` · `scripts/pdf-local.mjs` e `scripts/pdf-paginas.mjs` |
-| **Versão do cliente** (Mapa do Ser) | tudo menos "Perguntas para a sua sessão"; caixinha inclui | APLICADA | `48b4c00` |
+| **Versão do cliente** (Mapa do Ser) | **o terapeuta escolhe bloco a bloco** — caixinha por bloco, os 9; padrão = tudo menos "Perguntas para a sua sessão" | APLICADA | 2026-08-03 · `VersaoClienteButton.tsx` + `blocos=` na rota do PDF · conferida por `smoke-render.mjs` |
+| **Escopo da escolha de blocos** | por ENTREGA, nada persistido (duas leituras do mesmo cliente podem sair diferentes) | APLICADA | 2026-08-03 |
+| **Fitoterapia tradicional** | do TERAPEUTA — fora da versão do cliente, **sem caixinha** | APLICADA | 2026-08-03 · antes vazava quando o terapeuta marcava "incluir Perguntas" |
+| **"Regenerar análise"** | REMOVIDO da UI (era founder-only, nos dois lugares) — resgate manual só por `/admin/regenerar` | APLICADA | 2026-08-03 |
+| **Rótulo do Dossiê na tela da leitura** | "Gerar dossiê IRIS (antigo relatório) (1 crédito)" | APLICADA | 2026-08-03 · `AntigoRelatorioButton.tsx` |
 
 ---
 

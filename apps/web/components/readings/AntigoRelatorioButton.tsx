@@ -1,8 +1,10 @@
 'use client'
 
 /**
- * "Antigo relatório" — o DOSSIÊ (o Stage 2 que era o relatório de produção até
- * 2026-07-30, quando o Mapa do Ser assumiu como principal).
+ * "Dossiê IRIS" — o Stage 2 que era o relatório de produção até 2026-07-30, quando o
+ * Mapa do Ser assumiu como principal. O rótulo carrega "(antigo relatório)" entre
+ * parênteses (founder, 2026-08-03): o documento tem nome próprio, e a explicação de que
+ * é o antigo vem junto para quem já conhecia a tela.
  *
  * Dois estados:
  *   - já existe  → abre em `/leituras/[id]/dossie` (o principal continua na página
@@ -45,18 +47,18 @@ export function AntigoRelatorioButton({
         data-testid="ver-dossie"
       >
         <FileText className="h-4 w-4" aria-hidden />
-        Antigo relatório
+        Dossiê IRIS (antigo relatório)
       </Link>
     )
   }
 
   async function gerar() {
     const ok = window.confirm(
-      'Gerar o antigo relatório (Dossiê) consome 1 crédito, separado do relatório principal desta leitura.\n\nDeseja continuar?',
+      'Gerar o Dossiê IRIS (o antigo relatório) consome 1 crédito, separado do relatório principal desta leitura.\n\nDeseja continuar?',
     )
     if (!ok) return
     setGerando(true)
-    toast.info('Gerando o antigo relatório — costuma levar 2-3 minutos.')
+    toast.info('Gerando o Dossiê IRIS — costuma levar 2-3 minutos.')
     try {
       const res = await fetch(`/api/readings/${readingId}/analyze?doc=dossie`, {
         method: 'POST',
@@ -92,7 +94,7 @@ export function AntigoRelatorioButton({
           if (done) break
         }
       }
-      toast.success('Antigo relatório gerado.')
+      toast.success('Dossiê IRIS gerado.')
       router.refresh()
     } catch {
       // stream caiu (aba em background, rede) — o servidor continua
@@ -111,14 +113,14 @@ export function AntigoRelatorioButton({
       disabled={disabled || gerando}
       className="gap-2"
       data-testid="gerar-dossie"
-      title="Gera o relatório técnico antigo a partir desta mesma leitura. Consome 1 crédito."
+      title="Gera o Dossiê IRIS — o relatório técnico antigo — a partir desta mesma leitura. Consome 1 crédito."
     >
       {gerando ? (
         <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
       ) : (
         <FileText className="h-4 w-4" aria-hidden />
       )}
-      {gerando ? 'Gerando… (~3 min)' : 'Gerar antigo relatório (1 crédito)'}
+      {gerando ? 'Gerando… (~3 min)' : 'Gerar dossiê IRIS (antigo relatório) (1 crédito)'}
     </Button>
   )
 }

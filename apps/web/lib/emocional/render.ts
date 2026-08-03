@@ -14,6 +14,7 @@ import 'server-only'
 import {
   renderHTML as _renderHTML,
   TITULOS_BLOCOS as _TITULOS,
+  OMITIR_RX_POR_BLOCO as _OMITIR_POR_BLOCO,
 } from '../../_motor-lab/render-novo.mjs'
 
 /**
@@ -44,6 +45,29 @@ const renderHTML = _renderHTML as (
  * guia de sessão ao cliente. Ver a nota no render-novo.mjs.
  */
 export const OMITIR_NA_VERSAO_CLIENTE = ['^perguntas para a sua sess']
+
+/**
+ * Padrão de título de CADA bloco, na ordem de exibição (0..8) — vindo do motor.
+ *
+ * `TITULOS_BLOCOS[i]` é o que o terapeuta lê na caixinha; `OMITIR_RX_POR_BLOCO[i]` é
+ * como aquele bloco é reconhecido no documento. Os dois andam juntos pelo índice.
+ */
+export const OMITIR_RX_POR_BLOCO = _OMITIR_POR_BLOCO as string[]
+
+/**
+ * Seleção do terapeuta (2026-08-03) → filtro do render.
+ *
+ * Recebe os índices de exibição que ele MARCOU e devolve os padrões dos que sobraram de
+ * fora. A escolha é por ENTREGA, não configuração global: chega na query da rota do PDF
+ * e nada é persistido.
+ *
+ * Devolver `[]` (marcou tudo) não é o mesmo que não filtrar: array vazio ainda sinaliza
+ * ao motor que este é o documento do CLIENTE, e é isso que segura a fitoterapia — que é
+ * do terapeuta e nunca dependeu de caixinha.
+ */
+export function omitirDaSelecao(incluidos: readonly number[]): string[] {
+  return OMITIR_RX_POR_BLOCO.filter((_rx, i) => !incluidos.includes(i))
+}
 
 export function renderEmocional(
   markdown: string,

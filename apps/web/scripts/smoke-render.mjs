@@ -31,7 +31,7 @@ import { readFileSync } from 'node:fs'
   }
 }
 
-const { renderHTML } = await import('../_motor-lab/render-novo.mjs')
+const { renderHTML, TITULOS_BLOCOS, OMITIR_RX_POR_BLOCO } = await import('../_motor-lab/render-novo.mjs')
 const md = readFileSync('../_motor-lab/out/novo-miguel--sonnet-5.md', 'utf8')
 const { html, AG } = renderHTML(md, 'miguel', 'Teste')
 if (!html || html.length < 50000) throw new Error('HTML suspeito: ' + html.length)
@@ -54,4 +54,55 @@ if (usos < 20) {
   console.error(`⛔ só ${usos} <use href="#..."> no SVG do transgeracional (esperado 30+). As figuras somem da tela.`)
   process.exit(1)
 }
+// ⛔ SELEÇÃO DE BLOCOS DA VERSÃO DO CLIENTE (founder, 2026-08-03) — provada NOS DOIS
+// SENTIDOS: o bloco desmarcado some E os outros ficam.
+//
+// Mora aqui, e não no vitest, porque o motor é .mjs e não carrega sob o vite (o import
+// morre com SyntaxError antes de qualquer teste rodar). Sem este guard, um padrão que
+// casa demais tira o bloco errado e um que casa de menos entrega ao cliente o guia de
+// condução do terapeuta — nada disso aparece em build, lint ou tsc.
+{
+  const todos = TITULOS_BLOCOS.map((_t, i) => i)
+  if (OMITIR_RX_POR_BLOCO.length !== TITULOS_BLOCOS.length) {
+    console.error('⛔ OMITIR_RX_POR_BLOCO e TITULOS_BLOCOS têm tamanhos diferentes — a caixinha passa a desmarcar o bloco errado.')
+    process.exit(1)
+  }
+  const omitirDaSelecao = (inc) => OMITIR_RX_POR_BLOCO.filter((_rx, i) => !inc.includes(i))
+  const doc = (inc) => renderHTML(md, 'miguel', 'Teste', { omitirTitulos: omitirDaSelecao(inc) }).html
+  const presentes = (h) => todos.filter((i) => h.includes(`<section class="block" id="b${i + 1}"`))
+
+  const cheio = presentes(doc(todos))
+  if (cheio.length !== todos.length) {
+    console.error('⛔ com TODOS os blocos marcados o documento veio incompleto:', cheio.map((i) => i + 1).join(','))
+    process.exit(1)
+  }
+  for (const alvo of todos) {
+    const inc = todos.filter((i) => i !== alvo)
+    const h = doc(inc)
+    const p = presentes(h)
+    if (p.includes(alvo)) {
+      console.error(`⛔ desmarcar "${TITULOS_BLOCOS[alvo]}" NÃO tirou o bloco do documento.`)
+      process.exit(1)
+    }
+    if (h.includes(`href="#b${alvo + 1}"`)) {
+      console.error(`⛔ "${TITULOS_BLOCOS[alvo]}" saiu do documento mas continua no ÍNDICE (âncora morta).`)
+      process.exit(1)
+    }
+    if (inc.some((i) => !p.includes(i))) {
+      console.error(`⛔ desmarcar "${TITULOS_BLOCOS[alvo]}" derrubou outro bloco junto: presentes=${p.map((i) => i + 1).join(',')}`)
+      process.exit(1)
+    }
+  }
+  // fitoterapia é do TERAPEUTA e nunca dependeu de caixinha
+  if (doc(todos).includes('Fitoterapia tradicional')) {
+    console.error('⛔ Fitoterapia tradicional VAZOU para a versão do cliente.')
+    process.exit(1)
+  }
+  if (!html.includes('Fitoterapia tradicional')) {
+    console.error('⛔ Fitoterapia tradicional sumiu do PDF do TERAPEUTA (deveria estar lá).')
+    process.exit(1)
+  }
+  console.log(`✓ seleção de blocos OK — ${todos.length} blocos, cada um provado nos dois sentidos`)
+}
+
 console.log('✓ render OK —', html.length, 'chars · AG', JSON.stringify(AG), '·', usos, 'pictogramas')

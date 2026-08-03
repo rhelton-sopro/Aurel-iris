@@ -22,43 +22,27 @@ beforeEach(() => {
 })
 
 describe('components/readings/ReadingModeActions (Plan 7.4-18 — UAT-3 reading-mode top buttons)', () => {
-  it('founder: renders 4 action buttons when not delivered (Plan 19 + regen founder-only 2026-06-03)', () => {
+  it('renders 3 action buttons when not delivered (Plan 19)', () => {
     render(
-      <ReadingModeActions
-        readingId="reading-123"
-        regenerationCount={0}
-        isDelivered={false}
-        deliveredAt={null}
-        isFounder={true}
-      />,
+      <ReadingModeActions readingId="reading-123" isDelivered={false} deliveredAt={null} />,
     )
     expect(screen.getByTestId('reading-mode-export-pdf')).toBeDefined()
     expect(screen.getByTestId('reading-mode-edit')).toBeDefined()
     expect(screen.getByTestId('reading-mode-deliver')).toBeDefined()
-    expect(screen.getByTestId('reading-mode-regenerate')).toBeDefined()
   })
 
-  it('terapeuta (não-founder): regen escondido — só 3 botões (2026-06-03)', () => {
+  it('"Regenerar análise" NÃO existe mais — nem para founder (founder, 2026-08-03)', () => {
     render(
-      <ReadingModeActions
-        readingId="reading-123"
-        regenerationCount={0}
-        isDelivered={false}
-        deliveredAt={null}
-      />,
+      <ReadingModeActions readingId="reading-123" isDelivered={false} deliveredAt={null} />,
     )
-    expect(screen.getByTestId('reading-mode-export-pdf')).toBeDefined()
-    expect(screen.getByTestId('reading-mode-edit')).toBeDefined()
-    expect(screen.getByTestId('reading-mode-deliver')).toBeDefined()
-    // Regen é exclusivo do founder agora — terapeuta nunca vê.
     expect(screen.queryByTestId('reading-mode-regenerate')).toBeNull()
+    expect(screen.queryByText(/Regenerar/i)).toBeNull()
   })
 
   it('Plan 23: ExportPdfButton renders as Button (no href — direct fetch + blob download)', () => {
     render(
       <ReadingModeActions
         readingId="reading-xyz"
-        regenerationCount={0}
         isDelivered={false}
         deliveredAt={null}
       />,
@@ -78,7 +62,6 @@ describe('components/readings/ReadingModeActions (Plan 7.4-18 — UAT-3 reading-
     render(
       <ReadingModeActions
         readingId="reading-abc"
-        regenerationCount={0}
         isDelivered={false}
         deliveredAt={null}
       />,
@@ -87,50 +70,19 @@ describe('components/readings/ReadingModeActions (Plan 7.4-18 — UAT-3 reading-
     expect(editLink.getAttribute('href')).toBe('/leituras/reading-abc/editar')
   })
 
-  it('Regenerar análise shows {n}/1 counter (cap = 1 regen grátis)', () => {
+  it('isDelivered=true hides edit/deliver but KEEPS o PDF do Dossiê visível (Plan 19)', () => {
     render(
       <ReadingModeActions
         readingId="reading-123"
-        regenerationCount={1}
-        isDelivered={false}
-        deliveredAt={null}
-        isFounder={true}
-      />,
-    )
-    // count=1 (1 geração feita, 0 regen usado) → exibe (0/1)
-    expect(screen.getByText(/Regenerar análise \(0\/1\)/)).toBeDefined()
-  })
-
-  it('Regenerar disabled at 2/1 (1 regen usado) with tooltip explanation', () => {
-    render(
-      <ReadingModeActions
-        readingId="reading-123"
-        regenerationCount={2}
-        isDelivered={false}
-        deliveredAt={null}
-        isFounder={true}
-      />,
-    )
-    const regen = screen.getByTestId('reading-mode-regenerate')
-    expect(regen.hasAttribute('disabled')).toBe(true)
-    expect(regen.getAttribute('aria-label')).toContain('1/1')
-  })
-
-  it('isDelivered=true hides edit/deliver/regenerate but KEEPS o PDF do Dossiê visível (Plan 19)', () => {
-    render(
-      <ReadingModeActions
-        readingId="reading-123"
-        regenerationCount={1}
         isDelivered={true}
         deliveredAt="2026-05-14T15:00:00.000Z"
       />,
     )
     // Plan 19: PDF stays visible — re-export of delivered reading is allowed
     expect(screen.getByTestId('reading-mode-export-pdf')).toBeDefined()
-    // The 3 state-modifying buttons are hidden
+    // Os botões que MODIFICAM estado somem
     expect(screen.queryByTestId('reading-mode-edit')).toBeNull()
     expect(screen.queryByTestId('reading-mode-deliver')).toBeNull()
-    expect(screen.queryByTestId('reading-mode-regenerate')).toBeNull()
     const status = screen.getByTestId('reading-mode-delivered-status')
     expect(status.textContent).toContain('Leitura concluída')
   })
@@ -139,7 +91,6 @@ describe('components/readings/ReadingModeActions (Plan 7.4-18 — UAT-3 reading-
     render(
       <ReadingModeActions
         readingId="reading-123"
-        regenerationCount={0}
         isDelivered={true}
         deliveredAt={null}
       />,
@@ -152,7 +103,6 @@ describe('components/readings/ReadingModeActions (Plan 7.4-18 — UAT-3 reading-
     render(
       <ReadingModeActions
         readingId="reading-123"
-        regenerationCount={0}
         isDelivered={false}
         deliveredAt={null}
       />,
@@ -168,17 +118,14 @@ describe('components/readings/ReadingModeActions (Plan 7.4-18 — UAT-3 reading-
     render(
       <ReadingModeActions
         readingId="reading-self"
-        regenerationCount={0}
         isDelivered={false}
         deliveredAt={null}
         isSelfReading={true}
-        isFounder={true}
       />,
     )
-    // Outros 3 botões seguem renderizando — só o deliver é escondido
+    // Os outros botões seguem renderizando — só o deliver é escondido
     expect(screen.getByTestId('reading-mode-export-pdf')).toBeDefined()
     expect(screen.getByTestId('reading-mode-edit')).toBeDefined()
-    expect(screen.getByTestId('reading-mode-regenerate')).toBeDefined()
     expect(screen.queryByTestId('reading-mode-deliver')).toBeNull()
   })
 })

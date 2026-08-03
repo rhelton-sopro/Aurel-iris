@@ -7,7 +7,7 @@
  *   B — streaming (client-driven, ephemeral): handled by analise-client.tsx
  *   C — generated (report_generated populated): NEW Plan 18 — render
  *       ReportReadView (continuous flowing serif text) with ReadingModeActions
- *       top buttons (Editar análise + Entregar ao cliente + Regenerar análise).
+ *       top buttons (Editar análise + Entregar ao cliente + PDFs).
  *
  * Phase 7.4 Plan 10 (Direction Correction — see 07.4-CONTEXT.md DC-1..DC-10):
  *   The 8-block JSON v2 surface (ReportAdaptiveView + AdvancedAnalysisCTA
@@ -27,7 +27,6 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { createClient } from '@/lib/supabase/server'
-import { isFounderEmail } from '@/lib/auth/founder'
 import { createServiceClient } from '@/lib/supabase/service'
 import { convertReservationToConsume } from '@/lib/billing/credits'
 import { LocalDateTime } from '@/components/ui/local-date-time'
@@ -81,11 +80,9 @@ export default async function LeituraDetailPage({
 
   if (error || !reading) notFound()
 
-  // `ehFounder` continua governando o botão de REGENERAR (2026-06-03: regen saiu
-  // do terapeuta). O Mapa do Ser em si não é mais founder-only desde 2026-07-30 —
+  // 2026-08-03: com a saída do "Regenerar análise", esta página não tem mais nenhuma
+  // ação founder-only — o Mapa do Ser deixou de ser founder-only em 2026-07-30, quando
   // virou o relatório padrão de toda leitura nova.
-  const { data: authUser } = await supabase.auth.getUser()
-  const ehFounder = isFounderEmail(authUser?.user?.email)
 
   // Marca como "vista pelo terapeuta" — derruba o badge de notificação
   // no /dashboard (0026 readings.seen_by_therapist_at). Idempotente:
@@ -271,14 +268,15 @@ export default async function LeituraDetailPage({
     const acoes = (
       <ReadingModeActions
         readingId={readingId}
-        regenerationCount={regenerationCount}
         isDelivered={isDelivered}
         deliveredAt={reading.delivered_at}
         isSelfReading={isSelfReading}
         clientName={clientName}
         clientPhone={clientPhone}
         isAnalysisInProgress={isAnalysisInProgress}
-        isFounder={ehFounder}
+        // Caixinhas da versão do cliente: os títulos vêm do MOTOR (server-only aqui,
+        // client lá). Uma lista só, como no checklist da geração.
+        titulosBlocos={TITULOS_BLOCOS}
         temMapa={temMapa}
         temDossie={hasReport}
       />
@@ -492,8 +490,6 @@ export default async function LeituraDetailPage({
         <AnaliseClient
           readingId={readingId}
           hasInitialReport={hasReport}
-          regenerationCount={regenerationCount}
-          isDelivered={isDelivered}
           isAnalysisInProgress={isAnalysisInProgress}
           // Gerar aqui = gerar o MAPA DO SER (padrão desde 2026-07-30). Os títulos
           // vêm do motor porque `lib/emocional/render` é server-only e o checklist

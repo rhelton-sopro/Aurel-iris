@@ -46,8 +46,6 @@ const BLOCO_RE = /^# /gm
 export interface AnaliseClientProps {
   readingId: string
   hasInitialReport: boolean
-  regenerationCount: number
-  isDelivered: boolean
   /**
    * Server-side flag: análise rodando agora (started_at < 5min, sem
    * finalize ainda). Quando true, esconde o CTA "Gerar análise" pra
@@ -56,8 +54,6 @@ export interface AnaliseClientProps {
    * quando terminar.
    */
   isAnalysisInProgress?: boolean
-  /** Regen só pro founder (2026-06-03) — repassa ao AnalysisCTA. */
-  isFounder?: boolean
   /**
    * Títulos dos 7 blocos do Mapa do Ser, vindos do motor via server component
    * (`lib/emocional/render` é server-only). Presentes = a geração é do Mapa do Ser,
@@ -69,10 +65,7 @@ export interface AnaliseClientProps {
 export function AnaliseClient({
   readingId,
   hasInitialReport,
-  regenerationCount,
-  isDelivered,
   isAnalysisInProgress = false,
-  isFounder = false,
   blocosTitulos,
 }: AnaliseClientProps) {
   const router = useRouter()
@@ -236,10 +229,7 @@ export function AnaliseClient({
           <AnalysisCTA
             readingId={readingId}
             hasReport={hasInitialReport}
-            regenerationCount={regenerationCount}
-            isDelivered={isDelivered}
             onTrigger={handleTrigger}
-            isFounder={isFounder}
           />
           {/* Aviso de ciclo de vida da foto (2026-06-03) — só antes da geração:
               depois de gerar, a foto já foi apagada. */}

@@ -23,7 +23,12 @@
  */
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { renderEmocional, OMITIR_NA_VERSAO_CLIENTE } from '@/lib/emocional/render'
+import {
+  renderEmocional,
+  OMITIR_NA_VERSAO_CLIENTE,
+  OMITIR_RX_POR_BLOCO,
+  omitirDaSelecao,
+} from '@/lib/emocional/render'
 import { REPORT_FONTS } from '@/lib/design/report-tokens'
 import {
   renderCoverHtml,
@@ -79,12 +84,39 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
   // e o terapeuta precisa baixar o PDF do próprio trabalho. O isolamento continua sendo
   // o de sempre: RLS na leitura abaixo (a query não retorna leitura de outro terapeuta).
 
-  // Versão do cliente (2026-07-30): blocos 1-6; o 7 ("Perguntas para a sua sessão") é o
-  // guia de condução do terapeuta e só entra se ele marcar a caixinha (`&guia=1`).
+  // Versão do cliente — O TERAPEUTA ESCOLHE OS BLOCOS (founder, 2026-08-03).
+  //
+  //   `blocos=0,1,2…`  índices de EXIBIÇÃO que ele marcou. Manda a seleção inteira, para
+  //                    que a rota não precise adivinhar o que "não marcado" significa.
+  //   sem `blocos`     comportamento de sempre: tudo menos "Perguntas para a sua sessão",
+  //                    que o `guia=1` reinclui. Mantido porque a conclusão da leitura
+  //                    (`Concluir leitura`) baixa o PDF do cliente sem passar seleção.
+  //
+  // A escolha é por ENTREGA: nada é persistido, cada PDF carrega a sua.
   const sp = new URL(req.url).searchParams
   const isClient = sp.get('variant') === 'client'
   const comGuia = sp.get('guia') === '1'
-  const omitirTitulos = isClient && !comGuia ? OMITIR_NA_VERSAO_CLIENTE : undefined
+  const blocosParam = sp.get('blocos')
+
+  let omitirTitulos: string[] | undefined
+  if (isClient) {
+    if (blocosParam !== null) {
+      const incluidos = blocosParam
+        .split(',')
+        .map((s) => Number(s.trim()))
+        .filter((n) => Number.isInteger(n) && n >= 0 && n < OMITIR_RX_POR_BLOCO.length)
+      // Sem nenhum bloco não há documento — só a capa. Recusar aqui é melhor que
+      // entregar um PDF de uma folha e o terapeuta descobrir na frente do cliente.
+      if (!incluidos.length) {
+        return NextResponse.json({ error: 'selecione ao menos um bloco' }, { status: 400 })
+      }
+      omitirTitulos = omitirDaSelecao(incluidos)
+    } else {
+      // Marcar "incluir Perguntas" NÃO deixa de ser a versão do cliente: por isso `[]`
+      // e não `undefined` — o array vazio é o sinalizador que segura a fitoterapia.
+      omitirTitulos = comGuia ? [] : OMITIR_NA_VERSAO_CLIENTE
+    }
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- colunas da 0051, tipos não regerados
   const db = supabase as unknown as { from: (t: string) => any }
