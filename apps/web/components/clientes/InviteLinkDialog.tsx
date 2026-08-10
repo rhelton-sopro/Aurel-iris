@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { createInviteTokenAction } from '@/app/actions/invites'
+import { buildClientMessage } from '@/lib/invite/mensagem-cliente'
 import { cn } from '@/lib/utils'
 
 interface InviteLinkDialogProps {
@@ -79,20 +80,6 @@ export function InviteLinkDialog({
       }
       setGenerated({ url: res.url, expires_at: res.expires_at ?? '' })
     })
-  }
-
-  // Mensagem pronta que o terapeuta cola no WhatsApp do cliente. Tom de marca
-  // (Bob): não-médico, sóbrio, DIRETA — o cliente já sabe que vai fotografar
-  // (o terapeuta já conversou ao vivo), então nada de "propor"/explicar: é só
-  // o link + a instrução prática da captura. Sem personalização por nome.
-  function buildClientMessage(url: string): string {
-    return `Olá. Aqui está o seu link para a leitura da íris.
-
-Abra no celular, num lugar bem iluminado, e siga o passo a passo — o app guia a foto do seu olho. Leva poucos minutos.
-
-A imagem é apagada assim que o relatório fica pronto, em no máximo 24 horas. O link é só seu e fica disponível por 7 dias:
-
-${url}`
   }
 
   // Ícone ao lado do campo: copia a MENSAGEM completa (não só o link). O
