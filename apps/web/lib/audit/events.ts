@@ -29,6 +29,11 @@ export type AuditEventType =
   | 'lgpd.deletion_requested'
   // Admin (internal_use bypass tracking)
   | 'admin.internal_use_used'
+  // Notificações ao terapeuta. Existe pra ser AUDITÁVEL: quando a leitura da
+  // Melissa (09/08) morreu esperando geração, não deu pra saber se o aviso de
+  // "captura completa" tinha saído — o envio só ia pro console. Agora dá.
+  | 'notification.capture_complete_sent'
+  | 'notification.capture_complete_failed'
 
 export const AUDIT_EVENT_TYPES: ReadonlySet<AuditEventType> = new Set([
   'auth.login',
@@ -52,4 +57,6 @@ export const AUDIT_EVENT_TYPES: ReadonlySet<AuditEventType> = new Set([
   'trial.ended',
   'lgpd.deletion_requested',
   'admin.internal_use_used',
+  'notification.capture_complete_sent',
+  'notification.capture_complete_failed',
 ])

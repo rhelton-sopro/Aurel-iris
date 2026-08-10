@@ -28,6 +28,7 @@
 import 'server-only'
 
 import { createServiceClient } from '@/lib/supabase/service'
+import { logAuditEvent } from '@/lib/audit/log'
 
 const RESEND_API_URL = 'https://api.resend.com/emails'
 // Domínio iriscodex.com verificado no Resend desde 2026-05-22 (founder).
@@ -100,13 +101,19 @@ export async function notifyTherapistCaptureComplete(readingId: string): Promise
   const readingUrl = `${baseUrl}/leituras/${readingId}`
 
   const fromEmail = process.env.RESEND_FROM_EMAIL ?? DEFAULT_FROM
-  const subject = `Captura recebida — análise em andamento — ${clientName}`
+  // ⚠️ O texto anterior dizia "análise em andamento — ficará pronta em poucos minutos".
+  // Era FALSO desde sempre: o relatório só sai quando o terapeuta clica em gerar. O
+  // e-mail avisava e, na mesma frase, ensinava a não fazer nada — foi assim que a
+  // leitura da Melissa (09/08) morreu esperando. Agora o assunto pede a ação, e o corpo
+  // diz a verdade nova: o EXAME já rodou sozinho (Stage 1 automático), falta o
+  // relatório. Ver lib/readings/auto-stage1.ts.
+  const subject = `${clientName} enviou as fotos — gere o relatório`
 
   const textBody = `${greeting},
 
-${clientName} completou a captura das 6 fotografias da íris. A leitura iridológica entrou em processamento e ficará pronta em poucos minutos.
+${clientName} completou as 6 fotografias da íris. O exame já foi processado e está guardado — as fotos são apagadas em 24 horas, mas o relatório continua disponível para você gerar quando quiser.
 
-Você pode acompanhar aqui: ${readingUrl}
+Gerar o relatório: ${readingUrl}
 
 Boas reflexões,
 Equipe Iris Codex`
@@ -117,9 +124,9 @@ Equipe Iris Codex`
 <body style="font-family: Georgia, 'Times New Roman', serif; color: #1a1a1a; max-width: 560px; margin: 0 auto; padding: 32px 24px; line-height: 1.6;">
   <h1 style="font-size: 20px; font-weight: 300; letter-spacing: 0.08em; text-transform: uppercase; color: #1a1a1a; margin: 0 0 24px;">Iris Codex</h1>
   <p style="margin: 0 0 16px;">${greeting},</p>
-  <p style="margin: 0 0 16px;"><strong>${escapeHtml(clientName)}</strong> completou a captura das 6 fotografias da íris. A leitura iridológica entrou em processamento e ficará pronta em poucos minutos.</p>
+  <p style="margin: 0 0 16px;"><strong>${escapeHtml(clientName)}</strong> completou as 6 fotografias da íris. O exame já foi processado e está guardado &mdash; as fotos são apagadas em 24 horas, mas o relatório continua disponível para você gerar quando quiser.</p>
   <p style="margin: 24px 0;">
-    <a href="${readingUrl}" style="display: inline-block; background-color: #1e6b65; color: #ffffff; text-decoration: none; padding: 12px 24px; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;">Acompanhar leitura</a>
+    <a href="${readingUrl}" style="display: inline-block; background-color: #1e6b65; color: #ffffff; text-decoration: none; padding: 12px 24px; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;">Gerar relatório</a>
   </p>
   <p style="margin: 24px 0 0; color: #6b6b6b; font-size: 13px;">Boas reflexões,<br>Equipe Iris Codex</p>
 </body>
@@ -145,9 +152,25 @@ Equipe Iris Codex`
       console.error(
         `[notify] resend HTTP ${res.status} — ${detail.slice(0, 200)}`,
       )
+      // Registrado no banco, não só no console: sem isto não há como responder
+      // depois "o aviso chegou ao terapeuta?" — foi o que faltou no caso Melissa.
+      await logAuditEvent({
+        event_type: 'notification.capture_complete_failed',
+        actor_user_id: token.therapist_id,
+        target_type: 'reading',
+        target_id: readingId,
+        metadata: { status: res.status, detalhe: detail.slice(0, 200) },
+      })
       return
     }
     console.log(`[notify] email enviado pra ${therapistEmail} (reading ${readingId})`)
+    await logAuditEvent({
+      event_type: 'notification.capture_complete_sent',
+      actor_user_id: token.therapist_id,
+      target_type: 'reading',
+      target_id: readingId,
+      metadata: { para: therapistEmail },
+    })
   } catch (err) {
     // Non-fatal — não quebra a pipeline da análise.
     console.error(
