@@ -15,6 +15,17 @@ vi.mock('@/lib/vision/modal-client', async () => {
 })
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }))
 
+// `after()` do Next só existe dentro de um request scope de verdade; chamando a rota
+// direto no teste, ele lança. Aqui ele executa na hora — o que também deixa visível se
+// o trabalho pós-resposta (o Stage 1 automático) quebrar.
+vi.mock('next/server', async (original) => {
+  const real = await original<typeof import('next/server')>()
+  return { ...real, after: (fn: () => unknown) => fn() }
+})
+// O Stage 1 automático tem teste próprio (lib/readings/__tests__/auto-stage1.test.ts);
+// aqui só não pode disparar chamada de API de verdade.
+vi.mock('@/lib/readings/auto-stage1', () => ({ ensureStage1: vi.fn(async () => ({ ok: true })) }))
+
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { ModalTriggerError, triggerVisionPipeline } from '@/lib/vision/modal-client'

@@ -20,14 +20,17 @@
  *
  * NÃO marca used_at — isso vive no /finalize (uma única queima).
  */
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextResponse, after, type NextRequest } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { validateToken, markTokenUsed } from '@/lib/invite/tokens'
 import { buildOriginalStoragePath } from '@/lib/capture/storage-path'
 import { markReadingReady } from '@/lib/readings/mark-ready'
+import { ensureStage1 } from '@/lib/readings/auto-stage1'
 import { notifyTherapistCaptureComplete } from '@/lib/notifications/notify-therapist-capture-complete'
 
 export const runtime = 'nodejs'
+// O Stage 1 automático roda em after() — o tempo dele conta pra função.
+export const maxDuration = 800
 
 const BUCKET = 'iris-captures'
 const VALID_EYES = ['left', 'right'] as const
@@ -204,6 +207,11 @@ export async function POST(
             err instanceof Error ? err.message : err,
           )
         }
+
+        // Exame estruturado JÁ (founder 2026-08-10): roda depois da resposta, sem
+        // debitar crédito. Solta a leitura das fotos que o cron apaga em 24h, pra
+        // ela não morrer se o terapeuta demorar a gerar. Ver auto-stage1.ts.
+        after(() => ensureStage1(readingId))
       }
     }
   }

@@ -37,7 +37,7 @@ import { ReadingModeActions } from '@/components/readings/ReadingModeActions'
 import { AutoRefreshWhileProcessing } from '@/components/readings/AutoRefreshWhileProcessing'
 import { ExpiredReadingActions } from '@/components/readings/ExpiredReadingActions'
 import { MapaDoSerEmbed } from '@/components/readings/MapaDoSerEmbed'
-import { getExameJson } from '@/lib/emocional/findings'
+import { getExameJson, temStage1 } from '@/lib/emocional/findings'
 import { renderEmocional, TITULOS_BLOCOS } from '@/lib/emocional/render'
 import { AnaliseClient } from './analise-client'
 
@@ -212,7 +212,15 @@ export default async function LeituraDetailPage({
   // mostra um toast enganoso de "rodando no servidor" que nunca atualiza. Aqui
   // detectamos o estado terminal (fotos purgadas + sem relatório) e renderizamos
   // um aviso claro + caminho de refazer captura, SEM o botão de gerar.
-  const photosExpired = photosPurgedAt != null && !hasReport
+  //
+  // ⭐ 2026-08-10 — o Stage 1 AUTOMÁTICO muda este estado. Desde que o exame passou a
+  // rodar sozinho no fim da captura, foto apagada NÃO significa mais leitura perdida:
+  // com o exame guardado, o relatório ainda pode ser gerado (o Stage 2 lê o exame, não
+  // as imagens — é o mesmo caminho que já gerava o Dossiê depois do expurgo). Só é
+  // terminal quando não há exame — capturas incompletas e as leituras antigas que
+  // morreram antes deste conserto.
+  const temExameSalvo = await temStage1(readingId)
+  const photosExpired = photosPurgedAt != null && !hasReport && !temExameSalvo
 
   // Parte C (preventiva — 2026-06-29): prazo de geração. O cron photo-ttl apaga
   // as fotos 24h após a captura (readings.created_at), INDEPENDENTE do relatório.
@@ -248,8 +256,17 @@ export default async function LeituraDetailPage({
 
   // Parte C: só avisa o prazo quando a leitura está pronta-pra-gerar, ainda tem
   // fotos e não está gerando agora. (Declarado após isAnalysisInProgress.)
+  //
+  // ⭐ 2026-08-10 — `!temExameSalvo`: com o Stage 1 já rodado, não existe mais prazo
+  // pra correr atrás. Manter o alarme de "gere em 24h" numa leitura que não depende
+  // mais das fotos seria apressar o terapeuta por um risco que não existe — e o aviso
+  // que mente é o que ensina a ignorar os avisos que importam.
   const showPurgeDeadline =
-    status === 'ready' && !hasReport && !photosExpired && !isAnalysisInProgress
+    status === 'ready' &&
+    !hasReport &&
+    !photosExpired &&
+    !isAnalysisInProgress &&
+    !temExameSalvo
 
   // Phase 7.4 Sonnet-direct: signal (no hard block) when ≥1 photo was read
   // from a non-iris-centered frame (canonicalization fallback).

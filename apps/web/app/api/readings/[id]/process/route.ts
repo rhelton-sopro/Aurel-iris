@@ -18,18 +18,21 @@
  *   - D-F5 atomic UPDATE (single .update() call per phase).
  */
 import { revalidatePath } from 'next/cache'
-import { NextResponse } from 'next/server'
+import { NextResponse, after } from 'next/server'
 
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { isModalPipelineEnabled } from '@/lib/vision/pipeline-flag'
 import { markReadingReady } from '@/lib/readings/mark-ready'
+import { ensureStage1 } from '@/lib/readings/auto-stage1'
 import {
   triggerVisionPipeline,
   type ImageUrlEntry,
 } from '@/lib/vision/modal-client'
 
 export const runtime = 'nodejs'
+// O Stage 1 automático roda em after() — o tempo dele conta pra função.
+export const maxDuration = 800
 
 const SIGNED_URL_TTL_SECONDS = 600 // D-T6
 const STATUSES_RETRIGGERABLE = new Set(['pending', 'failed'])
@@ -117,6 +120,12 @@ export async function POST(
     }
     revalidatePath('/leituras')
     revalidatePath(`/leituras/${readingId}`)
+
+    // Exame estruturado JÁ (founder 2026-08-10): mesmo caminho do convite. Roda
+    // depois da resposta, sem debitar crédito. Solta a leitura das fotos que o cron
+    // apaga em 24h — captura de consultório também morria assim. Ver auto-stage1.ts.
+    after(() => ensureStage1(readingId))
+
     return new NextResponse(null, { status: 202 })
   }
 

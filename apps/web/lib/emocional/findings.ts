@@ -24,6 +24,32 @@ import { createServiceClient } from '@/lib/supabase/service'
  * `superseded_at IS NULL`: leitura regerada tem várias linhas aqui, e sem o filtro o
  * `maybeSingle()` devolve erro + null (bug que já mordeu tela, documento e PDF).
  */
+/**
+ * A leitura já tem o exame do Stage 1 guardado?
+ *
+ * Desde o Stage 1 automático (2026-08-10), isto decide se uma leitura cujas FOTOS já
+ * foram apagadas ainda pode virar relatório: com exame salvo, pode — o Stage 2 lê o
+ * exame, não as imagens. Sem ele, a leitura é mesmo terminal e só resta recapturar.
+ *
+ * Service-role pelo mesmo motivo de getExameJson: pela sessão, a policy da 0028 só
+ * responde ao founder — e aqui um `false` errado esconderia o botão de gerar do
+ * terapeuta e mandaria refazer captura à toa.
+ */
+export async function temStage1(readingId: string): Promise<boolean> {
+  const service = createServiceClient()
+  const { data, error } = await service
+    .from('report_findings')
+    .select('id')
+    .eq('reading_id', readingId)
+    .is('superseded_at', null)
+    .maybeSingle<{ id: string }>()
+  if (error) {
+    console.error('[emocional] temStage1 falhou', { readingId, erro: error.message })
+    return false
+  }
+  return data != null
+}
+
 export async function getExameJson(readingId: string): Promise<Record<string, unknown>> {
   const service = createServiceClient()
   const { data, error } = await service

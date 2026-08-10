@@ -20,13 +20,16 @@
  * via /leituras/[id] com seu próprio session token (RLS funciona porque
  * therapist_id da reading é dele).
  */
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextResponse, after, type NextRequest } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { validateToken, markTokenUsed } from '@/lib/invite/tokens'
 import { markReadingReady } from '@/lib/readings/mark-ready'
+import { ensureStage1 } from '@/lib/readings/auto-stage1'
 import { notifyTherapistCaptureComplete } from '@/lib/notifications/notify-therapist-capture-complete'
 
 export const runtime = 'nodejs'
+// O Stage 1 automático roda em after() — o tempo dele conta pra função.
+export const maxDuration = 800
 
 interface FinalizeBody {
   reading_id?: unknown
@@ -155,6 +158,11 @@ export async function POST(
           err instanceof Error ? err.message : err,
         )
       }
+
+      // Exame estruturado JÁ (founder 2026-08-10): roda depois da resposta, sem
+      // debitar crédito. É o que solta a leitura das fotos — que o cron apaga em
+      // 24h — pra ela não morrer se o terapeuta demorar a gerar. Ver auto-stage1.ts.
+      after(() => ensureStage1(readingId))
     }
   }
 
