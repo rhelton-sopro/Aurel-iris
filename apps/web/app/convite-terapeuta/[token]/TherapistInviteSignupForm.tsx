@@ -142,15 +142,22 @@ export function TherapistInviteSignupForm({ tokenEmail, tokenId }: Props) {
       return
     }
 
-    // Marca token usado após sessão criada.
-    // Nice-to-have: se falhar, continua (sessão já está ativa).
-    const markResult = await markTherapistInviteUsedAction(tokenId)
-    if (!markResult.ok) {
-      console.warn('[therapist-invite] markTherapistInviteUsedAction failed:', markResult.error)
-    }
+    // Pós-OTP: nada aqui pode impedir a navegação. Com o código já verificado,
+    // a conta existe e a sessão está ativa — uma falha de rede nestas Server
+    // Actions rejeitava a promise e deixava `verifying` true PARA SEMPRE, com o
+    // botão preso em "Verificando..." (2026-08-09, Daniel Negri no /signup).
+    try {
+      // Marca token usado após sessão criada.
+      const markResult = await markTherapistInviteUsedAction(tokenId)
+      if (!markResult.ok) {
+        console.warn('[therapist-invite] markTherapistInviteUsedAction failed:', markResult.error)
+      }
 
-    // Religa a trial de boas-vindas (idempotente). Mesma trilha do self-signup.
-    await ensureTrialStartedAction()
+      // Religa a trial de boas-vindas (idempotente). Mesma trilha do self-signup.
+      await ensureTrialStartedAction()
+    } catch (err) {
+      console.warn('[therapist-invite] pós-verificação falhou (não bloqueia):', err)
+    }
 
     // Hard navigation: middleware lê o cookie de sessão recém-gravado.
     window.location.assign('/dashboard')

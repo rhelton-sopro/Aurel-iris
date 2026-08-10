@@ -173,9 +173,20 @@ export default function SignupPage() {
       return
     }
 
-    // Religa a trial de boas-vindas (idempotente). Nice-to-have: se falhar, a
-    // sessão já está ativa e o gate/cron pode recriar; não bloqueia a entrada.
-    await ensureTrialStartedAction()
+    // Religa a trial de boas-vindas (idempotente). Nice-to-have: o trigger
+    // handle_new_user (0050) já criou a row na mesma transação do signup.
+    //
+    // try/catch OBRIGATÓRIO (2026-08-09, Daniel Negri): sem ele, uma falha de
+    // rede no POST desta Server Action rejeitava a promise, a função abortava
+    // e `verifying` ficava true PARA SEMPRE — o botão travava em
+    // "Verificando..." com a conta JÁ CRIADA e a sessão JÁ ativa. O usuário
+    // ficava preso numa tela que nunca ia sair. Nada aqui pode impedir a
+    // navegação: se o OTP passou, o cadastro está feito.
+    try {
+      await ensureTrialStartedAction()
+    } catch (err) {
+      console.warn('[signup] ensureTrialStartedAction falhou (não bloqueia):', err)
+    }
 
     // Hard navigation: middleware lê o cookie de sessão recém-gravado.
     window.location.assign('/dashboard')

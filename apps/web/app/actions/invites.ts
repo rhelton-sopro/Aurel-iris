@@ -129,6 +129,92 @@ export type CompleteInviteFormState = {
   error?: Record<string, string[]> | string | null
 }
 
+/** Normaliza e-mail pra comparação/gravação: sem espaços, minúsculo. */
+function normalizeEmail(v: string): string {
+  return v.trim().toLowerCase()
+}
+
+/**
+ * Acha o cadastro que o cliente JÁ tem com ESTE terapeuta, comparando e-mail
+ * sem diferenciar maiúsculas (a constraint clients_therapist_email_unique é
+ * case-sensitive; a comparação aqui é mais larga de propósito, pra reaproveitar
+ * "Daniel.Negri@x.com" quando ele digita "daniel.negri@x.com").
+ *
+ * `%` e `_` são wildcards no ilike — escapados pra não casar o cliente errado
+ * (e-mail com underscore é comum).
+ */
+async function findExistingClientByEmail(
+  service: ReturnType<typeof createServiceClient>,
+  therapistId: string,
+  email: string,
+) {
+  const pattern = normalizeEmail(email).replace(/([\\%_])/g, '\\$1')
+  const { data } = await service
+    .from('clients')
+    .select('id, full_name, birth_date, biological_sex, phone, notes')
+    .eq('therapist_id', therapistId)
+    .ilike('email', pattern)
+    .order('created_at', { ascending: true })
+    .limit(1)
+  return data?.[0] ?? null
+}
+
+/** Derivado do próprio select — não redeclarar os campos à mão, senão o tipo
+ *  daqui e o do banco divergem em silêncio na próxima migration. */
+type ExistingClient = NonNullable<
+  Awaited<ReturnType<typeof findExistingClientByEmail>>
+>
+
+/**
+ * Ao reaproveitar um cadastro que já existia, completa APENAS o que estava em
+ * branco. Nunca sobrescreve dado que o terapeuta já tinha preenchido — o
+ * prontuário dele é a fonte. A observação nova do cliente é anexada (não
+ * substitui) pra não sumir em silêncio: ele digitou achando que ia ser lida.
+ */
+async function fillBlankFields(
+  service: ReturnType<typeof createServiceClient>,
+  existing: ExistingClient,
+  input: {
+    full_name: string
+    birth_date: string
+    biological_sex: string
+    phone: string
+    notes?: string | null
+  },
+): Promise<void> {
+  const patch: {
+    full_name?: string
+    birth_date?: string
+    biological_sex?: string
+    phone?: string
+    notes?: string
+  } = {}
+  const isBlank = (v: string | null) => v === null || v.trim() === ''
+
+  if (isBlank(existing.full_name)) patch.full_name = input.full_name
+  if (isBlank(existing.birth_date)) patch.birth_date = input.birth_date
+  if (isBlank(existing.biological_sex)) patch.biological_sex = input.biological_sex
+  if (isBlank(existing.phone)) patch.phone = input.phone
+
+  // Anexa a observação nova. O `includes` evita repetir o mesmo texto quando o
+  // cliente reenvia o form (duplo toque, voltar-e-mandar-de-novo).
+  const novaNota = input.notes?.trim()
+  const notasAtuais = existing.notes ?? ''
+  if (novaNota) {
+    if (notasAtuais.trim() === '') {
+      patch.notes = novaNota
+    } else if (!notasAtuais.includes(novaNota)) {
+      patch.notes = `${notasAtuais}\n\n${novaNota}`
+    }
+  }
+
+  if (Object.keys(patch).length === 0) return
+
+  const { error } = await service.from('clients').update(patch).eq('id', existing.id)
+  // Nice-to-have: falhar aqui não pode impedir a captura de começar.
+  if (error) console.error('[invite] fillBlankFields falhou:', error.message)
+}
+
 /**
  * Path PÚBLICO — chamado de /convite/[token]/page.tsx pelo cliente sem
  * sessão. Valida o token (NÃO marca used_at — isso só na finalize da
@@ -167,23 +253,55 @@ export async function completeInviteNewClientAction(
   }
 
   const service = createServiceClient()
+  const therapistId = validation.token.therapist_id
+  const email = normalizeEmail(parsed.data.email)
 
   // 1. Cria o client com therapist_id do token (service-role; RLS bypassed).
-  const { data: client, error: clientErr } = await service
-    .from('clients')
-    .insert({
-      therapist_id: validation.token.therapist_id,
-      full_name: parsed.data.full_name,
-      birth_date: parsed.data.birth_date,
-      biological_sex: parsed.data.biological_sex,
-      email: parsed.data.email,
-      phone: parsed.data.phone,
-      notes: parsed.data.notes ?? null,
-    })
-    .select('id')
-    .single()
-  if (clientErr || !client) {
-    return { error: clientErr?.message ?? 'Falha ao criar cliente.' }
+  //
+  // ANTES disso: se este e-mail JÁ é cliente deste mesmo terapeuta, reaproveita
+  // o cadastro em vez de tentar criar outro (founder 2026-08-09: "um e-mail não
+  // pode ser negado quando ele vai fazer o exame"). Sem isso, o insert batia na
+  // constraint clients_therapist_email_unique e o cliente via na tela o erro
+  // cru do Postgres — "duplicate key value violates unique constraint" — sem
+  // saída nenhuma (Daniel Negri, 09/08: já era cliente do mesmo terapeuta desde
+  // 18/07). É a MESMA pessoa com o MESMO terapeuta: o certo é seguir pra
+  // captura, não barrar.
+  let client = await findExistingClientByEmail(service, therapistId, email)
+
+  if (client) {
+    await fillBlankFields(service, client, parsed.data)
+  } else {
+    const { data: created, error: clientErr } = await service
+      .from('clients')
+      .insert({
+        therapist_id: therapistId,
+        full_name: parsed.data.full_name,
+        birth_date: parsed.data.birth_date,
+        biological_sex: parsed.data.biological_sex,
+        email,
+        phone: parsed.data.phone,
+        notes: parsed.data.notes ?? null,
+      })
+      .select('id, full_name, birth_date, biological_sex, phone, notes')
+      .single()
+
+    if (clientErr || !created) {
+      // 23505 aqui = corrida entre dois submits (duplo toque / reenvio do
+      // form): o outro já criou. Busca o vencedor e segue.
+      if ((clientErr as { code?: string } | null)?.code === '23505') {
+        client = await findExistingClientByEmail(service, therapistId, email)
+      }
+      if (!client) {
+        // Nunca devolve error.message do Postgres pra tela do cliente final.
+        console.error('[invite] falha ao criar cliente:', clientErr?.message)
+        return {
+          error:
+            'Não conseguimos concluir seu cadastro agora. Tente de novo em instantes ou avise seu terapeuta.',
+        }
+      }
+    } else {
+      client = created
+    }
   }
 
   // 2. Vincula client_id ao token. Sem isto, re-entrada do cliente
