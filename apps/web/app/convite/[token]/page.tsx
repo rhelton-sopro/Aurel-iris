@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Camera, RotateCcw } from 'lucide-react'
 
+import { OrdemDosOlhos } from '@/components/convite/OrdemDosOlhos'
 import { validateToken } from '@/lib/invite/tokens'
 import { createServiceClient } from '@/lib/supabase/service'
 import { InviteRegistrationForm } from './InviteRegistrationForm'
@@ -103,6 +104,8 @@ export default async function InviteLandingPage({
           </div>
         </div>
 
+        <OrdemDosOlhos />
+
         <div className="rounded-md border border-border bg-muted/30 p-3 space-y-2 text-sm">
           <p className="font-medium">Para uma boa leitura:</p>
           <ul className="list-disc pl-5 space-y-1 text-foreground/80">
@@ -145,6 +148,13 @@ export default async function InviteLandingPage({
           o resultado vai direto para o terapeuta.
         </p>
       </div>
+
+      {/* Também aqui: o cliente NOVO vai do cadastro direto pra captura e não
+          passa pela tela de boas-vindas, onde este aviso aparece. Sem isto, o
+          único caminho que ele veria é o rótulo foto a foto — que é justamente
+          o que não estava bastando. */}
+      <OrdemDosOlhos />
+
       <InviteRegistrationForm token={token} />
     </div>
   )
