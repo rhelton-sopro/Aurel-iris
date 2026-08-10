@@ -21,6 +21,7 @@
  */
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { getExameJson } from '@/lib/emocional/findings'
 import { renderEmocional } from '@/lib/emocional/render'
 
 export const runtime = 'nodejs'
@@ -42,16 +43,16 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
     .single()
   if (!reading?.report_emocional) return new NextResponse('Mapa do Ser não gerado', { status: 404 })
 
-  const [{ data: findings }, { data: client }] = await Promise.all([
-    // superseded_at IS NULL — sem isto, leitura regerada tem 2+ linhas, o maybeSingle erra
-    // e o documento sai com os gráficos vazios (o mesmo bug que já mordeu tela e PDF).
-    db.from('report_findings').select('exame_json').eq('reading_id', id).is('superseded_at', null).maybeSingle(),
+  // getExameJson usa service-role (a policy da 0028 é founder-only) — o dono já foi
+  // validado acima, a leitura veio por RLS. Ver lib/emocional/findings.ts.
+  const [exame, { data: client }] = await Promise.all([
+    getExameJson(id),
     db.from('clients').select('full_name').eq('id', reading.client_id).maybeSingle(),
   ])
 
   const nome = (client?.full_name || '').trim().split(/\s+/)[0] || 'você'
   try {
-    const { html } = renderEmocional(reading.report_emocional, findings?.exame_json ?? {}, nome)
+    const { html } = renderEmocional(reading.report_emocional, exame, nome)
     return new NextResponse(html, {
       headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'private, no-store' },
     })

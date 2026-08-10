@@ -37,6 +37,7 @@ import { ReadingModeActions } from '@/components/readings/ReadingModeActions'
 import { AutoRefreshWhileProcessing } from '@/components/readings/AutoRefreshWhileProcessing'
 import { ExpiredReadingActions } from '@/components/readings/ExpiredReadingActions'
 import { MapaDoSerEmbed } from '@/components/readings/MapaDoSerEmbed'
+import { getExameJson } from '@/lib/emocional/findings'
 import { renderEmocional, TITULOS_BLOCOS } from '@/lib/emocional/render'
 import { AnaliseClient } from './analise-client'
 
@@ -293,12 +294,10 @@ export default async function LeituraDetailPage({
       // data null, e o render recebe `exame = {}` — o documento sai com as agulhas
       // neutras, o mapa emocional VAZIO e a linha do tempo sem figura. Silencioso:
       // o texto aparece normal e só os gráficos somem (founder pegou em prod, 31/07).
-      const { data: findings } = await supabase
-        .from('report_findings')
-        .select('exame_json')
-        .eq('reading_id', readingId)
-        .is('superseded_at', null)
-        .maybeSingle<{ exame_json: unknown }>()
+      // service-role: a policy da 0028 (`founder_full_access`) deixava o exame vazio
+      // para todo terapeuta que não fosse o founder. O dono já foi validado (a leitura
+      // veio por RLS lá em cima). Ver lib/emocional/findings.ts.
+      const exame = await getExameJson(readingId)
 
       const primeiroNome = clientName.trim().split(/\s+/)[0] || 'você'
       // ⚠️ Este render NÃO é o que vai à tela — quem serve o documento ao iframe é
@@ -309,7 +308,7 @@ export default async function LeituraDetailPage({
       try {
         mapaHtml = renderEmocional(
           progress!.report_emocional!,
-          findings?.exame_json ?? {},
+          exame,
           primeiroNome,
         ).html
       } catch (e) {

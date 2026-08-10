@@ -14,6 +14,7 @@
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { getExameJson } from '@/lib/emocional/findings'
 import { renderEmocional } from '@/lib/emocional/render'
 
 export const runtime = 'nodejs'
@@ -42,23 +43,19 @@ export default async function RelatorioEmocionalPage({
     .single()
   if (!reading?.report_emocional) notFound()
 
-  const [{ data: findings }, { data: client }] = await Promise.all([
-    // superseded_at IS NULL: leitura regerada tem VÁRIAS linhas aqui e o maybeSingle
-    // devolveria erro + null → render sem exame → gráficos vazios. Ver nota em
-    // /leituras/[id]/page.tsx.
-    db
-      .from('report_findings')
-      .select('exame_json')
-      .eq('reading_id', id)
-      .is('superseded_at', null)
-      .maybeSingle(),
+  // getExameJson lê com service-role: a policy da 0028 (`founder_full_access`) deixava
+  // o exame vazio para todo terapeuta que não fosse o founder, e o render seguia sem
+  // dado — gráficos zerados, Repertório de suporte ausente. O dono já foi validado
+  // acima (a leitura veio por RLS). Ver lib/emocional/findings.ts.
+  const [exame, { data: client }] = await Promise.all([
+    getExameJson(id),
     db.from('clients').select('full_name').eq('id', reading.client_id).maybeSingle(),
   ])
 
   const nome = (client?.full_name || '').trim().split(/\s+/)[0] || 'você'
   let html = ''
   try {
-    html = renderEmocional(reading.report_emocional, findings?.exame_json ?? {}, nome).html
+    html = renderEmocional(reading.report_emocional, exame, nome).html
   } catch (e) {
     // o render depende do formato @BLOCOS; se o markdown vier de uma versão antiga do
     // prompt, falha aqui — melhor dizer isso que servir página quebrada.

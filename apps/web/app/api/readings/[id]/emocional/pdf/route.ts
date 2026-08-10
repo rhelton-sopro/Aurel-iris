@@ -23,6 +23,7 @@
  */
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { getExameJson } from '@/lib/emocional/findings'
 import {
   renderEmocional,
   OMITIR_NA_VERSAO_CLIENTE,
@@ -130,15 +131,12 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
     return NextResponse.json({ error: 'Mapa do Ser ainda não gerado' }, { status: 404 })
   }
 
-  const [{ data: findings }, { data: client }] = await Promise.all([
-    // superseded_at IS NULL — sem isto, leitura regerada tem 2+ linhas, o maybeSingle
-    // erra e o PDF sai com os gráficos vazios (mesmo bug da tela).
-    db
-      .from('report_findings')
-      .select('exame_json')
-      .eq('reading_id', id)
-      .is('superseded_at', null)
-      .maybeSingle(),
+  // getExameJson lê com service-role: a policy da 0028 (`founder_full_access`) deixava o
+  // exame vazio para todo terapeuta que não fosse o founder — o PDF saía com gráfico
+  // zerado e sem o Repertório de suporte, calado. O dono já foi validado acima (a
+  // leitura veio por RLS). Ver lib/emocional/findings.ts.
+  const [exame, { data: client }] = await Promise.all([
+    getExameJson(id),
     db.from('clients').select('full_name').eq('id', reading.client_id).maybeSingle(),
   ])
   const nomeCompleto = (client?.full_name || 'cliente').trim()
@@ -147,7 +145,7 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
 
   let html: string
   try {
-    html = renderEmocional(reading.report_emocional, findings?.exame_json ?? {}, primeiro, {
+    html = renderEmocional(reading.report_emocional, exame, primeiro, {
       omitirTitulos,
     }).html
     // Única alteração no documento: tirar o @page, senão as bandas não têm onde caber.
