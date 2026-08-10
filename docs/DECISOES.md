@@ -686,6 +686,58 @@ ganhar uma folha inteira de novo (bug de 01/08).
 bloco 7). H2 virou *"As regras que você repete sem perceber"* — frase do próprio prompt do
 bloco. **Status:** APLICADA.
 
+### 2026-08-04 — TRÊS teses aprovadas: D5, D3 e a "falta de instrumento"
+**Decisão do founder:** *"gostei dessa terceira tese, então a gente vai trabalhar a D3, D5 e a terceira
+tese."* Resolve o contraponto que a Nefertiti deixou em aberto em `CAMPANHAS-3-LPS.md` §A.0: vale a
+**leitura ampla** da regra de aterrissagem — o gancho pode ser do tamanho de uma página, desde que o
+pouso seja em D5 ou D3. A "falta de instrumento" (selo 🟢 forte no estudo, fora da numeração D1–D5)
+é tese legítima de landing e pousa em D3.
+
+| | Rota | Tese | Momento |
+|---|---|---|---|
+| 1 · A segunda porta | `/` (existe) | Você é refém do que o cliente consegue trazer | **dentro** da sessão |
+| 2 · O objeto de prova | `/prova` (existe) | O seu melhor trabalho é invisível | **depois** da sessão |
+| 3 · A direção na mão | `/sessao` (a construir) | A sessão começa do zero toda vez | **antes** da sessão |
+
+**Princípio do founder que sustenta as três, verbatim:** *"um terapeuta compra para resolver uma dor
+DELE, não a dor do cliente."* Isso confirma e reforça a ordem canônica de §3.3 — a reação do cliente
+é **prova**, nunca abertura.
+**⏳ Em aberto na mesma conversa:** se a copy pode usar argumento econômico (o founder disse *"mostrar
+que ele vai ganhar dinheiro com o Iris Codex"*), o que hoje colide com a trava de vocabulário de renda.
+Ver a entrada seguinte quando decidido.
+**Status:** DECIDIDA — arquitetura em `Estatégia comercial e mkt/CAMPANHAS-3-LPS.md`. `/sessao` a construir.
+**🔴 Bloqueio anterior a qualquer campanha:** `apps/web` não tem instrumentação (sem UTM, sem pixel, sem
+campo de origem no signup). Sem isso, três landings produzem três resultados ilegíveis. Ver §D.1.
+
+### 2026-08-10 — E-mail repetido no link de convite: **reaproveita, nunca nega**
+**O caso (produção, 09/08 — Daniel Negri).** Ele abriu o link de convite do terapeuta, digitou o
+e-mail com que **já era cliente daquele mesmo terapeuta** (cadastro de 18/07, 1 leitura pronta) e
+recebeu na tela o erro cru do Postgres: `duplicate key value violates unique constraint
+"clients_therapist_email_unique"`. Sem saída nenhuma. Na mesma manhã, criando a conta de terapeuta
+dele, o botão travou em **"Verificando..."** para sempre — a conta *tinha sido criada* (11:53:57) e
+a sessão estava ativa; quem travou foi a tela.
+
+**Decisão do founder, verbatim:** *"Um e-mail como terapeuta não pode negar, por exemplo, quando ele
+coloca o e-mail, quando ele vai fazer o exame, quando outro terapeuta manda um link para ele."*
+Escolhida a opção **reaproveitar e seguir**: mesmo e-mail + mesmo terapeuta = mesma pessoa, então o
+cadastro existente é reusado e o cliente vai direto para a captura. Campos em branco são completados
+com o que ele digitou; **nada que o terapeuta já preencheu é sobrescrito**; observação nova é anexada.
+
+**Contraponto registrado (o founder decidiu assumir):** quem tiver o link em mãos e digitar o e-mail
+de *outro* cliente do mesmo terapeuta cai na captura daquele cadastro — as fotos entrariam no
+prontuário errado. As alternativas eram conferir a data de nascimento antes de reusar (barraria
+cliente legítimo com cadastro antigo incompleto) ou só trocar por uma mensagem amigável (continuaria
+negando). Prevaleceu não negar.
+
+**Regra que fica:** o path público do convite **nunca** devolve `error.message` do Postgres para a
+tela do cliente final. E **nada depois de um OTP válido pode impedir a navegação** — as ações
+pós-verificação (`ensureTrialStartedAction`, `markTherapistInviteUsedAction`) são nice-to-have e
+agora vivem dentro de `try/catch`. A migration 0050 já previa a queda de rede nessa ação; o que
+ninguém tratou foi o lado da UI, que ficava preso no spinner.
+**Status:** APLICADA — `app/actions/invites.ts`, `app/(auth)/signup/page.tsx`,
+`app/convite-terapeuta/[token]/TherapistInviteSignupForm.tsx`; regressão coberta em
+`app/actions/invites.test.ts`.
+
 ## Como usar
 
 - **Ao tomar uma decisão:** registrar aqui na mesma sessão, com razão e status.
