@@ -115,15 +115,17 @@ export default async function InviteLandingPage({
         </div>
 
         {/* Aviso de prazo (furo corrigido 2026-06-29): por privacidade, as fotos
-            são apagadas 24h após a captura (cron photo-ttl). Se o cliente começa
-            e não conclui — ou o terapeuta não gera o relatório — nesse prazo, as
-            imagens somem e a leitura precisa ser refeita. Avisamos quem captura. */}
+            são apagadas 24h após a captura (cron photo-ttl).
+            2026-08-10 — o relógio passou a contar da ÚLTIMA FOTO, não de quando o
+            cliente abre o link, então o texto mudou junto: dizer "depois que você
+            começa" descreveria um prazo que não é mais o que o sistema aplica. E
+            "após o envio" é o que o termo assinado promete, palavra por palavra. */}
         <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
           <p>
             <strong>Conclua as 6 fotos de uma vez.</strong> Por privacidade, as
             imagens são apagadas automaticamente{' '}
-            <strong>24 horas depois que você começa</strong>. Se passar desse
-            prazo, será preciso recomeçar a leitura.
+            <strong>24 horas depois que você envia a última foto</strong>. Se
+            passar desse prazo, será preciso recomeçar a leitura.
           </p>
         </div>
 

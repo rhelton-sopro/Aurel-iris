@@ -34,9 +34,21 @@ export async function purgeExpiredIrisPhotos(): Promise<TtlSweepResult> {
   // ── Pass A: TTL 24h ────────────────────────────────────────────────────
   // Dirigido pela readings (não por reading_images): leituras de convite às
   // vezes NÃO têm rows em reading_images, então buscar por lá as deixava
-  // invisíveis ao cron — fotos eternas no storage. readings.created_at ≈
-  // momento da captura no beta; é a fonte robusta. purgeIrisPhotos deleta pelo
+  // invisíveis ao cron — fotos eternas no storage. purgeIrisPhotos deleta pelo
   // prefixo do storage, então leitura sem foto vira no-op (removed:0, ok).
+  //
+  // ⭐ O RELÓGIO CONTA DA ÚLTIMA FOTO (founder, 2026-08-10). Antes contava de
+  // `readings.created_at` — o momento em que o cliente ABRE o link e começa. Quem
+  // começava e demorava a terminar perdia janela sem saber: abrir hoje, tirar 3
+  // fotos e voltar depois de amanhã significava encontrar as 3 primeiras já
+  // apagadas — captura incompleta e irrecuperável. Contar do fim da captura é
+  // também o que o termo assinado promete, literalmente: "no máximo 24 horas
+  // após o ENVIO".
+  //
+  // `created_at` segue como PENEIRA barata (a última foto nunca é anterior à
+  // criação, então nada expirado escapa) e como regra para leitura SEM foto
+  // registrada — que continua sendo purgada, senão volta o problema das fotos
+  // eternas no storage.
   const cutoff = new Date(Date.now() - TTL_MS).toISOString()
   const { data: oldRaw, error: oldErr } = await service
     .from('readings')
@@ -52,6 +64,17 @@ export async function purgeExpiredIrisPhotos(): Promise<TtlSweepResult> {
   } else {
     const rows = (oldRaw ?? []) as unknown as Array<{ id: string }>
     for (const row of rows) {
+      const { data: ultima } = await service
+        .from('reading_images')
+        .select('created_at')
+        .eq('reading_id', row.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle<{ created_at: string }>()
+
+      // Ainda dentro das 24h contadas do fim da captura — deixa viver.
+      if (ultima?.created_at && ultima.created_at >= cutoff) continue
+
       const r = await purgeIrisPhotos(service, row.id, 'ttl_24h')
       if (r.skipped) continue // founder isento — não conta como purga
       if (r.ok) result.ttl_purged += 1
