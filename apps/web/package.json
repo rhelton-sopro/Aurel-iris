@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "eslint app lib components middleware.ts _motor-lab",
     "gen:types": "supabase gen types typescript --linked --schema public > types/database.ts",
     "test": "vitest",
     "test:run": "vitest run",
