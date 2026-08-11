@@ -385,7 +385,14 @@ export default async function RelatoriosAdminPage({
               <thead className="border-b bg-muted/30 text-left text-muted-foreground">
                 <tr>
                   <th className="px-3 py-2 font-medium">Terapeuta</th>
-                  <th className="px-3 py-2 font-medium text-right">Leituras</th>
+                  {/* Relatórios ANTES de capturas, e é por ele que a tabela ordena:
+                      é o número que responde "quanto essa pessoa usou" e o único que
+                      consome crédito. "Capturas" ao lado, em cinza, porque mede
+                      tentativa — inclui quem abriu a tela e parou em 0 foto. Juntar
+                      os dois numa coluna só (era assim até 2026-08-10) fazia uma
+                      terapeuta com 1 relatório aparecer como "4 leituras". */}
+                  <th className="px-3 py-2 font-medium text-right">Relatórios gerados</th>
+                  <th className="px-3 py-2 font-medium text-right">Capturas iniciadas</th>
                   <th className="px-3 py-2 font-medium text-right">Entregues</th>
                   <th className="px-3 py-2 font-medium text-right">Captura (aproveit.)</th>
                   <th className="px-3 py-2 font-medium">Última leitura</th>
@@ -398,7 +405,17 @@ export default async function RelatoriosAdminPage({
                       <div className="font-medium">{r.full_name}</div>
                       <div className="font-mono text-xs text-muted-foreground">{r.email}</div>
                     </td>
-                    <td className="px-3 py-2 text-right tabular-nums">{r.readings_total}</td>
+                    <td className="px-3 py-2 text-right tabular-nums font-medium">
+                      {r.reports_generated}
+                    </td>
+                    <td className="px-3 py-2 text-right tabular-nums text-muted-foreground">
+                      {r.readings_total}
+                      {r.readings_total > r.reports_generated && (
+                        <span className="ml-1 text-xs">
+                          ({r.readings_total - r.reports_generated} sem relatório)
+                        </span>
+                      )}
+                    </td>
                     <td className="px-3 py-2 text-right tabular-nums">{r.readings_delivered}</td>
                     <td className="px-3 py-2 text-right tabular-nums">
                       {r.aproveitamento_pct != null

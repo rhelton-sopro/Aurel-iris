@@ -469,7 +469,22 @@ export interface ThroughputRow {
   therapist_id: string
   full_name: string
   email: string
+  /**
+   * Capturas INICIADAS no período — inclui as que pararam em 0 foto. Uma leitura
+   * nasce quando alguém abre a tela de captura, então este número mede TENTATIVA,
+   * não trabalho: 28% dele, desde 01/07, nunca virou relatório.
+   */
   readings_total: number
+  /**
+   * Relatórios efetivamente gerados — o que consome crédito e o que o terapeuta
+   * de fato entrega. É este que responde "quanto ela usou?".
+   *
+   * Separado de readings_total em 2026-08-10: no painel, uma terapeuta nova
+   * aparecia com "4 leituras" e nenhuma compra, e a conclusão natural era que
+   * havia furo na cobrança. Eram 3 tentativas abandonadas (0, 0 e 1 foto) mais 1
+   * relatório, esse pago pela trial. O número certo era 1.
+   */
+  reports_generated: number
   readings_delivered: number
   haiku_attempts: number    // capture_attempts no período (0 se migration pendente)
   haiku_accepted: number
@@ -491,16 +506,32 @@ export async function fetchThroughput(
 ): Promise<ThroughputStats> {
   const service = createServiceClient()
 
-  const { data: readings } = await service
+  // `report_emocional` é da migration 0051 e ainda não está em types/database.ts —
+  // mesmo cast usado nas outras rotas até o founder regenerar os tipos.
+  type ReadingRow = {
+    therapist_id: string | null
+    status: string | null
+    is_delivered: boolean | null
+    created_at: string | null
+    regeneration_count: number | null
+    vision_features: unknown
+    report_generated: Record<string, unknown> | null
+    report_emocional: string | null
+  }
+  const { data: readingsRaw } = await service
     .from('readings')
-    .select('therapist_id, status, is_delivered, created_at, regeneration_count, vision_features')
+    .select(
+      'therapist_id, status, is_delivered, created_at, regeneration_count, vision_features, report_generated, report_emocional' as never,
+    )
     .gte('created_at', range.from)
     .lte('created_at', range.to)
+  const readings = (readingsRaw ?? []) as unknown as ReadingRow[]
 
   const byTherapist = new Map<
     string,
     {
       total: number
+      generated: number
       delivered: number
       last_at: string | null
     }
@@ -509,11 +540,17 @@ export async function fetchThroughput(
   let regen_n = 0
   let failed = 0
   const errors = new Map<string, number>()
-  for (const r of readings ?? []) {
+  for (const r of readings) {
     const tid = r.therapist_id as string | null
     if (tid) {
-      const cur = byTherapist.get(tid) ?? { total: 0, delivered: 0, last_at: null }
+      const cur = byTherapist.get(tid) ?? { total: 0, generated: 0, delivered: 0, last_at: null }
       cur.total++
+      // "Gerou relatório" = tem Mapa do Ser OU Dossiê. É o mesmo critério que o
+      // resto do sistema usa pra dizer que a leitura virou entrega.
+      const temDossie =
+        r.report_generated != null &&
+        Object.keys(r.report_generated as Record<string, unknown>).length > 0
+      if (temDossie || r.report_emocional) cur.generated++
       if (r.is_delivered) cur.delivered++
       const ts = r.created_at as string | null
       if (ts && (!cur.last_at || ts > cur.last_at)) cur.last_at = ts
@@ -557,13 +594,14 @@ export async function fetchThroughput(
   for (const tid of activeIds) {
     const info = therapists.get(tid)
     if (!info) continue // founder filtrado em fetchTherapistsMap
-    const r = byTherapist.get(tid) ?? { total: 0, delivered: 0, last_at: null }
+    const r = byTherapist.get(tid) ?? { total: 0, generated: 0, delivered: 0, last_at: null }
     const h = haikuByTherapist.get(tid) ?? { total: 0, accepted: 0 }
     rows.push({
       therapist_id: tid,
       full_name: info.full_name,
       email: info.email,
       readings_total: r.total,
+      reports_generated: r.generated,
       readings_delivered: r.delivered,
       haiku_attempts: h.total,
       haiku_accepted: h.accepted,
@@ -571,9 +609,11 @@ export async function fetchThroughput(
       last_reading_at: r.last_at,
     })
   }
-  rows.sort((a, b) => b.readings_total - a.readings_total)
+  // Ordena por RELATÓRIO GERADO (uso real), com a tentativa como desempate — antes
+  // ordenava por tentativa, e quem só abriu a tela várias vezes subia no ranking.
+  rows.sort((a, b) => b.reports_generated - a.reports_generated || b.readings_total - a.readings_total)
 
-  const total = readings?.length ?? 0
+  const total = readings.length
   return {
     rows,
     avg_regeneration: regen_n > 0 ? regen_sum / regen_n : null,
