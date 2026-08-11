@@ -551,7 +551,14 @@ function calc(exameOuNome, lastro) {
     }
   }
 
-  const pres = preservados.map((p) => ({ campo: p.campo, pol: p.polaridade_funcional }))
+  // `clareza` PRECISA vir junto (2026-08-11): sem ela aqui, o serialize monta o texto do
+  // Stage 2 só com a polaridade e um preservado de clareza 1 chega ao relatório escrito
+  // igual a um de clareza 5. A régua entrava no cálculo e morria antes do texto.
+  const pres = preservados.map((p) => ({
+    campo: p.campo,
+    pol: p.polaridade_funcional,
+    ...(Number.isInteger(p.clareza) ? { clareza: p.clareza } : {}),
+  }))
   // (E) seleção: todo achado GARANTE seu núcleo (todo achado ruim aparece — decisão
   // founder); achado FORTE (w≥4 = I4/I5) ganha a 2ª emoção também (a pessoa se
   // identifica forte → "raiva E ressentimento"). Depois preenche os slots restantes.

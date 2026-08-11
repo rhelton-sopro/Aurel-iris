@@ -114,7 +114,15 @@ const bipC = bipCarga
   L.push('')
 
   L.push('## Força / recursos preservados')
-  for (const p of r.pres) L.push(`- ‹${p.campo}›${p.pol === 'vital_ativo' ? ' (vital)' : ' (livre)'}`)
+  // CLAREZA 1-5 (2026-08-11): antes só a polaridade vinha pra cá, e um preservado de
+  // clareza 1 chegava ao Stage 2 escrito IGUAL a um de clareza 5 — "(livre)" nos dois.
+  // A régua entrava no cálculo (W_CLAREZA, agulhas) e não no texto. Exame gravado antes
+  // desta data não tem o campo: sai sem o sufixo, como antes.
+  for (const p of r.pres) {
+    const pol = p.pol === 'vital_ativo' ? 'vital' : 'livre'
+    const cl = Number.isInteger(p.clareza) ? `, clareza ${p.clareza}/5` : ''
+    L.push(`- ‹${p.campo}› (${pol}${cl})`)
+  }
   const cb = d.constituicao_base || {}
   const consti = []
   if (cb.pupila === 'centrada_regular') consti.push('centramento (um chão por dentro)')
