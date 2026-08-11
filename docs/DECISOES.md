@@ -738,6 +738,26 @@ ninguém tratou foi o lado da UI, que ficava preso no spinner.
 `app/convite-terapeuta/[token]/TherapistInviteSignupForm.tsx`; regressão coberta em
 `app/actions/invites.test.ts`.
 
+### 2026-08-11 — Lateralidade: "right iris" do Jensen = **olho DIREITO do cliente** = OD
+**Pergunta aberta desde 26/07**, registrada como ressalva na `AUDITORIA-GLOSSARIO-TOPOGRAFIA.md`:
+*"A convenção de lado NÃO está resolvida. Jensen escreve 'right iris'/'left iris'. O glossário usa
+OD/OE. **Isto precisa da confirmação do founder** — ela decide metade dos vereditos de lateralidade."*
+
+**Decisão do founder, verbatim:** *"com certeza é olho direito do cliente, tá tranquilo isso aí."*
+
+⇒ `right iris` (Jensen) = `OD` (glossário) = `eye: 'right'` (captura) = olho direito **do cliente**,
+anatômico. As três convenções são a mesma, e as afirmações posicionais do livro podem ser comparadas
+DIRETO com o glossário, sem espelhamento.
+
+**Por que travava:** metade dos vereditos da auditoria de topografia dependia disso. Tabela de
+lateralidade errada é pior que nenhuma — erra com precisão e confiança, e o erro entra igual em todas
+as leituras.
+
+**Status:** APLICADA no registro; destrava a tabela de-para do redesenho Stage 1a/1b
+(`docs/TOPOGRAFIA-JENSEN-2004.md`). Restam 4 pendências lá: validar setor a setor com zoom, extrair a
+íris esquerda (não é espelho — o gráfico põe SPLEEN à esquerda onde a direita tem LIVER), escola da
+linha do tempo, e `vaso_transversal`.
+
 ## Como usar
 
 - **Ao tomar uma decisão:** registrar aqui na mesma sessão, com razão e status.

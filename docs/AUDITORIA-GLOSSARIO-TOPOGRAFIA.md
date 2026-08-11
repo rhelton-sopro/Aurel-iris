@@ -11,7 +11,7 @@
 ## ⚠️ Ressalvas que limitam este documento
 
 1. **Uma escola.** Jensen (escola americana) é a mais difundida e a única citável aqui. A escola alemã (Deck/Angerer/Schnabel) tem topografia própria; Lo Rito/Birello têm mapa embriológico. Divergência entre escolas é esperada — o problema é o glossário divergir da escola que ele mesmo cita (usa "zona 6 Jensen" e "zona 7 Jensen" em dois campos).
-2. **A convenção de lado NÃO está resolvida.** Jensen escreve "right iris" / "left iris". O glossário usa OD/OE. Se "right iris" = olho direito do cliente (leitura padrão) e OD = olho direito do cliente, as afirmações são comparáveis e os vereditos abaixo valem. **Isto precisa da confirmação do founder** — ela decide metade dos vereditos de lateralidade.
+2. ✅ **RESOLVIDO 2026-08-11 — a convenção de lado é ANATÔMICA.** Founder: *"com certeza é olho direito do cliente, tá tranquilo isso aí."* Portanto `right iris` (Jensen) = `OD` (glossário) = `eye: 'right'` (captura) = olho direito do cliente. As afirmações do livro comparam-se DIRETO com o glossário, sem espelhamento, e **os vereditos de lateralidade abaixo valem**. Ver `docs/DECISOES.md`.
 3. **Não é auditoria completa.** 15 dos 38 campos têm afirmação posicional localizada no Jensen. Os outros 23 não foram encontrados nesta fonte e ficam **não verificados** — não "certos".
 
 ---
