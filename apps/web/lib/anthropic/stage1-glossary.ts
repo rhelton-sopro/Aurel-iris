@@ -144,24 +144,16 @@ export const GLOSSARY: readonly GlossaryEntry[] = [
     bibliografia: 'Manual ES Moraga p.62',
   },
   {
-    // 2026-08-11 — critério revisto. ⏳ FALTA a coordenada RADIAL (o anel), que só o
-    // founder pode dar: sem ela o endereço fica incompleto e o campo segue difícil de
-    // localizar. Medido: 0 achados em 60 leituras, 40 preservados.
-    // O "pupila centrada" saiu: é sinal GLOBAL (quase toda íris tem), então servia de
-    // cheque em branco pra declarar o coração preservado sem olhar o coração — e
-    // contradizia a regra do próprio prompt ("ausência de carga NÃO é evidência de saúde").
     group: 'sistema_orgao', campo: 'coracao',
-    zona: 'Anel BLOOD & LYMPH (3º de 7, humoral zone — logo FORA do colarete), ~2-3h na íris ESQUERDA (OE). Livro grande: "the left iris at 3 [h] in Zone 3, usually ON the autonomic nerve wreath line" — o gráfico Jensen/Ellen Jensen 2004 o põe colado ao colarete, não na periferia. Também é a Área da VONTADE (Marcos V. Dias): lacuna aqui lê-se como dificuldade de VÍNCULO, NUNCA como sinal cardíaco.',
-    sinal_carga: 'LACUNA de contorno definido no setor, OU pigmento CONCENTRADO na mesma faixa. Pigmento DIFUSO pela íris inteira NÃO qualifica (é constitucional). Micro-irregularidade de trama, sem lacuna nem pigmento delimitado, NÃO qualifica.',
-    sinal_preservacao: 'Setor varrido DIRETAMENTE: fibras contínuas e regulares, tom uniforme, sem lacuna definida e sem pigmento concentrado. ⛔ "pupila centrada" NÃO é critério — é sinal global, não deste campo.',
+    zona: 'Superior esquerda OE (~2-3h)',
+    sinal_carga: 'Lacunas, manchas, anel circular',
+    sinal_preservacao: 'Zona limpa, pupila centrada',
   },
   {
-    // 2026-08-11 — critério revisto. ⏳ FALTA a coordenada RADIAL.
-    // Medido: 0 achados em 60 leituras, 46 preservados.
     group: 'sistema_orgao', campo: 'pulmoes',
-    zona: 'Anel SUPERFICIAL LYMPH & BLOOD (6º de 7 — faixa EXTERNA, azul-clara no gráfico), ~3h OE e ~9h OD. Bloco grande do gráfico Jensen/Ellen Jensen 2004 que reúne LUNG (upper/mid/lower lobe), BRONCHIOLES, PLEURA, THORAX e RIBS — fica FORA do cinza de BONY STRUCTURE (onde está SHOULDER). Corrobora Jackson (1992): "the outer zone of the iris contains the main detoxification and elimination channels — the skin, lungs, liver". Também é a porção brônquio-pulmonar da Área da VONTADE (Marcos V. Dias).',
-    sinal_carga: 'LACUNA definida OU opacidade DELIMITADA na faixa temporal superior. Opacidade difusa periférica NÃO qualifica (é linfática/constitucional).',
-    sinal_preservacao: 'Faixa temporal superior varrida DIRETAMENTE: fibra contínua, tom uniforme, sem lacuna e sem opacidade localizada.',
+    zona: 'Temporal superior (~3h OE, ~9h OD)',
+    sinal_carga: 'Lacunas, manchas pulmonares, opacidade',
+    sinal_preservacao: 'Zona clara, fibras regulares',
   },
   {
     // 2026-07-26 — enriquecido (estava correto, faltava a coordenada radial).
@@ -254,15 +246,10 @@ export const GLOSSARY: readonly GlossaryEntry[] = [
     sinal_preservacao: 'Coroa simpática regular, ausência de anel sódico',
   },
   {
-    // 2026-08-11 — critério revisto. ⏳ FALTA a coordenada RADIAL.
-    // Medido: 0 achados em 60 leituras, 50 preservados — o campo mais declarado
-    // preservado de todos. O critério antigo ("fibras compactas, densas") descreve
-    // uma íris de TRAMA FECHADA, que é constituição da pessoa, não integridade
-    // observada naquela zona: qualquer íris densa satisfazia sem exame nenhum.
     group: 'sistema_orgao', campo: 'sistema_musculoesqueletico',
-    zona: 'Anéis MUSCULATURE (4º de 7, rosa-claro) e BONY STRUCTURE (5º, cinza) — os dois, porque o campo cobre músculo E esqueleto. Gráfico Jensen 2004: SHOULDER cai no cinza; as faixas rosa-claro imediatamente internas são musculatura. Jackson (1992): "the muscle tissue lies next to the blood zone... não é fácil distinguir a zona muscular da esquelética, pois ficam lado a lado". ⛔ NÃO é a periferia (6-7) nem a nutritiva (1-2).',
-    sinal_carga: 'Trama visivelmente AFROUXADA em relação ao restante do estroma DESTA íris, com separação de fibras nomeável em setor identificável. ⛔ trama aberta de constituição (a íris inteira é assim) NÃO qualifica — é o tipo da pessoa, não um achado.',
-    sinal_preservacao: 'Fibra compacta e alinhada VERIFICADA em pelo menos dois setores distintos, com o setor nomeado. ⛔ trama fechada de constituição NÃO é preservação observada.',
+    zona: 'Estroma intermediário-periférico',
+    sinal_carga: 'Trama afrouxada, fibras irregulares',
+    sinal_preservacao: 'Fibras compactas, densas, estroma firme',
   },
   {
     group: 'sistema_orgao', campo: 'pele_tegumentar',
@@ -321,12 +308,6 @@ export const GLOSSARY: readonly GlossaryEntry[] = [
     bibliografia: 'Jackson p.36',
   },
   {
-    // ⏳ 2026-08-11 — NÃO alterado, e o motivo importa: o tipo `EixoTopograficoEntry`
-    // não admite sinal_carga/sinal_preservacao. Este campo (e coluna_cervical,
-    // coluna_toracica, coluna_lombar, sacro_coccyx) PODE ser emitido pelo modelo —
-    // está no CAMPO_ENUM — mas nunca recebeu critério do que procurar. Medido: 0
-    // achados, 2 preservados em 60 leituras; coluna_toracica e sacro_coccyx são mudos.
-    // Dar critério a eles exige ESTENDER O TIPO: decisão de arquitetura, do founder.
     group: 'eixo_topografico', campo: 'boca_garganta',
     zona: 'Orofaríngea ~1-2h OE, ~10-11h OD (mais externa que tireoide)',
     psicossomatica: 'Expressão, eixo verbal',

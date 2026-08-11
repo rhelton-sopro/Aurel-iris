@@ -140,15 +140,6 @@ const AchadoSchema = z.object({
 const SistemaPreservadoSchema = z.object({
   campo: z.enum(CAMPO_ENUM),
   polaridade_funcional: z.enum(POLARIDADE_FUNCIONAL),
-  // 2026-08-11 (founder): CLAREZA 1-5, espelhando `intensidade` do achado.
-  // Antes o preservado era binário (vital_ativo / neutro) e 76% saíam `neutro` —
-  // que não é força, é silêncio: o campo simplesmente não falou. Sem régua, o
-  // motor tratava "não vi carga" e "vi integridade evidente" quase igual
-  // (W_PRES 1.5 vs 2.0). Com a escala, "clareza 1" passa a ser uma resposta
-  // honesta, que hoje não existe.
-  // .optional(): exames GRAVADOS antes desta data não têm o campo, e precisam
-  // continuar validando — o fallback vive em motor-calc.mjs.
-  clareza: z.number().int().min(1).max(5).optional(),
   // v2.9.0: min 15→30 chars. Sistema preservado precisa de ancoragem
   // visual concreta — descrição vaga ("zona limpa") não permite Stage 2
   // construir leitura clínica. 30 chars (vs 40 de achado) reconhece que
@@ -272,22 +263,12 @@ export const REGISTRAR_EXAME_TOOL: Anthropic.Tool = {
         items: {
           type: 'object',
           required: [
-            'campo', 'polaridade_funcional', 'clareza', 'sinal_visual_positivo',
+            'campo', 'polaridade_funcional', 'sinal_visual_positivo',
             'implicacao_funcional', 'observacao_qualifying',
           ],
           properties: {
             campo: { type: 'string', enum: CAMPO_ENUM },
             polaridade_funcional: { type: 'string', enum: POLARIDADE_FUNCIONAL as unknown as string[] },
-            clareza: {
-              type: 'integer', minimum: 1, maximum: 5,
-              description:
-                'QUANTO de integridade você viu neste campo, 1 a 5 — a régua espelha a ' +
-                '`intensidade` do achado. 5 = sinal positivo inequívoco e extenso ' +
-                '(fibra contínua, tom uniforme, varrido em toda a zona). 3 = integridade ' +
-                'clara mas localizada. 1 = zona sem carga aparente, porém pouco ' +
-                'conclusiva. ⛔ NÃO use 4-5 por ausência de achado: ausência de carga ' +
-                'não é evidência de saúde. Se você não varreu a zona, o campo não entra.',
-            },
             // v2.9.0: minLength 15→30 pra sinal_visual_positivo.
             sinal_visual_positivo: { type: 'string', minLength: 30 },
             implicacao_funcional: { type: 'string', minLength: 15 },

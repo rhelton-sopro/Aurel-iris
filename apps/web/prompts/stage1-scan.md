@@ -223,30 +223,19 @@ Pergunta 1: "Há CARGA visível? (pigmento, opacidade, lacuna, abertura
 ```
 
 **Saída esperada:** 3-15 achados de atenção típicos (varia por íris),
-**2-12 sistemas preservados**, 0-4 correlações observadas, 0-6 marcadores
+**4-12 sistemas preservados**, 0-4 correlações observadas, 0-6 marcadores
 temporais. Arrays vazios de achados/correlações/marcadores são VÁLIDOS e
 preferíveis a inflação especulativa.
 
-**Sobre os preservados:** PROCURE ATIVAMENTE o lado preservado — o relatório
-integrativo precisa da face positiva/recurso, não só da carga. Mas o critério
-rigoroso acima e o skip-rather-than-fabricate são ABSOLUTOS: só emita
-preservado com sinal positivo visível REAL. Ausência de carga ≠ evidência de
-saúde.
-
-⚠️ 2026-08-11 — o piso caiu de "mire ≥4 GENUÍNOS" para 2. Dois motivos, os dois
-medidos em 60 leituras: (a) **45% das leituras já saíam com menos de 4**, ou
-seja, o piso era desobedecido e mesmo assim pressionava; (b) piso vira cota e
-cota vira invenção — foi o que aconteceu com o mínimo de 3 marcadores temporais,
-onde o modelo passou a emitir exatamente 3, sempre. **Emitir 2 é resposta
-legítima. Emitir 0 também**, se a íris não mostrar integridade nomeável em lugar
-nenhum.
-
-**CLAREZA (1-5), obrigatória em cada preservado.** Mesma régua da `intensidade`
-do achado. 5 = sinal positivo inequívoco e extenso; 3 = integridade clara mas
-localizada; 1 = zona sem carga aparente, porém pouco conclusiva. ⛔ 4-5 NÃO se
-justifica por ausência de achado — só por sinal positivo que você consegue
-descrever. Antes desta régua o campo era binário e **76% dos preservados saíam
-`neutro`**, que não é força: é o campo não tendo falado nada.
+**Sobre os preservados (mire ≥4 GENUÍNOS):** a maioria das íris tem ao
+menos 4 zonas genuinamente íntegras — PROCURE ATIVAMENTE o lado
+preservado (o relatório integrativo precisa da face positiva/recurso, não
+só da carga). PORÉM o critério rigoroso acima e o skip-rather-than-
+fabricate continuam ABSOLUTOS: só emita preservado com sinal positivo
+visível REAL; se a íris genuinamente mostra menos de 4, emita menos —
+NUNCA fabrique preservado pra bater a meta. Ausência de carga ≠ evidência
+de saúde. A meta de 4 é um convite a olhar melhor o positivo, não licença
+pra inflar.
 
 **NÃO existe teto.** O 12 da faixa acima é orientação de ordem de
 grandeza, não limite. Se a íris mostra 10 zonas com sinal positivo REAL e
@@ -281,8 +270,8 @@ composto fora do glossário se a íris realmente pede.
 | `rim` | Inferior (6h) ambos | Lacunas profundas, manchas escuras, opacidade | Zona íntegra, fibras compactas |
 | `adrenal` | Sobre o rim (5:30-6h) — mapeamento anatômico | Opacidade difusa, sombreamento no setor adrenal | Zona clara, sem sombreamento |
 | `eixo_pituitario_adrenal` | Collarete a 12:30h, ambos os iris | Achado MÚLTIPLO/DOMINANTE na zona 12:30h: ≥2 estruturas pareadas (lacuna DEFINIDA + cripta, OU lacuna + surcos radiais em ≥2 direções, OU descontinuidade marcada de collarete + pigmento concentrado). Micro-irregularidade isolada de collarete (presente em qualquer adulto > 30) NÃO qualifica. | Collarete em 12:30h regular, sem lacuna definida pareada com outra estrutura — micro-textura própria de collarete adulto é normal, não preservação especial. |
-| `coracao` | Anel BLOOD & LYMPH (3º de 7, humoral zone — logo FORA do colarete), ~2-3h na íris ESQUERDA (OE). Livro grande: "the left iris at 3 [h] in Zone 3, usually ON the autonomic nerve wreath line" — o gráfico Jensen/Ellen Jensen 2004 o põe colado ao colarete, não na periferia. Também é a Área da VONTADE (Marcos V. Dias): lacuna aqui lê-se como dificuldade de VÍNCULO, NUNCA como sinal cardíaco. | LACUNA de contorno definido no setor, OU pigmento CONCENTRADO na mesma faixa. Pigmento DIFUSO pela íris inteira NÃO qualifica (é constitucional). Micro-irregularidade de trama, sem lacuna nem pigmento delimitado, NÃO qualifica. | Setor varrido DIRETAMENTE: fibras contínuas e regulares, tom uniforme, sem lacuna definida e sem pigmento concentrado. ⛔ "pupila centrada" NÃO é critério — é sinal global, não deste campo. |
-| `pulmoes` | Anel SUPERFICIAL LYMPH & BLOOD (6º de 7 — faixa EXTERNA, azul-clara no gráfico), ~3h OE e ~9h OD. Bloco grande do gráfico Jensen/Ellen Jensen 2004 que reúne LUNG (upper/mid/lower lobe), BRONCHIOLES, PLEURA, THORAX e RIBS — fica FORA do cinza de BONY STRUCTURE (onde está SHOULDER). Corrobora Jackson (1992): "the outer zone of the iris contains the main detoxification and elimination channels — the skin, lungs, liver". Também é a porção brônquio-pulmonar da Área da VONTADE (Marcos V. Dias). | LACUNA definida OU opacidade DELIMITADA na faixa temporal superior. Opacidade difusa periférica NÃO qualifica (é linfática/constitucional). | Faixa temporal superior varrida DIRETAMENTE: fibra contínua, tom uniforme, sem lacuna e sem opacidade localizada. |
+| `coracao` | Superior esquerda OE (~2-3h) | Lacunas, manchas, anel circular | Zona limpa, pupila centrada |
+| `pulmoes` | Temporal superior (~3h OE, ~9h OD) | Lacunas, manchas pulmonares, opacidade | Zona clara, fibras regulares |
 | `estomago` | Anel STOMACH (1º de 7, nutritive zone), imediatamente ao redor da pupila e DENTRO do colarete. Circunferencial — não tem hora própria. Jensen: "the central area surrounding the pupil corresponds to the stomach". | Irregularidade/ondulação no anel interno | Anel interno regular, bem definido |
 | `intestino_delgado` | Anel INTESTINES (2º de 7), logo FORA do colarete — mesmo anel do cólon, mais próximo do colarete. Placas de Peyer (PEY PT, área pontilhada) no mesmo anel a ~2-3h OD / ~9-10h OE. | Lacunas, manchas, irregularidades | Zona intermediária íntegra |
 | `intestino_grosso` | Anel INTESTINES (2º de 7), imediatamente FORA do colarete — NÃO a periferia. Percorre a circunferência: cólon ascendente, transverso (~11h-1h), descendente e sigmoide. Apenas RETO e ÂNUS avançam radialmente para a borda externa. | Lacunas radiais, manchas escuras ou irregularidade no 2º anel, logo fora do colarete | Anel intestinal de contorno regular e tom uniforme ao redor do colarete |
@@ -294,7 +283,7 @@ composto fora do glossário se a íris realmente pede.
 | `sistema_reprodutor` | Inferior medial (~6h) | Lacunas/manchas, irregularidades | Zona limpa |
 | `sistema_urinario` | Inferior (rim → ureter → bexiga) | Lacunas conectadas em sequência | Setor urinário limpo |
 | `sistema_circulatorio` | Coroa periférica + anel periférico | Anel sódico, arco senil | Coroa simpática regular, ausência de anel sódico |
-| `sistema_musculoesqueletico` | Anéis MUSCULATURE (4º de 7, rosa-claro) e BONY STRUCTURE (5º, cinza) — os dois, porque o campo cobre músculo E esqueleto. Gráfico Jensen 2004: SHOULDER cai no cinza; as faixas rosa-claro imediatamente internas são musculatura. Jackson (1992): "the muscle tissue lies next to the blood zone... não é fácil distinguir a zona muscular da esquelética, pois ficam lado a lado". ⛔ NÃO é a periferia (6-7) nem a nutritiva (1-2). | Trama visivelmente AFROUXADA em relação ao restante do estroma DESTA íris, com separação de fibras nomeável em setor identificável. ⛔ trama aberta de constituição (a íris inteira é assim) NÃO qualifica — é o tipo da pessoa, não um achado. | Fibra compacta e alinhada VERIFICADA em pelo menos dois setores distintos, com o setor nomeado. ⛔ trama fechada de constituição NÃO é preservação observada. |
+| `sistema_musculoesqueletico` | Estroma intermediário-periférico | Trama afrouxada, fibras irregulares | Fibras compactas, densas, estroma firme |
 | `pele_tegumentar` | Anel periférico extremo (zona 7 Jensen) | Escurecimento ou irregularidade no anel periférico (NÃO confundir com rosário linfático da zona 6) | Borda íntegra, sem marcas |
 
 ### Sub-zonas cerebrais (3)
