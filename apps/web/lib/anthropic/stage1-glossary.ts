@@ -144,16 +144,24 @@ export const GLOSSARY: readonly GlossaryEntry[] = [
     bibliografia: 'Manual ES Moraga p.62',
   },
   {
+    // 2026-08-11 — critério revisto. ⏳ FALTA a coordenada RADIAL (o anel), que só o
+    // founder pode dar: sem ela o endereço fica incompleto e o campo segue difícil de
+    // localizar. Medido: 0 achados em 60 leituras, 40 preservados.
+    // O "pupila centrada" saiu: é sinal GLOBAL (quase toda íris tem), então servia de
+    // cheque em branco pra declarar o coração preservado sem olhar o coração — e
+    // contradizia a regra do próprio prompt ("ausência de carga NÃO é evidência de saúde").
     group: 'sistema_orgao', campo: 'coracao',
-    zona: 'Superior esquerda OE (~2-3h)',
-    sinal_carga: 'Lacunas, manchas, anel circular',
-    sinal_preservacao: 'Zona limpa, pupila centrada',
+    zona: 'Superior esquerda OE (~2-3h). Área da VONTADE (Marcos V. Dias, Iridologia psicoemocional): setor temporal sobre brônquio-pulmonar e coração — lacuna aqui lê-se como dificuldade de vínculo, NÃO como sinal cardíaco.',
+    sinal_carga: 'LACUNA de contorno definido no setor, OU pigmento CONCENTRADO na mesma faixa. Pigmento DIFUSO pela íris inteira NÃO qualifica (é constitucional). Micro-irregularidade de trama, sem lacuna nem pigmento delimitado, NÃO qualifica.',
+    sinal_preservacao: 'Setor varrido DIRETAMENTE: fibras contínuas e regulares, tom uniforme, sem lacuna definida e sem pigmento concentrado. ⛔ "pupila centrada" NÃO é critério — é sinal global, não deste campo.',
   },
   {
+    // 2026-08-11 — critério revisto. ⏳ FALTA a coordenada RADIAL.
+    // Medido: 0 achados em 60 leituras, 46 preservados.
     group: 'sistema_orgao', campo: 'pulmoes',
-    zona: 'Temporal superior (~3h OE, ~9h OD)',
-    sinal_carga: 'Lacunas, manchas pulmonares, opacidade',
-    sinal_preservacao: 'Zona clara, fibras regulares',
+    zona: 'Temporal superior (~3h OE, ~9h OD) — porção brônquio-pulmonar da Área da VONTADE (Marcos V. Dias).',
+    sinal_carga: 'LACUNA definida OU opacidade DELIMITADA na faixa temporal superior. Opacidade difusa periférica NÃO qualifica (é linfática/constitucional).',
+    sinal_preservacao: 'Faixa temporal superior varrida DIRETAMENTE: fibra contínua, tom uniforme, sem lacuna e sem opacidade localizada.',
   },
   {
     // 2026-07-26 — enriquecido (estava correto, faltava a coordenada radial).
@@ -246,10 +254,15 @@ export const GLOSSARY: readonly GlossaryEntry[] = [
     sinal_preservacao: 'Coroa simpática regular, ausência de anel sódico',
   },
   {
+    // 2026-08-11 — critério revisto. ⏳ FALTA a coordenada RADIAL.
+    // Medido: 0 achados em 60 leituras, 50 preservados — o campo mais declarado
+    // preservado de todos. O critério antigo ("fibras compactas, densas") descreve
+    // uma íris de TRAMA FECHADA, que é constituição da pessoa, não integridade
+    // observada naquela zona: qualquer íris densa satisfazia sem exame nenhum.
     group: 'sistema_orgao', campo: 'sistema_musculoesqueletico',
     zona: 'Estroma intermediário-periférico',
-    sinal_carga: 'Trama afrouxada, fibras irregulares',
-    sinal_preservacao: 'Fibras compactas, densas, estroma firme',
+    sinal_carga: 'Trama visivelmente AFROUXADA em relação ao restante do estroma DESTA íris, com separação de fibras nomeável em setor identificável. ⛔ trama aberta de constituição (a íris inteira é assim) NÃO qualifica — é o tipo da pessoa, não um achado.',
+    sinal_preservacao: 'Fibra compacta e alinhada VERIFICADA em pelo menos dois setores distintos, com o setor nomeado. ⛔ trama fechada de constituição NÃO é preservação observada.',
   },
   {
     group: 'sistema_orgao', campo: 'pele_tegumentar',
@@ -308,6 +321,12 @@ export const GLOSSARY: readonly GlossaryEntry[] = [
     bibliografia: 'Jackson p.36',
   },
   {
+    // ⏳ 2026-08-11 — NÃO alterado, e o motivo importa: o tipo `EixoTopograficoEntry`
+    // não admite sinal_carga/sinal_preservacao. Este campo (e coluna_cervical,
+    // coluna_toracica, coluna_lombar, sacro_coccyx) PODE ser emitido pelo modelo —
+    // está no CAMPO_ENUM — mas nunca recebeu critério do que procurar. Medido: 0
+    // achados, 2 preservados em 60 leituras; coluna_toracica e sacro_coccyx são mudos.
+    // Dar critério a eles exige ESTENDER O TIPO: decisão de arquitetura, do founder.
     group: 'eixo_topografico', campo: 'boca_garganta',
     zona: 'Orofaríngea ~1-2h OE, ~10-11h OD (mais externa que tireoide)',
     psicossomatica: 'Expressão, eixo verbal',

@@ -18,6 +18,15 @@ const EXAM = (n) => path.join(REPO, `apps/web/_exame-${n}.json`)
 const GAMMA = 1.1
 const K = 6 // saturação squash S/(S+k)
 const W_PRES = { vital_ativo: 2.0, neutro: 1.5 }
+// CLAREZA 1-5 do preservado (2026-08-11, founder). Espelha a `intensidade` do
+// achado. A escala é CENTRADA no peso antigo: clareza 3 = 1.5 = o `neutro` de
+// antes, e o topo (2.2) fica perto do `vital_ativo` (2.0). Foi escolhida assim de
+// propósito — se a média dos pesos mudasse, TODAS as agulhas se deslocariam, e o
+// α (BASELINE_LIVRE) foi calibrado contra um resultado aprovado pelo founder
+// (~26/83/21). Escala centrada = agulha estável, sem recalibrar α às cegas.
+// ⚠️ É um palpite de escala, não medição: confirmar com golden-set.mjs comparar
+// depois do primeiro exame gerado COM clareza.
+const W_CLAREZA = { 1: 0.8, 2: 1.2, 3: 1.5, 4: 1.8, 5: 2.2 }
 const squash = (s) => s / (s + K)
 // AGULHA dos centros: prior de suavização (Laplace) que tira os extremos 0/100.
 // posicao_livre = (livre + α) / (tensão + livre + 2α). Ajustado p/ bater o
@@ -490,7 +499,12 @@ function calc(exameOuNome, lastro) {
   for (const p of preservados) {
     const { key } = classify(p.campo)
     const t = lastro[key]
-    const w = W_PRES[p.polaridade_funcional] || W_PRES.neutro
+    // Exame novo traz `clareza` (1-5); exame gravado ANTES de 2026-08-11 não traz e
+    // cai no peso por polaridade — assim o golden das leituras antigas não se move
+    // e o diff só mostra o que mudou de verdade.
+    const w = Number.isInteger(p.clareza)
+      ? (W_CLAREZA[p.clareza] ?? W_PRES.neutro)
+      : (W_PRES[p.polaridade_funcional] || W_PRES.neutro)
     if (t) {
       for (const e of ['fogo', 'agua', 'terra', 'ar']) elem.recurso[e] += w * (t.elem[e] || 0)
       const cs = TOPO_CENTRO[key] || t.centros
