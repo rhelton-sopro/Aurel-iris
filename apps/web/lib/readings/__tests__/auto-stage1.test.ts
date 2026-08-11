@@ -107,6 +107,28 @@ describe('ensureStage1', () => {
     expect(runStage1Scan).not.toHaveBeenCalled()
   })
 
+  it('NÃO grava exame vazio — melhor sem linha que com linha mentindo', async () => {
+    // O Stage 1 devolve {} de vez em quando (3 execuções da mesma foto deram 9, 0 e 8
+    // achados). Gravar o vazio faz temStage1() dizer "tem exame", a tela esconde o
+    // aviso de "fotos apagadas", e o terapeuta descobre o buraco ao clicar em gerar —
+    // sem foto (purgada em 24h) e sem exame.
+    runStage1Scan.mockResolvedValue({ ...STAGE1_OK, exame: {}, validation_status: 'invalid_final' })
+
+    const r = await ensureStage1('r1')
+
+    expect(r).toEqual({ ok: false, erro: 'stage1 invalid_final' })
+    expect(rpc).not.toHaveBeenCalled()
+  })
+
+  it('NÃO grava quando o exame vem vazio mesmo com validação ok', async () => {
+    runStage1Scan.mockResolvedValue({ ...STAGE1_OK, exame: {} })
+
+    const r = await ensureStage1('r1')
+
+    expect(r.ok).toBe(false)
+    expect(rpc).not.toHaveBeenCalled()
+  })
+
   it('falha do Stage 1 não derruba a captura — devolve erro, não lança', async () => {
     runStage1Scan.mockRejectedValue(new Error('anthropic 529'))
 

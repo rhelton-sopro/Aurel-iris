@@ -103,8 +103,28 @@ export async function ensureStage1(readingId: string): Promise<
       clientAge,
     })
 
-    // 5. Persiste pelo MESMO RPC do /analyze (transação atômica com superseded_at) —
-    //    é o que faz o exame ser reaproveitado depois, em vez de rodar de novo.
+    // 5. ⛔ Exame VAZIO ou inválido NÃO entra no banco (2026-08-11).
+    //    Medido: o Stage 1 devolve `{}` de vez em quando — 3 execuções da mesma foto
+    //    deram 9, 0 e 8 achados, e há 2 casos gravados em produção com
+    //    validation_status='invalid_final'. O /analyze já aborta nesse caso
+    //    (route.ts ~436); aqui faltava. Gravar o vazio faria a leitura PARECER ter
+    //    exame: `temStage1()` diria true, a tela esconderia o aviso de "fotos
+    //    apagadas", e o terapeuta descobriria o buraco ao clicar em gerar — sem foto
+    //    (purgada em 24h) e sem exame. Melhor não ter linha nenhuma: aí a tela avisa
+    //    e ele refaz a captura enquanto ainda dá tempo.
+    const exameVazio =
+      !stage1.exame || Object.keys(stage1.exame as Record<string, unknown>).length === 0
+    if (stage1.validation_status === 'invalid_final' || exameVazio) {
+      console.error('[auto-stage1] Stage 1 inválido — NÃO gravando (leitura segue sem exame)', {
+        readingId,
+        validacao: stage1.validation_status,
+        vazio: exameVazio,
+      })
+      return { ok: false, erro: `stage1 ${stage1.validation_status}` }
+    }
+
+    // Persiste pelo MESMO RPC do /analyze (transação atômica com superseded_at) —
+    // é o que faz o exame ser reaproveitado depois, em vez de rodar de novo.
     const validationStatusForDb =
       stage1.validation_status === 'valid' || stage1.validation_status === 'valid_with_warnings'
         ? 'valid'
