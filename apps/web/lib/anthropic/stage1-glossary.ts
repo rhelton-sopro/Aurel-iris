@@ -151,7 +151,7 @@ export const GLOSSARY: readonly GlossaryEntry[] = [
     // cheque em branco pra declarar o coração preservado sem olhar o coração — e
     // contradizia a regra do próprio prompt ("ausência de carga NÃO é evidência de saúde").
     group: 'sistema_orgao', campo: 'coracao',
-    zona: 'Superior esquerda OE (~2-3h). Área da VONTADE (Marcos V. Dias, Iridologia psicoemocional): setor temporal sobre brônquio-pulmonar e coração — lacuna aqui lê-se como dificuldade de vínculo, NÃO como sinal cardíaco.',
+    zona: 'Anel BLOOD & LYMPH (3º de 7, humoral zone — logo FORA do colarete), ~2-3h na íris ESQUERDA (OE). Livro grande: "the left iris at 3 [h] in Zone 3, usually ON the autonomic nerve wreath line" — o gráfico Jensen/Ellen Jensen 2004 o põe colado ao colarete, não na periferia. Também é a Área da VONTADE (Marcos V. Dias): lacuna aqui lê-se como dificuldade de VÍNCULO, NUNCA como sinal cardíaco.',
     sinal_carga: 'LACUNA de contorno definido no setor, OU pigmento CONCENTRADO na mesma faixa. Pigmento DIFUSO pela íris inteira NÃO qualifica (é constitucional). Micro-irregularidade de trama, sem lacuna nem pigmento delimitado, NÃO qualifica.',
     sinal_preservacao: 'Setor varrido DIRETAMENTE: fibras contínuas e regulares, tom uniforme, sem lacuna definida e sem pigmento concentrado. ⛔ "pupila centrada" NÃO é critério — é sinal global, não deste campo.',
   },
