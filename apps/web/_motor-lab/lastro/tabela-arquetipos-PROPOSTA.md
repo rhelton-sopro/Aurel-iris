@@ -189,3 +189,61 @@ Peso na leitura = % dos achados que caem na célula (peso igual por achado, deci
 - anel_nervoso — 1 achados
 
 Esses precisam de centro definido, senão viram um arquétipo fantasma.
+
+---
+
+## ⭐ LEVANTAMENTO DE SOMBRA × LUZ (2026-08-11) — o que o dado paga
+
+Medido nas mesmas 40 leituras. **Antes de escrever qualquer texto, ler isto.**
+
+### As três coisas que estavam sendo chamadas de "luz"
+
+| | O que é de fato | Massa por leitura |
+|---|---|---|
+| **Sombra** (achado com carga) | onde a pessoa carrega | **7,3** — sólida |
+| Preservado `neutro` | o campo **não falou nada** | 2,4 — ⛔ NÃO é força |
+| **Luz real** (`vital_ativo`) | força observada | **0,75** — rara |
+| **Direção** (eixo/antídoto) | o que **falta**, não o que tem | 42 eixos — farta |
+
+**76% dos preservados são `neutro`** (96 de 126). Usar isso como "luz do arquétipo" seria
+afirmar força onde houve silêncio — a fabricação por cobertura obrigatória que o projeto já
+proibiu uma vez. A luz de verdade dá menos de uma por leitura.
+
+### A pergunta do founder: "mente ferrada = Sábio em sombra?"
+
+**Não.** Medido: sombra e luz caem no **mesmo centro em 8%** das leituras (3 de 40); em **93%**
+a força mora em outro lugar da ferida.
+
+    24x  sombra no corpo → luz no coração
+    10x  sombra na mente → luz no corpo
+
+⚠️ Com a ressalva de que esse padrão está largamente construído sobre preservados `neutro` —
+ou seja, é mais silêncio que força. Vale como sinal de que **não** dá pra inferir vocação a
+partir de carga; não vale como retrato da força da pessoa.
+
+⛔ O lastro liga achado → emoção, **nunca** achado → vocação. Dizer "você é um Sábio" porque a
+mente está carregada é camada que o dado não paga (e é o formato "sua ferida é seu dom", que
+é frase de coach).
+
+### Desenho proposto
+
+    arquétipo = célula (família × centro)     ← o NOME, das 12 células acima
+    peso      = % dos achados, peso igual     ← decisão do founder; empate é permitido
+    direção   = eixo do antídoto              ← honesta: pra onde ir, não onde está
+    luz       = só quando há vital_ativo      ← rara, e por isso vale
+
+Sem simetria luz/sombra obrigatória — não há massa pra isso.
+
+### Ordem do trabalho
+
+1. **Founder nomeia as 12 células** e escreve o comportamento (2-3 frases cada).
+2. **Mapear os 42 eixos** → família/arquétipo. Hoje eixo NÃO tem família: é uma terceira
+   taxonomia solta, e é ela que carrega a direção. Enquanto não existir, qualquer conta sobre
+   luz/direção é chute (a primeira medição do assistente deu "46% cruza de arquétipo" com
+   amostra de 7% — número descartado).
+3. **Fechar 2 furos do motor** (ver seção acima): `anel_sodico`/`anel_nervoso` sem centro, e a
+   regra do centro duplo (`mente,corpo`).
+4. Cálculo + render, 100% determinístico, sem prompt — mesma arquitetura dos blocos 7 e 8.
+5. **Rodar a sonda de sobreposição no TEXTO final**, não só nas células. Régua: o bloco 8 só
+   passou quando caiu pra 13%. O trio de famílias hoje dá 15% de pico — se o texto agrupar
+   demais, sobe, e aí não vale existir.
