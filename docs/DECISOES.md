@@ -103,6 +103,32 @@ normalizada e a agulha linear FICAM** — o que caiu foi só o desenho, não a r
 `smoke-render` ✓ · `eslint` 0 erros · `tsc` sem erro novo (os que aparecem são o backlog conhecido de
 testes + `tmp/`).
 
+**⭐ O QUE ISTO CONSERTOU DE VERDADE — descoberto depois, e é maior do que parecia.** O prompt do
+Stage 1 tem a **regra de protagonista** (`prompts/stage1-scan.md` §"Escala de intensidade"):
+*"em cada íris pode haver no MÁXIMO 1 achado intensidade 5 — o protagonista"*. O motor obedecia; **a
+régua não**. Um I5 pontua 5,87 e o corte de "muito alta" era 6,0 ⇒ o sistema **declarava** um
+protagonista numa ponta e o **recusava** na outra, rotulando-o com a mesma palavra de um I4 qualquer.
+Medido nas 60 de produção: leituras com um pêndulo "muito alta" vão de **12 (20%) para 27 (45%)**, e
+19 (32%) têm de fato um achado I5. ⇒ **a mudança não inflou nada — desbloqueou o que a spec já mandava.**
+
+**A questão da distribuição, encerrada — não era da régua.** Medido em 60 leituras / 300 achados:
+I1 9,7% · **I2 35,0%** · **I3 32,3%** · I4 16,7% · I5 6,3%. **77% dos achados são I1-I3**, e os
+rótulos são 86% baixa/média — os dois batem (a diferença de 9 pontos é o decaimento). A régua espelha
+fielmente o Stage 1. E o critério de intensidade **não é vago**: tem âncora visual em cada nível
+(sutil / localizado / moderado / expressivo / dominante). ⇒ hipótese de "modelo se refugia no meio"
+**descartada**. Os 86% em baixa/média são o **fundo contra o qual o protagonista se destaca** — é
+desenho, não defeito.
+
+**⏳ FICA ABERTO, e é de PRODUTO, não de régua:** **18 das 60 leituras (30%) não têm nenhum pêndulo em
+alta nem em muito alta** — mapa emocional inteiro em baixa/média, sem destaque. Pode ser fiel (o
+próprio prompt admite íris sem protagonista, "raro mas válido") ou pode ser um relatório morno para
+quase um terço dos clientes. **Não se decide por número — decide-se olhando as íris.**
+**Decisão do founder (13/08):** *"eu não vou olhar. Se você considerar que tá ok, vamos manter assim."*
+⇒ **MANTÉM.** Registrado para quando houver sinal: se aparecer queixa de "o relatório não apontou nada
+forte", a investigação começa por estas 18, e não do zero.
+**Contraponto registrado:** quem escreveu isto assinou a régua, **não** assinou que os 30% estão
+corretos — isso exige leitura de íris, que não é competência de quem escreveu.
+
 **⚠️ Registro de um susto que não era:** o founder relatou *"minha raiva contida era alta e agora ficou
 média"*. **Não foi esta mudança.** Medido: "raiva contida" sai **média** nos três renders — código
 atual, código novo e o render de 29/07, anterior a tudo. O pêndulo dele pontua 3,69 (63% da escala),
