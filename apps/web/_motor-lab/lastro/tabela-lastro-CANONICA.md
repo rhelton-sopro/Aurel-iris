@@ -130,7 +130,11 @@ Esta é a tabela-mestra. O 🔴 de um campo é a carga daquele elemento; o 🟢 
 - **🌍 Terra**
   - **🟢 emoções:** capacidade de soltar/deixar fluir — eliminar o que não serve (MTC — intestino grosso em harmonia) · desapego leve, confiança de que o novo chega (assinatura Terra+) · constância sem apego
   - **🟢 crenças:** "posso deixar ir o que já cumpriu seu papel" · "soltar abre espaço pro que vem" · "o que é meu de verdade não se perde quando eu solto"
-  - **🔴 emoções:** dificuldade de soltar (MTC/Hay) · apego ao passado (MTC/Hay/Dias) · retenção (Dias) · obstinação (Br) · congestionamento/acúmulo do velho (Hay) · constipação emocional (Hay) · marca de primeira infância (Dias)
+  - **🔴 emoções:** dificuldade de soltar (MTC/Hay) · apego ao passado (MTC/Hay/Dias) · retenção (Dias) · obstinação (Br) · congestionamento/acúmulo do velho (Hay) · constipação emocional (Hay)
+    <!-- "marca de primeira infância" saiu daqui em 2026-08-13: é marcação de TEMPO, não emoção
+         (o quando, que é do bloco 3), e a emoção dela — `retenção` — já está nesta mesma lista.
+         Continua em `anel_interno` como "marca de primeira infância/retenção", onde vem colada
+         à emoção e faz sentido. Ver AUDITORIA-motor-2026-08-13.md §4. -->
   - **🔴 crenças:** "se eu soltar, perco pra sempre" · "guardo tudo, vai que precisa" · "o passado era melhor, prefiro ficar nele"
 - **💧 Água**
   - **🟢 emoções:** soltar a mágoa velha com leveza (assinatura Água+)

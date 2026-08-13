@@ -26,7 +26,11 @@ const BASELINE_LIVRE = 1.2 // α
 // MAPA emocional: decaimento por rank DENTRO do campo — a emoção-núcleo do
 // órgão domina, a paleta genérica cai (quebra o empate 4.6 sem mapa de família
 // frágil, que reintroduziria o Forer da emoção ubíqua). rank0=1 · r1=.6 · r2=.36…
-const DECAY = 0.6
+// ⚠️ CALIBRÁVEL PARA MEDIÇÃO (2026-08-13): `IRIS_DECAY=0.8 node ...`. **Default 0.6 =
+// comportamento vigente.** É ELE, e não o NUCLEO_CAP, que decide quais emoções chegam ao
+// leque — medido: tirar o cap não muda nada, porque a decadência por rank já enterra a
+// emoção tardia. Ver AUDITORIA-motor-2026-08-13.md §4.
+const DECAY = Number(process.env.IRIS_DECAY) || 0.6
 // ATENUADOR do reforço de família (decisão founder 2026-07-25): os achados SOMAM na
 // família, mas cada membro SECUNDÁRIO entra atenuado por (intensidade/5)^2 — achado
 // fraco (I2 → fator 0.16) quase não soma; achado forte (I4 → 0.64, I5 → 1.0) soma quase
@@ -133,7 +137,21 @@ function parseLastro() {
     // Emoções POR ELEMENTO (não só flat) — o founder: o órgão carrega 2+
     // elementos e cada um tem sua emoção (fígado = 🔥raiva + 💧guardar). Núcleo
     // = as ~4 primeiras de cada bloco (corta paleta genérica/Forer).
-    const NUCLEO_CAP = 4
+    //
+    // ⛔ TETO REMOVIDO em 2026-08-13 (decisão do founder, medida antes). O corte em 4 tornava
+    // **33 emoções da canônica inalcançáveis** — e cortava por POSIÇÃO NA LISTA, não por
+    // qualidade: `vergonha` (que dá nome a uma família), `desamparo`, `angústia`, `rejeição`,
+    // `ciúme` e `rancor` estavam fora por terem sido digitadas em 5º lugar.
+    // ⭐ E o medo que justificava o teto — Forer — NÃO se confirmou. Medido nas 60 leituras de
+    // produção: com teto 4 · 8 · sem teto, a sobreposição média entre leituras fica em 21,7%
+    // nos três, e o número de emoções que chegam ao leque não muda (55). Quem enterra a emoção
+    // tardia é o `DECAY`, não o teto. Mais vocabulário deixa as leituras MAIS distintas
+    // (decay 0,95 → 20,9%), não menos.
+    // ⚠️ Pré-requisito que foi feito junto: as 33 precisavam de FAMÍLIA no `emocao-familia.md`,
+    // que tinha sido construído sobre o vocabulário já cortado ("232 emoções", diz o cabeçalho).
+    // Sem isso, tirar o teto criaria 33 emoções sem família e quebraria o reforço por família.
+    // `IRIS_NUCLEO_CAP=4` reproduz o comportamento antigo, para comparar.
+    const NUCLEO_CAP = Number(process.env.IRIS_NUCLEO_CAP) || Infinity
     const clean = (p) => p.replace(/\([^)]*\)/g, '').replace(/[*_`]/g, '').trim()
     const cargaByElem = { fogo: [], agua: [], terra: [], ar: [] }
     const recursoByElem = { fogo: [], agua: [], terra: [], ar: [] }
