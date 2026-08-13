@@ -958,6 +958,66 @@ aprovado (~26/83/21), então exige medição.
 **Status:** REVERTIDA — `motor-calc.mjs` intocado, golden 58/58 idênticas (as 2 restantes são
 capturas novas que entraram na janela).
 
+---
+
+## 2026-08-13 — ⛔ REPROVADO: "o prompt escolhe qual emoção é a mais provável"
+
+**Quem decidiu:** founder (propôs a hipótese e autorizou o A/B de 20 leituras).
+**Status:** REPROVADO por medição. Não sobe. Código removido do `serialize.mjs`.
+
+**A hipótese.** O motor escolhe a emoção de cada campo por **posição na tabela de lastro**, não
+por evidência — o achado da íris diz *onde* e *quanto*, nunca *qual das emoções daquele campo*.
+A ideia era oferecer ao modelo, no bloco B, as emoções **irmãs** do mesmo campo, para ele decidir
+pela `descricao_visual` (que já recebe no bloco A) em vez de aceitar a primeira da lista.
+
+**O teste.** 20 leituras reais de produção, cada uma nos dois braços — controle (bloco B como está
+no ar) e tratamento (bloco B + o menu). 40 gerações, **US$ 9,10**, zero erros. Métrica: sobreposição
+de vocabulário entre os relatórios **dentro** de cada braço.
+
+| | sobreposição |
+|---|---|
+| controle | 40,4% |
+| tratamento | 40,2% |
+
+**Por que isso é "não funcionou" e não "quase".** A diferença de 0,2 p.p. está dentro do ruído.
+A prova está na **similaridade cruzada**: a mesma leitura, nos dois braços, deu 44,5% de
+sobreposição entre si — ou seja, o modelo **usou** o menu (o texto mudou), mas a variação que o
+menu introduz tem a mesma magnitude da variação normal de duas execuções iguais. Ele trocou uma
+palavra por outra, não trocou de leitura.
+
+**Contraponto registrado:** o problema que motivou a hipótese **continua de pé** — a escolha da
+emoção segue sendo posicional, e isso é arbitrariedade real dentro do motor. O que o teste mata é
+*esta solução*, não o problema. Um segundo round plausível seria deixar o motor escolher pelo
+**nível do pêndulo** em vez da posição; não foi testado. ⚠️ Antes de tentar de novo, ler
+`_motor-lab/lastro/AUDITORIA-motor-2026-08-13.md` §6 — o experimento custa ~US$ 9 e já foi pago
+uma vez.
+
+---
+
+## 2026-08-13 — teto de saída sobe de 24.000 para 32.000 tokens
+
+**Quem decidiu:** founder.
+**Status:** APLICADA.
+
+**O que estava acontecendo.** `MAX_TOKENS = 24000` em `lib/emocional/gerar.ts` é teto rígido: ao
+atingir, a API **para no meio da frase**. Medido no A/B: 4 de 40 gerações bateram exatamente
+24.000 e terminam truncadas dentro do **bloco 7**, no meio dos Caminhos —
+*"...sem precisar controlar o qu"*, *"...s2: Lembre de uma vez rec"*. Em produção real são
+**2 de 22 (9%)**. O cliente recebe um documento que acaba no meio de uma pergunta de sessão,
+e paga-se o preço cheio por ele.
+
+**Por que 32.000.** As gerações que não truncam param sozinhas entre 15.000 e 23.700 — a mediana
+fica perto de 20.000. 32.000 dá folga de ~35% sobre o maior relatório completo já observado sem
+abrir espaço para o modelo se alongar: ele para quando termina, não quando pode. Custo: só sobe
+nos relatórios que de fato precisavam do espaço; os demais não mudam.
+
+**Contraponto registrado:** o teto é um **sintoma**. A causa é o bloco 7 crescer com o número de
+emoções no vocabulário — e hoje o vocabulário cresceu (o teto de 4 por campo saiu no `5783aae`).
+Se o truncamento voltar com 32.000, a resposta certa não é 40.000: é limitar o **número de
+Caminhos** que o bloco 7 escreve.
+
+---
+
 ## Como usar
 
 - **Ao tomar uma decisão:** registrar aqui na mesma sessão, com razão e status.

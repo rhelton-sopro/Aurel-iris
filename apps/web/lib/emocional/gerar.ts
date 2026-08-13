@@ -25,7 +25,12 @@ const serialize = _serialize as (exame: unknown, nome: string) => string
 const LAB = path.join(process.cwd(), '_motor-lab')
 export const PROMPT_VERSION = 'emocional_0.1.0'
 const MODEL = 'claude-sonnet-5'
-const MAX_TOKENS = 24000
+// ⚠️ TETO RÍGIDO: ao atingir, a API para NO MEIO DA FRASE — não existe "resumir o final".
+// Era 24.000 e truncava 2 de 22 relatórios de produção (9%), sempre dentro do bloco 7,
+// no meio dos Caminhos. As gerações que terminam sozinhas param entre 15k e 23,7k.
+// Ver docs/DECISOES.md (2026-08-13). Se voltar a truncar, a resposta NÃO é subir de novo:
+// é limitar quantos Caminhos o bloco 7 escreve.
+const MAX_TOKENS = 32000
 
 let _system: string | null = null
 function systemPrompt(): string {

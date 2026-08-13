@@ -95,9 +95,11 @@ function serialize(exameOuNome, nomePessoa) {
       anti = ` ⟷ 🟢 **${a.principal}**${a.oque ? ` (${a.oque})` : ''}${formul.length ? ` _[formulações do eixo: ${formul.join(' · ')}]_` : ''}`
     }
     const conv = (r.famN?.[famDe(emo)] || 1) >= 2
-    // % da escala = quanto isso pesa comparado a UM achado I5 sozinho (=100%). Acima de
-    // 100% significa mais de um achado apontando pra mesma coisa. O ⊕ é anotação de
-    // confiança, e NÃO rebaixa mais o nível — medida é medida (founder, 2026-08-13).
+    // ⛔ TESTADO E REPROVADO (A/B de 20 leituras, 40 gerações, US$ 9,10 — 13/08).
+    // A ideia era oferecer aqui as emoções IRMÃS do mesmo campo, para o modelo escolher
+    // pela `descricao_visual` em vez de aceitar a que o motor escolheu por POSIÇÃO na
+    // tabela. MEDIDO: sobreposição entre os 20 relatórios 40,4% → 40,2% — ruído, não
+    // efeito. Ver AUDITORIA-motor-2026-08-13.md §6 antes de tentar de novo.
     L.push(`- ${emo} — ${nivel(s)} · ${Math.round(normCarga(s) * 100)}% da escala (agulha ${Math.round(bipCarga(s))})${conv ? ' ⊕ corroborada' : ''}${anti}`)
   }
   L.push('> ⚠️ O 🟢 acima é o **antídoto** = a DIREÇÃO de saída daquela carga, não uma força que a pessoa já tem. Use-o pra mostrar a saída ("o outro lado disso é…"), **nunca** pra afirmar que ela já está assim. O que ela JÁ tem livre é só a lista abaixo.')
