@@ -164,6 +164,37 @@ Achadas no caminho, **nenhuma é da mudança de 13/08**:
 
 ---
 
+## 7. 🔴 FURO NO GATE — o golden não vê os níveis do pêndulo
+
+Descoberto ao medir o impacto da escala nova (13/08, depois do corpo desta auditoria).
+
+Cada linha do `golden/emocional-1.0.json` grava: `agulhas` dos 3 centros, `nAch`, `nPres`,
+`familias`, `domFam`, `suportes`, `integrativas`, `crencas`, `htmlHash`. **Não grava o rótulo de
+carga de nenhuma emoção.** Consequência direta: a normalização da escala (`a8f2c84`), que é a
+mudança mais visível do dia para o cliente, passou pelo `golden-set.mjs comparar` como
+**"60 idênticas · 0 diferenças"**. O gate não mentiu — ele simplesmente não olha para lá.
+
+**O que a escala nova de fato muda** (medido sobre as mesmas 60 leituras, régua antiga
+`s ≥ 6 / 4 / 2,5` contra a nova `n ≥ 0,90 / 0,70 / 0,45`):
+
+| | |
+|---|---|
+| rótulos de carga avaliados | 495 |
+| rótulos que mudam | **18 (3,6%)** · em 17 das 60 leituras |
+| `alta → muito alta` | 17 — e **14 são a emoção PRINCIPAL** da leitura |
+| `média → baixa` | 1 |
+
+Ou seja: a mudança é praticamente unidirecional e é exatamente a regra do protagonista chegando à
+tela — um achado I5 finalmente lê como *muito alta*. `alta → média` **não ocorre nenhuma vez**:
+exige score na janela `[4,000 ; 4,111)`, larga demais para 0,11 de amplitude.
+
+⚠️ **Enquanto o golden não gravar os níveis, qualquer mexida futura em `CORTES`, `GAMMA`, `DECAY`
+ou `MAX_ACHADO` passa em silêncio.** Corrigir = acrescentar às linhas do golden o par
+`[emoção, nível]` das 3 primeiras cargas. Barato, e fecha o único ponto onde o gate é cego para o
+que o cliente enxerga.
+
+---
+
 ## Como repetir esta auditoria
 
 ```
