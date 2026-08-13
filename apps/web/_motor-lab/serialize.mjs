@@ -123,7 +123,15 @@ function serialize(exameOuNome, nomePessoa) {
   if (cb.bordas_pupilares === 'regulares') consti.push('estabilidade')
   if (consti.length) L.push(`- constituição: ${consti.join(' · ')}`)
   if (r.adjuvantes.length) L.push(`- (adjuvantes, sem peso próprio — reforçam a área-alvo: ${r.adjuvantes.join(', ')})`)
-  if (r.skipped.length) L.push(`- (ignorados — marcador/modulador: ${r.skipped.join(', ')})`)
+  // ⚠️ SEPARADO em 2026-08-13 (auditoria): esta linha dizia "ignorados — marcador/modulador"
+  // e engolia junto os campos SEM LASTRO, que não são nem uma coisa nem outra — são achados
+  // que o Stage 1 tem permissão de emitir e o motor não sabe interpretar, então descarta.
+  // Medido nas 60 de produção: 8 ocorrências (`plexo_solar` 6 · `baco` 2) em 8 leituras.
+  // Rotular os dois com o mesmo nome escondia o furo de quem lê o bloco B pra calibrar.
+  const porDesenho = r.skipped.filter((s) => !s.includes('SEM-LASTRO'))
+  const semLastro = r.skipped.filter((s) => s.includes('SEM-LASTRO'))
+  if (porDesenho.length) L.push(`- (ignorados por desenho — marcador/modulador: ${porDesenho.join(', ')})`)
+  if (semLastro.length) L.push(`- ⚠️ (DESCARTADOS — o Stage 1 emitiu e o motor não tem lastro pra interpretar: ${semLastro.join(', ')})`)
   L.push('')
 
   // linha do tempo (bloco 3) — passa cru, o LLM traduz pra emoção/comportamento

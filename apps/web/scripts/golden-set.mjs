@@ -31,6 +31,16 @@ const { data: fnds } = await sb
   .order('generated_at', { ascending: false })
   .limit(60)
 
+// O render carimba a data de HOJE no documento ("Leitura de 12 de agosto de 2026"), então
+// hashear o HTML cru fazia a régua acusar "documento mudou" em TODA leitura com relatório,
+// todo dia, sem nada ter mudado — 18 falsos positivos por dia, medido em 12/08. A régua tem
+// que comparar CONTEÚDO, não calendário.
+const MESES = 'janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro'
+const semData = (html) => html
+  .replace(new RegExp(`\\d{1,2}\\s+de\\s+(${MESES})\\s+de\\s+\\d{4}`, 'gi'), '«DATA»')
+  .replace(/\d{2}\/\d{2}\/\d{4}/g, '«DATA»')
+  .replace(/\d{4}-\d{2}-\d{2}/g, '«DATA»')
+
 const α = BASELINE_LIVRE
 const linhas = []
 for (const f of fnds ?? []) {
@@ -47,7 +57,7 @@ for (const f of fnds ?? []) {
   if (r?.report_emocional) {
     try {
       const { html } = renderHTML(r.report_emocional, f.exame_json ?? {}, 'Golden')
-      htmlHash = createHash('sha1').update(html).digest('hex').slice(0, 12)
+      htmlHash = createHash('sha1').update(semData(html)).digest('hex').slice(0, 12)
     } catch { htmlHash = 'ERRO_RENDER' }
   }
 

@@ -122,7 +122,7 @@
     "nutricao"
    ],
    "crencas": 6,
-   "htmlHash": "d38bdd29e1fe"
+   "htmlHash": "302d029295f5"
   },
   {
    "id": "0a75c429",
@@ -159,45 +159,6 @@
     "nutricao"
    ],
    "crencas": 4,
-   "htmlHash": null
-  },
-  {
-   "id": "1bdbc52d",
-   "agulhas": {
-    "mente": 47,
-    "coracao": 50,
-    "corpo": 22
-   },
-   "nAch": 8,
-   "nPres": 3,
-   "familias": [
-    "Controle e rigidez",
-    "Esgotamento e vitalidade",
-    "Raiva"
-   ],
-   "domFam": "Raiva",
-   "suportes": [
-    "complexo B",
-    "enxofre alimentar",
-    "fibras",
-    "magnésio",
-    "vitamina C",
-    "vitamina D",
-    "vitamina E",
-    "água",
-    "ômega-3"
-   ],
-   "integrativas": [
-    "adapto",
-    "contemplativas",
-    "corporais",
-    "eixos",
-    "exercicios",
-    "fito",
-    "florais",
-    "nutricao"
-   ],
-   "crencas": 5,
    "htmlHash": null
   },
   {
@@ -281,46 +242,6 @@
     "nutricao"
    ],
    "crencas": 6,
-   "htmlHash": null
-  },
-  {
-   "id": "218b7843",
-   "agulhas": {
-    "mente": 18,
-    "coracao": 82,
-    "corpo": 24
-   },
-   "nAch": 7,
-   "nPres": 3,
-   "familias": [
-    "Ansiedade e preocupação",
-    "Controle e rigidez",
-    "Esgotamento e vitalidade",
-    "Medo",
-    "Raiva"
-   ],
-   "domFam": "Raiva",
-   "suportes": [
-    "complexo B",
-    "enxofre alimentar",
-    "fibras",
-    "magnésio",
-    "potássio",
-    "vitamina D",
-    "água",
-    "ômega-3"
-   ],
-   "integrativas": [
-    "adapto",
-    "contemplativas",
-    "corporais",
-    "eixos",
-    "exercicios",
-    "fito",
-    "florais",
-    "nutricao"
-   ],
-   "crencas": 5,
    "htmlHash": null
   },
   {
@@ -434,7 +355,7 @@
     "nutricao"
    ],
    "crencas": 5,
-   "htmlHash": "f32da01e2c25"
+   "htmlHash": "ef4b4ac44ed9"
   },
   {
    "id": "32727690",
@@ -708,7 +629,7 @@
     "nutricao"
    ],
    "crencas": 4,
-   "htmlHash": "7e92c2478dc2"
+   "htmlHash": "34489c477e3f"
   },
   {
    "id": "3f6d5ef7",
@@ -789,7 +710,7 @@
     "nutricao"
    ],
    "crencas": 6,
-   "htmlHash": "436efecf98e4"
+   "htmlHash": "59efce6bdde5"
   },
   {
    "id": "405a8091",
@@ -942,7 +863,7 @@
     "nutricao"
    ],
    "crencas": 5,
-   "htmlHash": "e8e200c164f6"
+   "htmlHash": "3649fd899d51"
   },
   {
    "id": "4c0f2b1f",
@@ -1066,7 +987,7 @@
     "nutricao"
    ],
    "crencas": 6,
-   "htmlHash": "fce23da5cd89"
+   "htmlHash": "d0e3dbc0ea64"
   },
   {
    "id": "679cfd2c",
@@ -1147,7 +1068,7 @@
     "nutricao"
    ],
    "crencas": 5,
-   "htmlHash": "6c3df1709689"
+   "htmlHash": "6ecb64f611e8"
   },
   {
    "id": "683d51c5",
@@ -1307,7 +1228,7 @@
     "nutricao"
    ],
    "crencas": 6,
-   "htmlHash": "bb860389134a"
+   "htmlHash": "210e55e0e985"
   },
   {
    "id": "85f37df8",
@@ -1349,7 +1270,7 @@
     "nutricao"
    ],
    "crencas": 5,
-   "htmlHash": "6adafb7bbcef"
+   "htmlHash": "bd76bd078f9a"
   },
   {
    "id": "885d4796",
@@ -1391,7 +1312,7 @@
     "nutricao"
    ],
    "crencas": 5,
-   "htmlHash": "f847c1bdc056"
+   "htmlHash": "68832cd43adf"
   },
   {
    "id": "8d9031ff",
@@ -1432,6 +1353,46 @@
    ],
    "crencas": 5,
    "htmlHash": null
+  },
+  {
+   "id": "92445040",
+   "agulhas": {
+    "mente": 26,
+    "coracao": 82,
+    "corpo": 29
+   },
+   "nAch": 8,
+   "nPres": 4,
+   "familias": [
+    "Ansiedade e preocupação",
+    "Esgotamento e vitalidade",
+    "Nojo e aversão",
+    "Raiva"
+   ],
+   "domFam": "Raiva",
+   "suportes": [
+    "complexo B",
+    "fibras",
+    "glutamina",
+    "magnésio",
+    "vitamina A",
+    "vitamina D",
+    "zinco",
+    "água",
+    "ômega-3"
+   ],
+   "integrativas": [
+    "adapto",
+    "contemplativas",
+    "corporais",
+    "eixos",
+    "exercicios",
+    "fito",
+    "florais",
+    "nutricao"
+   ],
+   "crencas": 5,
+   "htmlHash": "6f66f0940a8f"
   },
   {
    "id": "94610af8",
@@ -1511,7 +1472,7 @@
     "nutricao"
    ],
    "crencas": 5,
-   "htmlHash": "07580e3d00cb"
+   "htmlHash": "346aef8852b9"
   },
   {
    "id": "a88994a2",
@@ -1551,7 +1512,7 @@
     "nutricao"
    ],
    "crencas": 5,
-   "htmlHash": "e3ff557257e5"
+   "htmlHash": "a1fa50721917"
   },
   {
    "id": "aac033d9",
@@ -1635,6 +1596,44 @@
    "htmlHash": null
   },
   {
+   "id": "bd7ff26d",
+   "agulhas": {
+    "mente": 26,
+    "coracao": 82,
+    "corpo": 35
+   },
+   "nAch": 6,
+   "nPres": 3,
+   "familias": [
+    "Ansiedade e preocupação",
+    "Controle e rigidez",
+    "Esgotamento e vitalidade"
+   ],
+   "domFam": "Ansiedade e preocupação",
+   "suportes": [
+    "complexo B",
+    "fibras",
+    "magnésio",
+    "triptofano",
+    "vitamina B6",
+    "vitamina D",
+    "zinco",
+    "água"
+   ],
+   "integrativas": [
+    "adapto",
+    "contemplativas",
+    "corporais",
+    "eixos",
+    "exercicios",
+    "fito",
+    "florais",
+    "nutricao"
+   ],
+   "crencas": 4,
+   "htmlHash": "86d48aeeda9b"
+  },
+  {
    "id": "be53fde0",
    "agulhas": {
     "mente": 34,
@@ -1716,7 +1715,43 @@
     "nutricao"
    ],
    "crencas": 6,
-   "htmlHash": "0dcd51d719be"
+   "htmlHash": "7d3bb0f31715"
+  },
+  {
+   "id": "bf6c8900",
+   "agulhas": {
+    "mente": 41,
+    "coracao": 40,
+    "corpo": 69
+   },
+   "nAch": 6,
+   "nPres": 3,
+   "familias": [
+    "Ansiedade e preocupação",
+    "Controle e rigidez",
+    "Esgotamento e vitalidade"
+   ],
+   "domFam": "Controle e rigidez",
+   "suportes": [
+    "complexo B",
+    "magnésio",
+    "vitamina D",
+    "vitamina E",
+    "zinco",
+    "ômega-3"
+   ],
+   "integrativas": [
+    "adapto",
+    "contemplativas",
+    "corporais",
+    "eixos",
+    "exercicios",
+    "fito",
+    "florais",
+    "nutricao"
+   ],
+   "crencas": 3,
+   "htmlHash": "26c7e39d7c34"
   },
   {
    "id": "c15a0752",
@@ -1758,7 +1793,7 @@
     "nutricao"
    ],
    "crencas": 7,
-   "htmlHash": "00f57503d387"
+   "htmlHash": "6fe44810e270"
   },
   {
    "id": "c3841fbf",
@@ -1799,7 +1834,7 @@
     "nutricao"
    ],
    "crencas": 6,
-   "htmlHash": "5de3fd8dfa0e"
+   "htmlHash": "371e086262f9"
   },
   {
    "id": "ca339d18",
@@ -1921,6 +1956,44 @@
    "htmlHash": null
   },
   {
+   "id": "d51cd2e4",
+   "agulhas": {
+    "mente": 68,
+    "coracao": 56,
+    "corpo": 33
+   },
+   "nAch": 6,
+   "nPres": 6,
+   "familias": [
+    "Ansiedade e preocupação",
+    "Controle e rigidez",
+    "Medo"
+   ],
+   "domFam": "Controle e rigidez",
+   "suportes": [
+    "complexo B",
+    "fibras",
+    "magnésio",
+    "potássio",
+    "vitamina E",
+    "zinco",
+    "água",
+    "ômega-3"
+   ],
+   "integrativas": [
+    "adapto",
+    "contemplativas",
+    "corporais",
+    "eixos",
+    "exercicios",
+    "fito",
+    "florais",
+    "nutricao"
+   ],
+   "crencas": 4,
+   "htmlHash": "729ff3db8baf"
+  },
+  {
    "id": "d5f8fe74",
    "agulhas": {
     "mente": 41,
@@ -1956,7 +2029,7 @@
     "nutricao"
    ],
    "crencas": 4,
-   "htmlHash": "8663d965430b"
+   "htmlHash": "b0b085b29799"
   },
   {
    "id": "d79765ef",
@@ -1997,46 +2070,7 @@
     "nutricao"
    ],
    "crencas": 6,
-   "htmlHash": "16625350252c"
-  },
-  {
-   "id": "e008c80a",
-   "agulhas": {
-    "mente": 32,
-    "coracao": 25,
-    "corpo": 50
-   },
-   "nAch": 8,
-   "nPres": 2,
-   "familias": [
-    "Ansiedade e preocupação",
-    "Controle e rigidez",
-    "Esgotamento e vitalidade",
-    "Raiva"
-   ],
-   "domFam": "Controle e rigidez",
-   "suportes": [
-    "complexo B",
-    "enxofre alimentar",
-    "magnésio",
-    "triptofano",
-    "vitamina B6",
-    "vitamina D",
-    "vitamina E",
-    "ômega-3"
-   ],
-   "integrativas": [
-    "adapto",
-    "contemplativas",
-    "corporais",
-    "eixos",
-    "exercicios",
-    "fito",
-    "florais",
-    "nutricao"
-   ],
-   "crencas": 4,
-   "htmlHash": null
+   "htmlHash": "f490102f23f0"
   },
   {
    "id": "e39d6613",
@@ -2237,48 +2271,6 @@
    "htmlHash": null
   },
   {
-   "id": "edb6c761",
-   "agulhas": {
-    "mente": 21,
-    "coracao": 40,
-    "corpo": 23
-   },
-   "nAch": 9,
-   "nPres": 2,
-   "familias": [
-    "Ansiedade e preocupação",
-    "Controle e rigidez",
-    "Esgotamento e vitalidade",
-    "Raiva"
-   ],
-   "domFam": "Raiva",
-   "suportes": [
-    "complexo B",
-    "enxofre alimentar",
-    "fibras",
-    "magnésio",
-    "triptofano",
-    "vitamina B6",
-    "vitamina C",
-    "vitamina D",
-    "vitamina E",
-    "água",
-    "ômega-3"
-   ],
-   "integrativas": [
-    "adapto",
-    "contemplativas",
-    "corporais",
-    "eixos",
-    "exercicios",
-    "fito",
-    "florais",
-    "nutricao"
-   ],
-   "crencas": 6,
-   "htmlHash": null
-  },
-  {
    "id": "f27108d6",
    "agulhas": {
     "mente": 44,
@@ -2315,7 +2307,7 @@
     "nutricao"
    ],
    "crencas": 6,
-   "htmlHash": "368c23f167d8"
+   "htmlHash": "8a8d9ecf51e1"
   },
   {
    "id": "f513a919",
