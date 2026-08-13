@@ -157,6 +157,44 @@ Esta é a tabela-mestra. O 🔴 de um campo é a carga daquele elemento; o 🟢 
   - **🔴 emoções:** irritação voltada contra si na auto-humilhação (o calor virado pra dentro)
   - **🔴 crenças:** "desconto em mim a raiva do que não recebo"
 
+### `baco` — anel MUSCULATURA (4º de 7), ~3:45-4:15h, íris ESQUERDA (OE)
+- **Elemento(s):** 🌍Terra 60% · 💧Água 22% · 💨Ar 18%. **Derivação:** ruminação(🌍0.7/💨0.3) + não-assimilar(🌍0.8/💧0.2) + falta de reserva/apoio(💧0.7/🌍0.3) + preocupação(🌍0.6/💨0.4) → 🌍=2.4 · 💧=0.9 · 💨=0.7 sobre 4.0 → **🌍60 · 💧22 · 💨18**. **Lastro:** MTC (Baço = Terra; transformar e transportar; 思 = pensamento excessivo/ruminação; "o Baço sustenta") + Jensen (banda própria no gráfico oficial, espelho anatômico do fígado). ⚠️ *Campo mapeado em 2026-08-13 (auditoria)* — estava no glossário do Stage 1 desde 26/07 e sem lastro, então todo achado aqui era **descartado em silêncio**.
+- **Centro:** Coração — zona temporal/medial 2-4h (regra topográfica do bloco 2).
+- **🌍 Terra**
+  - **🟢 emoções:** capacidade de assimilar/aproveitar o que serve — separar o puro do impuro (MTC — Baço em harmonia: transforma e transporta) · acolhimento/nutrição de si e dos outros (MTC — Terra = centro/cuidado) · capacidade de receber tanto quanto dá (MTC — nutrir a si)
+  - **🟢 crenças:** "consigo separar o que me serve do que não me serve" · "o que eu recebo eu aproveito, não fica parado" · "sei me sustentar sem endurecer"
+  - **🔴 emoções:** ruminação (MTC — *modo Mente*) · não-assimilar (MTC/Hay) · preocupação (Br/MTC)
+  - **🔴 crenças:** "fico mastigando a mesma coisa e não digiro" · "recebo, mas nada disso vira força em mim" · "se eu parar de me preocupar, alguma coisa desanda"
+- **💧 Água**
+  - **🟢 emoções:** senso de reserva e apoio real (assinatura Água+ — a base que sustenta) · capacidade de pedir e receber apoio
+  - **🟢 crenças:** "tenho com quem contar quando pesa" · "posso pedir ajuda sem me sentir menor"
+  - **🔴 emoções:** falta de reserva/apoio (Dias)
+  - **🔴 crenças:** "se eu não segurar, ninguém segura" · "não sobra reserva pra mim"
+- **💨 Ar**
+  - **🟢 emoções:** praticidade, resolver no próprio tempo (assinatura Ar+/Terra — a mente que assenta)
+  - **🟢 crenças:** "nem tudo precisa ser resolvido agora"
+  - **🔴 emoções:** dispersão mental (assinatura Ar− — a atenção que se espalha quando o pensamento gira)
+  - **🔴 crenças:** "penso em tudo ao mesmo tempo e não concluo nada"
+
+### `plexo_solar` — oval peri-colarete, ~3h na íris ESQUERDA (OE) · marcado SOL PLX no gráfico
+- **Elemento(s):** 🔥Fogo 45% · 💧Água 33% · 🌍Terra 22%. **Derivação:** desvalorização(🔥0.5/💧0.5) + senso de inferioridade(💧0.6/🌍0.4) + sobressalto(🔥0.7/💧0.3) + assertividade travada(🔥0.6/🌍0.4) → 🔥=1.8 · 💧=1.4 · 🌍=0.8 sobre 4.0 → **🔥45 · 💧33 · 🌍22**. **Lastro:** Jensen agrupa o plexo solar com adrenal/coração-aorta na mesma faixa; leitura somática do plexo como centro visceral do poder pessoal — o lugar onde o susto e a afirmação são *sentidos* antes de pensados. ⚠️ *Lastro ESTICADO:* Br/MTC não cobrem "plexo solar" como órgão; a ponte é somática. ⚠️ *Campo mapeado em 2026-08-13 (auditoria)* — mesma história do `baco`.
+- **Centro:** Coração — zona temporal/medial 2-4h (regra topográfica do bloco 2).
+- **🔥 Fogo**
+  - **🟢 emoções:** assertividade — falar por si com firmeza (assinatura Fogo+ — o poder pessoal que sai sem atropelar) · capacidade de pôr limites e sustentar a própria posição
+  - **🟢 crenças:** "consigo dizer o que quero sem pedir licença" · "meu lugar não precisa ser disputado"
+  - **🔴 emoções:** desvalorização (Dias) · sobressalto (somático — o susto que bate na boca do estômago)
+  - **🔴 crenças:** "quando é hora de me impor, some a voz" · "levo susto com coisa pequena"
+- **💧 Água**
+  - **🟢 emoções:** valor sentido por dentro (assinatura Água+ — o valor que não depende de aplauso) · segurança interna
+  - **🟢 crenças:** "meu valor não depende de quem está olhando" · "posso me sentir seguro por dentro, mesmo sem garantia fora"
+  - **🔴 emoções:** senso de inferioridade (Dias)
+  - **🔴 crenças:** "os outros parecem saber o que estão fazendo, eu não" · "meu lugar é sempre um degrau abaixo"
+- **🌍 Terra**
+  - **🟢 emoções:** firmeza para sustentar a própria posição (assinatura Terra+ — a base que segura o que foi dito)
+  - **🟢 crenças:** "o que eu afirmo eu sustento"
+  - **🔴 emoções:** ruminação (MTC — o pensamento que gira em vez de virar ação)
+  - **🔴 crenças:** "ensaio a conversa mil vezes e não tenho ela"
+
 ### `coracao` — superior esquerda OE (2-3h)
 - **Elemento(s):** 💧Água 50% · 💨Ar 35% · 🔥Fogo 15%. **Derivação:** carga = medo de não ser amado(💧0.6/💨0.4) + abandono(💧0.8/💨0.2) + dificuldade de vínculo(💨0.5/💧0.5) → 💧Água+💨Ar dominam. **🔥Fogo 15% (ajuste pós-auditoria):** honra a MTC (Coração=Fogo) — o Fogo entra como calor/vitalidade/desejo de aproximar-se, sem desmontar a carga. Alegria social fica no 🟢 do Ar; o ardor/calor fica no Fogo.
 - **Centro:** Coração (vínculo, amor).
@@ -496,7 +534,7 @@ Esta é a tabela-mestra. O 🔴 de um campo é a carga daquele elemento; o 🟢 
 - **💧 Água**
   - **🟢 emoções:** autoestima que sustenta a defesa sem exaustão (Dias — o positivo do anel de expressão) · valor sentido por dentro (assinatura Água+)
   - **🟢 crenças:** "meu valor não depende de me defender" · "posso me sentir bem comigo sem provar nada"
-  - **🔴 emoções:** baixa autoestima (Dias — "anel de expressão") · desilusão/trauma localizado (Dias) · "baixa estima → baixa imunidade" (Dias)
+  - **🔴 emoções:** baixa autoestima (Dias — "anel de expressão") · desilusão/trauma localizado (Dias)
   - **🔴 crenças:** "nunca sou bom o bastante" (baixa autoestima — Dias) · "guardo uma desilusão que ainda dói"
 - **🌍 Terra**
   - **🟢 emoções:** capacidade de se recuperar e se fortalecer, base que se refaz (assinatura Terra+ — resistência)

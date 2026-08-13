@@ -95,6 +95,10 @@ const TOPO_CENTRO = {
   sistema_nervoso_autonomico: ['mente'], eixo_pituitario_adrenal: ['mente'],
   // Coração (temporal/medial 2-4h · 8-10h + expressão/peito)
   coracao: ['coracao'], pulmoes: ['coracao'], tireoide: ['coracao'], boca_garganta: ['coracao'],
+  // mapeados em 2026-08-13 (auditoria): `baco` ~3:45-4:15h OE e `plexo_solar` ~3h OE caem
+  // os dois na faixa temporal/medial 2-4h ⇒ Coração pela régua topográfica desta tabela.
+  // Bate com o `Centro:` que ficou escrito no lastro deles (o fallback daria o mesmo).
+  baco: ['coracao'], plexo_solar: ['coracao'],
   coluna_cervical: ['coracao'], coluna_toracica: ['coracao'], sistema_linfatico: ['coracao'],
   sistema_circulatorio: ['coracao'],
   // Corpo (inferior 4-8h + víscera/estrutura/periferia física)
@@ -188,6 +192,12 @@ function loadFamilias() {
     const m = ln.match(/^\*\*(?:🔴 Carga|🟢 Recurso) \(\d+\):\*\*\s*(.*)$/)
     if (!m || !cur) continue
     if (/^—/.test(m[1].trim())) continue
+    // ⚠️ NÃO tentar casar pela parte antes da seta (testado e descartado em 13/08).
+    // Parece a correção óbvia para as emoções que o `emocao-familia.md` escreve como
+    // `sintoma → emoção-base`, mas MEDIDO não resolve nenhum dos 2 casos abertos:
+    // num deles a CANÔNICA é mais longa que a família (sufixo a mais), no outro a seta
+    // está DENTRO das aspas do nome e o split quebra o próprio termo. O descasamento é
+    // de DADO, não de busca — corrige-se no `emocao-familia.md`, não aqui.
     for (const item of m[1].split(' · ')) { const k = clean(item); if (k.length > 2 && !(k in fam)) fam[k] = cur }
   }
   return fam
@@ -491,7 +501,14 @@ function calc(exameOuNome, lastro) {
       const eixo = INTEG.eixoDeCampo[key]
       if (eixo) eixoPeso[eixo] = Math.max(eixo in eixoPeso ? eixoPeso[eixo] : 0, a.intensidade || 0)
       camposAtivos.push({ key, int: a.intensidade || 0 })
-      for (const n of sup.suporte) {
+      // ⚠️ `sup` PODE SER undefined — o comentário logo acima já dizia que este bloco
+      // "independe de haver suporte nutricional pro campo", mas o laço abaixo lia
+      // `sup.suporte` sem guarda. Nunca estourou porque, até 2026-08-13, TODO campo do
+      // lastro tinha entrada em SUPORTES (os 9 sem entrada são marcador/modulador, que
+      // saem no `continue` lá em cima). Ao mapear `baco` e `plexo_solar` — que entram no
+      // cálculo e ainda não têm suporte nutricional — o `calc()` passou a estourar
+      // `Cannot read properties of undefined (reading 'suporte')`. Achado antes de subir.
+      for (const n of sup?.suporte ?? []) {
         ;(supCampos[n] ||= new Set()).add(key)
         supPeso[n] = (supPeso[n] || 0) + w
       }
