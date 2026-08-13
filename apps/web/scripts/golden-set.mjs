@@ -14,7 +14,7 @@ import { createClient } from '@supabase/supabase-js'
 import { createHash } from 'node:crypto'
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
 import path from 'node:path'
-import { parseLastro, calc, familiaDe, BASELINE_LIVRE } from '../_motor-lab/motor-calc.mjs'
+import { parseLastro, calc, familiaDe, BASELINE_LIVRE, nivelDe, normCarga } from '../_motor-lab/motor-calc.mjs'
 import { renderHTML } from '../_motor-lab/render-novo.mjs'
 
 const ARQUIVO = '_motor-lab/golden/emocional-1.0.json'
@@ -71,6 +71,11 @@ for (const f of fnds ?? []) {
     suportes: (c.suporteList || []).map((s) => s.nutriente).sort(),
     integrativas: Object.entries(c.integrativas || {}).filter(([, v]) => Array.isArray(v) && v.length).map(([k]) => k).sort(),
     crencas: (c.crencaList || []).length,
+    // ⚠️ 13/08 — o golden era CEGO aqui. Gravava agulha dos centros, famílias e suportes, mas
+    // NENHUM rótulo de carga. Resultado: a normalização da escala (`a8f2c84`), que muda o que
+    // o cliente lê no pêndulo, passou como "60 idênticas · 0 diferenças". As 3 primeiras cargas
+    // são o que a narrativa usa; o `pct` pega deriva de GAMMA/DECAY antes de virar troca de rótulo.
+    pendulo: (c.mapaCarga || []).slice(0, 3).map(([emo, s]) => [emo, nivelDe(s), Math.round(normCarga(s) * 100)]),
     htmlHash,
   })
 }
@@ -100,6 +105,14 @@ if (MODO === 'gravar') {
     if (old.domFam !== agora.domFam) d.push(`família dominante ${old.domFam}→${agora.domFam}`)
     if (old.suportes.join('|') !== agora.suportes.join('|')) d.push(`bloco 7 mudou (${old.suportes.length}→${agora.suportes.length} itens)`)
     if (old.integrativas.join('|') !== agora.integrativas.join('|')) d.push('bloco 8 mudou de categorias')
+    // pêndulo — rótulo primeiro (é o que o cliente lê), depois deriva de % sem troca de rótulo
+    for (let i = 0; i < Math.max(old.pendulo?.length ?? 0, agora.pendulo?.length ?? 0); i++) {
+      const [oe, on, op] = old.pendulo?.[i] ?? []
+      const [ae, an, ap] = agora.pendulo?.[i] ?? []
+      if (oe !== ae) d.push(`pêndulo ${i + 1}ª: "${oe ?? '—'}"→"${ae ?? '—'}"`)
+      else if (on !== an) d.push(`pêndulo "${ae}" ${on}→${an}`)
+      else if (Math.abs((op ?? 0) - (ap ?? 0)) >= 3) d.push(`pêndulo "${ae}" ${op}%→${ap}% (rótulo igual)`)
+    }
     if (old.htmlHash !== agora.htmlHash) d.push('documento mudou')
     if (d.length) difs.push(`  ${agora.id}  ${d.join(' · ')}`); else iguais++
   }

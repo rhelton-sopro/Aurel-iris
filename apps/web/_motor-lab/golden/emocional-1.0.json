@@ -43,6 +43,23 @@
     "nutricao"
    ],
    "crencas": 5,
+   "pendulo": [
+    [
+     "sobrecarga mental",
+     "baixa",
+     42
+    ],
+    [
+     "urgência constante",
+     "baixa",
+     36
+    ],
+    [
+     "\"tagarelice mental rotativa\" — mente que não desliga",
+     "baixa",
+     36
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -80,6 +97,23 @@
     "nutricao"
    ],
    "crencas": 4,
+   "pendulo": [
+    [
+     "fixação no passado — \"como as coisas eram antes\"",
+     "muito alta",
+     100
+    ],
+    [
+     "\"tagarelice mental rotativa\" — mente que não desliga",
+     "alta",
+     78
+    ],
+    [
+     "medo do futuro",
+     "média",
+     60
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -122,6 +156,23 @@
     "nutricao"
    ],
    "crencas": 6,
+   "pendulo": [
+    [
+     "preocupação",
+     "alta",
+     84
+    ],
+    [
+     "rigidez/intolerância",
+     "média",
+     57
+    ],
+    [
+     "dificuldade de soltar",
+     "média",
+     57
+    ]
+   ],
    "htmlHash": "302d029295f5"
   },
   {
@@ -159,6 +210,23 @@
     "nutricao"
    ],
    "crencas": 4,
+   "pendulo": [
+    [
+     "sobrecarga mental",
+     "baixa",
+     42
+    ],
+    [
+     "urgência constante",
+     "baixa",
+     36
+    ],
+    [
+     "\"tagarelice mental rotativa\" — mente que não desliga",
+     "baixa",
+     36
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -200,6 +268,23 @@
     "nutricao"
    ],
    "crencas": 7,
+   "pendulo": [
+    [
+     "irritação que \"sobe\" do visceral ao mental",
+     "muito alta",
+     150
+    ],
+    [
+     "\"tagarelice mental rotativa\" — mente que não desliga",
+     "alta",
+     78
+    ],
+    [
+     "raiva contida",
+     "alta",
+     78
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -242,6 +327,23 @@
     "nutricao"
    ],
    "crencas": 6,
+   "pendulo": [
+    [
+     "dificuldade de soltar",
+     "alta",
+     78
+    ],
+    [
+     "\"tagarelice mental rotativa\" — mente que não desliga",
+     "média",
+     57
+    ],
+    [
+     "raiva contida",
+     "média",
+     57
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -280,6 +382,23 @@
     "nutricao"
    ],
    "crencas": 4,
+   "pendulo": [
+    [
+     "urgência constante",
+     "baixa",
+     42
+    ],
+    [
+     "sobrecarga mental",
+     "baixa",
+     36
+    ],
+    [
+     "exaustão/esgotamento adrenal",
+     "baixa",
+     36
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -316,6 +435,23 @@
     "nutricao"
    ],
    "crencas": 4,
+   "pendulo": [
+    [
+     "\"tagarelice mental rotativa\" — mente que não desliga",
+     "média",
+     63
+    ],
+    [
+     "raiva contida",
+     "média",
+     57
+    ],
+    [
+     "preocupação",
+     "baixa",
+     36
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -355,6 +491,23 @@
     "nutricao"
    ],
    "crencas": 5,
+   "pendulo": [
+    [
+     "fixação no passado — \"como as coisas eram antes\"",
+     "muito alta",
+     99
+    ],
+    [
+     "preocupação",
+     "alta",
+     78
+    ],
+    [
+     "dificuldade de soltar",
+     "média",
+     57
+    ]
+   ],
    "htmlHash": "ef4b4ac44ed9"
   },
   {
@@ -397,6 +550,23 @@
     "nutricao"
    ],
    "crencas": 7,
+   "pendulo": [
+    [
+     "irritação que \"sobe\" do visceral ao mental",
+     "muito alta",
+     150
+    ],
+    [
+     "raiva contida",
+     "alta",
+     78
+    ],
+    [
+     "dificuldade de soltar",
+     "alta",
+     78
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -440,6 +610,23 @@
     "nutricao"
    ],
    "crencas": 6,
+   "pendulo": [
+    [
+     "raiva contida",
+     "muito alta",
+     100
+    ],
+    [
+     "fixação no passado — \"como as coisas eram antes\"",
+     "alta",
+     78
+    ],
+    [
+     "ressentimento",
+     "média",
+     60
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -476,6 +663,23 @@
     "nutricao"
    ],
    "crencas": 2,
+   "pendulo": [
+    [
+     "humilhação engolida",
+     "média",
+     57
+    ],
+    [
+     "voz sufocada / \"nunca é minha vez\"",
+     "baixa",
+     34
+    ],
+    [
+     "ressentimento de nunca ter vez",
+     "baixa",
+     21
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -516,6 +720,23 @@
     "nutricao"
    ],
    "crencas": 5,
+   "pendulo": [
+    [
+     "raiva contida",
+     "alta",
+     78
+    ],
+    [
+     "fixação no passado — \"como as coisas eram antes\"",
+     "média",
+     57
+    ],
+    [
+     "ressentimento",
+     "média",
+     47
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -554,6 +775,23 @@
     "nutricao"
    ],
    "crencas": 3,
+   "pendulo": [
+    [
+     "irritação que \"sobe\" do visceral ao mental",
+     "muito alta",
+     106
+    ],
+    [
+     "dispersão mental",
+     "média",
+     60
+    ],
+    [
+     "irritabilidade de fundo",
+     "média",
+     60
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -592,6 +830,23 @@
     "nutricao"
    ],
    "crencas": 5,
+   "pendulo": [
+    [
+     "falta de amor-próprio/auto-rejeição",
+     "alta",
+     78
+    ],
+    [
+     "preocupação",
+     "média",
+     57
+    ],
+    [
+     "\"tagarelice mental rotativa\" — mente que não desliga",
+     "média",
+     57
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -629,6 +884,23 @@
     "nutricao"
    ],
    "crencas": 4,
+   "pendulo": [
+    [
+     "irritação que \"sobe\" do visceral ao mental",
+     "média",
+     57
+    ],
+    [
+     "preocupação",
+     "baixa",
+     36
+    ],
+    [
+     "urgência constante",
+     "baixa",
+     36
+    ]
+   ],
    "htmlHash": "34489c477e3f"
   },
   {
@@ -670,6 +942,23 @@
     "nutricao"
    ],
    "crencas": 6,
+   "pendulo": [
+    [
+     "preocupação",
+     "muito alta",
+     99
+    ],
+    [
+     "irritação que \"sobe\" do visceral ao mental",
+     "alta",
+     78
+    ],
+    [
+     "rigidez/intolerância",
+     "média",
+     57
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -711,6 +1000,23 @@
     "nutricao"
    ],
    "crencas": 6,
+   "pendulo": [
+    [
+     "preocupação",
+     "alta",
+     83
+    ],
+    [
+     "dificuldade de soltar",
+     "média",
+     57
+    ],
+    [
+     "\"tagarelice mental rotativa\" — mente que não desliga",
+     "média",
+     57
+    ]
+   ],
    "htmlHash": "59efce6bdde5"
   },
   {
@@ -748,6 +1054,23 @@
     "nutricao"
    ],
    "crencas": 5,
+   "pendulo": [
+    [
+     "falta de amor-próprio/auto-rejeição",
+     "alta",
+     78
+    ],
+    [
+     "medo de falta de apoio",
+     "média",
+     57
+    ],
+    [
+     "\"tagarelice mental rotativa\" — mente que não desliga",
+     "média",
+     57
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -789,6 +1112,23 @@
     "nutricao"
    ],
    "crencas": 5,
+   "pendulo": [
+    [
+     "raiva contida",
+     "muito alta",
+     99
+    ],
+    [
+     "irritação que \"sobe\" do visceral ao mental",
+     "média",
+     57
+    ],
+    [
+     "rigidez/intolerância",
+     "média",
+     57
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -827,6 +1167,23 @@
     "nutricao"
    ],
    "crencas": 5,
+   "pendulo": [
+    [
+     "fixação no passado — \"como as coisas eram antes\"",
+     "muito alta",
+     106
+    ],
+    [
+     "medo do futuro",
+     "média",
+     60
+    ],
+    [
+     "resistência à mudança",
+     "média",
+     60
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -864,6 +1221,23 @@
     "nutricao"
    ],
    "crencas": 5,
+   "pendulo": [
+    [
+     "preocupação",
+     "alta",
+     84
+    ],
+    [
+     "irritação que \"sobe\" do visceral ao mental",
+     "média",
+     57
+    ],
+    [
+     "dificuldade de soltar",
+     "média",
+     57
+    ]
+   ],
    "htmlHash": "3649fd899d51"
   },
   {
@@ -904,6 +1278,23 @@
     "nutricao"
    ],
    "crencas": 4,
+   "pendulo": [
+    [
+     "fixação no passado — \"como as coisas eram antes\"",
+     "alta",
+     78
+    ],
+    [
+     "medo do futuro",
+     "média",
+     47
+    ],
+    [
+     "resistência à mudança",
+     "média",
+     47
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -944,6 +1335,23 @@
     "nutricao"
    ],
    "crencas": 6,
+   "pendulo": [
+    [
+     "raiva contida",
+     "muito alta",
+     128
+    ],
+    [
+     "irritação que \"sobe\" do visceral ao mental",
+     "alta",
+     78
+    ],
+    [
+     "\"tagarelice mental rotativa\" — mente que não desliga",
+     "média",
+     57
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -988,6 +1396,23 @@
     "nutricao"
    ],
    "crencas": 6,
+   "pendulo": [
+    [
+     "preocupação",
+     "muito alta",
+     99
+    ],
+    [
+     "rigidez/intolerância",
+     "alta",
+     78
+    ],
+    [
+     "humilhação engolida",
+     "média",
+     57
+    ]
+   ],
    "htmlHash": "3cba141b5872"
   },
   {
@@ -1028,6 +1453,23 @@
     "nutricao"
    ],
    "crencas": 5,
+   "pendulo": [
+    [
+     "raiva contida",
+     "média",
+     57
+    ],
+    [
+     "fixação no passado — \"como as coisas eram antes\"",
+     "média",
+     57
+    ],
+    [
+     "urgência constante",
+     "baixa",
+     36
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -1069,6 +1511,23 @@
     "nutricao"
    ],
    "crencas": 5,
+   "pendulo": [
+    [
+     "preocupação",
+     "média",
+     63
+    ],
+    [
+     "rigidez/intolerância",
+     "média",
+     57
+    ],
+    [
+     "urgência constante",
+     "baixa",
+     36
+    ]
+   ],
    "htmlHash": "6ecb64f611e8"
   },
   {
@@ -1110,6 +1569,23 @@
     "nutricao"
    ],
    "crencas": 5,
+   "pendulo": [
+    [
+     "falta de amor-próprio/auto-rejeição",
+     "alta",
+     78
+    ],
+    [
+     "raiva contida",
+     "média",
+     57
+    ],
+    [
+     "fixação no passado — \"como as coisas eram antes\"",
+     "média",
+     57
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -1149,6 +1625,23 @@
     "nutricao"
    ],
    "crencas": 4,
+   "pendulo": [
+    [
+     "urgência constante",
+     "baixa",
+     36
+    ],
+    [
+     "sobrecarga mental",
+     "baixa",
+     36
+    ],
+    [
+     "raiva contida",
+     "baixa",
+     36
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -1188,6 +1681,23 @@
     "nutricao"
    ],
    "crencas": 5,
+   "pendulo": [
+    [
+     "raiva contida",
+     "muito alta",
+     99
+    ],
+    [
+     "falta de amor-próprio/auto-rejeição",
+     "alta",
+     78
+    ],
+    [
+     "irritação que \"sobe\" do visceral ao mental",
+     "média",
+     57
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -1230,6 +1740,23 @@
     "nutricao"
    ],
    "crencas": 7,
+   "pendulo": [
+    [
+     "irritação que \"sobe\" do visceral ao mental",
+     "muito alta",
+     121
+    ],
+    [
+     "preocupação",
+     "alta",
+     78
+    ],
+    [
+     "dispersão mental",
+     "média",
+     60
+    ]
+   ],
    "htmlHash": "0801cb2121df"
   },
   {
@@ -1272,6 +1799,23 @@
     "nutricao"
    ],
    "crencas": 5,
+   "pendulo": [
+    [
+     "baixa autoestima",
+     "muito alta",
+     106
+    ],
+    [
+     "raiva contida",
+     "alta",
+     78
+    ],
+    [
+     "autoproteção exaurida",
+     "média",
+     60
+    ]
+   ],
    "htmlHash": "bd76bd078f9a"
   },
   {
@@ -1314,6 +1858,23 @@
     "nutricao"
    ],
    "crencas": 5,
+   "pendulo": [
+    [
+     "humilhação engolida",
+     "média",
+     57
+    ],
+    [
+     "urgência constante",
+     "baixa",
+     36
+    ],
+    [
+     "preocupação",
+     "baixa",
+     36
+    ]
+   ],
    "htmlHash": "68832cd43adf"
   },
   {
@@ -1354,6 +1915,23 @@
     "nutricao"
    ],
    "crencas": 5,
+   "pendulo": [
+    [
+     "raiva contida",
+     "alta",
+     78
+    ],
+    [
+     "dificuldade de soltar",
+     "média",
+     57
+    ],
+    [
+     "\"tagarelice mental rotativa\" — mente que não desliga",
+     "média",
+     57
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -1395,6 +1973,23 @@
     "nutricao"
    ],
    "crencas": 6,
+   "pendulo": [
+    [
+     "irritação que \"sobe\" do visceral ao mental",
+     "muito alta",
+     100
+    ],
+    [
+     "preocupação",
+     "alta",
+     78
+    ],
+    [
+     "dispersão mental",
+     "média",
+     60
+    ]
+   ],
    "htmlHash": "2c856357c53b"
   },
   {
@@ -1432,6 +2027,23 @@
     "nutricao"
    ],
    "crencas": 4,
+   "pendulo": [
+    [
+     "sobrecarga mental",
+     "baixa",
+     42
+    ],
+    [
+     "urgência constante",
+     "baixa",
+     36
+    ],
+    [
+     "fixação no passado — \"como as coisas eram antes\"",
+     "baixa",
+     36
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -1475,6 +2087,23 @@
     "nutricao"
    ],
    "crencas": 5,
+   "pendulo": [
+    [
+     "baixa autoestima",
+     "média",
+     57
+    ],
+    [
+     "dificuldade de vínculo / de ligar-se",
+     "média",
+     57
+    ],
+    [
+     "raiva contida",
+     "média",
+     57
+    ]
+   ],
    "htmlHash": "346aef8852b9"
   },
   {
@@ -1515,6 +2144,23 @@
     "nutricao"
    ],
    "crencas": 5,
+   "pendulo": [
+    [
+     "fixação no passado — \"como as coisas eram antes\"",
+     "média",
+     63
+    ],
+    [
+     "urgência constante",
+     "baixa",
+     36
+    ],
+    [
+     "sobrecarga mental",
+     "baixa",
+     36
+    ]
+   ],
    "htmlHash": "a1fa50721917"
   },
   {
@@ -1558,6 +2204,23 @@
     "nutricao"
    ],
    "crencas": 9,
+   "pendulo": [
+    [
+     "ruminação",
+     "muito alta",
+     119
+    ],
+    [
+     "dificuldade de soltar",
+     "muito alta",
+     100
+    ],
+    [
+     "preocupação",
+     "muito alta",
+     99
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -1598,6 +2261,23 @@
     "nutricao"
    ],
    "crencas": 5,
+   "pendulo": [
+    [
+     "preocupação",
+     "alta",
+     78
+    ],
+    [
+     "dificuldade de soltar",
+     "média",
+     57
+    ],
+    [
+     "irritação que \"sobe\" do visceral ao mental",
+     "média",
+     57
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -1636,6 +2316,23 @@
     "nutricao"
    ],
    "crencas": 4,
+   "pendulo": [
+    [
+     "preocupação",
+     "baixa",
+     37
+    ],
+    [
+     "urgência constante",
+     "baixa",
+     36
+    ],
+    [
+     "dificuldade de soltar",
+     "baixa",
+     36
+    ]
+   ],
    "htmlHash": "86d48aeeda9b"
   },
   {
@@ -1678,6 +2375,23 @@
     "nutricao"
    ],
    "crencas": 6,
+   "pendulo": [
+    [
+     "preocupação",
+     "muito alta",
+     150
+    ],
+    [
+     "\"tagarelice mental rotativa\" — mente que não desliga",
+     "alta",
+     78
+    ],
+    [
+     "ansiedade",
+     "média",
+     60
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -1720,6 +2434,23 @@
     "nutricao"
    ],
    "crencas": 6,
+   "pendulo": [
+    [
+     "preocupação",
+     "muito alta",
+     101
+    ],
+    [
+     "irritação que \"sobe\" do visceral ao mental",
+     "alta",
+     78
+    ],
+    [
+     "ansiedade",
+     "média",
+     60
+    ]
+   ],
    "htmlHash": "7d3bb0f31715"
   },
   {
@@ -1756,6 +2487,23 @@
     "nutricao"
    ],
    "crencas": 3,
+   "pendulo": [
+    [
+     "fixação no passado — \"como as coisas eram antes\"",
+     "média",
+     57
+    ],
+    [
+     "resistência à mudança",
+     "baixa",
+     34
+    ],
+    [
+     "intolerância",
+     "baixa",
+     21
+    ]
+   ],
    "htmlHash": "26c7e39d7c34"
   },
   {
@@ -1798,6 +2546,23 @@
     "nutricao"
    ],
    "crencas": 7,
+   "pendulo": [
+    [
+     "preocupação",
+     "muito alta",
+     99
+    ],
+    [
+     "irritação que \"sobe\" do visceral ao mental",
+     "alta",
+     78
+    ],
+    [
+     "rigidez/intolerância",
+     "média",
+     57
+    ]
+   ],
    "htmlHash": "6fe44810e270"
   },
   {
@@ -1839,7 +2604,79 @@
     "nutricao"
    ],
    "crencas": 7,
+   "pendulo": [
+    [
+     "preocupação",
+     "muito alta",
+     126
+    ],
+    [
+     "ruminação",
+     "muito alta",
+     96
+    ],
+    [
+     "irritação que \"sobe\" do visceral ao mental",
+     "alta",
+     78
+    ]
+   ],
    "htmlHash": "8f187962492b"
+  },
+  {
+   "id": "c907928c",
+   "agulhas": {
+    "mente": 31,
+    "coracao": 82,
+    "corpo": 37
+   },
+   "nAch": 6,
+   "nPres": 4,
+   "familias": [
+    "Ansiedade e preocupação",
+    "Controle e rigidez",
+    "Esgotamento e vitalidade",
+    "Medo"
+   ],
+   "domFam": "Esgotamento e vitalidade",
+   "suportes": [
+    "complexo B",
+    "fibras",
+    "magnésio",
+    "potássio",
+    "vitamina D",
+    "zinco",
+    "água"
+   ],
+   "integrativas": [
+    "adapto",
+    "contemplativas",
+    "corporais",
+    "eixos",
+    "exercicios",
+    "fito",
+    "florais",
+    "nutricao"
+   ],
+   "crencas": 4,
+   "pendulo": [
+    [
+     "urgência constante",
+     "baixa",
+     36
+    ],
+    [
+     "preocupação",
+     "baixa",
+     36
+    ],
+    [
+     "dificuldade de soltar",
+     "baixa",
+     36
+    ]
+   ],
+   "htmlHash": "46a4b34db9e8"
   },
   {
    "id": "ca339d18",
@@ -1880,6 +2717,23 @@
     "nutricao"
    ],
    "crencas": 6,
+   "pendulo": [
+    [
+     "fixação no passado — \"como as coisas eram antes\"",
+     "alta",
+     84
+    ],
+    [
+     "\"tagarelice mental rotativa\" — mente que não desliga",
+     "alta",
+     78
+    ],
+    [
+     "falta de amor-próprio/auto-rejeição",
+     "média",
+     57
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -1920,6 +2774,23 @@
     "nutricao"
    ],
    "crencas": 5,
+   "pendulo": [
+    [
+     "raiva contida",
+     "muito alta",
+     100
+    ],
+    [
+     "ressentimento",
+     "média",
+     60
+    ],
+    [
+     "frustração",
+     "média",
+     60
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -1958,6 +2829,23 @@
     "nutricao"
    ],
    "crencas": 6,
+   "pendulo": [
+    [
+     "irritação que \"sobe\" do visceral ao mental",
+     "muito alta",
+     100
+    ],
+    [
+     "\"tagarelice mental rotativa\" — mente que não desliga",
+     "alta",
+     78
+    ],
+    [
+     "dificuldade de soltar",
+     "alta",
+     78
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -1996,6 +2884,23 @@
     "nutricao"
    ],
    "crencas": 4,
+   "pendulo": [
+    [
+     "fixação no passado — \"como as coisas eram antes\"",
+     "muito alta",
+     99
+    ],
+    [
+     "preocupação",
+     "média",
+     57
+    ],
+    [
+     "dificuldade de soltar",
+     "média",
+     57
+    ]
+   ],
    "htmlHash": "729ff3db8baf"
   },
   {
@@ -2034,6 +2939,23 @@
     "nutricao"
    ],
    "crencas": 4,
+   "pendulo": [
+    [
+     "preocupação",
+     "alta",
+     78
+    ],
+    [
+     "dificuldade de soltar",
+     "média",
+     57
+    ],
+    [
+     "ansiedade",
+     "média",
+     47
+    ]
+   ],
    "htmlHash": "b0b085b29799"
   },
   {
@@ -2076,6 +2998,23 @@
     "nutricao"
    ],
    "crencas": 7,
+   "pendulo": [
+    [
+     "irritação que \"sobe\" do visceral ao mental",
+     "muito alta",
+     121
+    ],
+    [
+     "dificuldade de soltar",
+     "alta",
+     78
+    ],
+    [
+     "preocupação",
+     "alta",
+     78
+    ]
+   ],
    "htmlHash": "d599f8604748"
   },
   {
@@ -2117,6 +3056,23 @@
     "nutricao"
    ],
    "crencas": 5,
+   "pendulo": [
+    [
+     "raiva contida",
+     "muito alta",
+     100
+    ],
+    [
+     "fixação no passado — \"como as coisas eram antes\"",
+     "alta",
+     78
+    ],
+    [
+     "ressentimento",
+     "média",
+     60
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -2156,6 +3112,23 @@
     "nutricao"
    ],
    "crencas": 5,
+   "pendulo": [
+    [
+     "sobrecarga mental",
+     "baixa",
+     42
+    ],
+    [
+     "urgência constante",
+     "baixa",
+     36
+    ],
+    [
+     "\"tagarelice mental rotativa\" — mente que não desliga",
+     "baixa",
+     36
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -2196,6 +3169,23 @@
     "nutricao"
    ],
    "crencas": 6,
+   "pendulo": [
+    [
+     "fixação no passado — \"como as coisas eram antes\"",
+     "muito alta",
+     121
+    ],
+    [
+     "medo do futuro",
+     "média",
+     60
+    ],
+    [
+     "resistência à mudança",
+     "média",
+     60
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -2236,44 +3226,23 @@
     "nutricao"
    ],
    "crencas": 5,
-   "htmlHash": null
-  },
-  {
-   "id": "eb818f3c",
-   "agulhas": {
-    "mente": 29,
-    "coracao": 86,
-    "corpo": 29
-   },
-   "nAch": 7,
-   "nPres": 5,
-   "familias": [
-    "Ansiedade e preocupação",
-    "Controle e rigidez",
-    "Esgotamento e vitalidade",
-    "Raiva"
+   "pendulo": [
+    [
+     "raiva contida",
+     "alta",
+     78
+    ],
+    [
+     "ressentimento",
+     "média",
+     47
+    ],
+    [
+     "frustração",
+     "média",
+     47
+    ]
    ],
-   "domFam": "Raiva",
-   "suportes": [
-    "complexo B",
-    "enxofre alimentar",
-    "fibras",
-    "magnésio",
-    "vitamina D",
-    "água",
-    "ômega-3"
-   ],
-   "integrativas": [
-    "adapto",
-    "contemplativas",
-    "corporais",
-    "eixos",
-    "exercicios",
-    "fito",
-    "florais",
-    "nutricao"
-   ],
-   "crencas": 5,
    "htmlHash": null
   },
   {
@@ -2313,6 +3282,23 @@
     "nutricao"
    ],
    "crencas": 6,
+   "pendulo": [
+    [
+     "preocupação",
+     "alta",
+     78
+    ],
+    [
+     "dificuldade de soltar",
+     "média",
+     57
+    ],
+    [
+     "raiva contida",
+     "média",
+     57
+    ]
+   ],
    "htmlHash": "8a8d9ecf51e1"
   },
   {
@@ -2350,6 +3336,23 @@
     "nutricao"
    ],
    "crencas": 3,
+   "pendulo": [
+    [
+     "fixação no passado — \"como as coisas eram antes\"",
+     "média",
+     57
+    ],
+    [
+     "urgência constante",
+     "baixa",
+     36
+    ],
+    [
+     "resistência à mudança",
+     "baixa",
+     34
+    ]
+   ],
    "htmlHash": null
   },
   {
@@ -2386,6 +3389,23 @@
     "nutricao"
    ],
    "crencas": 3,
+   "pendulo": [
+    [
+     "raiva contida",
+     "média",
+     57
+    ],
+    [
+     "medo estrutural de base",
+     "baixa",
+     36
+    ],
+    [
+     "frustração",
+     "baixa",
+     34
+    ]
+   ],
    "htmlHash": null
   }
  ]
