@@ -44,6 +44,72 @@ que o founder não lê, não revisa e não pode corrigir.
 
 ## Histórico
 
+### 2026-08-13 — ESCALA DA CARGA normalizada, régua marcada, corroboração vira ⊕
+
+**Pergunta do founder:** *"naquelas réguas ali na agulha, tá demarcado em que faixas a agulha tá
+andando? Tem que estar preciso."* E depois, o que reabriu tudo: *"a escala vai de quanto a quanto?"*
+
+**O que a medição achou.** A régua desenhada é bipolar (−50 … 0 … +50) e o score ia de 1,00 até um
+teto que **mudava conforme a família emocional** — medido rodando o motor num exame com os 38 campos
+em I5: **5,87** para uma família de 1 campo, **29,37** para "Medo" (5 campos). Eram onze escalas no
+mesmo desenho: 5,87 em *Nojo e aversão* é o máximo que aquela emoção consegue registrar; 5,87 em
+*Medo* é 20% do teto dela. Mesma agulha, sentidos opostos. E as **quatro famílias de 1 campo jamais
+alcançavam "muito alta"** (teto 5,87 < corte 6,0) — impossível por construção, não por leitura.
+Outros dois achados no caminho: o rótulo e a agulha eram **contas diferentes** sobre o mesmo número
+(faixa discreta × curva saturante), com a regra de corroboração aplicada por **dois freios distintos**
+— teto duro no rótulo, freio macio na agulha —, que podiam discordar entre si; e a régua estava
+escrita em **três arquivos**, com a cópia do `fmt()` do motor-calc sem a regra de corroboração —
+mostrava "muito alta" onde o cliente lia "alta", e é por esse dump que se calibra.
+
+**A decisão.** 100% = **um achado sozinho na intensidade máxima (I5) = 5^γ = 5,873**. Passar de 100%
+é legítimo e significa mais de um achado apontando pra mesma coisa. Cortes **colados na intensidade**
+(45% / 70% / 90%), pro rótulo ser leitura direta do que a íris mostrou:
+**I1/I2 baixa · I3 média · I4 alta · I5 muito alta · 2ª emoção de um I5 (60%) média.**
+Agulha **linear** na escala normalizada — é o que permite cravar a marca de cada faixa na barra
+(31,9% · 25,1% · 19,7%). A **corroboração deixa de travar o rótulo e de frear a agulha**: vira a
+marca **⊕** ao lado, como já era feito nas crenças. Medida é medida; confiança é anotação.
+
+**O que muda no que está no ar — medido, não estimado.** Em 248 pêndulos de 31 execuções (5 pessoas):
+**9 rótulos mudam (3,6%)**, todos do mesmo caso — score ~5,8 saindo de "alta" para "muito alta", que é
+exatamente o I5 puro que a decisão quis endereçar. Distribuição: *muito alta* 4% → 8%; as outras três
+faixas idênticas. ⚠️ Amostra de **5 pessoas** — suficiente pra dimensionar o impacto, não pra calibrar
+corte. Medir nas 60 do golden antes de mexer em corte de novo.
+
+**Contraponto registrado.** A regra antiga *"muito alta = forte E corroborada"* era do founder e foi
+afrouxada: agora um único achado I5 alcança "muito alta" sem segundo achado. Foi condição para o
+conserto — mantê-la reintroduziria o teto que impede famílias de 1 campo de chegar lá. O ⊕ preserva a
+informação sem esconder a medida. Se um dia isso incomodar, o caminho é voltar o teto **no rótulo E na
+agulha juntos**, nunca em um só.
+
+**Arquivos:** `_motor-lab/motor-calc.mjs` (fonte única — exporta `MAX_ACHADO`, `CORTES`, `normCarga`,
+`nivelDe`, `bipCarga`, `leftCarga`), `_motor-lab/serialize.mjs` (prompt) e `_motor-lab/render-novo.mjs`
+(cliente) passam a importar. ⛔ **Não recriar cópia local de nenhuma delas** — a divergência entre as
+cópias era o defeito.
+
+**⛔ REPROVADO NO MESMO DIA — as duas peças visuais saíram.** Founder, vendo o render:
+*"ficou uns tracinhos na régua, não ficou legal não… tem um desenhozinho depois de cada palavra,
+também não ficou legal. Mas esses tracinhos a gente não precisa colocar."*
+1. **Marcas de faixa na barra** (linhas em 31,9% · 25,1% · 19,7%) — removidas. Traço vertical sobre a
+   barra de gradiente suja o objeto mais bonito do relatório. Se voltar um dia, que seja como entalhe
+   curto na borda, nunca linha atravessando. Os pontos exatos ficam registrados no código.
+2. **Marca ⊕ no pêndulo** — removida. A informação **não se perdeu**: continua no bloco B do prompt,
+   que é quem precisa dela pra dosar a força do texto. O cliente não precisa ver metodologia no
+   gráfico. ⚠️ Só o **pêndulo** perdeu o símbolo — o ⊕ das **crenças** é anterior, nunca foi
+   questionado, e continua.
+⇒ A faixa segue dita em **palavra**, ao lado do rótulo, que é onde ela já funcionava. **A escala
+normalizada e a agulha linear FICAM** — o que caiu foi só o desenho, não a régua.
+
+**Status:** APLICADA no working tree, **não commitada, não deployada**. Gates após a remoção:
+`smoke-render` ✓ · `eslint` 0 erros · `tsc` sem erro novo (os que aparecem são o backlog conhecido de
+testes + `tmp/`).
+
+**⚠️ Registro de um susto que não era:** o founder relatou *"minha raiva contida era alta e agora ficou
+média"*. **Não foi esta mudança.** Medido: "raiva contida" sai **média** nos três renders — código
+atual, código novo e o render de 29/07, anterior a tudo. O pêndulo dele pontua 3,69 (63% da escala),
+e a leitura do lab tem só 3 achados com peso (fígado I3 · radii I2 · musculoesquelético I1). Se
+houver um "alta" em algum lugar, é do relatório de PRODUÇÃO, que vem de outra captura — o
+`_exame-self.json` é um retrato de 28/07. **Pendente:** conferir no banco.
+
 ### 2026-07-31 — RESULTADO do estudo refeito (4.6 × Sonnet 5, pós-fix)
 Harness `apps/web/scripts/estudo-modelo-stage1.mts` · 3 amostras × 2 modelos · mesma íris e mesmas 6 canônicas do
 estudo de 26/07 · enum vindo de `KNOWN_CAMPOS_LIST` (40 campos, igual produção) · custo $0,996.
@@ -757,6 +823,67 @@ as leituras.
 (`docs/TOPOGRAFIA-JENSEN-2004.md`). Restam 4 pendências lá: validar setor a setor com zoom, extrair a
 íris esquerda (não é espelho — o gráfico põe SPLEEN à esquerda onde a direita tem LIVER), escola da
 linha do tempo, e `vaso_transversal`.
+
+### 2026-08-12 — Nasal/temporal: o parágrafo do `stage1-scan.md` estava **INVERTIDO** nos dois olhos
+**Não é a mesma pergunta de 11/08.** Aquela resolveu *qual olho* é "right iris" (= olho direito do
+cliente) e continua valendo. Esta é outra: **onde fica 3h dentro da imagem**. Ficou aberta, ninguém
+tinha notado, e o prompt afirmava o oposto do gráfico oficial:
+
+    antes:  OD → 9h = NASAL · 3h = TEMPORAL   |   OE → 3h = NASAL · 9h = TEMPORAL
+    agora:  OD → 3h = NASAL · 9h = TEMPORAL   |   OE → 9h = NASAL · 3h = TEMPORAL
+
+**Prova, em duas fontes independentes:**
+1. **Gráfico canônico** (`livros/551115800-iridology-chart.pdf`, Jensen/Ellen Jensen 2004,
+   rasterizado a 300dpi). Os rótulos anatômicos externos decidem sozinhos, porque nariz é nasal e
+   orelha é temporal por definição: na íris **R**, FACE · NOSE · EYE · JAW estão à **direita** da
+   imagem e NECK · OUT/MID/INNER EAR · MASTOID · SHOULDER à esquerda. Na íris **L**, o espelho exato.
+2. **Foto real** (`be53fde0`, olho esquerdo): a carúncula — o canto nasal — está à **esquerda** da
+   imagem; o canto direito é o externo, com cílios longos e ângulo agudo. ⇒ nasal em ~9h no OE.
+
+⭐ **O que NÃO estava errado: as horas do glossário.** Conferidas uma a uma contra o gráfico e todas
+batem — `tireoide ~3h OD / ~9h OE` (THYROID em 3h na R, 9h na L) · `coracao ~2-3h OE` (HEART com a
+AORTA em ~2-3h na L) · `pulmoes ~3h OE / ~9h OD`. O endereçamento sempre esteve certo; **só a legenda
+estava trocada**. Nenhuma zona foi mexida.
+
+**Por que importava:** o prompt manda usar nasal/temporal como CHECAGEM obrigatória antes de
+classificar ("Em que olho o sinal está? Essa hora cai na zona canônica?"). Com a régua invertida, um
+achado localizado corretamente podia ser descartado ou reatribuído na conferência. Sintoma medido: na
+**mesma leitura**, execuções diferentes descreveram o mesmo sinal como *"lado temporal de OD (~3h)"* e
+*"lado nasal (9h) de OD"*.
+
+**Status:** APLICADA — `apps/web/prompts/stage1-scan.md`, §Convenção de coordenadas horárias, mais
+uma "âncora de verificação" com os rótulos do gráfico para o modelo se corrigir sozinho. ⚠️ Só afeta
+leituras NOVAS: exames já gravados não reprocessam, e por isso o golden set continua 60/60.
+
+### 2026-08-12 — Peso do achado `indeterminada` no motor: **fica como está** (não mexer)
+**Founder:** *"vamos ficar como estávamos… estava funcionando muito bem."*
+
+Proposta testada e **descartada**: achado com `natureza_da_carga='indeterminada'` entrar a meio
+peso, e `motivo='limitacao_tecnica'` não entrar. Hoje ele entra com peso cheio (`intensidade^γ`),
+igual a qualquer outro.
+
+**O que motivou a proposta:** 13% dos achados saem `indeterminada` (30 de 225, medidos em 30
+execuções de Stage 1 sobre 5 leituras). O Stage 2 roteia `limitacao_tecnica` para "campos
+não-conclusivos" — nota fria, bloqueada das outras seções — mas o motor os conta na agulha.
+O texto exclui e o gráfico conta. Era também a porta do falso positivo do fígado: 5 de 17
+declarações diziam *"impossível confirmar ou descartar"* e mesmo assim pesavam.
+
+**Por que foi descartada — medido, não achismo.** Aplicada, deslocou **49 das 58** leituras, e as
+três médias subiram: mente **+4,6** · coração **+1,0** · corpo **+2,2**. Nenhuma desceu. Pior caso
+(`69b472aa`): corpo **26 → 68**. Os dois únicos achados do corpo eram ilegíveis, saíram, o centro
+ficou com `t=0` e aí bateu a **zona quieta** (`motor-calc.mjs:509`, centro sem tensão ganha +1,0 de
+livre) — o corpo foi tratado como *varrido e limpo* justamente porque ninguém conseguiu varrer.
+⇒ Trocaria um viés por outro, e o outro é pior: *"não consegui ver"* virando *"está livre"* é a
+mesma coisa que já incomoda nos preservados.
+
+**Contraponto registrado (fica aberto):** a incoerência texto × gráfico continua de pé, e o
+diagnóstico segue válido. Se um dia for reaberto, o caminho não é descartar — é fazer a incerteza
+puxar a agulha para o **meio**, aumentando o `α` daquele centro (a agulha é `(l+α)/(t+l+2α)`, então
+mais incerteza aproxima de 50% em vez de aproximar de "livre"). ⚠️ `α` é calibrado contra o mockup
+aprovado (~26/83/21), então exige medição.
+
+**Status:** REVERTIDA — `motor-calc.mjs` intocado, golden 58/58 idênticas (as 2 restantes são
+capturas novas que entraram na janela).
 
 ## Como usar
 

@@ -9,11 +9,14 @@ import path from 'node:path'
 // BASE resolvida em RUNTIME (ver lab-dir.mjs) — NÃO usar import.meta.url: o webpack o
 // congela no caminho da máquina de build e isso dá ENOENT em produção.
 import { LAB_DIR, REPO } from './lab-dir.mjs'
-import { parseLastro, calc, classify, familiaDe as famDe, BASELINE_LIVRE, EXAM } from './motor-calc.mjs'
+import { parseLastro, calc, classify, familiaDe as famDe, BASELINE_LIVRE, EXAM, nivelDe, normCarga, bipCarga } from './motor-calc.mjs'
 
 const α = BASELINE_LIVRE
 const agulhaDe = (t, l) => Math.round(((l + α) / (t + l + 2 * α)) * 100)
-const nivel = (s, conv = true) => (s >= 6 && conv ? 'muito alta' : s >= 4 ? 'alta' : s >= 2.5 ? 'média' : 'baixa')
+// ⛔ NÃO recriar `nivel` aqui. A régua é uma só e mora no motor-calc — este arquivo
+// alimenta o PROMPT e o render alimenta o CLIENTE; se as duas cópias divergirem, o modelo
+// escreve num nível e o gráfico mostra outro. Foi o que aconteceu até 2026-08-13.
+const nivel = (s) => nivelDe(s)
 const pende = (a) => (a < 40 ? 'mais tensão' : a <= 60 ? 'meio a meio' : 'mais livre')
 
 // rótulo de cada lado do centro (o que o gráfico DIZ) — SPEC bloco 2
@@ -77,17 +80,12 @@ function serialize(exameOuNome, nomePessoa) {
   // ESCALA SATURANTE (calibração 2026-07-27, medida em 49 scores de 6 exames).
 // A linear com trava tinha dois defeitos: CRAVAVA em cima (o Daniel, 8.81, ficava
 // idêntico a um hipotético 15) e ACHATAVA embaixo (tudo abaixo de 1.1 virava -6, então
-// 0.10 e 0.46 desenhavam igual). A curva nunca crava e nunca achata: sempre sobra
-// régua pra quem vier mais forte, e o fundo continua distinguindo.
-//   posição = -(6 + 42 · (1 - e^(-s/5.5)))     8.81 → -39.5 · 2.76 → -22.6 · 0.10 → -6.8
-const bipCarga = (s) => -(6 + 42 * (1 - Math.exp(-s / 5.5)))
-// O EXTREMO exige CONVERGÊNCIA (2+ achados na mesma família — metodologia C do founder):
-// sem ela o fator satura em 0.70, ou seja, a agulha não passa de ~70% da régua. Um elo
-// de fonte única não pode desenhar como conclusão fechada.
-const bipC2 = (s, conv) => (conv ? bipCarga(s) : -(6 + 42 * Math.min(1 - Math.exp(-s / 5.5), 0.70)))
-const bipC = bipCarga
+// ⚠️ A curva saturante e o freio por convergência que moravam aqui SAÍRAM (2026-08-13).
+// A escala agora é normalizada e LINEAR, e vem de `motor-calc.mjs` — fonte única, para o
+// que o prompt lê e o que o cliente vê nunca mais divergirem. Ver o bloco de comentário
+// "ESCALA NORMALIZADA DA CARGA" lá.
   const bipR = (s) => clamp(Math.round(9 * s + 12), 24, 48)
-  L.push('## Mapa emocional (escala −50 carregado ⟷ 0 ⟷ +50 livre — todo achado ruim representado)')
+  L.push('## Mapa emocional (0% = nada ⟷ 100% = um achado no talo (I5) ⟷ acima de 100% = mais de um achado apontando pra mesma coisa)')
   L.push('**O que pesa hoje (cargas) — cada uma com o SEU lado-antídoto (o outro polo do mesmo pêndulo):**')
   for (const [emo, s] of r.mapaCarga) {
     const a = r.antidoto?.[emo]
@@ -97,7 +95,10 @@ const bipC = bipCarga
       anti = ` ⟷ 🟢 **${a.principal}**${a.oque ? ` (${a.oque})` : ''}${formul.length ? ` _[formulações do eixo: ${formul.join(' · ')}]_` : ''}`
     }
     const conv = (r.famN?.[famDe(emo)] || 1) >= 2
-    L.push(`- ${emo} — ${nivel(s, conv)} (${Math.round(bipC2(s, conv))})${conv ? ' ⊕ corroborada' : ''}${anti}`)
+    // % da escala = quanto isso pesa comparado a UM achado I5 sozinho (=100%). Acima de
+    // 100% significa mais de um achado apontando pra mesma coisa. O ⊕ é anotação de
+    // confiança, e NÃO rebaixa mais o nível — medida é medida (founder, 2026-08-13).
+    L.push(`- ${emo} — ${nivel(s)} · ${Math.round(normCarga(s) * 100)}% da escala (agulha ${Math.round(bipCarga(s))})${conv ? ' ⊕ corroborada' : ''}${anti}`)
   }
   L.push('> ⚠️ O 🟢 acima é o **antídoto** = a DIREÇÃO de saída daquela carga, não uma força que a pessoa já tem. Use-o pra mostrar a saída ("o outro lado disso é…"), **nunca** pra afirmar que ela já está assim. O que ela JÁ tem livre é só a lista abaixo.')
   L.push('> **O nome em negrito é o termo do EIXO — já está em 8ª série, use-o.** As "formulações do eixo" são variações da MESMA saída: escolha a que encaixa nesta pessoa, e quanto mais forte a carga, mais forte a formulação. NÃO invente antídoto fora do eixo.')

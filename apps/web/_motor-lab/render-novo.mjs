@@ -10,7 +10,7 @@ import path from 'node:path'
 // porque os readFileSync abaixo rodam no TOPO do módulo: derrubavam a página e o PDF
 // já no carregamento, antes de qualquer request chegar ao handler.
 import { LAB_DIR } from './lab-dir.mjs'
-import { parseLastro, calc, eixoDe, displayDe, EIXOS, BASELINE_LIVRE } from './motor-calc.mjs'
+import { parseLastro, calc, eixoDe, displayDe, EIXOS, BASELINE_LIVRE, nivelDe, leftCarga, CORTES, PISO_CARGA } from './motor-calc.mjs'
 import { METODO7, CONDUCT } from './metodo7.mjs'
 import { familiaDe as famDe, oqueCargaDe } from './motor-calc.mjs'
 
@@ -112,30 +112,28 @@ const lastro = parseLastro()
 const r = calc(exame, lastro)
 const agu = (c) => Math.round(((r.centro[c].l + α) / (r.centro[c].t + r.centro[c].l + 2 * α)) * 100)
 const AG = { mente: agu('mente'), coracao: agu('coracao'), corpo: agu('corpo') }
-// "muito alta" passa a significar FORTE **E** CORROBORADA. Sem 2 achados na família, o
-// teto é "alta" — porque um elo de autor único não pode desenhar como conclusão fechada.
+// CORROBORADA = 2+ achados na mesma família. Desde 2026-08-13 ela **não rebaixa mais o
+// rótulo**: vira a marca ⊕ ao lado, como já é feito nas crenças. Medida é medida.
 const convDe = (e) => (r.famN?.[famDe(e)] || 1) >= 2
-const nivel = (s, e) => {
-  const top = e === undefined || convDe(e)
-  return s >= 6 && top ? 'muito alta' : s >= 4 ? 'alta' : s >= 2.5 ? 'média' : 'baixa'
-}
 // régua BIPOLAR −50 (totalmente carregado) ⟷ 0 (neutro) ⟷ +50 (antídoto/livre),
 // mesmo modelo dos 3 centros. carga = negativo · recurso = positivo. track% = 50 + bip.
-// CONTÍNUA (não bucketizada): cada emoção tem seu número; só empata quem é igual de verdade.
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v))
-// ESCALA SATURANTE (calibração 2026-07-27, medida em 49 scores de 6 exames).
-// A linear com trava tinha dois defeitos: CRAVAVA em cima (o Daniel, 8.81, ficava
-// idêntico a um hipotético 15) e ACHATAVA embaixo (tudo abaixo de 1.1 virava -6, então
-// 0.10 e 0.46 desenhavam igual). A curva nunca crava e nunca achata: sempre sobra
-// régua pra quem vier mais forte, e o fundo continua distinguindo.
-//   posição = -(6 + 42 · (1 - e^(-s/5.5)))     8.81 → -39.5 · 2.76 → -22.6 · 0.10 → -6.8
-const bipCarga = (s) => -(6 + 42 * (1 - Math.exp(-s / 5.5)))
-// O EXTREMO exige CONVERGÊNCIA (2+ achados na mesma família — metodologia C do founder):
-// sem ela o fator satura em 0.70, ou seja, a agulha não passa de ~70% da régua. Um elo
-// de fonte única não pode desenhar como conclusão fechada.
-const bipC2 = (s, conv) => (conv ? bipCarga(s) : -(6 + 42 * Math.min(1 - Math.exp(-s / 5.5), 0.70)))
+// ⚠️ `nivel`, `bipCarga` e `leftCarga` vêm do motor-calc — FONTE ÚNICA (ver o bloco
+// "ESCALA NORMALIZADA DA CARGA" lá). A curva saturante e o freio por convergência que
+// moravam aqui saíram em 2026-08-13: a escala agora é normalizada (100% = um achado I5
+// sozinho) e LINEAR, que é o que permite cravar a marca de cada faixa na barra.
+// ⛔ Não recriar cópia local: a divergência entre as cópias era o defeito.
+const nivel = (s) => nivelDe(s)
 const bipRecurso = (s) => clamp(Math.round(9 * s + 12), 24, 48)
-const leftCarga = (s, e) => 50 + bipC2(s, e === undefined || convDe(e))
+// ⛔ MARCAS DE FAIXA NA BARRA — TESTADAS E REPROVADAS (founder, 2026-08-13):
+// "ficou uns tracinhos na régua, não ficou legal não... a gente não precisa colocar".
+// Eram os limites 45/70/90 da escala cravados na barra (31,9% · 25,1% · 19,7%). A intenção
+// era responder "deu 3, caiu em qual faixa?" no próprio desenho; o custo visual não pagou —
+// traço vertical sobre a barra de gradiente suja o objeto mais bonito do relatório.
+// A faixa continua dita em PALAVRA ao lado do rótulo, que é onde ela já funcionava.
+// Se um dia voltar, que seja como entalhe curto na borda, nunca linha atravessando.
+const MARCAS = [CORTES.media, CORTES.alta, CORTES.muitoAlta].map((n) => 50 + Math.max(-48, -(PISO_CARGA + 27 * n)))
+void MARCAS // mantido só como registro dos pontos exatos, caso o desenho seja retomado
 // PÊNDULO por emoção de carga: [rótulo limpo, o-que-é (carga), antídoto, o-que-é (antídoto)]
 const PEND = {
   'raiva contida': ['Raiva contida', 'a raiva que você segura pra dentro, pra não virar briga', 'Serenidade', 'sentir e deixar passar, sem explodir'],
@@ -408,7 +406,16 @@ function block5(body) {
     // sem descrição curada, o antídoto entra sozinho como "A saída" (não fica linha vazia)
     if (p.antiDesc) bits.push(p.antiEixo ? `<b class="anti">A saída</b>: ${esc(p.antiDesc)}` : `<b class="anti">${esc(p.anti)}</b>: ${esc(p.antiDesc)}`)
     const desc = bits.length ? `<p class="pend-desc">${bits.join(' &nbsp;·&nbsp; ')}</p>` : ''
-    return `<div class="pend"><div class="pend-labels"><span class="pl-carga">${esc(p.lab)} <span class="lv">${nivel(s, e)}</span></span><span class="pl-anti">${esc(p.anti)}</span></div><div class="pend-track"><i class="needle" style="left:${leftCarga(s, e)}%"></i></div>${desc}</div>`
+    // ⛔ MARCA ⊕ NO PÊNDULO — TESTADA E REPROVADA no mesmo dia em que nasceu (founder,
+    // 2026-08-13): "tem um desenhozinho depois de cada palavra, também não ficou legal".
+    // Ela dizia que 2+ achados independentes apontam pra mesma emoção. A informação NÃO se
+    // perdeu: continua no bloco B do prompt (`serialize.mjs`), que é quem precisa dela pra
+    // dosar a força do texto. O cliente não precisa ver metodologia no gráfico.
+    // ⚠️ Só o pêndulo perdeu o símbolo — as CRENÇAS seguem com o ⊕ delas, que é anterior
+    // a isto e nunca foi questionado. Não mexer lá sem pedir.
+    const corr = ''
+    void convDe
+    return `<div class="pend"><div class="pend-labels"><span class="pl-carga">${esc(p.lab)} <span class="lv">${nivel(s)}${corr}</span></span><span class="pl-anti">${esc(p.anti)}</span></div><div class="pend-track"><i class="needle" style="left:${leftCarga(s)}%"></i></div>${desc}</div>`
   }).join('')
   // DEDUPE por EIXO: duas entradas distintas da canônica podem cair no mesmo eixo e,
   // desde que o rótulo passou a vir do eixo, imprimiam a MESMA linha duas vezes
@@ -728,6 +735,9 @@ const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><met
 .facet .fk.tenso{color:#b5701a} .facet .fk.livre{color:#2f7a54} .facet .fk.meio{color:#8a7d63}
 .respira{text-align:center;font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint,#a99);margin:2px 0 6px}
 .pend-desc{font-size:13px;line-height:1.5;color:var(--ink-soft,#6b6357);margin:5px 0 2px} .pend-desc b{color:#a35a1c;font-weight:600} .pend-desc b.anti{color:#2f7a54} .pend{margin-bottom:14px}
+/* as regras .tick e .pend-corr sairam em 2026-08-13: marcas de faixa na barra e o simbolo
+   depois do nivel foram reprovados pelo founder no mesmo dia em que entraram. Ver o
+   comentario no codigo que gera o pendulo. A barra volta a ser so gradiente + agulha. */
 .maieutica + .maieutica{margin-top:2px}
 /* ===== faixa .gen com pictogramas — escopo .genfig ===== */
 .genfig{--h:158px;margin:38px 0 26px;}

@@ -35,6 +35,44 @@ const DECAY = 0.6
 // (~7.5). Um achado I3 nunca alcança o patamar de um I5.
 const FAM_DAMP_EXP = 2
 
+// ---------- ESCALA NORMALIZADA DA CARGA (decisão founder 2026-08-13) ----------
+// O QUE ISTO CONSERTA. O score cru não tinha escala declarada. A régua desenhada é bipolar
+// (−50 … 0 … +50) e o score ia de 1,00 até um teto que MUDAVA conforme a família — medido
+// no exame máximo: 5,87 para uma família de 1 campo, 29,37 para "Medo" (5 campos). Eram
+// onze escalas no mesmo desenho: 5,87 em "Nojo e aversão" é o MÁXIMO que aquela emoção
+// consegue registrar; 5,87 em "Medo" é 20% do teto dela. Mesma agulha, sentidos opostos.
+// E quatro famílias de 1 campo NUNCA alcançavam "muito alta" (teto 5,87 < corte 6,0) —
+// impossível por construção, não por leitura.
+//
+// A ESCALA: 100% = UM achado sozinho na intensidade máxima (I5) = 5^γ = 5,873.
+// É a referência que se explica numa frase: "quanto isso pesa, comparado a um achado no
+// talo". Passar de 100% é legítimo e quer dizer MAIS DE UM achado apontando pra mesma
+// coisa (o reforço de família). Máximo real observado até hoje: 150%.
+const MAX_ACHADO = Math.pow(5, GAMMA) // 5,873 — um achado I5 sozinho = 100%
+const normCarga = (s) => s / MAX_ACHADO
+// CORTES colados na intensidade do achado (decisão founder 2026-08-13), pro rótulo ser
+// leitura direta do que a íris mostrou: I1 17% · I2 37% · I3 57% · I4 78% · I5 100%.
+//   baixa < 45% ≤ média < 70% ≤ alta < 90% ≤ muito alta
+// ⇒ I1/I2 baixa · I3 média · I4 alta · I5 muito alta · 2ª emoção de um I5 (60%) média.
+const CORTES = { media: 0.45, alta: 0.7, muitoAlta: 0.9 }
+const nivelDe = (s) => {
+  const n = normCarga(s)
+  return n >= CORTES.muitoAlta ? 'muito alta' : n >= CORTES.alta ? 'alta' : n >= CORTES.media ? 'média' : 'baixa'
+}
+// AGULHA — LINEAR na escala normalizada. É o que torna a régua legível: 45% cai sempre no
+// mesmo ponto da barra, em qualquer pêndulo, e por isso dá pra cravar a marca da faixa.
+// Piso −6: um achado que EXISTE nunca desenha como neutro (regra antiga, preservada).
+// 100% = −33, e sobra régua até −48 pro que passa de 100% — 150% cai em −46,5, sem cravar.
+const PISO_CARGA = 6
+const bipCarga = (s) => Math.max(-48, -(PISO_CARGA + 27 * normCarga(s)))
+// posição na barra (0-100%), que é o que o render usa: 50 = meio da régua bipolar.
+const leftCarga = (s) => 50 + bipCarga(s)
+// ⚠️ A CORROBORAÇÃO NÃO TRAVA MAIS O RÓTULO NEM FREIA A AGULHA (decisão founder
+// 2026-08-13). Antes, sem 2+ achados na família o rótulo tinha teto duro ("alta") e a
+// agulha tinha freio macio (saturava em 70%) — dois freios diferentes pra mesma regra, que
+// podiam discordar entre si. Agora medida é medida, e a corroboração aparece como a marca
+// ⊕ ao lado do rótulo, do mesmo jeito que já aparece nas crenças.
+
 // ---------- classificação dos campos (de classificacao-campos.md) ----------
 const ALIAS = {
   manchas_psoricas: 'sistema_imune',
@@ -774,9 +812,10 @@ function fmt(r) {
   for (const p of r.pres) L.push(`    ✓ ${p.campo}${p.pol === 'vital_ativo' ? ' (vital)' : ''}`)
 
   // (B) mapa emocional — o leque que o prompt seleciona
-  // limiares alinhados ao SPEC (intensidade→nível): I5≈5.9→muito alta · I4≈4.6→alta ·
-  // I3≈3.3→média · abaixo→baixa. (reforço entre campos da mesma emoção sobe o nível.)
-  const nivel = (s) => (s >= 6 ? 'muito alta' : s >= 4 ? 'alta' : s >= 2.5 ? 'média' : 'baixa')
+  // ⚠️ régua ÚNICA: `nivelDe` é o mesmo do serialize (prompt) e do render (cliente).
+  // Antes existia uma cópia aqui, SEM a regra de corroboração — este dump mostrava
+  // "muito alta" onde o cliente lia "alta", e é por ele que se calibra. Não duplicar.
+  const nivel = nivelDe
   const maxE = (r.mapaCarga[0] || [0, 1])[1] || 1
   // metodologia C — família que REPETE entre achados carrega a soma (reforço SEM elemento)
   const famRank = Object.entries(r.famScore || {}).sort((a, b) => b[1] - a[1])
@@ -784,11 +823,12 @@ function fmt(r) {
     L.push('\n(C) REFORÇO POR FAMÍLIA (a que repete entre achados leva o líder ao extremo):')
     L.push('  ' + famRank.map(([f, s], i) => `${i === 0 ? '★' : '·'}${f} ${s.toFixed(1)}`).join('  ·  ') + `   → dominante: ${r.domFam}`)
   }
-  L.push('\n(B) MAPA EMOCIONAL — leque de CARGA (score=Σ intensidade^γ · o prompt seleciona):')
+  L.push('\n(B) MAPA EMOCIONAL — leque de CARGA (100% = um achado I5 sozinho = 5,87):')
   for (const [emo, s] of r.mapaCarga) {
     const bar = '▓'.repeat(Math.round((s / maxE) * 16)).padEnd(16)
     const a = r.antidoto?.[emo]
-    L.push(`    ${bar} ${s.toFixed(1).padStart(4)} ${nivel(s).padEnd(9)} ${emo}`)
+    const pc = `${Math.round(normCarga(s) * 100)}%`.padStart(5)
+    L.push(`    ${bar} ${s.toFixed(1).padStart(4)} ${pc} ${nivel(s).padEnd(9)} ${emo}`)
     L.push(`    ${' '.repeat(16)}      ⟷ 🟢 ${a ? a.principal : '(SEM ANTÍDOTO — furo na canônica)'}`)
   }
   L.push('   leque de RECURSO (força — dos preservados):')
@@ -807,6 +847,10 @@ function fmt(r) {
 
 // ---------- exports (usados pelo serialize.mjs) ----------
 export { parseLastro, calc, classify, eixoDe, familiaDe, displayDe, oqueCargaDe, EIXOS, TOPO_CENTRO, GAMMA, K, BASELINE_LIVRE, DECAY, EXAM }
+// ESCALA DA CARGA — fonte ÚNICA. O serialize (que alimenta o prompt) e o render (que o
+// cliente lê) importam daqui. ⛔ Não recriar cópia local de nenhuma destas: a divergência
+// entre as cópias foi exatamente o defeito corrigido em 2026-08-13.
+export { MAX_ACHADO, CORTES, PISO_CARGA, normCarga, nivelDe, bipCarga, leftCarga }
 
 // ---------- CLI (só quando rodado direto: node motor-calc.mjs) ----------
 import { pathToFileURL } from 'node:url'
