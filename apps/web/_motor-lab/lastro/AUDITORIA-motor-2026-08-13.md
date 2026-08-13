@@ -12,8 +12,14 @@ Stage 1 → Stage 2 conferida contra o glossário; incidência real medida nas *
 
 ## Veredito em uma linha
 
-**O motor está redondo.** Dos 29 campos que carregam peso, **nenhum** tem furo de tabela. Achei
-**dois defeitos reais** (um vivo, pequeno; um latente), e **três decisões** que são suas, não minhas.
+**O motor está redondo.** Achei **três defeitos** — dois campos órfãos que eram descartados em
+silêncio, uma emoção que o motor não conseguia resolver, e um **crash latente** que só apareceu ao
+consertar o primeiro. **Os três foram corrigidos no mesmo dia** e o golden aceito como nova base.
+Sobra **uma decisão** que é sua (o corte posicional do vocabulário, §4) e duas divergências entre spec
+e código (§5) que não bloqueiam nada.
+
+**Estado final:** 40 campos no lastro · 31 carregam peso · 267 cargas e 149 recursos, cada uma em
+exatamente um eixo · **0 sem família, 0 sem eixo** · golden 60 idênticas.
 
 ---
 
@@ -21,8 +27,8 @@ Stage 1 → Stage 2 conferida contra o glossário; incidência real medida nas *
 
 | Verificação | Resultado |
 |---|---|
-| **Eixos** (carga ⟷ antídoto) | 268 cargas + 149 recursos, cada uma em **exatamente um** eixo. Zero órfãos, zero typos, zero duplicatas. |
-| **Campos que carregam peso** | **29 de 38.** Todos os 29 têm: os dois polos (carga E recurso), crença, suporte nutricional e eixo integrativo. **Zero lacunas.** |
+| **Eixos** (carga ⟷ antídoto) | 267 cargas + 149 recursos, cada uma em **exatamente um** eixo. Zero órfãos, zero typos, zero duplicatas. |
+| **Campos que carregam peso** | **29 de 38** na medição inicial — **31 de 40** depois de mapear `baco` e `plexo_solar`. Todos têm os dois polos (carga E recurso) e crença; os 29 originais têm também suporte nutricional e eixo integrativo. ⏳ os 2 novos ainda **não** têm suporte nem eixo integrativo — degradam sem quebrar (ver §2). |
 | **Campos "mudos"** | 9 — e são **exatamente** os marcadores e moduladores que o motor ignora por desenho. Coerência, não defeito. |
 | **Antídoto em produção** | **0 pêndulos sem antídoto** nas 60 leituras. |
 | **Contrato de campos** | Tudo que o lastro sabe interpretar, o Stage 1 sabe emitir. Nenhum campo morto na tabela. |
@@ -55,29 +61,64 @@ bloco B para calibrar via "marcador/modulador" e não enxergava o furo.
 **✅ CORRIGIDO em 13/08** (`serialize.mjs`): as duas listas agora são separadas, e a dos órfãos sai
 marcada com ⚠️ e o motivo real.
 
-**O que FALTA e é decisão sua** — três saídas, e a escolha é de iridologia, não de código:
-1. **Mapear** `baco` e `plexo_solar` na tabela-lastro (elementos, centro, emoções 🔴/🟢, crenças).
-   É a saída completa e exige o seu conhecimento.
-2. **Tirar** os dois do glossário do Stage 1, para o modelo não poder emiti-los.
-3. **Deixar como está**, agora que o descarte é visível. São 2% dos achados.
+### ✅ RESOLVIDO no mesmo dia — os dois campos foram MAPEADOS
+
+Decisão do founder: *"você mapeie. Bora, vamos atacar todos eles."* Feito, e a régua aceita.
+
+- **`baco`** — 🌍Terra 60 · 💧Água 22 · 💨Ar 18. Lastro: **MTC** (Baço = Terra; transformar e
+  transportar; 思 = pensamento excessivo) + **Jensen** (banda própria no gráfico oficial).
+  Cargas: ruminação · não-assimilar · preocupação · falta de reserva/apoio · dispersão mental.
+- **`plexo_solar`** — 🔥Fogo 45 · 💧Água 33 · 🌍Terra 22. ⚠️ **Lastro ESTICADO declarado:** Br/MTC não
+  cobrem plexo solar como órgão; a ponte é somática (centro visceral do poder pessoal). Mesma marca
+  que o `adrenal` já carrega. Cargas: desvalorização · sobressalto · senso de inferioridade · ruminação.
+- **Centro dos dois = Coração**, pela régua topográfica (faixa temporal/medial 2-4h), coerente com o
+  `Centro:` escrito no lastro deles.
+
+**Regra que tornou isso seguro:** mapeados **só com vocabulário que já existia na canônica** ⇒ família
+e eixo vieram garantidos, e a cobertura seguiu completa (0 sem família, 0 sem eixo).
+
+**🔴 BUG PRÉ-EXISTENTE que o mapeamento revelou — e que teria quebrado produção.** O bloco do eixo
+integrativo lia `sup.suporte` **sem guarda**, apesar de o comentário logo acima dizer que ele
+*"independe de haver suporte nutricional pro campo"*. Nunca estourou porque, até 13/08, **todo** campo
+do lastro tinha entrada em `SUPORTES` (os 9 sem entrada são marcador/modulador e saem no `continue`
+antes). `baco` e `plexo_solar` são os primeiros campos que entram no cálculo **sem** suporte
+nutricional — e o `calc()` passou a estourar `Cannot read properties of undefined (reading 'suporte')`.
+Pego no teste, antes do commit. Corrigido com `sup?.suporte ?? []`.
+
+**Impacto medido nas 60 leituras:** mudam **8 — exatamente as 8** que tinham achado nesses campos.
+Médias das agulhas: mente **29,1 → 29,1** · corpo **33,4 → 33,4** · coração **65,7 → 63,3**.
+O caso extremo é `aac033d9`, coração **88 → 49** (e a família dominante virou de *Controle e rigidez*
+para *Ansiedade e preocupação*). A direção é a certa: aquelas leituras tinham achados reais sendo
+jogados fora, então o "coração livre 88%" era falsamente otimista. **Golden regravado e aceito como a
+nova base** (60 idênticas · 0 diferenças).
 
 ---
 
-## 3. Defeito LATENTE — entrada malformada na canônica 🟡
+## 3. ✅ RESOLVIDO — a única emoção que o motor não conseguia resolver
 
-`tabela-lastro-CANONICA.md`, linha 499, campo `sistema_imune`:
+> ⚠️ **Correção da primeira versão desta auditoria.** Eu a descrevi como "entrada malformada". Não era.
+> Ela segue a convenção psicossomática documentada (`sintoma → emoção-base`, a seta que liga os dois).
+> O defeito real era outro, e só apareceu medindo.
 
-```
-🔴 emoções: baixa autoestima (Dias) · desilusão/trauma localizado (Dias) · "baixa estima → baixa imunidade" (Dias)
-```
+`tabela-lastro-CANONICA.md`, campo `sistema_imune`: `"baixa estima → baixa imunidade"`.
 
-A terceira **não é uma emoção** — é uma nota de mecanismo (causa → efeito) escrita dentro da lista de
-emoções. Ela é lida como emoção, **não tem eixo**, e geraria um pêndulo com
-*"(SEM ANTÍDOTO — furo na canônica)"* na tela do cliente.
+**A causa real:** o `clean()` do `loadFamilias` faz `.split('→')[0]` — e nesta emoção **a seta está
+dentro do próprio nome, entre aspas**. A chave virava `"baixa estima` e nunca casava com nada. Era a
+única das 232 cargas sem família **e** sem eixo; se chegasse ao leque, desenharia um pêndulo com
+*"(SEM ANTÍDOTO — furo na canônica)"* na tela do cliente. Nunca disparou (0 em 60).
 
-**Nunca disparou:** 0 ocorrências nas 60 leituras. Ela é a 3ª do campo, entra com peso `DECAY²=0,36`
-e raramente alcança o leque. **É armadilha, não incêndio** — mas é a única emoção da canônica inteira
-sem eixo, e some com uma linha de edição.
+**⛔ Tentei consertar na busca e MEDI que não resolve** — indexar a parte antes da seta (como o `eixoDe`
+já faz) não ajuda: numa das entradas a canônica é *mais longa* que o mapa de famílias, e nesta a seta
+está dentro do nome. **O descasamento era de dado, não de busca.** O comentário no `loadFamilias`
+registra isso para ninguém tentar de novo.
+
+**✅ Resolvido no dado:** a entrada saiu da canônica — era redundante (`baixa autoestima` já está no
+mesmo campo, no mesmo eixo Autoestima, e é exatamente a emoção-base que ela descrevia). E o
+descasamento de `temperamento manifesto reativo` (a canônica tinha `, submisso↔sedutor` a mais que o
+mapa de famílias) foi corrigido igualando os dois textos.
+
+**Estado agora: 0 sem família · 0 sem eixo, nos dois lados.** ⛔ Não reintroduzir nome de emoção com
+`→` dentro — o parser não tem como distinguir do separador.
 
 ---
 

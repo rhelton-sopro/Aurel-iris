@@ -635,7 +635,7 @@
    "id": "3f6d5ef7",
    "agulhas": {
     "mente": 30,
-    "coracao": 88,
+    "coracao": 71,
     "corpo": 25
    },
    "nAch": 8,
@@ -643,6 +643,7 @@
    "familias": [
     "Ansiedade e preocupação",
     "Controle e rigidez",
+    "Culpa e vergonha",
     "Nojo e aversão",
     "Raiva"
    ],
@@ -668,7 +669,7 @@
     "florais",
     "nutricao"
    ],
-   "crencas": 5,
+   "crencas": 6,
    "htmlHash": null
   },
   {
@@ -949,7 +950,7 @@
    "id": "5460079d",
    "agulhas": {
     "mente": 15,
-    "coracao": 56,
+    "coracao": 61,
     "corpo": 25
    },
    "nAch": 9,
@@ -987,7 +988,7 @@
     "nutricao"
    ],
    "crencas": 6,
-   "htmlHash": "d0e3dbc0ea64"
+   "htmlHash": "3cba141b5872"
   },
   {
    "id": "679cfd2c",
@@ -1193,7 +1194,7 @@
    "id": "7fa0749d",
    "agulhas": {
     "mente": 29,
-    "coracao": 88,
+    "coracao": 69,
     "corpo": 14
    },
    "nAch": 8,
@@ -1201,6 +1202,7 @@
    "familias": [
     "Ansiedade e preocupação",
     "Controle e rigidez",
+    "Culpa e vergonha",
     "Nojo e aversão",
     "Raiva"
    ],
@@ -1227,8 +1229,8 @@
     "florais",
     "nutricao"
    ],
-   "crencas": 6,
-   "htmlHash": "210e55e0e985"
+   "crencas": 7,
+   "htmlHash": "0801cb2121df"
   },
   {
    "id": "85f37df8",
@@ -1358,13 +1360,14 @@
    "id": "92445040",
    "agulhas": {
     "mente": 26,
-    "coracao": 82,
+    "coracao": 57,
     "corpo": 29
    },
    "nAch": 8,
    "nPres": 4,
    "familias": [
     "Ansiedade e preocupação",
+    "Culpa e vergonha",
     "Esgotamento e vitalidade",
     "Nojo e aversão",
     "Raiva"
@@ -1391,8 +1394,8 @@
     "florais",
     "nutricao"
    ],
-   "crencas": 5,
-   "htmlHash": "6f66f0940a8f"
+   "crencas": 6,
+   "htmlHash": "2c856357c53b"
   },
   {
    "id": "94610af8",
@@ -1518,7 +1521,7 @@
    "id": "aac033d9",
    "agulhas": {
     "mente": 26,
-    "coracao": 88,
+    "coracao": 49,
     "corpo": 19
    },
    "nAch": 9,
@@ -1526,11 +1529,12 @@
    "familias": [
     "Ansiedade e preocupação",
     "Controle e rigidez",
+    "Culpa e vergonha",
     "Esgotamento e vitalidade",
     "Nojo e aversão",
     "Raiva"
    ],
-   "domFam": "Controle e rigidez",
+   "domFam": "Ansiedade e preocupação",
    "suportes": [
     "complexo B",
     "enxofre alimentar",
@@ -1553,14 +1557,14 @@
     "florais",
     "nutricao"
    ],
-   "crencas": 7,
+   "crencas": 9,
    "htmlHash": null
   },
   {
    "id": "ac0a4fa6",
    "agulhas": {
     "mente": 51,
-    "coracao": 66,
+    "coracao": 54,
     "corpo": 38
    },
    "nAch": 6,
@@ -1568,6 +1572,7 @@
    "familias": [
     "Ansiedade e preocupação",
     "Controle e rigidez",
+    "Culpa e vergonha",
     "Expressão contida",
     "Raiva"
    ],
@@ -1592,7 +1597,7 @@
     "florais",
     "nutricao"
    ],
-   "crencas": 4,
+   "crencas": 5,
    "htmlHash": null
   },
   {
@@ -1799,7 +1804,7 @@
    "id": "c3841fbf",
    "agulhas": {
     "mente": 30,
-    "coracao": 86,
+    "coracao": 66,
     "corpo": 13
    },
    "nAch": 8,
@@ -1833,8 +1838,8 @@
     "florais",
     "nutricao"
    ],
-   "crencas": 6,
-   "htmlHash": "371e086262f9"
+   "crencas": 7,
+   "htmlHash": "8f187962492b"
   },
   {
    "id": "ca339d18",
@@ -2035,7 +2040,7 @@
    "id": "d79765ef",
    "agulhas": {
     "mente": 32,
-    "coracao": 85,
+    "coracao": 64,
     "corpo": 13
    },
    "nAch": 8,
@@ -2043,6 +2048,7 @@
    "familias": [
     "Ansiedade e preocupação",
     "Controle e rigidez",
+    "Culpa e vergonha",
     "Nojo e aversão",
     "Raiva"
    ],
@@ -2069,8 +2075,8 @@
     "florais",
     "nutricao"
    ],
-   "crencas": 6,
-   "htmlHash": "f490102f23f0"
+   "crencas": 7,
+   "htmlHash": "d599f8604748"
   },
   {
    "id": "e39d6613",

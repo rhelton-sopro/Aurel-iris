@@ -44,6 +44,53 @@ que o founder não lê, não revisa e não pode corrigir.
 
 ## Histórico
 
+### 2026-08-13 — AUDITORIA do motor: `baco` e `plexo_solar` mapeados, crash latente corrigido
+
+**Pedido:** *"Stage 1 e Stage 2 funcionando redondo. E os nossos glossários, tabelas de cálculo,
+fórmulas. Faça uma auditoria."* Relatório completo em
+`apps/web/_motor-lab/lastro/AUDITORIA-motor-2026-08-13.md`.
+
+**O que estava quebrado.** `baco` e `plexo_solar` entraram no glossário do Stage 1 em 26/07 (ancorados
+no gráfico oficial do Jensen) e **nunca chegaram à tabela-lastro**. O motor caía em `SEM-LASTRO` e
+descartava: o achado não virava emoção, centro, crença nem suporte. **8 ocorrências em 8 das 60
+leituras de produção (13%).** E o bloco B do prompt anunciava esse descarte junto com os ignorados de
+propósito, na mesma linha *"marcador/modulador"* — quem lia para calibrar não enxergava o furo.
+
+**Decisão do founder:** *"você mapeie… Bora, vamos atacar todos eles"* e, vendo o impacto medido,
+*"se você viu que isso tem diferença, pode ir embora, vamos pra cima"*.
+
+**Mapeados** só com vocabulário que já existia na canônica (⇒ família e eixo garantidos):
+`baco` 🌍60/💧22/💨18, lastro MTC (Baço=Terra, ruminação) + Jensen · `plexo_solar` 🔥45/💧33/🌍22,
+**lastro ESTICADO declarado** (Br/MTC não cobrem plexo solar como órgão; ponte somática, mesma marca
+que o `adrenal` já carrega). Centro dos dois = Coração, pela régua topográfica (2-4h).
+
+**🔴 CRASH LATENTE que o mapeamento revelou.** O bloco do eixo integrativo lia `sup.suporte` **sem
+guarda**, apesar do comentário logo acima dizer que ele *"independe de haver suporte nutricional pro
+campo"*. Nunca estourou porque até então **todo** campo do lastro tinha entrada em `SUPORTES`. Os dois
+novos são os primeiros sem — e o `calc()` passou a estourar. **Pego no teste, antes do commit.**
+
+**Impacto medido, e é o que o founder aceitou:** mudam **8 leituras — exatamente as 8**. Médias das
+agulhas: mente **29,1 = 29,1** · corpo **33,4 = 33,4** · coração **65,7 → 63,3**. Caso extremo
+`aac033d9`: coração **88 → 49**, e a família dominante virou de *Controle e rigidez* para *Ansiedade e
+preocupação*. **Contraponto registrado:** é queda grande num gráfico já aprovado; a direção é a certa
+(aquelas leituras tinham achados reais sendo jogados fora, então "coração livre 88%" era falsamente
+otimista), mas se algum dia incomodar, reverter o commit devolve os dois campos ao descarte — agora
+visível, não silencioso.
+
+**Também fechado:** a única das 232 cargas sem família e sem eixo (`"baixa estima → baixa imunidade"`,
+que tinha a seta **dentro do nome** e quebrava o `split('→')` do `loadFamilias`) e o descasamento de
+`temperamento manifesto reativo`. **Agora 0 sem família, 0 sem eixo.** ⛔ Não reintroduzir nome de
+emoção com `→` dentro.
+
+**⏳ Fica aberto (§4 e §5 da auditoria):** o `NUCLEO_CAP=4` torna 40 de 272 emoções (15%) inalcançáveis
+e corta **por posição na lista, não por qualidade** — decisão de calibração, não mexida · o nível
+"leve" existe na spec e nunca no código · a modulação por `natureza_da_carga` está especificada e não
+existe no motor · e os 2 campos novos ainda não têm suporte nutricional nem eixo integrativo (degradam
+sem quebrar).
+
+**Status:** APLICADA · golden regravado e aceito como nova base (60 idênticas · 0 diferenças) ·
+commits `6548c85` e `df4e451` · **não deployada**.
+
 ### 2026-08-13 — ESCALA DA CARGA normalizada, régua marcada, corroboração vira ⊕
 
 **Pergunta do founder:** *"naquelas réguas ali na agulha, tá demarcado em que faixas a agulha tá
