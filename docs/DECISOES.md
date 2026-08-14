@@ -1018,6 +1018,52 @@ Caminhos** que o bloco 7 escreve.
 
 ---
 
+---
+
+## 2026-08-13 — a escala da carga tem TETO: o máximo é 100%
+
+**Quem decidiu:** founder — *"O máximo é 100%. Não pode dar mais do que 100%, correto?"*
+**Status:** APLICADA. Supera a parte da entrada de hoje mais cedo que dizia *"passar de 100% é
+legítimo"* — era minha, e estava errada.
+
+**O que o founder lembrou, e estava certo.** Que o I5 tem um **atenuante** de grupo e também um
+**agravante** de grupo. São exatamente estes, e ambos existem no código:
+
+| | onde | o quê |
+|---|---|---|
+| atenuante | `emoCarga[e] += w · DECAY^rank` | a 2ª emoção do campo vale 60% da 1ª, a 3ª 36%… |
+| atenuante | `famScore`: `+= w_i · (int_i/5)^2` | irmão fraco na família quase não soma |
+| **agravante** | `emoCarga[líder] = max(emoCarga[líder], famScore[domFam])` | **é este que furava o teto** |
+
+**Um ajuste no que foi dito:** um I5 sozinho, sem agravante nenhum, **já dá exatamente 100%** —
+`w = 5^γ = 5,873` é o próprio `MAX_ACHADO`. O agravante não é o que o leva a 100%; é o que o
+faz **passar** de 100%.
+
+**Medido antes de aplicar.** Dos 495 rótulos das 60 leituras, **13 (2,6%) passavam de 100%**, em
+13 leituras distintas. Nos **13**, o `famScore` da família dominante batia exatamente o
+percentual — nenhum caso vinha de convergência de campos ou de soma por rank. Máximo: **150%**.
+
+**Por que isso importava mesmo sem o cliente ver.** O percentual não é impresso no documento. Mas
+o bloco B do prompt manda a frase literal — o Sonnet chegou a ler *"150% da escala"*. Percentual
+de uma escala que passa da escala não é leitura, é vazamento.
+
+**Custo medido:** `normCarga` ganhou `Math.min(1, …)`. **0 rótulos mudam** (os 13 já eram "muito
+alta", pois >90%) e **12 agulhas** andam para a direita, todas para a posição 17 — o extremo
+passa a ser um ponto só, em vez de espalhado entre as posições 3 e 17.
+
+**Contraponto registrado (fica aberto):** o teto tirou o uso da faixa −33…−48 da régua (posições
+2 a 17). O pêndulo mais carregado possível ainda desenha a 17% da borda, e a ponta da régua nunca
+é alcançada. Se o founder quiser que 100% desenhe no extremo, o coeficiente da `bipCarga` vai de
+27 para 42. ⚠️ Isso recalibra **todas** as agulhas de carga, não só as 12 — por isso não foi
+feito junto.
+
+**Nota de processo:** quem pegou isto foi o `golden-set.mjs` com o campo `pendulo`, acrescentado
+horas antes na mesma sessão (`652b23f`). Ele acusou as 13 leituras com "(rótulo igual)" — a
+deriva de percentual SEM troca de rótulo, que é o caso mais sutil dos três que ele compara. Sem
+esse campo o gate teria dito "60 idênticas".
+
+---
+
 ## Como usar
 
 - **Ao tomar uma decisão:** registrar aqui na mesma sessão, com razão e status.

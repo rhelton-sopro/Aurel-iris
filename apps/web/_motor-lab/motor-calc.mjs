@@ -50,10 +50,29 @@ const FAM_DAMP_EXP = 2
 //
 // A ESCALA: 100% = UM achado sozinho na intensidade máxima (I5) = 5^γ = 5,873.
 // É a referência que se explica numa frase: "quanto isso pesa, comparado a um achado no
-// talo". Passar de 100% é legítimo e quer dizer MAIS DE UM achado apontando pra mesma
-// coisa (o reforço de família). Máximo real observado até hoje: 150%.
+// talo".
+//
+// ⛔ TETO EM 100% (decisão founder, 2026-08-13, mesma sessão — corrige o que ficou meia-boca
+// algumas horas antes). Eu tinha deixado passar de 100%, e o founder cortou: "o máximo é
+// 100%, não pode dar mais do que 100%". Está certo — um percentual DE UMA ESCALA que passa
+// da escala não é leitura, é vazamento. O prompt chegou a receber a frase literal
+// "150% da escala".
+//
+// De ONDE vinha o excesso — medido, não suposto: dos 495 rótulos das 60 leituras, 13 (2,6%)
+// passavam de 100%, e **todos os 13** vinham da mesma linha, o reforço de família
+// (`emoCarga[líder] = max(emoCarga[líder], famScore[domFam])`, ~l.617). O `famScore` da
+// família dominante batia EXATAMENTE o percentual nos 13 casos. Não era convergência de
+// campos nem soma de rank: era o agravante de família furando o teto. Máximo visto: 150%.
+//
+// ⚠️ O que o teto NÃO faz: ele não apaga o agravante. O reforço de família continua puxando
+// o líder para cima — só não empurra além do topo declarado. Quem quiser o valor bruto
+// (para calibrar `FAM_DAMP_EXP`, por exemplo) tem `famScore` inteiro no retorno do `calc`.
+//
+// CUSTO MEDIDO do teto: 0 rótulos mudam (os 13 já eram "muito alta", pois >90%) e 12 agulhas
+// (2,4%) andam para a direita, para a posição 17 — o extremo passa a ser único em vez de
+// espalhado entre 3 e 17.
 const MAX_ACHADO = Math.pow(5, GAMMA) // 5,873 — um achado I5 sozinho = 100%
-const normCarga = (s) => s / MAX_ACHADO
+const normCarga = (s) => Math.min(1, s / MAX_ACHADO)
 // CORTES colados na intensidade do achado (decisão founder 2026-08-13), pro rótulo ser
 // leitura direta do que a íris mostrou: I1 17% · I2 37% · I3 57% · I4 78% · I5 100%.
 //   baixa < 45% ≤ média < 70% ≤ alta < 90% ≤ muito alta
@@ -66,7 +85,14 @@ const nivelDe = (s) => {
 // AGULHA — LINEAR na escala normalizada. É o que torna a régua legível: 45% cai sempre no
 // mesmo ponto da barra, em qualquer pêndulo, e por isso dá pra cravar a marca da faixa.
 // Piso −6: um achado que EXISTE nunca desenha como neutro (regra antiga, preservada).
-// 100% = −33, e sobra régua até −48 pro que passa de 100% — 150% cai em −46,5, sem cravar.
+// 0% = −6 (posição 44) · 100% = −33 (posição 17).
+// ⚠️ O `Math.max(-48, …)` virou CÓDIGO MORTO quando o `normCarga` ganhou teto em 1 — o pior
+// caso agora é −33. Fica no lugar como cinto de segurança: se alguém tirar o teto lá em
+// cima, isto continua impedindo a agulha de sair da régua. Não é redundância por descuido.
+// ❓ EM ABERTO (13/08): com o teto, a faixa −33…−48 (posições 2 a 17) ficou sem uso — o
+// pêndulo mais carregado possível ainda para a 17% da borda. Se o founder quiser que 100%
+// desenhe no extremo, o coeficiente 27 vira 42 (`-(6 + 42n)` → 100% = −48). É recalibração
+// de TODAS as agulhas de carga, não só das 12 — por isso não foi feito junto.
 const PISO_CARGA = 6
 const bipCarga = (s) => Math.max(-48, -(PISO_CARGA + 27 * normCarga(s)))
 // posição na barra (0-100%), que é o que o render usa: 50 = meio da régua bipolar.
