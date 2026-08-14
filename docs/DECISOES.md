@@ -1064,6 +1064,153 @@ esse campo o gate teria dito "60 idênticas".
 
 ---
 
+---
+
+## 2026-08-13 — o que o exame NÃO CONSEGUIU VER não vira emoção (+ a 5ª faixa)
+
+**Quem decidiu:** founder — e mudou de ideia no mesmo dia, depois de ver o custo medido.
+**Status:** ⛔ **REVERTIDA, não subiu.** O motor está exatamente como antes; todos os relatórios
+continuam mostrando as emoções, inclusive as que nascem de achado não-visto.
+
+**A reversão, e por quê.** As duas regras chegaram a ser construídas e medidas (tudo abaixo é
+real). O founder autorizou aplicar aceitando o custo (*"vamos com a 1"*) — mas em seguida pediu
+para testar a mudança irmã no Stage 1, o teste reprovou aquela mudança, e a decisão final foi
+manter tudo parado: *"vamos deixar como está... Não vamos subir nada... E deixa mostrando as
+emoções"*.
+
+⚠️ **O que fica desta entrada:** a MEDIÇÃO, que continua válida e cara de refazer. Se um dia isto
+voltar à mesa, os números abaixo já estão prontos — não repetir o trabalho. O que NÃO vale mais é
+o veredito.
+
+### Como chegamos aqui
+
+O founder observou que os valores dos pêndulos pareciam repetitivos entre relatórios e pediu que
+a resposta viesse de **cálculo**, não de escolha nossa: *"tem que ser com base num cálculo, não a
+gente aqui pensando e determinando como é que é"*.
+
+Medido: o exame entrega **7 informações** por achado e o cálculo usava **1** (a intensidade).
+Como a intensidade só tem 5 valores, os pêndulos caíam sempre nos mesmos números, com 5 faixas de
+5 pontos completamente vazias na régua.
+
+**Quatro hipóteses testadas em laboratório** (cópia do motor validada contra produção: 0
+diferenças antes de qualquer modificação), todas sobre as 60 leituras reais:
+
+| hipótese | valores distintos (base 25) | rótulos que mudam |
+|---|---|---|
+| `natureza_da_carga` como a spec escreveu | 25 | **0** |
+| `natureza_da_carga`, variante mais forte | 32 | **0** |
+| confiança puxando a agulha pro meio | 27 | **0** |
+| lateralidade (dois olhos × um olho) | 46 | 40 |
+
+As três primeiras são **becos sem saída** e ficam registradas para ninguém refazer. A da
+`natureza_da_carga` não funciona por um motivo concreto: dos 4 valores da regra, o único que
+abaixaria (`em_reorganizacao_ativa`) **nunca aparece** nos exames reais, e o valor mais comum
+depois do `cronica_sustentada` (o `indeterminada`, 27%) a regra nem menciona. A lateralidade
+funcionava, e foi **reprovada pelo founder** (*"esse negócio dos dois olhos não ficou legal"*).
+
+### As duas regras aplicadas — nenhuma delas inventada aqui
+
+Ambas já estavam escritas em `_motor-lab/lastro/score-emocoes-SPEC.md` e **nunca foram
+construídas**. Mais forte que isso: o **prompt do Stage 2 já mandava as duas** (§ "Display
+qualitativo" e § "Nível a partir da intensidade": *"muito alta / alta / média / baixa / **leve**"*
+e *"`indeterminada` **não entra**"*). O modelo recebia instrução e dado se contradizendo.
+
+**1. Achado não-visto não gera emoção.** 27% dos achados (118 de 435) vêm com
+`natureza_da_carga: indeterminada`, e 115 deles declaram também o `motivo_indeterminacao` — sempre
+de visibilidade (midríase tapando a zona, limite técnico da foto). Nenhum achado de outra natureza
+traz motivo: o campo significa **"não consegui ler aqui"**, não "não sei datar".
+
+**2. A 5ª faixa ("leve").** 237 das 495 emoções — quase metade — estavam no mesmo balaio "baixa".
+Corte em 25%, que separa I1 (17%) de I2 (36%).
+
+### Medições
+
+| | antes | depois |
+|---|---|---|
+| repetição de emoções entre as 60 leituras (top 5) | 25,5% | **21,5%** |
+| agulhas grandes (mente/coração/corpo) | 29 / 63 / 33 | **29 / 63 / 33** |
+| leituras sem nenhuma emoção | 0 | **0** |
+
+⚠️ **A variante que descartava o achado inteiro foi medida e REPROVADA:** movia a agulha da mente
+18 pontos em média, com salto de 52, e deixava 3 leituras vazias. O achado não-visto **continua
+contando** para o centro, o elemento e o bloco 7 — só não entra no leque de emoções.
+
+### O custo, aceito conscientemente
+
+O gráfico é redesenhado a cada visualização; o texto fica salvo. Então relatório antigo não "fica
+como está": **26 das 60 mudam**, **16 ficam com buraco** (o texto nomeia uma emoção que o gráfico
+não tem mais — 47 pêndulos rejeitados) e **4 trocam a família dominante**.
+
+**Contraponto registrado:** as alternativas eram refazer os 16 (≈US$ 4, mas o cliente que já leu
+receberia texto diferente) ou segurar a mudança para a próxima leva. O founder escolheu aplicar,
+com a diretriz *"o que já tá feito, deixa feito. Agora a gente vai fazer daqui pra frente, achando
+os erros de agora pra corrigir"*.
+
+### ⚠️ Remendo consciente, que fica aberto
+
+Em **3 das 60 leituras, TODO** achado emocional está marcado como não-visto — a pupila dilatada
+tapou tudo, e a única coisa legível era o padrão pupilar, que não gera emoção. Aplicar a regra ali
+deixaria o relatório **sem nenhuma emoção**. Nessas, a regra não entra e vale o comportamento
+antigo.
+
+⛔ Isto **não é a resposta certa**, é um remendo para não gerar relatório vazio. A resposta certa é
+uma destas duas, e as duas são decisão de PRODUTO, não de cálculo:
+- **(a)** o relatório dizer que as fotos não permitiram ler, oferecendo recaptura;
+- **(b)** o gate de captura barrar a midríase antes de virar leitura.
+
+⭐ O fato de fundo continua de pé e é o mais grave desta sessão: **5% das leituras hoje produzem
+um relatório emocional inteiro — mapa, crenças, perguntas de sessão — a partir de achados que o
+próprio exame declarou que não conseguiu ver.**
+
+---
+
+## 2026-08-13 — ⛔ REPROVADO por medição: avisar o Stage 1 que "a midríase só tapa o meio"
+
+**Quem decidiu:** founder mandou fazer (*"faz isso no Stage 1"*) e mandou testar antes de subir
+(*"vamos testar... faça a leitura e compare"*).
+**Status:** REPROVADO. Bloco removido de `prompts/stage1-scan.md`. Nada subiu.
+
+**A hipótese.** A midríase dilata a pupila e obscurece o que está encostado nela (colarete, zona
+pericentral, eixo pituitário-adrenal), mas **não alcança** a zona ciliar nem a periferia. Medido
+nas 60 leituras: em leituras com midríase, 43% dos campos CENTRAIS saem indeterminados contra 18%
+dos campos da BORDA — a varredura em geral acerta. Mas em 3 leituras ela desistiu geral e marcou
+como ilegíveis até `figado_vesicula` e `sistema_linfatico`. A ideia era dizer isso ao prompt.
+
+**O teste.** A/B honesto: mesmas fotos, mesmo modelo (`claude-sonnet-4-6`), `temperature 0.0`
+(determinístico), mesma ferramenta com o enum vindo do glossário VIVO (40 campos — ⚠️ o script
+antigo `test-haiku-vs-sonnet-stage1.mjs` tem a lista CHUMBADA e desatualizada, sem `baco` nem
+`plexo_solar`; não reusar). Braço "velho" = arquivo atual MENOS o bloco novo, para isolar só esta
+mudança e deixar a correção nasal/temporal nos dois lados. 4 leituras × 2 braços, **US$ 1,25**.
+
+**O resultado — a regra fez o CONTRÁRIO do que devia:**
+
+| leitura | achados na BORDA: velho → novo |
+|---|---|
+| 39689d6d | melhorou (apareceu `figado_vesicula`) |
+| c15a0752 | 3 → **2** |
+| be53fde0 | 3 → **1** |
+| c3841fbf | 3 → **1** |
+
+**1 melhorou, 3 pioraram.** E o que sumiu foi exatamente o que a regra queria salvar: sistema
+circulatório, linfático, fígado, tireoide, intestino grosso, adrenal. No lugar entraram campos do
+CENTRO. Ou seja: o bloco não aumentou a leitura da periferia, **embaralhou** os achados.
+
+**Alarme falso meu, registrado para calibrar confiança:** na 1ª leitura as intensidades mudaram
+muito (pigmento âmbar I5→I2) e eu levantei isso como risco sistêmico. Nas 3 seguintes o achado
+mais forte continuou I5 nos dois braços. Era caso isolado — **n=1 não sustentava o alarme**.
+
+⚠️ **Limite do teste, declarado:** as leituras que de fato exibem o defeito (`69b472aa`,
+`e46f3b68`, `0a75c429`) **perderam as fotos** para o expurgo de 24h — as linhas de
+`reading_images` sobrevivem, os objetos no bucket não. Só deu para testar em leituras sem o
+defeito, ou seja, o teste provou que a regra **piora o que estava certo**, não que ela falha em
+consertar o que estava errado. Para testar o caso real é preciso pegar uma captura NOVA com
+midríase, dentro da janela de 24h.
+
+**O que fica aberto:** o problema original é real (o Stage 1 às vezes desiste de zona que a pupila
+não tapa) e **a solução não é instruir no prompt** — isso está medido. Qual é, não se sabe.
+
+---
+
 ## Como usar
 
 - **Ao tomar uma decisão:** registrar aqui na mesma sessão, com razão e status.
