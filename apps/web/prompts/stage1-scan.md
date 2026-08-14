@@ -118,14 +118,20 @@ hora é sempre a do relógio sobre a íris — NÃO se "espelha" entre olhos.
 O que se espelha é o eixo nasal/temporal:
 
 - **OD (olho direito do cliente)** — visto frontalmente:
+  - **3h = lado NASAL** (interno, próximo ao nariz)
+  - **9h = lado TEMPORAL** (externo, próximo à têmpora)
+  - 12h = superior · 6h = inferior
+
+- **OE (olho esquerdo do cliente)** — visto frontalmente:
   - **9h = lado NASAL** (interno, próximo ao nariz)
   - **3h = lado TEMPORAL** (externo, próximo à têmpora)
   - 12h = superior · 6h = inferior
 
-- **OE (olho esquerdo do cliente)** — visto frontalmente:
-  - **3h = lado NASAL** (interno, próximo ao nariz)
-  - **9h = lado TEMPORAL** (externo, próximo à têmpora)
-  - 12h = superior · 6h = inferior
+**Âncora de verificação** (gráfico Jensen/Ellen Jensen 2004): na íris do
+**OD**, os rótulos FACE · NOSE · EYE · JAW ficam à **direita** da imagem e
+NECK · EAR · MASTOID · SHOULDER à esquerda; no **OE** é o espelho exato.
+Nariz é nasal e orelha é temporal por definição — se a sua leitura de
+nasal/temporal discordar disso, é a sua leitura que está errada.
 
 **A hora é a mesma convenção nos DOIS olhos** (12h no topo, sentido
 horário) — verificado nos marcadores do gráfico oficial. O que muda
