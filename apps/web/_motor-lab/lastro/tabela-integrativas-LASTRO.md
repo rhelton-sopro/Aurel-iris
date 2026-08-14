@@ -46,6 +46,7 @@ práticas contemplativas por **FAMÍLIA DE PADRÃO** — as duas coisas são der
 | intestino_grosso | digestivo_imune |
 | sistema_imune | digestivo_imune |
 | sistema_linfatico | digestivo_imune |
+| baco | digestivo_imune |
 | radii_solaris | digestivo_imune |
 | adrenal | adrenal_nervoso |
 | eixo_pituitario_adrenal | adrenal_nervoso |
@@ -54,6 +55,7 @@ práticas contemplativas por **FAMÍLIA DE PADRÃO** — as duas coisas são der
 | cerebrum_motor | adrenal_nervoso |
 | cerebellum_sensory | adrenal_nervoso |
 | coroa_simpatica | adrenal_nervoso |
+| plexo_solar | adrenal_nervoso |
 | tireoide | reprodutivo_hormonal |
 | sistema_reprodutor | reprodutivo_hormonal |
 | coracao | cardiovascular |

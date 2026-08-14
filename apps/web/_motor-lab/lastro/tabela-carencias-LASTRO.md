@@ -90,6 +90,16 @@ Para cada campo do Stage 1, a **hipótese de suporte** que o achado pode sustent
 | **AY** | **Kledaka Kapha** + agni. Desequilíbrio = peso e sonolência após comer. |
 | **E** | preocupação · necessidade de "adoçar" o que está amargo |
 
+### `baco` — anel MUSCULATURA (4º de 7), ~3:45-4:15h, íris ESQUERDA (OE)
+| | |
+|---|---|
+| **Suporte** | ferro · zinco · vitamina C |
+| **Por quê** | **F** a polpa vermelha do baço recicla o ferro das hemácias envelhecidas — é o órgão onde esse metal volta a circular; a polpa branca é tecido linfoide, e a carência de zinco produz atrofia linfoide documentada. A vitamina C entra pelos dois lados: função imune e absorção do ferro não-heme. |
+| **MTC** | Baço = **Terra**: transforma e transporta, separa o puro do impuro. 思 (pensamento excessivo) é a emoção do órgão — "o Baço sustenta". |
+| **AY** | **Kapha** + agni: o que não é transformado não some, vira peso. |
+| **E** | ruminação · não-assimilar · preocupação |
+| ⚠️ | Campo mapeado em **2026-08-13**. Estava no glossário do Stage 1 desde 26/07 sem suporte nem eixo: subia no pêndulo e sumia nos blocos 7 e 8. |
+
 ---
 
 ## ELIMINAÇÃO E FLUIDOS
@@ -218,6 +228,16 @@ Para cada campo do Stage 1, a **hipótese de suporte** que o achado pode sustent
 | **MTC** | Umidade turva subindo e obscurecendo os orifícios superiores. |
 | **E** | pensamento que gira · dificuldade de clarear |
 
+### `plexo_solar` — oval peri-colarete, ~3h na íris ESQUERDA (OE)
+| | |
+|---|---|
+| **Suporte** | magnésio · vitaminas do complexo B · vitamina C |
+| **Por quê** | **F** o plexo solar é o plexo celíaco — uma rede **autonômica**, não um órgão. O magnésio regula a excitabilidade neuromuscular e é consumido na resposta de estresse; as vitaminas do complexo B são cofatores na síntese dos neurotransmissores dessa rede; o córtex adrenal, que o plexo enerva, guarda uma das maiores concentrações de ascorbato do corpo. |
+| **AY** | **Vata** no epigástrio: o sobressalto que bate na boca do estômago antes de virar pensamento. |
+| **E** | desvalorização · sobressalto · senso de inferioridade · assertividade travada |
+| ⚠️ | Sem linha **MTC**: a tradição chinesa não trata "plexo solar" como órgão. O lastro deste campo é somático/Jensen e já está declarado como **ESTICADO** na canônica — não inventar par MTC para preencher tabela. |
+| ⚠️ | Campo mapeado em **2026-08-13**, mesma história do `baco`. |
+
 ---
 
 ## ESTRUTURA E MOVIMENTO
@@ -339,6 +359,8 @@ que sustentam o suporte, não pela ordem dos campos.
 | intestino_grosso | magnésio · fibras · água | é o fim da linha: o que o corpo já usou precisa sair na hora certa | segurar o que já cumpriu o papel cansa o corpo do mesmo jeito que cansa você |
 | figado_vesicula | complexo B · magnésio · enxofre alimentar | o fígado é a central de limpeza, e esse trabalho gasta um conjunto específico de nutrientes | é o órgão do impulso que precisa sair; quando não sai, vira calor guardado |
 | pancreas | cromo · magnésio · complexo B | ajuda o corpo a manter o açúcar estável ao longo do dia, sem picos e quedas | a busca por doce costuma aparecer quando falta doçura em outro lugar |
+| baco | ferro · zinco · vitamina C | é o órgão que recicla o ferro do sangue usado e abriga tecido de defesa; quando ele pesa, o que entra rende menos | o que você não consegue transformar não some — fica girando |
+| plexo_solar | magnésio · complexo B · vitamina C | é uma rede de nervos no meio do tronco, não um órgão: ela responde ao susto antes de você pensar | o corpo já reagiu na boca do estômago quando a cabeça ainda está entendendo |
 | rim | água · magnésio · potássio | filtrar o dia inteiro depende de líquido suficiente e do equilíbrio dos sais | é o órgão da reserva: o cansaço que vem de fundo mora aqui |
 | sistema_urinario | água · magnésio · vitamina C | hidratação é o fator que mais muda esse eixo, e é o mais simples de ajustar | o que se segura e o que se deixa ir passam pelo mesmo caminho |
 | sistema_linfatico | água · vitamina C · movimento | a linfa não tem bomba própria: ela só circula quando você se move e respira fundo | acúmulo pede movimento, não mais uma coisa pra tomar |
@@ -416,6 +438,8 @@ Texto na voz do cliente; campo sem entrada simplesmente não mostra a linha.
 | intestino_grosso | forma par com o pulmão: os dois tratam de soltar o que já cumpriu o papel | é o vento descendente que governa a eliminação — quando desregula, nada desce na hora certa |
 | figado_vesicula | quando a energia do fígado estagna, o impulso que não saiu vira calor guardado | é território do calor: excesso aqui aparece como pavio curto |
 | pancreas | pertence ao centro da terra, o eixo da doçura — inclusive da que falta e se busca no açúcar | o peso e a sonolência depois de comer são o sinal clássico deste desequilíbrio |
+| baco | forma com o estômago o centro que transforma: separa o que serve do que não serve, na comida e no que acontece | o que não é transformado não desaparece — vira peso |
+| plexo_solar |  | é o vento do meio do corpo: o sobressalto chega no epigástrio antes de virar pensamento |
 | rim | é a raiz da energia herdada e a morada do medo — o cansaço de fundo mora aqui | governa o movimento e a secura; medo e agitação vêm do mesmo lugar |
 | sistema_linfatico | é o padrão de umidade: acúmulo, peso, coisa que não escoa | é o excesso do que estagna — pede movimento, não mais uma coisa pra tomar |
 | pele_tegumentar | a pele é governada pelo pulmão: é a fronteira entre você e o mundo | é onde o calor interno encontra saída quando as outras vias estão ocupadas |
@@ -448,6 +472,7 @@ forma continua valendo.
 | figado_vesicula | complexo B | B9 · B12 |
 | boca_garganta | complexo B | B2 · B12 |
 | adrenal | complexo B | B5 |
+| plexo_solar | complexo B | B6 · B12 |
 | eixo_pituitario_adrenal | complexo B | B5 |
 | sistema_nervoso_autonomico | complexo B | B1 · B6 · B12 |
 | cerebrum_motor | complexo B | B9 · B12 |

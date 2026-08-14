@@ -926,6 +926,7 @@
     "glutamina",
     "magnésio",
     "vitamina A",
+    "vitamina C",
     "vitamina D",
     "zinco",
     "água",
@@ -1724,6 +1725,7 @@
     "glutamina",
     "magnésio",
     "vitamina A",
+    "vitamina C",
     "vitamina D",
     "zinco",
     "água",
@@ -1957,6 +1959,7 @@
     "glutamina",
     "magnésio",
     "vitamina A",
+    "vitamina C",
     "vitamina D",
     "zinco",
     "água",
@@ -2184,10 +2187,12 @@
    "suportes": [
     "complexo B",
     "enxofre alimentar",
+    "ferro",
     "fibras",
     "glutamina",
     "magnésio",
     "vitamina A",
+    "vitamina C",
     "vitamina D",
     "zinco",
     "água",
@@ -2247,6 +2252,7 @@
     "iodo",
     "magnésio",
     "selênio",
+    "vitamina C",
     "zinco",
     "água"
    ],
@@ -2584,10 +2590,12 @@
    "suportes": [
     "complexo B",
     "enxofre alimentar",
+    "ferro",
     "fibras",
     "glutamina",
     "magnésio",
     "vitamina A",
+    "vitamina C",
     "vitamina D",
     "zinco",
     "água",
@@ -2621,7 +2629,7 @@
      78
     ]
    ],
-   "htmlHash": "8f187962492b"
+   "htmlHash": "4049d4a8982a"
   },
   {
    "id": "c907928c",
@@ -2982,6 +2990,7 @@
     "glutamina",
     "magnésio",
     "vitamina A",
+    "vitamina C",
     "vitamina D",
     "zinco",
     "água",
@@ -3015,7 +3024,7 @@
      78
     ]
    ],
-   "htmlHash": "d599f8604748"
+   "htmlHash": "8b6e3331c1fc"
   },
   {
    "id": "e39d6613",

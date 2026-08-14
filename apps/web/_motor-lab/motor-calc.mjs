@@ -333,7 +333,15 @@ const PORQUE_NUTRIENTE = loadPorqueNutriente()
 // elas explicam o padrão, não prescrevem.
 export function loadTradicoes() {
   const md = fs.readFileSync(CARENCIAS_MD, 'utf8')
-  const sec = md.slice(md.indexOf('## MAPA MÁQUINA — TRADIÇÕES'))
+  // ⚠️ O slice PRECISA parar na próxima seção. Ia até o fim do arquivo, e a tabela
+  // `## MAPA MÁQUINA — ESPECIFICAÇÃO`, que vem depois e também tem 3 colunas, sobrescrevia
+  // a leitura de todo campo repetido nas duas: `estomago`, `figado_vesicula`,
+  // `boca_garganta` e `adrenal` ficavam com mtc="complexo B" e ay="B12". Não chegava ao
+  // cliente — a seção que imprimia isso saiu em 2026-08-03 (decisão do founder) —, mas era
+  // armadilha armada para quem reativasse. Achado em 13/08 ao mapear o `plexo_solar`.
+  const i = md.indexOf('## MAPA MÁQUINA — TRADIÇÕES')
+  const j = md.indexOf('\n## ', i + 5)
+  const sec = md.slice(i, j < 0 ? md.length : j)
   const out = {}
   for (const linha of sec.split(/\r?\n/)) {
     const m = linha.match(/^\|\s*([a-z_]+)\s*\|([^|]*)\|([^|]*)\|\s*$/)
