@@ -1211,6 +1211,76 @@ não tapa) e **a solução não é instruir no prompt** — isso está medido. Q
 
 ---
 
+---
+
+## 2026-08-17 — a repetição do relatório: 5 consertos + a régua dos pêndulos recalibrada
+
+**Origem:** reclamação de CLIENTES REAIS — *"a pessoa lê num bloco, a frase repete em outro bloco,
+depois em outro"*. **Quem decidiu:** founder, ao longo do dia.
+**Status:** APLICADA.
+
+### O diagnóstico (2 estudos, no repo)
+`_motor-lab/lastro/ESTUDO-repeticao-relatorio-2026-08-17.md` (medição) +
+`LAUDO-redacao-repeticao-2026-08-17.md` (leitura editorial do Bob, 18 relatórios lidos).
+
+**A causa não era o modelo — era o prompt entregando a frase pronta** com uma lacuna para trocar
+(`"o que essa [carga] estava tentando proteger?"`, `"um cantinho já basta"`). Com 4,8 Caminhos por
+relatório, a mesma frase saía 5 vezes. Medido nos 25 de produção: `s6` com **67%** de igualdade
+interna e **85%** entre clientes; **24 frases literalmente idênticas** em relatórios de pessoas
+diferentes (uma delas em 9 clientes).
+
+⭐ **A causa a montante, achada pelo Bob e confirmada no motor:** a lista já vinha duplicada.
+Em **58 das 60 leituras (97%)**, 2+ dos cinco primeiros pêndulos são da MESMA FAMÍLIA — o cliente
+recebia 5 exercícios para 3 temas. *"Sem deduplicar a lista de origem, reescrever os Caminhos
+melhora o texto e não melhora a leitura."*
+
+### Os cinco consertos
+1. **Rodízio de ângulos** — o motor manda, por Caminho, um ângulo diferente por movimento, com
+   ponto de partida derivado da própria leitura (senão o Caminho 1 de todo cliente saía igual).
+2. **Um Caminho por TEMA** — dedup por família, piso 3. O MAPA continua completo (lá a função é painel).
+3. **Uma CRENÇA por tema** — mesmo critério. Era o último lugar onde a lista duplicada sobrevivia.
+4. **Bloco 2: cada marcador com trabalho próprio** — o ranking dos 3 centros era enunciado **5 vezes**.
+5. **Regra do NOME (4-6 vezes)** — founder: *"o nome é importante repetir, mas não tanto. Tem que ter
+   bom gosto."* Uma rodada intermediária derrubou de 7 para 2 e o texto esfriou.
+
+### A régua dos pêndulos — coeficiente 27 → 42
+**Founder, verbatim:** *"se a régua vai de menos 50 a 50 e o zero no meio, até 48 acho que está ok"*.
+Ele viu no relatório dele: a `preocupação` marcava **100% da escala** e a agulha parava na posição 17
+— só **66% do caminho** entre o meio e a borda. Lia como "passou do meio", não como "no talo".
+⚠️ Isto **supera** a resposta dele de 13/08 (*"deixe assim… nunca no máximo, mas perto do máximo"*):
+a implementação de então entregou o "nunca no máximo" e **não** entregou o "perto do máximo".
+**Efeito:** 100% → posição 2. As faixas deixam de ser espremidas (`muito alta` de 2,7 → 4,2 pontos).
+Verificado nas 495 agulhas: nenhuma fora da régua, nenhuma encostando na borda, faixas em ordem.
+
+### ⚠️ Dois erros MEUS no caminho, medidos e corrigidos — ficam registrados
+- **Tirei a AÇÃO do fecho.** Apliquei uma regra que estava parada no working tree (*"nunca prescrever
+  tarefa"*) sem medir o custo: os fechos viraram pergunta hipotética e o passo sumiu de **30 em 33**
+  para **2 em 29**. O Bob pegou: *"era a única coisa que o cliente levava embora para fazer"*.
+  O defeito nunca foi a ação ser ação — era a mesma frase de abertura 5 vezes. **Revertido.**
+- **Entupi o TEMPLATE de saída com regras** e a geração saiu **sem os movimentos `s5` e `s7`** em
+  todos os Caminhos. O molde mostra a FORMA; as regras vão abaixo dele. **Corrigido e reverificado.**
+
+### ℹ️ Onde o laudo editorial ERROU (registrado para não "consertarem" de novo)
+O Bob apontou `"Método somático · Sopro da Origem"` como violação de marca. **NÃO é.** O prompt
+autoriza explicitamente (*"marca própria — permitida"*; o checklist diz *"exceto Sopro da Origem"*).
+O veto do Sopro da Origem é de **vocabulário** (centelha divina, atravessar) e da **landing page**.
+
+### Medido (3 leituras, tudo aplicado)
+| | produção | agora |
+|---|---|---|
+| subtítulo dos Caminhos | 62% | **17%** |
+| dar voz à sensação (`s3`) | 53% | **15%** |
+| o sentido (`s6`) | 60% | **20%** |
+| tocar no corpo (`s2`) | 55% | **20%** |
+| fechos com passo concreto | 12/15 | **8/10** |
+| nome da pessoa | 3 a 7 | **5 a 6** |
+
+**Contraponto registrado:** 2 de 10 fechos ainda saem sem passo, e *"Essa semana"* ainda abre 4 de 10
+— o founder viu e decidiu **deixar por ora** (*"acho até ok"*). E a landing promete *"quatro ou cinco
+Caminhos"*: com a dedup, 13 de 60 leituras entregam **3**. ⚠️ Ou a copy muda, ou o piso sobe para 4.
+
+---
+
 ## Como usar
 
 - **Ao tomar uma decisão:** registrar aqui na mesma sessão, com razão e status.

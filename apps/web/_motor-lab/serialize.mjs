@@ -28,6 +28,54 @@ function centroLabel(c, agulha, sabor) {
   return sabor === 'medo' ? 'reage se protegendo, em alerta' : 'ferve rápido, gatilho curto'
 }
 
+
+// ---------- RODÍZIO DE ÂNGULOS (experimento B, 2026-08-17) ----------
+// PROBLEMA: o prompt entregava a frase pronta por movimento; com 4-5 Caminhos, a mesma frase
+// saía 5 vezes. Medido em 25 relatórios: s6 com 67% de igualdade interna e 85% entre clientes.
+// IDEIA: o motor SABE quantos Caminhos vão sair e em que ordem. Então ele atribui, por Caminho,
+// um ÂNGULO diferente para cada movimento — variação GARANTIDA, sem depender do modelo lembrar.
+// Mesma lógica que derrubou a sobreposição dos exercícios de 67% para 13%.
+const ANGULOS = {
+  s2: ['uma cena RECENTE em que isso apareceu',
+       'a última vez em que isso se REPETIU (não a primeira, a mais recente que se repetiu)',
+       'o GATILHO — o que costuma acender isso',
+       'a ANTECIPAÇÃO — o momento em que ela percebe que vem vindo',
+       'o DEPOIS — como o corpo fica quando aquilo passa'],
+  s3: ['o que essa sensação DIRIA se tivesse voz',
+       'o que ela PEDE (não o que ela reclama)',
+       'o que ela IMPEDE de acontecer',
+       'HÁ QUANTO TEMPO ela está por ali',
+       'COM QUEM ela aprendeu a ficar'],
+  s5: ['uma vez em que ela CONSEGUIU o outro lado, mesmo pequena',
+       'a PESSOA com quem isso não acontece',
+       'o LUGAR ou a situação onde aquilo afrouxa sozinho',
+       'a HORA DO DIA em que aquilo pesa menos',
+       'quem PERCEBEU a mudança nela antes dela mesma'],
+  // ⚠️ s7 e sub ENTRARAM na 2ª rodada (17/08): sem ângulo, eles PIORARAM enquanto os outros melhoravam
+  // — s7 foi de 31% pra 61% interno e de 42% pra 81% entre clientes, porque a regra do "já pode"
+  // trocou um molde fixo por outro molde fixo. A lição: molde fixo repete, sempre. Não importa qual.
+  // ⚠️ 3ª rodada (17/08): o s7 tinha virado pergunta hipotética e o passo SUMIU — medido,
+  // 30 de 33 caminhos de produção entregavam ação concreta contra 2 de 29 nos novos.
+  // Bob: "era a única coisa que o cliente levava embora para fazer". O defeito nunca foi a ação
+  // ser ação; era a MESMA frase de abertura cinco vezes. Então: a ação volta, e o que roda é o
+  // TIPO de passo — cada Caminho pede uma natureza de gesto diferente.
+  s7: ['DIZER algo — uma frase que ela costuma engolir, dita no momento em que aparece',
+       'PARAR algo — uma coisa pequena que ela faz no automático e pode interromper uma vez',
+       'NOTAR sem mudar nada — só reparar quando acontece, sem corrigir',
+       'um gesto do CORPO — algo físico e curto, no momento em que aquilo aperta',
+       'ESCOLHER um momento fixo da semana para deixar aquilo de lado de propósito'],
+  sub: ['o MOVIMENTO: de onde para onde',
+        'o que ela GANHA do outro lado',
+        'o CUSTO que para de ser pago',
+        'a IMAGEM concreta do outro lado',
+        'o que ficava IMPEDIDO e passa a caber'],
+  s6: ['de que aquilo estava PROTEGENDO',
+       'o que teria acontecido SEM aquilo',
+       'QUANDO aquilo foi útil de verdade',
+       'DE QUEM ela aprendeu a se cuidar assim',
+       'o que aquilo JÁ NÃO precisa mais segurar'],
+}
+
 // `exameOuNome` = objeto (produção) ou nome (lab). `nomePessoa` sobrepõe o mapa do lab.
 function serialize(exameOuNome, nomePessoa) {
   const lastro = parseLastro()
@@ -85,7 +133,7 @@ function serialize(exameOuNome, nomePessoa) {
 // que o prompt lê e o que o cliente vê nunca mais divergirem. Ver o bloco de comentário
 // "ESCALA NORMALIZADA DA CARGA" lá.
   const bipR = (s) => clamp(Math.round(9 * s + 12), 24, 48)
-  L.push('## Mapa emocional (0% = nada ⟷ 100% = um achado no talo (I5) ⟷ acima de 100% = mais de um achado apontando pra mesma coisa)')
+  L.push('## Mapa emocional (0% = nada ⟷ 100% = o máximo da escala: um achado no talo (I5), ou vários apontando pra mesma coisa)')
   L.push('**O que pesa hoje (cargas) — cada uma com o SEU lado-antídoto (o outro polo do mesmo pêndulo):**')
   for (const [emo, s] of r.mapaCarga) {
     const a = r.antidoto?.[emo]
@@ -101,6 +149,62 @@ function serialize(exameOuNome, nomePessoa) {
     // tabela. MEDIDO: sobreposição entre os 20 relatórios 40,4% → 40,2% — ruído, não
     // efeito. Ver AUDITORIA-motor-2026-08-13.md §6 antes de tentar de novo.
     L.push(`- ${emo} — ${nivel(s)} · ${Math.round(normCarga(s) * 100)}% da escala (agulha ${Math.round(bipCarga(s))})${conv ? ' ⊕ corroborada' : ''}${anti}`)
+  }
+  // ⭐ ÂNGULOS POR CAMINHO — cada Caminho recebe um ângulo DIFERENTE em cada movimento.
+  // O deslocamento por movimento evita que os Caminhos fiquem "em fase" (todos no ângulo 1, depois todos no 2).
+  {
+    // ---------- UM CAMINHO POR TEMA (2026-08-17) ----------
+    // PROBLEMA (laudo do Bob + medição): em 58 das 60 leituras, 2+ dos cinco primeiros pêndulos são da
+    // MESMA FAMÍLIA — quatro nomes para o mesmo fenômeno. O cliente recebia CINCO exercícios para TRÊS
+    // temas, e reclamou de repetição. Consertar só a redação dos Caminhos não resolvia: "o leitor vai
+    // continuar fazendo quatro exercícios para o mesmo problema, com quatro nomes diferentes".
+    // REGRA: um Caminho por família, o de maior carga. Piso de 3 (senão uma leitura cairia a 2).
+    // ⚠️ O MAPA (bloco 5) continua mostrando TODOS os pêndulos — lá a função é painel, e ver as emoções
+    // vizinhas da mesma família é informação. Quem deduplica é só o bloco dos Caminhos.
+    const caminhos = []
+    {
+      const vistas = new Set()
+      for (const [emo, sc] of r.mapaCarga) {
+        const k = famDe(emo) || `__${emo}`
+        if (vistas.has(k)) continue
+        vistas.add(k); caminhos.push([emo, sc])
+        if (caminhos.length >= 5) break
+      }
+      for (const [emo, sc] of r.mapaCarga) {          // piso de 3
+        if (caminhos.length >= 3) break
+        if (!caminhos.some((c) => c[0] === emo)) caminhos.push([emo, sc])
+      }
+    }
+    const nCam = caminhos.length
+      // ⚠️ 2ª rodada mostrou: com todo mundo começando no mesmo ângulo, o Caminho 1 de TODO cliente
+      // recebia o mesmo — a repetição saía de dentro do relatório e reaparecia ENTRE clientes (s7 a 75%).
+      // O ponto de partida agora vem da PRÓPRIA leitura: determinístico (a mesma íris dá sempre o mesmo
+      // resultado, então o golden continua estável) e diferente de pessoa para pessoa.
+      const semente = (d.achados_de_atencao || []).reduce((acc, a2) =>
+        acc + (a2.intensidade || 0) + String(a2.campo || '').length, (d.achados_de_atencao || []).length)
+    if (nCam >= 2) {
+      L.push('')
+      L.push(`## ⭐ OS CAMINHOS DESTA LEITURA — são EXATAMENTE estes ${nCam}, nesta ordem`)
+      L.push('> ⛔ **NÃO escolha os Caminhos você.** A lista abaixo já foi deduplicada por TEMA: o mapa acima')
+      L.push('> mostra emoções vizinhas da mesma família (ex.: sobrecarga mental · ruminação · preocupação),')
+      L.push('> e escrever um Caminho para cada uma faria a pessoa repetir o mesmo exercício com outro nome.')
+      L.push(`> ⛔ Não acrescente Caminho, não troque, não reordene. São ${nCam} — e ${nCam} é a resposta certa`)
+      L.push('> para esta pessoa, mesmo que o mapa liste mais emoções.')
+      L.push('')
+      L.push('## ⭐ ÂNGULO DE CADA CAMINHO — obrigatório, é o que impede os Caminhos de saírem iguais')
+      L.push('> Um ângulo por movimento, por Caminho. **Dois Caminhos nunca recebem o mesmo ângulo no mesmo movimento.**')
+      L.push('> Se um ângulo não couber nesta pessoa, troque por OUTRO que não esteja em uso — nunca repita o de outro Caminho.')
+      const desloc = { sub: 0, s2: 1, s3: 2, s5: 3, s6: 4, s7: 0 }
+      for (let i = 0; i < nCam; i++) {
+        const emo = caminhos[i][0]
+        const partes = ['sub', 's2', 's3', 's5', 's6', 's7'].map((k) => {
+          const banco = ANGULOS[k]
+          return `\`${k}\` → ${banco[(semente + i + desloc[k]) % banco.length]}`
+        })
+        L.push(`- **Caminho ${i + 1} · ${emo}** — ${partes.join(' · ')}`)
+      }
+      L.push('')
+    }
   }
   L.push('> ⚠️ O 🟢 acima é o **antídoto** = a DIREÇÃO de saída daquela carga, não uma força que a pessoa já tem. Use-o pra mostrar a saída ("o outro lado disso é…"), **nunca** pra afirmar que ela já está assim. O que ela JÁ tem livre é só a lista abaixo.')
   L.push('> **O nome em negrito é o termo do EIXO — já está em 8ª série, use-o.** As "formulações do eixo" são variações da MESMA saída: escolha a que encaixa nesta pessoa, e quanto mais forte a carga, mais forte a formulação. NÃO invente antídoto fora do eixo.')

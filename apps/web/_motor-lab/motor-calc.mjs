@@ -85,16 +85,22 @@ const nivelDe = (s) => {
 // AGULHA — LINEAR na escala normalizada. É o que torna a régua legível: 45% cai sempre no
 // mesmo ponto da barra, em qualquer pêndulo, e por isso dá pra cravar a marca da faixa.
 // Piso −6: um achado que EXISTE nunca desenha como neutro (regra antiga, preservada).
-// 0% = −6 (posição 44) · 100% = −33 (posição 17).
-// ⚠️ O `Math.max(-48, …)` virou CÓDIGO MORTO quando o `normCarga` ganhou teto em 1 — o pior
-// caso agora é −33. Fica no lugar como cinto de segurança: se alguém tirar o teto lá em
-// cima, isto continua impedindo a agulha de sair da régua. Não é redundância por descuido.
-// ❓ EM ABERTO (13/08): com o teto, a faixa −33…−48 (posições 2 a 17) ficou sem uso — o
-// pêndulo mais carregado possível ainda para a 17% da borda. Se o founder quiser que 100%
-// desenhe no extremo, o coeficiente 27 vira 42 (`-(6 + 42n)` → 100% = −48). É recalibração
-// de TODAS as agulhas de carga, não só das 12 — por isso não foi feito junto.
+// 0% = −6 (posição 44) · 100% = −48 (posição 2).
+//
+// ⭐ COEFICIENTE 27 → 42 (decisão do founder, 2026-08-17): *"se a régua vai de menos 50 a 50
+// e o zero no meio, até 48 acho que está ok"*.
+// O QUE ISTO CONSERTA — o founder viu no relatório dele e apontou: a `preocupação` marcava
+// **100% da escala** e a agulha desenhava na posição 17, ou seja, apenas **66% do caminho**
+// entre o meio e a borda. Lia como "passou do meio", não como "no talo" — e o terço esquerdo
+// da régua (posições 0 a 17) era espaço morto que ninguém alcançava.
+// Efeito colateral do desenho antigo: as faixas ficavam espremidas e desiguais — "muito alta"
+// ocupava **2,7 pontos** de régua contra 6,8 de "leve", justo a faixa que mais precisa ser vista.
+// ⚠️ Isto recalibra TODAS as agulhas de carga de TODOS os relatórios. Foi a pergunta que ficou
+// aberta em 13/08 (o founder respondera "deixe assim… nunca no máximo, mas perto do máximo") —
+// e a implementação de então entregou o "nunca no máximo" sem entregar o "perto do máximo".
+// O `Math.max(-48, …)` deixa de ser código morto: agora é exatamente o limite do desenho.
 const PISO_CARGA = 6
-const bipCarga = (s) => Math.max(-48, -(PISO_CARGA + 27 * normCarga(s)))
+const bipCarga = (s) => Math.max(-48, -(PISO_CARGA + 42 * normCarga(s)))
 // posição na barra (0-100%), que é o que o render usa: 50 = meio da régua bipolar.
 const leftCarga = (s) => 50 + bipCarga(s)
 // ⚠️ A CORROBORAÇÃO NÃO TRAVA MAIS O RÓTULO NEM FREIA A AGULHA (decisão founder
@@ -590,7 +596,7 @@ function calc(exameOuNome, lastro) {
     let idx = tags.findIndex((tg) => tg && tg.length > 2 && (nucleo.includes(tg) || tg.includes(nucleo.split(/[\/,(—]/)[0].trim())))
     if (idx < 0) idx = 0
     const cr = (t.cargaCrenca || [])[idx]
-    if (cr) (crencaSrc[cr] ||= []).push({ campo: key, int: a.intensidade || 0 })
+    if (cr) (crencaSrc[cr] ||= []).push({ campo: key, int: a.intensidade || 0, fam: familiaDe(breakdown[0]?.emo) })
     achadoList.push({ campo: a.campo, int: a.intensidade, breakdown, w })
   }
   // PRESERVADOS → recurso (elemento) + livre (centro)
@@ -712,6 +718,27 @@ function calc(exameOuNome, lastro) {
     if (corroborada) i = Math.min(i + 1, BANDA.length - 1) // +1 banda quando 2+ achados apontam a mesma regra
     return { texto, nivel: BANDA[i], forca: i + 1, int, corroborada, campos: srcs.map((x) => x.campo) }
   }).sort((a, b) => b.forca - a.forca || b.int - a.int)
+
+  // ---------- UMA CRENÇA POR TEMA (2026-08-17) ----------
+  // O bloco 6 era o ÚLTIMO lugar onde a lista duplicada sobrevivia inteira. O laudo editorial pegou:
+  // "sete crenças, três da mesma família, espelhando o bloco 5". A pessoa lia a mesma ideia três vezes
+  // em primeira pessoa — "minha cabeça vive girando" · "fico remoendo a mesma coisa" · "fico mastigando
+  // e não digiro". Os Caminhos já foram deduplicados; sem isto, o defeito só mudava de bloco.
+  // Mesma regra e mesmo piso dos Caminhos: a mais forte de cada família, mínimo 3.
+  const crencaDedup = []
+  {
+    const vistas = new Set()
+    for (const c of crencaList) {
+      const fam = (c.campos || []).length ? (crencaSrc[c.texto] || []).map((x) => x.fam).find(Boolean) : null
+      const k = fam || `__${c.texto}`
+      if (vistas.has(k)) continue
+      vistas.add(k); crencaDedup.push(c)
+    }
+    for (const c of crencaList) {                    // piso de 3
+      if (crencaDedup.length >= 3) break
+      if (!crencaDedup.includes(c)) crencaDedup.push(c)
+    }
+  }
 
   const rankedCarga = Object.entries(emoCarga).sort((a, b) => b[1] - a[1])
   const mapaCarga = rankedCarga.filter(([e]) => garantidas.has(e)) // 1º: as garantidas
@@ -840,7 +867,7 @@ function calc(exameOuNome, lastro) {
     })(),
   }
 
-  return { name, elem, centro, pres, mapaCarga, mapaRecurso, antidoto, colisoes, crencaList, suporteList, integrativas,
+  return { name, elem, centro, pres, mapaCarga, mapaRecurso, antidoto, colisoes, crencaList: crencaDedup, crencaTodas: crencaList, suporteList, integrativas,
     // nº de campos distintos por emoção — o EXTREMO da régua se ganha por CONVERGÊNCIA
     // (metodologia C do founder), não por um único achado forte. Sem isto, um I5 de
     // fonte única desenha igual a um I4 confirmado por três órgãos.
