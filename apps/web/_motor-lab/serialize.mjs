@@ -170,10 +170,13 @@ function serialize(exameOuNome, nomePessoa) {
         vistas.add(k); caminhos.push([emo, sc])
         if (caminhos.length >= 5) break
       }
-      for (const [emo, sc] of r.mapaCarga) {          // piso de 3
-        if (caminhos.length >= 3) break
-        if (!caminhos.some((c) => c[0] === emo)) caminhos.push([emo, sc])
-      }
+      // ⛔⛔ NÃO REPOR PISO AQUI. Tentei um piso de 3 em 17/08 e ele DESFEZ a própria dedup:
+      // numa leitura com só 2 temas reais, o piso completou o 3º puxando um SINÔNIMO do 1º
+      // ("sobrecarga mental" e depois "tagarelice mental rotativa", ambos de Ansiedade e
+      // preocupação, os dois indo para "Sossego"). O laudo pegou em produção: "2 dos 3 Caminhos
+      // vão para Sossego" — pior que antes do conserto.
+      // A regra é: quem tem 2 temas recebe 2 Caminhos. Dois Caminhos verdadeiros valem mais que
+      // três com um inventado — é a doença inteira que estamos curando. Afeta 1 leitura em 60.
     }
     const nCam = caminhos.length
       // ⚠️ 2ª rodada mostrou: com todo mundo começando no mesmo ângulo, o Caminho 1 de TODO cliente

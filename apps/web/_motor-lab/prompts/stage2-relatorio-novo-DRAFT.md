@@ -166,13 +166,17 @@ Dentro dos textos, marque 1-2 **palavras-chave** por parágrafo com `**negrito**
 - Como planeja | [idem]
 - Nas relações | [idem]
 @RAIZ:
+- ⛔⛔ **NÃO usar "é a mesma coisa que" em mais de UM dos quatro pares.** Medido: 12 de 12 bullets, em 3 de 3 relatórios — quatro parágrafos seguidos com abertura, meio e fecho idênticos. O laudo editorial: *"é o único lugar do documento onde ainda dá pra ouvir a máquina batendo o compasso"*. O conteúdo desses pares é dos melhores do relatório; a fôrma é que estraga. Outras costuras: "e é ela que…", "o preço disso é…", "vira…", "cobra de você…", ou simplesmente duas frases.
 - [par força↔sombra da MESMA raiz. Marque a FORÇA com {{...}} e a SOMBRA com [[...]]. Ex.: {{A sua entrega intensa}} faz as pessoas confiarem em você — e é a mesma coisa que [[te esgota quando ninguém retribui]].]
 - **⛔ UMA COISA POR MARCADOR — nunca duas coladas com "e".** A força dentro de `{{…}}` é **um traço só**, dito em português que se entende sem decifrar. ❌ *"seu jeito de se ligar rápido e sentir fundo"* (o founder derrubou: teve que perguntar o que significava, e eram duas capacidades de áreas diferentes grudadas). ✅ *"a sua facilidade de criar laço com quem chega"*. Se você tem dois traços bons, **escolha o mais forte** ou faça deles dois pares — nunca funda os dois numa etiqueta.
 - **Teste antes de emitir cada par:** *"alguém lê isso uma vez e entende, sem reler?"* Se precisar reler, quebrou. Vale para `{{…}}` E para `[[…]]`.
 - [2º par]
 - [3º par]
 - [4º par — 4 pares no total, cada um um dom que é também um custo]
-@MALENTENDIDO: [o mal-entendido sobre você — 3-4 frases, o que as pessoas leem errado × a verdade por dentro, com **destaques**. NÃO resuma.]
+@MALENTENDIDO: [o mal-entendido sobre você — 3-4 frases, o que as pessoas leem errado × a verdade por dentro, com **destaques**. NÃO resuma.
+  ⛔⛔ **NÃO abrir com "As pessoas leem/veem você como…"** — saiu em 25 de 25 relatórios, e em 17/08 duas clientes DIFERENTES receberam a MESMA frase de 23 palavras: *"As pessoas leem você como alguém tranquila, que dá conta de tudo sem esforço"*. Isso é Forer literal, no marcador cuja função é justamente provar que a leitura é só dela.
+  ✅ **O mal-entendido tem que ser DESTA pessoa:** quem lê errado (o chefe? a mãe? o parceiro?), em que situação concreta, e o que ela faz que produz essa leitura errada. Sem cena, não é mal-entendido — é adjetivo.
+  ⛔ E não fechar com *"O que parece X é, na verdade, Y"*: também virou fórmula (3 de 3 na última medição).]
 @APERTA: [quando aperta, você vira… — 3-4 frases sobre o comportamento SOB PRESSÃO/estresse: o que dispara primeiro, o sinal de que passou do limite, com **destaques**.]
 @ACENDE: item | item | item | item   (4-5 coisas que te dão energia)
 @APAGA: item | item | item | item   (4-5 coisas que te drenam)
@@ -425,6 +429,7 @@ As regras de cada um vêm logo abaixo do molde; não as leia aqui dentro.
   **e o caminho**"; sem o passo, some metade.
   ⛔ O que continua proibido é a **fórmula única**: *"Essa semana, escolha…"* saiu em 30 de 33. Cada fecho
   abre de um jeito. **Varie a construção, mantenha a ação.**
+  ⛔⛔ **E a FORMULAÇÃO é sua, não do ângulo.** O bloco B manda o TIPO de gesto; a frase quem escreve é você, ancorada NESTA pessoa. Medido em 17/08: com o tipo travado e a frase solta, o modelo convergiu sozinho e duas clientes diferentes receberam *"a frase que você costuma engolir"* e *"só repare — sem tentar mudar nada"* quase palavra por palavra. É a mesma armadilha que a TITRAÇÃO já resolveu no `s2`: **o tipo roda, a redação muda.** O passo tem que citar algo concreto da vida DESTA pessoa — a cena, a pessoa, o objeto que apareceu na leitura.
 
 
 **Regras das falas:** 2ª pessoa, faladas (o terapeuta lê quase como está), curtas, **ancoradas nesta pessoa** — nunca "essa dor", sempre a carga nomeada. ⛔ Nada de oferecer lugar no corpo (vale a regra do bloco 1).

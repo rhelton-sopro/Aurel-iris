@@ -1275,6 +1275,42 @@ O veto do Sopro da Origem é de **vocabulário** (centelha divina, atravessar) e
 | fechos com passo concreto | 12/15 | **8/10** |
 | nome da pessoa | 3 a 7 | **5 a 6** |
 
+### 🔴 Segunda passada do laudo — dois BLOQUEIOS achados depois do primeiro commit
+
+O laudo releu a versão consertada e achou duas coisas que **impediam o push**. As duas confirmadas
+no material antes de mexer:
+
+**1. Forer LITERAL entre clientes.** A frase *"As pessoas leem você como alguém tranquila, que dá
+conta de tudo sem esforço"* — **23 palavras idênticas** — saiu em relatórios de DUAS clientes
+diferentes, no marcador cuja função é justamente provar que a leitura é só dela. O prompt não dava
+essa frase; o modelo convergiu sozinho a partir de *"o que as pessoas leem errado"*. ⇒ Proibida a
+abertura-fórmula; o mal-entendido agora exige cena (quem lê errado, em que situação).
+
+**2. 🔴 O PISO DE 3 DESFAZIA A PRÓPRIA DEDUPLICAÇÃO — bug meu.** Numa leitura com só 2 temas reais,
+a dedup devolvia 2 Caminhos e o piso completava o 3º puxando um **sinônimo do 1º** — dois Caminhos
+indo para o mesmo destino ("Sossego"), *pior que antes do conserto*. ⇒ **Piso removido.** Quem tem
+2 temas recebe 2 Caminhos. Verificado nas 60: **zero leituras com Caminhos da mesma família**
+(distribuição: 2 caminhos ×1 · 3 ×12 · 4 ×17 · 5 ×30).
+
+Junto foram travadas mais duas fórmulas que o laudo mediu: *"é a mesma coisa que"* (4 vezes seguidas
+no `@RAIZ`, 12 de 12 bullets) limitada a um par; e a **formulação** do `s7` — o motor manda o TIPO de
+gesto, mas a frase tem de citar algo concreto DESTA pessoa, senão o modelo converge sozinho (duas
+clientes receberam *"a frase que você costuma engolir"* quase palavra por palavra).
+
+**Medido depois (3 leituras novas):** trechos de prosa repetidos entre clientes **28 → 7** (e os 7
+restantes são rótulo de estrutura ou a frase-ritual, que é repetição legítima) · *"As pessoas leem
+você como"* **2 → 0** · *"é a mesma coisa que"* **8 → 2** · os seis movimentos completos em 100% dos
+Caminhos · zero Caminhos da mesma família.
+
+**Onde o laudo ERROU e retirou:** ele mesmo foi à fonte e confirmou que `"Método somático · Sopro da
+Origem"` está autorizado (`prompt §8`) — o veto é de **vocabulário**, não de assinatura de método.
+
+⚠️ **CONTINUA ABERTO, e é o que o cliente mais sentiu:** a abertura e o bloco *"Como você funciona
+por dentro"* falam das mesmas coisas — **37% antes, 37% depois**. Nenhuma trava de prompt pegou,
+porque os dois blocos são legitimamente sobre a mesma pessoa. ⭐ A saída não é instrução: é **dar ao
+bloco 2 um eixo próprio**, como a Linha do tempo tem (tempo/idade/cena) — decisão de PRODUTO.
+Founder ciente; decidiu subir o que está pronto e tratar isto depois.
+
 **Contraponto registrado:** 2 de 10 fechos ainda saem sem passo, e *"Essa semana"* ainda abre 4 de 10
 — o founder viu e decidiu **deixar por ora** (*"acho até ok"*). E a landing promete *"quatro ou cinco
 Caminhos"*: com a dedup, 13 de 60 leituras entregam **3**. ⚠️ Ou a copy muda, ou o piso sobe para 4.
