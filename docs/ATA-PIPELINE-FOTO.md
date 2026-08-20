@@ -61,6 +61,7 @@
 | — | **Upload mantém 4K, sem recompressão.** | "recompressão JPEG client-side degrada a imagem 4K e é inaceitável para iridologia" (`upload.ts:11`). Custo aceito: upload lento e falho em 4G → mitigado com retry exponencial, não com compressão (`upload-invite.ts:37-39`). |
 | 2026-06-29 | **NÃO afrouxar limiar de borrado/reflexo junto com mudança de resolução.** | Bundlar cega a medição; e íris mole degrada a Stage 1, que é o produto. |
 | 2026-07-17 | **LLM (não CV) identifica a íris no gate.** | Founder: "antes fizemos sem LLM e ficou ruim". Confirmado pelo histórico (§3). |
+| 2026-07-17 | **Fotos modelo antes da 1ª foto. Cliente SEMPRE vê; terapeuta pode dispensar.** | Recusa é de técnica, não de limiar (§4.3): quem erra (cliente 59%) é quem precisa ver; terapeuta (20%) já sabe. `010f115`. Imagens em `public/captura/` — íris do FOUNDER (LGPD: nunca de cliente). |
 
 ---
 

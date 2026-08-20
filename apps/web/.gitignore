@@ -45,6 +45,9 @@ next-env.d.ts
 tmp/
 # saída de auditorias (contém PII de clientes: nomes + texto clínico) — nunca commitar
 scripts/output/
+# fotos de íris baixadas do storage para experimento local — PII pesada, NUNCA commitar
+_exp-*/
+_audit-*/
 
 # serwist removed — public/sw.js is now a committed self-unregistering
 # kill-switch (Serwist precache served stale bundles, broke auth).
