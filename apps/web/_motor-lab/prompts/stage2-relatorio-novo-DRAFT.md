@@ -104,6 +104,7 @@ Ordem final (travada): **1** Em poucas palavras · **2** Como você funciona por
 # Em poucas palavras
 @VOCATIVO: [o primeiro nome do cadastro do cliente — vem do contexto_cliente, NÃO da íris]
 @MICRO:
+⛔⛔ **O BLOCO 1 MOSTRA, NÃO EXPLICA.** Proibida cadeia causal de três elos ("A vira B, e B vira C") e conector de mecanismo (*por isso · quando isso passa do ponto · antes de · e aí*). A mecânica é o trabalho do bloco 2 — **se você explicar aqui, o bloco 2 fica sem ter o que dizer, e é exatamente daí que nasce o eco que os clientes reclamaram.** Aqui é imagem e cena: ❌ *"a preocupação nasce pequena, vira ansiedade, e essa ansiedade vira o hábito de remoer"* · ✅ *"uma preocupação chega e não sai sozinha — ela gira"*.
 [parágrafo 1 — marque 1-2 **palavras-chave** com negrito]
 [parágrafo 2 — com **destaque**]
 [parágrafo 3 — inclui o reframe "Você não é X — você é alguém que…", com **destaque**]
@@ -117,6 +118,7 @@ Marque as palavras que carregam o peso (viram destaque no design) — como no mo
 ---
 
 ### BLOCO 2 — "Como você funciona por dentro" (Mente · Coração · Corpo)
+
 **Fonte do score = TOPOGRAFIA** (onde a carga mora), não tipo de achado. Discrimina de verdade (nos 3 exames reais: self M/C/Corpo ≈ 26/83/21 · daniel · miguel são nitidamente diferentes).
 **Consome (do motor):** as 3 agulhas `posicao_livre` + o rótulo de cada lado.
 **Cada centro tem 2 lados** — a agulha pende pra **tensão** (âmbar) ou **livre** (verde):
@@ -147,12 +149,13 @@ Dentro dos textos, marque 1-2 **palavras-chave** por parágrafo com `**negrito**
 @INTRO: [1 frase: todo mundo vive de três lugares — mente, coração, corpo…]
 @MENTE: [parágrafo do centro Mente — o que a agulha diz, com **destaque**]
 @CORACAO: [parágrafo do centro Coração]
-@CORPO: [parágrafo do centro Corpo — use o sabor que o motor indicou]
+@CORPO: [parágrafo do centro Corpo — use o sabor que o motor indicou.
+  ⛔ **CENA, não fluxograma.** Medido em 18/08: este marcador virou diagrama de ordem ("o corpo dispara primeiro, a mente entra depois"). Diga **diante do quê** o corpo reage e **o que ele FAZ** — travar, recuar, os ombros subirem, a resposta demorar um segundo a mais. Verbo que se sente, não sequência de módulos.]
 @RESUMO: [a caixa "Em resumo" — 1 frase. ⛔⛔ **NÃO re-ranquear os centros.** Os três parágrafos acima
   já disseram quem aperta mais. Esta frase diz **o que essa combinação PRODUZ no dia** — a consequência,
   não o placar. ❌ "sua cabeça carrega o peso, o corpo dispara, o coração segura a ponta" (é o ranking de novo)
   ✅ "é por isso que você chega em casa exausta sem ter feito nada de diferente".]
-@TENSAO: [⛔ **NÃO é o resumo outra vez.** É o **CICLO**: como os dois centros mais tensos se alimentam
+@TENSAO: [⛔ **NÃO é o resumo outra vez.** ⛔ E **não é diagrama**: descrever o ciclo não é listar a ordem dos módulos ("A dispara, B pega, B devolve pra A"). O ciclo precisa de **cena e de custo** — em que momento do dia isso roda, e o que sobra da pessoa depois. Se o centro livre tem papel nisso, ele entra aqui. É o **CICLO**: como os dois centros mais tensos se alimentam
   um ao outro, em que ordem, e o que dispara o quê. Se você não consegue descrever um ciclo, **omita este
   marcador** — ele é opcional e é melhor não existir do que repetir o `@RESUMO`.]
 @FACETAS:

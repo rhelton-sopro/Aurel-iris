@@ -1317,6 +1317,61 @@ Caminhos"*: com a dedup, 13 de 60 leituras entregam **3**. ⚠️ Ou a copy muda
 
 ---
 
+---
+
+## 2026-08-20 — ⛔ TRÊS TENTATIVAS FALHARAM no eco entre os blocos 1 e 2 — e o que aprendemos
+
+**Status:** REVERTIDAS as três. Guardado só o que se sustentou por medição.
+
+### O problema
+O bloco 1 (*"Em poucas palavras"*) e o bloco 2 (*"Como você funciona por dentro"*) falam das mesmas
+coisas — **37%** de sobreposição de palavras-conteúdo. É o eco que o cliente descreveu como
+*"lê num bloco, repete em outro"*, e acontece na **segunda página**, o que contamina o resto.
+
+### As três tentativas, e por que cada uma falhou
+| # | a teoria | a instrução | resultado |
+|---|---|---|---|
+| 1 | "o modelo repete por descuido" | trava *"cada bloco avança, nenhum reconta"* | **37% → 37%.** Zero efeito. |
+| 2 | "o bloco 2 não tem verbo próprio" | bloco 1 = *o que você sente* · bloco 2 = *como as partes agem entre si* | **37% → 40%.** O modelo OBEDECEU (marcas de mecânica 4,0 → 9,3 por relatório) e a sobreposição SUBIU. |
+| 3 | "falta a virada" | um centro tem de **corrigir** a impressão do bloco 1, na 1ª frase | a virada saiu em **1 de 3** — a mesma proporção que a produção já tinha por acaso. |
+
+⭐ **Três teorias diferentes, três instruções, zero resultado. Isso é sinal de que o problema NÃO
+está no prompt.**
+
+### A explicação que se sustenta (do laudo, com prova no material)
+O laudo achou uma leitura em que a sobreposição é ALTA e **não incomoda em nenhuma linha** — porque
+ali o bloco 2 **desmente** o bloco 1 (*"sua mente é o lugar mais livre… o problema não nasce aí"*).
+⇒ **O que cansa não é reencontrar a palavra; é o bloco 2 CONFIRMAR em vez de VIRAR.**
+
+⛔ **Mas a virada não é escolha de redação — é propriedade do DADO.** Ela só existe quando o centro
+que o bloco 1 acusa é justamente o que está **livre**. Quando o dado dá, o modelo faz. Quando não dá,
+ele **não inventa** — e é correto que não invente. **Pedimos ao prompt uma coisa que só o motor pode
+entregar.**
+
+### O custo de manter, que motivou a reversão
+A tentativa 2 transformou o `@CORPO` em diagrama:
+> antes: *"o primeiro movimento é se proteger — travar, recuar, ficar de guarda"* (cena, se sente)
+> depois: *"o corpo dispara primeiro, a mente entra depois"* (ordem dos módulos)
+
+### ✅ O que FICOU (sustentou-se por medição)
+1. **O bloco 1 MOSTRA, não explica** — proibida cadeia causal de 3 elos e conector de mecanismo no
+   `@MICRO`. Se o bloco 1 já explica o mecanismo, o bloco 2 fica sem ter o que dizer.
+2. **`@CORPO` e `@TENSAO`: cena, não diagrama** — a guarda contra o fluxograma fica, mesmo sem a causa.
+
+### ⚠️ Erro de método meu, registrado
+A primeira medição comparou **pessoas diferentes**: o script pegava "as 3 leituras mais recentes" e a
+lista mudou entre as rodadas. O laudo pegou. O trio agora é **fixo** no script. ⛔ Comparação de
+prompt só vale sobre as MESMAS leituras.
+
+### ⏭️ Se um dia for reaberto
+Não escrever a quarta instrução. As saídas reais são de PRODUTO: (a) aceitar os ~40% como o normal de
+dois blocos sobre a mesma pessoa; (b) o **motor** decidir quando existe virada (ele sabe qual centro
+está livre e qual o bloco 1 vai acusar) e só então pedi-la; (c) fundir os dois blocos — ⚠️ o laudo
+desaconselha: o corte entre eles é o silêncio onde o cliente respira e onde o terapeuta pausa na
+devolutiva.
+
+---
+
 ## Como usar
 
 - **Ao tomar uma decisão:** registrar aqui na mesma sessão, com razão e status.
