@@ -107,7 +107,19 @@ Ordem final (travada): **1** Em poucas palavras · **2** Como você funciona por
 ⛔⛔ **O BLOCO 1 MOSTRA, NÃO EXPLICA.** Proibida cadeia causal de três elos ("A vira B, e B vira C") e conector de mecanismo (*por isso · quando isso passa do ponto · antes de · e aí*). A mecânica é o trabalho do bloco 2 — **se você explicar aqui, o bloco 2 fica sem ter o que dizer, e é exatamente daí que nasce o eco que os clientes reclamaram.** Aqui é imagem e cena: ❌ *"a preocupação nasce pequena, vira ansiedade, e essa ansiedade vira o hábito de remoer"* · ✅ *"uma preocupação chega e não sai sozinha — ela gira"*.
 [parágrafo 1 — marque 1-2 **palavras-chave** com negrito]
 [parágrafo 2 — com **destaque**]
-[parágrafo 3 — inclui o reframe "Você não é X — você é alguém que…", com **destaque**]
+[parágrafo 3 — o **reframe**, com **destaque**.
+  ✅ **A NEGAÇÃO AQUI FICA, e é o coração do relatório.** Não se absolve sem citar a acusação: a
+  frase que levanta a lágrima não é *"você é alguém que carrega demais"*, é ***"você NÃO é o que te
+  disseram que você é"***. A palavra negada é o veredito que ela carrega há anos.
+  ⛔ **(a) UMA VEZ POR DOCUMENTO, e só aqui.** Proibido reframe em qualquer outro marcador —
+  ele estava reaparecendo no `@FECHO` do bloco 2 e no `@MALENTENDIDO`.
+  ⛔ **(b) O PREDICADO NÃO PODE SER *"é alguém que aprendeu"*** — está em **16 de 25**, e é AÍ que
+  mora o molde, não na negação. Use o verbo do caso dela: carrega · segura · adianta · guarda · vigia.
+  ⛔ **(c) Terminações proibidas:** *"a única forma de se sentir segura"* (11 de 25) e *"mais seguro
+  do que"*. São fechos de catálogo.
+  ⛔ **(d) A ACUSAÇÃO CITADA não pode ser "difícil"** (8 de 25). Ela vem **entre aspas** e sai do
+  vocabulário DESTA leitura — a palavra que os outros usam para ela, e que ela já usa contra si
+  ("estressada", "controladora", "que se irrita por qualquer coisa").]
 @PERGUNTA:
 [TEMPO 1 — pergunta de punch, rotacionando a família]
 (respira)
@@ -192,6 +204,11 @@ Dentro dos textos, marque 1-2 **palavras-chave** por parágrafo com `**negrito**
 ---
 
 ### BLOCO 3 — "Linha do tempo emocional"
+> ✅ **R6 — negação dentro de PERGUNTA não conta e não se mexe.** *"O que já não precisa mais ser
+> provado, hoje?"* é negação **sem adversário** — não corrige ninguém, propõe. É por isso que este
+> bloco tem a menor densidade de negação do documento (0,3 por mil palavras contra 10,6 das Crenças)
+> e foi eleito o melhor pelo laudo editorial. **É o modelo, não a exceção.**
+
 **Consome:** `linha_temporal[]` do Stage 1 (status + idade_aproximada em formato LIVRE + tipo_provavel).
 **Regra dura:** ZERO iridologia. Cada marco vira **emoção + possível comportamento + possíveis situações vividas** — nunca "marca na zona X".
 - Marcos `a_resolver` = card completo, cor laranja ("ainda ativo"), com as **Chaves** (perguntas). Marcos `em_processo` = teal. `resolvido` = linha compacta.
@@ -244,9 +261,22 @@ Regras: `idade=` e `fase=` vêm da **cronologia da íris** (o `linha_temporal` d
 @VOCE: [como esses padrões vivem HOJE em você — 1 frase, começa minúscula]
 @DEPOIS: [o que você tira de quem vem depois ao mudar em si — 1 frase, começa minúscula]
 @PADRAO_DETALHE: [o parágrafo que mostra que o padrão não começou numa pessoa só + dissolve a culpa]
-@DIFICIL: [o nó da lealdade — por que ficar bem pode dar culpa; repetir a dor não é lealdade]
+@DIFICIL: [o nó da lealdade — por que ficar bem pode dar culpa.
+  ⛔ **A fórmula *"repetir X não é lealdade — lealdade de verdade é Y"* está PROIBIDA.** Saiu em
+  **25 de 25** com a mesma arquitetura. A ideia fica; a frase muda.
+  ⭐ **Este é o ÚNICO marcador do bloco que pode refutar** — é onde o argumento é de fato difícil e
+  precisa de contraponto. ⛔ `@DIFICIL` e `@RESILIENCIA` **não podem ambos abrir refutando**: eram
+  parágrafos vizinhos, os dois com *"não é isso, é aquilo"* (23 de 25), e o leitor sente como alguém
+  que não confia que a primeira frase pegou.]
 @VIRADA: [a virada — muda só em VOCÊ; personagem de transição; é assim que protege quem vem]
-@RESILIENCIA: [a resiliência herdada — a ferida E a força vieram da mesma linhagem]
+@RESILIENCIA: [a resiliência herdada — a mesma linhagem que passou o peso passou também a força.
+  ⛔⛔ **NÃO ABRIR COM NEGAÇÃO.** Medido em 25 relatórios: **22 abriam com a frase LITERAL**
+  *"E não é só o peso que veio de trás"* — a mesma abertura, palavra por palavra, em 22 documentos,
+  na posição mais visível de um parágrafo. O terapeuta lê três leituras na mesma semana e vê a mesma
+  frase três vezes; aí ele **para de usar esta linha na devolutiva** — e é o fecho emocional do bloco
+  que ele mais usa. A primeira palavra do parágrafo tem de ser **afirmativa**.
+  ⛔ E a frase *"a ferida e a força vieram juntas"* está PROIBIDA (5 de 25) — é o carimbo do bloco.
+  A ideia não precisa de negação nenhuma para existir: diga o que a linhagem **deu**.]
 @IDENTIFICACAO:
 - Padrão curto um | [pergunta "quem na sua família também…"]
 - Padrão curto dois | [pergunta]
@@ -308,7 +338,11 @@ Voz do cliente, zero iridologia.
 **SAÍDA — formato EXATO:**
 ```
 # Crenças a serem trabalhadas
-@LEAD: [2-3 frases: o que é uma crença, na voz do cliente. Sem jargão. Sem "crença limitante".]
+@LEAD: [2-3 frases: o que é uma crença, na voz do cliente. Sem jargão. Sem "crença limitante".
+  ⛔⛔ **NÃO DEFINIR POR NEGAÇÃO.** *"Uma crença, aqui, não é uma opinião — é a frase que você repete
+  por dentro"* saiu em **22 de 25**, com variação só de vírgula. É professor explicando o conceito
+  antes da aula: o cliente não pediu a definição de crença, e **não é ele quem lê este bloco sozinho**
+  — quem conduz é o terapeuta. Abra dizendo o que a crença **FAZ** na vida dela, não o que ela não é.]
 @FECHO: [1-2 frases: ligue a crença MAIS FORTE ao que ela custa no dia a dia desta pessoa — concreto, ancorado nos achados, nunca conselho genérico. Se houver crença corroborada (⊕), é dela que você fala.]
 ```
 

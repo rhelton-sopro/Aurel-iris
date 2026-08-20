@@ -1372,6 +1372,73 @@ devolutiva.
 
 ---
 
+## 2026-08-20 (tarde) — ✅ O MOLDE DA NEGAÇÃO: 6 regras, e desta vez a medição SUBIU
+
+**Status:** APLICADA (prompt) + APLICADA (legenda da linha do tempo). Aguarda o olho do founder nos PDFs.
+
+### O problema, medido em 25 relatórios de produção
+Não era "o modelo nega muito" — era **a mesma frase de negação na mesma posição**, documento após
+documento. O terapeuta lê três leituras na semana e vê a mesma linha três vezes.
+
+| a frase | onde | produção |
+|---|---|---|
+| *"E não é só o peso que veio de trás"* | abertura do `@RESILIENCIA` | **22/25** |
+| *"uma crença não é uma opinião…"* | `@LEAD` das Crenças | **22/25** |
+| *"repetir X não é lealdade — lealdade de verdade é Y"* | `@DIFICIL` | **25/25** |
+| *"você é alguém que **aprendeu**…"* | predicado do reframe | **20/25** |
+| *"a única forma de se sentir segura"* | fecho do reframe | **11/25** |
+| *"a ferida e a força vieram juntas"* | `@RESILIENCIA` | 5/25 |
+
+⭐ **A distinção que fez a diferença:** negação em **abertura de parágrafo** (o olho pousa ali) é
+outra coisa de negação **no meio da frase** (invisível). O alvo é a abertura. E `@PERGUNTA` do bloco 3
+(*"o que já não precisa mais ser provado, hoje?"*) é negação **sem adversário** — não corrige ninguém,
+propõe. Fica, e é o modelo: o bloco 3 tem a menor densidade de negação do documento e foi o eleito
+pelo laudo editorial.
+
+### As 6 regras que entraram
+1. `@RESILIENCIA` **não abre com negação** — a primeira palavra é afirmativa; diga o que a linhagem **deu**.
+2. `@DIFICIL` é o **único** marcador do bloco 4 que pode refutar — e a fórmula *"não é lealdade — lealdade de verdade é"* está proibida. `@DIFICIL` e `@RESILIENCIA` **não podem ambos abrir refutando** (eram parágrafos vizinhos).
+3. `@LEAD` das Crenças **não define por negação** — abre pelo que a crença **FAZ**.
+4. O **reframe fica** (a negação aqui é o coração do relatório: *"você NÃO é o que te disseram que você é"*), mas **uma vez por documento, e só no bloco 1**.
+5. O predicado do reframe **não pode ser *"é alguém que aprendeu"*** — use o verbo do caso dela.
+6. A acusação citada vem **entre aspas**, do vocabulário DESTA leitura, e **não pode ser "difícil"**.
+
+### O resultado — 3 leituras do trio FIXO, prompt novo contra produção
+| | produção (25) | v5 (3) |
+|---|---|---|
+| *não é só o peso* | 22/25 | **0/3** |
+| *não é uma opinião* | 22/25 | **0/3** |
+| *é alguém que aprendeu* | 20/25 | **0/3** |
+| *não é lealdade* | 25/25 | 1/3 |
+| *a única forma* | 11/25 | 1/3 |
+| negação abrindo marcador | 1,0 por relatório | **0,3** |
+| negações no total (inclui as invisíveis) | 55,7 | 55,3 |
+
+⭐ **A última linha é a prova de que a régua estava certa:** o total de negações **não mudou** — o que
+saiu foi a negação **visível**, na abertura. Não empobrecemos o texto; tiramos o carimbo.
+
+⚠️ **O que NÃO mudou, e não era o alvo:** molde geral entre clientes (trechos de 8+ palavras repetidos
+41 → 42; marcadores abrindo com as mesmas 3 palavras 22 → 23). Continua aberto.
+
+### ⛔ Ainda escapa (1 de 3 cada)
+*"não é lealdade"* e *"a única forma"*. Com N=3 não dá para dizer se é resíduo ou ruído — ⏭️ conferir
+na próxima leva sem gastar API nova.
+
+### 📄 O PDF ficou mais curto — e não é destas regras
+33→29 · 33→23 · 34→30 páginas (ANTES × NOVO). A queda inteira está no **bloco 9**: os Caminhos caíram
+de 5 para 3/2/4 pela **dedup por família** de `aa9bb26` — decisão tomada e registrada. Gabriela é o
+caso "1 leitura em 60" que tem só **2 temas reais** e por isso recebe 2 Caminhos. Esperado, não é bug.
+
+### 🕐 Legenda dos três estados da linha do tempo
+O bloco 3 mostrava *"ainda ativo"*, *"em processo"* e *"fechado"* sem dizer o que significavam. Agora
+tem legenda logo abaixo do trilho — e ela **só lista os estados que aquela leitura tem**.
+
+### Gates
+`smoke-render` OK · `pnpm lint` 0 erros / 25 warnings (baseline) · golden: **nenhuma agulha mudou**
+(32 idênticas · 28 com diferença **com e sem** a legenda — as 28 são anteriores a hoje).
+
+---
+
 ## Como usar
 
 - **Ao tomar uma decisão:** registrar aqui na mesma sessão, com razão e status.
