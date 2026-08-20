@@ -327,7 +327,21 @@ function block3(body) {
     const cls = m.status === 'ativo' ? 'on' : m.status === 'proc' ? 'proc' : ''
     return `<div class="moment ${cls}"><div class="moment-h"><span class="mage display">${esc(m.idade)}</span><span class="${m.status === 'ativo' ? 'mflag' : 'mproc'}">${flag(m.status)}</span></div>${rows}${keys}</div>`
   }).join('')
-  return `<p class="snote">${inl(intro)}</p><div class="rail-wrap"><div class="rail" style="grid-template-columns:repeat(${Math.max(marcos.length, 1)},1fr)"><div class="rail-line"></div>${rail}</div></div>${moments}`
+  // LEGENDA dos três estados (founder, 2026-08-20): o relatório mostrava "ainda ativo",
+  // "em processo" e "fechado" sem dizer o que cada um significa — só o 'proc' tinha explicação,
+  // e ela vinha solta no meio do texto. A legenda fica logo abaixo do trilho, onde o leitor
+  // encontra os três rótulos pela primeira vez.
+  // ⚠️ Só lista os estados que ESTA leitura tem — legenda de coisa que não aparece é ruído.
+  const stats = new Set(marcos.map((m) => m.status))
+  const GLOSSA = [
+    ['ativo', 'ainda ativo', 'pede atenção hoje — é por onde a leitura sugere começar'],
+    ['proc', 'em processo', 'já está se movendo: não é ferida aberta, mas também não fechou de todo'],
+    ['fechado', 'fechado', 'a marca ficou, o peso não — é história, não é tarefa'],
+  ].filter(([k]) => (k === 'fechado' ? [...stats].some((x) => x !== 'ativo' && x !== 'proc') : stats.has(k)))
+  const legenda = GLOSSA.length > 1
+    ? `<div class="tl-leg">${GLOSSA.map(([, rot, txt]) => `<p class="tl-leg-i"><span class="tl-leg-k">${rot}</span>${txt}</p>`).join('')}</div>`
+    : ''
+  return `<p class="snote">${inl(intro)}</p><div class="rail-wrap"><div class="rail" style="grid-template-columns:repeat(${Math.max(marcos.length, 1)},1fr)"><div class="rail-line"></div>${rail}</div></div>${legenda}${moments}`
 }
 
 // ---------- BLOCO 4 — corrente + padrões + identificação + frases ----------
@@ -734,6 +748,11 @@ const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><met
 .sheet .pcard{margin-bottom:18px} .sheet .resumo{margin-bottom:2px} .microfilme p b{color:var(--teal-deep);font-weight:600}
 .facet .fk.tenso{color:#b5701a} .facet .fk.livre{color:#2f7a54} .facet .fk.meio{color:#8a7d63}
 .respira{text-align:center;font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint,#a99);margin:2px 0 6px}
+/* legenda dos estados da linha do tempo (2026-08-20) — sóbria, no tom do resto */
+.tl-leg{margin:12px 0 26px;padding:11px 15px;border-left:2px solid rgba(0,0,0,.10)}
+.tl-leg-i{margin:0 0 6px;font-size:13px;line-height:1.55;color:#6b6357}
+.tl-leg-i:last-child{margin-bottom:0}
+.tl-leg-k{display:inline-block;min-width:96px;font-size:10.5px;font-weight:600;letter-spacing:.10em;text-transform:uppercase;color:#2b2b2b}
 .pend-desc{font-size:13px;line-height:1.5;color:var(--ink-soft,#6b6357);margin:5px 0 2px} .pend-desc b{color:#a35a1c;font-weight:600} .pend-desc b.anti{color:#2f7a54} .pend{margin-bottom:14px}
 /* as regras .tick e .pend-corr sairam em 2026-08-13: marcas de faixa na barra e o simbolo
    depois do nivel foram reprovados pelo founder no mesmo dia em que entraram. Ver o
