@@ -1594,6 +1594,46 @@ Pedido literal: *"e deixo um aviso para quando a gente começar a sessão aqui, 
 
 ---
 
+## 2026-08-23 (fecho) — o prompt entregava a frase pronta: 90% dos relatórios abriam as Crenças igual
+
+**Achado do Bob, MEDIDO por mim nos 29 relatórios de produção.** O carimbo entre clientes não era mania do modelo: **estava escrito no prompt como exemplo e como spec**, e ele copiava.
+
+| o que o prompt entregava pronto | relatórios que copiaram |
+|---|---|
+| a **definição de crença** do bloco 6 (forma espelhada *"não é X: é Y"*) | **26 de 29 — 90%** |
+| a metáfora que vinha junto (*"combinado silencioso"*) | **18 de 29 — 62%** |
+| o ✅ da primeira frase do bloco 1 | 2 de 29 — 7% |
+
+⚠️ **CORREÇÃO DE ROTA:** eu havia dito ao founder, seguindo o Bob, que trocar o exemplo do bloco 1 era *"a edição de maior retorno do arquivo"*. **Medido, é 7%** — e os 2 casos eram as duas gerações da MESMA cliente, porque a emoção principal do exame dela batia com a do exemplo. O de verdade era o do bloco 6, em 9 de cada 10 relatórios. Régua do dia: **n=2 do mesmo cliente não é frequência.**
+
+### O que foi feito (custo: ZERO proibição — 59 antes, 59 depois; +900 bytes)
+
+1. O ✅ do bloco 1 passou a usar uma **emoção diferente de propósito**, com aviso de que o exemplo é FORMA, nunca palavra.
+2. A spec do `@LEAD` do bloco 6 saiu da forma espelhada **e perdeu a metáfora**: enquanto a frase bonita estivesse escrita ali, ele ia continuar copiando. A definição virou "para você entender, não para copiar", com o número medido junto.
+
+### Medição (1 geração paga, mesmo exame da Evelyn, prompt novo)
+
+```
+7/7 blocos · end_turn · 25.526 tokens de 40.000 · US$ 0,283
+  "não sai sozinha"        sim -> NÃO
+  "não é uma opinião"      sim -> NÃO
+  "combinado silencioso"   sim -> NÃO
+  exemplo NOVO copiado?    NÃO   <-- o risco que justificou o teste
+```
+
+O modelo escreveu a própria imagem (*"Uma preocupação chama a outra, numa fila que não acaba"*) e o próprio `@LEAD` (*"o que decide, no automático, se você pede ajuda, se fala o que sente, se se permite parar"*) — concreto e desta cliente, no lugar da definição de catálogo.
+
+⭐ **E o gasto não subiu:** 25.526 contra 27.208 da mesma leitura antes. Tirar frase pronta do prompt **não custa orçamento e ainda sai mais barato** — é o oposto de empilhar proibição, que quebrou duas vezes hoje.
+
+### A lei que fica
+
+**REGRA PERDE PARA EXEMPLO.** Antes de escrever proibição nova (que custa orçamento e pode estourar o teto), procure se o próprio arquivo já entrega a frase pronta — em exemplo ✅ ou em spec. Trocar sai de graça e rende mais.
+
+### Gates
+`pnpm lint` 0 erros / 25 warnings · `tsc` no baseline · `smoke-render` OK (9 blocos, anti-Forer 13% com teto de 35%).
+
+---
+
 ## Como usar
 
 - **Ao tomar uma decisão:** registrar aqui na mesma sessão, com razão e status.

@@ -104,7 +104,8 @@ Ordem final (travada): **1** Em poucas palavras · **2** Como você funciona por
 # Em poucas palavras
 @VOCATIVO: [o primeiro nome do cadastro do cliente — vem do contexto_cliente, NÃO da íris]
 @MICRO:
-⛔⛔ **O BLOCO 1 MOSTRA, NÃO EXPLICA.** Proibida cadeia causal de três elos ("A vira B, e B vira C") e conector de mecanismo (*por isso · quando isso passa do ponto · antes de · e aí*). A mecânica é o trabalho do bloco 2 — **se você explicar aqui, o bloco 2 fica sem ter o que dizer, e é exatamente daí que nasce o eco que os clientes reclamaram.** Aqui é imagem e cena: ❌ *"a preocupação nasce pequena, vira ansiedade, e essa ansiedade vira o hábito de remoer"* · ✅ *"uma preocupação chega e não sai sozinha — ela gira"*.
+⛔⛔ **O BLOCO 1 MOSTRA, NÃO EXPLICA.** Proibida cadeia causal de três elos ("A vira B, e B vira C") e conector de mecanismo (*por isso · quando isso passa do ponto · antes de · e aí*). A mecânica é o trabalho do bloco 2 — **se você explicar aqui, o bloco 2 fica sem ter o que dizer, e é exatamente daí que nasce o eco que os clientes reclamaram.** Aqui é imagem e cena: ❌ *"a preocupação nasce pequena, vira ansiedade, e essa ansiedade vira o hábito de remoer"* · ✅ *"a raiva sobe rápido e desce sozinha, e ninguém em volta chega a ver"*.
+  ⚠️ **O ✅ é FORMA, não conteúdo — a emoção dele é de outra pessoa, de propósito.** Copiar as palavras de um exemplo é a falha nº 1 deste arquivo: o ✅ anterior saía como 1ª frase do documento e a imagem dele se desdobrava 5x. Aproveite o andamento; nunca as palavras.
 [parágrafo 1 — marque 1-2 **palavras-chave** com negrito]
 [parágrafo 2 — com **destaque**]
 [parágrafo 3 — inclui o reframe "Você não é X — você é alguém que…", com **destaque**]
@@ -299,7 +300,9 @@ Voz do cliente, zero iridologia.
 
 **⛔ A LISTA É DETERMINÍSTICA — você NÃO a escreve.** O render desenha as crenças e a régua a partir do motor. Você escreve **só os dois textos** abaixo. Nunca invente crença, nunca reordene, nunca mude o nível.
 
-**O que é uma crença aqui** (para o `@LEAD`): é a **forma em que a emoção virou regra** — a frase que a pessoa repete por dentro sem perceber e que decide como ela age. Não é opinião nem pensamento passageiro: é o combinado silencioso que organiza o comportamento. Explique isso em linguagem de cliente, sem termo técnico e sem citar escola.
+**O que é uma crença aqui** (para o `@LEAD`): é a **forma em que a emoção virou regra** — a frase que a pessoa repete por dentro sem perceber e que decide como ela age.
+⚠️⚠️ **ESTA DEFINIÇÃO É PARA VOCÊ ENTENDER, NÃO PARA COPIAR.** Medido nos 29 relatórios de produção: a forma espelhada que morava aqui saiu no `@LEAD` de **26 deles (90%)**, e a metáfora que a acompanhava, em **18 (62%)** — a mesma frase, para clientes diferentes. É o pior carimbo do documento inteiro. **Escreva o `@LEAD` com as suas palavras, dizendo o que a crença FAZ na vida DESTA pessoa** — não o que uma crença é, e nunca o que ela não é.
+⚠️ Esta linha já esteve escrita na forma *espelhada* (X, e não Y) e o modelo COPIAVA a forma para o `@LEAD`: 22 de 25 relatórios abriam igual. **Abra dizendo o que a crença FAZ na vida dela, nunca o que ela não é.** Explique isso em linguagem de cliente, sem termo técnico e sem citar escola.
 
 **A régua é ABSOLUTA, não é pêndulo** (decisão founder): crença não tem polo oposto — não se balança pro contrário, **se desmonta**. Então não escreva "o outro lado disso é…" aqui; isso é do bloco 5.
 
