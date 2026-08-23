@@ -13,7 +13,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { isFounderEmail } from '@/lib/auth/founder'
-import { gerarRelatorioEmocional } from '@/lib/emocional/gerar'
+import { gerarRelatorioEmocional, BLOCOS_ESPERADOS } from '@/lib/emocional/gerar'
 
 export const runtime = 'nodejs'
 export const maxDuration = 800 // plano PRO; a geração leva ~200s e o teto da SDK é maior
@@ -68,7 +68,21 @@ export async function POST(_req: Request, ctx: { params: Promise<{ id: string }>
   const nome = (client?.full_name || '').trim().split(/\s+/)[0] || 'você'
 
   try {
-    const { markdown, metadata } = await gerarRelatorioEmocional(exame, nome)
+    const { markdown, completo, metadata } = await gerarRelatorioEmocional(exame, nome)
+    // Mesma trava da rota que o terapeuta usa (2026-08-23): documento cortado não vira
+    // relatório. Aqui não há crédito para proteger (founder-only), mas guardar metade
+    // como pronta é o mesmo defeito — e foi assim que o corte de 23/08 passou batido.
+    if (!completo) {
+      console.error('[emocional] INCOMPLETO', {
+        readingId: id,
+        blocos: metadata.blocos,
+        stop_reason: metadata.stop_reason,
+      })
+      return NextResponse.json(
+        { error: `saiu incompleto (${metadata.blocos} de ${BLOCOS_ESPERADOS} partes) — nada foi gravado`, metadata },
+        { status: 502 },
+      )
+    }
     const { error: eUp } = await db
       .from('readings')
       .update({

@@ -163,6 +163,18 @@ export function AnaliseClient({
         const boundaryMatches = accumulated.match(re) ?? []
         setSectionsReceived(boundaryMatches.length)
       }
+      // O servidor sinaliza falha DENTRO do stream (o cabeçalho 200 já foi enviado
+      // quando ela acontece — não há status HTTP para dar). Sem esta checagem o
+      // terapeuta via "Análise gerada" e a página voltava vazia, sem explicação.
+      // É assim que ele fica sabendo que o relatório saiu pela metade e NÃO foi cobrado.
+      const marcador = accumulated.lastIndexOf('\n\n[erro]: ')
+      if (marcador !== -1) {
+        const msg = accumulated.slice(marcador + '\n\n[erro]: '.length).trim()
+        setError(msg)
+        toast.error(msg, { duration: 12000 })
+        router.refresh()
+        return
+      }
       toast.success('Análise gerada. Revise as seções antes de concluir.')
       router.refresh()
     } catch (err) {

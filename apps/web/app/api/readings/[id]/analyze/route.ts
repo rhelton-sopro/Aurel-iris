@@ -44,7 +44,7 @@ import {
   STAGE2_VERSION,
 } from '@/lib/anthropic/analyze-direct'
 import { runStage1Scan } from '@/lib/anthropic/stage1-scan'
-import { gerarRelatorioEmocional } from '@/lib/emocional/gerar'
+import { gerarRelatorioEmocional, BLOCOS_ESPERADOS } from '@/lib/emocional/gerar'
 import { getPricingFor, computeCostUsd } from '@/lib/anthropic/pricing'
 import { buildRecentPhrasesContext } from '@/lib/anthropic/recent-phrases-context'
 import { extractPhrases } from '@/lib/anthropic/extract-phrases'
@@ -876,7 +876,7 @@ async function gerarMapaDoSer({
       }
 
       try {
-        const { markdown, metadata } = await gerarRelatorioEmocional(
+        const { markdown, completo, metadata } = await gerarRelatorioEmocional(
           exame,
           primeiroNome,
           (delta) => enqueueSilent(encoder.encode(delta)),
@@ -884,6 +884,57 @@ async function gerarMapaDoSer({
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- colunas da 0051, tipos não regerados
         const db = service as unknown as { from: (t: string) => any }
+
+        // ---------- TRAVA DO DOCUMENTO PELA METADE (founder, 2026-08-23) ----------
+        // "Não pode cobrar do terapeuta."
+        //
+        // Em 23/08 um relatório saiu com 3 blocos de 7 — a API cortou no meio da frase
+        // ao bater no teto de tokens. Ele foi gravado como pronto, exibido como pronto e
+        // o crédito da Nailli foi debitado. Ela pagou por um documento pela metade e só
+        // descobriu lendo.
+        //
+        // A regra agora: INTEIRO OU NADA. Documento cortado não vira `report_emocional`
+        // e, principalmente, NÃO GRAVA `report_emocional_generated_at` — esse campo é a
+        // PROVA DE SUCESSO que o backstop da página e o cron usam para debitar reserva
+        // órfã. Gravar o `_at` de um documento cortado faria o crédito ser debitado no
+        // próximo carregamento da página, mesmo pulando o consume aqui.
+        //
+        // O texto pago não se perde: vai inteiro para o metadata, de onde /admin resgata.
+        // Não bota em `report_emocional` porque a página entra em modo leitura só de ver
+        // aquela coluna preenchida — e voltaria a exibir metade de relatório como pronto.
+        if (!completo) {
+          console.error(
+            '[analyze/mapa] INCOMPLETO — nao entrega e NAO cobra',
+            JSON.stringify({
+              readingId,
+              blocos: metadata.blocos,
+              esperados: BLOCOS_ESPERADOS,
+              stop_reason: metadata.stop_reason,
+              tokens_out: metadata.tokens_out,
+            }),
+          )
+          // guarda o que foi pago, sem `_at` e sem `report_emocional`
+          await db
+            .from('readings')
+            .update({
+              report_emocional_metadata: { ...metadata, incompleto: true, markdown_parcial: markdown },
+            })
+            .eq('id', readingId)
+            .then(
+              ({ error }: { error: { message: string } | null }) =>
+                error &&
+                console.warn(
+                  `[analyze/mapa] falha ao guardar o parcial reading=${readingId}: ${error.message}`,
+                ),
+            )
+          // a foto NÃO é purgada (o purge só roda no caminho bom, abaixo) e a reserva
+          // continua ATIVA — a próxima tentativa reusa a mesma, sem cobrar duas vezes.
+          throw new Error(
+            `O relatório saiu incompleto (${metadata.blocos} de ${BLOCOS_ESPERADOS} partes) e foi descartado. ` +
+              'Nenhum crédito foi cobrado — pode gerar de novo.',
+          )
+        }
+
         const { error: upErr } = await db
           .from('readings')
           .update({
@@ -920,18 +971,15 @@ async function gerarMapaDoSer({
         // São **7 blocos** — "Crenças a serem trabalhadas" é canônico desde `90f35f2`
         // (27/07). Documento com 6 significa que o bloco de crenças não veio: é
         // geração INCOMPLETA, retém a foto e cai no resgate do /admin/regenerar.
-        const blocos = (markdown.match(/^# /gm) ?? []).length
+        // ⚠️ a contagem NÃO se refaz aqui: quem conta é o gerador (`metadata.blocos`),
+        // fonte única com a trava do documento pela metade lá em cima. Duas contagens do
+        // mesmo número em arquivos diferentes é exatamente a deriva que já custou caro.
+        const blocos = metadata.blocos
         try {
-          if (blocos >= 7) {
-            const purge = await purgeIrisPhotos(service, readingId, 'audit_complete')
-            if (!purge.ok) {
-              console.warn(
-                `[analyze/mapa] purge fotos falhou reading=${readingId}: ${purge.error} — cron horário cobre`,
-              )
-            }
-          } else {
+          const purge = await purgeIrisPhotos(service, readingId, 'audit_complete')
+          if (!purge.ok) {
             console.warn(
-              `[analyze/mapa] Mapa do Ser INCOMPLETO reading=${readingId} blocos=${blocos}/7 — foto RETIDA`,
+              `[analyze/mapa] purge fotos falhou reading=${readingId}: ${purge.error} — cron horário cobre`,
             )
           }
         } catch (purgeErr) {

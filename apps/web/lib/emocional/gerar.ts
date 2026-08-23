@@ -41,8 +41,22 @@ function systemPrompt(): string {
   return _system
 }
 
+/**
+ * Quantos blocos `# ` o markdown do Mapa do Ser tem quando está INTEIRO.
+ *
+ * São 7 desde `90f35f2` (27/07), quando "Crenças a serem trabalhadas" entrou. O render
+ * mostra 9 porque monta dois sozinho (repertório e integrativas) — estes 7 são os que
+ * o modelo escreve. Vive aqui porque é o gerador que sabe o que pediu.
+ */
+export const BLOCOS_ESPERADOS = 7
+
 export type ResultadoEmocional = {
   markdown: string
+  /**
+   * FALSE = o documento não saiu inteiro. Quem chama NÃO pode entregar nem cobrar.
+   * Ver a nota sobre `stop_reason` em `metadata`.
+   */
+  completo: boolean
   metadata: {
     model: string
     prompt_version: string
@@ -50,6 +64,17 @@ export type ResultadoEmocional = {
     tokens_out: number
     latency_ms: number
     words: number
+    /**
+     * Por que o modelo parou. `max_tokens` = a API cortou no meio da frase.
+     *
+     * Passou a ser gravado em 2026-08-23, depois de um relatório sair com 3 blocos de 7
+     * sem ninguém perceber: ele foi salvo como pronto e o crédito da terapeuta foi
+     * debitado. Sem esta linha, a única forma de descobrir era comparar `tokens_out`
+     * com o teto na mão. Ver docs/DECISOES.md.
+     */
+    stop_reason: string | null
+    /** quantos `# ` vieram, contra os {@link BLOCOS_ESPERADOS} */
+    blocos: number
   }
 }
 
@@ -123,8 +148,17 @@ export async function gerarRelatorioEmocional(
 
   if (!markdown.trim()) throw new Error('resposta vazia do modelo')
 
+  // ---------- o documento saiu INTEIRO? ----------
+  // Duas provas independentes, porque nenhuma das duas sozinha basta:
+  //   · `stop_reason === 'max_tokens'` pega o corte mesmo que os 7 blocos tenham vindo
+  //     (o corte de 10/08 e 11/08 foi dentro do bloco 7, com o título já escrito);
+  //   · a contagem de blocos pega o documento incompleto que terminou sozinho.
+  const blocos = (markdown.match(/^# /gm) ?? []).length
+  const completo = msg.stop_reason !== 'max_tokens' && blocos >= BLOCOS_ESPERADOS
+
   return {
     markdown,
+    completo,
     metadata: {
       model: MODEL,
       prompt_version: PROMPT_VERSION,
@@ -132,6 +166,8 @@ export async function gerarRelatorioEmocional(
       tokens_out: msg.usage.output_tokens,
       latency_ms: Date.now() - t0,
       words: markdown.trim().split(/\s+/).length,
+      stop_reason: msg.stop_reason,
+      blocos,
     },
   }
 }

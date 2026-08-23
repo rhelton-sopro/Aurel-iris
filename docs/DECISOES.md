@@ -1439,6 +1439,107 @@ tem legenda logo abaixo do trilho — e ela **só lista os estados que aquela le
 
 ---
 
+## 2026-08-23 — o relatório sai INTEIRO ou não sai — e documento cortado NÃO cobra o terapeuta
+
+**O que aconteceu.** A terapeuta **Nailli** gerou o Mapa do Ser da cliente **Evelyn** (leitura
+`e595730d`, 13h49) e recebeu um documento com **3 blocos de 7**, cortado no meio da primeira frase
+do bloco 3 (*"Três marcos"*). Ele foi gravado como pronto, exibido como pronto, e **o crédito dela
+foi debitado**. Ninguém foi avisado de nada. Quem descobriu foi o founder, lendo.
+
+### A causa: 79% do que pagamos é PENSAMENTO, não texto
+
+O Sonnet 5 **pensa por padrão** (thinking adaptativo — omitir o parâmetro NÃO desliga, ao contrário
+do Opus 4.8/4.7) e esse raciocínio é contado em `output_tokens` e **consome o mesmo `max_tokens` do
+texto**. Medido nos **29 relatórios de produção** (28/07 → 23/08):
+
+| | tokens de saída | texto (~3,5 chars/token) | pensamento |
+|---|---|---|---|
+| média | 20.100 | ~4.300 | **15.936 — 79%** |
+| faixa | 14.747 a 32.000 | 3.889 a 4.692 | 70% a 82% |
+
+- Custo médio do Stage 2: **US$ 0,227**, dos quais **US$ 0,159 é pensamento** que ninguém lê.
+- **O texto é ESTÁVEL** (~4.300 tokens sempre). Quem varia é o pensamento. Por isso o relatório
+  corta: não é texto demais, é deliberação demais.
+- O de 23/08 foi **95% pensamento** — o pico da série inteira.
+
+⚠️ **O comentário em `gerar.ts` que dizia *"se voltar a truncar, a resposta NÃO é subir o teto, é
+limitar quantos Caminhos o bloco 7 escreve"* está errado na premissa.** Foi escrito em 13/08
+achando que o consumidor do teto era o TEXTO. O consumidor é o pensamento — limitar o bloco 7 não
+devolve teto nenhum.
+
+### Decisão 1 — as 6 regras anti-negação de 20/08 VOLTAM ATRÁS
+
+`f104bc9` (as 6 regras contra o molde da negação) foi o **único** deploy entre o último relatório
+inteiro e o quebrado — e o de 23/08 foi o **primeiro** relatório de produção gerado sob elas.
+Seis proibições com contagem (*"22 de 25"*, *"16 de 25"*) e verificação cruzada entre marcadores
+vizinhos multiplicaram a deliberação antes de cada parágrafo.
+
+**STATUS: APLICADA** — `7d3252f` reverte **só o prompt**. A legenda da linha do tempo (`1145e03`)
+FICA. Os números do ganho revertido ficam registrados na entrada de 20/08 (tarde): *"não é só o
+peso"* 22/25→0/3, *"não é uma opinião"* 22/25→0/3, *"é alguém que aprendeu"* 20/25→0/3. **O ganho
+era real** — o que não dá é pagá-lo com relatório pela metade.
+
+⏭️ A repetição que essas regras matavam **voltou**. Tratar por um caminho que não torre token.
+
+### ⚖️ CONTRAPONTO — o founder recusou subir o teto
+
+Minha recomendação foi **subir o teto de 32k para 64k e MANTER as regras**: `max_tokens` é uma
+tesoura, não uma meta — só corta se passar, e paga-se apenas o que sai. Sozinho isso teria salvado o
+relatório da Evelyn inteiro.
+
+O founder decidiu o contrário: *"além disso, eu quero que economize token. Prefiro voltar ao que era
+dia 20 e depois a gente trabalhar com essas repetições."* E o argumento que fecha a questão é dele:
+**com o teto de 32k e o prompt antigo, 10 relatórios seguidos saíram inteiros.** O teto nunca foi o
+problema. `MAX_TOKENS` fica em **32.000**.
+
+### Decisão 2 — INTEIRO OU NADA, e cortado não cobra
+
+Palavra do founder: **"Não pode cobrar do terapeuta."**
+
+**STATUS: APLICADA.** O gerador agora devolve `completo`, decidido por **duas provas independentes**
+— nenhuma das duas basta sozinha:
+
+1. `stop_reason === 'max_tokens'` → pega o corte mesmo com os 7 blocos presentes (os cortes de 10/08
+   e 11/08 foram **dentro** do bloco 7, com o título já escrito);
+2. contagem de `# ` < 7 → pega o documento incompleto que terminou sozinho.
+
+Quando não está completo, a rota do terapeuta:
+
+- **não grava `report_emocional`** — a página entra em modo leitura só de ver essa coluna
+  preenchida, e voltaria a exibir metade de relatório como pronta;
+- **não grava `report_emocional_generated_at`** — ⭐ este é o ponto que quase passou: esse campo é a
+  **prova de sucesso** que o backstop da página (`leituras/[id]/page.tsx`) e o cron usam para
+  debitar reserva órfã. Pular só o consume inline **não bastaria**: o crédito seria debitado no
+  próximo carregamento da página;
+- **não purga a foto** (retida para resgate) e **não incrementa `regeneration_count`**;
+- **guarda o texto pago** em `report_emocional_metadata` (`incompleto: true` + `markdown_parcial`) —
+  a API foi paga, o texto não se perde;
+- **deixa a reserva ATIVA** — a próxima tentativa reusa a mesma, sem cobrar duas vezes;
+- **avisa na tela**: *"O relatório saiu incompleto (N de 7 partes) e foi descartado. Nenhum crédito
+  foi cobrado — pode gerar de novo."*
+
+`stop_reason` e `blocos` passam a ser gravados no metadata. Sem eles, a única forma de descobrir um
+corte era comparar `tokens_out` com o teto na mão — foi assim que **dois relatórios cortados em
+10/08 e 11/08** (ambos em 24.000, o teto da época) foram entregues sem ninguém notar.
+
+A rota founder-only (`/emocional`) ganhou a mesma trava: lá não há crédito a proteger, mas guardar
+metade como pronta é o mesmo defeito.
+
+### ⏭️ Em aberto
+
+- **Relatório da Evelyn continua quebrado** e o crédito da Nailli continua debitado (a trava é para
+  daqui pra frente; não desfaz o de hoje). Refazer custa ~US$ 0,46. Founder: *"ainda não, primeiro
+  conserta."*
+- **Economizar token de verdade** é mexer no quanto o modelo pensa — `output_config: { effort }`,
+  hoje no padrão máximo (`high`), nunca testado neste produto. ⛔ É calibração: exige o founder e
+  medição antes/depois.
+
+### Gates
+`pnpm lint` 0 erros / 25 warnings (baseline) · `tsc` sem erro novo (os 30 são débito conhecido de
+`*.test.ts` e `tmp/`) · `vitest lib/emocional` 8/8.
+
+---
+
 ## Como usar
 
 - **Ao tomar uma decisão:** registrar aqui na mesma sessão, com razão e status.
