@@ -1540,6 +1540,60 @@ metade como pronta é o mesmo defeito.
 
 ---
 
+## 2026-08-23 (noite) — teto 40.000 + sentinela em 30.000: o corte era o sintoma, não a doença
+
+**Palavra do founder, que inverteu o desenho:**
+
+> *"Põe 40 mil de limite. Mas se passar de 30, me manda um e-mail, porque aí tem alguma coisa errada — antes não estava passando, não estava ficando tão caro, agora está ficando caro."*
+
+De manhã ele havia **recusado** subir o teto (registrado como contraponto na entrada anterior). O que mudou entre uma coisa e outra foi a medição do dia: ficou claro que **consumo alto é o sintoma, e o corte era só a forma como esse sintoma aparecia** quando o teto era baixo demais para escondê-lo. Subir o teto tira o corte; a sentinela deixa o sintoma visível. **Os dois números andam juntos — mudar um sem o outro cega o alarme.**
+
+### Os dois números
+
+| | valor | por quê |
+|---|---|---|
+| `MAX_TOKENS` | 32.000 → **40.000** | o teto é uma TESOURA, não uma meta: só corta se passar, e paga-se apenas o que sai. Subir não encarece o dia a dia. |
+| `ALERTA_TOKENS` | **30.000** (novo) | em 29 relatórios de produção a saída ficou entre **14.747 e 25.489**; a maior geração INTEIRA já medida foi **27.208**. Passar de 30.000 está fora da faixa conhecida — é sintoma, não variação. |
+
+⛔ **A nota antiga de `gerar.ts` foi REMOVIDA por estar errada na premissa:** dizia *"se voltar a truncar, a resposta NÃO é subir o teto, é limitar quantos Caminhos o bloco 7 escreve"*. Ela supunha que quem consumia o teto era o TEXTO. Medido: **79% da saída é pensamento do Sonnet 5**; o texto é estável em ~4.300 tokens. Limitar o bloco 7 não devolve teto nenhum.
+
+### O aviso
+
+`lib/notifications/notify-mapa-alerta.ts` — e-mail via Resend para `FOUNDER_EMAILS` (os dois founders, não o suporte: é decisão de dono). Dois motivos:
+
+- 🔴 **incompleto** — saiu com menos de 7 blocos e foi DESCARTADO. Diz o que o founder precisa saber sem abrir nada: a terapeuta não foi cobrada, o crédito segue reservado, a foto foi retida, e o link direto do `/admin/regenerar`.
+- 🟡 **caro** — saiu INTEIRO e foi entregue, mas passou de 30.000. Nenhuma ação; é vigilância de custo.
+
+⛔ **Retentativa automática foi RECUSADA pelo founder**, com a proposta na mesa (ela teria coberto a terapeuta antes de ela ver o problema, ao custo de uma geração extra só no caso de falha). Decisão dele: *"não tenta nada, só me avisa na hora"* — quem regera é ele, à mão.
+
+### E o aviso que não é e-mail
+
+Pedido literal: *"e deixo um aviso para quando a gente começar a sessão aqui, você me falar"*.
+
+`apps/web/scripts/relatorios-com-problema.mjs` — lista os incompletos pendurados e os caros dos últimos 30 dias, com nome de terapeuta, de cliente e o link de regerar. **Só lê o banco: não gera nada, não gasta API.** Rodar no início da sessão e avisar o founder.
+
+### O que ficou provado hoje e vale mais que os consertos
+
+**O prompt tem ORÇAMENTO de proibições — medido 4 vezes, mesmo exame, mesmo modelo:**
+
+| prompt | ⛔ | saída | resultado |
+|---|---|---|---|
+| produção (revertido hoje) | 59 | 27.208 | ✅ inteiro |
+| + 3 regras anti-"cheiro de IA" | ~62 | 24.955 | ✅ inteiro (**gastou menos**) |
+| as 6 regras de 20/08 | 70 | 32.000 | ⛔ 3 blocos de 7 |
+| + 4 regras + 7 edições | 71 | 32.000 | ⛔ 3 blocos de 7 |
+
+⛔ **A tese de "regra barata × regra cara" MORREU na medição.** Passei o dia sustentando que o problema eram as regras que mandam o modelo reler o documento, e que proibir uma frase era de graça. As 4 regras da última tentativa eram **todas locais** — quebrou igual. **Não é o tipo, é a quantidade.** Duas vezes acima de 70: quebrou. Duas vezes abaixo de 62: terminou. Comentário de engenharia dentro do prompt também pesa.
+
+**Para entrar regra nova, tem que SAIR regra velha.** O caminho não testado é TROCAR, com teto de ~62 proibições.
+
+**⭐ E o achado que não custa orçamento nenhum: regra perde para EXEMPLO.** Dois exemplos ✅ do prompt saíram **palavra por palavra** no relatório da cliente, em duas gerações independentes — inclusive a **primeira frase** do documento. A "cabeça girando" que se repetia 5 vezes **não era muleta do modelo: foi plantada pelo prompt.** Trocar os dois exemplos é a edição de maior retorno do arquivo. Não foi feita — ficou para a próxima sessão.
+
+### Gates
+`pnpm lint` 0 erros / 25 warnings (baseline) · `tsc` 30 erros, todos pré-existentes em `*.test.ts` e `tmp/` · `vitest lib/emocional lib/notifications` 25/25 · script de pendências rodado contra produção.
+
+---
+
 ## Como usar
 
 - **Ao tomar uma decisão:** registrar aqui na mesma sessão, com razão e status.

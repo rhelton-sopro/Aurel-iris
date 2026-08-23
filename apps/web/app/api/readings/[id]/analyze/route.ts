@@ -44,7 +44,13 @@ import {
   STAGE2_VERSION,
 } from '@/lib/anthropic/analyze-direct'
 import { runStage1Scan } from '@/lib/anthropic/stage1-scan'
-import { gerarRelatorioEmocional, BLOCOS_ESPERADOS } from '@/lib/emocional/gerar'
+import {
+  gerarRelatorioEmocional,
+  BLOCOS_ESPERADOS,
+  MAX_TOKENS as MAPA_MAX_TOKENS,
+  ALERTA_TOKENS as MAPA_ALERTA_TOKENS,
+} from '@/lib/emocional/gerar'
+import { notifyMapaAlerta } from '@/lib/notifications/notify-mapa-alerta'
 import { getPricingFor, computeCostUsd } from '@/lib/anthropic/pricing'
 import { buildRecentPhrasesContext } from '@/lib/anthropic/recent-phrases-context'
 import { extractPhrases } from '@/lib/anthropic/extract-phrases'
@@ -846,6 +852,34 @@ export async function POST(
  * (~3 min de geração). A VERDADE é o que se grava no banco no fim — se o terapeuta
  * fechar a aba no meio, o relatório continua e aparece completo no próximo load.
  */
+/**
+ * Nome da terapeuta, só para o e-mail de alerta do founder ficar legível.
+ *
+ * Best-effort de ponta a ponta: se falhar, o aviso sai com o id da leitura, que já basta
+ * para achar tudo. ⛔ Não pode lançar — roda dentro do caminho de geração.
+ */
+async function nomeDoTerapeuta(
+  service: ReturnType<typeof createServiceClient>,
+  readingId: string,
+): Promise<string | null> {
+  try {
+    const { data: r } = await service
+      .from('readings')
+      .select('therapist_id')
+      .eq('id', readingId)
+      .maybeSingle()
+    if (!r?.therapist_id) return null
+    const { data: p } = await service
+      .from('profiles')
+      .select('full_name')
+      .eq('id', r.therapist_id)
+      .maybeSingle()
+    return p?.full_name ?? null
+  } catch {
+    return null
+  }
+}
+
 async function gerarMapaDoSer({
   readingId,
   service,
@@ -927,6 +961,21 @@ async function gerarMapaDoSer({
                   `[analyze/mapa] falha ao guardar o parcial reading=${readingId}: ${error.message}`,
                 ),
             )
+          // Aviso ao founder (decisão dele, 23/08): quem regera é ele, à mão. ⛔ Não existe
+          // retentativa automática — foi recusada de propósito.
+          await notifyMapaAlerta({
+            motivo: 'incompleto',
+            readingId,
+            therapistName: await nomeDoTerapeuta(service, readingId),
+            clientName,
+            blocos: metadata.blocos,
+            stopReason: metadata.stop_reason,
+            tokensOut: metadata.tokens_out,
+            maxTokens: MAPA_MAX_TOKENS,
+            alertaTokens: MAPA_ALERTA_TOKENS,
+          }).catch(() => {
+            /* best-effort: e-mail não pode derrubar a geração */
+          })
           // a foto NÃO é purgada (o purge só roda no caminho bom, abaixo) e a reserva
           // continua ATIVA — a próxima tentativa reusa a mesma, sem cobrar duas vezes.
           throw new Error(
@@ -1020,6 +1069,27 @@ async function gerarMapaDoSer({
             `[analyze/mapa] logReportGeneration falhou reading=${readingId}:`,
             logErr instanceof Error ? logErr.message : logErr,
           )
+        }
+
+        // SENTINELA DE CUSTO (founder, 23/08): *"se passar de 30, me manda um e-mail,
+        // porque aí tem alguma coisa errada"*. O relatório saiu INTEIRO e já foi entregue —
+        // este aviso é sobre gasto, não sobre defeito. Faixa medida em 29 relatórios:
+        // 14.747 a 25.489, com a maior geração inteira em 27.208. Passar de 30k é fora
+        // da faixa conhecida.
+        if (metadata.tokens_out > MAPA_ALERTA_TOKENS) {
+          await notifyMapaAlerta({
+            motivo: 'caro',
+            readingId,
+            therapistName: await nomeDoTerapeuta(service, readingId),
+            clientName,
+            blocos: metadata.blocos,
+            stopReason: metadata.stop_reason,
+            tokensOut: metadata.tokens_out,
+            maxTokens: MAPA_MAX_TOKENS,
+            alertaTokens: MAPA_ALERTA_TOKENS,
+          }).catch(() => {
+            /* best-effort */
+          })
         }
 
         revalidatePath(`/leituras/${readingId}`)

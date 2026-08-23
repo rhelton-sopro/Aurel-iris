@@ -26,11 +26,35 @@ const LAB = path.join(process.cwd(), '_motor-lab')
 export const PROMPT_VERSION = 'emocional_0.1.0'
 const MODEL = 'claude-sonnet-5'
 // ⚠️ TETO RÍGIDO: ao atingir, a API para NO MEIO DA FRASE — não existe "resumir o final".
-// Era 24.000 e truncava 2 de 22 relatórios de produção (9%), sempre dentro do bloco 7,
-// no meio dos Caminhos. As gerações que terminam sozinhas param entre 15k e 23,7k.
-// Ver docs/DECISOES.md (2026-08-13). Se voltar a truncar, a resposta NÃO é subir de novo:
-// é limitar quantos Caminhos o bloco 7 escreve.
-const MAX_TOKENS = 32000
+// Histórico: 24.000 truncava 9% dos relatórios → 32.000 em 13/08 → **40.000 em 23/08**.
+//
+// A nota que morava aqui dizia "se voltar a truncar, a resposta NÃO é subir de novo, é
+// limitar quantos Caminhos o bloco 7 escreve". ⛔ **Estava errada na premissa** e foi
+// removida: ela supunha que quem consumia o teto era o TEXTO. Medido em 29 relatórios de
+// produção (23/08), **79% da saída é PENSAMENTO do Sonnet 5**, não texto — o texto é
+// estável em ~4.300 tokens, sempre. Limitar o bloco 7 não devolve teto nenhum.
+//
+// Por que 40.000 (decisão do founder, 23/08): o teto é uma TESOURA, não uma meta — só
+// corta se passar, e paga-se apenas o que sai. Subir não encarece o dia a dia; o que
+// encarece é o modelo deliberar mais, e isso o teto não controla. Quem vigia o custo é o
+// ALERTA_TOKENS abaixo.
+export const MAX_TOKENS = 40000
+
+/**
+ * Acima disto, o founder recebe e-mail — mesmo que o relatório saia INTEIRO.
+ *
+ * *"Se passar de 30, me manda um e-mail, porque aí tem alguma coisa errada — antes não
+ * estava passando, não estava ficando tão caro, agora está ficando caro."* (founder, 23/08)
+ *
+ * O número tem lastro: em 29 relatórios de produção a saída ficou entre 14.747 e 25.489,
+ * e a maior geração INTEIRA já medida foi 27.208. Passar de 30.000 é fora da faixa
+ * conhecida — é sintoma, não é variação normal.
+ *
+ * ⚠️ Consumo alto é o SINTOMA; o corte era só como ele aparecia quando o teto era baixo
+ * demais para escondê-lo. Subir o teto tira o corte e deixa o sintoma visível — por isso
+ * os dois números andam juntos e mudar um sem o outro cega o alarme.
+ */
+export const ALERTA_TOKENS = 30000
 
 let _system: string | null = null
 function systemPrompt(): string {
