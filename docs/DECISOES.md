@@ -1700,6 +1700,127 @@ Mesma leitura (founder), método × perguntas: **18.978 → 24.268 tokens** (+28
 
 ---
 
+## 2026-08-24 — disparo de e-mail para a base: quem entra na lista e como sai
+
+**Decisão do founder, em resposta a duas perguntas diretas.** Ele pediu uma caixinha no
+webmail do admin para ir clicando e escolhendo destinatários ("tipo mail marketing").
+
+### 1. A lista é de TERAPEUTAS. Os clientes dos terapeutas ficam fora. — `APLICADA`
+
+As duas listas existem no banco e as duas têm e-mail: **39 terapeutas** e **90 clientes**.
+Escolhida a dos terapeutas, que são os clientes dele.
+
+**Razão:** o cliente entregou os dados ao **terapeuta**, não ao Iris Codex. Escrever direto
+para ele é exposição de LGPD e atropela a relação do terapeuta com a própria clientela.
+
+⛔ **Não estender para a tabela `clients` sem decisão nova do founder.** A trava está
+escrita em `app/admin/suporte/actions.ts` e em `RecipientPicker.tsx`.
+
+### 2. Um e-mail SEPARADO por pessoa — nunca um envio único. — `APLICADA`
+
+**Razão:** ninguém pode ver o endereço de ninguém, e mandando um por um dá para chamar cada
+pessoa pelo primeiro nome (marca `{nome}` no texto). A alternativa oferecida — um e-mail só
+com cópia oculta — foi recusada por perder a personalização.
+
+Consequências travadas em código:
+
+- Uma conexão SMTP só (pool, 3 msg/s) para as N mensagens. Uma conexão por pessoa derruba o
+  disparo nos limites do Hostinger antes dos 39.
+- **Uma** cópia em Enviados como registro do disparo, não 39.
+- O e-mail de cada terapeuta é resolvido **no servidor a partir do id** — a tela nunca manda
+  endereço.
+- Falha parcial não passa por sucesso: quem não recebeu aparece nomeado e o formulário fica
+  aberto para reenviar só a esses.
+- ⚠️ Envio **bloqueado** quando o texto usa `{nome}` e algum escolhido está sem nome
+  cadastrado. Um "Olá, ." indo para dezenas de pessoas não tem desfazer.
+
+### Contraponto registrado
+
+Não houve divergência do founder. O contraponto é meu e fica anotado: **o disparo nunca foi
+testado contra o servidor de verdade** — nenhum e-mail real foi enviado nesta sessão. A
+recomendação dada a ele foi mandar primeiro para si mesmo e mais uma pessoa antes de usar
+nos 39.
+
+### Gates
+
+`pnpm lint` 0 erros / 25 warnings (baseline) · `tsc` 28 erros, todos pré-existentes em
+`*.test.ts` e `tmp/` · `vitest` 1003 passando, com as mesmas 14 falhas antigas de áreas não
+relacionadas · 35 testes novos.
+
+---
+
+## 2026-08-24 — o rascunho do e-mail sumia porque o React 19 reescrevia o editor
+
+**Queixa do founder:** *"quando vai digitar uma mensagem, se você clica em outro lugar, às
+vezes ele desaparece"*.
+
+**Não era "às vezes": era sempre, em dois gatilhos.** O corpo do e-mail é um
+`contenteditable` cujo conteúdo inicial vinha por `dangerouslySetInnerHTML`. No React 19 o
+diff de props compara `{__html: …}` por **identidade de objeto** (`next === prev` em
+`updateProperties`) e, quando difere, executa `domElement.innerHTML = value.__html` **sem
+comparar a string**. Um objeto literal nasce novo a cada render — então todo re-render
+reescrevia o editor com o texto inicial.
+
+| gatilho | efeito |
+|---|---|
+| digitar uma letra em "Para" ou "Assunto" | apagava a mensagem inteira |
+| auto-atualização de 60s da inbox | apagava sozinho, sem tocar em nada — daí o "às vezes" |
+
+**Medido antes de corrigir:** teste escrito primeiro, **3 de 4 falharam**, mostrando o texto
+sendo trocado pela citação inicial. Depois da correção, 4 de 4.
+
+**O que ficou:**
+
+1. O conteúdo inicial é semeado uma vez e o React nunca mais toca no editor.
+   ⛔ **Não devolver `dangerouslySetInnerHTML` a esse nó.**
+2. A auto-atualização de 60s **pausa enquanto o formulário está aberto**. O comentário
+   anterior afirmava que o estado do cliente "é preservado pelo React" — foi essa suposição
+   que escondeu o bug. O rascunho não é estado do React: mora no DOM.
+
+**A lei que fica:** conteúdo que mora no DOM (contenteditable, canvas, editor de terceiro)
+não é preservado por re-render nenhum. Antes de escrever "o React preserva", perguntar
+**onde o dado mora**.
+
+---
+
+## 2026-08-24 — a tela de terapeutas descartava telefone e especialidades
+
+**Queixa do founder:** *"tem que ter um lugar dos terapeutas e mostrar os dados dele… onde
+eu vejo o telefone, vejo a profissão, o que ele marcou"*.
+
+A tela `/admin/terapeutas` **já buscava `phone` e `specialties` do banco** e não os exibia em
+lugar nenhum — dado carregado e jogado fora. Agora a linha mostra telefone e áreas, e clicar
+abre a ficha (contato com link de WhatsApp, áreas marcadas, uso/conta, cadastro e cobrança).
+
+**Medido no banco (39 terapeutas):**
+
+| campo | preenchido |
+|---|---|
+| `full_name`, `subscription_status` | 39/39 |
+| `phone`, `specialties`, `cpf`, `tos_accepted_at` | 37/39 |
+| `city`, `state`, `address`, `cep` | 27/39 |
+| `asaas_customer_id` (passou por cobrança) | 4/39 |
+| **`professional_id`** (registro CRP/CRM) | **0/39** |
+| **`bio`** | **0/39** |
+
+⛔ `professional_id` e `bio` **não entraram na ficha**: mostrar campo que nunca é preenchido
+é ruído. Para ter o registro profissional é preciso pedi-lo no cadastro.
+
+⚠️ **A ficha expõe CPF e endereço** — estão lá porque a NF-e exige e a tela é founder-only.
+Não levar esses campos para nenhuma tela fora de `/admin`.
+
+### Achado de negócio, não pedido
+
+Áreas marcadas pelos 39: **Psicologia / Psicoterapia 11** · Constelação Familiar 8 ·
+Coaching / PNL 7 · Hipnose 6 · Biomagnetismo 6 · Tarot 5 · Reiki 5 · Iridologia 4.
+
+**Quase 3 em cada 10 já são psicólogos** — o maior mercado e o pior encaixe pela Resolução
+CFP 13/2022, exatamente o risco registrado em `PREMISSAS-DO-PRODUTO.md §3.3`. Registrado
+aqui como observação; nenhuma ação foi tomada.
+
+---
+
+
 ## Como usar
 
 - **Ao tomar uma decisão:** registrar aqui na mesma sessão, com razão e status.
