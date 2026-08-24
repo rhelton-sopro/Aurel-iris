@@ -590,7 +590,49 @@ function blockSuporte() {
     <div class="medicine"><p class="med-lab">Antes de fazer qualquer coisa com isto</p><p>${SUPORTE_FECHO}</p></div>`
 }
 
+// ---------- BLOCO 7 — DOIS FORMATOS, de propósito ----------
+//
+// 24/08: o founder tirou o Método Somático do relatório e pôs no lugar as PERGUNTAS
+// ANCORADAS (o §12 do Dossiê). O método foi pra prateleira, não pro lixo.
+//
+// ⚠️ POR QUE O FORMATO ANTIGO CONTINUA AQUI: o markdown é o que se guarda no banco e o
+// HTML é derivado na hora. Os ~30 relatórios já gerados trazem `@CAMINHO` dentro deles.
+// Se este render passasse a ler só a lista numerada, todos perderiam o bloco 7 **em
+// silêncio** — o pior modo de falha que existe neste projeto. Então o render escolhe o
+// leitor pelo que o documento TEM, e os dois convivem. Foi decisão explícita do founder:
+// "deixa a versão atual do relatório salva também".
+//
+// ⛔ Não apagar `block7Metodo` enquanto existir relatório com `@CAMINHO` no banco.
 function block7(body) {
+  return /^@CAMINHO /m.test(body) ? block7Metodo(body) : block7Perguntas(body)
+}
+
+// ---------- formato NOVO (24/08) — perguntas ancoradas em lista numerada ----------
+//
+// O Sonnet escreve `@PONTE:` + `1. … 2. …`. Aqui não há esqueleto fixo nem injeção do
+// sistema: o valor está no texto, e o render só o veste. É o contrário do método, que era
+// 80% esqueleto — e é por isso que este bloco agora pode ir para a CLIENTE.
+function block7Perguntas(body) {
+  const m = body.match(/^@PONTE:[ \t]*([\s\S]*?)(?=\n\s*\d+\.\s|\n@|$)/m)
+  const ponte = m ? m[1].trim() : ''
+  // `1.` no começo da linha; a pergunta segue até a próxima numerada (aceita quebra de
+  // linha no meio, que é o que o modelo faz quando a pergunta é longa).
+  const perguntas = [...body.matchAll(/^\s*(\d+)\.[ \t]+([\s\S]*?)(?=\n\s*\d+\.[ \t]|\n@|$)/gm)]
+    .map((x) => x[2].trim().replace(/\s*\n\s*/g, ' '))
+    .filter(Boolean)
+  // Sem nenhuma pergunta reconhecida, devolve a prosa crua em vez de um bloco vazio: o
+  // documento defeituoso tem que APARECER, nunca sumir.
+  if (!perguntas.length) return prose(body)
+  const lis = perguntas
+    .map((p, i) => `<li class="qa-item"><span class="qa-n">${i + 1}</span><p>${inl(p)}</p></li>`)
+    .join('')
+  return (ponte ? `<p class="qa-ponte">${inl(ponte)}</p>` : '') + `<ol class="qa-list">${lis}</ol>`
+}
+
+// ---------- formato ANTIGO (até 23/08) — Método Somático de 7 movimentos ----------
+// ⛔ NÃO É CÓDIGO MORTO: é o que mantém legíveis os relatórios já entregues. Ver a nota
+// em `block7` acima.
+function block7Metodo(body) {
   const out = [B6HTML.slice(0, B6HTML.indexOf('<div class="qsec"'))]
   const g1 = (k) => { const m = body.match(new RegExp(`^@${k}:[ \\t]*(.*)`, 'm')); return m ? m[1].trim() : '' }
   const blocos = body.split(/^@CAMINHO /m).slice(1)
@@ -753,6 +795,15 @@ const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><met
 .tl-leg-i{margin:0 0 6px;font-size:13px;line-height:1.55;color:#6b6357}
 .tl-leg-i:last-child{margin-bottom:0}
 .tl-leg-k{display:inline-block;min-width:96px;font-size:10.5px;font-weight:600;letter-spacing:.10em;text-transform:uppercase;color:#2b2b2b}
+/* perguntas ancoradas (24/08) — o bloco 7 novo. Sem esqueleto: a pergunta E o conteudo,
+   entao o desenho so da ar e um numero discreto. Numero fora do fluxo do texto pra a
+   pergunta poder respirar em varias linhas sem o numero descer junto. */
+.qa-ponte{font-size:14.5px;line-height:1.62;color:var(--ink-soft,#6b6357);margin:0 0 26px;padding-left:15px;border-left:2px solid rgba(0,0,0,.10)}
+.qa-list{list-style:none;margin:0;padding:0;counter-reset:qa}
+.qa-item{position:relative;padding:0 0 0 40px;margin:0 0 22px;break-inside:avoid;page-break-inside:avoid}
+.qa-item:last-child{margin-bottom:0}
+.qa-item p{margin:0;font-size:16px;line-height:1.66}
+.qa-n{position:absolute;left:0;top:1px;width:26px;text-align:right;font-size:12.5px;font-weight:600;letter-spacing:.04em;color:var(--amber,#a35a1c)}
 .pend-desc{font-size:13px;line-height:1.5;color:var(--ink-soft,#6b6357);margin:5px 0 2px} .pend-desc b{color:#a35a1c;font-weight:600} .pend-desc b.anti{color:#2f7a54} .pend{margin-bottom:14px}
 /* as regras .tick e .pend-corr sairam em 2026-08-13: marcas de faixa na barra e o simbolo
    depois do nivel foram reprovados pelo founder no mesmo dia em que entraram. Ver o

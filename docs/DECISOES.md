@@ -1634,6 +1634,72 @@ O modelo escreveu a própria imagem (*"Uma preocupação chama a outra, numa fil
 
 ---
 
+## 2026-08-24 — o bloco 7 troca de mão: o Método Somático sai, as PERGUNTAS ANCORADAS voltam
+
+**Decisão do founder**, depois de 8 meses com o método no documento e de uma sessão inteira lendo PDFs lado a lado:
+
+> *"Vamos pegar o nosso método somático e colocar na prateleira. E no lugar dele, o prompt exato do nosso modelo antigo de perguntas — o roteiro de anamnese. Aqui é terapia. Essas perguntas são fazer uma terapia por meio de perguntas."*
+
+**O que decidiu junto:** as perguntas vão **também para a cliente** (o `OMITIR_NA_VERSAO_CLIENTE` virou `[]`); o método vai **pra prateleira, não pro lixo**; e a versão atual do relatório fica **salva e legível**.
+
+### ⭐ O MECANISMO — "abrir a gaveta" (palavra do founder)
+
+> *"Aqui fala que você tem uma raiva de fundo. Você consegue lembrar a última vez que sentiu raiva? É como se fosse abrir a gaveta da dor. Quando abre a gaveta, dá a oportunidade de a gente mexer na gaveta. Agora entra na cena. Existe alguma parte do corpo que te chama a atenção? Aí a pessoa fala: tem, tem sim. E o terapeuta: coloca atenção nisso agora."*
+
+**Cinco tempos, em TODAS as perguntas:** 1 nomeia o achado · 2 **abre a gaveta** (chama a lembrança) · 3 entra na cena · 4 **o corpo chama** (pergunta de SIM ou NÃO) · 5 **a atenção** ("coloca a atenção nisso agora").
+
+⭐⭐ **A emoção precisa estar ABERTA pra ser trabalhada.** Pergunta sem gaveta aberta é conversa sobre o assunto, não terapia.
+⭐ **A variação é na PALAVRA, nunca no mecanismo.** Foi o erro que custou 3 rodadas: eu tratei a cena como uma opção entre cinco e a limitei a 3 em 10 — e as perguntas viraram reflexão de cabeça. A cena é o mecanismo; o que varia é a redação.
+
+### Correções de rota (todas medidas, todas minhas)
+
+| eu escrevi | o founder cortou | o que a medição disse |
+|---|---|---|
+| âncora podia ser um **recurso/força** | *"aqui é terapia, a gente fala de achados"* | **0 de 49** primeiras perguntas do Dossiê ancoravam numa força |
+| *"leva o ar até ali, respira uma vez"* | *"isso não existe, não é princípio somático"* | "respir" em **2%** das 391 perguntas do Dossiê. O gesto é de **ATENÇÃO** |
+| proibi a cena lembrada | *"a anterior eu achei melhor, traz o sensorial"* | a cena era **18%** do Dossiê — eu tinha zerado |
+| *"lendo isso agora"* | — | fura a regra do próprio prompt (bloco 1): metade das vezes **quem lê é o terapeuta** |
+
+### O LUGAR × A TEXTURA (founder, 24/08 — revoga metade da decisão de 27/07)
+
+- ⛔ **O LUGAR nunca aparece na pergunta.** *"A gente não sabe onde é."* Oferecer o lugar PLANTA a resposta e destrói a prova de que a leitura tocou algo.
+- ✅ **A TEXTURA foi LIBERADA** (*"quente ou frio, parado, se mexendo"*), **condicionada**: *"se tiver, repara como é"*. No papel a resposta dela ainda não aconteceu — ela responde ao terapeuta, e o terapeuta continua dali.
+- O bloco 1 foi alinhado à mesma régua.
+
+### O lastro — para eu não inventar de novo
+
+`_motor-lab/lastro/levar-ao-corpo.md`. Quatro escolas, **autores escondidos** (regra 8): **Clean Language** (Grove) — a pergunta 3, *"and whereabouts is X?"*, é literalmente o tempo 4, e o princípio "só as palavras da pessoa" é a origem da regra do lugar · **Focusing** (Gendlin) — felt sense, e o passo "receber" é por que NÃO se promete resultado · **Somatic Experiencing** (Levine) — titração é a origem do *"se nada vier, tudo bem"* · **Hakomi** (Kurtz) — primeiro a atenção, depois o experimento; sempre voluntário.
+⚠️ O que está marcado como síntese **é síntese** — não consegui o verbatim de Gendlin nem de Kurtz.
+
+### Código
+
+- `render-novo.mjs`: `block7()` escolhe o leitor pelo que o documento TEM. `block7Perguntas` (lista numerada) e `block7Metodo` (`@CAMINHO`) convivem. ⛔ **Não apagar `block7Metodo`**: o markdown fica no banco e o HTML é derivado na hora — sem ele, os relatórios já entregues perderiam o bloco 7 **em silêncio**.
+- Prompt congelado em `prompts/stage2-relatorio-v1-metodo-somatico.md`.
+- `_lab-gerar.mjs`: teto 32k → **40k**, alinhado com produção. Estava medindo com régua mais curta e podia reprovar aqui o que produção entregaria inteiro.
+
+### 🐛 Dois defeitos que a troca revelou (e mataram junto)
+
+1. **O prompt tinha DOIS formatos de saída contraditórios** pro mesmo bloco — `- s2:…s7:` (que o render lê) e `- chegar:…passo:` (que o prompt mandava). Quando o modelo obedecia ao formato escrito, o render **descartava mais da metade das falas em silêncio**: 20 passos renderizados contra 48.
+2. **A proibição de oferecer o lugar morava só no bloco 1**, com uma remissão 330 linhas depois. Furou duas vezes em dois dias. **Remissão é mais fraca que texto** — agora está escrita nos dois lugares.
+
+### Orçamento de proibições
+
+43 → **44 regras** (patamar medido que funciona: 43; quebra em 51-52). O bloco novo **liberou** orçamento: saiu com 19 regras a menos que o método. ⭐ Cardápio de formulação não é proibição — foi assim que a variedade subiu sem custar teto.
+
+### Custo — medido, e SUBIU
+
+Mesma leitura (founder), método × perguntas: **18.978 → 24.268 tokens** (+28%, ~R$ 0,32/relatório). Não é o texto, que está do mesmo tamanho: são **cinco tempos obrigatórios em dez perguntas**, contra um esqueleto fixo que o modelo só preenchia. ⚠️ Corrigi duas vezes neste dia uma afirmação minha de que teria **barateado** — era n=1.
+
+### Gates
+`smoke-render` OK · **29 de 29 relatórios já entregues renderizam inteiros, 0 fallback** (o gate que mais importava) · `pnpm lint` 0 erros / 25 warnings · `tsc` 30 erros, todos pré-existentes em `*.test.ts` e `tmp/`.
+
+### ⏭️ Em aberto
+
+- **A agulha dos 3 centros.** Medido nos 80 exames: **57% recebem o mesmo desenho** (mente tensa / coração livre / corpo tenso) e a **mente sai tensa em 94%**. Causa achada: o lado "livre" vem só de `sistemas_preservados`, e **66% dele aponta pro coração** (pulmões, coração, linfático são o que a íris mais mostra íntegro). Os atenuadores de constituição estão mal calibrados: pupila centrada dispara em 40%, **trama compacta em 1 de 80**. Simulei normalizar por centro — o desenho comum cai de 57% pra 10%, mas a agulha passa a medir "comparado aos outros" e o founder ficaria **"livre" numa mente que ele reconhece como o que mais pesa**. **Founder decidiu: deixa como está.** ⭐ O conserto barato, quando quiser: mexer nos LIMIARES dos bônus, não na fórmula.
+- O tempo 5 (a atenção) saiu em **7 das 10** perguntas — os outros quatro tempos em 10/10.
+
+---
+
 ## Como usar
 
 - **Ao tomar uma decisão:** registrar aqui na mesma sessão, com razão e status.

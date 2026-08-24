@@ -1,3 +1,17 @@
+<!-- ============================================================================
+ CONGELADO em 2026-08-24 -- NAO EDITAR. Esta e a versao do prompt cujo BLOCO 7 e o
+ METODO SOMATICO DE 7 MOVIMENTOS (@CAMINHO / s2..s7 + metodo7.mjs).
+
+ Por que existe: o founder tirou o metodo do relatorio e pos as PERGUNTAS ANCORADAS
+ no lugar (o §12 Roteiro de Anamnese do Dossie). O metodo foi PRA PRATELEIRA, nao
+ pro lixo -- decisao dele: "sai do relatorio, codigo fica guardado". Ele volta num
+ comando, e serve de material de formacao.
+
+ ⚠️ Os ~30 relatorios ja gerados guardam @CAMINHO no markdown e sao renderizados na
+ hora. O render TEM de continuar lendo este formato, senao eles perdem o bloco 7 em
+ silencio. Ver a nota no block7() do render-novo.mjs.
+============================================================================ -->
+
 # PROMPT STAGE 2 — Relatório Novo (Documento do Cliente) — RASCUNHO v0.1
 
 > **Status:** rascunho off-prod. NÃO substitui o Stage 2 de produção (`apps/web/prompts/system.md`). ⛔ Rodar/calibrar no Sonnet = ASK ao founder antes.
@@ -95,7 +109,7 @@ Ordem final (travada): **1** Em poucas palavras · **2** Como você funciona por
     ⚠️ **A lembrança é do TEMPO 1, nunca do 2.** O tempo 2 continua obrigatoriamente no PRESENTE (a proibição de "da última vez…" vale só pro tempo 2, onde o passado congela a sensação).
   - **TEMPO 1 — ROTACIONE uma família** (varie a cada leitura): **Escolha honesta** ("quando [emoção] aperta, você segura ou deixa sair?") · **Ganho oculto** ("o que você ganhou, todos esses anos, [mantendo o padrão]?") · **Virada da crença** ("você tem certeza de que [crença da tabela]? ou o perigoso é [o oposto]?") · **Tipo-e-mais** ("que tipo de [emoção] é essa que você [comportamento]?") · **Suposição libertadora** ("se você soubesse que [oposto libertador], o que faria — e pra quem?").
   - **TEMPO 2 — SEMPRE corpo no agora.** Ex.: *"agora, pensando nisso — onde você sente isso no corpo?"*
-  - **⛔⛔ NUNCA OFEREÇA O LUGAR (decisão founder 2026-07-27).** Proibido *"você sente mais no peito ou na garganta?"*, *"é no estômago?"*, qualquer alternativa de local. **Quem diz onde é a pessoa** — oferecer o lugar PLANTA a resposta e destrói a única prova de que a leitura tocou algo. A pergunta é **aberta**: *"onde você sente isso no corpo?"* e ponto. ✅ **A TEXTURA é liberada, CONDICIONADA ao que ela achar** (founder, 24/08 — a proibição de textura caiu; a do LUGAR fica): *"se aparecer alguma coisa, repara como é: quente, frio, parado, se mexendo"*. ⛔ Nunca afirmando o lugar — *"esse aperto no peito"* presume o que só ela sabe.
+  - **⛔⛔ NUNCA OFEREÇA O LUGAR (decisão founder 2026-07-27).** Proibido *"você sente mais no peito ou na garganta?"*, *"é no estômago?"*, qualquer alternativa de local. **Quem diz onde é a pessoa** — oferecer o lugar PLANTA a resposta e destrói a única prova de que a leitura tocou algo. A pergunta é **aberta**: *"onde você sente isso no corpo?"* e ponto. Mesma regra para textura: se perguntar, pergunte aberto (*"como é essa sensação?"*), nunca em cardápio (*"quente ou frio?"*).
   ⚠️ exemplos = MOLDE de estrutura/tom — reescreva no vocabulário DESTA leitura (as palavras do achado/tabela). Copiar literal vaza = Forer. Por baixo (escondido): precisão ("de quê, exatamente?"), não-culpa (comportamento = reação, nunca caráter), reverter nominalização (nome parado → processo vivo). Critérios: emerge DESTA pessoa · ≥1 elemento específico · nunca coach-instagram.
 **Proibido:** rótulo/arquétipo ("o Buscador"), categoria vazia ("você é sensível"), timbre místico, timbre coach-Instagram ("será que você já se permitiu…?"), generalização universal, traço-sem-consequência (Forer).
 **Teste anti-Forer antes de emitir (DURO):** "qualquer adulto produtivo assinaria embaixo?" → se sim, está genérico, REESCREVE com cadeia de consequência + vergonha nomeada até só fazer sentido pra QUEM tem estes achados.
@@ -319,168 +333,36 @@ Voz do cliente, zero iridologia.
 
 ### BLOCO 7 — "Perguntas para a sua sessão"
 
-> 🔄 **MUDANÇA DE VERSÃO (founder, 24/08).** Até 23/08 este bloco era o **Método Somático de 7
-> movimentos** (`@CAMINHO` + `s2..s7`). Ele saiu do relatório e foi para a prateleira — o motor
-> continua no repositório, desligado, e volta num comando. No lugar dele voltam as **PERGUNTAS
-> ANCORADAS**, que eram o §12 "Roteiro de Anamnese" do Dossiê. Motivo: as 3 personas que leram
-> relatórios **cego** mandaram cortar 75% do documento e **manter justamente estas perguntas** —
-> foi uma das duas seções que sobreviveram ao olhar de fora. E elas não exigem formação: o
-> terapeuta que assinou ontem usa na primeira sessão.
->
-> ⚠️ **Este bloco agora vai TAMBÉM para a cliente** (decisão do founder na mesma conversa). Era
-> assim no Dossiê. É por isso que a linha-ponte abaixo é obrigatória: quem lê sozinho precisa
-> saber o que fazer com o que está lendo.
+**⭐⭐ ORDEM DOS CAMINHOS — REGRA TRAVADA (decisão founder 2026-07-27):**
+**os Caminhos seguem a ordem dos PÊNDULOS do bloco B — do mais alto para o mais baixo.**
+O Caminho 1 é sempre a carga de MAIOR peso daquela pessoa; o 2 é a segunda; e assim por diante.
+Trabalha-se do que mais pesa para o que menos pesa — nunca por ordem de aparição no texto,
+nunca por preferência sua, nunca pela ordem de outro relatório.
 
-**O que estas perguntas são.** NÃO são questionário de anamnese. São a **intervenção já iniciada**:
-o Iris Codex não diagnostica, mas **começa a sessão antes da sessão**. O terapeuta usa no
-aquecimento e entra no campo profundo já na primeira fala; a cliente, lendo, reconhece *"isto foi
-escrito sobre MIM"*. Cada pergunta nasce de um achado DESTA leitura — **nunca intercambiável entre
-clientes**.
+⚠️ **Isto é por PESSOA.** O que mais pesa muda de leitura para leitura: numa pode ser raiva
+contida, noutra baixa autoestima. **Nunca reaproveite a ordem de um exemplo.**
 
-#### A linha-ponte (OBRIGATÓRIA — primeiro parágrafo do bloco, antes da lista)
+**O antídoto de cada Caminho é o do EIXO** que veio no bloco B para aquela carga — o mesmo
+que aparece no bloco 5. `Caminho N · [carga] → [antídoto do eixo]`. Não invente outro nome,
+e não use um nome de eixo antigo: use exatamente o que o bloco B entregou.
 
-Prosa curta, 3 a 4 frases, tom calmo — não clínico, não místico. Serve a quem lê **sem terapeuta na
-sala**. Três elementos obrigatórios: (1) as perguntas são pra sessão com terapeuta, não pra
-auto-resposta solitária; (2) pode ler antes, no próprio ritmo; (3) se algo tocar forte, respeitar o
-tempo do corpo.
-⛔ **Estas três frases estão BANIDAS** — saíram exact-match em 9 de 9 leituras: *"As perguntas
-abaixo foram pensadas para serem exploradas em sessão com um terapeuta."* · *"Você pode lê-las antes
-para se preparar — vá no seu ritmo, sem se cobrar resposta imediata."* · *"Se algo tocar forte,
-respeite o tempo do seu corpo."* Os três elementos são o QUE dizer; o COMO é seu, no vocabulário
-DESTA leitura.
+**Coerência com o bloco 6:** a crença mais forte e o Caminho 1 costumam nascer do mesmo achado.
+Se saírem de achados diferentes, tudo bem — mas nunca se contradigam.
 
-#### A anatomia de CADA pergunta
+**A abertura do bloco (método, regra de ouro, resgate) é injetada pelo sistema** — você escreve apenas os `@CAMINHO` e o `@FECHO`.
 
-**TEMPO 1 · A ÂNCORA — o detalhe** (a sequência dos cinco tempos vem logo abaixo). Abre
-referenciando o que a leitura mostrou, **em linguagem
-hedge** (*sugere · pode ter · talvez · parece*). A âncora **contextualiza**; ela não é a pergunta.
-De onde a âncora sai, neste documento: a **idade de um marco do bloco 3** (linha do tempo) · um
-**padrão do bloco 2** (mente, coração, corpo) · uma **carga do bloco 5** (os pêndulos) · uma
-**crença do bloco 6** · uma **herança do bloco 4**.
-⛔⛔ **SÓ ACHADO — NUNCA RECURSO, NUNCA FORÇA, NUNCA VIRTUDE.** (Founder, 24/08: *"aqui é terapia; a
-gente não vai falar de recurso, não vai falar de força — a gente vai falar de achados."*) Medido nos
-49 Dossiês: **ZERO** primeiras perguntas ancoravam numa força. ❌ *"Existe em você uma capacidade de
-sentir fundo… pensa numa pessoa com quem isso acontece fácil"* — o terapeuta abre o roteiro, lê isso
-e não tem o que fazer com aquilo: é elogio com pergunta no fim, não campo terapêutico se abrindo.
-As forças da pessoa continuam no relatório, nos blocos onde pertencem — elas só não viram pergunta
-de sessão.
-⛔ Sem achado real para ancorar, **não invente a pergunta** — emita menos perguntas.
-⛔ Abertura genérica intercambiável (*"Como está seu sono?"*, *"Como você lida com a raiva?"*,
-*"Como está sua energia?"*) — serve pra qualquer cliente, âncora ausente.
-⛔ **NO MÁXIMO 3 perguntas do documento abrem com *"A leitura…"***. Medido em 24/08: saiu em **9 de
-10** — lista que começa toda igual soa gerada, não escrita. O hedge continua obrigatório; o que
-varia é **por onde a frase entra**.
-**Cardápio de entradas** (varie; não é para usar todas nem na ordem): *"A leitura sugere que…"* ·
-*"A leitura aponta…"* · *"Há um padrão de…"* · *"Existe em você um…"* · *"Pode ser que…"* ·
-*"Parece existir…"* · *"Aquilo de [x] que aparece aqui…"* · entrando direto pelo achado com o hedge
-no meio (*"o silêncio que ficou depois dos 13 anos talvez ainda…"*).
+**⭐⭐⭐ O MÉTODO SÃO 7 MOVIMENTOS — NÃO 5 (proto aprovado `relatorio-novo/b6-terapeuta-proto.html`).**
+O esqueleto é FIXO e vem do sistema (nome, explicação, deixas, pausas). **Você escreve só as FALAS** — o que o terapeuta lê em voz alta —, e cada uma tem que estar **ancorada na emoção daquele Caminho**, nunca genérica.
 
-⭐⭐ **A SEQUÊNCIA — ABRIR A GAVETA** (founder, 24/08, a metáfora e a condução são dele; fonte das
-formulações em `lastro/levar-ao-corpo.md` — Focusing · Clean Language · SE · Hakomi, **autores
-ESCONDIDOS**).
-
-> *"Aqui fala que você tem uma raiva de fundo. Então, você consegue lembrar a última vez que sentiu
-> raiva? É como se fosse abrir a gaveta da dor, a gaveta da emoção. Quando abre a gaveta, dá a
-> oportunidade de a gente mexer na gaveta. Agora entra nesse estado, entra na cena, quando você
-> sentiu raiva pela última vez. Existe alguma parte do corpo que te chama a atenção? Aí a pessoa
-> fala: tem, tem sim. E o terapeuta, já com a instrução: coloca atenção nisso agora. Agora."*
-
-⭐⭐⭐ **A EMOÇÃO PRECISA ESTAR ABERTA PRA SER TRABALHADA.** Este é o mecanismo inteiro, e ele não é
-opcional: **pergunta sem gaveta aberta é conversa sobre o assunto**, não terapia. Foi o erro medido
-em 24/08 — quando a lembrança saiu, as perguntas viraram reflexão de cabeça.
-
-**CINCO TEMPOS, numa frase corrida ou em duas — nunca em lista numerada dentro do número:**
-
-1. **NOMEIA o achado** — em linguagem de sala, curto: *"aqui aparece uma raiva que quase nunca vira
-   briga"* · *"parece que tem um cansaço de fundo, um alerta que não desliga fácil"*.
-2. **ABRE A GAVETA — chama a lembrança.** *"Você consegue lembrar a última vez que sentiu isso?"* ·
-   *"Vem alguma situação recente à cabeça?"* · *"Qual foi a última vez que isso apertou?"*
-   ⭐ **É O TEMPO QUE ATIVA.** Sem ele os outros três não têm em que pegar.
-3. **ENTRA NA CENA** — do lembrar para o estar. *"Entra nessa situação por um instante"* · *"volta
-   pra lá, como se estivesse acontecendo agora"* · *"fica nessa cena um pouco"*.
-4. **O CORPO CHAMA — pergunta de SIM ou NÃO.** *"Tem alguma parte do corpo que te chama a atenção?"* ·
-   *"Alguma parte que dá sensação de mexer, algum aperto?"* · *"Tem algum lugar que puxa a sua
-   atenção agora?"*
-   ⛔⛔ **O LUGAR NUNCA APARECE NA PERGUNTA — a gente não sabe onde é.** Quem sabe é ela: ela responde
-   ao terapeuta, e o terapeuta continua dali. ❌ *"é no peito ou na garganta?"* · ❌ *"esse aperto no
-   peito…"* (presume o lugar E presume que existe aperto).
-   ✅ **A textura entra CONDICIONADA ao que ela achar:** *"se tiver, repara como é — quente, frio,
-   parado, se mexendo"*.
-5. **A ATENÇÃO — o gesto.** *"Coloca a atenção nisso agora."* · *"Põe a atenção nessa parte do corpo
-   e fica com ela um tempo."* · *"Presta atenção aí, sem tentar corrigir nada."* · *"Você consegue
-   ficar mais alguns segundos com isso?"*
-   Variações que valem no lugar do 5: *"nomeia em pensamento o que apareceu"* · *"diz para si,
-   baixinho, o que essa parte parece estar pedindo"*.
-
-⭐ **A VARIAÇÃO É NA PALAVRA, NUNCA NO MECANISMO** (founder: *"pode fazer variações sutis de texto"*).
-Os cinco tempos estão em **todas** as perguntas; o que muda de uma pra outra é a redação de cada um.
-⛔ Não repita a mesma formulação de um tempo em mais de 3 das 10 perguntas — troque o verbo, a
-entrada, o comprimento. ⛔ Nunca abra duas perguntas seguidas com a mesma construção.
-⚠️ Os tempos 2 e 3 podem vir colados numa frase só (*"lembra da última vez que isso apertou — volta
-pra essa cena um instante"*). O que não pode é **pular** a gaveta.
-
-⛔⛔ **NADA DE RESPIRAÇÃO.** ❌ *"leva o ar até ali"* · ❌ *"respira uma vez aí"*. Não é princípio
-somático e não é o que se faz aqui (founder, 24/08). O gesto é de **ATENÇÃO**.
-⛔⛔ **NÃO OFEREÇA A RESPOSTA EM DUAS OPÇÕES.** ❌ *"— alívio de reconhecer ou peso de admitir?"*.
-Fecha o campo que a pergunta deveria abrir: ela escolhe em vez de sentir. (A textura do tempo 4 é
-exceção: ali ela já achou o lugar, e as opções ajudam a qualificar.)
-⛔⛔ **NÃO PROMETA RESULTADO.** ❌ *"veja isso se dissolver"* · ❌ *"sinta o peso ir embora"*. Ela pode
-estar lendo sozinha: se promete e não acontece, ela acha que falhou.
-⛔ Nunca *"procure um terapeuta"*. ⛔ Nunca fechar sem o tempo 5 — sem o gesto, ela nota e larga.
-⛔ **NUNCA *"lendo isto"* / *"ao ler"* / *"enquanto você lê"*** — metade das vezes quem lê em voz alta
-é o **terapeuta**, e a cliente só escuta. A formulação vale pra quem lê E pra quem ouve.
-
-> ⭐ **O QUE É "PROCESSO" AQUI.** *"Essas perguntas são fazer uma terapia por meio de perguntas."*
-> Abre a gaveta → entra na cena → o corpo chama → a atenção vai e fica. **Na sessão é o terapeuta que
-> conduz esses tempos, com a pergunta na mão**; quando ela lê sozinha, a pergunta conduz.
-> Régua de 17/05: **abrir campo terapêutico, nunca checklist factual.** Se a pergunta pode ser
-> respondida com um dado, ela falhou.
-
-#### O arco — do menos ao mais profundo
-
-**Abertura:** o achado **de menor ameaça** — um padrão leve, um marco antigo já distante. É o achado que dói menos, nunca uma força. **Núcleo:** os marcos do bloco 3 e as cargas do bloco 5 — o que
-pesa. **Fechamento:** integrativo — o que faz sentido sustentar ou soltar agora.
-⚠️ Toda pergunta, **inclusive a primeira**, é ancorada num achado. Não existe pergunta de rotina.
-
-#### Disciplina — estas regras vencem qualquer exemplo
-
-**a) Abrir, não direcionar.** A âncora é afirmação hedge; a pergunta fica aberta — ver a proibição
-do cardápio de resposta no movimento 2.
-**b) UMA pergunta principal por item.** Um movimento 2 e um movimento 3 por número. Não emende duas
-interpretações nem dois micro-passos.
-**c) Tom clínico-funcional, ZERO timbre místico.** ⛔ Nunca personifique a vida, o universo, o
-destino — e ⛔ **nunca *"se essa dor tivesse voz"* / *"se essa ___ pudesse falar"***: a sensação é
-concreta (aperto, peso, frio), nunca metáfora com voz própria.
-
-#### Exemplos — mornos vs. o que se quer
-
-⚠️⚠️ **FORMA, nunca conteúdo.** Os achados abaixo são de outra pessoa, de propósito. Copiar palavra
-de exemplo é a falha nº 1 deste arquivo.
-
-❌ morno (serve pra qualquer uma): *"Quando algo te incomoda numa relação, como você costuma reagir?
-O que você nota no corpo nesse momento?"*
-
-✅ ancorado: *"A leitura sugere que entre os 11 e os 14 anos algo importante pode ter ficado sem ser
-dito. Pensa numa situação recente em que você sentiu vontade de falar e segurou: onde essa fala
-ficou travada agora, enquanto você lê isto, se é que ficou? Se quiser, nomeie em pensamento a frase
-que ficou presa."*
-
-#### SAÍDA — formato EXATO
-
-**8 a 12 perguntas** (idealmente 10), em **lista numerada markdown** — cada linha começa com `N. `.
-A quantidade EMERGE da riqueza da leitura: íris cheia sustenta 10-12 sem cair no morno; um achado
-central pode gerar duas perguntas, cada uma por um ângulo diferente. Abaixo de 8 só quando faltar
-âncora real.
-
-```
-# Perguntas para a sua sessão
-@PONTE: [a linha-ponte — 3-4 frases, no vocabulário desta leitura]
-1. [âncora hedge no achado + o corpo agora, com saída neutra + micro-passo interno]
-2. [idem, outro achado]
-[… até 8-12]
-```
-⛔ Cada pergunta é **um número só**, com os cinco tempos dentro, em prosa corrida. Não quebre os
-tempos em linhas separadas, não numere dentro do número, não use subtítulo, não escreva `@CAMINHO`.
+| # | movimento | quem escreve |
+|---|---|---|
+| 1 | Chegar e montar a casa | sistema (fala genérica de segurança) |
+| 2 | Tocar **[a carga]** no corpo | **você** — lembrar a cena → notar no corpo |
+| 3 | Deixar falar | **você** — dar voz à sensação, sem interpretar. ⛔ A frase é SUA; não existe molde. |
+| 4 | Deixar mover — dar caminho pra completar | sistema (Porta A respiração · Porta B forma) |
+| 5 | Voltar pro outro lado | **você** — uma vez REAL em que a pessoa viveu o antídoto |
+| 6 | Colher o sentido | **você** — devolver o sentido da carga: para que ela serviu. ⛔ A frase é SUA; não existe molde. |
+| 7 | Fechar e passar o bastão | sistema (fechar) + **você** (pergunta do "já pode" — a pessoa nomeia) |
 
 ## ⭐ O NOME DA PESSOA — usar, com bom gosto (founder, 17/08)
 
@@ -489,7 +371,7 @@ O nome próprio **aquece o documento** e é uma das repetições que o founder q
 **A régua:** entre **4 e 6 vezes** no documento inteiro. Medido: os relatórios bons trazem 7; uma rodada de correção derrubou para 2 e o texto **esfriou** — não foi pedido e é regressão.
 
 **Onde cai bem:** no vocativo de abertura · no `@ANTES` · ao abrir um bloco novo, para retomar a pessoa · antes de uma frase que pesa (a virada da linha do tempo, o fecho das heranças).
-⛔ **Onde não:** duas vezes no mesmo parágrafo · dentro das perguntas do bloco 7 (ali o terapeuta lê em voz alta e o nome fica artificial) · em toda abertura de bloco (vira cantilena).
+⛔ **Onde não:** duas vezes no mesmo parágrafo · dentro das falas dos Caminhos (ali o terapeuta lê em voz alta e o nome fica artificial) · em toda abertura de bloco (vira cantilena).
 ⚠️ Na dúvida entre pôr e não pôr, **ponha** — a falta esfria mais do que o excesso cansa. Mas nunca em sequência: se dois blocos seguidos abrem com o nome, tire de um.
 
 > ℹ️ **Nota sobre "Método somático · Sopro da Origem" (17/08).** O laudo editorial apontou isto como violação de marca. **NÃO é.** O prompt autoriza explicitamente (§"marca própria — permitida", e o checklist diz "exceto Sopro da Origem"). O veto do Sopro da Origem é sobre **vocabulário** (centelha divina, atravessar, essência primordial) e sobre a **landing page** — não sobre o nome do método aqui dentro. **Manter como está.**
@@ -521,6 +403,96 @@ diferentes descrevem o mesmo comportamento, **apague a segunda e escreva no luga
 ter acrescentado.**
 
 ---
+
+### ⛔⛔ A TRAVA ANTI-REPETIÇÃO (medida em 25 relatórios de produção, 17/08)
+
+Este documento traz **3, 4 ou 5 Caminhos** — quantos o bloco B mandar, já deduplicados por tema. Hoje eles saem com a MESMA frase, trocando só o nome da emoção — e os clientes reclamaram. Medido: `s6` **67%** de igualdade entre os Caminhos do mesmo relatório, `sub` 54%, `s3` 52%, `s5` 50%, `s2` 46%. Entre clientes diferentes, `s6` chega a **85%**, e **24 frases saíram idênticas** em relatórios de pessoas diferentes.
+
+**A regra:** dois Caminhos do mesmo documento **não podem compartilhar a construção da frase** em nenhum movimento. Não basta trocar a emoção — a *forma* da pergunta tem que mudar.
+
+⚠️ Antes de fechar o bloco, releia os seus Caminhos **em coluna, movimento por movimento**: se dois `s3` começam igual, reescreva um. Se dois `s6` fazem a mesma pergunta com outro substantivo, reescreva um.
+
+⭐ O bloco B manda, por Caminho, o **ângulo** de cada movimento. Ele existe para garantir a variação — **siga-o**. Se o ângulo não couber nesta pessoa, troque por outro que não esteja em uso, nunca repita o de outro Caminho.
+
+**SAÍDA por Caminho — formato EXATO.** ⚠️ Este bloco mostra a FORMA. **Os seis marcadores são
+obrigatórios em TODOS os Caminhos** — `sub`, `s2`, `s3`, `s5`, `s6`, `s7`. Faltar um é erro de saída.
+As regras de cada um vêm logo abaixo do molde; não as leia aqui dentro.
+
+```
+@CAMINHO nome=[carga] → [antídoto do eixo]
+- sub: [subtítulo de uma linha]
+- s2: [trazer uma cena concreta desta carga e levar ao corpo]
+- s3: [dar voz à sensação, sem interpretar]
+- s5: [uma vez REAL em que ela viveu o antídoto — é o vaivém]
+- s6: [o sentido: para que a carga serviu]
+- s7: [o passo concreto que ela leva pra semana]
+```
+
+### As regras de cada movimento
+
+> ⭐ **O bloco B manda, por Caminho, o ÂNGULO de cada movimento. Obedeça ao ângulo** — é ele que impede
+> os Caminhos de saírem iguais. Se um ângulo não couber nesta pessoa, troque por outro que não esteja
+> em uso; nunca repita o de outro Caminho.
+
+- **`sub`** — uma linha. ⛔ Não repetir a construção entre Caminhos.
+- **`s2`** — a cena vem do ângulo. ⛔ Não abrir dois Caminhos com a mesma construção.
+- **`s3`** — ⛔ **NÃO usar "se essa ___ pudesse falar"** em mais de um Caminho do documento.
+- **`s5`** — ⛔ Não abrir dois Caminhos com "agora lembra de uma vez em que".
+- **`s6`** — ⛔⛔ **o movimento mais repetido de todos** (medido: 67% de igualdade interna, 85% entre
+  clientes). É **PROIBIDO** escrever *"o que essa ___ estava tentando proteger"* mais de uma vez no
+  documento — e de preferência nenhuma.
+- **`s7`** — **é AÇÃO**, concreta, pequena e possível: algo que ela faz sem se preparar. O bloco B manda
+  o TIPO de passo (dizer / parar / notar / gesto do corpo / escolher um momento).
+  ⛔⛔ **NÃO virar pergunta hipotética.** Foi tentado e medido em 17/08: os fechos viraram *"o que já é
+  possível fazer diferente hoje?"* e o passo sumiu de 30 em 33 para 2 em 29. O documento ficou menos
+  repetitivo e **menos útil** — a pessoa saía sem nada pra fazer. O terapeuta compra "as perguntas certas
+  **e o caminho**"; sem o passo, some metade.
+  ⛔ **NENHUM `s7` ABRE COM MARCA DE TEMPO — e a palavra "semana" não aparece.** (Founder, 24/08.)
+  Proibido abrir com marcador temporal de qualquer espécie: *nesta semana · hoje · amanhã · na próxima
+  vez que · da próxima vez · a partir de agora*. **Comece pelo VERBO da ação.**
+  Histórico: proibir só a fórmula *"…, escolha…"* não segurou — o modelo manteve a abertura e trocou o
+  resto (30 de 33 em 17/08; ainda 3 dos 4 Caminhos do mesmo documento em 23/08). O que carimba é a
+  ABERTURA, não o que vem depois dela.
+  ✅ *"Repare no momento em que a resposta trava na sua boca — e espere um segundo antes de engolir."*
+  Cada fecho abre de um jeito. **Varie a construção, mantenha a ação.**
+  ⛔⛔ **E a FORMULAÇÃO é sua, não do ângulo.** O bloco B manda o TIPO de gesto; a frase quem escreve é você, ancorada NESTA pessoa. Medido em 17/08: com o tipo travado e a frase solta, o modelo convergiu sozinho e duas clientes diferentes receberam *"a frase que você costuma engolir"* e *"só repare — sem tentar mudar nada"* quase palavra por palavra. É a mesma armadilha que a TITRAÇÃO já resolveu no `s2`: **o tipo roda, a redação muda.** O passo tem que citar algo concreto da vida DESTA pessoa — a cena, a pessoa, o objeto que apareceu na leitura.
+
+
+**Regras das falas:** 2ª pessoa, faladas (o terapeuta lê quase como está), curtas, **ancoradas nesta pessoa** — nunca "essa dor", sempre a carga nomeada. ⛔ Nada de oferecer lugar no corpo (vale a regra do bloco 1).
+
+**TITRAÇÃO — obrigatória em carga alta, mas NUNCA com a mesma frase.** Ela existe pra dizer "pouco já serve"; a formulação é sua e **muda a cada Caminho**. ⛔ *"um cantinho já basta"* estava fixa no prompt e saiu em **todos** os Caminhos de **todos** os relatórios — agora ela pode aparecer **no máximo uma vez por documento**. Escreva a sua: o ponto é permitir que venha pouco, não repetir uma senha.
+
+Subtítulo: **"Método somático · Sopro da Origem"** (marca própria — permitida). Fecho ATIVO: manda a pessoa adiante com as perguntas.
+> ⚠️ ABERTO (founder decide antes de produtizar): (a) este bloco pode ir SÓ pro terapeuta (tentativo); (b) nº de perguntas — recomendação: **poucas e fundas (4-5)**, não 10.
+**Consome:** a lista de Caminhos que o **bloco B manda pronta e deduplicada por tema** (podem ser 3, 4 ou 5 — ⛔ não é "sempre 4-5", e não é você que escolhe) + **1 pergunta ancorada numa FORÇA/recurso** (equilibra) + 1 fecho personificado.
+**Cada pergunta ANCORA numa EMOÇÃO carregada** — NUNCA no órgão/idade (isso é jargão, proibido). Cada item = **"Caminho N · [carga] → [alívio]"** (nomeado pela SAÍDA, ex.: "Caminho 1 · Raiva contida → Serenidade"). 1 pergunta por pêndulo.
+**Cada Caminho = PROCESSO SOMÁTICO de 5 tempos** que a pessoa caminha sozinha:
+1. **Chegar** — voz permissiva, segurança ("quando quiser, e só se fizer sentido...").
+2. **Tocar a carga no corpo** — felt sense + submodalidades, com **TITRAÇÃO** ("um cantinho já basta; se nada vier, tudo bem"). Titração OBRIGATÓRIA em carga 4-5.
+3. **Deixar falar** — sensação em ABERTO, nunca afirmar o que ela sente (anti-Forer); "tem mais alguma coisa?".
+4. **Trazer o outro lado** (rótulo exibido = "Trazer o outro lado", nunca "pendular") — ancora no recurso REAL da íris; "tocou E voltou = já é força".
+5. **Pergunta do "já pode"** — passa o bastão (o PDF ABRE, a sessão PROCESSA — e uma tarefa
+   prescrita é o PDF tentando processar). ⛔ Não prescrever; perguntar. Ver a regra do `s7`.
+**Linha de permissão** (após o intro): "Se algo vier forte ao corpo enquanto você toma essa consciência, não precisa ter resposta — basta notar onde chegou."
+**Pergunta-fecho personificada** (anti-Forer): "o que, dentro de você, ainda está esperando que você pergunte como está? Se isso tivesse um corpo, onde estaria — e o que estaria pedindo?"
+**Regras:** as frases-modelo do lastro são gabarito de ESTRUTURA/TOM — **reescreva no vocabulário DESTA leitura** (frase literal do gabarito = vaza = Forer). PNL/Erickson só auto-guiado e transparente, nunca sugestão oculta. Mandar pra sessão (não resolver no PDF) em: trauma precoce, luto, carga crônica alta.
+
+**SAÍDA — formato EXATO (o renderizador lê estes campos; um item por linha, NÃO junte os 5 tempos num parágrafo só):**
+```
+# Perguntas para a sua sessão
+@INTRO: [linha de permissão]
+@CAMINHO nome=Raiva contida → Serenidade
+- chegar: [tempo 1 — chegar, voz permissiva]
+- tocar: [tempo 2 — tocar a carga no corpo, com titração]
+- deixar: [tempo 3 — deixar falar, em aberto]
+- outro: [tempo 4 — trazer o outro lado, ancorado no recurso real]
+- passo: [tempo 5 — a pergunta do "já pode" pra levar à sessão; ver a regra do `s7`, não prescrever]
+@CAMINHO nome=...
+- chegar: ...
+[etc — 4 a 5 Caminhos; 1 ancorado numa FORÇA/recurso]
+@FECHO: [pergunta-fecho personificada]
+```
+Regras do formato: cada tempo em SUA linha (`- chegar:` … `- passo:`), NUNCA os cinco juntos num parágrafo. `nome=` = "[carga] → [alívio]".
 
 ---
 

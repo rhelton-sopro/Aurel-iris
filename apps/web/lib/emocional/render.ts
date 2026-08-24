@@ -34,17 +34,24 @@ const renderHTML = _renderHTML as (
 ) => { html: string; AG: { mente: number; coracao: number; corpo: number } }
 
 /**
- * O que sai da VERSÃO DO CLIENTE (decisão founder, 2026-07-30).
+ * O que sai da VERSÃO DO CLIENTE **por padrão**.
  *
- * Todos os blocos vão pro cliente MENOS **"Perguntas para a sua sessão"** — o guia
- * de condução do terapeuta, que só acompanha se ele marcar a caixinha na hora de
- * baixar. Entregar o roteiro da devolutiva antes da devolutiva queima a sessão.
+ * 2026-07-30 → 2026-08-24: era `['^perguntas para a sua sess']`. Naquela data o bloco 7
+ * era o **Método Somático**, um roteiro de CONDUÇÃO — entregá-lo antes da devolutiva
+ * queimava a sessão, e por isso ele saía por padrão.
  *
- * ⚠️ É um padrão de TÍTULO, não um número de bloco. O documento canônico tem 7 blocos,
- * mas um filtro posicional falharia exatamente no documento defeituoso — entregando o
- * guia de sessão ao cliente. Ver a nota no render-novo.mjs.
+ * O bloco 7 mudou (founder, 24/08): agora são as **perguntas ancoradas**, que nasceram no
+ * Dossiê escritas para quem lê **sem terapeuta na sala** — a linha-ponte do prompt existe
+ * exatamente para isso. Não há mais roteiro de condução a proteger, e a decisão do founder
+ * foi explícita: *"o que eu quero que o terapeuta e o cliente vejam? As perguntas."*
+ *
+ * Vazio ≠ sem filtro: um array vazio ainda sinaliza ao motor que este é o documento do
+ * CLIENTE, e é isso que segura a fitoterapia fora dele (ver `versaoCliente` no render).
+ *
+ * ⚠️ Continua sendo padrão de TÍTULO, nunca número de bloco — a caixinha por bloco segue
+ * valendo, então o terapeuta ainda pode tirar as perguntas de uma entrega específica.
  */
-export const OMITIR_NA_VERSAO_CLIENTE = ['^perguntas para a sua sess']
+export const OMITIR_NA_VERSAO_CLIENTE: string[] = []
 
 /**
  * Padrão de título de CADA bloco, na ordem de exibição (0..8) — vindo do motor.
