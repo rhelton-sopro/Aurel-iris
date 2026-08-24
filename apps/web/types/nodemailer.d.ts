@@ -21,12 +21,21 @@ declare module 'nodemailer' {
   export interface Transporter {
     sendMail(mail: SendMailOptions): Promise<SentMessageInfo>
     verify(): Promise<true>
+    /** Fecha o pool. O Mailer repassa close/isIdle/verify para o transporte. */
+    close(): void
   }
   export interface TransportOptions {
     host?: string
     port?: number
     secure?: boolean
     auth?: { user: string; pass: string }
+    // Pool — usado só pelo envio em massa (lib/email/smtp-client.ts). Abrir uma
+    // conexão por destinatário derruba o disparo nos limites do Hostinger.
+    pool?: boolean
+    maxConnections?: number
+    maxMessages?: number
+    rateDelta?: number
+    rateLimit?: number
   }
   export function createTransport(opts: TransportOptions): Transporter
   const _default: { createTransport: typeof createTransport }

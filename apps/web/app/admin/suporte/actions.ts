@@ -10,7 +10,12 @@ import {
   setSeenMany,
   deleteMany,
 } from '@/lib/email/imap-client'
-import { sendSupportEmail } from '@/lib/email/smtp-client'
+import {
+  sendSupportEmail,
+  sendBulkSupportEmail,
+  type BulkRecipient,
+} from '@/lib/email/smtp-client'
+import { createServiceClient } from '@/lib/supabase/service'
 import type { SupportEmailBody } from '@/lib/email/types'
 
 async function assertFounder(): Promise<boolean> {
@@ -110,5 +115,117 @@ export async function sendEmailAction(
     html: input.html,
     inReplyTo: input.inReplyTo,
     references: input.references,
+  })
+}
+
+// ============================================================================
+// ENVIO EM MASSA PARA TERAPEUTAS (24/08)
+//
+// ⭐ DECISÃO DO FOUNDER: a caixinha lista os TERAPEUTAS (os clientes dele), e
+// NÃO os clientes dos terapeutas. Os clientes entregaram os dados ao terapeuta
+// deles, não ao Iris Codex — escrever direto para eles é risco de LGPD e
+// atropela a relação do terapeuta com a própria clientela.
+// ⛔ Não estender esta lista para a tabela `clients` sem decisão nova dele.
+// ============================================================================
+
+export interface TherapistRecipient {
+  id: string
+  name: string
+  email: string
+}
+
+/** Lista os terapeutas que podem receber um disparo. Founder-only. */
+export async function listTherapistRecipients(): Promise<
+  { ok: true; therapists: TherapistRecipient[] } | { ok: false; error: string }
+> {
+  if (!(await assertFounder())) return { ok: false, error: 'Não autorizado.' }
+  try {
+    const service = createServiceClient()
+    const [profilesRes, usersRes] = await Promise.all([
+      service.from('profiles').select('id, full_name'),
+      service.auth.admin.listUsers({ perPage: 1000 }),
+    ])
+    if (profilesRes.error) throw profilesRes.error
+    const emailById = new Map(
+      (usersRes.data?.users ?? []).map((u) => [u.id, u.email ?? '']),
+    )
+    const therapists = (profilesRes.data ?? [])
+      .map((p) => ({
+        id: p.id as string,
+        name: ((p.full_name as string | null) ?? '').trim(),
+        email: emailById.get(p.id as string) ?? '',
+      }))
+      // sem e-mail não há como enviar: fica fora da lista em vez de aparecer
+      // selecionável e falhar calado na hora do disparo.
+      .filter((t) => t.email)
+      .sort((a, b) => (a.name || a.email).localeCompare(b.name || b.email, 'pt-BR'))
+    return { ok: true, therapists }
+  } catch (err) {
+    console.error('[admin/suporte] listar terapeutas:', err instanceof Error ? err.message : err)
+    return { ok: false, error: 'Falha ao carregar a lista de terapeutas.' }
+  }
+}
+
+export interface SendBulkActionInput {
+  /** IDs dos terapeutas escolhidos na caixinha. */
+  therapistIds: string[]
+  /** Endereço avulso digitado no campo "Para" (opcional). */
+  extraTo?: string
+  subject: string
+  text: string
+  html?: string
+}
+
+export interface SendBulkActionResult {
+  ok: boolean
+  sent: number
+  failed: { email: string; error: string }[]
+  error?: string
+}
+
+/**
+ * Dispara UM e-mail separado por pessoa. Founder-only.
+ *
+ * ⚠️ O e-mail de cada terapeuta é resolvido AQUI, a partir do id — a tela nunca
+ * manda endereço. Assim o nome usado no {nome} é sempre o do cadastro, e a
+ * lista não pode ser trocada por outra no caminho.
+ */
+export async function sendBulkEmailAction(
+  input: SendBulkActionInput,
+): Promise<SendBulkActionResult> {
+  if (!(await assertFounder())) return { ok: false, sent: 0, failed: [], error: 'Não autorizado.' }
+
+  const subject = input.subject?.trim()
+  if (!subject || !input.text?.trim()) {
+    return { ok: false, sent: 0, failed: [], error: 'Preencha assunto e mensagem.' }
+  }
+
+  const listed = await listTherapistRecipients()
+  if (!listed.ok) return { ok: false, sent: 0, failed: [], error: listed.error }
+
+  const escolhidos = new Set(input.therapistIds ?? [])
+  const recipients: BulkRecipient[] = listed.therapists
+    .filter((t) => escolhidos.has(t.id))
+    .map((t) => ({ email: t.email, name: t.name }))
+
+  const extra = input.extraTo?.trim()
+  if (extra) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(extra)) {
+      return { ok: false, sent: 0, failed: [], error: 'Destinatário avulso inválido.' }
+    }
+    if (!recipients.some((r) => r.email.toLowerCase() === extra.toLowerCase())) {
+      recipients.push({ email: extra, name: null })
+    }
+  }
+
+  if (!recipients.length) {
+    return { ok: false, sent: 0, failed: [], error: 'Escolha pelo menos um destinatário.' }
+  }
+
+  return sendBulkSupportEmail({
+    recipients,
+    subject,
+    text: input.text,
+    html: input.html,
   })
 }

@@ -84,12 +84,20 @@ export function SupportInbox({ mailboxes, result, currentMailbox, search }: Prop
   const [compose, setCompose] = useState<ComposeInitial | null>(null)
   const [selected, setSelected] = useState<Set<number>>(new Set())
 
-  // Auto-atualização: re-busca a lista a cada 60s sem F5 (o estado do client —
-  // email aberto, seleção, composição — é preservado pelo React).
+  // Auto-atualização: re-busca a lista a cada 60s sem F5.
+  //
+  // ⛔ PAUSA ENQUANTO SE ESCREVE (24/08). O comentário anterior dizia que o
+  // estado do cliente "é preservado pelo React" — e foi essa suposição que
+  // escondeu o bug do rascunho que sumia. O rascunho NÃO é estado do React:
+  // mora no DOM do contenteditable. A causa raiz já está corrigida no
+  // ComposeForm, mas mandar a inbox inteira re-renderizar por baixo de um
+  // formulário aberto não traz nenhum ganho e só cria risco. Quem está
+  // escrevendo não está lendo a lista; ela volta a atualizar ao fechar.
   useEffect(() => {
+    if (compose) return
     const id = setInterval(() => router.refresh(), 60000)
     return () => clearInterval(id)
-  }, [router])
+  }, [router, compose])
 
   function toggleSelect(uid: number) {
     setSelected((prev) => {
