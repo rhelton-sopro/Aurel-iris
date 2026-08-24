@@ -2,9 +2,8 @@ import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { isFounderEmail } from '@/lib/auth/founder'
-import { DeleteTherapistDialog } from './DeleteTherapistDialog'
 import { InviteTherapistForm } from './InviteTherapistForm'
-import { GrantCreditsDialog } from './GrantCreditsDialog'
+import { TherapistTable } from './TherapistTable'
 
 // Cache off — listagem reflete deletes imediatamente após revalidatePath.
 export const dynamic = 'force-dynamic'
@@ -39,7 +38,11 @@ export default async function TerapeutasAdminPage() {
   ] = await Promise.all([
     service
       .from('profiles')
-      .select('id, full_name, phone, specialties, created_at'),
+      .select(
+        // 24/08: telefone e specialties já vinham aqui e não apareciam em tela
+        // nenhuma. O resto entrou junto para a ficha por terapeuta.
+        'id, full_name, phone, specialties, created_at, city, state, cpf, cep, address, address_number, address_complement, district, subscription_status, trial_ends_at, asaas_customer_id, tos_accepted_at, tos_version',
+      ),
     service.auth.admin.listUsers({ perPage: 200 }),
     service.from('clients').select('therapist_id'),
     service.from('readings').select('therapist_id, created_at'),
@@ -118,6 +121,22 @@ export default async function TerapeutasAdminPage() {
         phone: (p.phone as string | null) ?? '',
         specialties: ((p.specialties as string[] | null) ?? []) as string[],
         created_at: p.created_at as string | null,
+        city: (p.city as string | null) ?? '',
+        state: (p.state as string | null) ?? '',
+        cpf: (p.cpf as string | null) ?? '',
+        cep: (p.cep as string | null) ?? '',
+        address: (p.address as string | null) ?? '',
+        address_number: (p.address_number as string | null) ?? '',
+        address_complement: (p.address_complement as string | null) ?? '',
+        district: (p.district as string | null) ?? '',
+        subscription_status: (p.subscription_status as string | null) ?? '—',
+        trial_ends_at: (p.trial_ends_at as string | null) ?? null,
+        // Quem tem cadastro no Asaas já passou por cobrança de verdade — é o
+        // sinal mais honesto de "pagante" que existe hoje, porque o
+        // subscription_status está em `trial` para todos os 39.
+        is_paying: !!(p.asaas_customer_id as string | null),
+        tos_accepted_at: (p.tos_accepted_at as string | null) ?? null,
+        tos_version: (p.tos_version as string | null) ?? '',
         is_founder: isFounderEmail(u?.email ?? null),
         clients_count: clientCounts.get(p.id) ?? 0,
         readings_count: readingCounts.get(p.id) ?? 0,
@@ -149,78 +168,7 @@ export default async function TerapeutasAdminPage() {
           Nenhum terapeuta cadastrado ainda.
         </p>
       ) : (
-        <div className="rounded-md border overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="border-b bg-muted/30 text-left text-muted-foreground">
-              <tr>
-                <th className="px-3 py-2 font-medium">Nome</th>
-                <th className="px-3 py-2 font-medium">Email</th>
-                <th className="px-3 py-2 font-medium">Cadastro</th>
-                <th className="px-3 py-2 font-medium text-right">Clientes</th>
-                <th className="px-3 py-2 font-medium text-right">Leituras</th>
-                <th className="px-3 py-2 font-medium text-right">
-                  Comprados<span className="block text-[10px] font-normal normal-case text-muted-foreground/70">no mês</span>
-                </th>
-                <th className="px-3 py-2 font-medium text-right">
-                  Usados<span className="block text-[10px] font-normal normal-case text-muted-foreground/70">no mês</span>
-                </th>
-                <th className="px-3 py-2 font-medium text-right">Saldo</th>
-                <th className="px-3 py-2 font-medium">Última leitura</th>
-                <th className="px-3 py-2"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => (
-                <tr key={r.id} className="border-t">
-                  <td className="px-3 py-2">{r.full_name}</td>
-                  <td className="px-3 py-2 font-mono text-xs">{r.email}</td>
-                  <td className="px-3 py-2 text-muted-foreground text-xs">
-                    {r.created_at
-                      ? new Date(r.created_at).toLocaleDateString('pt-BR')
-                      : '—'}
-                  </td>
-                  <td className="px-3 py-2 text-right tabular-nums">
-                    {r.clients_count}
-                  </td>
-                  <td className="px-3 py-2 text-right tabular-nums">
-                    {r.readings_count}
-                  </td>
-                  <td className="px-3 py-2 text-right tabular-nums">
-                    {r.bought_month}
-                  </td>
-                  <td className="px-3 py-2 text-right tabular-nums">
-                    {r.used_month}
-                  </td>
-                  <td className="px-3 py-2 text-right tabular-nums font-medium">
-                    {r.balance}
-                  </td>
-                  <td className="px-3 py-2 text-xs text-muted-foreground">
-                    {r.last_reading_at
-                      ? new Date(r.last_reading_at).toLocaleDateString('pt-BR')
-                      : '—'}
-                  </td>
-                  <td className="px-3 py-2 text-right">
-                    <div className="flex items-center justify-end gap-1">
-                      <GrantCreditsDialog
-                        therapistId={r.id}
-                        email={r.email}
-                        fullName={r.full_name}
-                        packages={packages}
-                      />
-                      <DeleteTherapistDialog
-                        therapistId={r.id}
-                        email={r.email}
-                        fullName={r.full_name}
-                        clientsCount={r.clients_count}
-                        readingsCount={r.readings_count}
-                      />
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <TherapistTable rows={rows} packages={packages} />
       )}
     </div>
   )
