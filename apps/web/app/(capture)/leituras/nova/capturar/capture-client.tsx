@@ -1,11 +1,19 @@
 'use client'
 
 import * as React from 'react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { X } from 'lucide-react'
 import { toast } from 'sonner'
 import { finalizeReadingAction } from '@/app/actions/readings'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
 import { AngleInterstitial } from '@/components/capture/AngleInterstitial'
 import { PhotoExamples, hasDismissedExamples } from '@/components/capture/PhotoExamples'
 import { CapturePreview } from '@/components/capture/CapturePreview'
@@ -150,6 +158,9 @@ export function CaptureClient({
   // ao servidor — preenchido no finalize quando count<6. Dispara a tela
   // 'incomplete' que obriga o cliente a refazer SÓ essas antes de concluir.
   const [missingSlots, setMissingSlots] = React.useState<number[]>([])
+  // Confirmação de saída (2026-08-25). O "X" fica no topo, na altura do polegar,
+  // durante as 6 fotos — um toque sem querer abandonava a captura sem uma palavra.
+  const [sairAberto, setSairAberto] = React.useState(false)
 
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   const slotAbortRefs = React.useRef<Map<number, AbortController>>(new Map())
@@ -475,20 +486,28 @@ export function CaptureClient({
           className="absolute top-0 left-0 right-0 z-[60] pt-[env(safe-area-inset-top)] bg-amber-500/95 backdrop-blur-sm border-b border-amber-700/30"
         >
           <p className="px-4 py-1.5 text-xs font-medium text-amber-950 text-center">
-            Luz de frente ou lateral — nunca atrás do cliente
+            {isInviteMode
+              ? 'Luz de frente ou lateral — nunca atrás de você'
+              : 'Luz de frente ou lateral — nunca atrás do cliente'}
           </p>
         </div>
       )}
 
       <header className="absolute top-[calc(env(safe-area-inset-top)+30px)] left-0 right-0 z-[55] flex items-center justify-between px-4 py-2">
         <span className="text-sm text-foreground/80 max-w-[70%] leading-tight">{clientName}</span>
-        <Link
-          href="/leituras"
-          aria-label="Cancelar leitura"
+        {/* ⛔ Este botão NÃO pode levar a /leituras no fluxo do convite: quem está
+            aqui não tem conta, e /leituras é área logada — o cliente caía numa
+            tela de login pedindo e-mail, no meio das 6 fotos, sem caminho de
+            volta. No convite ele volta pra própria tela de boas-vindas do link,
+            de onde retoma as fotos que faltam. */}
+        <button
+          type="button"
+          onClick={() => setSairAberto(true)}
+          aria-label="Sair da captura"
           className="rounded-full bg-muted p-2 text-foreground"
         >
           <X className="h-5 w-5" />
-        </Link>
+        </button>
       </header>
 
       {phase === 'examples' && (
@@ -528,6 +547,7 @@ export function CaptureClient({
           analysis={pendingPreview.analysis}
           onRedo={handleRedo}
           onConfirm={handleConfirm}
+          selfCapture={isInviteMode}
         />
       )}
 
@@ -576,6 +596,40 @@ export function CaptureClient({
           </p>
         </div>
       )}
+
+      <Dialog open={sairAberto} onOpenChange={setSairAberto}>
+        <DialogContent showCloseButton={false}>
+          <DialogHeader>
+            <DialogTitle>Sair da captura?</DialogTitle>
+            <DialogDescription>
+              {capturedCount > 0 ? (
+                <>
+                  Você já enviou <strong>{capturedCount} de {SEQUENCE.length} fotos</strong>.
+                  {isInviteMode
+                    ? ' Elas ficam guardadas — dá pra continuar depois pelo mesmo link, enquanto ele estiver válido.'
+                    : ' Elas ficam guardadas — dá pra continuar esta leitura depois, pela lista de leituras.'}
+                </>
+              ) : (
+                'Nenhuma foto foi enviada ainda.'
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setSairAberto(false)}>
+              Continuar tirando fotos
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                setSairAberto(false)
+                router.push(isInviteMode ? `/convite/${inviteToken}` : '/leituras')
+              }}
+            >
+              Sair
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <input
         ref={fileInputRef}

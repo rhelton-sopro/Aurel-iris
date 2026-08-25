@@ -29,6 +29,28 @@ export type TherapistGateResult =
   | { status: 'ok' }
   | { status: 'incomplete'; missing: TherapistGap[] }
 
+/**
+ * ⭐ 2026-08-25 — O ENDEREÇO SAIU DO PORTÃO DE ENTRADA.
+ *
+ * O cadastro pedia nome, e-mail, WhatsApp, CPF, especialidades e termos. Ao
+ * entrar pela primeira vez, a pessoa era imediatamente desviada para uma
+ * SEGUNDA tela de cadastro pedindo CEP, número, cidade e estado — e qualquer
+ * tela que ela tentasse abrir virava essa. O endereço existe por dois motivos,
+ * e os dois acontecem na hora de COMPRAR: emitir a nota fiscal e passar no
+ * antifraude da operadora do cartão. Quem está na avaliação gratuita nunca
+ * precisou dele, e ele estava barrando exatamente quem ainda não viu valor
+ * nenhum: duas de oito contas recentes ficaram paradas nisso (2026-08-03).
+ *
+ *   'acesso' — usar o produto. WhatsApp, especialidades, termos e CPF.
+ *              (o CPF fica: é o antifraude da própria avaliação gratuita, D-12)
+ *   'compra' — comprar créditos. Tudo do 'acesso' MAIS o endereço.
+ *
+ * ⛔ Ao mexer aqui, mexer nos DOIS lados: o middleware avalia 'acesso' e a tela
+ * de compra avalia 'compra'. Um gate só, dois contextos — nunca duas cópias da
+ * regra, que foi como o texto dos Termos ficou 81 dias divergindo do sistema.
+ */
+export type GateContexto = 'acesso' | 'compra'
+
 function nonEmpty(v: string | null | undefined): boolean {
   return typeof v === 'string' && v.trim().length > 0
 }
@@ -40,6 +62,7 @@ function nonEmpty(v: string | null | undefined): boolean {
  */
 export function evaluateTherapistProfile(
   p: TherapistProfileInput,
+  contexto: GateContexto = 'acesso',
 ): TherapistGateResult {
   const missing: TherapistGap[] = []
   if (!nonEmpty(p.phone)) missing.push('phone')
@@ -48,18 +71,22 @@ export function evaluateTherapistProfile(
   if (!nonEmpty(p.tos_accepted_at)) missing.push('tos')
   if (!p.cpf || !isValidCpf(p.cpf)) missing.push('cpf') // Fase 8 D-12
   // Endereço completo: CEP (8 díg) + número + cidade + UF. city/state são
-  // preenchidos pelo ViaCEP a partir do CEP; se faltarem, o cadastro ficou
-  // incompleto. Sem isso, NF-e não emite e o cartão é recusado pelo Asaas.
-  if (
-    !cepIsValidBR(p.cep ?? '') ||
-    !nonEmpty(p.address_number) ||
-    !nonEmpty(p.city) ||
-    !ufIsValidBR(p.state)
-  )
-    missing.push('address')
+  // preenchidos pelo ViaCEP a partir do CEP. Sem isso, NF-e não emite e o
+  // cartão é recusado — por isso ele é exigido na COMPRA, e só nela.
+  if (contexto === 'compra' && !enderecoCompleto(p)) missing.push('address')
 
   if (missing.length > 0) return { status: 'incomplete', missing }
   return { status: 'ok' }
+}
+
+/** O endereço está completo o bastante pra emitir nota e passar no antifraude? */
+export function enderecoCompleto(p: TherapistProfileInput): boolean {
+  return (
+    cepIsValidBR(p.cep ?? '') &&
+    nonEmpty(p.address_number) &&
+    nonEmpty(p.city) &&
+    ufIsValidBR(p.state)
+  )
 }
 
 /**

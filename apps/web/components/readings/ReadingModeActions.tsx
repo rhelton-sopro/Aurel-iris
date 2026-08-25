@@ -24,7 +24,7 @@
  *
  * Phase 7.4 | Plan 07.4-18 | UAT-3 UX flip
  */
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
@@ -92,6 +92,20 @@ export function ReadingModeActions({
   const [deliverOpen, setDeliverOpen] = useState(false)
   const [deliverPending, setDeliverPending] = useState(false)
 
+  // ⭐ A seleção de blocos da versão do cliente mora AQUI, não dentro do botão que
+  // a exibe — porque quem também precisa dela é o "Concluir leitura", logo abaixo.
+  // Enquanto ela morava lá dentro, a conclusão ignorava a escolha e baixava o PDF
+  // padrão: o terapeuta marcava os blocos, baixava o arquivo certo, e o WhatsApp
+  // abria logo depois de um SEGUNDO download — o errado. Mesmo estado, um dono só.
+  const padraoBlocos = useMemo(
+    () =>
+      titulosBlocos
+        .map((_t, i) => i)
+        .filter((i) => !/^perguntas/i.test(titulosBlocos[i]!)),
+    [titulosBlocos],
+  )
+  const [blocosIncluidos, setBlocosIncluidos] = useState<number[]>(padraoBlocos)
+
   if (isDelivered) {
     // Plan 19: ExportPdfButton stays visible — therapist can re-export a
     // delivered reading at any time (PDF doesn't modify state).
@@ -105,7 +119,12 @@ export function ReadingModeActions({
               variant="emocional"
               label="Mapa do Ser (PDF)"
             />
-            <VersaoClienteButton readingId={readingId} titulos={titulosBlocos} />
+            <VersaoClienteButton
+              readingId={readingId}
+              titulos={titulosBlocos}
+              incluidos={blocosIncluidos}
+              onIncluidosChange={setBlocosIncluidos}
+            />
             {temDossie && <AntigoRelatorioButton readingId={readingId} jaExiste />}
           </>
         ) : (
@@ -151,10 +170,15 @@ export function ReadingModeActions({
         // O PDF que vai pro cliente é o do relatório DELE. Numa leitura nova isso é
         // o Mapa do Ser; pedir `/pdf` aqui buscaria o Dossiê e devolveria 409 "Report
         // not ready" em toda leitura nova.
-        // Sem `blocos=`: a conclusão entrega a seleção PADRÃO. Escolher bloco a bloco
-        // é o caminho do "Versão do cliente", onde ele vê o que está marcando.
+        // A conclusão entrega EXATAMENTE os blocos marcados na tela — é o mesmo
+        // documento que o terapeuta acabou de conferir. Lista vazia não deveria
+        // acontecer (o botão fica desabilitado), mas se acontecer cai no padrão do
+        // servidor em vez de gerar um PDF sem conteúdo.
+        const query = blocosIncluidos.length
+          ? `?variant=client&blocos=${blocosIncluidos.join(',')}`
+          : '?variant=client'
         const pdfUrl = temMapa
-          ? `/api/readings/${readingId}/emocional/pdf?variant=client`
+          ? `/api/readings/${readingId}/emocional/pdf${query}`
           : `/api/readings/${readingId}/pdf`
         const res = await fetch(pdfUrl, { method: 'GET' })
         if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -236,7 +260,12 @@ export function ReadingModeActions({
             variant="emocional"
             label="Mapa do Ser (PDF)"
           />
-          <VersaoClienteButton readingId={readingId} titulos={titulosBlocos} />
+          <VersaoClienteButton
+            readingId={readingId}
+            titulos={titulosBlocos}
+            incluidos={blocosIncluidos}
+            onIncluidosChange={setBlocosIncluidos}
+          />
           <AntigoRelatorioButton
             readingId={readingId}
             jaExiste={temDossie}
@@ -300,6 +329,11 @@ export function ReadingModeActions({
         onOpenChange={setDeliverOpen}
         onConfirm={onDeliverConfirm}
         pending={deliverPending}
+        blocosIncluidos={
+          temMapa && titulosBlocos.length
+            ? blocosIncluidos.map((i) => titulosBlocos[i]!).filter(Boolean)
+            : undefined
+        }
       />
     </>
   )

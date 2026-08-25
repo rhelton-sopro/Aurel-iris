@@ -71,6 +71,18 @@ export async function createChargeAction(
   if (!profile.cpf || !profile.phone) {
     return { ok: false, error: 'Complete CPF + telefone no seu perfil antes de comprar.' }
   }
+  // Defesa em profundidade: a TELA de compra já desvia pra completar o endereço
+  // (ele saiu do portão de entrada em 2026-08-25 — ver lib/gates/therapist-
+  // profile.ts). Este guarda existe pro caminho que não passa pela tela: sem
+  // endereço a nota fiscal não emite e a operadora do cartão recusa, e falhar
+  // aqui com mensagem clara é melhor do que criar uma cobrança que morre depois.
+  if (!profile.cep || !profile.address_number) {
+    return {
+      ok: false,
+      error:
+        'Falta o endereço para a nota fiscal. Complete no seu perfil e tente de novo.',
+    }
+  }
 
   const service = createServiceClient()
 

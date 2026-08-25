@@ -34,6 +34,17 @@ export const DISCLAIMER_COMPACT =
 type DisclaimerVariant = 'footer' | 'inline' | 'compact'
 
 /**
+ * E-mail de suporte — MESMA fonte de /termos e /privacidade.
+ *
+ * ⚠️ Duas telas mandam "entre em contato com o suporte" (editar perfil, e o
+ * pedido de reembolso) e não existia onde clicar: o endereço só aparecia
+ * enterrado dentro das páginas legais, que o rodapé das telas logadas nem
+ * linkava. Mandar procurar suporte sem dar o suporte é um beco.
+ */
+const OPERATOR_EMAIL =
+  process.env.NEXT_PUBLIC_OPERATOR_EMAIL ?? 'suporte@iriscodex.com'
+
+/**
  * Componente reusável da copy obrigatória LGPD-05.
  * - `compact`: 1 linha discreta (header/rodapé minimal).
  * - `inline`: parágrafo completo (dentro de páginas legais).
@@ -48,11 +59,28 @@ export function DisclaimerCopy({
 }: {
   variant?: DisclaimerVariant
 }) {
+  // `compact` agora leva os links junto: é o rodapé das telas logadas, e era o
+  // único lugar do app autenticado onde Privacidade, Termos e Suporte cabiam.
   if (variant === 'compact') {
     return (
-      <p className="text-[10.5px] uppercase tracking-label text-mist">
-        {DISCLAIMER_COMPACT}
-      </p>
+      <div className="flex flex-col gap-1.5">
+        <p className="text-[10.5px] uppercase tracking-label text-mist">
+          {DISCLAIMER_COMPACT}
+        </p>
+        <p className="text-[10.5px] uppercase tracking-label text-mist">
+          <Link href="/privacidade" className="underline">
+            Privacidade
+          </Link>
+          {' · '}
+          <Link href="/termos" className="underline">
+            Termos
+          </Link>
+          {' · '}
+          <a href={`mailto:${OPERATOR_EMAIL}`} className="underline">
+            Suporte
+          </a>
+        </p>
+      </div>
     )
   }
 
@@ -80,6 +108,10 @@ export function DisclaimerCopy({
         <Link href="/privacidade#deletar-dados" className="underline">
           Solicitar exclusão
         </Link>
+        {' · '}
+        <a href={`mailto:${OPERATOR_EMAIL}`} className="underline">
+          Suporte
+        </a>
       </p>
     </footer>
   )

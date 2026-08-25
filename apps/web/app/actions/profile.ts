@@ -20,6 +20,7 @@ import { MIN_AGE, isAdult } from '@/lib/gates/profile-completeness'
 import { isValidCpf, cpfDigits } from '@/lib/auth/cpf'
 import { signBiometricTerm } from '@/lib/consent/sign'
 import { logAuditEvent } from '@/lib/audit/log'
+import { safeNextPath } from '@/lib/nav/safe-next'
 
 // 'use server': SÓ funções async exportadas. Schema/tipos ficam internos
 // (export viraria stub RPC no bundle client — feedback use-server-export).
@@ -36,6 +37,13 @@ export async function completeProfileAction(input: {
   district: string
   city: string
   state: string
+  /** Tela que a pessoa tinha pedido antes do desvio do portão (`?next=`). */
+  next?: string
+  /**
+   * 'compra' exige o endereço; 'acesso' (padrão) não. Ver a nota grande em
+   * lib/gates/therapist-profile.ts — o endereço saiu do portão de entrada.
+   */
+  contexto?: 'acesso' | 'compra'
 }): Promise<{ error?: string } | void> {
   const supabase = await createClient()
   // SEMPRE reautenticar no server action (não confiar só no middleware).
@@ -44,6 +52,15 @@ export async function completeProfileAction(input: {
     error: authError,
   } = await supabase.auth.getUser()
   if (!user || authError) redirect('/login')
+
+  const exigeEndereco = input.contexto === 'compra'
+
+  // Campos do endereço: obrigatórios só na compra. Fora dela aceitam vazio —
+  // mas continuam validados quando preenchidos, pra não gravar CEP quebrado.
+  const opcionalSeVazio = <T extends z.ZodTypeAny>(campo: T) =>
+    exigeEndereco
+      ? campo
+      : z.union([z.literal(''), campo]) as unknown as T
 
   const schema = z.object({
     phone: z.string().refine(phoneIsValidBR, 'Telefone inválido (DDD + número)'),
@@ -56,13 +73,15 @@ export async function completeProfileAction(input: {
     tosAccepted: z
       .boolean()
       .refine((v) => v === true, 'É necessário aceitar os Termos e a Política'),
-    cep: z.string().refine(cepIsValidBR, 'CEP inválido'),
-    address: z.string().trim().min(2, 'Informe o logradouro (rua/avenida)'),
-    addressNumber: z.string().trim().min(1, 'Informe o número'),
+    cep: opcionalSeVazio(z.string().refine(cepIsValidBR, 'CEP inválido')),
+    address: opcionalSeVazio(
+      z.string().trim().min(2, 'Informe o logradouro (rua/avenida)'),
+    ),
+    addressNumber: opcionalSeVazio(z.string().trim().min(1, 'Informe o número')),
     complement: z.string(),
-    district: z.string().trim().min(1, 'Informe o bairro'),
-    city: z.string().trim().min(1, 'Informe a cidade'),
-    state: z.string().refine(ufIsValidBR, 'UF inválida'),
+    district: opcionalSeVazio(z.string().trim().min(1, 'Informe o bairro')),
+    city: opcionalSeVazio(z.string().trim().min(1, 'Informe a cidade')),
+    state: opcionalSeVazio(z.string().refine(ufIsValidBR, 'UF inválida')),
   })
 
   const parsed = schema.safeParse(input)
@@ -87,13 +106,24 @@ export async function completeProfileAction(input: {
       tos_accepted_at: new Date().toISOString(),
       tos_version: TOS_VERSION,
       // Endereço (Fase 8) — CEP só dígitos; UF normalizada.
-      cep: cepDigits(parsed.data.cep),
-      address: parsed.data.address.trim(),
-      address_number: parsed.data.addressNumber.trim(),
-      address_complement: parsed.data.complement.trim() || null,
-      district: parsed.data.district.trim(),
-      city: parsed.data.city.trim(),
-      state: parsed.data.state.trim().toUpperCase(),
+      //
+      // ⛔ Campo vazio NÃO grava: fora do contexto de compra o endereço é
+      // opcional, e escrever '' por cima apagaria o que a pessoa já tinha
+      // preenchido antes — inclusive de quem completou o cadastro no formato
+      // anterior, quando ele era obrigatório.
+      ...(parsed.data.cep ? { cep: cepDigits(parsed.data.cep) } : {}),
+      ...(parsed.data.address ? { address: parsed.data.address.trim() } : {}),
+      ...(parsed.data.addressNumber
+        ? { address_number: parsed.data.addressNumber.trim() }
+        : {}),
+      ...(parsed.data.complement.trim()
+        ? { address_complement: parsed.data.complement.trim() }
+        : {}),
+      ...(parsed.data.district ? { district: parsed.data.district.trim() } : {}),
+      ...(parsed.data.city ? { city: parsed.data.city.trim() } : {}),
+      ...(parsed.data.state
+        ? { state: parsed.data.state.trim().toUpperCase() }
+        : {}),
     })
     .eq('id', user.id)
 
@@ -131,7 +161,9 @@ export async function completeProfileAction(input: {
     }
   }
 
-  redirect('/dashboard')
+  // Volta pra onde ela ia antes do portão. Sem isto, quem clicou num link de
+  // leitura e foi desviado pra cá terminava no /dashboard sem o que pediu.
+  redirect(safeNextPath(input.next) ?? '/dashboard')
 }
 
 // Edição básica de perfil (founder 2026-05-30): terapeuta re-edita nome +

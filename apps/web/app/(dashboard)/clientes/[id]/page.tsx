@@ -7,6 +7,8 @@ import { cn } from '@/lib/utils'
 import { resolveClientGate } from '@/lib/gates/client-gates'
 import { UnderageBlockPanel } from '@/components/clientes/underage-block-panel'
 import { ReadingsListManager } from '@/components/readings/readings-list-manager'
+import { FichaClienteActions } from '@/components/clientes/FichaClienteActions'
+import { LocalDateTime } from '@/components/ui/local-date-time'
 
 /**
  * A lista deve refletir leituras criadas neste mesmo request (ex.: terapeuta
@@ -47,6 +49,11 @@ export default async function ClienteDetailPage({
     )
   }
 
+  // Ponteiro corrente do consentimento (clients.consent_last_at) — mesma fonte
+  // que o gate de criação de leitura consulta.
+  const termoAssinadoEm =
+    (client as { consent_last_at?: string | null }).consent_last_at ?? null
+
   const { data: readings } = await supabase
     .from('readings')
     .select(`
@@ -77,18 +84,51 @@ export default async function ClienteDetailPage({
 
   return (
     <div className="space-y-6 max-w-2xl">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold">{client.full_name}</h1>
-        <Link href={`/clientes/${client.id}/editar`} className={cn(buttonVariants({ variant: 'outline' }))}>
-          Editar cliente
-        </Link>
+        {/* D-03: "Convidar" existia em /clientes e /leituras e sumia justamente
+            DENTRO da ficha — onde ele está olhando ESTE cliente e decidindo o
+            que fazer. Tinha que voltar pra lista pra convidar. */}
+        <div className="flex flex-wrap items-center gap-2">
+          <FichaClienteActions
+            client={{ id: client.id, full_name: client.full_name }}
+          />
+          <Link href={`/clientes/${client.id}/editar`} className={cn(buttonVariants({ variant: 'outline' }))}>
+            Editar cliente
+          </Link>
+        </div>
       </div>
 
+      {/* ⚠️ Esta ficha JÁ buscava e-mail e telefone do banco (o select é `*`) e
+          jogava os dois fora, mostrando só nascimento e notas — pra ver o
+          WhatsApp do cliente o terapeuta tinha que entrar em "editar". Mesmo
+          caso da tela de terapeutas corrigida em 843fef2. */}
       <div className="space-y-2 text-sm">
         {client.birth_date && (
           <p>
             <span className="font-medium">Nascimento:</span>{' '}
             {format(new Date(client.birth_date + 'T00:00:00'), 'dd/MM/yyyy')}
+          </p>
+        )}
+        {client.email && (
+          <p>
+            <span className="font-medium">E-mail:</span>{' '}
+            <a href={`mailto:${client.email}`} className="underline">
+              {client.email}
+            </a>
+          </p>
+        )}
+        {client.phone && (
+          <p>
+            <span className="font-medium">WhatsApp:</span>{' '}
+            <a
+              href={`https://wa.me/${client.phone.replace(/\D/g, '')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline"
+            >
+              {client.phone}
+            </a>
           </p>
         )}
         {client.notes && (
@@ -98,6 +138,31 @@ export default async function ClienteDetailPage({
           </p>
         )}
       </div>
+
+      {/* D-04: o terapeuta só descobria que faltava o termo sendo BLOQUEADO ao
+          criar a leitura — e o bloqueio aparecia numa caixa vermelha de erro, a
+          mesma cor de "deu problema", como se ele tivesse errado. Aqui o estado
+          fica visível antes, e assinar vira um passo, não um erro. */}
+      {termoAssinadoEm ? (
+        <p className="text-sm text-muted-foreground">
+          Termo de consentimento assinado em{' '}
+          <LocalDateTime iso={termoAssinadoEm} />.
+        </p>
+      ) : (
+        <div className="flex flex-col gap-3 rounded-md border border-amber-400 bg-amber-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-amber-900">
+            <strong>Falta o termo de consentimento.</strong> Antes da primeira
+            leitura, {client.full_name.trim().split(/\s+/)[0]} precisa ler e
+            aceitar — no seu aparelho ou pelo link de convite.
+          </p>
+          <Link
+            href={`/clientes/${client.id}/termo`}
+            className={cn(buttonVariants({ size: 'sm' }), 'shrink-0')}
+          >
+            Colher assinatura
+          </Link>
+        </div>
+      )}
 
       <div className="space-y-3 pt-4 border-t">
         <div className="flex items-center justify-between">

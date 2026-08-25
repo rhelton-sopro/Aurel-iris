@@ -73,10 +73,24 @@ export default function PrivacidadePage() {
           <h2 className="text-base font-medium">
             2. Dados que tratamos — terapeuta
           </h2>
+          {/* ⚠️ Esta lista precisa espelhar o que o cadastro REALMENTE pede.
+              CPF e endereço eram obrigatórios e não estavam declarados aqui —
+              declarar a menos é o furo, não a mais. Se um campo entrar ou sair
+              do cadastro, esta frase muda junto. */}
           <p>
-            Nome completo, e-mail, telefone/WhatsApp, especialidades, aceite dos
-            termos (data e versão) e dados de uso (registros de acesso, logs
-            técnicos e de segurança).
+            Nome completo, e-mail, telefone/WhatsApp, <strong>CPF</strong>,
+            especialidades, <strong>endereço</strong> (CEP, logradouro, número,
+            complemento, bairro, cidade e estado), aceite dos termos (data e
+            versão) e dados de uso (registros de acesso, logs técnicos e de
+            segurança).
+          </p>
+          <p>
+            O <strong>CPF</strong> é usado para emissão de nota fiscal, para
+            prevenção a fraude no período de avaliação gratuita e como
+            identificação exigida pelo processador de pagamento. O{' '}
+            <strong>endereço</strong> é usado para emissão de nota fiscal e para
+            a verificação antifraude da operadora do cartão. Nenhum dos dois é
+            usado para qualquer outra finalidade.
           </p>
         </section>
 
@@ -140,22 +154,66 @@ export default function PrivacidadePage() {
           <h2 className="text-base font-medium">
             6. Operadores e transferência internacional
           </h2>
+          {/* ⚠️ Lista incompleta = art. 33 descumprido. Faltavam o processador de
+              pagamento (recebe nome, e-mail e CPF), o gerador de PDF (recebe o
+              conteúdo do relatório) e a caixa de suporte. Antes de plugar QUALQUER
+              serviço externo novo, ele entra aqui. */}
           <p>
-            Utilizamos subprocessadores para viabilizar o serviço:{' '}
-            <strong>Supabase</strong> (banco de dados e autenticação),{' '}
-            <strong>Vercel</strong> (hospedagem),{' '}
-            <strong>Resend</strong> (envio de e-mails) e{' '}
-            <strong>Anthropic</strong> (processamento de IA para geração do
-            relatório). Esses fornecedores armazenam e/ou processam dados nos{' '}
-            <strong>Estados Unidos</strong>. Como os EUA não possuem decisão de
-            adequação da ANPD, a transferência internacional fundamenta-se em
-            cláusulas contratuais firmadas com cada subprocessador, com
-            garantias compatíveis com a LGPD (art. 33, II e VIII), e, quanto a
-            dados sensíveis de examinados, no consentimento específico e
-            destacado do titular para a transferência (art. 33, VIII), coletado
-            por você no fluxo de consentimento. Os Acordos de Tratamento de
-            Dados (DPA) dos subprocessadores estão disponíveis mediante
-            solicitação ao contato do item 1.
+            Utilizamos os seguintes subprocessadores para viabilizar o serviço:
+          </p>
+          <ul className="ml-5 list-disc space-y-1">
+            <li>
+              <strong>Supabase</strong> — banco de dados, autenticação e
+              armazenamento de imagens.
+            </li>
+            <li>
+              <strong>Vercel</strong> — hospedagem da aplicação.
+            </li>
+            <li>
+              <strong>Anthropic</strong> — processamento de IA para geração do
+              relatório (recebe as imagens de íris e o texto do relatório).
+            </li>
+            <li>
+              <strong>Resend</strong> — envio dos e-mails da plataforma (código
+              de acesso, avisos de leitura, recibos).
+            </li>
+            <li>
+              <strong>Render</strong> — geração dos arquivos PDF (recebe o
+              conteúdo do relatório e do termo de consentimento no momento da
+              exportação; não retém o conteúdo após a geração).
+            </li>
+            <li>
+              <strong>Hostinger</strong> — caixa de e-mail de suporte
+              (suporte@iriscodex.com), que recebe as mensagens que você nos
+              envia, incluindo pedidos de reembolso.
+            </li>
+            <li>
+              <strong>Mercado Pago</strong> — processamento de pagamentos.
+              Recebe seu nome, e-mail e CPF para gerar a cobrança, e trata os
+              dados do seu cartão em ambiente próprio dele.{' '}
+              <strong>O Iris Codex não recebe nem armazena dados de cartão.</strong>{' '}
+              O Mercado Pago trata esses dados <strong>no Brasil</strong>, como
+              controlador independente para fins de prevenção a fraude e
+              obrigações regulatórias do setor financeiro.
+            </li>
+            <li>
+              <strong>ViaCEP</strong> — consulta pública de endereço a partir do
+              CEP digitado, para preencher cidade e estado. Enviamos apenas o
+              CEP, sem qualquer dado que identifique você.
+            </li>
+          </ul>
+          <p>
+            Com exceção do Mercado Pago e do ViaCEP, esses fornecedores
+            armazenam e/ou processam dados <strong>fora do Brasil</strong>,
+            majoritariamente nos <strong>Estados Unidos</strong>. Como os EUA não
+            possuem decisão de adequação da ANPD, a transferência internacional
+            fundamenta-se em cláusulas contratuais firmadas com cada
+            subprocessador, com garantias compatíveis com a LGPD (art. 33, II e
+            VIII), e, quanto a dados sensíveis de examinados, no consentimento
+            específico e destacado do titular para a transferência (art. 33,
+            VIII), coletado por você no fluxo de consentimento. Os Acordos de
+            Tratamento de Dados (DPA) dos subprocessadores estão disponíveis
+            mediante solicitação ao contato do item 1.
           </p>
           <p>
             As imagens e textos enviados para processamento de IA não são
@@ -173,11 +231,27 @@ export default function PrivacidadePage() {
             ativa e por período razoável após o encerramento, para cumprimento
             de obrigações legais. <strong>Registros de acesso à aplicação são
             guardados por 6 (seis) meses</strong>, nos termos do art. 15 do
-            Marco Civil da Internet. Dados de examinados são mantidos pelo
-            período definido por você (controlador) e eliminados após sua
-            instrução ou o encerramento da conta, ressalvada a guarda mínima
-            legal e a <strong>preservação anonimizada da prova de
-            consentimento</strong> (art. 16, I da LGPD).
+            Marco Civil da Internet.
+          </p>
+          {/* ⚠️ Esta era a contradição mais séria dos dois documentos: o termo que o
+              examinado ASSINA (v2) promete o apagamento em 24h, e esta Política dizia
+              que a retenção era "definida pelo controlador". Dois documentos do mesmo
+              produto dizendo coisas diferentes sobre o mesmo dado sensível. */}
+          <p>
+            <strong>Imagens de íris:</strong> são apagadas automaticamente pela
+            plataforma <strong>assim que o relatório é gerado</strong> e, em
+            qualquer caso, em <strong>no máximo 24 horas após o envio da última
+            foto</strong>. Esse apagamento é aplicado de ofício pelo Iris Codex,
+            independentemente de instrução do controlador, e corresponde ao que o
+            termo de consentimento assinado pelo examinado promete a ele.
+          </p>
+          <p>
+            <strong>Demais dados de examinados</strong> (cadastro, relatórios e
+            anotações) são mantidos pelo período definido por você (controlador)
+            e eliminados após sua instrução ou o encerramento da conta,
+            ressalvada a guarda mínima legal e a{' '}
+            <strong>preservação anonimizada da prova de consentimento</strong>{' '}
+            (art. 16, I da LGPD).
           </p>
         </section>
 
@@ -253,8 +327,12 @@ export default function PrivacidadePage() {
           <p>
             Utilizamos apenas o cookie de sessão de autenticação (Supabase),
             estritamente necessário para manter você conectado. Não utilizamos
-            cookies de publicidade nem analytics de terceiros. Registros de
-            acesso seguem a retenção do item 7 (art. 15 do Marco Civil).
+            cookies de publicidade nem analytics de terceiros. Guardamos também,
+            no armazenamento local do seu próprio navegador, a preferência de não
+            reexibir a tela de fotos-exemplo durante a captura — esse dado fica
+            no seu aparelho, não é enviado a nós e pode ser apagado limpando os
+            dados do site. Registros de acesso seguem a retenção do item 7 (art.
+            15 do Marco Civil).
           </p>
         </section>
 

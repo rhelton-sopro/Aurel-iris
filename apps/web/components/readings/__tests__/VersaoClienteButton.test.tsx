@@ -8,6 +8,7 @@
  * porque é ele que decide o que o cliente recebe. Um off-by-one aqui entrega o guia de
  * condução do terapeuta achando que entregou o repertório.
  */
+import { useMemo, useState } from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { VersaoClienteButton } from '../VersaoClienteButton'
@@ -44,6 +45,29 @@ Object.defineProperty(URL, 'revokeObjectURL', {
   configurable: true,
 })
 
+/**
+ * O componente virou CONTROLADO em 2026-08-25: a seleção passou a morar no
+ * ReadingModeActions, que é quem também dispara o "Concluir leitura" — antes a
+ * conclusão ignorava a escolha e entregava o PDF padrão. Este harness reproduz o
+ * dono real do estado, incluindo o mesmo cálculo do padrão, para que os testes
+ * continuem travando o CONTRATO com a rota (quais índices saem na query).
+ */
+function Controlado({ titulos }: { titulos: string[] }) {
+  const padrao = useMemo(
+    () => titulos.map((_t, i) => i).filter((i) => !/^perguntas/i.test(titulos[i]!)),
+    [titulos],
+  )
+  const [incluidos, setIncluidos] = useState<number[]>(padrao)
+  return (
+    <VersaoClienteButton
+      readingId="r1"
+      titulos={titulos}
+      incluidos={incluidos}
+      onIncluidosChange={setIncluidos}
+    />
+  )
+}
+
 function mockFetchOk() {
   const fetchMock = vi.fn().mockResolvedValue({
     ok: true,
@@ -60,7 +84,7 @@ beforeEach(() => {
 
 describe('components/readings/VersaoClienteButton — seleção de blocos por entrega', () => {
   it('padrão: tudo marcado MENOS "Perguntas para a sua sessão"', () => {
-    render(<VersaoClienteButton readingId="r1" titulos={TITULOS} />)
+    render(<Controlado titulos={TITULOS} />)
     fireEvent.click(screen.getByTestId('escolher-blocos'))
     for (let i = 0; i < TITULOS.length - 1; i++) {
       expect((screen.getByTestId(`bloco-${i}`) as HTMLInputElement).checked).toBe(true)
@@ -71,7 +95,7 @@ describe('components/readings/VersaoClienteButton — seleção de blocos por en
 
   it('baixa com a seleção padrão na query (blocos=0..7)', async () => {
     const fetchMock = mockFetchOk()
-    render(<VersaoClienteButton readingId="r1" titulos={TITULOS} />)
+    render(<Controlado titulos={TITULOS} />)
     fireEvent.click(screen.getByTestId('reading-mode-versao-cliente'))
     await vi.waitFor(() => expect(fetchMock).toHaveBeenCalled())
     expect(fetchMock.mock.calls[0]![0]).toBe(
@@ -81,7 +105,7 @@ describe('components/readings/VersaoClienteButton — seleção de blocos por en
 
   it('desmarcar um bloco tira o índice DELE da query, e só ele', async () => {
     const fetchMock = mockFetchOk()
-    render(<VersaoClienteButton readingId="r1" titulos={TITULOS} />)
+    render(<Controlado titulos={TITULOS} />)
     fireEvent.click(screen.getByTestId('escolher-blocos'))
     fireEvent.click(screen.getByTestId('bloco-6')) // Repertório de suporte
     fireEvent.click(screen.getByTestId('reading-mode-versao-cliente'))
@@ -91,7 +115,7 @@ describe('components/readings/VersaoClienteButton — seleção de blocos por en
 
   it('marcar "Perguntas" inclui o bloco 8 na entrega', async () => {
     const fetchMock = mockFetchOk()
-    render(<VersaoClienteButton readingId="r1" titulos={TITULOS} />)
+    render(<Controlado titulos={TITULOS} />)
     fireEvent.click(screen.getByTestId('escolher-blocos'))
     fireEvent.click(screen.getByTestId('bloco-8'))
     fireEvent.click(screen.getByTestId('reading-mode-versao-cliente'))
@@ -100,7 +124,7 @@ describe('components/readings/VersaoClienteButton — seleção de blocos por en
   })
 
   it('sem nenhum bloco marcado o download fica bloqueado (PDF só de capa não sai)', () => {
-    render(<VersaoClienteButton readingId="r1" titulos={TITULOS} />)
+    render(<Controlado titulos={TITULOS} />)
     fireEvent.click(screen.getByTestId('escolher-blocos'))
     for (let i = 0; i < TITULOS.length - 1; i++) {
       fireEvent.click(screen.getByTestId(`bloco-${i}`))
@@ -111,7 +135,7 @@ describe('components/readings/VersaoClienteButton — seleção de blocos por en
   })
 
   it('"Voltar ao padrão" desfaz a mexida', () => {
-    render(<VersaoClienteButton readingId="r1" titulos={TITULOS} />)
+    render(<Controlado titulos={TITULOS} />)
     fireEvent.click(screen.getByTestId('escolher-blocos'))
     fireEvent.click(screen.getByTestId('bloco-0'))
     expect((screen.getByTestId('bloco-0') as HTMLInputElement).checked).toBe(false)

@@ -87,6 +87,39 @@ describe('createChargeAction', () => {
     if (!r.ok) expect(r.error).toContain('Complete CPF')
   })
 
+  /**
+   * ⭐ 2026-08-25 — o endereço saiu do PORTÃO DE ENTRADA e passou a ser exigido
+   * aqui, na compra, que é onde ele serve pra alguma coisa (nota fiscal +
+   * antifraude da operadora do cartão). Ver a nota grande em
+   * lib/gates/therapist-profile.ts.
+   *
+   * A tela de compra já desvia pra completar o endereço antes de chegar aqui —
+   * este teste trava a defesa em profundidade, pro caminho que NÃO passa pela
+   * tela. Sem ela, a cobrança seria criada e morreria depois, na emissão.
+   */
+  it('bloqueia a cobrança quando falta o endereço (nota fiscal + antifraude)', async () => {
+    selectChain.maybeSingle
+      .mockResolvedValueOnce({
+        data: { id: 'pkg1', sku: 'medio', name: 'Médio', leituras_count: 15, price_brl: 745.5 },
+      })
+      .mockResolvedValueOnce({
+        data: {
+          id: 'u1',
+          cpf: '12345678909',
+          phone: '47999999999',
+          full_name: 'X',
+          asaas_customer_id: null,
+          cep: null,
+          address_number: null,
+        },
+      })
+    const r = await createChargeAction({ sku: 'medio', billingType: 'PIX' })
+    expect(r.ok).toBe(false)
+    if (!r.ok) expect(r.error).toContain('endereço')
+    // E não chega a criar cobrança nenhuma no provedor.
+    expect(createChargeMock).not.toHaveBeenCalled()
+  })
+
   it('happy path: inserts pending credit + creates charge via provider', async () => {
     selectChain.maybeSingle
       .mockResolvedValueOnce({
@@ -99,6 +132,11 @@ describe('createChargeAction', () => {
           phone: '47999999999',
           asaas_customer_id: null,
           full_name: 'X',
+          // Endereço passou a ser exigido na COMPRA em 2026-08-25, quando saiu do
+          // portão de entrada — sem ele a nota fiscal não emite e a operadora do
+          // cartão recusa. Ver lib/gates/therapist-profile.ts.
+          cep: '89010000',
+          address_number: '123',
         },
       })
     insertChain.single.mockResolvedValueOnce({ data: { id: 'credit-1' }, error: null })
@@ -132,7 +170,14 @@ describe('createChargeAction', () => {
         data: { id: 'pkg1', sku: 'medio', name: 'Médio', leituras_count: 15, price_brl: 745.5 },
       })
       .mockResolvedValueOnce({
-        data: { id: 'u1', cpf: '12345678909', phone: '47999999999', asaas_customer_id: 'cus_1' },
+        data: {
+          id: 'u1',
+          cpf: '12345678909',
+          phone: '47999999999',
+          asaas_customer_id: 'cus_1',
+          cep: '89010000',
+          address_number: '123',
+        },
       })
     insertChain.single.mockResolvedValueOnce({ data: { id: 'credit-2' }, error: null })
     createChargeMock.mockResolvedValueOnce({
@@ -165,7 +210,14 @@ describe('createChargeAction', () => {
         data: { id: 'pkg1', sku: 'medio', leituras_count: 15, price_brl: 745.5 },
       })
       .mockResolvedValueOnce({
-        data: { id: 'u1', cpf: '12345678909', phone: '47999999999', asaas_customer_id: 'cus_1' },
+        data: {
+          id: 'u1',
+          cpf: '12345678909',
+          phone: '47999999999',
+          asaas_customer_id: 'cus_1',
+          cep: '89010000',
+          address_number: '123',
+        },
       })
     insertChain.single.mockResolvedValueOnce({ data: { id: 'credit-x' }, error: null })
     createChargeMock.mockResolvedValueOnce({ ok: false, error: 'provedor recusou' })

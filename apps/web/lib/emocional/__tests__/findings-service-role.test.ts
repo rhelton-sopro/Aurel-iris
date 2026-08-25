@@ -18,9 +18,16 @@ import { describe, expect, it } from 'vitest'
  */
 const RAIZ = path.resolve(__dirname, '../../..')
 
+// ⛔ Toda rota que EXIBE o Mapa do Ser entra aqui. Tirar uma da lista sem tirar a
+// rota do produto reabre o furo em silêncio.
+//
+// `emocional/page.tsx` saiu em 2026-08-25: era uma terceira tela do mesmo
+// documento que NENHUM botão do sistema abria — órfã, com a lógica de render
+// duplicada. O "abrir em tela cheia" que faltava passou a apontar pro
+// `documento/route.ts`, que já está coberto abaixo. Um render só, uma rota a
+// menos pra manter em sincronia.
 const ROTAS_DE_EXIBICAO = [
   'app/(dashboard)/leituras/[id]/page.tsx',
-  'app/(dashboard)/leituras/[id]/emocional/page.tsx',
   'app/(dashboard)/leituras/[id]/emocional/documento/route.ts',
   'app/api/readings/[id]/emocional/pdf/route.ts',
 ]

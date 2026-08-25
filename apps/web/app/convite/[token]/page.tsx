@@ -27,7 +27,23 @@ export default async function InviteLandingPage({
   const validation = await validateToken(token)
 
   if (validation.status !== 'ok') {
-    return <InvalidTokenPanel reason={validation.status} />
+    // Beco sem saída (2026-08-25): a tela dizia "peça outro link ao seu
+    // terapeuta" e parava ali. Agora ela diz QUEM é o terapeuta e abre o
+    // WhatsApp dele com o pedido já escrito — o cliente resolve sozinho, e o
+    // terapeuta fica sabendo na hora em vez de nunca.
+    let terapeuta: { nome: string; telefone: string | null } | null = null
+    if (validation.status !== 'not_found') {
+      const service = createServiceClient()
+      const { data: prof } = await service
+        .from('profiles')
+        .select('full_name, phone')
+        .eq('id', validation.therapist_id)
+        .maybeSingle<{ full_name: string | null; phone: string | null }>()
+      if (prof?.full_name) {
+        terapeuta = { nome: prof.full_name, telefone: prof.phone }
+      }
+    }
+    return <InvalidTokenPanel reason={validation.status} terapeuta={terapeuta} />
   }
 
   // Cliente existente: busca nome para boas-vindas (service-role bypassa RLS).
@@ -60,7 +76,12 @@ export default async function InviteLandingPage({
     return (
       <div className="mx-auto w-full max-w-md px-4 py-8 space-y-6">
         <div className="space-y-2">
-          <h2 className="text-2xl font-semibold">Olá, {client?.full_name ?? 'paciente'}!</h2>
+          {/* ⛔ NUNCA "paciente" — quem está aqui é CLIENTE do terapeuta, e a
+              palavra é justamente o que separa este produto do vocabulário
+              médico. Sem nome, cumprimenta sem substantivo nenhum. */}
+          <h2 className="text-2xl font-semibold">
+            {client?.full_name ? `Olá, ${client.full_name}!` : 'Olá!'}
+          </h2>
           {resumeProgress ? (
             <p className="text-sm text-muted-foreground">
               Você já enviou <strong>{resumeProgress.captured} de 6 fotos</strong>{' '}
@@ -164,8 +185,10 @@ export default async function InviteLandingPage({
 
 function InvalidTokenPanel({
   reason,
+  terapeuta,
 }: {
   reason: 'not_found' | 'expired' | 'already_used'
+  terapeuta: { nome: string; telefone: string | null } | null
 }) {
   const messages: Record<typeof reason, { title: string; body: string }> = {
     not_found: {
@@ -174,18 +197,49 @@ function InvalidTokenPanel({
     },
     expired: {
       title: 'Convite expirado',
-      body: 'Este link de convite passou da validade (7 dias). Peça ao seu terapeuta para gerar um novo.',
+      body: 'Este link de convite passou da validade de 7 dias. É preciso um link novo para fazer a leitura.',
     },
     already_used: {
       title: 'Convite já utilizado',
-      body: 'Este convite é de uso único e já foi usado. Se precisa fazer uma nova leitura, peça ao terapeuta para enviar um novo link.',
+      body: 'Este convite é de uso único e já foi usado. Se precisa fazer uma nova leitura, é preciso um link novo.',
     },
   }
   const { title, body } = messages[reason]
+
+  const pedido = `Olá${terapeuta ? `, ${terapeuta.nome.trim().split(/\s+/)[0]}` : ''}! O meu link da leitura da íris não está mais funcionando. Pode me mandar um novo?`
+  const digitos = terapeuta?.telefone?.replace(/\D/g, '') ?? ''
+  const waHref = digitos
+    ? `https://wa.me/${digitos}?text=${encodeURIComponent(pedido)}`
+    : null
+
   return (
-    <div className="mx-auto w-full max-w-md px-4 py-12 space-y-3">
+    <div className="mx-auto w-full max-w-md px-4 py-12 space-y-4">
       <h2 className="text-xl font-semibold">{title}</h2>
       <p className="text-sm text-muted-foreground">{body}</p>
+
+      {terapeuta && (
+        <div className="space-y-3 rounded-md border border-border bg-muted/30 p-4">
+          <p className="text-sm">
+            Quem enviou este link foi{' '}
+            <strong className="text-foreground">{terapeuta.nome}</strong>.
+          </p>
+          {waHref ? (
+            <a
+              href={waHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full rounded-md bg-foreground py-3 text-center text-sm font-medium text-background hover:opacity-90"
+            >
+              Pedir um novo link no WhatsApp
+            </a>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Entre em contato com {terapeuta.nome.trim().split(/\s+/)[0]} para
+              receber um novo link.
+            </p>
+          )}
+        </div>
+      )}
     </div>
   )
 }

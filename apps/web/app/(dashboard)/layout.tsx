@@ -56,6 +56,7 @@ export default async function DashboardLayout({
           fullName={fullName}
           creditsRemaining={creditsRemaining}
           trialReadingsRemaining={trialReadingsRemaining}
+          trialExpiresAt={trial.status === 'active' ? trial.expires_at : null}
         />
         <main className="flex-1 px-7 py-6">
           {/* Nudge de recompra quando o saldo COMPRADO total está baixo (≤3).

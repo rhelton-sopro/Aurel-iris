@@ -1820,6 +1820,108 @@ aqui como observação; nenhuma ação foi tomada.
 
 ---
 
+## 2026-08-25 — auditoria de experiência: 33 achados, todos aplicados
+
+**Pedido do founder:** *"Faça uma auditoria completa da experiência do usuário, em todos os
+acessos que ele faz... veja se você encontra algum furo... se tem algo redundante"* — e, na
+sequência, *"sou a favor de aplicar todas as soluções"* + *"tem uma incoerência nos termos... que
+está diferente em termos de prazos do que está programado"*.
+
+Percorridos os 5 caminhos completos (terapeuta novo · navegação · cliente do convite · rotina do
+terapeuta · o que vale pra todas as telas). 33 achados: 15 que quebravam, 14 que atrasavam, 4 de
+peso morto. **Relatório navegável:** artifact `17fbd106-6a40-4514-878a-43e1ee412e43`.
+
+### As decisões estruturais (as outras 27 foram texto e correção direta)
+
+**1. O ENDEREÇO SAIU DO PORTÃO DE ENTRADA.** Era a barreira mais cara do produto: quem terminava
+o cadastro era desviado na hora para uma segunda tela pedindo CEP, número, cidade e estado, e
+qualquer tela pedida virava essa. O endereço serve à nota fiscal e ao antifraude do cartão — os
+dois na COMPRA. Duas de oito contas recentes ficaram paradas exatamente aí (registrado em
+2026-08-03). Agora o gate tem dois contextos, `'acesso'` e `'compra'`, numa função só
+(`lib/gates/therapist-profile.ts`). O CPF **fica** no acesso: é o antifraude da própria avaliação
+gratuita (D-12).
+
+**2. Os TEXTOS LEGAIS divergiam do sistema — e agora há um teste que impede a deriva.**
+Os Termos prometiam **3 leituras** de avaliação enquanto o código dá **1** desde 2026-06-05 —
+81 dias de divergência, 1 conta aceitou o documento nessa janela. Outras três lacunas na
+Política: CPF e endereço não declarados (ambos obrigatórios), três subprocessadores faltando
+(Mercado Pago, Render/Gotenberg, Hostinger), e a retenção da imagem contradizendo o termo que o
+próprio examinado assina — a Política dizia "período definido pelo controlador"; o termo v2
+promete apagamento automático em 24h. Corrigidos os quatro.
+**TOS_VERSION: v1 → v2**, vigência 25/08/2026 — manter "v1" com texto diferente do que as contas
+aceitaram criaria dois documentos alegando ser a mesma versão. O gate não checa versão, então
+ninguém é bloqueado nem forçado a re-aceitar.
+⭐ `app/__tests__/legal-coerencia.test.ts` passa a comparar cada número do texto com
+`lib/billing/config.ts`. Cópia solta não avisa quando a fonte muda — foi assim que durou 81 dias.
+
+**3. A seleção de blocos se perdia na entrega.** O terapeuta escolhia o que ia pro cliente,
+baixava o PDF, clicava "Concluir leitura" — e a conclusão baixava um SEGUNDO PDF com a seleção
+padrão, que era o que o WhatsApp abria pra anexar. Ele entregava o arquivo errado sem jeito de
+perceber. O estado subiu pro `ReadingModeActions`, dono dos dois botões.
+⛔ E por isso a barra de ações **não pode ser duplicada** no fim do documento (a tentativa óbvia
+de resolver o "rolar tudo de volta"): duas instâncias = duas seleções independentes = o mesmo
+furo de volta. A barra virou **sticky**, instância única.
+
+**4. O "X" da câmera jogava o CLIENTE numa tela de login.** No fluxo do convite o botão de fechar
+levava a `/leituras` — área logada. O cliente, sem conta, caía numa tela pedindo e-mail no meio
+das 6 fotos. Agora volta pra tela de boas-vindas do próprio link, com confirmação antes de sair.
+
+**5. O destino se perdia em dois desvios.** Link de "relatório pronto" aberto com sessão
+expirada, e desvio do portão de cadastro: os dois descartavam para onde a pessoa ia e a
+despejavam no Dashboard. `lib/nav/safe-next.ts` guarda o destino nos dois, recusando qualquer
+caminho não-interno (`//evil.com`, `/\evil.com`, control chars) — `?next=` é entrada de fora, e
+sem essa validação vira redirect aberto. 12 testes cobrem as formas de burlar.
+
+**6. O zoom estava proibido no app inteiro.** `userScalable: false` impedia o terapeuta de
+aumentar o relatório no celular e o cliente de enxergar a tela da captura. A trava existia por
+causa do salto de zoom do iOS ao focar um campo — que se resolve no tamanho da fonte do campo
+(≥16px), não desligando a pinça de todo mundo. `components/ui/input.tsx` passou a
+`text-base md:text-sm`.
+
+### Furos que davam informação errada
+
+| O que | Era | Ficou |
+|---|---|---|
+| Coluna "Última leitura" (lista de clientes) | traço fixo no JSX, para todo mundo, sempre | data real |
+| Cartão de créditos durante a avaliação | "0 leituras — compre créditos", em vermelho, com o selo dizendo "1 grátis" ao lado | soma cortesia + comprado |
+| Selo "1 grátis" → tela de créditos | tela dizia "nenhum pacote ativo" | bloco da avaliação, com validade |
+| Prazo de 15 dias da avaliação | invisível em toda parte | no selo, no cartão e na tela de créditos |
+| Checagem de "tem relatório" (lista) | `.limit(200)` sem ordem → acima disso, leitura boa aparecia como "fotos apagadas" | pergunta só pelas leituras da página |
+| Ficha do cliente | buscava e-mail e telefone e jogava fora | mostra os dois, telefone clicável |
+| Texto da compra | "checkout Asaas" | Mercado Pago (o Asaas está dormente) |
+| Tela do convite sem nome | "Olá, **paciente**!" | "Olá!" — a palavra é proibida no produto |
+
+### Peso morto removido
+
+- Aviso legal duplicado (topo **e** rodapé de toda tela logada) → só no rodapé, que ganhou
+  Privacidade, Termos e **Suporte** — duas telas mandavam "falar com o suporte" e não existia
+  onde clicar.
+- Terceira tela do Mapa do Ser, órfã, sem nenhum botão apontando pra ela e com o render
+  duplicado → removida; o "abrir em tela cheia" que faltava aponta pro `documento/route.ts`.
+- "Assinatura" (menu) / "Pagamento" (avatar) → **Créditos** nos dois. Rota `/assinatura`
+  preservada: e-mails já enviados apontam pra ela.
+- Botão "Fazer meu próprio exame" duplicado com o cartão de boas-vindas.
+
+### Telas que não existiam
+
+`not-found.tsx`, `error.tsx`, `global-error.tsx` (a página padrão do Next, em inglês e sem marca,
+era o que aparecia ao abrir uma leitura apagada) e esqueleto de carregamento em Dashboard,
+Leituras, Clientes e leitura.
+
+### O que NÃO foi mexido
+
+⛔ Duas ocorrências de "paciente" em `lib/canonicalize/sonnet-bbox.ts` — é texto de PROMPT,
+descrevendo anatomia. Mexer sem A/B viola a regra de não calibrar sem medir.
+⛔ 14 testes seguem falhando — **os mesmos 5 arquivos do baseline**, provado com `git stash`.
+
+**STATUS: APLICADA** — `pnpm lint` 0 erros/14 warnings · build OK, URLs inalteradas ·
+1026 testes passando (+23) · **NÃO PUSHADO**.
+
+⏭️ **Em aberto para o founder:** os documentos legais seguem AI-DRAFTED, sem revisão jurídica —
+o débito continua, agora sobre um texto que ao menos descreve o sistema real.
+
+---
+
 
 ## Como usar
 

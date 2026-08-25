@@ -36,8 +36,12 @@ export interface InviteTokenRow {
 export type ValidateResult =
   | { status: 'ok'; token: InviteTokenRow }
   | { status: 'not_found' }
-  | { status: 'expired' }
-  | { status: 'already_used' }
+  // Link achado, mas vencido ou já queimado: devolvemos QUEM mandou o link.
+  // Sem isso a tela de erro era um beco — dizia "peça outro ao seu terapeuta"
+  // sem dizer quem é o terapeuta nem oferecer como falar com ele, e o terapeuta
+  // só ficava sabendo se o cliente ligasse.
+  | { status: 'expired'; therapist_id: string }
+  | { status: 'already_used'; therapist_id: string }
 
 /** Gera 32 chars URL-safe base64url. Não-encontrável por força bruta. */
 export function generateToken(): string {
@@ -66,8 +70,10 @@ export async function validateToken(token: string): Promise<ValidateResult> {
     .eq('token', token)
     .maybeSingle<InviteTokenRow>()
   if (error || !data) return { status: 'not_found' }
-  if (data.used_at) return { status: 'already_used' }
-  if (new Date(data.expires_at) <= new Date()) return { status: 'expired' }
+  if (data.used_at)
+    return { status: 'already_used', therapist_id: data.therapist_id }
+  if (new Date(data.expires_at) <= new Date())
+    return { status: 'expired', therapist_id: data.therapist_id }
   return { status: 'ok', token: data }
 }
 

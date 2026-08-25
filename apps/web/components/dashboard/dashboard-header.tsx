@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { LogOut, UserPen, CreditCard } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { SidebarTrigger } from '@/components/ui/sidebar'
-import { DisclaimerCopy } from '@/components/legal/DisclaimerCopy'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
   DropdownMenu,
@@ -19,12 +18,19 @@ interface DashboardHeaderProps {
   creditsRemaining: number
   /** Leituras de trial restantes (0 quando trial inativa/esgotada). */
   trialReadingsRemaining: number
+  /**
+   * Vencimento da avaliação (ISO). O prazo de 15 dias existe e era invisível:
+   * o selo dizia só "1 grátis", e quem voltava depois do vencimento encontrava
+   * o selo sumido sem uma palavra de explicação.
+   */
+  trialExpiresAt?: string | null
 }
 
 export function DashboardHeader({
   fullName,
   creditsRemaining,
   trialReadingsRemaining,
+  trialExpiresAt,
 }: DashboardHeaderProps) {
   const router = useRouter()
   const initial = fullName ? fullName.charAt(0).toUpperCase() : 'T'
@@ -33,6 +39,12 @@ export function DashboardHeader({
   // trial acaba; selo de créditos some durante a trial se ainda não comprou
   // nada (sem "0 créditos" vermelho enquanto a trial cobre as leituras).
   const showTrial = trialReadingsRemaining > 0
+  const validadeTrial = trialExpiresAt
+    ? new Date(trialExpiresAt).toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+      })
+    : null
   const showCredits = creditsRemaining > 0 || trialReadingsRemaining === 0
 
   async function handleLogout() {
@@ -45,11 +57,11 @@ export function DashboardHeader({
     <header className="sticky top-0 z-10 flex h-[calc(4rem+env(safe-area-inset-top))] items-center justify-between border-b border-[#EAEAEA] bg-white px-6 pt-[env(safe-area-inset-top)]">
       <div className="flex min-w-0 items-center gap-3">
         <SidebarTrigger className="size-9 hover:bg-transparent hover:text-teal" />
-        {/* Surface 3 (LGPD-05) — reforço ATIVO (não rola pra ver). Oculto no
-            mobile pra não competir com o trigger no header de 4rem. */}
-        <div className="hidden min-w-0 truncate md:block">
-          <DisclaimerCopy variant="compact" />
-        </div>
+        {/* ⛔ O aviso da LGPD-05 SAIU daqui (2026-08-25). Ele já está no rodapé de
+            toda tela logada — a mesma frase, na mesma tela, duas vezes. Repetir
+            não aumenta a proteção: treina a pessoa a não ler o aviso. O rodapé
+            ganhou em troca os links legais e o suporte, que não existiam em
+            lugar nenhum dentro do app. */}
       </div>
       <div className="flex items-center gap-2.5">
         {/* Selo da TRIAL — leituras grátis (teal, positivo). Clicável →
@@ -57,10 +69,17 @@ export function DashboardHeader({
         {showTrial && (
           <Link
             href="/assinatura"
-            aria-label={`${trialReadingsRemaining} leituras grátis do período de teste`}
+            aria-label={
+              validadeTrial
+                ? `${trialReadingsRemaining} leituras grátis da avaliação, válidas até ${validadeTrial}`
+                : `${trialReadingsRemaining} leituras grátis da avaliação`
+            }
             className="rounded-[2px] border border-teal px-2.5 py-1 text-[11px] font-normal uppercase tracking-label text-teal transition-colors hover:bg-teal/5"
           >
-            {trialReadingsRemaining} {trialReadingsRemaining === 1 ? 'grátis' : 'grátis'}
+            {trialReadingsRemaining} grátis
+            {validadeTrial && (
+              <span className="hidden opacity-70 sm:inline"> · até {validadeTrial}</span>
+            )}
           </Link>
         )}
         {/* Selo de CRÉDITOS comprados (separado da trial). 0 créditos em
@@ -102,7 +121,7 @@ export function DashboardHeader({
               render={<Link href="/assinatura" />}
             >
               <CreditCard className="mr-2 h-4 w-4" />
-              Pagamento
+              Créditos
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={handleLogout}

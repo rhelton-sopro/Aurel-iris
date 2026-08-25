@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { safeNextPath } from '@/lib/nav/safe-next'
 import { withNetworkRetry, isNetworkError } from '@/lib/net/retry'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -29,6 +30,10 @@ type EmailValues = z.infer<typeof emailSchema>
 function LoginForm() {
   const searchParams = useSearchParams()
   const hasError = searchParams.get('error') === 'auth_callback_failed'
+  // Destino guardado pelo middleware quando a sessão expirou no meio do caminho
+  // (ex.: link de "relatório pronto" aberto no celular). Validado como caminho
+  // interno — `next` vindo da URL é entrada de fora. Ver lib/nav/safe-next.ts.
+  const destino = safeNextPath(searchParams.get('next')) ?? '/dashboard'
 
   const [step, setStep] = useState<'email' | 'code'>('email')
   const [email, setEmail] = useState('')
@@ -119,7 +124,7 @@ function LoginForm() {
 
     // Hard navigation: garante request novo onde o middleware lê o cookie de
     // sessão recém-gravado (mais robusto que router.push no PWA standalone).
-    window.location.assign('/dashboard')
+    window.location.assign(destino)
   }
 
   async function onResend() {

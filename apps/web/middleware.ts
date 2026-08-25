@@ -1,4 +1,5 @@
 import { isFounderEmail } from '@/lib/auth/founder'
+import { safeNextPath } from '@/lib/nav/safe-next'
 import { updateSession } from '@/lib/supabase/middleware'
 import { evaluateTherapistProfile } from '@/lib/gates/therapist-profile'
 import { NextResponse, type NextRequest } from 'next/server'
@@ -44,8 +45,13 @@ export async function middleware(request: NextRequest) {
   const isProtected = PROTECTED_PATHS.some(p => pathname.startsWith(p))
 
   if (isProtected && !user) {
+    // ⭐ Guarda o destino. Sem isto, o link de "relatório pronto" que chega por
+    // e-mail era descartado no login: o terapeuta digitava o código e caía no
+    // /dashboard, tendo que caçar a leitura na lista. Ver lib/nav/safe-next.ts.
+    const destino = safeNextPath(pathname + request.nextUrl.search)
     const url = request.nextUrl.clone()
     url.pathname = '/login'
+    url.search = destino ? `?next=${encodeURIComponent(destino)}` : ''
     return NextResponse.redirect(url)
   }
 
@@ -60,20 +66,29 @@ export async function middleware(request: NextRequest) {
       .eq('id', user.id)
       .maybeSingle()
 
-    const gate = evaluateTherapistProfile({
-      phone: profile?.phone ?? null,
-      specialties: profile?.specialties ?? null,
-      tos_accepted_at: profile?.tos_accepted_at ?? null,
-      cpf: profile?.cpf ?? null,
-      cep: profile?.cep ?? null,
-      address_number: profile?.address_number ?? null,
-      city: profile?.city ?? null,
-      state: profile?.state ?? null,
-    })
+    // ⭐ 'acesso' — o portão de ENTRADA não pede endereço (ver a nota grande em
+    // lib/gates/therapist-profile.ts). Quem está na avaliação gratuita usa o
+    // produto inteiro sem ele; o endereço é cobrado na tela de compra.
+    const gate = evaluateTherapistProfile(
+      {
+        phone: profile?.phone ?? null,
+        specialties: profile?.specialties ?? null,
+        tos_accepted_at: profile?.tos_accepted_at ?? null,
+        cpf: profile?.cpf ?? null,
+        cep: profile?.cep ?? null,
+        address_number: profile?.address_number ?? null,
+        city: profile?.city ?? null,
+        state: profile?.state ?? null,
+      },
+      'acesso',
+    )
     if (gate.status !== 'ok') {
+      // Mesmo motivo do desvio de login: ao salvar o cadastro, a pessoa volta
+      // pra tela que ela tinha pedido, não pro /dashboard.
+      const destino = safeNextPath(pathname + request.nextUrl.search)
       const url = request.nextUrl.clone()
       url.pathname = '/perfil/completar'
-      url.search = ''
+      url.search = destino ? `?next=${encodeURIComponent(destino)}` : ''
       return NextResponse.redirect(url)
     }
   }

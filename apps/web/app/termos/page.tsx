@@ -42,9 +42,13 @@ export default function TermosPage() {
         <section className="space-y-3 border-2 border-teal/30 bg-ivory/50 p-4">
           <h2 className="text-base font-medium">Modelo de pagamento</h2>
           <ul className="ml-5 list-disc space-y-1.5">
+            {/* ⚠️ NÚMEROS TRAVADOS EM lib/billing/config.ts — não editar aqui sem
+                conferir lá. O "3 leituras" desta linha ficou 81 dias divergente do
+                sistema (que dá 1 desde 2026-06-05). Se o trial mudar de novo, esta
+                frase muda junto. */}
             <li>
-              <strong>Avaliação gratuita:</strong> 3 leituras ou 15 dias (o que
-              ocorrer primeiro), sem necessidade de cartão de crédito.
+              <strong>Avaliação gratuita:</strong> 1 leitura ou 15 dias corridos
+              (o que ocorrer primeiro), sem necessidade de cartão de crédito.
             </li>
             <li>
               <strong>Pacotes pré-pagos</strong> (créditos adquiridos
@@ -73,10 +77,26 @@ export default function TermosPage() {
               encerrados <strong>sem reembolso</strong> (salvo avaliação
               caso-a-caso pelo suporte).
             </li>
+            <li>
+              <strong>Formas de pagamento:</strong> PIX ou cartão de crédito. Os
+              pacotes Médio e Grande têm <strong>5% de desconto no PIX</strong>;
+              no cartão, o Médio pode ser dividido em até 2x e o Grande em até
+              3x, sem juros. O pagamento é processado pelo{' '}
+              <strong>Mercado Pago</strong> em ambiente próprio dele — o Iris
+              Codex não recebe nem armazena os dados do seu cartão.
+            </li>
+            <li>
+              <strong>Nota fiscal:</strong> emitida após a confirmação do
+              pagamento, com os dados de cadastro (CPF e endereço) informados por
+              você no momento da compra.
+            </li>
           </ul>
         </section>
 
-        <section className="space-y-3 border-2 border-teal/30 bg-ivory/50 p-4">
+        <section
+          id="arrependimento"
+          className="scroll-mt-24 space-y-3 border-2 border-teal/30 bg-ivory/50 p-4"
+        >
           <h2 className="text-base font-medium">Direito de arrependimento</h2>
           <p>
             Nos termos do art. 49 do Código de Defesa do Consumidor, você dispõe
@@ -90,11 +110,46 @@ export default function TermosPage() {
             </li>
             <li>
               Se ao menos 1 leitura foi consumida:{' '}
-              <strong>reembolso proporcional</strong> sobre o saldo restante.
+              <strong>reembolso proporcional</strong> sobre o saldo restante
+              (leituras não utilizadas × valor unitário do pacote). Neste caso o
+              estorno é feito <strong>mediante solicitação</strong>: o pedido é
+              registrado pelo botão na tela de créditos e processado pelo
+              suporte — o reembolso integral, esse sim, é imediato.
             </li>
             <li>
               Após os 7 dias: sem reembolso de créditos não utilizados (avaliação
               caso-a-caso via suporte).
+            </li>
+          </ul>
+        </section>
+
+        {/* Ciclo de vida da imagem — o terapeuta é o CONTROLADOR desses dados e
+            precisa conhecer a retenção que a plataforma aplica de ofício. O termo
+            do examinado (v2) já promete isto a ele; faltava constar aqui. */}
+        <section className="space-y-3 border-2 border-teal/30 bg-ivory/50 p-4">
+          <h2 className="text-base font-medium">
+            Ciclo de vida das imagens de íris
+          </h2>
+          <ul className="ml-5 list-disc space-y-1.5">
+            <li>
+              As fotos da íris são apagadas <strong>assim que o relatório é
+              gerado</strong> e, em qualquer caso, em{' '}
+              <strong>no máximo 24 horas após o envio da última foto</strong>.
+              Isso vale para todas as capturas — presenciais, por link de convite
+              ou por upload.
+            </li>
+            <li>
+              Gere o relatório dentro dessa janela. Passado o prazo, as imagens
+              são removidas e a leitura precisa ser refeita com novas fotos.
+            </li>
+            <li>
+              O relatório gerado permanece na sua conta e não é apagado junto com
+              as imagens.
+            </li>
+            <li>
+              <strong>Link de convite ao cliente:</strong> é de{' '}
+              <strong>uso único</strong> e expira em{' '}
+              <strong>7 dias</strong>. Depois disso é preciso gerar um novo.
             </li>
           </ul>
         </section>
@@ -164,9 +219,9 @@ export default function TermosPage() {
           <h2 className="text-base font-medium">5. Fase beta</h2>
           <p>
             A ferramenta encontra-se em fase beta restrita. Funcionalidades
-            podem mudar, há limite de leituras por conta no período, e pode
-            haver instabilidades. Recursos podem ser adicionados, alterados ou
-            removidos sem aviso prévio.
+            podem mudar e pode haver instabilidades. Recursos podem ser
+            adicionados, alterados ou removidos sem aviso prévio. Não há limite
+            de leituras por conta além do seu saldo de créditos.
           </p>
         </section>
 

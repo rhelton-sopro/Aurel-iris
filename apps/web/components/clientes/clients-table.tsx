@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { Pencil, Trash2, Link as LinkIcon } from 'lucide-react'
 import { format } from 'date-fns'
 import { Input } from '@/components/ui/input'
+import { LocalDateTime } from '@/components/ui/local-date-time'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -18,7 +19,16 @@ import { cn } from '@/lib/utils'
 import type { Database } from '@/types/database'
 import { evaluateProfileCompleteness } from '@/lib/gates/profile-completeness'
 
-type Client = Database['public']['Tables']['clients']['Row']
+type Client = Database['public']['Tables']['clients']['Row'] & {
+  /**
+   * Data da leitura mais recente deste cliente (ISO), ou null se nunca fez.
+   *
+   * ⚠️ A coluna "Última leitura" era literalmente um traço fixo no JSX — nunca
+   * consultou nada. Quem tinha cinco leituras aparecia igual a quem não tinha
+   * nenhuma. Calculada agora no server (ver app/(dashboard)/clientes/page.tsx).
+   */
+  ultima_leitura_at?: string | null
+}
 
 interface ClientsTableProps {
   clients: Client[]
@@ -170,7 +180,13 @@ export function ClientsTable({ clients }: ClientsTableProps) {
                       }
                     </TableCell>
                     <TableCell>
-                      <span className="text-muted-foreground">—</span>
+                      {client.ultima_leitura_at ? (
+                        <LocalDateTime iso={client.ultima_leitura_at} />
+                      ) : (
+                        <span className="text-muted-foreground">
+                          nenhuma ainda
+                        </span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
@@ -276,6 +292,16 @@ export function ClientsTable({ clients }: ClientsTableProps) {
                         Nascimento: {format(new Date(client.birth_date + 'T00:00:00'), 'dd/MM/yyyy')}
                       </span>
                     )}
+                    <span>
+                      {client.ultima_leitura_at ? (
+                        <>
+                          Última leitura:{' '}
+                          <LocalDateTime iso={client.ultima_leitura_at} />
+                        </>
+                      ) : (
+                        'Sem leituras'
+                      )}
+                    </span>
                     {gate.status === 'incomplete' && (
                       <span className="rounded bg-amber-100 text-amber-800 px-1.5 py-0.5">
                         perfil incompleto

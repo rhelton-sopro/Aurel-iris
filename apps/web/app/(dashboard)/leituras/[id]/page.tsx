@@ -347,11 +347,38 @@ export default async function LeituraDetailPage({
             <StatusBadge status={status as never} />
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">{acoes}</div>
+          {/* ⚠️ As ações ficavam no topo de um documento LONGO: depois de ler tudo,
+              pra concluir a leitura o terapeuta tinha que rolar o documento
+              inteiro de volta.
+              ⛔ E NÃO dá pra simplesmente repetir a barra no fim: a seleção de
+              blocos da "Versão do cliente" mora dentro deste componente, então
+              duas instâncias teriam duas seleções independentes — ele marcaria
+              em cima e concluiria embaixo com o padrão, que é exatamente o furo
+              que acabamos de fechar. Uma instância só, grudada no topo. */}
+          <div className="sticky top-[calc(4rem+env(safe-area-inset-top))] z-20 -mx-4 flex flex-wrap items-center gap-2 border-b bg-background px-4 py-3 sm:-mx-6 sm:px-6">
+            {acoes}
+          </div>
 
           {mapaHtml ? (
-            <div className="overflow-hidden rounded-lg border bg-white">
-              <MapaDoSerEmbed readingId={readingId} title={`Mapa do Ser — ${clientName}`} />
+            <div className="space-y-2">
+              <div className="flex justify-end">
+                {/* ⭐ Existia uma TERCEIRA tela do Mapa do Ser que nenhum botão do
+                    sistema abria — órfã, com a lógica de render duplicada, pronta
+                    pra quebrar junto quando o formato mudasse. Ela saiu; o "abrir
+                    em tela cheia" que faltava aponta agora pro próprio documento,
+                    que é o mesmo que alimenta este quadro. Um render só. */}
+                <a
+                  href={`/leituras/${readingId}/emocional/documento`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-muted-foreground underline underline-offset-4 hover:text-foreground"
+                >
+                  Abrir em tela cheia ↗
+                </a>
+              </div>
+              <div className="overflow-hidden rounded-lg border bg-white">
+                <MapaDoSerEmbed readingId={readingId} title={`Mapa do Ser — ${clientName}`} />
+              </div>
             </div>
           ) : (
             <div className="rounded-lg border-2 border-amber-500 bg-amber-50 px-5 py-5">

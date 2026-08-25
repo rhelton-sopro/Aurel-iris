@@ -7,9 +7,14 @@
  * tem a sua caixinha; ele marca e baixa. Antes era uma caixinha só, para o guia de
  * sessão — o resto ia sempre, decidido por nós.
  *
- * A escolha é por ENTREGA, não uma configuração global: mora aqui, ao lado do botão, e
- * viaja na query do PDF. Duas leituras do mesmo cliente podem sair diferentes, que é o
- * caso real (acompanhamento à distância recebe o guia; devolutiva presencial, não).
+ * A escolha é por ENTREGA, não uma configuração global: viaja na query do PDF. Duas
+ * leituras do mesmo cliente podem sair diferentes, que é o caso real (acompanhamento à
+ * distância recebe o guia; devolutiva presencial, não).
+ *
+ * ⚠️ O estado da seleção NÃO mora mais aqui (2026-08-25) — mora no ReadingModeActions,
+ * que também é dono do "Concluir leitura". Enquanto morava aqui, a conclusão baixava um
+ * SEGUNDO PDF com a seleção padrão e era esse o que ia pro WhatsApp: o terapeuta escolhia
+ * os blocos, conferia o arquivo certo, e entregava o errado sem jeito de perceber.
  *
  * Padrão ao abrir: tudo menos "Perguntas para a sua sessão" — o guia de condução DO
  * terapeuta. Entregar o roteiro da devolutiva antes da devolutiva queima a sessão, mas
@@ -29,10 +34,15 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 export function VersaoClienteButton({
   readingId,
   titulos,
+  incluidos,
+  onIncluidosChange,
 }: {
   readingId: string
   /** Títulos dos blocos na ordem de EXIBIÇÃO — `TITULOS_BLOCOS` do motor. */
   titulos: string[]
+  /** Índices marcados. Controlado pelo pai (ver nota do cabeçalho). */
+  incluidos: number[]
+  onIncluidosChange: (proximos: number[]) => void
 }) {
   const [pending, setPending] = useState(false)
   const [aberto, setAberto] = useState(false)
@@ -44,13 +54,14 @@ export function VersaoClienteButton({
     () => titulos.map((_t, i) => i).filter((i) => !/^perguntas/i.test(titulos[i]!)),
     [titulos],
   )
-  const [incluidos, setIncluidos] = useState<number[]>(padrao)
 
   const nada = incluidos.length === 0
 
   function alternar(i: number) {
-    setIncluidos((atual) =>
-      atual.includes(i) ? atual.filter((x) => x !== i) : [...atual, i].sort((a, b) => a - b),
+    onIncluidosChange(
+      incluidos.includes(i)
+        ? incluidos.filter((x) => x !== i)
+        : [...incluidos, i].sort((a, b) => a - b),
     )
   }
 
@@ -151,7 +162,7 @@ export function VersaoClienteButton({
             size="sm"
             variant="ghost"
             className="mt-1 h-7 gap-1.5 px-2 text-xs"
-            onClick={() => setIncluidos(padrao)}
+            onClick={() => onIncluidosChange(padrao)}
             data-testid="blocos-padrao"
           >
             <Check className="h-3 w-3" aria-hidden />

@@ -32,6 +32,13 @@ interface CapturePreviewProps {
    * Default 'camera' preserva comportamento Fase 3.
    */
   mode?: CaptureMode
+  /**
+   * A pessoa na frente da tela é o PRÓPRIO examinado (fluxo /convite), não o
+   * terapeuta fotografando outra pessoa. Só muda o pronome das mensagens —
+   * "o olho do cliente" lido POR o cliente faz ele achar que entrou na tela
+   * errada, bem na hora em que ele precisa confiar no que está lendo.
+   */
+  selfCapture?: boolean
 }
 
 /**
@@ -49,6 +56,7 @@ export function CapturePreview({
   onConfirm,
   analysis,
   mode,
+  selfCapture = false,
 }: CapturePreviewProps) {
   const level: QualityLevel = levelFromScore(qualityScore)
   // Mostra alerta também para quality=regular (warning informativo, sem block).
@@ -60,7 +68,9 @@ export function CapturePreview({
   if (analysis?.vlmInvalidAlert && analysis.vlmValidation) {
     const r = analysis.vlmValidation.reason
     const messages: Record<string, string> = {
-      sem_olho: 'Foto não contém um olho — refaça apontando para o olho do cliente',
+      sem_olho: selfCapture
+        ? 'Foto não contém um olho — refaça apontando a câmera para o seu olho'
+        : 'Foto não contém um olho — refaça apontando para o olho do cliente',
       dois_olhos: 'Apenas um olho por foto — refaça com close de um único olho',
       muito_longe: 'Rosto/olho um pouco distante — se possível aproxime a câmera, mas você pode confirmar mesmo assim',
       borrado: 'Foto borrada — as fibras da íris não estão visíveis. Segure firme e tente novamente.',

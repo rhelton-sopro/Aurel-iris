@@ -24,7 +24,11 @@ const STEPS = [
   {
     id: 1,
     title: 'Complete seu perfil',
-    desc: 'Telefone, especialidades e aceite dos termos.',
+    // ⚠️ Esta frase listava 3 campos e o portão exige 8 — quem clicava esperando
+    // "telefone, especialidades e termos" encontrava CPF e endereço e concluía
+    // que o cadastro não tinha salvo. A tela de destino diz exatamente o que
+    // falta, nome por nome; aqui basta não prometer uma lista menor.
+    desc: 'Contato, CPF, especialidades, endereço e aceite dos termos.',
     href: '/perfil/completar',
     Icon: User,
   },

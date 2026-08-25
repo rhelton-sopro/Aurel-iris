@@ -10,12 +10,12 @@ import { redirect } from 'next/navigation'
 
 import { createClient } from '@/lib/supabase/server'
 import { listActiveReservations } from '@/lib/billing/reservations'
+import { getTrialState } from '@/lib/billing/trial'
 import { CreditsBalanceWidget } from '@/components/billing/CreditsBalanceWidget'
 import { ReservationsList } from '@/components/billing/ReservationsList'
 import { RefundPackageButton } from '@/components/billing/RefundPackageButton'
-import { DisclaimerCopy } from '@/components/legal/DisclaimerCopy'
 
-export const metadata = { title: 'Sua assinatura — Iris Codex' }
+export const metadata = { title: 'Seus créditos — Iris Codex' }
 
 interface CreditRow {
   id: string
@@ -35,7 +35,7 @@ export default async function AssinaturaPage() {
   } = await supabase.auth.getUser()
   if (!user) redirect('/login?next=/assinatura')
 
-  const [{ data: credits }, reservations] = await Promise.all([
+  const [{ data: credits }, reservations, trial] = await Promise.all([
     supabase
       .from('customer_credits')
       .select(
@@ -48,6 +48,7 @@ export default async function AssinaturaPage() {
       .eq('status', 'active')
       .order('purchase_date', { ascending: true }),
     listActiveReservations(user.id),
+    getTrialState(user.id),
   ])
 
   const activeCredits = (credits ?? []) as unknown as CreditRow[]
@@ -62,16 +63,60 @@ export default async function AssinaturaPage() {
   )
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6 px-4 py-6">
-      <header className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-ink">Sua assinatura</h1>
-        <Link
-          href="/dashboard"
-          className="text-sm text-muted-foreground underline"
-        >
-          ← Dashboard
-        </Link>
+    /* Esta tela agora vive DENTRO do layout do painel (2026-08-25): o menu
+       lateral levava até ela e desaparecia na chegada, deixando como único
+       caminho de volta um "← Dashboard" pequeno no canto. Com o layout, o menu
+       fica — e o "voltar" improvisado sai junto, porque virou redundância. */
+    <div className="mx-auto max-w-4xl space-y-6">
+      <header>
+        <h1 className="text-[22px] font-light uppercase tracking-display text-ink">
+          Seus créditos
+        </h1>
       </header>
+
+      {/* ⭐ A avaliação gratuita não aparecia AQUI (tirada da UI em 2026-05-30) — e
+          esta é exatamente a tela pra onde o selo "1 grátis" do topo aponta. Quem
+          clicava pra ver o saldo de cortesia lia "Nenhum pacote ativo" e concluía
+          que não tinha nada. O selo levava ao desmentido do próprio selo. */}
+      {trial.status === 'active' && (
+        <section className="rounded-[2px] border border-teal-dark/40 bg-teal-dark/5 p-4">
+          <p className="text-[11px] font-medium uppercase tracking-label text-teal-dark">
+            Avaliação gratuita
+          </p>
+          <p className="mt-1.5 text-lg font-semibold text-ink">
+            {trial.readings_remaining}{' '}
+            {trial.readings_remaining === 1
+              ? 'leitura de cortesia'
+              : 'leituras de cortesia'}
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Válida até{' '}
+            <strong className="text-ink">
+              {new Date(trial.expires_at).toLocaleDateString('pt-BR')}
+            </strong>{' '}
+            ({trial.days_remaining}{' '}
+            {trial.days_remaining === 1 ? 'dia restante' : 'dias restantes'}). É
+            gasta antes dos créditos comprados — o que você comprar fica intacto
+            até ela acabar.
+          </p>
+        </section>
+      )}
+
+      {trial.status === 'ended' && (
+        <section className="rounded-[2px] border border-border bg-muted/30 p-4">
+          <p className="text-[11px] font-medium uppercase tracking-label text-muted-foreground">
+            Avaliação gratuita
+          </p>
+          <p className="mt-1.5 text-sm text-ink">
+            {trial.reason === 'readings_exhausted'
+              ? 'Encerrada — a leitura de cortesia já foi usada.'
+              : trial.reason === 'days_elapsed'
+                ? 'Encerrada — o prazo de 15 dias venceu.'
+                : 'Encerrada.'}{' '}
+            A partir daqui, cada leitura consome 1 crédito.
+          </p>
+        </section>
+      )}
 
       <CreditsBalanceWidget
         totalRemaining={totalRemaining}
@@ -127,7 +172,6 @@ export default async function AssinaturaPage() {
         )}
       </section>
 
-      <DisclaimerCopy variant="footer" />
     </div>
   )
 }

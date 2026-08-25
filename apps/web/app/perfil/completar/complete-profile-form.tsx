@@ -34,7 +34,21 @@ type Initial = {
 
 const FIXED = SPECIALTIES as readonly string[]
 
-export function CompleteProfileForm({ initial }: { initial?: Initial }) {
+export function CompleteProfileForm({
+  initial,
+  next,
+  contexto = 'acesso',
+}: {
+  initial?: Initial
+  /** Tela pedida antes do desvio do portão — já validada no server. */
+  next?: string | null
+  /**
+   * 'compra' exige o endereço; 'acesso' o deixa opcional e recolhido.
+   * Ver a nota grande em lib/gates/therapist-profile.ts.
+   */
+  contexto?: 'acesso' | 'compra'
+}) {
+  const exigeEndereco = contexto === 'compra'
   // specialties salvas: separa as da lista fixa do texto livre ("Outro").
   const savedSpecs = initial?.specialties ?? []
   const freeText = savedSpecs.find((s) => !FIXED.includes(s)) ?? ''
@@ -114,6 +128,7 @@ export function CompleteProfileForm({ initial }: { initial?: Initial }) {
       specialties: selected,
       otherText,
       tosAccepted,
+      contexto,
       cep,
       address,
       addressNumber,
@@ -121,8 +136,10 @@ export function CompleteProfileForm({ initial }: { initial?: Initial }) {
       district,
       city,
       state: uf,
+      next: next ?? undefined,
     })
-    // Sucesso → a action faz redirect('/dashboard'). Só chega aqui em erro.
+    // Sucesso → a action redireciona (pro destino guardado, ou /dashboard).
+    // Só chega aqui em erro.
     if (res?.error) {
       setError(res.error)
       setPending(false)
@@ -214,11 +231,18 @@ export function CompleteProfileForm({ initial }: { initial?: Initial }) {
         )}
       </div>
 
-      {/* ── Endereço (NF-e + cobrança) ── */}
+      {/* ── Endereço (NF-e + cobrança) ──
+          ⭐ Fora do contexto de compra ele é OPCIONAL e vem recolhido: era o
+          bloco que transformava a primeira entrada numa segunda tela de
+          cadastro e travava quem ainda não tinha visto o produto funcionar. */}
       <fieldset className="flex flex-col gap-4 border-t border-b-ink/15 pt-5">
         <legend className="text-sm font-medium">
           Endereço{' '}
-          <span className="text-mist">(para a nota fiscal e o pagamento)</span>
+          <span className="text-mist">
+            {exigeEndereco
+              ? '(para a nota fiscal e o pagamento)'
+              : '(opcional agora — pedimos na hora de comprar créditos)'}
+          </span>
         </legend>
 
         <div className="flex flex-col gap-1.5">

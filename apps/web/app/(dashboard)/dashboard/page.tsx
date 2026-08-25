@@ -88,9 +88,14 @@ export default async function DashboardPage() {
       <AutoRefreshWhileProcessing active intervalMs={15000} />
       <div className="flex items-center justify-between gap-4">
         <h1 className="text-2xl font-semibold">Dashboard</h1>
-        <Link href="/leituras/autoexame" className={cn(buttonVariants())}>
-          Fazer meu próprio exame
-        </Link>
+        {/* Enquanto o cartão de boas-vindas está na tela, este botão seria a
+            SEGUNDA porta pro mesmo lugar, uma embaixo da outra. Duas portas
+            iguais fazem a pessoa parar pra descobrir a diferença — e não há. */}
+        {!showWelcome && (
+          <Link href="/leituras/autoexame" className={cn(buttonVariants())}>
+            Fazer meu próprio exame
+          </Link>
+        )}
       </div>
       {showWelcome && (
         <WelcomeAutoexame readingsRemaining={trialReadingsRemaining} />
@@ -106,6 +111,8 @@ export default async function DashboardPage() {
       <SummaryCards
         clientsCount={clientsCount ?? 0}
         creditsRemaining={creditsRemaining}
+        trialReadingsRemaining={trialReadingsRemaining}
+        trialExpiresAt={trial.status === 'active' ? trial.expires_at : null}
       />
     </div>
   )

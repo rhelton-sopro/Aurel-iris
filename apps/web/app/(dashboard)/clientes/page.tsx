@@ -8,12 +8,30 @@ import { cn } from '@/lib/utils'
 export default async function ClientesPage() {
   const supabase = await createClient()
 
-  const { data: clients } = await supabase
-    .from('clients')
-    .select('*')
-    .order('full_name', { ascending: true })
+  // ⚠️ A coluna "Última leitura" da tabela existia, tinha título, ocupava espaço
+  // — e mostrava um traço para TODO cliente, sempre. Um cliente com cinco
+  // leituras aparecia igual a um que nunca fez nenhuma: informação errada com
+  // cara de informação, na coluna que responde "quem está atrasado pra voltar".
+  const [{ data: clients }, { data: readingDates }] = await Promise.all([
+    supabase.from('clients').select('*').order('full_name', { ascending: true }),
+    supabase
+      .from('readings')
+      .select('client_id, created_at')
+      .order('created_at', { ascending: false }),
+  ])
 
-  const list = clients ?? []
+  // Primeira ocorrência por cliente = a mais recente (a query já vem ordenada).
+  const ultimaLeitura = new Map<string, string>()
+  for (const r of readingDates ?? []) {
+    if (r.client_id && !ultimaLeitura.has(r.client_id)) {
+      ultimaLeitura.set(r.client_id, r.created_at as string)
+    }
+  }
+
+  const list = (clients ?? []).map((c) => ({
+    ...c,
+    ultima_leitura_at: ultimaLeitura.get(c.id) ?? null,
+  }))
 
   return (
     <div className="space-y-6">

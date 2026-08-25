@@ -19,7 +19,12 @@ const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/clientes', label: 'Clientes', icon: Users },
   { href: '/leituras', label: 'Leituras', icon: Eye },
-  { href: '/assinatura', label: 'Assinatura', icon: CreditCard },
+  // ⚠️ "Assinatura" era o nome de duas coisas erradas ao mesmo tempo: o menu do
+  // avatar chamava a MESMA tela de "Pagamento", e o produto não é assinatura —
+  // a própria tela de compra escreve "sem assinatura mensal". Quem procurava
+  // onde comprar crédito lia "assinatura" e hesitava. A ROTA continua
+  // /assinatura (links antigos e e-mails já enviados apontam pra ela).
+  { href: '/assinatura', label: 'Créditos', icon: CreditCard },
 ]
 
 export function AppSidebar() {

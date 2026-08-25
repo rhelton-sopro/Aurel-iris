@@ -72,6 +72,20 @@ export function InviteTermoStep({
         pessoal sensível.
       </p>
 
+      {/* ⚠️ Este é o SEGUNDO aceite seguido: no cadastro ele já marcou "aceito os
+          Termos de Uso e a Política de Privacidade". Juridicamente são coisas
+          diferentes — a imagem da íris é dado biométrico, e o art. 11 da LGPD
+          exige consentimento específico e destacado, que não pode vir embutido
+          num aceite genérico. Mas ninguém sabe disso lendo a tela: sem esta
+          frase, o cliente conclui que o primeiro aceite não valeu, e é a última
+          coisa que se quer que ele pense antes de fotografar o próprio olho. */}
+      <p className="rounded-md border border-border bg-muted/20 px-3 py-2.5 text-sm leading-relaxed text-foreground/80">
+        <strong className="font-medium">Você já aceitou os termos no cadastro
+        — este aqui é outro, e é obrigatório.</strong>{' '}
+        A foto da íris é um dado biométrico, e a lei exige uma autorização
+        separada e específica pra ele. É a última etapa antes das fotos.
+      </p>
+
       <PhotoPrivacyNotice />
 
       <div className="space-y-2 rounded-md border border-border bg-muted/20 px-3 py-2.5">

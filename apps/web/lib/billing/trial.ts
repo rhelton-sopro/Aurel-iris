@@ -6,7 +6,16 @@ import { createServiceClient } from '@/lib/supabase/service'
 import { TRIAL_READINGS_MAX, trialExpiresAt } from './config'
 
 export type TrialState =
-  | { status: 'active'; readings_remaining: number; days_remaining: number }
+  // `expires_at` sai daqui pra UI poder mostrar a DATA do vencimento, não só a
+  // contagem de dias. O prazo de 15 dias existia e não aparecia em lugar nenhum:
+  // quem voltava no vigésimo dia encontrava o selo sumido, o cartão em zero e
+  // nenhuma explicação — não sabia se perdeu, se quebrou, ou se nunca teve.
+  | {
+      status: 'active'
+      readings_remaining: number
+      days_remaining: number
+      expires_at: string
+    }
   | { status: 'ended'; reason: 'readings_exhausted' | 'days_elapsed' | 'manual' }
   | { status: 'no_trial' }
 
@@ -56,7 +65,12 @@ export function evaluateTrial(
     0,
     Math.ceil((expiresAt.getTime() - now.getTime()) / 86_400_000),
   )
-  return { status: 'active', readings_remaining, days_remaining }
+  return {
+    status: 'active',
+    readings_remaining,
+    days_remaining,
+    expires_at: trial.trial_expires_at,
+  }
 }
 
 /**
