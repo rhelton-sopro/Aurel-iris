@@ -5,15 +5,17 @@
 // contenteditable; envia html + text (fallback) por SMTP.
 //
 // Dois modos de envio, escolhidos pelo que está preenchido:
-//  · nenhum terapeuta na caixinha  -> envio único (mantém o encadeamento da resposta)
-//  · um ou mais terapeutas         -> UM e-mail separado por pessoa, com {nome}
+//  · um destinatário só            -> envio único (mantém o encadeamento da resposta)
+//  · terapeutas na caixinha, ou    -> UM e-mail separado por pessoa, com {nome}
+//    vários endereços no "Para"
 
-import { useEffect, useRef, useState, useTransition } from 'react'
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { sendEmailAction, sendBulkEmailAction, type TherapistRecipient } from './actions'
+import { parseEnderecos } from '@/lib/email/enderecos'
 import { RecipientPicker } from './RecipientPicker'
 
 export interface ComposeInitial {
@@ -55,6 +57,14 @@ export function ComposeForm({
   const [escolhidos, setEscolhidos] = useState<TherapistRecipient[]>([])
   const [pickerAberto, setPickerAberto] = useState(false)
   const semNome = escolhidos.filter((t) => !t.name.trim())
+  // O campo "Para" aceita VÁRIOS endereços separados por ; ou , (25/08). A
+  // mesma função decide o aviso da tela e o envio no servidor.
+  const avulsos = useMemo(() => parseEnderecos(to), [to])
+  const totalDestinatarios = escolhidos.length + avulsos.validos.length
+  // Endereço avulso não tem cadastro, logo não tem nome: com {nome} no texto,
+  // sairia "Olá, ." para essa pessoa.
+  const semNomeTotal = semNome.length + avulsos.validos.length
+  const emMassa = escolhidos.length > 0 || avulsos.validos.length > 1
 
   // ⛔⛔ NÃO devolver `dangerouslySetInnerHTML` para o editor. (bug de 24/08: a
   // mensagem que o founder digitava sumia sozinha "ao clicar em outro lugar")
@@ -93,18 +103,27 @@ export function ComposeForm({
     const html = editorRef.current?.innerHTML ?? ''
     const text = editorRef.current?.innerText ?? ''
 
+    // Endereço mal digitado barra ANTES de sair qualquer mensagem — o disparo
+    // inteiro não pode morrer no servidor por causa de uma vírgula solta.
+    if (avulsos.invalidos.length) {
+      toast.error(
+        `Isto não é um endereço: ${avulsos.invalidos.join(', ')}. Separe os endereços por ponto e vírgula.`,
+      )
+      return
+    }
+
     // ⚠️ Trava do {nome} sem nome: um "Olá, ." saindo para dezenas de pessoas
     // não tem desfazer. Só bloqueia quando as duas coisas se encontram.
     const usaMarcaDeNome = MARCA_NOME.test(text) || MARCA_NOME.test(subject)
-    if (escolhidos.length && usaMarcaDeNome && semNome.length) {
+    if (emMassa && usaMarcaDeNome && semNomeTotal) {
       toast.error(
-        `${semNome.length} selecionado(s) não têm nome cadastrado — o {nome} sairia vazio. Tire essas pessoas ou o {nome} do texto.`,
+        `${semNomeTotal} destinatário(s) sem nome cadastrado — o {nome} sairia vazio. Tire essas pessoas ou o {nome} do texto.`,
       )
       return
     }
 
     start(async () => {
-      if (escolhidos.length) {
+      if (emMassa) {
         const r = await sendBulkEmailAction({
           therapistIds: escolhidos.map((t) => t.id),
           extraTo: to,
@@ -161,15 +180,27 @@ export function ComposeForm({
       <div className="max-h-[90vh] w-full max-w-lg space-y-3 overflow-y-auto rounded-[2px] border border-border bg-background p-5">
         <h3 className="text-lg font-semibold text-ink">{initial.title}</h3>
         <div className="space-y-1">
-          <label className="text-xs text-muted-foreground">Para (endereço avulso)</label>
+          <label className="text-xs text-muted-foreground">
+            Para (endereços avulsos — separe por ponto e vírgula)
+          </label>
           <input
-            type="email"
+            type="text"
             value={to}
             onChange={(e) => setTo(e.target.value)}
             disabled={isPending}
-            placeholder="destinatario@email.com"
+            placeholder="fulana@email.com; beltrano@email.com"
             className={inputCls}
           />
+          {avulsos.invalidos.length ? (
+            <p className="text-[11px] text-[#B23A2B]">
+              ⚠️ isto não é um endereço: {avulsos.invalidos.join(', ')}
+            </p>
+          ) : null}
+          {avulsos.validos.length > 1 ? (
+            <p className="text-[11px] text-muted-foreground">
+              {avulsos.validos.length} endereços — cada um recebe um e-mail separado.
+            </p>
+          ) : null}
         </div>
         <div className="space-y-1">
           <div className="flex items-center justify-between">
@@ -249,9 +280,7 @@ export function ComposeForm({
         </div>
         <p className="text-[11px] text-muted-foreground">
           Enviado de suporte@iriscodex.com ·{' '}
-          {escolhidos.length
-            ? 'uma cópia do disparo fica em Enviados.'
-            : 'cópia salva em Enviados.'}
+          {emMassa ? 'uma cópia do disparo fica em Enviados.' : 'cópia salva em Enviados.'}
         </p>
         <div className="flex justify-end gap-2">
           <Button type="button" variant="outline" size="sm" onClick={onClose} disabled={isPending}>
@@ -267,8 +296,8 @@ export function ComposeForm({
           >
             {isPending
               ? 'Enviando…'
-              : escolhidos.length
-                ? `Enviar para ${escolhidos.length + (to.trim() ? 1 : 0)}`
+              : emMassa
+                ? `Enviar para ${totalDestinatarios}`
                 : 'Enviar'}
           </Button>
         </div>

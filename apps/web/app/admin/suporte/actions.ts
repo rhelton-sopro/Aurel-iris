@@ -15,6 +15,7 @@ import {
   sendBulkSupportEmail,
   type BulkRecipient,
 } from '@/lib/email/smtp-client'
+import { parseEnderecos } from '@/lib/email/enderecos'
 import { createServiceClient } from '@/lib/supabase/service'
 import type { SupportEmailBody } from '@/lib/email/types'
 
@@ -104,12 +105,18 @@ export async function sendEmailAction(
   if (!to || !subject || !input.text?.trim()) {
     return { ok: false, error: 'Preencha destinatário, assunto e mensagem.' }
   }
-  // validação simples de email no destinatário
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
+  const { validos, invalidos } = parseEnderecos(to)
+  if (invalidos.length) {
+    return { ok: false, error: `Endereço inválido: ${invalidos.join(', ')}` }
+  }
+  // Mais de um endereço não passa por aqui: a tela manda esse caso para o
+  // envio em massa, que dispara UMA mensagem por pessoa. Juntar todo mundo no
+  // mesmo "Para" mostraria o endereço de cada um para todos os outros.
+  if (validos.length !== 1) {
     return { ok: false, error: 'Destinatário inválido.' }
   }
   return sendSupportEmail({
-    to,
+    to: validos[0],
     subject,
     text: input.text,
     html: input.html,
@@ -208,11 +215,18 @@ export async function sendBulkEmailAction(
     .filter((t) => escolhidos.has(t.id))
     .map((t) => ({ email: t.email, name: t.name }))
 
-  const extra = input.extraTo?.trim()
-  if (extra) {
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(extra)) {
-      return { ok: false, sent: 0, failed: [], error: 'Destinatário avulso inválido.' }
+  // Campo "Para": um ou vários endereços avulsos, separados por ; ou , (ver
+  // lib/email/enderecos.ts). Quem já está na caixinha não entra de novo.
+  const { validos, invalidos } = parseEnderecos(input.extraTo)
+  if (invalidos.length) {
+    return {
+      ok: false,
+      sent: 0,
+      failed: [],
+      error: `Endereço avulso inválido: ${invalidos.join(', ')}`,
     }
+  }
+  for (const extra of validos) {
     if (!recipients.some((r) => r.email.toLowerCase() === extra.toLowerCase())) {
       recipients.push({ email: extra, name: null })
     }

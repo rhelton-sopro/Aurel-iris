@@ -174,3 +174,49 @@ describe('ComposeForm — envio em massa para terapeutas', () => {
     expect(editor.innerHTML).toContain('rascunho anterior à escolha')
   })
 })
+
+// ===========================================================================
+// Vários endereços no campo "Para" (25/08). O founder cola a lista separada
+// por ponto e vírgula — antes disso o envio inteiro morria em "Destinatário
+// avulso inválido", levando junto os terapeutas já escolhidos.
+// ===========================================================================
+
+describe('ComposeForm — vários endereços no campo Para', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it('dois ou mais endereços viram disparo separado, um por pessoa', async () => {
+    const { editor } = setup({ ...INITIAL, to: 'a@x.com; b@y.com', text: '' })
+    editor.innerHTML = 'Comunicado.'
+
+    fireEvent.click(screen.getByText('Enviar para 2'))
+    await waitFor(() => expect(sendBulkEmailAction).toHaveBeenCalledTimes(1))
+    expect(sendEmailAction).not.toHaveBeenCalled()
+    expect(vi.mocked(sendBulkEmailAction).mock.calls[0][0].extraTo).toBe('a@x.com; b@y.com')
+  })
+
+  it('endereços avulsos somam com os terapeutas escolhidos', async () => {
+    const { container, editor } = setup({ ...INITIAL, to: 'a@x.com; b@y.com', text: '' })
+    await escolher(container, ['nailli@exemplo.com'])
+    editor.innerHTML = 'Comunicado.'
+    expect(screen.getByText('Enviar para 3')).toBeTruthy()
+  })
+
+  it('barra o envio quando um dos endereços está mal digitado', async () => {
+    const { editor } = setup({ ...INITIAL, to: 'a@x.com; b@y.com; bagunça@', text: '' })
+    editor.innerHTML = 'Comunicado.'
+
+    fireEvent.click(screen.getByText('Enviar para 2'))
+    await waitFor(() => expect(toast.error).toHaveBeenCalled())
+    expect(sendBulkEmailAction).not.toHaveBeenCalled()
+    expect(sendEmailAction).not.toHaveBeenCalled()
+  })
+
+  it('com {nome} no texto, endereço avulso (que não tem cadastro) barra o disparo', async () => {
+    const { editor } = setup({ ...INITIAL, to: 'a@x.com; b@y.com', text: '' })
+    editor.innerHTML = 'Olá, {nome}!'
+
+    fireEvent.click(screen.getByText('Enviar para 2'))
+    await waitFor(() => expect(toast.error).toHaveBeenCalled())
+    expect(sendBulkEmailAction).not.toHaveBeenCalled()
+  })
+})

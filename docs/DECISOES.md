@@ -1923,6 +1923,38 @@ o débito continua, agora sobre um texto que ao menos descreve o sistema real.
 ---
 
 
+## 2026-08-25 — o campo "Para" do disparo aceitava UM endereço só
+
+**Relato do founder:** *"está tendo algum erro na hora que eu vou colocar mais terapeutas.
+Eu separo por ponto e vírgula, eu vou clicando e vou adicionando."*
+
+**Causa:** o campo "Para (endereço avulso)" era validado por uma regex de e-mail ÚNICO
+(`/^[^\s@]+@[^\s@]+\.[^\s@]+$/`). Com dois endereços separados por `;` a validação falhava e a
+server action devolvia "Destinatário avulso inválido" — derrubando o disparo INTEIRO, inclusive
+os terapeutas já marcados na caixinha, que não tinham nada com aquele campo.
+
+**Decisão:** o campo passa a aceitar vários endereços, separados por `;`, `,`, espaço ou quebra
+de linha (e a forma `Fulana <fulana@x.com>`, que sai ao copiar de outro cliente de e-mail).
+Duplicata cai fora; quem já está na caixinha não entra duas vezes.
+
+⭐ **Dois ou mais destinatários = disparo separado, um e-mail por pessoa** — nunca todo mundo no
+mesmo "Para". É a decisão de 24/08 ("ninguém vê o endereço de ninguém") aplicada também ao campo
+avulso. O envio único, que preserva o encadeamento da resposta, continua valendo quando há UM
+destinatário só.
+
+⚠️ Endereço avulso não tem cadastro, logo não tem nome: com `{nome}` no texto, ele entra na
+trava que já existia — o disparo é bloqueado em vez de sair um "Olá, .".
+
+**Regra em UM lugar** (`lib/email/enderecos.ts`), usada pela tela e pela server action: o aviso
+que aparece na tela é exatamente a regra que decide o envio. O endereço mal digitado agora é
+apontado na hora, embaixo do campo, e não depois que o disparo morreu no servidor.
+
+**STATUS: APLICADA** — 22 testes no caminho (8 novos em `enderecos.test.ts`, 4 no
+`ComposeForm.test.tsx`) · `pnpm lint` 0 erros/25 warnings · **pushado em 25/08**.
+
+---
+
+
 ## Como usar
 
 - **Ao tomar uma decisão:** registrar aqui na mesma sessão, com razão e status.
