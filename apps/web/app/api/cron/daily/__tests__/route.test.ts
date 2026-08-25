@@ -1,13 +1,28 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+/**
+ * ⚠️ Esta lista precisa ter TODOS os trabalhos que a rota chama.
+ *
+ * O robô diário ganhou dois trabalhos novos (a reconciliação de créditos órfãos
+ * e a renovação do token do Instagram) e esta imitação continuou declarando os
+ * quatro originais. O teste então quebrava dizendo "não existe essa função" — e
+ * o que ele deixou de vigiar nesse meio-tempo foi justamente o que importa: que
+ * um trabalho falhando não derrube os outros cinco.
+ */
 vi.mock('@/lib/billing/cron-jobs', () => ({
   releaseExpiredReservations: vi.fn(),
   expireOldCredits: vi.fn(),
   expireOldTrials: vi.fn(),
   sendExpirationWarnings: vi.fn(),
+  reconcileOrphanedConsumes: vi.fn(),
+}))
+
+vi.mock('@/lib/instagram/token', () => ({
+  refreshAndHealthcheckInstagram: vi.fn(),
 }))
 
 import * as jobs from '@/lib/billing/cron-jobs'
+import { refreshAndHealthcheckInstagram } from '@/lib/instagram/token'
 
 import { GET } from '../route'
 
@@ -58,7 +73,7 @@ describe('GET /api/cron/daily', () => {
     expect(res.status).toBe(401)
   })
 
-  it('200 roda os 4 jobs em sequência', async () => {
+  it('200 roda os 6 jobs em sequência', async () => {
     vi.mocked(jobs.releaseExpiredReservations).mockResolvedValue({
       released: 2,
       errors: 0,
@@ -68,6 +83,14 @@ describe('GET /api/cron/daily', () => {
     vi.mocked(jobs.sendExpirationWarnings).mockResolvedValue({
       sent: 3,
       skipped: 1,
+    })
+    vi.mocked(jobs.reconcileOrphanedConsumes).mockResolvedValue({
+      consumed: 0,
+      errors: 0,
+    })
+    vi.mocked(refreshAndHealthcheckInstagram).mockResolvedValue({
+      refreshed: false,
+      healthy: true,
     })
 
     const res = await GET(makeReq('cron_secret_x'))
@@ -81,6 +104,8 @@ describe('GET /api/cron/daily', () => {
     expect(jobs.expireOldCredits).toHaveBeenCalledOnce()
     expect(jobs.expireOldTrials).toHaveBeenCalledOnce()
     expect(jobs.sendExpirationWarnings).toHaveBeenCalledOnce()
+    expect(jobs.reconcileOrphanedConsumes).toHaveBeenCalledOnce()
+    expect(refreshAndHealthcheckInstagram).toHaveBeenCalledOnce()
   })
 
   it('continua os outros jobs quando um lança', async () => {
@@ -93,11 +118,23 @@ describe('GET /api/cron/daily', () => {
       sent: 0,
       skipped: 0,
     })
+    vi.mocked(jobs.reconcileOrphanedConsumes).mockResolvedValue({
+      consumed: 0,
+      errors: 0,
+    })
+    vi.mocked(refreshAndHealthcheckInstagram).mockResolvedValue({
+      refreshed: false,
+      healthy: true,
+    })
 
     const res = await GET(makeReq('cron_secret_x'))
     expect(res.status).toBe(200)
     const body = await res.json()
     expect(body.reservations.errors).toBe(1)
     expect(body.credits.expired).toBe(1)
+    // ⭐ E os DOIS trabalhos novos seguem rodando mesmo com o primeiro caído —
+    // é esta a garantia que o teste existe pra dar.
+    expect(jobs.reconcileOrphanedConsumes).toHaveBeenCalledOnce()
+    expect(refreshAndHealthcheckInstagram).toHaveBeenCalledOnce()
   })
 })

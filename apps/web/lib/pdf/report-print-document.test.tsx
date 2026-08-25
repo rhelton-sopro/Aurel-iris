@@ -103,12 +103,44 @@ describe('renderBodyHtml', () => {
     expect(html).toContain('id="sec-15"')
   })
 
-  it('renders the "Em poucas palavras" essence page when present', () => {
+  /**
+   * ⚠️ Este teste cobrava UMA página que hoje são DUAS, e por isso ficou
+   * vermelho meses a fio.
+   *
+   * A frase-síntese ganhou página própria, rotulada "Em uma palavra", e o
+   * rótulo "Em poucas palavras" passou para o bloco de abertura do relatório —
+   * outro conteúdo, outra origem, outro lugar no documento. O teste procurava
+   * o rótulo novo dentro da página velha e não achava nenhum dos dois direito.
+   *
+   * Agora são dois testes, um por página, porque são duas coisas.
+   */
+  it('renders the "Em uma palavra" essence page when the phrase is present', () => {
     expect(html).toContain('class="essence-page"')
-    expect(html).toContain('class="essence-label">Em poucas palavras')
+    expect(html).toContain('class="essence-label">Em uma palavra')
     expect(html).toContain('aprendeu a sustentar')
     expect(html).toContain('class="essence-divider"')
     expect(html).toContain('essência que atravessa este relatório')
+  })
+
+  it('⛔ sem bloco de abertura, a página "Em poucas palavras" não é inventada', () => {
+    // O fixture desta suíte não traz o bloco 0 — então ele não pode aparecer.
+    expect(html).not.toContain('class="zero-section"')
+  })
+
+  it('renders the "Em poucas palavras" opening block when it exists', async () => {
+    // Cobertura NOVA: é o primeiro bloco que o cliente lê no PDF, e nenhum teste
+    // olhava para ele — o que falhava cobria a página da frase-síntese.
+    const comAbertura = await renderBodyHtml({
+      ...PROPS,
+      sections: {
+        ...SECTIONS,
+        '0_em_poucas_palavras':
+          'Alguém que aprende a temperatura de um ambiente antes de entrar nele.',
+      },
+    })
+    expect(comAbertura).toContain('class="essence-label">Em poucas palavras')
+    expect(comAbertura).toContain('id="sec-0"')
+    expect(comAbertura).toContain('a temperatura de um ambiente')
   })
 
   it('omits the essence page when essence_phrase is absent', async () => {

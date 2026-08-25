@@ -49,6 +49,34 @@ scripts/output/
 _exp-*/
 _audit-*/
 
+# ── Bancada de experimento do founder (2026-08-25) ───────────────────────────
+# Ele trabalha com scripts soltos aqui na raiz: ~84 arquivos de investigação
+# (medições de custo, comparações de crop, dumps de exame) que vivem no
+# computador dele e não pertencem ao repositório.
+#
+# Antes disso, ficavam permanentemente listados como "novidade não guardada" —
+# e um `git add -A` os varria junto. Aconteceu: 353 arquivos entraram num commit
+# por acidente e foi preciso desfazer.
+#
+# ⛔ Só arquivos SOLTOS da raiz. `_motor-lab/` é VERSIONADO de propósito (é onde
+# moram as auditorias, os estudos e o golden set do motor) e não entra aqui —
+# por isso nada de `_*/` genérico, que engoliria as pastas junto.
+# ⚠️ `_lab-gerar.mjs` já está rastreado; ignorar não desrastreia, ele segue
+# normal — só não some da lista se alguém quiser mexer nele.
+/_*.mjs
+/_*.mts
+/_*.json
+/_*.md
+/_*.html
+/_*.log
+/_*.tsx
+
+# Fotos de íris de teste e PDFs gerados localmente. As fotos são PII, mesma
+# razão do `_exp-*/` acima.
+/_stage1-founder-photos/
+/_stage1-probe/
+/_pdf-local/
+
 # serwist removed — public/sw.js is now a committed self-unregistering
 # kill-switch (Serwist precache served stale bundles, broke auth).
 public/sw.js.map

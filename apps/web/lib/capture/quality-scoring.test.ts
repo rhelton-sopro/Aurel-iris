@@ -44,14 +44,24 @@ describe('overallScore', () => {
       WEIGHTS.distance +
       WEIGHTS.sharpness +
       WEIGHTS.exposure +
-      WEIGHTS.reflex +
       WEIGHTS.occlusion
     expect(sumOfWeights).toBeCloseTo(1.0, 9)
   })
 
-  it('reflex true cancels its 0.15 contribution', () => {
+  /**
+   * ⭐ O REFLEXO DEIXOU DE PESAR NA NOTA — e é decisão, não descuido.
+   *
+   * Câmera de celular quase sempre produz reflexo, então penalizá-lo reprovava
+   * captura boa em condição real. O peso dele foi redistribuído para a
+   * DISTÂNCIA, que é o indicador que de fato governa a qualidade iridológica
+   * (ver o comentário sobre WEIGHTS em quality-scoring.ts).
+   *
+   * Estes dois testes ficaram 3 meses vermelhos cobrando um peso que já não
+   * existia. Agora eles travam o contrário: reflexo NÃO derruba a nota.
+   */
+  it('⛔ reflexo não derruba a nota — só a copy de orientação continua existindo', () => {
     const reflexed: QualityCheck = { ...PERFECT, reflexInIrisCenter: true }
-    expect(overallScore(reflexed)).toBeCloseTo(1.0 - WEIGHTS.reflex, 9)
+    expect(overallScore(reflexed)).toBeCloseTo(1.0, 9)
   })
 
   it('eyelid 1.0 (totally closed) cancels its 0.10 contribution', () => {
@@ -100,15 +110,10 @@ describe('dominantFailure + feedbackMessage', () => {
     expect(dominantFailure(c)).toBe('sharpness')
   })
 
-  it('returns reflex when reflexInIrisCenter=true and score < 0.75', () => {
-    const c: QualityCheck = {
-      ...PERFECT,
-      reflexInIrisCenter: true,
-      irisCenteredness: 0.5,
-      sharpness: 0.5,
-    }
-    expect(overallScore(c)).toBeLessThan(0.75)
-    // reflex sozinho não é necessariamente o pior; este teste valida que o key existe e a copy é correta
+  it('a copy de reflexo continua existindo, mesmo fora da nota', () => {
+    // O reflexo saiu do CÁLCULO (ver acima) mas segue como orientação possível
+    // ao terapeuta. Este teste guarda só a frase — foi por confundir as duas
+    // coisas que ele cobrava uma nota abaixo de 0,75 que a fórmula nova não dá.
     expect(feedbackMessage('reflex')).toBe('Muito reflexo — gire levemente a cabeça')
   })
 

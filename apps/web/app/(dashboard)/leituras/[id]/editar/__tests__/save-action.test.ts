@@ -81,6 +81,8 @@ function createMockSupabase(opts: {
   reading?: Record<string, unknown> | null
   readingError?: { message: string } | null
   updateError?: { message: string } | null
+  /** Markdown do Mapa do Ser, quando a leitura tem um. null = leitura do Dossiê. */
+  mapaMd?: string | null
 }) {
   const update = vi.fn(() => ({
     eq: vi.fn().mockResolvedValue({ error: opts.updateError ?? null }),
@@ -89,10 +91,30 @@ function createMockSupabase(opts: {
     data: opts.reading ?? null,
     error: opts.readingError ?? null,
   })
+  /**
+   * ⚠️ A imitação do banco precisa aceitar as DUAS formas de consulta que o
+   * código faz — e por meses aceitou só uma.
+   *
+   * Quando o Mapa do Ser virou o relatório principal (30/07), a conclusão da
+   * leitura passou a fazer uma segunda consulta, mais curta, para descobrir se
+   * a leitura tem Mapa do Ser ou o Dossiê antigo. A imitação só sabia responder
+   * à consulta longa, então o teste morria em "isso não é uma função" — e, com
+   * ele, morreram os seis testes que vigiam as travas da conclusão: leitura já
+   * entregue, relatório vazio, ancoragem insuficiente.
+   *
+   * Eram travas caras de perder: são elas que impedem entregar ao cliente um
+   * relatório que não devia sair.
+   */
+  const maybeSingle = vi
+    .fn()
+    .mockResolvedValue({ data: { report_emocional: opts.mapaMd ?? null }, error: null })
   const fromChain = {
     select: vi.fn(() => ({
       eq: vi.fn(() => ({
+        // consulta longa (o Dossiê, com dono): select → eq → eq → single
         eq: vi.fn(() => ({ single })),
+        // consulta curta (tem Mapa do Ser?): select → eq → maybeSingle
+        maybeSingle,
       })),
     })),
     update,

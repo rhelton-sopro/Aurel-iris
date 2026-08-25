@@ -31,7 +31,11 @@ describe('lib/anthropic/prompts — getSystemPromptVersion (07.4-36)', () => {
 describe('lib/anthropic/prompts — file content (Plan 21 — 16-section Iris Codex V1, no § symbol)', () => {
   it('system.md contém o marker allowlist do audit na linha 1', () => {
     const sys = loadSystemPrompt()
-    const firstLine = sys.split('\n')[0]
+    // ⚠️ `.trimEnd()`: no Windows o arquivo é lido com fim de linha CRLF, então
+    // a primeira linha vinha com um caractere invisível no fim e a comparação
+    // falhava — só na máquina do founder, nunca no servidor. Meses de vermelho
+    // por uma diferença que não existe no texto que o modelo lê.
+    const firstLine = sys.split('\n')[0]!.trimEnd()
     expect(firstLine).toBe('<!-- audit-vocabulary:allowlist -->')
   })
 
@@ -246,7 +250,11 @@ describe('lib/anthropic/prompts — Plan 16 absolute rules + structural restruct
     const sys = loadSystemPrompt()
     expect(sys).toContain('**Período de vida:**')
     expect(sys).toContain('**O que pode ter acontecido:**')
-    expect(sys).toContain('**Tipo de bloqueio/trauma:**')
+    // ⭐ RENOMEADO, não removido: "Tipo de bloqueio/trauma" virou "Tipo de
+    // bloqueio/padrão limitante". "Trauma" é vocabulário clínico, e o produto
+    // não fala clínica — mesma regra que governa o resto do texto. O teste
+    // cobrava o nome antigo e acusava a falta de um campo que está lá.
+    expect(sys).toContain('**Tipo de bloqueio/padrão limitante:**')
     expect(sys).toContain('**Status atual:**')
   })
 

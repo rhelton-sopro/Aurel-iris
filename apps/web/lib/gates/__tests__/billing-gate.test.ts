@@ -4,12 +4,15 @@ import { evaluateBilling } from '../billing-gate'
 import type { TrialState } from '@/lib/billing/trial'
 
 describe('evaluateBilling', () => {
-  // TrialState real (lib/billing/trial.ts): active carrega readings_remaining +
-  // days_remaining; ended carrega reason; no_trial é só status.
+  // TrialState real (lib/billing/trial.ts): active carrega readings_remaining,
+  // days_remaining e expires_at; ended carrega reason; no_trial é só status.
+  // `expires_at` entrou em 25/08 pra UI poder mostrar a DATA do vencimento — o
+  // prazo de 15 dias existia e não aparecia em lugar nenhum.
   const trialActive: TrialState = {
     status: 'active',
     readings_remaining: 2,
     days_remaining: 30,
+    expires_at: '2026-09-09T00:00:00.000Z',
   }
   const trialEnded: TrialState = {
     status: 'ended',
