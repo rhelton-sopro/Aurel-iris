@@ -115,12 +115,16 @@ export async function POST(
   // regenerar. Idempotency gate (f) usa o par {started, completed}.
   const { data: progress } = await supabase
     .from('readings')
-    .select('analysis_started_at, analysis_completed_at, report_emocional' as never)
+    .select(
+      'analysis_started_at, analysis_completed_at, report_emocional, report_generated_at, images_purged_at' as never,
+    )
     .eq('id', readingId)
     .maybeSingle<{
       analysis_started_at: string | null
       analysis_completed_at: string | null
       report_emocional: string | null
+      report_generated_at: string | null
+      images_purged_at: string | null
     }>()
 
   if (readingError) {
@@ -165,10 +169,17 @@ export async function POST(
   // "Antigo relatório" já nascia bloqueado como se fosse regeneração. A intenção
   // da regra continua a mesma: uma geração de cada documento, sem regen (founder
   // bypassa). Gerar o Dossiê pela 1ª vez não é regenerar coisa nenhuma.
+  const temMapa = Boolean(progress?.report_emocional)
+  // ⚠️ 2026-09-11: numa leitura com Mapa do Ser, o Dossiê só "existe" com a prova de
+  // sucesso (`report_generated_at`). O caminho de erro gravava o texto PELA METADE em
+  // `report_generated`, sem `_at` — e isso bastava para bloquear a nova tentativa com
+  // "a regeneração agora é feita pela equipe". O catch do stream não grava mais ali,
+  // mas os Dossiês que falharam antes disto continuam com o parcial guardado.
+  // Leituras antigas (sem Mapa, Dossiê como relatório principal) seguem a regra de antes.
   const temDossie =
     reading.report_generated != null &&
-    Object.keys(reading.report_generated as Record<string, unknown>).length > 0
-  const temMapa = Boolean(progress?.report_emocional)
+    Object.keys(reading.report_generated as Record<string, unknown>).length > 0 &&
+    (!temMapa || progress?.report_generated_at != null)
   const docJaExiste = doc === 'dossie' ? temDossie : temMapa
   if (docJaExiste && !isFounder) {
     return NextResponse.json(
@@ -297,18 +308,35 @@ export async function POST(
   // Stage 1 é não-determinístico e o Dossiê descreveria outra íris).
   const { data: findingsExistentes } = await service
     .from('report_findings')
-    .select('exame_json')
+    .select('exame_json, validation_status')
     .eq('reading_id', readingId)
     .is('superseded_at', null)
-    .maybeSingle<{ exame_json: Record<string, unknown> | null }>()
+    .maybeSingle<{
+      exame_json: Record<string, unknown> | null
+      validation_status: string | null
+    }>()
+  // Exame reprovado nas duas tentativas não serve de base — é o mesmo critério que faz
+  // o Stage 1 recém-rodado abortar o Stage 2 mais abaixo (`invalid_final`).
   const exameReaproveitado =
     findingsExistentes?.exame_json &&
-    Object.keys(findingsExistentes.exame_json).length > 0
+    Object.keys(findingsExistentes.exame_json).length > 0 &&
+    findingsExistentes.validation_status !== 'invalid_final'
       ? findingsExistentes.exame_json
       : null
 
-  // `true` = pula fotos e Stage 1, vai direto compor o Dossiê com o exame que existe.
-  const reusaStage1 = doc === 'dossie' && exameReaproveitado != null
+  // `true` = pula fotos e Stage 1, vai direto ao Stage 2 com o exame que existe.
+  //
+  // ⚠️ 2026-09-11: valia SÓ para o Dossiê. O Mapa do Ser — o relatório principal —
+  // ignorava o exame salvo e relia as fotos toda vez. Dois efeitos:
+  //   1. O exame que roda sozinho no fim da captura (8005e04) era pago DE NOVO em toda
+  //      leitura, e os gráficos (que leem o exame salvo) podiam vir de um exame
+  //      diferente do que gerou o texto.
+  //   2. Depois do expurgo de 24h o Mapa NÃO GERAVA MAIS: os registros das fotos
+  //      ficam, os arquivos somem, a preparação dava 502 e a tela dizia "rodando no
+  //      servidor" para sempre. Caso Julianna (terapeuta Nailli), 08/09: 4 cliques,
+  //      4 × 502, crédito preso. A promessa do 8005e04 — "foto apagada não perde mais
+  //      a leitura" — nunca tinha chegado a esta rota.
+  const reusaStage1 = exameReaproveitado != null
 
   // Lazy canonicalization (fix 07.4 — raiz da convergência cross-leitura):
   // leituras capturadas via CONVITE não passam pelo finalizeReadingAction (que
@@ -341,25 +369,29 @@ export async function POST(
     ? { ok: true as const, images: [], fallbackCount: 0 }
     : await prepareDirectImages(service, readingId)
   if (!prep.ok) {
-    const status = prep.reason === 'no_images' ? 404 : 502
+    // Nada foi gerado: a reserva desta tentativa volta ao saldo AGORA. Antes ficava
+    // ativa e prendia o crédito por 7 dias, até o cron liberar.
+    await liberarReservaDaTentativa(service, readingId, `falha_fotos_${prep.reason}`)
+
     // Cada documento é auto-suficiente: sem Stage 1 gravado, QUALQUER um dos dois o
     // gera a partir das fotos. Só que sem Stage 1 E sem fotos não há o que fazer — e
-    // quem pede o Dossiê nesse estado é um terapeuta clicando num botão, não um script.
-    // "Image preparation failed: no_images" não diz a ele o que aconteceu nem o que fazer.
-    if (doc === 'dossie' && prep.reason === 'no_images') {
-      return NextResponse.json(
-        {
-          error:
-            'Esta leitura não tem mais as fotos da íris (apagadas por privacidade) e não tem observação estruturada guardada, então o antigo relatório não pode ser gerado. Para um novo relatório, faça uma nova leitura.',
-        },
-        { status: 409 },
-      )
-    }
+    // quem chega aqui é um terapeuta clicando num botão, não um script.
+    //
+    // ⚠️ Não usar 5xx: a tela trata 5xx como "a plataforma cortou a conexão, a geração
+    // continua" e promete "rodando no servidor" — para um relatório que nunca viria.
+    // Foto expurgada nem sempre chega como `no_images`: os registros ficam e só os
+    // arquivos somem, então a falha aparece como `sign_failed`/`fetch_failed`.
+    const fotosApagadas = prep.reason === 'no_images' || progress?.images_purged_at != null
     return NextResponse.json(
       {
-        error: `Image preparation failed: ${prep.reason} ${prep.message ?? ''}`.trim(),
+        error: fotosApagadas
+          ? doc === 'dossie'
+            ? 'Esta leitura não tem mais as fotos da íris (apagadas por privacidade) e não tem observação estruturada guardada, então o antigo relatório não pode ser gerado. Para um novo relatório, faça uma nova leitura.'
+            : 'As fotos desta leitura já foram apagadas por privacidade e a observação da íris não chegou a ser feita, então o relatório não pode ser gerado. Para um novo relatório, faça uma nova leitura. Nenhum crédito foi cobrado.'
+          : 'Não foi possível carregar as fotos da íris agora. Tente de novo em alguns minutos — nenhum crédito foi cobrado.',
+        reason: prep.reason,
       },
-      { status },
+      { status: 409 },
     )
   }
 
@@ -450,6 +482,8 @@ export async function POST(
         .from('readings')
         .update({ analysis_completed_at: new Date().toISOString() } as never)
         .eq('id', readingId)
+      // Sem exame não há documento: o crédito desta tentativa volta ao saldo agora.
+      await liberarReservaDaTentativa(service, readingId, 'falha_stage1')
       return NextResponse.json(
         {
           error:
@@ -782,19 +816,20 @@ export async function POST(
           err instanceof Error ? err.message : 'unknown',
         )
         try {
-          if (Object.keys(completedSections).length > 0 || buffer.length > 0) {
-            const partialEssence = extractEssencePhrase(buffer)
-            if (partialEssence) completedSections.essence_phrase = partialEssence
-            const partialZero = extractZeroSection(buffer)
-            if (partialZero) completedSections['0_em_poucas_palavras'] = partialZero
+          // ⚠️ 2026-09-11 — INTEIRO OU NADA, a mesma regra do Mapa do Ser (23/08).
+          // Antes o texto pela metade ia para `report_generated`. Com o Mapa pronto na
+          // leitura, isso fazia três estragos: o botão dizia "Dossiê IRIS gerado"; a
+          // próxima visita à página COBRAVA a reserva (o Mapa entregue servia de prova
+          // de sucesso); e o parcial bloqueava a nova tentativa, virando "ver Dossiê"
+          // que abria meio relatório. Agora o texto pago fica só no bruto (resgatável
+          // pelo /admin), o documento não passa a "existir" e a reserva volta ao saldo.
+          if (buffer.length > 0) {
             await supabase
               .from('readings')
-              .update({
-                report_generated: completedSections,
-                report_raw_text: buffer as unknown as never,
-              })
+              .update({ report_raw_text: buffer as unknown as never })
               .eq('id', readingId)
           }
+          await liberarReservaDaTentativa(service, readingId, 'falha_dossie')
           enqueueSilent(
             encoder.encode(
               '\n\n[erro]: ' + (err instanceof Error ? err.message : 'desconhecido'),
@@ -858,6 +893,29 @@ export async function POST(
  * Best-effort de ponta a ponta: se falhar, o aviso sai com o id da leitura, que já basta
  * para achar tudo. ⛔ Não pode lançar — roda dentro do caminho de geração.
  */
+async function liberarReservaDaTentativa(
+  service: ReturnType<typeof createServiceClient>,
+  readingId: string,
+  motivo: string,
+): Promise<void> {
+  try {
+    const { error } = await service.rpc('release_reservation', {
+      p_reading_id: readingId,
+      p_reason: motivo,
+    })
+    if (error) {
+      console.warn(
+        `[analyze] liberar reserva falhou reading=${readingId} motivo=${motivo}: ${error.message} — o cron de 7 dias cobre`,
+      )
+    }
+  } catch (err) {
+    console.warn(
+      `[analyze] liberar reserva lançou reading=${readingId} motivo=${motivo}:`,
+      err instanceof Error ? err.message : err,
+    )
+  }
+}
+
 async function nomeDoTerapeuta(
   service: ReturnType<typeof createServiceClient>,
   readingId: string,

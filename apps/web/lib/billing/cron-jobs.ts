@@ -74,7 +74,7 @@ export async function reconcileOrphanedConsumes(): Promise<{
   const service = createServiceClient()
   const { data: actives, error } = await service
     .from('credit_reservations')
-    .select('reading_id')
+    .select('reading_id, created_at')
     .eq('status', 'active')
     .limit(RELEASE_BATCH_CAP)
   if (error) {
@@ -83,27 +83,46 @@ export async function reconcileOrphanedConsumes(): Promise<{
   }
   if (!actives?.length) return { consumed: 0, errors: 0 }
 
-  // Quais dessas readings JÁ completaram (têm relatório) → reserva órfã.
+  // Quais dessas readings JÁ completaram um documento → reserva órfã.
+  //
+  // A prova de sucesso é o `_at` de cada documento — gravado SÓ no caminho bom
+  // (Dossiê: `report_generated_at`; Mapa do Ser: `report_emocional_generated_at`).
+  // Um relatório falho/parcial nunca tem `_at`, então nunca é cobrado aqui.
+  //
+  // ⚠️ 2026-09-11 — duas correções, mesma regra do on-view (page.tsx):
+  //   1. Olhava só o Dossiê. Um Mapa do Ser cuja função morreu entre gravar e cobrar
+  //      só era pego se o terapeuta abrisse a página.
+  //   2. O documento precisa ter sido concluído DEPOIS da reserva. Sem isso, o Mapa
+  //      entregue dias antes servia de prova para a reserva de um Dossiê que falhou.
+  const reservadaEm = new Map(
+    actives.map((r) => [r.reading_id, new Date(r.created_at).getTime()]),
+  )
   const readingIds = actives.map((r) => r.reading_id)
-  const { data: done, error: rErr } = await service
+  const { data: leituras, error: rErr } = await service
     .from('readings')
-    .select('id')
+    .select('id, report_generated_at, report_emocional_generated_at' as never)
     .in('id', readingIds)
-    .not('report_generated', 'is', null)
-    // FIX bug#1: report_generated_at só é setado no caminho de SUCESSO
-    // (analyze/route.ts:490). O catch de erro grava report_generated PARCIAL
-    // SEM _at. Filtrar por _at NOT NULL cobra só órfãos LEGÍTIMOS (sucesso cujo
-    // consume inline morreu na race >300s), nunca o relatório falho/parcial que
-    // o inline DELIBERADAMENTE não cobrou. Mesma regra do on-view (page.tsx).
-    .not('report_generated_at', 'is', null)
   if (rErr) {
     console.error('[cron] reconcileOrphanedConsumes readings failed:', rErr.message)
     return { consumed: 0, errors: 1 }
   }
+  const done = (
+    (leituras ?? []) as unknown as Array<{
+      id: string
+      report_generated_at: string | null
+      report_emocional_generated_at: string | null
+    }>
+  ).filter((rd) => {
+    const desde = reservadaEm.get(rd.id)
+    if (desde == null) return false
+    return [rd.report_generated_at, rd.report_emocional_generated_at].some(
+      (t) => t != null && new Date(t).getTime() >= desde,
+    )
+  })
 
   let consumed = 0
   let errors = 0
-  for (const rd of done ?? []) {
+  for (const rd of done) {
     const { data, error: rpcErr } = await (
       service.rpc as unknown as (
         fn: string,

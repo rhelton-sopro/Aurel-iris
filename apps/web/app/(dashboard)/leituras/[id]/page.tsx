@@ -140,18 +140,29 @@ export default async function LeituraDetailPage({
   // do gerador não escreve nada), então serve de "_at" exatamente como o do Dossiê.
   // Sem isto, uma geração de Mapa do Ser cuja função morresse logo após persistir
   // ficaria com a reserva ativa para sempre = leitura entregue e nunca cobrada.
-  const geracaoBemSucedida =
-    (hasReport && reportGeneratedAt != null) ||
-    Boolean(progress?.report_emocional_generated_at)
-  if (geracaoBemSucedida) {
+  //
+  // ⚠️ 2026-09-11 — a prova de sucesso precisa ser DO DOCUMENTO QUE RESERVOU. Antes
+  // bastava existir QUALQUER documento pronto. Com o Dossiê cobrando um crédito próprio,
+  // o Mapa entregue dias antes servia de "prova" para a reserva do Dossiê: se o Dossiê
+  // falhasse (ou ainda estivesse gerando) e o terapeuta abrisse a página, o crédito era
+  // debitado por um documento que não existia. A reserva não guarda qual documento a
+  // criou, mas guarda QUANDO — e só conta um documento concluído DEPOIS dela.
+  const conclusoes = [
+    hasReport ? reportGeneratedAt : null,
+    progress?.report_emocional_generated_at ?? null,
+  ].filter((t): t is string => t != null)
+  if (conclusoes.length > 0) {
     const service = createServiceClient()
     const { data: orphan } = await service
       .from('credit_reservations')
-      .select('reading_id')
+      .select('created_at')
       .eq('reading_id', readingId)
       .eq('status', 'active')
       .maybeSingle()
-    if (orphan) {
+    const reservadaEm = orphan ? new Date(orphan.created_at).getTime() : null
+    const concluiuDepoisDaReserva =
+      reservadaEm != null && conclusoes.some((t) => new Date(t).getTime() >= reservadaEm)
+    if (concluiuDepoisDaReserva) {
       await convertReservationToConsume(readingId).catch((e) =>
         console.warn(
           `[reading] on-view reconcile falhou reading=${readingId}:`,
@@ -296,7 +307,8 @@ export default async function LeituraDetailPage({
         // client lá). Uma lista só, como no checklist da geração.
         titulosBlocos={TITULOS_BLOCOS}
         temMapa={temMapa}
-        temDossie={hasReport}
+        // Dossiê que falhou antes de 11/09 deixou texto parcial sem `_at`: não é Dossiê.
+        temDossie={hasReport && (reportGeneratedAt != null || !temMapa)}
       />
     )
 

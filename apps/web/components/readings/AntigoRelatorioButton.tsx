@@ -97,14 +97,26 @@ export function AntigoRelatorioButton({
         toast.error(`Falha ao gerar: ${msg ?? `HTTP ${res.status}`}`)
         return
       }
-      // Consome o stream até o fim para saber que terminou (o texto em si não é usado
-      // aqui — quem exibe é a página do dossiê).
+      // Consome o stream até o fim para saber que terminou. Quem exibe o Dossiê é a
+      // página dele — o texto só é lido aqui para achar o aviso de falha, que o servidor
+      // manda DENTRO do stream (o 200 já saiu quando a falha acontece). Sem esta leitura
+      // um Dossiê que quebrou no meio aparecia como "gerado".
+      let texto = ''
       const reader = res.body?.getReader()
       if (reader) {
+        const decoder = new TextDecoder()
         for (;;) {
-          const { done } = await reader.read()
+          const { done, value } = await reader.read()
           if (done) break
+          texto += decoder.decode(value, { stream: true })
         }
+      }
+      if (texto.lastIndexOf('\n\n[erro]: ') !== -1) {
+        toast.error(
+          'O Dossiê não pôde ser concluído e nenhum crédito foi cobrado. Tente gerar de novo.',
+        )
+        router.refresh()
+        return
       }
       toast.success('Dossiê IRIS gerado.')
       router.refresh()
