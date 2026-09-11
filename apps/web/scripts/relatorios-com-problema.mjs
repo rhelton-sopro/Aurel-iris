@@ -8,6 +8,8 @@
  *   🔴 INCOMPLETO — saiu com menos de 7 blocos, foi DESCARTADO, a terapeuta NÃO foi
  *      cobrada e está esperando o founder regerar por /admin/regenerar.
  *   🟡 CARO — saiu inteiro e foi entregue, mas passou do limiar de alerta (30.000).
+ *   🟠 CRÉDITO PRESO — a terapeuta tentou gerar, o crédito foi reservado e nenhum
+ *      documento saiu depois disso (qualquer data, não só 30 dias).
  *
  * Rodar de dentro de apps/web:  node scripts/relatorios-com-problema.mjs
  * Só LÊ o banco — não gera nada, não gasta API, não escreve.
@@ -122,8 +124,43 @@ for (const obs of EM_OBSERVACAO) {
   console.log('   >> LEVAR ESTE RESULTADO AO FOUNDER — foi ele quem pediu pra olhar junto.\n')
 }
 
-if (!incompletos.length && !caros.length) {
-  console.log(`✅ nada pendurado nos últimos ${DIAS} dias.`)
+// ---------- CRÉDITO PRESO / GERAÇÃO QUE NÃO TERMINOU (2026-09-11) ----------
+// O sintoma que TODA geração quebrada deixa: a reserva do crédito fica ATIVA sem nenhum
+// documento concluído depois dela. Foi assim que Julianna (Nailli) e Juceni (Livia)
+// ficaram 3 dias presas sem ninguém saber — a tela dizia "rodando no servidor" e o
+// servidor já tinha desistido. Depois do conserto de 11/09 isto deve ficar VAZIO; se
+// voltar a aparecer, é defeito novo — olhar os logs da Vercel da rota /analyze.
+// A regra é a mesma de lib/readings/regras-de-geracao.ts (concluiuDepoisDaReserva) —
+// copiada porque este script é .mjs e não importa TypeScript.
+const PRESA_MIN = 30
+const { data: ativas } = await sb
+  .from('credit_reservations')
+  .select('reading_id, user_id, created_at')
+  .eq('status', 'active')
+const presas = []
+for (const r of ativas || []) {
+  if (Date.now() - new Date(r.created_at).getTime() < PRESA_MIN * 60e3) continue
+  const { data: l } = await sb
+    .from('readings')
+    .select('client_id, report_generated_at, report_emocional_generated_at')
+    .eq('id', r.reading_id)
+    .maybeSingle()
+  const desde = new Date(r.created_at).getTime()
+  const concluiu = [l?.report_generated_at, l?.report_emocional_generated_at].some(
+    (t) => t && new Date(t).getTime() >= desde,
+  )
+  if (!concluiu) presas.push({ ...r, client_id: l?.client_id })
+}
+if (presas.length) {
+  console.log(`🟠 ${presas.length} CRÉDITO(S) PRESO(S) — a terapeuta tentou gerar e não saiu documento:\n`)
+  for (const r of presas) {
+    console.log(`   desde ${r.created_at.slice(0, 16).replace('T', ' ')}  ${await nome('profiles', r.user_id)} / ${await nome('clients', r.client_id)}`)
+    console.log(`      >> https://iriscodex.com/leituras/${r.reading_id} · logs: /api/readings/${r.reading_id}/analyze\n`)
+  }
+}
+
+if (!incompletos.length && !caros.length && !presas.length) {
+  console.log(`✅ nada pendurado nos últimos ${DIAS} dias, e nenhum crédito preso.`)
   process.exit(0)
 }
 

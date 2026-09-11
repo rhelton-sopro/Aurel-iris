@@ -56,6 +56,7 @@ import { buildRecentPhrasesContext } from '@/lib/anthropic/recent-phrases-contex
 import { extractPhrases } from '@/lib/anthropic/extract-phrases'
 import { prepareDirectImages } from '@/lib/anthropic/prepare-direct-images'
 import { canonicalizeReading } from '@/lib/canonicalize'
+import { exameReaproveitavel } from '@/lib/readings/regras-de-geracao'
 import { isFounderEmail } from '@/lib/auth/founder'
 import {
   findAllBoundaries,
@@ -315,14 +316,10 @@ export async function POST(
       exame_json: Record<string, unknown> | null
       validation_status: string | null
     }>()
-  // Exame reprovado nas duas tentativas não serve de base — é o mesmo critério que faz
-  // o Stage 1 recém-rodado abortar o Stage 2 mais abaixo (`invalid_final`).
-  const exameReaproveitado =
-    findingsExistentes?.exame_json &&
-    Object.keys(findingsExistentes.exame_json).length > 0 &&
-    findingsExistentes.validation_status !== 'invalid_final'
-      ? findingsExistentes.exame_json
-      : null
+  // Regra ÚNICA, compartilhada com a tela (`temStage1`): o que a página chama de "tem
+  // exame, pode gerar" é exatamente o que esta rota consegue usar. Vazio e
+  // `invalid_final` não servem. Ver lib/readings/regras-de-geracao.ts.
+  const exameReaproveitado = exameReaproveitavel(findingsExistentes)
 
   // `true` = pula fotos e Stage 1, vai direto ao Stage 2 com o exame que existe.
   //

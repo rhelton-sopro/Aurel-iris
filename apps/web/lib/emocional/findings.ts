@@ -1,6 +1,7 @@
 import 'server-only'
 
 import { createServiceClient } from '@/lib/supabase/service'
+import { exameReaproveitavel } from '@/lib/readings/regras-de-geracao'
 
 /**
  * O `exame_json` (Stage 1) da leitura — a fonte dos gráficos e dos blocos
@@ -41,17 +42,24 @@ export async function temStage1(readingId: string): Promise<boolean> {
   // devolve `{}` — há 2 casos gravados em produção. Uma linha com exame vazio faria
   // esta função dizer "tem exame", a tela esconderia o aviso de "fotos apagadas", e o
   // terapeuta só descobriria o buraco ao clicar em gerar: sem foto e sem exame.
+  //
+  // ⚠️ 2026-09-11: a decisão agora é a MESMA função que a rota de geração usa
+  // (`exameReaproveitavel`). Por um mês esta tela disse "pode gerar" enquanto a rota,
+  // com a própria cópia da regra, exigia as fotos — ver regras-de-geracao.ts.
   const { data, error } = await service
     .from('report_findings')
-    .select('exame_json')
+    .select('exame_json, validation_status')
     .eq('reading_id', readingId)
     .is('superseded_at', null)
-    .maybeSingle<{ exame_json: Record<string, unknown> | null }>()
+    .maybeSingle<{
+      exame_json: Record<string, unknown> | null
+      validation_status: string | null
+    }>()
   if (error) {
     console.error('[emocional] temStage1 falhou', { readingId, erro: error.message })
     return false
   }
-  return !!data?.exame_json && Object.keys(data.exame_json).length > 0
+  return exameReaproveitavel(data) != null
 }
 
 export async function getExameJson(readingId: string): Promise<Record<string, unknown>> {

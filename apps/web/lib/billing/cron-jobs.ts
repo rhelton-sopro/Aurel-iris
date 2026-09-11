@@ -6,6 +6,7 @@ import {
   type ExpiryWindow,
 } from '@/lib/notifications/notify-credit-expiring'
 import { createServiceClient } from '@/lib/supabase/service'
+import { concluiuDepoisDaReserva } from '@/lib/readings/regras-de-geracao'
 
 const DAY_MS = 86_400_000
 const RELEASE_BATCH_CAP = 500 // safety cap por execução
@@ -94,9 +95,7 @@ export async function reconcileOrphanedConsumes(): Promise<{
   //      só era pego se o terapeuta abrisse a página.
   //   2. O documento precisa ter sido concluído DEPOIS da reserva. Sem isso, o Mapa
   //      entregue dias antes servia de prova para a reserva de um Dossiê que falhou.
-  const reservadaEm = new Map(
-    actives.map((r) => [r.reading_id, new Date(r.created_at).getTime()]),
-  )
+  const reservadaEm = new Map(actives.map((r) => [r.reading_id, r.created_at]))
   const readingIds = actives.map((r) => r.reading_id)
   const { data: leituras, error: rErr } = await service
     .from('readings')
@@ -114,9 +113,9 @@ export async function reconcileOrphanedConsumes(): Promise<{
     }>
   ).filter((rd) => {
     const desde = reservadaEm.get(rd.id)
-    if (desde == null) return false
-    return [rd.report_generated_at, rd.report_emocional_generated_at].some(
-      (t) => t != null && new Date(t).getTime() >= desde,
+    return (
+      desde != null &&
+      concluiuDepoisDaReserva(desde, [rd.report_generated_at, rd.report_emocional_generated_at])
     )
   })
 

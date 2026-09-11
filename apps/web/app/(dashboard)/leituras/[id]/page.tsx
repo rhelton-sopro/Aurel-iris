@@ -29,6 +29,7 @@ import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { convertReservationToConsume } from '@/lib/billing/credits'
+import { concluiuDepoisDaReserva } from '@/lib/readings/regras-de-geracao'
 import { LocalDateTime } from '@/components/ui/local-date-time'
 import { StatusBadge } from '@/components/readings/StatusBadge'
 import { AnalysisHero } from '@/components/readings/AnalysisHero'
@@ -159,10 +160,7 @@ export default async function LeituraDetailPage({
       .eq('reading_id', readingId)
       .eq('status', 'active')
       .maybeSingle()
-    const reservadaEm = orphan ? new Date(orphan.created_at).getTime() : null
-    const concluiuDepoisDaReserva =
-      reservadaEm != null && conclusoes.some((t) => new Date(t).getTime() >= reservadaEm)
-    if (concluiuDepoisDaReserva) {
+    if (orphan && concluiuDepoisDaReserva(orphan.created_at, conclusoes)) {
       await convertReservationToConsume(readingId).catch((e) =>
         console.warn(
           `[reading] on-view reconcile falhou reading=${readingId}:`,
